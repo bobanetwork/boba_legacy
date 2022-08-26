@@ -6,7 +6,7 @@ description: Frequently asked questions
 
 [Boba](https://boba.network) a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](./packages/boba/turing/README.md).
 
-![](./packages/boba/gateway/src/images/boba2/turing.png)
+![Boba---August-08---Hybrid-Compute-Slide2](https://user-images.githubusercontent.com/107710263/184889568-34e1a67c-a448-471c-a92d-60dfbe2ee890.png)
 
 Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). We chose to build on Optimism because it is essentially a modified version of Ethereum, which makes it relatively easy to ensure EVM and Solidity compatibility, minimizing the efforts required to migrate smart contracts from L1 to L2.
 
@@ -107,8 +107,6 @@ There are 4 different mechanisms for following the status of a transaction.
 These methods are described [here](./boba_documentation/developer/xdomain-tx-status.md).
 
 # Developer FAQ
-
-![Boba---August-08---Hybrid-Compute-Slide2](https://user-images.githubusercontent.com/107710263/184889568-34e1a67c-a448-471c-a92d-60dfbe2ee890.png)
 
 Categories:
 - Smart Contracts
