@@ -36,7 +36,6 @@ import { selectBridgeTokens, selectMultiBridgeMode } from "selectors/bridgeSelec
 
 import { resetToken, setMultiBridgeMode } from "actions/bridgeAction"
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
-import { setPage } from 'actions/uiAction'
 import { useNavigate } from 'react-router-dom'
 
 function BobaBridge() {
@@ -216,7 +215,6 @@ function BobaBridge() {
 
       <S.HistoryLink
         onClick={() => {
-          // dispatch(setPage('History'))
           navigate('/history')
         }}
         display="flex" justifyContent="center">
