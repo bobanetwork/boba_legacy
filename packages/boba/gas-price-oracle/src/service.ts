@@ -670,10 +670,16 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const l1NativeTokenPriceFromCoinGecko = await this._getTokenPriceFromCoinGecko(this.options.l1TokenCoinGeckoId)
       const BobaPriceFromCoinMarketCap = await this._getTokenPriceFromCoinMarketCap('14556')
       const l1NativeTokenPriceFromCoinMarketCap = await this._getTokenPriceFromCoinMarketCap(this.options.l1TokenCoinMarketCapId)
+      const BobaMarketPricesFromCoinMarketCap = await this._getTokenMarketPriceFromCoinMarketCap('14556')
+      const l1NativeTokenMarketPricesFromCoinMarketCap = await this._getTokenMarketPriceFromCoinMarketCap(this.options.l1TokenCoinMarketCapId)
+
+      BobaMarketPricesFromCoinMarketCap.push(BobaPriceFromCoinGecko, BobaPriceFromCoinMarketCap)
+      l1NativeTokenMarketPricesFromCoinMarketCap.push(l1NativeTokenPriceFromCoinGecko, l1NativeTokenPriceFromCoinMarketCap)
 
       // calculate the average price of the two sources
-      const BobaPrice = (BobaPriceFromCoinGecko ? BobaPriceFromCoinGecko: BobaPriceFromCoinMarketCap + BobaPriceFromCoinMarketCap ? BobaPriceFromCoinMarketCap: BobaPriceFromCoinGecko) / 2
-      const l1NativeTokenPrice = (l1NativeTokenPriceFromCoinGecko ? l1NativeTokenPriceFromCoinGecko: l1NativeTokenPriceFromCoinMarketCap + l1NativeTokenPriceFromCoinMarketCap ? l1NativeTokenPriceFromCoinMarketCap: l1NativeTokenPriceFromCoinGecko) / 2
+      const calculateAverage = (array: Array<number>) => array.reduce((a, b) => a + b) / array.length
+      const BobaPrice = calculateAverage(this.filterOutliers(BobaMarketPricesFromCoinMarketCap))
+      const l1NativeTokenPrice = calculateAverage(this.filterOutliers(l1NativeTokenMarketPricesFromCoinMarketCap))
       /* eslint-enable */
 
       if (BobaPrice === 0 || l1NativeTokenPrice === 0) {
@@ -711,8 +717,10 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             marketPriceRatio,
             BobaPriceFromCoinGecko,
             BobaPriceFromCoinMarketCap,
+            BobaMarketPricesFromCoinMarketCap,
             l1NativeTokenPriceFromCoinGecko,
             l1NativeTokenPriceFromCoinMarketCap,
+            l1NativeTokenMarketPricesFromCoinMarketCap,
           })
         } else {
           this.logger.info('No need to update price ratio', {
@@ -757,5 +765,49 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       )
       return 0
     }
+  }
+
+  private async _getTokenMarketPriceFromCoinMarketCap(
+    id: string
+  ): Promise<Array<number>> {
+    try {
+      const URL = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/market-pairs/latest?id=${id}`
+      const payload = await fetch(URL, {
+        method: 'GET',
+        headers: { 'x-cmc_pro_api_key': this.options.coinMarketCapApiKey },
+      })
+      const payloadParsed = await payload.json()
+      const marketData = payloadParsed.data.market_pairs
+      // Get market price ratio
+      const markertPrices = []
+      for (const values of marketData) {
+        if (values.outlier_detected === 0) {
+          markertPrices.push(Number(values.quote.exchange_reported.price))
+        }
+      }
+      return markertPrices
+    } catch (err) {
+      this.logger.warn(
+        `CAN\'T QUERY TOKEN PRICE ${err} - ${id} FROM CoinMarketCap`
+      )
+      return []
+    }
+  }
+
+  private filterOutliers(input: Array<number>) {
+    if (input.length <= 2) {
+      return input
+    }
+    const values = input.concat()
+    values.sort((a: number, b: number) => a - b)
+
+    const q1 = values[Math.floor(values.length / 4)]
+    const q3 = values[Math.ceil(values.length * (3 / 4))]
+    const iqr = q3 - q1
+
+    const maxValue = q3 + iqr * 1.5
+    const minValue = q1 - iqr * 1.5
+
+    return values.filter((i) => i <= maxValue && i >= minValue)
   }
 }

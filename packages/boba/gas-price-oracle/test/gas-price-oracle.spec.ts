@@ -647,6 +647,12 @@ describe('gas-price-oracle', () => {
 
     await tempGasPriceOracleService.init()
 
+    const input = [-100, 2, 2, 2, 2, 2, 2, 2, 2, 10000]
+    const filteredOutliers = tempGasPriceOracleService.filterOutliers(input)
+    expect(filteredOutliers.includes(10000)).to.be.eq(false)
+    expect(filteredOutliers.includes(-100)).to.be.eq(false)
+    expect(filteredOutliers.length).to.be.eq(input.length - 2)
+
     /* eslint-disable */
     const BobaPriceFromCoinGecko = await tempGasPriceOracleService._getTokenPriceFromCoinGecko('boba-network')
     const l1NativeTokenPriceFromCoinGecko = await tempGasPriceOracleService._getTokenPriceFromCoinGecko(tempGasPriceOracleService.options.l1TokenCoinGeckoId)
