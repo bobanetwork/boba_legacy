@@ -37,6 +37,7 @@ import { selectBridgeTokens, selectMultiBridgeMode } from "selectors/bridgeSelec
 import { resetToken, setMultiBridgeMode } from "actions/bridgeAction"
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 import { setPage } from 'actions/uiAction'
+import { useNavigate } from 'react-router-dom'
 
 function BobaBridge() {
 
@@ -48,6 +49,8 @@ function BobaBridge() {
   const [ toL2, setToL2 ] = useState(true)
   const theme = useTheme()
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
+
+  const navigate = useNavigate()
 
   async function connectToETH () {
     dispatch(setConnectETH(true))
@@ -213,7 +216,8 @@ function BobaBridge() {
 
       <S.HistoryLink
         onClick={() => {
-          dispatch(setPage('History'))
+          // dispatch(setPage('History'))
+          navigate('/history')
         }}
         display="flex" justifyContent="center">
         <Typography

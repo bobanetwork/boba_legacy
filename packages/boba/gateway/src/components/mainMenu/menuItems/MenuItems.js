@@ -1,18 +1,18 @@
 import React from 'react'
 import { menuItems } from '../menuItems'
+import { useSelector } from 'react-redux'
+
+import { selectMonster } from 'selectors/setupSelector'
+import { useTheme } from '@mui/material'
+
 import * as S from './MenuItems.styles'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { selectModalState } from 'selectors/uiSelector'
-import { setPage } from 'actions/uiAction'
-import { selectMonster } from 'selectors/setupSelector'
-
-function MenuItems ({ setOpen }) {
+const MenuItems = () => {
 
   const monsterNumber = useSelector(selectMonster())
   const monstersAdded = menuItems.some(item => item.key === 'Monster')
 
-  if(monsterNumber > 0 && !monstersAdded) {
+  if (monsterNumber > 0 && !monstersAdded) {
     menuItems.push({
       key: 'Monster',
       icon: "MonsterIcon",
@@ -21,8 +21,7 @@ function MenuItems ({ setOpen }) {
     })
   }
 
-  const pageDisplay = useSelector(selectModalState('page'))
-  const dispatch = useDispatch()
+  const theme = useTheme()
 
   return (
     <S.Nav>
@@ -30,23 +29,19 @@ function MenuItems ({ setOpen }) {
         if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE && item.key === 'Lock') {
           return null;
         }
-        const isActive = pageDisplay === item.key
+
         return (
-            <S.MenuItem
-              key={item.key}
-              onClick={() => {
-                if (item.url.startsWith('http')) {
-                  window.open(item.url)
-                  setOpen(false)
-                } else {
-                  dispatch(setPage(item.key))
-                  setOpen(false)
-                }
-              }}
-              selected={isActive}
-            >
-              {item.title}
-            </S.MenuItem>
+          <S.MenuItem
+            style={({ isActive }) => {
+              return {
+                color: isActive ? theme.palette.secondary.main : 'inherit'
+              }
+            }}
+            key={item.key}
+            to={item.url}
+          >
+            {item.title}
+          </S.MenuItem>
         )
       })}
     </S.Nav>

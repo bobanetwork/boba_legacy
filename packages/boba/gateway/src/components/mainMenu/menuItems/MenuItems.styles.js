@@ -1,6 +1,5 @@
-
-import { Box } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import { NavLink } from 'react-router-dom'
 
 export const Nav = styled('nav')(({ theme }) => ({
   width: '100%',
@@ -23,12 +22,12 @@ export const Nav = styled('nav')(({ theme }) => ({
   }
 }))
 
-export const MenuItem = styled(Box)(({ selected, theme }) => ({
-  color: `${ selected ? theme.palette.secondary.main : "inherit"}`,
+export const MenuItem = styled(NavLink)(({ selected, theme }) => ({
   fontSize: '0.8em',
   fontWeight: 'normal',
   cursor: 'pointer',
   height: '22px',
+  textDecoration: 'none',
   [ theme.breakpoints.down('md') ]: {
     fontSize: '20px',
     fontWeight: '400',

@@ -66,32 +66,26 @@ const PageFooter = ({maintenance}) => {
         {!isMobile && <GasSwitcher />}
         <S.LinkWrapper>
           <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('Help'))
-            }}
+            to="/help"
           >FAQs</S.FooterLink>
-          <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('Airdrop'))
-            }}
+            <S.FooterLink
+              to="/airdrop"
           >AirDrop</S.FooterLink>
           <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('BobaScope'))
-            }}
+            to="/bobascope"
           >BobaScope</S.FooterLink>
-          <S.FooterLink
+          <S.FooterLinkExt
             href="https://bobascan.com"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Blockexplorer</S.FooterLink>
-          <S.FooterLink
+          >Blockexplorer</S.FooterLinkExt>
+          <S.FooterLinkExt
             href="https://docs.boba.network"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Docs</S.FooterLink>
+          >Boba Docs</S.FooterLinkExt>
         </S.LinkWrapper>
         </S.FooterLinkWrapperLeft>
         <S.FooterDividerMobile />
@@ -105,13 +99,13 @@ const PageFooter = ({maintenance}) => {
           <IconButton href="https://boba.eco/telegram" target='_blank' aria-label="telegram">
             <Telegram sx={{opacity: 0.65}} />
           </IconButton>
-          <S.FooterLink
+          <S.FooterLinkExt
             href="https://boba.network"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
           >Boba Website
-          </S.FooterLink>
+          </S.FooterLinkExt>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>
     </S.Wrapper>
