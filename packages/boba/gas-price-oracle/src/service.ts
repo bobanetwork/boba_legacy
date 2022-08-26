@@ -795,9 +795,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   }
 
   private filterOutliers(input: Array<number>) {
-    if (input.length <= 2) {
-      return input
-    }
     const values = input.concat()
     values.sort((a: number, b: number) => a - b)
 
