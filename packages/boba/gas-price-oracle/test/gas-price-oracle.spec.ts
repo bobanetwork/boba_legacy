@@ -612,7 +612,7 @@ describe('gas-price-oracle', () => {
     expect(postL1BaseFee).to.be.equal(ethers.utils.parseEther('0'))
   })
 
-  it('should get Boba and l1 native token prices', async () => {
+  it('should filter the outliers', async () => {
     // Initialize GasPriceOracleService
     tempGasPriceOracleService = new GasPriceOracleService({
       l1RpcProvider: ethers.provider,
@@ -652,6 +652,42 @@ describe('gas-price-oracle', () => {
     expect(filteredOutliers.includes(10000)).to.be.eq(false)
     expect(filteredOutliers.includes(-100)).to.be.eq(false)
     expect(filteredOutliers.length).to.be.eq(input.length - 2)
+  })
+
+  it('should get Boba and l1 native token prices', async () => {
+    // Initialize GasPriceOracleService
+    tempGasPriceOracleService = new GasPriceOracleService({
+      l1RpcProvider: ethers.provider,
+      l2RpcProvider: ethers.provider,
+
+      addressManagerAddress: Lib_AddressManager.address,
+      gasPriceOracleAddress: gasPriceOracle.address,
+
+      OVM_SequencerFeeVault: address5,
+
+      gasPriceOracleOwnerWallet: wallet8,
+
+      sequencerAddress: address1,
+      proposerAddress: address2,
+      relayerAddress: address3,
+      fastRelayerAddress: address4,
+
+      pollingInterval: 0,
+      overheadRatio1000X: 10,
+      overheadMinPercentChange: 10,
+      minOverhead: 2000,
+      minL1BaseFee: 50_000_000_000,
+      maxL1BaseFee: 100_000_000_000,
+      bobaFeeRatio100X: 100,
+      bobaFeeRatioMinPercentChange: 3000,
+      bobaLocalTestnetChainId: 31337,
+      l1TokenCoinGeckoId: 'moonbeam',
+      l1TokenCoinMarketCapId: '6836',
+      // CoinMarketCap free key
+      coinMarketCapApiKey: '19841722-df8b-493c-b6b3-d7290e4c24d9',
+    })
+
+    await tempGasPriceOracleService.init()
 
     /* eslint-disable */
     const BobaPriceFromCoinGecko = await tempGasPriceOracleService._getTokenPriceFromCoinGecko('boba-network')
