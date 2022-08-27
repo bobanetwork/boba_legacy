@@ -1,31 +1,41 @@
-import React from 'react'
-import { menuItems } from '../menuItems'
+import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useTheme } from '@mui/material'
 
 import { selectMonster } from 'selectors/setupSelector'
-import { useTheme } from '@mui/material'
+
+import { menuItems } from '../menuItems'
 
 import * as S from './MenuItems.styles'
 
 const MenuItems = () => {
 
+  const theme = useTheme()
   const monsterNumber = useSelector(selectMonster())
   const monstersAdded = menuItems.some(item => item.key === 'Monster')
+  const [ menuList, setMenuList ] = useState([]);
 
-  if (monsterNumber > 0 && !monstersAdded) {
-    menuItems.push({
-      key: 'Monster',
-      icon: "MonsterIcon",
-      title: "MonsterVerse",
-      url: "/"
-    })
-  }
+  useEffect(() => {
+    setMenuList(menuItems)
+  },[])
 
-  const theme = useTheme()
+  useEffect(() => {
+    if (monsterNumber > 0 && !monstersAdded) {
+      setMenuList([
+        ...menuItems,
+        {
+          key: 'Monster',
+          icon: "MonsterIcon",
+          title: "MonsterVerse",
+          url: "/monster"
+        }
+      ])
+    }
+  }, [ monsterNumber, monstersAdded ]);
 
   return (
     <S.Nav>
-      {menuItems.map((item) => {
+      {menuList.map((item) => {
         if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE && item.key === 'Lock') {
           return null;
         }
