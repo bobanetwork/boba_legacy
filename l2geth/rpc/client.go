@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"sync/atomic"
 	"time"
+	"net/http"
 
 	"github.com/ethereum-optimism/optimism/l2geth/log"
 )
@@ -180,6 +181,27 @@ func DialContext(ctx context.Context, rawurl string) (*Client, error) {
 		return DialStdIO(ctx)
 	case "":
 		return DialIPC(ctx, rawurl)
+	default:
+		return nil, fmt.Errorf("no known transport for URL scheme %q", u.Scheme)
+	}
+}
+
+func ProxyDial(proxyStr string, rawurl string) (*Client, error) {
+
+	u, err := url.Parse(rawurl)
+	if err != nil {
+		return nil, err
+	}
+	proxyURL, err := url.Parse(proxyStr)
+	if err != nil {
+		return nil, err
+	}
+
+	switch u.Scheme {
+	case "http", "https":
+		ht := http.Transport{Proxy: http.ProxyURL(proxyURL)}
+		hc := &http.Client{Transport: &ht}
+		return DialHTTPWithClient(rawurl, hc)
 	default:
 		return nil, fmt.Errorf("no known transport for URL scheme %q", u.Scheme)
 	}

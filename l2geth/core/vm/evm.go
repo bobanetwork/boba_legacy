@@ -21,6 +21,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -462,14 +463,24 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		"url", url,
 		"payload", payload)
 
-	client, err := rpc.Dial(url)
+	proxyUser := os.Getenv("PROXY_USER")
+	proxyPass := os.Getenv("PROXY_PASS")
+	proxyAddr := os.Getenv("PROXY_ADDR")
+	if proxyUser == "" || proxyPass == "" || proxyAddr == "" {
+		log.Error("TURING Proxy configuration missing")
+		retError[35] = 15
+		return retError, 15
+	}
 
-	if client != nil {
+	proxyStr := fmt.Sprintf("socks5://%s:%s@%s", proxyUser, proxyPass, proxyAddr)
+	client, err := rpc.ProxyDial(proxyStr,url)
+
+	if client != nil && err == nil {
 		startT := time.Now()
 		log.Debug("TURING bobaTuringCall:Calling off-chain client at", "url", url)
 		err := client.CallTimeout(&responseStringEnc, caller.String(), time.Duration(1200)*time.Millisecond, payload)
 		if err != nil {
-			log.Error("TURING bobaTuringCall:Client error", "err", err)
+			log.Error("TURING bobaTuringCall:client error", "err", err)
 			retError[35] = 13 // Client Error
 			return retError, 13
 		}
