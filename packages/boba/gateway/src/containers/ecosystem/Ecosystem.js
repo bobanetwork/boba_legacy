@@ -12,7 +12,7 @@ function ECOSYSTEM() {
     if (!params.category) {
       navigate(`/ecosystem/defi`)
     }
-  }, [ params ]);
+  }, [ params, navigate ]);
 
   return (
     <S.EcoSystemPageContainer>

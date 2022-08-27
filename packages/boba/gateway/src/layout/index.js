@@ -25,7 +25,7 @@ import { setTheme } from 'actions/uiAction'
 import Home from 'containers/home/Home'
 import Notification from 'containers/notification/Notification'
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 
 import Airdrop from 'containers/airdrop/Airdrop'
