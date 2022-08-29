@@ -1,6 +1,6 @@
 # Boba Avalanche (public testnet)
 ## Network Info
-- **Chain ID**: 3428
+- **Chain ID**: 4328
 - **Public RPC**: https://testnet.avax.boba.network
 - **Block Explorer**: https://blockexplorer.testnet.avax.boba.network
 ## Layer 1 Contracts
