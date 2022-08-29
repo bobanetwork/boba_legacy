@@ -3,11 +3,14 @@ import { Contract, Wallet, BigNumber, providers, utils } from 'ethers'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
 import { orderBy } from 'lodash'
+import fetch from 'node-fetch'
 
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract } from '@eth-optimism/contracts'
+
+import Boba_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/Boba_GasPriceOracle.sol/Boba_GasPriceOracle.json'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.
@@ -56,6 +59,15 @@ interface GasPriceOracleOptions {
 
   // local testnet chain ID
   bobaLocalTestnetChainId: number
+
+  // L1 token CoinGecko ID
+  l1TokenCoinGeckoId?: string
+
+  // l1 token Coinmarketcap ID
+  l1TokenCoinMarketCapId?: string
+
+  // Coinmarketcap API key
+  coinMarketCapApiKey?: string
 }
 
 const optionSettings = {}
@@ -70,6 +82,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     OVM_GasPriceOracle: Contract
     CanonicalTransactionChain: Contract
     StateCommitmentChain: Contract
+    Boba_GasPriceOracle: Contract
     BobaBillingContractAddress: string
     L1SecondaryFeeTokenBalance: BigNumber
     L1SecondaryFeeTokenCostFee: BigNumber
@@ -149,6 +162,20 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       address: this.state.OVM_GasPriceOracle.address,
     })
 
+    this.logger.info('Connecting to Boba_GasPriceOracle...')
+    const Boba_GasPriceOracleAddress =
+      await this.state.Lib_AddressManager.getAddress(
+        'Proxy__Boba_GasPriceOracle'
+      )
+    this.state.Boba_GasPriceOracle = new Contract(
+      Boba_GasPriceOracleAddress,
+      Boba_GasPriceOracleJson.abi,
+      this.options.l2RpcProvider
+    ).connect(this.options.gasPriceOracleOwnerWallet)
+    this.logger.info('Connected to Boba_GasPriceOracle', {
+      address: this.state.Boba_GasPriceOracle.address,
+    })
+
     this.logger.info('Connecting to Proxy__BobaBillingContract...')
     this.state.BobaBillingContractAddress =
       await this.state.Lib_AddressManager.getAddress(
@@ -188,6 +215,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       // l1 gas price and overhead fee
       await this._updateOverhead()
       await this._upateL1BaseFee()
+      // update price ratio
+      await this._updatePriceRatio()
     }
   }
 
@@ -632,5 +661,153 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)
     }
+  }
+
+  private async _updatePriceRatio(): Promise<void> {
+    try {
+      /* eslint-disable */
+      const BobaPriceFromCoinGecko = await this._getTokenPriceFromCoinGecko('boba-network')
+      const l1NativeTokenPriceFromCoinGecko = await this._getTokenPriceFromCoinGecko(this.options.l1TokenCoinGeckoId)
+      const BobaPriceFromCoinMarketCap = await this._getTokenPriceFromCoinMarketCap('14556')
+      const l1NativeTokenPriceFromCoinMarketCap = await this._getTokenPriceFromCoinMarketCap(this.options.l1TokenCoinMarketCapId)
+      const BobaMarketPricesFromCoinMarketCap = await this._getTokenMarketPriceFromCoinMarketCap('14556')
+      const l1NativeTokenMarketPricesFromCoinMarketCap = await this._getTokenMarketPriceFromCoinMarketCap(this.options.l1TokenCoinMarketCapId)
+
+      BobaMarketPricesFromCoinMarketCap.push(BobaPriceFromCoinGecko, BobaPriceFromCoinMarketCap)
+      l1NativeTokenMarketPricesFromCoinMarketCap.push(l1NativeTokenPriceFromCoinGecko, l1NativeTokenPriceFromCoinMarketCap)
+
+      // calculate the average price of the two sources
+      const calculateAverage = (array: Array<number>) => array.reduce((a, b) => a + b) / array.length
+      const BobaPrice = calculateAverage(this.filterOutliers(BobaMarketPricesFromCoinMarketCap))
+      const l1NativeTokenPrice = calculateAverage(this.filterOutliers(l1NativeTokenMarketPricesFromCoinMarketCap))
+      /* eslint-enable */
+
+      if (BobaPrice === 0 || l1NativeTokenPrice === 0) {
+        this.logger.warn(`Token price is 0, skipping update`)
+      } else {
+        const decimals = (
+          await this.state.Boba_GasPriceOracle.decimals()
+        ).toNumber()
+        const marketPriceRatio = Math.round(
+          (BobaPrice / l1NativeTokenPrice) * 10 ** decimals
+        )
+        const priceRatio = Math.round(
+          (marketPriceRatio * this.options.bobaFeeRatio100X) / 100
+        )
+
+        /* eslint-disable */
+        const originalPriceRatio = (await this.state.Boba_GasPriceOracle.priceRatio()).toNumber()
+        const originalMarketPriceRatio = (await this.state.Boba_GasPriceOracle.marketPriceRatio()).toNumber()
+        /* eslint-enable */
+
+        if (
+          priceRatio !== originalPriceRatio ||
+          marketPriceRatio !== originalMarketPriceRatio
+        ) {
+          const tx = await this.state.Boba_GasPriceOracle.updatePriceRatio(
+            priceRatio,
+            marketPriceRatio,
+            this.state.chainID === this.options.bobaLocalTestnetChainId
+              ? {}
+              : { gasPrice: 0 }
+          )
+          await tx.wait()
+          this.logger.info('Updated price ratio', {
+            priceRatio,
+            marketPriceRatio,
+            BobaPriceFromCoinGecko,
+            BobaPriceFromCoinMarketCap,
+            BobaMarketPricesFromCoinMarketCap,
+            l1NativeTokenPriceFromCoinGecko,
+            l1NativeTokenPriceFromCoinMarketCap,
+            l1NativeTokenMarketPricesFromCoinMarketCap,
+          })
+        } else {
+          this.logger.info('No need to update price ratio', {
+            priceRatio,
+            originalPriceRatio,
+            marketPriceRatio,
+            originalMarketPriceRatio,
+          })
+        }
+      }
+    } catch (error) {
+      this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${error}`)
+    }
+  }
+
+  // Data provided by CoinGecko
+  private async _getTokenPriceFromCoinGecko(id: string): Promise<number> {
+    try {
+      const URL = `https:///api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_date=false&developer_data=false&sparkline=false`
+      const payload = await fetch(URL)
+      const payloadParsed = await payload.json()
+      return Number(payloadParsed.market_data.current_price.usd)
+    } catch (err) {
+      this.logger.warn(`CAN\'T QUERY TOKEN PRICE ${err} - ${id} FROM CoinGecko`)
+      return 0
+    }
+  }
+
+  // Data provided by Coinmarketcap
+  private async _getTokenPriceFromCoinMarketCap(id: string): Promise<number> {
+    try {
+      const URL = `https://pro-api.coinmarketcap.com/v1/tools/price-conversion?amount=1&id=${id}`
+      const payload = await fetch(URL, {
+        method: 'GET',
+        headers: { 'x-cmc_pro_api_key': this.options.coinMarketCapApiKey },
+      })
+      const payloadParsed = await payload.json()
+      return Number(payloadParsed.data.quote.USD.price)
+    } catch (err) {
+      this.logger.warn(
+        `CAN\'T QUERY TOKEN PRICE ${err} - ${id} FROM CoinMarketCap`
+      )
+      return 0
+    }
+  }
+
+  private async _getTokenMarketPriceFromCoinMarketCap(
+    id: string
+  ): Promise<Array<number>> {
+    try {
+      const URL = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/market-pairs/latest?id=${id}`
+      const payload = await fetch(URL, {
+        method: 'GET',
+        headers: { 'x-cmc_pro_api_key': this.options.coinMarketCapApiKey },
+      })
+      const payloadParsed = await payload.json()
+      const marketData = payloadParsed.data.market_pairs
+      // Get market price ratio
+      const markertPrices = []
+      for (const values of marketData) {
+        if (values.outlier_detected === 0) {
+          markertPrices.push(Number(values.quote.exchange_reported.price))
+        }
+      }
+      return markertPrices
+    } catch (err) {
+      this.logger.warn(
+        `CAN\'T QUERY TOKEN PRICE ${err} - ${id} FROM CoinMarketCap`
+      )
+      return []
+    }
+  }
+
+  private filterOutliers(input: Array<number>) {
+    if (input.length <= 2) {
+      return input
+    }
+    const values = input.concat()
+    values.sort((a: number, b: number) => a - b)
+
+    const q1 = values[Math.floor(values.length / 4)]
+    const q3 = values[Math.ceil(values.length * (3 / 4))]
+    const iqr = q3 - q1
+
+    const maxValue = q3 + iqr * 1.5
+    const minValue = q1 - iqr * 1.5
+
+    return values.filter((i) => i <= maxValue && i >= minValue)
   }
 }

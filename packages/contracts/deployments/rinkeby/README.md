@@ -3,6 +3,129 @@
 - **Chain ID**: 28
 - **Public RPC**: https://rinkeby.boba.network
 - **Block Explorer**: https://blockexplorer.rinkeby.boba.network
+## Layer 1 Contracts
+<table>
+<tr>
+<th>
+<img width="506px" height="0px" />
+<p><small>Contract</small></p>
+</th>
+<th>
+<img width="506px" height="0px" />
+<p><small>Address</small></p>
+</th>
+</tr>
+<tr>
+<td>
+BondManager
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0xAF41D3399A91C43E8f2d70d9b47741b10CFA4Fc4">
+<code>0xAF41D3399A91C43E8f2d70d9b47741b10CFA4Fc4</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+CanonicalTransactionChain
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x321Bf0Df8F02FE665a7f7CcE31684A6dadB014b0">
+<code>0x321Bf0Df8F02FE665a7f7CcE31684A6dadB014b0</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-CTC-batches
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x72D9a74E542eF47eA4C837ba23A55EBcB35f51A8">
+<code>0x72D9a74E542eF47eA4C837ba23A55EBcB35f51A8</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-CTC-queue
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x404B7c8868a8c3e413AE3Af02cf969beE70256c2">
+<code>0x404B7c8868a8c3e413AE3Af02cf969beE70256c2</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-SCC-batches
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x9145C38532fCb0c5f9924343d18d9b6C92F38121">
+<code>0x9145C38532fCb0c5f9924343d18d9b6C92F38121</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+L1CrossDomainMessenger
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x04059a546419f54db4bfafFae9d4af3b081C2a8D">
+<code>0x04059a546419f54db4bfafFae9d4af3b081C2a8D</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+L1MultiMessageRelayer
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x5C6263BCAa00C7f5988E148dB3CA178e1262E69f">
+<code>0x5C6263BCAa00C7f5988E148dB3CA178e1262E69f</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Lib_AddressManager
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x93A96D6A5beb1F661cf052722A1424CDDA3e9418">
+<code>0x93A96D6A5beb1F661cf052722A1424CDDA3e9418</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__L1CrossDomainMessenger
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0xF10EEfC14eB5b7885Ea9F7A631a21c7a82cf5D76">
+<code>0xF10EEfC14eB5b7885Ea9F7A631a21c7a82cf5D76</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__L1StandardBridge
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0xDe085C82536A06b40D20654c2AbA342F2abD7077">
+<code>0xDe085C82536A06b40D20654c2AbA342F2abD7077</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+StateCommitmentChain
+</td>
+<td align="center">
+<a href="https://rinkeby.etherscan.io/address/0x39e52546e091A28831414949B1601449be03b307">
+<code>0x39e52546e091A28831414949B1601449be03b307</code>
+</a>
+</td>
+</tr>
+</table>
 
 ## Layer 2 Contracts
 <table>

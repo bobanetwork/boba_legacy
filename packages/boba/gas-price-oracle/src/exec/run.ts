@@ -96,6 +96,26 @@ const main = async () => {
     parseInt(env.BOBA_LOCAL_TESTNET_CHAINID, 10) || 31338
   )
 
+  // Data provided by CoinGecko
+  // Coin ID in CoinGecko
+  const L1_TOKEN_COINGECKO_ID = config.str(
+    'L1_TOKEN_COINGECKO_ID',
+    env.L1_TOKEN_COINGECKO_ID
+  )
+
+  // Data provide by Coinmarketcap
+  // Coin ID in Coinmarketcap
+  const L1_TOKEN_COINMARKETCAP_ID = config.str(
+    'L1_TOKEN_COINMARKETCAP_ID',
+    env.L1_TOKEN_COINMARKETCAP_ID
+  )
+
+  // API key for Coinmarketcap
+  const COINMARKETCAP_API_KEY = config.str(
+    'COINMARKETCAP_API_KEY',
+    env.COINMARKETCAP_API_KEY
+  )
+
   if (!GAS_PRICE_ORACLE_ADDRESS) {
     throw new Error('Must pass GAS_PRICE_ORACLE_ADDRESS')
   }
@@ -164,6 +184,9 @@ const main = async () => {
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
     bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
+    l1TokenCoinGeckoId: L1_TOKEN_COINGECKO_ID,
+    l1TokenCoinMarketCapId: L1_TOKEN_COINMARKETCAP_ID,
+    coinMarketCapApiKey: COINMARKETCAP_API_KEY,
   })
 
   await service.start()

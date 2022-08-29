@@ -187,8 +187,12 @@ export const makeL2GenesisFile = async (
         dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomTestnetBytecode
       }
       // Moonbeam local
-      if (cfg.l1NativeTokenSymbol === 'GLMR') {
-        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamBytecode
+      if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamLocalBytecode
+      }
+      // Moonbeam Mainnet
+      if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 1294) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamMainnetBytecode
       }
       // Avalanche local
       if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 31338) {

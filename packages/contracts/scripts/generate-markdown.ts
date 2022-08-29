@@ -64,6 +64,14 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     l1Explorer: 'https://testnet.bscscan.com/',
     l2Explorer: 'https://blockexplorer.testnet.bnb.boba.network',
   },
+  {
+    folder: 'bobabeam',
+    name: 'Bobabeam (public mainnet)',
+    chainid: 1294,
+    rpc: 'https://bobabase.boba.network',
+    l1Explorer: 'https://moonscan.io/',
+    l2Explorer: 'https://blockexplorer.bobabeam.boba.network',
+  },
 ]
 
 // List of contracts that are part of a deployment but aren't meant to be used by the general
@@ -175,7 +183,7 @@ const getL1Contracts = (deployment: string): ContractInfo[] => {
   const l1ContractsFolder = getDeploymentFolderPath(deployment)
   return dirtree(l1ContractsFolder)
     .children.filter((child) => {
-      return child.extension === '.json'
+      return child.name.includes('.json')
     })
     .map((child) => {
       return {

@@ -85,5 +85,9 @@
   "Boba_GasPriceOracle":"0x5d0763cf905DA3689B072FD19baD8dF823b2c349",
   "Proxy__Boba_GasPriceOracle":"0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51",
   "BobaBillingContract": "0x4a792F51CCc616b82EF74d2478C732e161c5E6b1",
-  "Proxy__BobaBillingContract": "0x29F373e4869e69faaeCD3bF747dd1d965328b69f"
+  "Proxy__BobaBillingContract": "0x29F373e4869e69faaeCD3bF747dd1d965328b69f",
+  "Proxy__MoonbeamToEthereumBobaBridge": "0x9F868333DB1720Fb1412AFfb1AeF47e8C6cFc8c3",
+  "MoonbeamToEthereumBobaBridge": "0x891b8c55E471f6a2ce8E055D553733b0126D49a1",
+  "Proxy__EthereumToMoonbeamBobaBridge": "0x6F537839714761388B6d7ED61Bc09579d5dA2F41",
+  "EthereumToMoonbeamBobaBridge": "0x76b82285fb4A75481645e5F3771E33bc4D207d72"
 }

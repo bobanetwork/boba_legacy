@@ -157,6 +157,21 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Moonbeam
+  1284: {
+    l1: {
+      AddressManager: '0x564c10A60af35a07f0EA8Be3106a4D81014b21a0',
+      L1CrossDomainMessenger: '0x4765f8b50Bbe049045bBA1270dc7A8CDF17165cF',
+      L1CrossDomainMessengerFast: '0x17d02C3e6cB69225d83d0bADEb0fC09aE735CA3b',
+      L1StandardBridge: '0xAf5297f68D48cd2DE37Ee5cbaC0647fbA4132985',
+      StateCommitmentChain: '0xAD379B1518f50Fc737536D2Ec2c13E4640e228A8',
+      CanonicalTransactionChain: '0x99C970105cf6EE2e22b563CB86bCA42D05ac7A95',
+      BondManager: '0xcfe333e0e48EC71f1399a76001cf39E0c6A51dA5',
+      L1MultiMessageRelayer: '0x3664bC9BA25D0d3911c39d8ae1734b0B5A3495C1',
+      L1MultiMessageRelayerFast: '0xE2EE964E39720f78Cd75BC146Ed078D301981759',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
   // Fantom local
   4003: {
     l1: {
@@ -436,6 +451,18 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: '0xBf0939120b4F5E3196b9E12cAC291e03dD058e9a',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  1284: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },

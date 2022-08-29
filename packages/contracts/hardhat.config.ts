@@ -63,6 +63,9 @@ const config: HardhatUserConfig = {
     'boba-mainnet': {
       url: 'https://mainnet.boba.network',
     },
+    moonbeam: {
+      url: 'https://rpc.api.moonbeam.network',
+    },
   },
   mocha: {
     timeout: 50000,
@@ -119,6 +122,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: process.env.ETHERSCAN_KEY,
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
+      moonbeam: process.env.MOONBEAM_KEY,
     },
     customChains: [
       {
@@ -127,6 +131,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.bobascan.com/api',
           browserURL: 'https://bobascan.com',
+        },
+      },
+      {
+        network: 'moonbeam',
+        chainId: 1284,
+        urls: {
+          apiURL: 'https://api-moonbeam.moonscan.io/api',
+          browserURL: 'https://moonscan.io/',
         },
       },
     ],

@@ -228,7 +228,7 @@ class l1BridgeMonitorService extends OptimismEnv {
           this.OVM_L1StandardBridgeInterface.parseLog(eachL1StandardBridgeLog)
         if (
           L1StandardBridgeEvent.name === 'ERC20DepositInitiated' ||
-          L1StandardBridgeEvent.name === 'ETHDepositInitiated'
+          L1StandardBridgeEvent.name === 'NativeTokenDepositInitiated'
         ) {
           const hash = eachL1StandardBridgeLog.transactionHash
           const blockHash = eachL1StandardBridgeLog.blockHash
@@ -251,7 +251,7 @@ class l1BridgeMonitorService extends OptimismEnv {
           const depositSender = L1StandardBridgeEvent.args._from
           const depositTo = L1StandardBridgeEvent.args._to
           let depositToken = null
-          if (L1StandardBridgeEvent.name === 'ETHDepositInitiated') {
+          if (L1StandardBridgeEvent.name === 'NativeTokenDepositInitiated') {
             depositToken = '0x0000000000000000000000000000000000000000'
           } else {
             depositToken = L1StandardBridgeEvent.args._l1Token

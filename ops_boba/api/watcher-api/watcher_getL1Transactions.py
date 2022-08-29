@@ -57,7 +57,7 @@ def watcher_getL1Transactions(event, context):
           fastDeposit = transactionDataRaw[18]
           crossDomainMessageEstimateFinalizedTime = transactionDataRaw[11]
         # depositL2
-        if transactionDataRaw[7] == "ClientDepositL1" or transactionDataRaw[7] == "ETHDepositInitiated" or transactionDataRaw[7] == "ERC20DepositInitiated" or transactionDataRaw[7] == "ClientDepositL1Batch":
+        if transactionDataRaw[7] == "ClientDepositL1" or transactionDataRaw[7] == "ETHDepositInitiated" or transactionDataRaw[7] == "ERC20DepositInitiated" or transactionDataRaw[7] == "ClientDepositL1Batch" or transactionDataRaw[7] == "NativeTokenDepositInitiated":
           depositL2 = True
         else: depositL2 = False
 
