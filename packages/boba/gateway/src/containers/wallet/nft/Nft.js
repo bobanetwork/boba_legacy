@@ -14,7 +14,6 @@ import Button from 'components/button/Button'
 import networkService from 'services/networkService'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Connect from 'containers/connect/Connect'
-import { openModal } from "../../../actions/uiAction";
 
 class Nft extends React.Component {
 
