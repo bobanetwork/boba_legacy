@@ -34,7 +34,7 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import { isEqual } from 'lodash'
 
 import { POLL_INTERVAL } from "util/constant"
-import useInterval from "util/useInterval"
+import useInterval from "hooks/useInterval"
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
