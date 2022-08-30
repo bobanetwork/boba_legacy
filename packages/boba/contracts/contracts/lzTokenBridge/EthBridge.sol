@@ -107,6 +107,7 @@ import "./lzApp/NonblockingLzApp.sol";
             require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
         } else {
             transferredAmount = _amount;
+            require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
             transferTimestampCheckPoint = block.timestamp;
         }
 
