@@ -8,7 +8,7 @@
     "prepare:bobabeam:rollup": "mustache config/bobabeam.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:bobaoperatestnet:rollup": "mustache config/bobaoperatestnet.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:fuji:rollup": "mustache config/fuji.json subgraph.template.rollup.yaml > subgraph.yaml",
-    "prepare:avax:rollup": "mustache config/bobaavax.json subgraph.template.rollup.yaml > subgraph.yaml",
+    "prepare:bobaavax:rollup": "mustache config/bobaavax.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:bobabnbtestnet:rollup": "mustache config/bobabnbtestnet.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:bobabase:addressManager": "mustache config/bobabase.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "prepare:bobabeam:addressManager": "mustache config/bobabeam.json subgraph.template.addressManager.yaml > subgraph.yaml",
