@@ -272,6 +272,23 @@ describe('LayerZero Bridges', () => {
         { value: estimatedFee._nativeFee }
       )
     ).to.be.revertedWith('max amount per day exceeded')
+
+    // move time forward to a new 24 hour epoch
+    // deposit should still fail if the amount is more than the max transfer amount per day
+    await ethers.provider.send('evm_increaseTime', [86400])
+    await ethers.provider.send('evm_mine', [])
+
+    await expect(
+      EthBridge.depositERC20(
+        L1Boba.address,
+        AltL1Boba.address,
+        depositAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
+        '0x',
+        { value: estimatedFee._nativeFee }
+      )
+    ).to.be.revertedWith('max amount per day exceeded')
   })
 
   it('should be able to withdraw back to L1', async function () {
@@ -452,6 +469,24 @@ describe('LayerZero Bridges', () => {
         '0x'
       )
     const withdrawAmount = depositAmount
+    await expect(
+      AltL1Bridge.withdraw(
+        AltL1Boba.address,
+        withdrawAmount,
+        ethers.constants.AddressZero,
+        '0x', // adapterParams
+        '0x',
+        {
+          value: estimatedFeeWithdraw._nativeFee,
+        }
+      )
+    ).to.be.revertedWith('max amount per day exceeded')
+
+    // move time forward to a new 24 hour epoch
+    // withdraw should still fail if the amount is more than the max transfer amount per day
+    await ethers.provider.send('evm_increaseTime', [86400])
+    await ethers.provider.send('evm_mine', [])
+
     await expect(
       AltL1Bridge.withdraw(
         AltL1Boba.address,
