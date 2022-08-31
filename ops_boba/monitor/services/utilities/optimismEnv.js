@@ -83,12 +83,7 @@ const OVM_L2_CROSS_DOMAIN_MESSENGER =
 const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 // layerZero env
-const LAYER_ZERO_URL = env.LAYER_ZERO_URL || ''
-const LAYER_ZERO_ETH_LATEST_BLOCK = Number(env.LAYER_ZERO_ETH_LATEST_BLOCK) || 0
-const LAYER_ZERO_ETH_BRIDGE_ADDRESS = env.LAYER_ZERO_ETH_BRIDGE_ADDRESS || ''
-const LAYER_ZERO_ALT_L1_BRIDGE_ADDRESS = env.LAYER_ZERO_ALT_L1_BRIDGE_ADDRESS || ''
-const LAYER_ZERO_ALT_L1_LATEST_BLOCK = Number(env.LAYER_ZERO_ALT_L1_LATEST_BLOCK) || 0
-const LAYER_ZERO_ALT_L1_CHAINID = Number(env.LAYER_ZERO_ALT_L1_CHAINID) || 0
+const LAYER_ZERO_MONITOR = env.LAYER_ZERO_MONITOR || 'ETH'
 
 class OptimismEnv {
   constructor() {
@@ -175,14 +170,7 @@ class OptimismEnv {
 
     this.sequencerPublishWindow = 0
 
-    this.layerZeroProvider = new ethers.providers.StaticJsonRpcProvider(
-      LAYER_ZERO_URL
-    )
-    this.layerZeroEthLatestBlock = LAYER_ZERO_ETH_LATEST_BLOCK
-    this.ethBridgeAddress = LAYER_ZERO_ETH_BRIDGE_ADDRESS
-    this.layerZeroAltL1LatestBlock = LAYER_ZERO_ALT_L1_LATEST_BLOCK
-    this.altL1BridgeAddress = LAYER_ZERO_ALT_L1_BRIDGE_ADDRESS
-    this.altL1ChainID = LAYER_ZERO_ALT_L1_CHAINID
+    this.layerZeroMonitor = LAYER_ZERO_MONITOR
   }
 
   async initOptimismEnv() {

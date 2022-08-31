@@ -5,63 +5,65 @@ const DatabaseService = require('./database.service')
 const OptimismEnv = require('./utilities/optimismEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
+const { Logger } = require('@eth-optimism/common-ts')
 
+const EthBridgeJson = require('@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
 const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
 
 const prefix = '[layer_zero_bridge]'
 
-class LayerZeroBridgeAltL1Monitor extends OptimismEnv {
+const bridges = {
+  ETH: {
+    bridgeAddress: '0x78af7bf02feba4d979ea2dbc5388cdc768e7b34e',
+    latestBlock: 11146110,
+    chainID: 1,
+  },
+  Avalanche: {
+    bridgeAddress: '0x72B9875fF366f12B7fCCa379E762AaCD4CD457Cb',
+    latestBlock: 12235720,
+    chainID: 10006,
+  },
+}
+
+class LayerZeroBridgeMonitor extends OptimismEnv {
   constructor() {
     super(...arguments)
 
     this.databaseService = new DatabaseService()
-    this.latestBlock = 0
-    this.currentBlock = 0
-    this.chainID = this.altL1ChainID
 
-    console.log(prefix, `Address ${this.altL1BridgeAddress}`)
-    this.altL1BridgeContract = new ethers.Contract(
-      this.altL1BridgeAddress,
-      AltL1Bridge.abi,
-      this.layerZeroProvider
+    this.chainInfo = bridges[this.layerZeroMonitor]
+    console.log(
+      prefix,
+      `monitoring ${this.layerZeroMonitor} ${JSON.stringify(this.chainInfo)}`
     )
-  }
+    this.isETH = this.layerZeroMonitor === 'ETH'
+    this.latestBlock = 0
+    this.currentBlock = this.chainInfo.latestBlock
+    this.chainID = this.chainInfo.chainID
 
-  async initConnection() {
-    this.logger.info(prefix, 'Trying to connect to the network...')
-    for (let i = 0; i < 10; i++) {
-      try {
-        await this.layerZeroProvider.detectNetwork()
-        this.logger.info('Successfully connected to the network.')
-        break
-      } catch (err) {
-        if (i < 9) {
-          this.logger.info('Unable to connect to network', {
-            retryAttemptsRemaining: 10 - i,
-          })
-          await sleep(1000)
-        } else {
-          throw new Error(
-            `Unable to connect to the L1 network, check that your L1 endpoint is correct.`
-          )
-        }
-      }
-    }
-    await this.initOptimismEnv()
+    const abi = this.isETH ? EthBridgeJson.abi : AltL1Bridge.abi
+    this.bridgeContract = new ethers.Contract(
+      this.chainInfo.bridgeAddress,
+      abi,
+      this.L1Provider
+    )
   }
 
   async initScan() {
-    console.log(`init MySQL`)
+    console.log(prefix, `init MySQL`)
     // Create tables
     await this.databaseService.initMySQL()
+    const destChain = await this.bridgeContract.dstChainId();
+    console.log(
+      prefix,
+      `monitor bridge ${this.chainInfo.bridgeAddress} with dstChainID ${destChain}`
+    )
 
     const maxBlockFromDB = await this.databaseService.getNewestBlockFromLayerZeroTx(this.chainID)
-    this.currentBlock = this.layerZeroAltL1LatestBlock || maxBlockFromDB
+    this.currentBlock = this.currentBlock > maxBlockFromDB ? this.currentBlock : maxBlockFromDB
 
-    this.latestBlock = await this.layerZeroProvider.getBlockNumber()
-    console.log(
-      `latestBlock ${this.latestBlock} currentBlock ${this.currentBlock}`
-    )
+    this.latestBlock = await this.L1Provider.getBlockNumber()
+    console.log(prefix, `latestBlock ${this.latestBlock}`)
 
     if (this.currentBlock < this.latestBlock) {
       await this.scanBlockRange(this.currentBlock, this.latestBlock)
@@ -69,11 +71,8 @@ class LayerZeroBridgeAltL1Monitor extends OptimismEnv {
   }
 
   async startMonitor() {
-    this.latestBlock = await this.layerZeroProvider.getBlockNumber()
-
-    console.log(
-      `latestBlock ${this.latestBlock} currentBlock ${this.currentBlock}`
-    )
+    console.log(prefix, `start monitor`)
+    this.latestBlock = await this.L1Provider.getBlockNumber()
 
     if (this.currentBlock < this.latestBlock) {
       await this.scanBlockRange(this.currentBlock, this.latestBlock)
@@ -94,14 +93,21 @@ class LayerZeroBridgeAltL1Monitor extends OptimismEnv {
   }
 
   async scanBlock(startBlock, endBlock) {
-    const logs = await this.altL1BridgeContract.queryFilter(
-      this.altL1BridgeContract.filters.DepositFinalized(),
+    const logs = await this.bridgeContract.queryFilter(
+      this.isETH
+        ? [
+          this.bridgeContract.filters.ERC20DepositInitiated(),
+          this.bridgeContract.filters.ERC20WithdrawalFinalized(),
+        ]
+        : [
+          this.bridgeContract.filters.WithdrawalInitiated(),
+          this.bridgeContract.filters.DepositFinalized(),
+        ],
       Number(startBlock),
       Number(endBlock)
     )
 
     for (const l of logs) {
-      console.log(`Found tx`, l)
       const tx = await l.getTransaction()
       const eventData = {
         chainID: this.chainID,
@@ -138,4 +144,4 @@ class LayerZeroBridgeAltL1Monitor extends OptimismEnv {
   }
 }
 
-module.exports = LayerZeroBridgeAltL1Monitor
+module.exports = LayerZeroBridgeMonitor
