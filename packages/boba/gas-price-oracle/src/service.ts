@@ -112,6 +112,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       bobaFeeRatio100X: this.options.bobaFeeRatio100X,
       bobaFeeRatioMinPercentChange: this.options.bobaFeeRatioMinPercentChange,
       bobaLocalTestnetChainId: this.options.bobaLocalTestnetChainId,
+      l1TokenCoinGeckoId: this.options.l1TokenCoinGeckoId,
+      l1TokenCoinMarketCapId: this.options.l1TokenCoinMarketCapId,
+      coinMarketCapApiKey: this.options.coinMarketCapApiKey,
     })
 
     this.state = {} as any
