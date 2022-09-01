@@ -42,7 +42,7 @@ describe('WBOBA9', () => {
       await expect(WBOBA9.withdraw(10000)).to.be.reverted
     })
 
-    it('should withdraw to eth', async () => {
+    it('should withdraw to boba', async () => {
       await WBOBA9.deposit({ value: 100 })
       await expect(WBOBA9.withdraw(50)).to.not.be.reverted
       expect(await WBOBA9.balanceOf(signer.address)).to.be.equal(50)
