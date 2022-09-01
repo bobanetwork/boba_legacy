@@ -99,20 +99,20 @@ const main = async () => {
   // Data provided by CoinGecko
   // Coin ID in CoinGecko
   const L1_TOKEN_COINGECKO_ID = config.str(
-    'L1_TOKEN_COINGECKO_ID',
+    'l1-token-coingecko-id',
     env.L1_TOKEN_COINGECKO_ID
   )
 
   // Data provide by Coinmarketcap
   // Coin ID in Coinmarketcap
   const L1_TOKEN_COINMARKETCAP_ID = config.str(
-    'L1_TOKEN_COINMARKETCAP_ID',
+    'l1-token-coinmarketcap-id',
     env.L1_TOKEN_COINMARKETCAP_ID
   )
 
   // API key for Coinmarketcap
   const COINMARKETCAP_API_KEY = config.str(
-    'COINMARKETCAP_API_KEY',
+    'coinmarketcap-api-key',
     env.COINMARKETCAP_API_KEY
   )
 

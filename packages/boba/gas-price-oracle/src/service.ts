@@ -61,13 +61,13 @@ interface GasPriceOracleOptions {
   bobaLocalTestnetChainId: number
 
   // L1 token CoinGecko ID
-  l1TokenCoinGeckoId?: string
+  l1TokenCoinGeckoId: string
 
   // l1 token Coinmarketcap ID
-  l1TokenCoinMarketCapId?: string
+  l1TokenCoinMarketCapId: string
 
   // Coinmarketcap API key
-  coinMarketCapApiKey?: string
+  coinMarketCapApiKey: string
 }
 
 const optionSettings = {}
