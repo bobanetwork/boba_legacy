@@ -211,10 +211,6 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31338,
-      l1TokenCoinGeckoId: 'moonbeam',
-      l1TokenCoinMarketCapId: '6836',
-      // CoinMarketCap free key
-      coinMarketCapApiKey: '19841722-df8b-493c-b6b3-d7290e4c24d9',
     })
 
     await gasPriceOracleService.init()
@@ -552,10 +548,6 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
-      l1TokenCoinGeckoId: 'moonbeam',
-      l1TokenCoinMarketCapId: '6836',
-      // CoinMarketCap free key
-      coinMarketCapApiKey: '19841722-df8b-493c-b6b3-d7290e4c24d9',
     })
 
     await tempGasPriceOracleService.init()
@@ -607,10 +599,6 @@ describe('gas-price-oracle', () => {
       bobaFeeRatio100X: 800,
       bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
-      l1TokenCoinGeckoId: 'moonbeam',
-      l1TokenCoinMarketCapId: '6836',
-      // CoinMarketCap free key
-      coinMarketCapApiKey: '19841722-df8b-493c-b6b3-d7290e4c24d9',
     })
 
     await tempGasPriceOracleService.init()
