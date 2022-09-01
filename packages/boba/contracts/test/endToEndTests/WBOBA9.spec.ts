@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { Contract } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
-describe('WETH9', () => {
+describe('WBOBA9', () => {
   let signer: SignerWithAddress
   let otherSigner: SignerWithAddress
 
@@ -19,7 +19,7 @@ describe('WETH9', () => {
   })
 
   describe('deposit', () => {
-    it('should create WETH with fallback function', async () => {
+    it('should create WBOBA with fallback function', async () => {
       await expect(
         signer.sendTransaction({
           to: WBOBA9.address,
@@ -30,7 +30,7 @@ describe('WETH9', () => {
       expect(await WBOBA9.balanceOf(signer.address)).to.be.equal(200)
     })
 
-    it('should create WETH with deposit function', async () => {
+    it('should create WBOBA with deposit function', async () => {
       await expect(WBOBA9.deposit({ value: 100 })).to.not.be.reverted
 
       expect(await WBOBA9.balanceOf(signer.address)).to.be.equal(100)
@@ -61,7 +61,7 @@ describe('WETH9', () => {
       await expect(WBOBA9.transfer(otherSigner.address, 500)).to.be.reverted
     })
 
-    it('should transfer WETH to an other address', async () => {
+    it('should transfer WBOBA to an other address', async () => {
       await WBOBA9.deposit({ value: 100 })
       await expect(WBOBA9.transfer(otherSigner.address, 50)).to.not.be.reverted
 
@@ -83,7 +83,7 @@ describe('WETH9', () => {
       ).to.be.reverted
     })
 
-    it('should transfer WETH to an other address when there is approvement', async () => {
+    it('should transfer WBOBA to an other address when there is approvement', async () => {
       await WBOBA9.deposit({ value: 100 })
       await WBOBA9.approve(otherSigner.address, 50)
       await expect(
