@@ -24,3 +24,7 @@ export const EXPIRY_OPTIONS = [
     label: '1 Year',
   },
 ]
+
+
+
+export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];

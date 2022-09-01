@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { Box, Divider } from '@mui/material'
+import { NavLink } from 'react-router-dom';
 
 export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -43,7 +44,19 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
   }
 }))
 
-export const FooterLink = styled(Box)(({ theme }) => ({
+export const FooterLink = styled(NavLink)(({ theme }) => ({
+  //marginLeft: theme.spacing(1),
+  marginTop: theme.spacing(1),
+  fontSize: '14px',
+  textDecoration: 'none',
+  cursor: 'pointer',
+  color: 'unset',
+  '&:hover': {
+    color: theme.palette.secondary.main,
+  },
+}));
+
+export const FooterLinkExt = styled(Box)(({ theme }) => ({
   //marginLeft: theme.spacing(1),
   marginTop: theme.spacing(1),
   fontSize: '14px',

@@ -8,7 +8,7 @@ import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
 import { fetchLookUpPrice } from 'actions/networkAction'
-import { setActiveHistoryTab, setPage as setPageAction } from 'actions/uiAction'
+import { setActiveHistoryTab } from 'actions/uiAction'
 
 import { openAlert } from 'actions/uiAction'
 
@@ -31,11 +31,12 @@ import { isEqual, orderBy } from 'lodash'
 import networkService from 'services/networkService'
 
 import { Md5 } from "ts-md5/dist/md5"
+import { useNavigate } from 'react-router-dom'
 
 function TokenPage() {
 
   const dispatch = useDispatch()
-
+  const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
   const tokenList = useSelector(selectTokens)
   const networkLayer = useSelector(selectLayer())
@@ -302,8 +303,8 @@ function TokenPage() {
             variant="body2"
             sx={{ cursor: 'pointer' }}
             onClick={() => {
-              dispatch(setPageAction('History'))
-              dispatch(setActiveHistoryTab("Pending"))
+              dispatch(setActiveHistoryTab("Pending"));
+              navigate('/history')
             }}
           >
             <span style={{opacity: '0.9'}}>Bridge in progress:</span>{' '}
