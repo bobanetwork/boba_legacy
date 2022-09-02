@@ -12,7 +12,7 @@ description: A collection of links and addresses to get started on Boba-Moonbeam
   * [Bobabeam Addresses](#bobabeam-addresses)
   * [Analytics and eth_getLogs for Bobabeam](#analytics-and-eth-getlogs-for-bobabeam)
   * [Bobabeam Links and Endpoints](#bobabeam-links-and-endpoints)
-  
+
 # Bobabase L2 (1297) for the Moonbase Testnet (1287)
 
 ## Testnet Fountain for Developers on Bobabase L2
@@ -27,7 +27,7 @@ The standard bridges for `GLMR` (aka `DEV` on Moonbase) and `BOBA` are active, s
 
 If you have unusual `getLogs` needs, especially calls from `0 to latest`, the main RPC will block you, since this is how most DoS attacks work. In those cases, we encourage you to run your own RPC endpoint on your own replica of Bobabase. We have prepared Docker images for you, so this should only take a few minutes. To access these images:
 
-* clone the `boba_base` repo
+* clone the `boba` repo
 * switch to `alt-l1` branch.
 * Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node) folder
 
@@ -35,7 +35,7 @@ If you have unusual `getLogs` needs, especially calls from `0 to latest`, the ma
   RELEASE_VERSION=v0.X.X
   ```
 
-The bobabase's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabase.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node) 
+The bobabase's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabase.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node)
 
 ```bash
 $ docker compose -f docker-compose-bobabase.yml pull
@@ -68,7 +68,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 To access these images:
 
-* clone the `boba_base` repo
+* clone the `boba` repo
 
 * switch to `alt-l1` branch.
 
