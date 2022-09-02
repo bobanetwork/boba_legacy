@@ -69,11 +69,6 @@ const deployFn: DeployFunction = async (hre) => {
     name: 'Boba_GasPriceOracle',
     address: predeploys.Boba_GasPriceOracle,
   })
-  await registerAddress({
-    hre,
-    name: 'Proxy__Boba_GasPriceOracle',
-    address: predeploys.Proxy__Boba_GasPriceOracle,
-  })
 }
 
 deployFn.tags = ['Lib_AddressManager']
