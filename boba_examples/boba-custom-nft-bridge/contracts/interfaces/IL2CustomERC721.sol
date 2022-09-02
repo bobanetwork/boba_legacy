@@ -7,7 +7,7 @@ import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol
 interface IL2CustomERC721 is IERC165, IERC721 {
     function l1Contract() external returns (address);
 
-    function mint(address _to, uint256 _tokenId, uint256 _feature_1, uint256 _feature_2, uint256 _feature_3, bytes memory _data) external;
+    function mint(address _to, uint256 _tokenId, string calldata _feature_1, string calldata _feature_2, string calldata _feature_3, bytes memory _data) external;
 
     function burn(uint256 _tokenId) external;
 

@@ -172,13 +172,10 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
         require(ERC165Checker.supportsInterface(_l2Contract, erc721), "L2 NFT is not ERC721 compatible");
-        bytes32 l1 = keccak256(abi.encodePacked("L1"));
-        bytes32 l2 = keccak256(abi.encodePacked("L2"));
         // l1 NFT address equal to zero, then pair is not registered yet.
         // use with caution, can register only once
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
         require(pairNFT.l1Contract == address(0), "L1 NFT address already registered");
-        // _baseNetwork can only be L1 or L2
         require(ERC165Checker.supportsInterface(_l2Contract, 0xb07cd11a), "L2 contract is not bridgable");
 
         pairNFTInfo[_l2Contract] =
@@ -391,9 +388,9 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         address _from,
         address _to,
         uint256 _tokenId,
-        uint256 _feature_1,
-        uint256 _feature_2,
-        uint256 _feature_3,
+        string calldata _feature_1,
+        string calldata _feature_2,
+        string calldata _feature_3,
         bytes memory _data
     )
         external
@@ -401,8 +398,6 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         override
         onlyFromCrossDomainAccount(l1NFTBridge)
     {
-        PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
-
         // Check the target token is compliant and
         // verify the deposited token on L1 matches the L2 deposited token representation here
         if (

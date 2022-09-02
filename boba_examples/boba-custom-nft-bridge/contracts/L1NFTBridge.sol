@@ -145,8 +145,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ReentrancyGuardUpgrade
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
         require(ERC165Checker.supportsInterface(_l1Contract, erc721), "L1 NFT is not ERC721 compatible");
-        bytes32 l1 = keccak256(abi.encodePacked("L1"));
-        bytes32 l2 = keccak256(abi.encodePacked("L2"));
         // l2 NFT address equal to zero, then pair is not registered yet.
         // use with caution, can register only once
         PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
@@ -341,8 +339,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ReentrancyGuardUpgrade
         override
         onlyFromCrossDomainAccount(l2NFTBridge)
     {
-        PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
-
         // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer
         IERC721(_l1Contract).safeTransferFrom(address(this), _to, _tokenId);
 

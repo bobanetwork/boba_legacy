@@ -71,9 +71,9 @@ interface iL2NFTBridge {
         address _from,
         address _to,
         uint256 _tokenId,
-        uint256 _feature_1,
-        uint256 _feature_2,
-        uint256 _feature_3,
+        string calldata _feature_1,
+        string calldata _feature_2,
+        string calldata _feature_3,
         bytes calldata _data
     )
         external;

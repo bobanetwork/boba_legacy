@@ -25,6 +25,8 @@ contract CustomERC721 is Ownable, ERC721 {
         feature_1[_tokenId] = "1";
         feature_2[_tokenId] = "2";
         feature_3[_tokenId] = "3";
+
+        // do something with _data
     }
 
 }
