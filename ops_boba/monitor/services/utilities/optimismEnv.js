@@ -84,6 +84,8 @@ const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 // layerZero env
 const LAYER_ZERO_MONITOR = env.LAYER_ZERO_MONITOR || 'ETH'
+const IS_LAYER_ZERO_MONITOR_MAINNET =
+  env.IS_LAYER_ZERO_MONITOR_MAINNET === 'true' || false
 
 class OptimismEnv {
   constructor() {
@@ -171,6 +173,7 @@ class OptimismEnv {
     this.sequencerPublishWindow = 0
 
     this.layerZeroMonitor = LAYER_ZERO_MONITOR
+    this.isLayerZeroMonitorMainnet = IS_LAYER_ZERO_MONITOR_MAINNET
   }
 
   async initOptimismEnv() {
