@@ -242,7 +242,7 @@ class DatabaseService extends OptimismEnv {
         ? receiptData.crossDomainMessageSendTime
         : null
       },
-      crossDomainMessageEstimateFinalizedTime=${receiptData.crossDomainMessage
+      crossDomainMessageEstimateFinalizedTime=${receiptData.crossDomainMessageEstimateFinalizedTime
         ? receiptData.crossDomainMessageEstimateFinalizedTime
         : null
       },
@@ -415,7 +415,7 @@ class DatabaseService extends OptimismEnv {
         ? bridgeData.crossDomainMessageSendTime
         : null
       },
-      crossDomainMessageEstimateFinalizedTime=${bridgeData.crossDomainMessage
+      crossDomainMessageEstimateFinalizedTime=${bridgeData.crossDomainMessageEstimateFinalizedTime
         ? bridgeData.crossDomainMessageEstimateFinalizedTime
         : null
       },

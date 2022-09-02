@@ -14,32 +14,37 @@ const layerZeroMainnetAddresses = require('@boba/register/addresses/layerZeroMai
 const layerZeroTestnetAddresses = require('@boba/register/addresses/layerZeroTestnet.json')
 
 const prefix = '[layer_zero_bridge]'
-
-const bridges = {
-  ETH: {
-    bridgeAddress: '0x78af7bf02feba4d979ea2dbc5388cdc768e7b34e',
-    latestBlock: 11146110,
-    chainID: 1,
-  },
-  Avalanche: {
-    bridgeAddress: '0x72B9875fF366f12B7fCCa379E762AaCD4CD457Cb',
-    latestBlock: 12235720,
-    chainID: 10006,
-  },
-}
-
 class LayerZeroBridgeMonitor extends OptimismEnv {
   constructor() {
     super(...arguments)
 
     this.databaseService = new DatabaseService()
 
-    this.chainInfo = bridges[this.layerZeroMonitor]
+    const layerZeroAddresses = this.layerZeroEnableTest
+      ? layerZeroTestnetAddresses
+      : layerZeroMainnetAddresses;
+
+    if (layerZeroAddresses.BOBA_Bridges[this.layerZeroChain] === undefined) {
+      throw new Error(
+        `Unable to find bridge address for ${this.layerZeroChain}`
+      )
+    }
+
+    this.chainInfo = {
+      bridgeAddress:
+        layerZeroAddresses.BOBA_Bridges[this.layerZeroChain][
+        this.layerZeroBridge
+        ],
+      latestBlock: this.layerZeroLatestBlock,
+      chainID:
+        layerZeroAddresses.Layer_Zero_Protocol[this.layerZeroChain]
+          .Layer_Zero_ChainId,
+    }
     console.log(
       prefix,
-      `monitoring ${this.layerZeroMonitor} ${JSON.stringify(this.chainInfo)}`
+      `monitoring ${this.layerZeroChain} with ${JSON.stringify(this.chainInfo)}`
     )
-    this.isETH = this.layerZeroMonitor === 'ETH'
+    this.isETH = this.layerZeroChain.search(/EthBridgeTo/) === 0
     this.latestBlock = 0
     this.currentBlock = this.chainInfo.latestBlock
     this.chainID = this.chainInfo.chainID

@@ -123,9 +123,9 @@ const main = async () => {
   }
 }
 
-  ; (async () => {
-    main().catch()
-  })().catch((err) => {
-    console.log(err)
-    process.exit(1)
-  })
+;(async () => {
+main().catch()
+})().catch((err) => {
+console.log(err)
+process.exit(1)
+})
