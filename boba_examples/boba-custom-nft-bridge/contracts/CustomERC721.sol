@@ -13,8 +13,7 @@ contract CustomERC721 is Ownable, ERC721 {
         ERC721(
             "Bubble",
             "BUBL"
-        ) {
-    }
+        ) {}
 
     mapping(uint256 => string) public feature_1;
     mapping(uint256 => string) public feature_2;
@@ -27,8 +26,5 @@ contract CustomERC721 is Ownable, ERC721 {
         feature_2[_tokenId] = 2;
         feature_3[_tokenId] = 3;
     }
-
-    function bridgeToL2
-
 
 }

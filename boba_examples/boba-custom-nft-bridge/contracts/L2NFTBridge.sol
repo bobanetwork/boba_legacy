@@ -9,10 +9,11 @@ import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 /* Library Imports */
-import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import { CrossDomainEnabled } from "@eth-optimism/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
+import { CrossDomainEnabled } from "@eth-optimism/contracts/libraries/bridge/CrossDomainEnabled.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
+import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+import "@eth-optimism/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 
 /* Contract Imports */
 import { L2CustomERC721 } from "./L2CustomERC721.sol";
@@ -20,10 +21,13 @@ import { L2CustomERC721 } from "./L2CustomERC721.sol";
 /* External Imports */
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
+import "@eth-optimism/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@eth-optimism/contracts/L2/messaging/IL2ERC20Bridge.sol";
+
+import { L2BillingContract } from "./L2BillingContract.sol";
 
 /* External Imports */
 
@@ -175,8 +179,6 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
         require(pairNFT.l1Contract == address(0), "L1 NFT address already registered");
         // _baseNetwork can only be L1 or L2
-        require(bn == l1 || bn == l2, "Invalid Network");
-        Network baseNetwork;
         require(ERC165Checker.supportsInterface(_l2Contract, 0xb07cd11a), "L2 contract is not bridgable");
 
         pairNFTInfo[_l2Contract] =

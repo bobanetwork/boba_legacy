@@ -8,13 +8,16 @@ import { iL1NFTBridge } from "./interfaces/iL1NFTBridge.sol";
 import { iL2NFTBridge } from "./interfaces/iL2NFTBridge.sol";
 
 /* Library Imports */
-import { CrossDomainEnabled } from "@eth-optimism/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
-import { Lib_PredeployAddresses } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
+import { CrossDomainEnabled } from "@eth-optimism/contracts/libraries/bridge/CrossDomainEnabled.sol";
+import { Lib_PredeployAddresses } from "@eth-optimism/contracts/libraries/constants/Lib_PredeployAddresses.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /* External Imports */
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import '@openzeppelin/contracts/utils/introspection/ERC165Checker.sol';
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /* NFT Imports */
 import { CustomERC721 } from "./CustomERC721.sol";
@@ -131,7 +134,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ReentrancyGuardUpgrade
      */
     function registerNFTPair(
         address _l1Contract,
-        address _l2Contract,
+        address _l2Contract
     )
         public
         onlyOwner()
@@ -146,7 +149,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ReentrancyGuardUpgrade
         // use with caution, can register only once
         PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
         require(pairNFT.l2Contract == address(0), "L2 NFT address already registered");
-        require(bn == l1 || bn == l2, "Invalid Network");
 
         pairNFTInfo[_l1Contract] =
             PairNFTInfo({
@@ -232,10 +234,10 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ReentrancyGuardUpgrade
         );
 
         // Get speical features
-        CustomERC721 l1NFTContract = CustomERC721(_l1Contract)
-        feature_1 = l1NFTContract.feature_1(_tokenId)
-        feature_2 = l1NFTContract.feature_2(_tokenId)
-        feature_3 = l1NFTContract.feature_3(_tokenId)
+        CustomERC721 l1NFTContract = CustomERC721(_l1Contract);
+        string memory feature_1 = l1NFTContract.feature_1(_tokenId);
+        string memory feature_2 = l1NFTContract.feature_2(_tokenId);
+        string memory feature_3 = l1NFTContract.feature_3(_tokenId);
 
         // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
         bytes memory message = abi.encodeWithSelector(
