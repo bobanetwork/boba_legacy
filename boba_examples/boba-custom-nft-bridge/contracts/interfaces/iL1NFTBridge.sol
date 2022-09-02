@@ -13,6 +13,9 @@ interface iL1NFTBridge {
         address indexed _from,
         address _to,
         uint256 _tokenId,
+        string _feature1,
+        string _feature2,
+        string _feature3,
         bytes _data
     );
 

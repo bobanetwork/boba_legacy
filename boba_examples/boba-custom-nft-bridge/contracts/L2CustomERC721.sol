@@ -50,9 +50,9 @@ contract L2CustomERC721 is IL2CustomERC721, ERC721 {
     function mint(address _to, uint256 _tokenId, uint256 _feature_1, uint256 _feature_2, uint256 _feature_3,bytes memory _data) public virtual override onlyL2Bridge {
         _mint(_to, _tokenId);
 
-        feature_1[_tokenId] = 1;
-        feature_2[_tokenId] = 2;
-        feature_3[_tokenId] = 3;
+        feature_1[_tokenId] = "1";
+        feature_2[_tokenId] = "2";
+        feature_3[_tokenId] = "3";
     }
 
     function burn(uint256 _tokenId) public virtual override onlyL2Bridge {

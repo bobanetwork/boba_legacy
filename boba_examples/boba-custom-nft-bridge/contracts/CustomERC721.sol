@@ -19,12 +19,12 @@ contract CustomERC721 is Ownable, ERC721 {
     mapping(uint256 => string) public feature_2;
     mapping(uint256 => string) public feature_3;
 
-    function mint(address _to, uint256 _tokenId) public onlyOwner {
+    function mint(address _to, uint256 _tokenId, bytes memory _data) external {
         _safeMint(_to, _tokenId);
 
-        feature_1[_tokenId] = 1;
-        feature_2[_tokenId] = 2;
-        feature_3[_tokenId] = 3;
+        feature_1[_tokenId] = "1";
+        feature_2[_tokenId] = "2";
+        feature_3[_tokenId] = "3";
     }
 
 }
