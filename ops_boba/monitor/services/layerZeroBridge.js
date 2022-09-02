@@ -10,6 +10,9 @@ const { Logger } = require('@eth-optimism/common-ts')
 const EthBridgeJson = require('@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
 const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
 
+const layerZeroMainnetAddresses = require('@boba/register/addresses/layerZeroMainnet.json')
+const layerZeroTestnetAddresses = require('@boba/register/addresses/layerZeroTestnet.json')
+
 const prefix = '[layer_zero_bridge]'
 
 const bridges = {
