@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./exec/run-monitor.js",
-    "trye": "node ./exec/try-monitor.js"
+    "try": "node ./exec/try-monitor.js"
   },
   "license": "MIT",
   "dependencies": {

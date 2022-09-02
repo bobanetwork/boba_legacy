@@ -12,7 +12,6 @@ const L2LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L2Li
 const L1StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
 const L2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
 const StateCommitmentChainJson = require('@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
-const { isJSDocThisTag } = require('typescript')
 
 require('dotenv').config()
 const env = process.env
@@ -83,9 +82,10 @@ const OVM_L2_CROSS_DOMAIN_MESSENGER =
 const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 // layerZero env
-const LAYER_ZERO_MONITOR = env.LAYER_ZERO_MONITOR || 'ETH'
-const IS_LAYER_ZERO_MONITOR_MAINNET =
-  env.IS_LAYER_ZERO_MONITOR_MAINNET === 'true' || false
+const LAYER_ZERO_ENABLE_TEST = Boolean(env.LAYER_ZERO_ENABLE_TEST) || true
+const LAYER_ZERO_CHAIN = env.LAYER_ZERO_CHAIN || 'Testnet'
+const LAYER_ZERO_BRIDGE = env.LAYER_ZERO_BRIDGE || 'EthBridgeToAvalanche'
+const LAYER_ZERO_LATEST_BLOCK = Number(env.LAYER_ZERO_LATEST_BLOCK) || 0
 
 class OptimismEnv {
   constructor() {
@@ -172,8 +172,10 @@ class OptimismEnv {
 
     this.sequencerPublishWindow = 0
 
-    this.layerZeroMonitor = LAYER_ZERO_MONITOR
-    this.isLayerZeroMonitorMainnet = IS_LAYER_ZERO_MONITOR_MAINNET
+    this.layerZeroEnableTest = LAYER_ZERO_ENABLE_TEST
+    this.layerZeroChain = LAYER_ZERO_CHAIN
+    this.layerZeroBridge = LAYER_ZERO_BRIDGE
+    this.layerZeroLatestBlock = LAYER_ZERO_LATEST_BLOCK
   }
 
   async initOptimismEnv() {
