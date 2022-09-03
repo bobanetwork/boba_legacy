@@ -50,21 +50,6 @@ interface iL2NFTBridge {
     )
         external;
 
-    function withdrawWithExtraData(
-        address _l2Contract,
-        uint256 _tokenId,
-        uint32 _l1Gas
-    )
-        external;
-
-    function withdrawWithExtraDataTo(
-        address _l2Contract,
-        address _to,
-        uint256 _tokenId,
-        uint32 _l1Gas
-    )
-        external;
-
     function finalizeDeposit(
         address _l1Contract,
         address _l2Contract,

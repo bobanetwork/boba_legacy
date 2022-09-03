@@ -27,7 +27,6 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import { L2BillingContract } from "./L2BillingContract.sol";
-import { iSupportBridgeExtraData } from "./interfaces/iSupportBridgeExtraData.sol";
 
 /* External Imports */
 
@@ -232,81 +231,6 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             _tokenId,
             _l1Gas,
             ""
-        );
-    }
-
-    /**
-     * @inheritdoc iL2NFTBridge
-     */
-    function withdrawWithExtraData(
-        address _l2Contract,
-        uint256 _tokenId,
-        uint32 _l1Gas
-    )
-        external
-        virtual
-        override
-        nonReentrant()
-        whenNotPaused()
-    {
-        bytes memory extraData;
-        // if token has base on this layer
-        // if (pairNFTInfo[_l2Contract].baseNetwork == Network.L2) {
-        //     // check the existence of bridgeExtraData(uint256) on l2Contract
-        //     if (ERC165Checker.supportsInterface(_l2Contract, 0x9b9284f9)) {
-        //         extraData = iSupportBridgeExtraData(_l2Contract).bridgeExtraData(_tokenId);
-        //     } else {
-        //         // otherwise send tokenURI return (encoded in bytes)
-        //         // allow to fail if the call fails
-        //         extraData = abi.encode(IERC721Metadata(_l2Contract).tokenURI(_tokenId));
-        //     }
-        // }
-        // size limits unchecked
-        _initiateWithdrawal(
-            _l2Contract,
-            msg.sender,
-            msg.sender,
-            _tokenId,
-            _l1Gas,
-            extraData
-        );
-    }
-
-    /**
-     * @inheritdoc iL2NFTBridge
-     */
-    function withdrawWithExtraDataTo(
-        address _l2Contract,
-        address _to,
-        uint256 _tokenId,
-        uint32 _l1Gas
-    )
-        external
-        virtual
-        override
-        nonReentrant()
-        whenNotPaused()
-    {
-        bytes memory extraData;
-        // if token has base on this layer
-        // if (pairNFTInfo[_l2Contract].baseNetwork == Network.L2) {
-        //     // check the existence of bridgeExtraData(uint256) on l2Contract
-        //     if (ERC165Checker.supportsInterface(_l2Contract, 0x9b9284f9)) {
-        //         extraData = iSupportBridgeExtraData(_l2Contract).bridgeExtraData(_tokenId);
-        //     } else {
-        //         // otherwise send tokenURI return (encoded in bytes)
-        //         // allow to fail if the call fails
-        //         extraData = abi.encode(IERC721Metadata(_l2Contract).tokenURI(_tokenId));
-        //     }
-        // }
-        // size limits unchecked
-        _initiateWithdrawal(
-            _l2Contract,
-            msg.sender,
-            _to,
-            _tokenId,
-            _l1Gas,
-            extraData
         );
     }
 

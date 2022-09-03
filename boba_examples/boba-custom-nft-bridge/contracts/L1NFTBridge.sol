@@ -6,7 +6,6 @@ pragma experimental ABIEncoderV2;
 /* Interface Imports */
 import { iL1NFTBridge } from "./interfaces/iL1NFTBridge.sol";
 import { iL2NFTBridge } from "./interfaces/iL2NFTBridge.sol";
-import { iSupportBridgeExtraData } from "./interfaces/iSupportBridgeExtraData.sol";
 
 /* Library Imports */
 import { CrossDomainEnabled } from "@eth-optimism/contracts/libraries/bridge/CrossDomainEnabled.sol";
@@ -195,67 +194,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ReentrancyGuardUpgrade
         whenNotPaused()
     {
         _initiateNFTDeposit(_l1Contract, msg.sender, _to, _tokenId, _l2Gas, "");
-    }
-
-    //  /**
-    //  * @inheritdoc iL1NFTBridge
-    //  */
-    function depositNFTWithExtraData(
-        address _l1Contract,
-        uint256 _tokenId,
-        uint32 _l2Gas
-    )
-        external
-        virtual
-        override
-        nonReentrant()
-        whenNotPaused()
-    {
-        bytes memory extraData;
-        // if token has base on this layer
-        // if (pairNFTInfo[_l1Contract].baseNetwork == Network.L1) {
-        //     // check the existence of bridgeExtraData(uint256) on l1Contract
-        //     if (ERC165Checker.supportsInterface(_l1Contract, 0x9b9284f9)) {
-        //         extraData = iSupportBridgeExtraData(_l1Contract).bridgeExtraData(_tokenId);
-        //     } else {
-        //         // otherwise send tokenURI return (encoded in bytes)
-        //         // allow to fail if the call fails
-        //         extraData = abi.encode(IERC721Metadata(_l1Contract).tokenURI(_tokenId));
-        //     }
-        // }
-        // size limits unchecked
-        _initiateNFTDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _l2Gas, extraData);
-    }
-
-    //  /**
-    //  * @inheritdoc iL1NFTBridge
-    //  */
-    function depositNFTWithExtraDataTo(
-        address _l1Contract,
-        address _to,
-        uint256 _tokenId,
-        uint32 _l2Gas
-    )
-        external
-        virtual
-        override
-        nonReentrant()
-        whenNotPaused()
-    {
-        bytes memory extraData;
-        // if token has base on this layer
-        // if (pairNFTInfo[_l1Contract].baseNetwork == Network.L1) {
-        //     // check the existence of bridgeExtraData(uint256) on l1Contract
-        //     if (ERC165Checker.supportsInterface(_l1Contract, 0x9b9284f9)) {
-        //         extraData = iSupportBridgeExtraData(_l1Contract).bridgeExtraData(_tokenId);
-        //     } else {
-        //         // otherwise send tokenURI return (encoded in bytes)
-        //         // allow to fail if the call fails
-        //         extraData = abi.encode(IERC721Metadata(_l1Contract).tokenURI(_tokenId));
-        //     }
-        // }
-        // size limits unchecked
-        _initiateNFTDeposit(_l1Contract, msg.sender, _to, _tokenId, _l2Gas, extraData);
     }
 
     /**
