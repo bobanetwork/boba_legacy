@@ -465,10 +465,6 @@ class NetworkService {
   }
 
   async getBobaFeeChoice() {
-
-    console.log("getBobaFeeChoice()")
-    console.log("this.account:",this.account)
-
     const bobaFeeContract = new ethers.Contract(
       allAddresses.Boba_GasPriceOracle,
       Boba_GasPriceOracleJson.abi,
@@ -478,10 +474,8 @@ class NetworkService {
     try {
 
       let priceRatio = await bobaFeeContract.priceRatio()
-      console.log("BFO: priceRatio:",priceRatio)
 
       let feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
-      console.log("BFO: feeChoice:",feeChoice)
 
       const bobaFee = {
         priceRatio: priceRatio.toString(),
@@ -501,9 +495,6 @@ class NetworkService {
   }
 
   async switchFee( targetFee ) {
-
-    console.log("switchFee()")
-    console.log("this.account:",this.account)
 
     if( this.L1orL2 !== 'L2' ) return
 
@@ -536,8 +527,6 @@ class NetworkService {
   }
 
   async getETHMetaTransaction() {
-
-    console.log("triggering getETHMetaTransaction")
 
     const EIP712Domain = [
       { name: 'name', type: 'string' },
@@ -1196,11 +1185,9 @@ class NetworkService {
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
-    console.log("switchChain to:", targetLayer)
-
     try {
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
-      console.log("calling: window.ethereum.on('chainChanged', handleChangeChainOnce)")
+
       window.ethereum.on('chainChanged', handleChangeChainOnce)
       return true
     } catch (error) {
