@@ -296,10 +296,6 @@ contract BaseV1Voter is OwnableUpgradeable {
     }
 
     // try getting funds from minter and distribute it to the gauge in param
-    /*
-        TODO: to distribute rewards on specific pool
-
-    */
     function distribute(address _gauge) public lock {
         // try to update minter
         IMinter(minter).update_period();
