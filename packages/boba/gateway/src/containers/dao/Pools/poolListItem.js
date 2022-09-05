@@ -13,15 +13,49 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Typography, Slider } from '@mui/material'
 
+import Button from 'components/button/Button'
 import bobaLogo from 'images/boba-token.svg'
 
 import * as G from 'containers/Global.styles'
 import * as S from './poolList.style'
 
-function PoolListItem() {
+function PoolListItem({
+  pool,
+  onPoolVoteChange,
+  token,
+  onDistribute,
+}) {
+
+  const [ selectedVote, setSelectedVote ] = useState(0);
+  const [ myVote, setMyVote ] = useState({});
+
+  const handleVoteChange = (e, value) => {
+    setSelectedVote(value);
+    onPoolVoteChange(pool.poolId, value);
+  }
+
+  useEffect(() => {
+    if (token) {
+      let tokenUsed = pool.usedTokens.find((t) => t.tokenId === token.tokenId);
+      if (tokenUsed) {
+        let tokenBalance = parseInt(token.balance);
+        let poolVote = Number(tokenUsed.vote);
+        let votePercent = parseInt((poolVote / tokenBalance) * 100);
+        setMyVote({
+          value: poolVote.toFixed(2),
+          votePercent,
+        })
+        setSelectedVote(votePercent)
+      } else {
+        setSelectedVote(0)
+        setMyVote({})
+      }
+    }
+
+  }, [ token, pool ]);
 
   return <S.ListItemContent>
     <G.TableBody>
@@ -29,45 +63,60 @@ function PoolListItem() {
         <img src={bobaLogo} alt="boba logo" width={25} height={25} />
         <Box display="flex" flexDirection="column">
           <Typography variant="body2">
-            BOBA-ETH
+            {pool.name}
           </Typography>
           <Typography variant="body4" sx={{ opacity: 0.65 }}>
-            olongswap LP
+            {pool.description}
           </Typography>
         </Box>
       </G.TableCell>
       <G.TableCell pl={1} py={2}>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Typography variant="body2">
-            220,500,000.00
+            {pool.totalVotes}
           </Typography>
           <Typography variant="body4" sx={{ opacity: 0.65 }}>
-            30%
+            {pool.votePercentage}%
           </Typography>
         </Box>
       </G.TableCell>
       <G.TableCell pl={1} py={2}>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Typography variant="body2">
-            0
+            {myVote.value || 0}
           </Typography>
           <Typography variant="body4" sx={{ opacity: 0.65 }}>
-            0%
+            {myVote.votePercent || 0}%
           </Typography>
         </Box>
       </G.TableCell>
       <G.TableCell pl={1} py={2} width="40%" flex="2">
         <Box display="flex" width="100%" alignItems="center" justifyContent="space-around" gap={2}>
           <Typography variant="body2">
-            0%
+            {selectedVote}%
           </Typography>
           <Slider
-            defaultValue={30}
+            defaultValue={0}
             valueLabelDisplay="auto"
             step={1}
             min={0}
             max={100}
+            value={selectedVote}
+            onChange={handleVoteChange}
           />
+        </Box>
+      {/* </G.TableCell>
+      <G.TableCell pl={1} py={2}> */}
+        <Box display="flex" flexDirection="column" alignItems="flex-start">
+          {pool.isClaimable ?<Button
+            fullWidth={true}
+            variant="outlined"
+            color="primary"
+            size="small"
+            onClick={() => onDistribute(pool.guageAddress)}
+          >
+            Destribute
+          </Button> : null}
         </Box>
       </G.TableCell>
     </G.TableBody>

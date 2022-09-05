@@ -108,6 +108,7 @@ import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 
 import { bobaBridges } from 'util/bobaBridges'
 import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { getPoolDetail } from 'util/poolDetails'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -4814,10 +4815,8 @@ class NetworkService {
         this.account,
         allAddresses.Ve_BOBA
       )
-      console.log("Allowance:", allowance_BN.toString())
 
       let depositAmount_BN = BigNumber.from(value_Wei_String)
-      console.log("Increase Amount:", depositAmount_BN)
 
       let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
 
@@ -4831,7 +4830,6 @@ class NetworkService {
               approveAmount_BN
             )
           const TX = await approveStatus.wait()
-          console.log("approveStatus:", TX)
         }
         else {
           console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
@@ -4884,7 +4882,7 @@ class NetworkService {
    * fetchLockRecords
    *  - To to fetch list of existing lock records.
    */
-  async fetchLockRecords() {
+   async fetchLockRecords() {
     if (this.account === null) {
       console.log('NS: fetchLockRecords() error - called but account === null')
       return
@@ -4903,10 +4901,16 @@ class NetworkService {
         this.provider
       )
 
+      const baseVoter = new ethers.Contract(
+        allAddresses.BASE_V1_VOTER,
+        voterJson.abi,
+        this.provider
+      )
+
       let tokenIdList = [];
       let balanceInfo = [];
-
       let nftCount = await ve.balanceOf(this.account)
+
       for (let index = 0; index < Number(nftCount); index++) {
         const tokenId = await ve.tokenOfOwnerByIndex(this.account, index)
         tokenIdList.push(Number(tokenId))
@@ -4915,13 +4919,16 @@ class NetworkService {
       for (let tokenId of tokenIdList) {
         const balance = await ve.balanceOfNFT(tokenId);
         const locked = await ve.locked(tokenId);
+        const usedWeights = await baseVoter.usedWeights(tokenId);
+
 
         balanceInfo.push({
           tokenId,
-          balance: Number(utils.formatUnits(balance, 18)).toFixed(2),
-          lockedAmount: Number(utils.formatUnits(locked.amount, 18)).toFixed(2),
+          balance: Number(utils.formatUnits(balance, 18)),
+          lockedAmount: Number(utils.formatUnits(locked.amount, 18)),
           expiry: new Date(locked.end.toString() * 1000),
           expirySeconds: locked.end.toString() * 1000,
+          usedWeights: Number(utils.formatUnits(usedWeights, 18))
         })
       }
 
@@ -5110,6 +5117,65 @@ class NetworkService {
   /********* Vote & Dao Pools *********/
   /************************************/
 
+  async savePoolVote({
+    tokenId,
+    pools,
+    weights
+  }) {
+    if (this.account === null) {
+      console.log('NS: fetchPools() error - called but account === null')
+      return
+    }
+
+    try {
+      const baseVoter = new ethers.Contract(
+        allAddresses.BASE_V1_VOTER,
+        voterJson.abi,
+        this.provider
+      )
+
+      const res = await baseVoter.connect(this.provider.getSigner()).vote(
+        tokenId,
+        pools,
+        weights
+      )
+      return true;
+
+    } catch (error) {
+      console.log('NS: savePoolVote() error', error)
+      return error;
+    }
+  }
+
+  async distributePool({gaugeAddress}) {
+    if (this.account === null) {
+      console.log('NS: distributePool() error - called but account === null')
+      return
+    }
+
+    try {
+      const baseVoter = new ethers.Contract(
+        allAddresses.BASE_V1_VOTER,
+        voterJson.abi,
+        this.provider
+      )
+
+
+      /*
+      :TODO : should have check for active_period,
+       - need to discuss logic once
+      */
+      await baseVoter.distribute(gaugeAddress);
+
+      console.log(`Distribute successfully!`);
+
+      return true;
+    } catch (error) {
+      console.log('NS: distributePool() error', error)
+      return error;
+    }
+  }
+
   async fetchPools() {
     if (this.account === null) {
       console.log('NS: fetchPools() error - called but account === null')
@@ -5119,35 +5185,58 @@ class NetworkService {
     try {
 
       const pools = []
-      console.log([
-        allAddresses.BASE_V1_VOTER,
-        voterJson.abi,
-        this.provider
-      ])
       const baseVoter = new ethers.Contract(
         allAddresses.BASE_V1_VOTER,
         voterJson.abi,
         this.provider
       )
+      // load and iterate over nft to find vote on pools.
+      let { records } = await this.fetchLockRecords();
+      // filter the ve nft records which has used.
+      records = records.filter((token)=> token.usedWeights > 0)
 
-      const poolListA = await baseVoter.pools(1);
-      // const poolList = await baseVoter.pools();
+      const poolLen = await baseVoter.length();
 
+      for (let i = 0; i < Number(poolLen); i++) {
+        const poolId = await baseVoter.pools(i);
+        // pool votes
+        const rawVotes = await baseVoter.weights(poolId);
+        const votes = Number(utils.formatUnits(rawVotes, 18));
+        // total pools weights
+        const rawTotalWeights = await baseVoter.totalWeight();
+        const totalWeigths = Number(utils.formatUnits(rawTotalWeights, 18));
 
-      console.log([ 'poolList',poolListA ]);
+        // vote percentage
+        const votePercentage = (votes / totalWeigths) * 100;
+        // guage address w.r.to poolId to check weather it's claimable;
+        const gaugeAddress = await baseVoter.gauges(poolId);
 
-      /*
+        const claimable = await baseVoter.claimable(gaugeAddress);
 
+        let usedTokens = [];
+        for (let j = 0; j < records.length; j++) {
+          const nft = records[ j ];
+          const rawTokenVote = await baseVoter.votes(nft.tokenId, poolId);
+          const tokenVote = Number(utils.formatUnits(rawTokenVote, 18));
+
+          if (tokenVote) {
+            usedTokens.push({
+              tokenId: nft.tokenId,
+              vote: tokenVote
+            })
+          }
+        }
+
+        pools.push({
+          ...getPoolDetail(poolId),
           poolId,
-          name,
-          description,
-          totalVotes,
+          totalVotes: votes.toFixed(2),
+          votePercentage,
           gaugeAddress,
-          totalVotesPercentage
-          votes,
-          votesPercentage
-
-      */
+          usedTokens,
+          isClaimable: !!Number(claimable) /// if claimable > 0 then pool can be destributed
+        })
+      }
 
       return {
         pools

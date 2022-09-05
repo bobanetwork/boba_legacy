@@ -48,13 +48,13 @@ function RecordItem({
     </Grid>
     <Grid item md={3}>
       <Box display="flex" flexDirection="column" alignItems="flex-start" py={2}>
-        <Typography variant="body2">{lockedAmount}</Typography>
+        <Typography variant="body2">{lockedAmount.toFixed(2)}</Typography>
         <Typography variant="body3" sx={{ opacity: 0.5 }} >Boba</Typography>
       </Box>
     </Grid>
     <Grid item md={3}>
       <Box display="flex" flexDirection="column" alignItems="flex-start" py={2}>
-        <Typography variant="body2">{balance}</Typography>
+        <Typography variant="body2">{balance.toFixed(2)}</Typography>
         <Typography variant="body3" sx={{ opacity: 0.5 }}>veBoba</Typography>
       </Box>
     </Grid>

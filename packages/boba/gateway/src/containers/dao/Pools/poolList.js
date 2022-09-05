@@ -23,13 +23,14 @@ import Pager from 'components/pager/Pager'
 import { PER_PAGE } from 'util/constant'
 import { useSelector } from 'react-redux'
 import { selectPools } from 'selectors/veBobaSelector'
+import { selectLoading } from 'selectors/loadingSelector'
+import { Typography, Box } from '@mui/material'
 
 
-function PoolList() {
+function PoolList({ onPoolVoteChange, token, onDistribute}) {
   const [ page, setPage ] = useState(1)
-  const pools = [ 1, 2, 4, 5 ];
-  const listOfPools = useSelector(selectPools)
-  console.log(['listOfPools',listOfPools])
+  const loading = useSelector(selectLoading([ 'VOTE/POOLS' ]))
+  const pools = useSelector(selectPools)
   const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
   const endingIndex = page * PER_PAGE
   const paginatedPools = pools.slice(startingIndex, endingIndex)
@@ -58,9 +59,17 @@ function PoolList() {
           })
         }
       </G.TableHeading>
-      {[ 1, 2, 4, 5 ].map((i) => {
-        return <React.Fragment key={i}>
-          <PoolListItem />
+      {loading && <Box>
+        <Typography>Loading...</Typography>
+      </Box>}
+      {pools.map((pool) => {
+        return <React.Fragment key={pool.poolId}>
+          <PoolListItem
+            token={token}
+            pool={pool}
+            onPoolVoteChange={onPoolVoteChange}
+            onDistribute={onDistribute}
+          />
         </React.Fragment>
       })}
       <Pager

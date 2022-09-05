@@ -42,3 +42,11 @@ export function fetchLockRecords() {
 export function fetchPools() {
   return createAction('VOTE/POOLS', () => networkService.fetchPools())
 }
+
+export function onSavePoolVote(payload) {
+  return createAction('SAVE_POOL/VOTE', () => networkService.savePoolVote(payload))
+}
+
+export function onDistributePool(payload) {
+  return createAction('DISTRIBUTE/POOL', () => networkService.distributePool(payload))
+}

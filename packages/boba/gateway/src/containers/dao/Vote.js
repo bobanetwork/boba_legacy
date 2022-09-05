@@ -19,12 +19,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Box, Typography } from '@mui/material'
 import CheckMarkIcon from '@mui/icons-material/CheckCircleOutline'
 
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+
 import Button from 'components/button/Button'
 
-import Input from 'components/input/Input'
-
+import { openAlert } from 'actions/uiAction'
 import { setConnectBOBA } from 'actions/setupAction'
-import { fetchLockRecords, fetchPools } from 'actions/veBobaAction'
+import { fetchLockRecords, fetchPools, onDistributePool, onSavePoolVote } from 'actions/veBobaAction'
 
 import { selectAccountEnabled } from 'selectors/setupSelector'
 import { selectLockRecords } from 'selectors/veBobaSelector'
@@ -34,8 +36,6 @@ import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
 import * as G from 'containers/Global.styles'
 import * as S from './Vote.style'
 
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
 import PoolList from './Pools/poolList'
 
 const responsive = {
@@ -64,13 +64,56 @@ function Vote() {
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
 
-  const [ balance, setBalance ] = useState('--');
-  const [ nftSearch, setNftSearch ] = useState('');
   const [ selectedNft, setSelectedNft ] = useState(null);
+  const [ poolsVote, setPoolsVote ] = useState(null);
+  const [ usedVotingPower, setUsedVotingPower ] = useState(0);
+
+  const onPoolVoteChange = (poolId, value) => {
+    setPoolsVote({
+      ...poolsVote,
+      [ poolId ]: value
+    })
+  }
+
+  const onVote = async () => {
+    const res = await dispatch(onSavePoolVote({
+      tokenId: selectedNft.tokenId,
+      pools: Object.keys(poolsVote),
+      weights: Object.values(poolsVote),
+    }))
+    if (res) {
+      dispatch(fetchLockRecords());
+      dispatch(fetchPools());
+      dispatch(
+        openAlert(`Vote has been submitted successfully!`)
+      )
+    }
+  }
+
+  const onDistribute = async (gaugeAddress) => {
+    const res = await dispatch(onDistributePool({
+      gaugeAddress
+    }))
+
+    if (res) {
+      dispatch(fetchPools());
+      dispatch(
+        openAlert(`Pool has been distributed successfully!`)
+      )
+    }
+  }
 
   async function connectToBOBA() {
     dispatch(setConnectBOBA(true))
   }
+
+
+  useEffect(() => {
+    if (selectedNft) {
+      let usedPower = (selectedNft.usedWeights / selectedNft.balance) * 100
+      setUsedVotingPower(parseInt(usedPower))
+    }
+  }, [ selectedNft ]);
 
   useEffect(() => {
     if (!!accountEnabled) {
@@ -79,12 +122,6 @@ function Vote() {
     }
   }, [ accountEnabled, dispatch ]);
 
-  useEffect(() => {
-    if (!!accountEnabled) {
-      const veBoba = nftRecords.reduce((s, record) => s + Number(record.balance), 0);
-      setBalance(veBoba.toFixed(2))
-    }
-  }, [ accountEnabled, nftRecords ]);
 
   return < S.VotePageContainer >
     <Box display="flex" flexDirection="column" gap={2}>
@@ -120,7 +157,7 @@ function Vote() {
                 </G.ThumbnailContainer>
                 <Box display="flex" flexDirection="column">
                   <Typography variant="body1">#{nft.tokenId}</Typography>
-                  <Typography variant="body2">{nft.balance} <Typography component="span" variant="body3" sx={{ opacity: 0.5 }}>veBoba</Typography> </Typography>
+                  <Typography variant="body2">{nft.balance.toFixed(2)} <Typography component="span" variant="body3" sx={{ opacity: 0.5 }}>veBoba</Typography> </Typography>
                 </Box>
               </S.NftContainer>
             })}
@@ -130,39 +167,36 @@ function Vote() {
     <S.VoteContent gap={2}>
       <Typography variant="h3">Proposals</Typography>
       <S.VoteContentAction>
-        <Box>
-          <Input
-            size='small'
-            placeholder='Search WAGMI Pools'
-            onChange={i => { setNftSearch(i.target.value) }}
-          />
-        </Box>
-        <Box display="flex" justifySelf="flex-end">
-          {
-            !accountEnabled ?
+        {
+          !accountEnabled ?
+            <Button
+              fullWidth={true}
+              variant="outlined"
+              color="primary"
+              size="small"
+              onClick={() => connectToBOBA()}
+            >
+              Connect to BOBA
+            </Button> : <Box display="flex" gap={2} alignItems="center">
+              {selectedNft && <Typography variant="body2">Selected #{selectedNft.tokenId}, Voting power used {usedVotingPower} %</Typography>}
               <Button
                 fullWidth={true}
                 variant="outlined"
                 color="primary"
-                size="small"
-                onClick={() => connectToBOBA()}
+                size="medium"
+                onClick={onVote}
+                disabled={!selectedNft || !poolsVote}
               >
-                Connect to BOBA
-              </Button> : <Box display="flex" gap={2} alignItems="center">
-                {selectedNft && <Typography variant="body2">Selected #{selectedNft.tokenId}, Voting power used {selectedNft.balance}</Typography>}
-                <Button
-                  fullWidth={true}
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                >
-                  Vote
-                </Button>
-              </Box>
-          }
-        </Box>
+                Submit Vote
+              </Button>
+            </Box>
+        }
       </S.VoteContentAction>
-      <PoolList />
+      <PoolList
+        token={selectedNft}
+        onPoolVoteChange={onPoolVoteChange}
+        onDistribute={onDistribute}
+      />
     </S.VoteContent>
   </S.VotePageContainer >
 }

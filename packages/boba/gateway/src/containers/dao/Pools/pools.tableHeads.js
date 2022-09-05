@@ -20,10 +20,20 @@ export const poolsTableHeads = [
   {
     label: 'My Vote%',
     isSort: false,
-    size: '40%',
+    size: '30%',
     flex: 2,
     sx: {
       textAlign: 'center'
     }
   }
+  // ,
+  // {
+  //   label: 'Action',
+  //   isSort: false,
+  //   size: '10%',
+  //   flex: 2,
+  //   sx: {
+  //     textAlign: 'center'
+  //   }
+  // }
 ]

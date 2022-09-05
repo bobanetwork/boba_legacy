@@ -20,8 +20,7 @@ export const VoteContent = styled(Box)(({ theme }) => ({
 export const VoteContentAction = styled(Box)(({ theme }) => ({
   display: 'flex',
   width: '100%',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
+  justifyContent: 'flex-end'
 }));
 
 export const NftContainer = styled(Box)(({ theme, active }) => ({
@@ -34,7 +33,7 @@ export const NftContainer = styled(Box)(({ theme, active }) => ({
   cursor: 'pointer'
 }))
 
-export const Card = styled(Box)(({ theme}) => ({
+export const Card = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
