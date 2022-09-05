@@ -77,10 +77,7 @@ import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
 
 //veBoba ABIs
 import veJson from "../deployment/contracts/ve.json"
-import gaugeFactoryJson from "../deployment/contracts/BaseV1GaugeFactory.json"
-import gaugeJson from "../deployment/contracts/Gauge.json"
 import voterJson from "../deployment/contracts/BaseV1Voter.json"
-import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
 // multi chain alt l1s ABI's
 // import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
@@ -4822,14 +4819,13 @@ class NetworkService {
 
       try {
         if (approveAmount_BN.gt(allowance_BN)) {
-          console.log("Need to approve YES:", approveAmount_BN)
           const approveStatus = await this.BobaContract
             .connect(this.provider.getSigner())
             .approve(
               allAddresses.Ve_BOBA,
               approveAmount_BN
             )
-          const TX = await approveStatus.wait()
+          await approveStatus.wait()
         }
         else {
           console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
@@ -5134,11 +5130,13 @@ class NetworkService {
         this.provider
       )
 
-      const res = await baseVoter.connect(this.provider.getSigner()).vote(
-        tokenId,
-        pools,
-        weights
-      )
+      await baseVoter
+        .connect(this.provider.getSigner())
+        .vote(
+          tokenId,
+          pools,
+          weights
+        )
       return true;
 
     } catch (error) {
