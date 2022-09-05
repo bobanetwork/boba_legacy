@@ -6,7 +6,7 @@ services:
     environment:
       - MYSQL_USER=admin
       - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=OMGXV1
+      - MYSQL_DATABASE=BOBAV1
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     command: "--character-set-server=utf8mb4 --max-connections=100000"
     ports:
