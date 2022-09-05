@@ -24,63 +24,61 @@ import { PER_PAGE } from 'util/constant'
 import { useSelector } from 'react-redux'
 import { selectPools } from 'selectors/veBobaSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { Typography, Box } from '@mui/material'
+import { Typography } from '@mui/material'
 
 
-function PoolList({ onPoolVoteChange, token, onDistribute}) {
+function PoolList({ onPoolVoteChange, token, onDistribute }) {
+
   const [ page, setPage ] = useState(1)
+
   const loading = useSelector(selectLoading([ 'VOTE/POOLS' ]))
   const pools = useSelector(selectPools)
+
+  // pagination logic
   const startingIndex = page === 1 ? 0 : ((page - 1) * PER_PAGE)
   const endingIndex = page * PER_PAGE
   const paginatedPools = pools.slice(startingIndex, endingIndex)
-
   let totalNumberOfPages = Math.ceil(pools.length / PER_PAGE)
-
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
-  return <G.Container>
-    <G.Content>
-      <G.TableHeading>
-        {
-          poolsTableHeads.map((item) => {
-            return (
-              <G.TableHeadingItem
-                sx={{
-                  width: item.size,
-                  flex: item.flex,
-                  ...item.sx
-                }}
-                key={item.label}
-                variant="body2"
-                component="div">{item.label}
-              </G.TableHeadingItem>
-            )
-          })
-        }
-      </G.TableHeading>
-      {loading && <Box>
-        <Typography>Loading...</Typography>
-      </Box>}
-      {pools.map((pool) => {
-        return <React.Fragment key={pool.poolId}>
-          <PoolListItem
-            token={token}
-            pool={pool}
-            onPoolVoteChange={onPoolVoteChange}
-            onDistribute={onDistribute}
-          />
-        </React.Fragment>
-      })}
-      <Pager
-        currentPage={page}
-        isLastPage={paginatedPools.length < PER_PAGE}
-        totalPages={totalNumberOfPages}
-        onClickNext={() => setPage(page + 1)}
-        onClickBack={() => setPage(page - 1)}
-      />
-    </G.Content>
-  </G.Container>
+  return <G.Content>
+    <G.TableHeading>
+      {
+        poolsTableHeads.map((item) => {
+          return (
+            <G.TableHeadingItem
+              sx={{
+                width: item.size,
+                flex: item.flex,
+                ...item.sx
+              }}
+              key={item.label}
+              variant="body2"
+              component="div">{item.label}
+            </G.TableHeadingItem>
+          )
+        })
+      }
+    </G.TableHeading>
+    {loading && <Typography>Loading...</Typography>}
+    {paginatedPools.map((pool) => {
+      return <React.Fragment key={pool.poolId}>
+        <PoolListItem
+          token={token}
+          pool={pool}
+          onPoolVoteChange={onPoolVoteChange}
+          onDistribute={onDistribute}
+        />
+      </React.Fragment>
+    })}
+    <Pager
+      currentPage={page}
+      isLastPage={paginatedPools.length < PER_PAGE}
+      totalPages={totalNumberOfPages}
+      onClickNext={() => setPage(page + 1)}
+      onClickBack={() => setPage(page - 1)}
+    />
+  </G.Content>
 }
 
 export default PoolList;

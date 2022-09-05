@@ -22,6 +22,11 @@ import { useTheme } from '@emotion/react';
 
 function Pager ({ currentPage, totalPages, isLastPage, onClickNext, onClickBack, label }) {
   const theme = useTheme();
+
+  if (totalPages <= 1) {
+    return null;
+  }
+
   return (
     <S.PagerContainer>
       <div className={styles.numberLeft}>{label}</div>

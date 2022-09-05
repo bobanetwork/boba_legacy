@@ -4,7 +4,7 @@ import { Box, Typography, IconButton, Divider } from '@mui/material'
 export const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-around',
-  margin: '20px auto',
+  margin: '0 auto',
   width: '100%',
   gap: '10px',
   [ theme.breakpoints.down('sm') ]: {
@@ -15,9 +15,9 @@ export const Container = styled(Box)(({ theme }) => ({
   },
 }))
 
-export const ContentEmpty = styled(Box)(({ theme }) => ({
+export const ContentEmpty = styled(Box)(({ theme, minHeight, p }) => ({
   width: '100%',
-  minHeight: '400px',
+  minHeight: minHeight || '400px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

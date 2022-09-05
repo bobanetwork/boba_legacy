@@ -14,13 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
-import { Box, Typography, Slider } from '@mui/material'
+import { Box, Typography, Slider, styled } from '@mui/material'
 
 import Button from 'components/button/Button'
 import bobaLogo from 'images/boba-token.svg'
 
 import * as G from 'containers/Global.styles'
-import * as S from './poolList.style'
+
+// styled component
+const ListItemContent = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '20px',
+  width: '100%',
+  padding: '10px',
+  borderBottom: theme.palette.primary.borderBottom
+}))
+
 
 function PoolListItem({
   pool,
@@ -57,7 +67,7 @@ function PoolListItem({
 
   }, [ token, pool ]);
 
-  return <S.ListItemContent>
+  return <ListItemContent>
     <G.TableBody>
       <G.TableCell pl={1} py={2}>
         <img src={bobaLogo} alt="boba logo" width={25} height={25} />
@@ -120,7 +130,7 @@ function PoolListItem({
         </Box>
       </G.TableCell>
     </G.TableBody>
-  </S.ListItemContent>
+  </ListItemContent>
 }
 
 export default PoolListItem;

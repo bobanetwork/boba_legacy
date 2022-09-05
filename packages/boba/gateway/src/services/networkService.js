@@ -146,9 +146,9 @@ if (APP_CHAIN === 'rinkeby') {
 let allTokens = {}
 
 function handleChangeChainOnce(chainID_hex_string) {
-  console.log("handleChangeChainOnce: switched to chain", Number(chainID_hex_string))
+
   localStorage.setItem('chainChangedInit', true)
-  console.log("chainChangedInit", true)
+
   localStorage.setItem('newChain', Number(chainID_hex_string))
   // and remove the listner
   window.ethereum.removeListener('chainChanged', handleChangeChainOnce)
