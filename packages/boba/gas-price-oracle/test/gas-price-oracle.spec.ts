@@ -7,12 +7,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { GasPriceOracleService } from '../dist/service'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
-import {
-  AppendSequencerBatchParams,
-  encodeAppendSequencerBatch,
-} from '@eth-optimism/core-utils'
-import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { keccak256 } from 'ethers/lib/utils'
+import { Provider } from '@ethersproject/providers'
 
 describe('gas-price-oracle', () => {
   let signer1: Signer
@@ -39,7 +34,6 @@ describe('gas-price-oracle', () => {
   // BOBA_billingContract
   let wallet7: Wallet
   let address7: string
-
   // deployer
   let wallet8: Wallet
 
@@ -194,6 +188,7 @@ describe('gas-price-oracle', () => {
       gasPriceOracleAddress: gasPriceOracle.address,
 
       OVM_SequencerFeeVault: address5,
+      l2_L1NativeTokenAddress: L2SecondaryFeeToken.address,
 
       gasPriceOracleOwnerWallet: wallet8,
 
@@ -446,7 +441,7 @@ describe('gas-price-oracle', () => {
   it('should get l2 revenue correctly', async () => {
     await signer1.sendTransaction({
       to: address5,
-      value: ethers.utils.parseEther('1'),
+      value: ethers.utils.parseEther('4'),
     })
     await signer1.sendTransaction({
       to: address6,
@@ -454,41 +449,60 @@ describe('gas-price-oracle', () => {
     })
     await signer1.sendTransaction({
       to: address7,
-      value: ethers.utils.parseEther('1'),
+      value: ethers.utils.parseEther('2'),
     })
     await L2SecondaryFeeToken.transfer(address6, ethers.utils.parseEther('1'))
-    await L2SecondaryFeeToken.transfer(address7, ethers.utils.parseEther('1'))
+    await L2SecondaryFeeToken.transfer(address7, ethers.utils.parseEther('2.5'))
+    await L2SecondaryFeeToken.transfer(
+      Boba_GasPriceOracle.address,
+      ethers.utils.parseEther('1000')
+    )
 
     await gasPriceOracleService._getL2GasCost()
 
     expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.eq(
-      ethers.utils.parseEther('1')
+      ethers.utils.parseEther('4')
     )
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.eq(
-      ethers.utils.parseEther('1')
+      ethers.utils.parseEther('4')
     )
-    expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.eq(
-      ethers.utils.parseEther('1')
-    )
-    expect(gasPriceOracleService.state.L2BOBABillingBalance).to.be.eq(
-      ethers.utils.parseEther('1')
+    expect(gasPriceOracleService.state.L2BOBABillingVaultBalance).to.be.eq(
+      ethers.utils.parseEther('2')
     )
     expect(gasPriceOracleService.state.L2BOBABillingCollectFee).to.be.eq(
-      ethers.utils.parseEther('1')
+      ethers.utils.parseEther('2')
+    )
+    expect(
+      gasPriceOracleService.state.L2SecondaryFeeTokenVaultBalance
+    ).to.be.eq(ethers.utils.parseEther('1000'))
+    expect(gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee).to.be.eq(
+      ethers.utils.parseEther('1000')
     )
   })
 
   it('should record l2 revenue correctly after withdrawing fees', async () => {
+    const getGasFee = async (provider: Provider) => {
+      const latestBlockNumber = await provider.getBlockNumber()
+      const latestTransaction = await provider.getBlock(latestBlockNumber)
+      const gasUsed = latestTransaction.gasUsed
+      const transactionHash = latestTransaction.transactions[0]
+      const receipt = await provider.getTransaction(transactionHash)
+      const gasPrice = receipt.gasPrice
+      return gasUsed.mul(gasPrice)
+    }
+
     const preL2BOBACollectFee = gasPriceOracleService.state.L2BOBACollectFee
     const preL2BOBABillingCollectFee =
       gasPriceOracleService.state.L2BOBABillingCollectFee
-
+    const preL2SecondaryFeeTokenCollectFee =
+      gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee
     // send some funds back
     const signer1Address = await signer1.getAddress()
     await wallet5.sendTransaction({
       to: signer1Address,
       value: ethers.utils.parseEther('0.5'),
     })
+    const withdrawBOBAGasFee = await getGasFee(wallet5.provider)
     await signer1.sendTransaction({
       to: wallet5.address,
       value: ethers.utils.parseEther('0.5'),
@@ -502,22 +516,26 @@ describe('gas-price-oracle', () => {
       ethers.utils.parseEther('0.5')
     )
 
+    const withdrawBOBABillingGasFee = await getGasFee(wallet7.provider)
+
     const L2BOBAVaultBalance = await wallet5.getBalance()
-    const L2BOBABillingBalance = await wallet5.provider.getBalance(address7)
+    const L2BOBABillingVaultBalance = await wallet5.provider.getBalance(address7)
 
     await gasPriceOracleService._getL2GasCost()
 
-    expect(gasPriceOracleService.state.L2BOBACollectFee).to.be.equal(
-      preL2BOBACollectFee
-    )
-    expect(gasPriceOracleService.state.L2BOBABillingCollectFee).to.be.equal(
-      preL2BOBABillingCollectFee
-    )
+    expect(
+      gasPriceOracleService.state.L2BOBACollectFee.add(withdrawBOBAGasFee)
+    ).to.be.equal(preL2BOBACollectFee)
+    expect(
+      gasPriceOracleService.state.L2BOBABillingCollectFee.add(
+        withdrawBOBABillingGasFee
+      )
+    ).to.be.equal(preL2BOBABillingCollectFee)
     expect(gasPriceOracleService.state.L2BOBAVaultBalance).to.be.equal(
       L2BOBAVaultBalance
     )
-    expect(gasPriceOracleService.state.L2BOBABillingBalance).to.be.equal(
-      L2BOBABillingBalance
+    expect(gasPriceOracleService.state.L2BOBABillingVaultBalance).to.be.equal(
+      L2BOBABillingVaultBalance
     )
   })
 
@@ -531,6 +549,7 @@ describe('gas-price-oracle', () => {
       gasPriceOracleAddress: gasPriceOracle.address,
 
       OVM_SequencerFeeVault: address5,
+      l2_L1NativeTokenAddress: L2SecondaryFeeToken.address,
 
       gasPriceOracleOwnerWallet: wallet8,
 
@@ -582,6 +601,7 @@ describe('gas-price-oracle', () => {
       gasPriceOracleAddress: gasPriceOracle.address,
 
       OVM_SequencerFeeVault: address5,
+      l2_L1NativeTokenAddress: L2SecondaryFeeToken.address,
 
       gasPriceOracleOwnerWallet: wallet8,
 
@@ -622,6 +642,7 @@ describe('gas-price-oracle', () => {
       gasPriceOracleAddress: gasPriceOracle.address,
 
       OVM_SequencerFeeVault: address5,
+      l2_L1NativeTokenAddress: L2SecondaryFeeToken.address,
 
       gasPriceOracleOwnerWallet: wallet8,
 
@@ -664,6 +685,7 @@ describe('gas-price-oracle', () => {
       gasPriceOracleAddress: gasPriceOracle.address,
 
       OVM_SequencerFeeVault: address5,
+      l2_L1NativeTokenAddress: L2SecondaryFeeToken.address,
 
       gasPriceOracleOwnerWallet: wallet8,
 

@@ -153,6 +153,7 @@ const main = async () => {
 
   // Fixed address
   const OVM_SequencerFeeVault = '0x4200000000000000000000000000000000000011'
+  const l2_L1NativeTokenAddress = '0x4200000000000000000000000000000000000023'
 
   // sequencer, proposer, relayer and fast relayer addresses
   const sequencerAddress = SEQUENCER_ADDRESS
@@ -170,6 +171,7 @@ const main = async () => {
     addressManagerAddress: ADDRESS_MANAGER_ADDRESS,
     gasPriceOracleAddress: GAS_PRICE_ORACLE_ADDRESS,
     OVM_SequencerFeeVault,
+    l2_L1NativeTokenAddress,
     gasPriceOracleOwnerWallet,
     sequencerAddress,
     proposerAddress,
