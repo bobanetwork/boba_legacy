@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ import Pending from './TX_Pending'
 import * as S from './History.styles'
 import * as styles from './TX_All.module.scss'
 
-import useInterval from 'util/useInterval'
+import useInterval from 'hooks/useInterval'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
@@ -85,8 +85,8 @@ function History() {
     <S.HistoryPageContainer>
 
       <PageTitle title={'History'} />
-      
-      <Connect 
+
+      <Connect
         userPrompt={'Connect to MetaMask to see your history'}
         accountEnabled={layer}
       />

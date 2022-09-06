@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,64 +39,64 @@ function setupReducer (state = initialState, action) {
   switch (action.type) {
     case 'SETUP/ACCOUNT/SET':
       localStorage.setItem("justSwitchedChain", JSON.stringify(false))
-      return { 
-        ...state, 
+      return {
+        ...state,
         accountEnabled: action.payload,
         justSwitchedChain: false
       }
     case 'SETUP/WALLETADDRESS/SET':
-      return { 
-        ...state, 
+      return {
+        ...state,
         walletAddress: action.payload,
       }
     case 'SETUP/BASE/SET':
-      return { 
-        ...state, 
+      return {
+        ...state,
         baseEnabled: action.payload,
       }
     case 'SETUP/LAYER/SET':
       console.log("SR: Setting layer to:", action.payload)
-      return { 
-        ...state, 
+      return {
+        ...state,
         netLayer: action.payload
       }
     case 'SETUP/NETWORK/SET':
-      return { 
-        ...state, 
+      return {
+        ...state,
         network: action.payload
       }
     case 'SETUP/CONNECT_ETH':
-      return { 
-        ...state, 
+      return {
+        ...state,
         connectETH: action.payload
       }
     case 'SETUP/CONNECT_BOBA':
-      return { 
-        ...state, 
+      return {
+        ...state,
         connectBOBA: action.payload
       }
     case 'SETUP/CONNECT':
-      return { 
-        ...state, 
+      return {
+        ...state,
         connect: action.payload
       }
     case 'SETUP/SWITCH/REQUEST':
       console.log("SR:REQUEST - setting just changed to true")
       localStorage.setItem("justSwitchedChain", JSON.stringify(true))
-      return { 
-        ...state, 
+      return {
+        ...state,
         justSwitchedChain: true
       }
     case 'SETUP/SWITCH/SUCCESS':
       console.log("SR:SUCCESS - setting just changed to true")
       localStorage.setItem("justSwitchedChain", JSON.stringify(true))
-      return { 
-        ...state, 
+      return {
+        ...state,
         justSwitchedChain: true
       }
     case 'BOBAFEE/ADD/SUCCESS':
       console.log("BOBAFEE/ADD/SUCCESS:",action.payload)
-      return { 
+      return {
         ...state,
         bobaFeePriceRatio: action.payload.priceRatio,
         bobaFeeChoice: action.payload.feeChoice

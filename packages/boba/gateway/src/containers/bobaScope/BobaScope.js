@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import FastExits from './FastExits'
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
-import useInterval from 'util/useInterval'
+import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 import Connect from 'containers/connect/Connect'

@@ -35,6 +35,7 @@ import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import webthreenamesLogo from '../../images/ecosystem/webthreenames-logo.png'
 
+
 /**
  * thematical order of type.
  *
@@ -402,7 +403,7 @@ export const projectList = [
 ]
 
 export const loadProjectByCategory = () => {
-  const typeOrder = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
+  const typeOrder = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
   const projectByType = groupBy(projectList, 'type')
   const orderProjects = {}
   typeOrder.forEach((key) => {

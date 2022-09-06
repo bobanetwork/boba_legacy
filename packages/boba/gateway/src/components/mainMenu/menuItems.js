@@ -3,19 +3,19 @@ export const menuItems = [
     key: 'Bridge',
     icon: "WalletIcon",
     title: "Bridge",
-    url: "/Bridge"
+    url: "/bridge"
   },
   {
     key: 'Ecosystem',
     icon: "SafeIcon",
     title: "Ecosystem",
-    url: "/Ecosystem"
+    url: "/ecosystem"
   },
   {
     key: 'Wallet',
     icon: "WalletIcon",
     title: "Wallet",
-    url: "/"
+    url: "/wallet"
   },
   {
     key: 'History',
@@ -27,7 +27,13 @@ export const menuItems = [
     key: 'Farm',
     icon: "EarnIcon",
     title: "Earn",
-    url: "/earn",
+    url: "/farm",
+  },
+  {
+    key: 'Lock',
+    icon: "LockIcon",
+    title: "Lock",
+    url: "/lock",
   },
   {
     key: 'Save',

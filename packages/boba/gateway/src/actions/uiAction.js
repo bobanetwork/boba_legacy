@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,21 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export function setPage (page) {
-  return function (dispatch) {
-    return dispatch({ type: 'UI/PAGE/UPDATE', payload: page });
-  }
-}
-
 export function setTheme (theme) {
   return function (dispatch) {
     return dispatch({ type: 'UI/THEME/UPDATE', payload: theme });
   }
 }
 
-export function openModal (modal, token, fast, tokenIndex) {
+export function openModal (modal, token, fast, tokenIndex, lock) {
   return function (dispatch) {
-    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast, tokenIndex });
+    return dispatch({ type: 'UI/MODAL/OPEN', payload: modal, token, fast, tokenIndex, lock });
   }
 }
 

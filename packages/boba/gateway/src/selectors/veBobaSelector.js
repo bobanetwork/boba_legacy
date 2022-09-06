@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2022-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,23 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { useEffect, useRef } from 'react';
-
-export default function useInterval (callback, delay) {
-  const savedCallback = useRef();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [ callback ]);
-
-  useEffect(() => {
-    function tick () {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      tick();
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [ delay ]);
+export function selectLockRecords(state) {
+    return state.veboba.records
 }

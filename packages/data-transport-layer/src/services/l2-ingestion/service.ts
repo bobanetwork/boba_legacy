@@ -137,6 +137,7 @@ export class L2IngestionService extends BaseService<L2IngestionServiceOptions> {
         )
 
         await this.state.db.setHighestSyncedUnconfirmedBlock(targetL2Block)
+        await this.state.db.setTargetL2Block(currentL2Block)
 
         this.l2IngestionMetrics.highestSyncedL2Block.set(targetL2Block)
 

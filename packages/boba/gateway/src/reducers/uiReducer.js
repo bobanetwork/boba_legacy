@@ -1,5 +1,5 @@
 /*
-Copyright 2019-present OmiseGO Pte Ltd
+Copyright 2021-present Boba Network.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,17 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-//localStorage.removeItem("activePage")
-
-let activePage = localStorage.getItem("activePage")
-
-if (activePage) {
-  activePage = JSON.parse(activePage)
-}
-
 const initialState = {
   theme: 'dark',
-  page: activePage ? activePage : 'Wallet',
   depositModal: false,
   depositBatchModal: false,
   transferModal: false,
@@ -46,6 +37,7 @@ const initialState = {
   ledger: false,
   alert: null,
   error: null,
+  lock: null,
   activeHistoryTab: 'All',
   activeDataTab: 'Seven Day Queue',
 };
@@ -54,19 +46,13 @@ function uiReducer (state = initialState, action) {
   switch (action.type) {
     case 'UI/THEME/UPDATE':
       return { ...state, theme: action.payload }
-    case 'UI/PAGE/UPDATE':
-      //save currently active page
-      localStorage.setItem("activePage", JSON.stringify(action.payload))
-      return {
-        ...state,
-        page: action.payload
-      }
     case 'UI/MODAL/OPEN':
       return { ...state,
         [action.payload]: true,
         fast: action.fast,
         token: action.token,
         tokenIndex: action.tokenIndex,
+        lock: action.lock, // incase of lock record
       }
     case 'UI/MODAL/CLOSE':
       return { ...state, [action.payload]: false }
