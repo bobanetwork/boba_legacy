@@ -1,6 +1,5 @@
 import { ethers } from 'ethers'
 import dotenv from 'dotenv'
-import * as fs from 'fs'
 import { getContractFactory } from '@eth-optimism/contracts'
 import chalk from 'chalk'
 
