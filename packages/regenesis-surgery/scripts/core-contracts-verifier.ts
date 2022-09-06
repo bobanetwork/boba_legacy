@@ -232,7 +232,7 @@ const blankAddress = '0x0000000000000000000000000000000000000000'
 
   console.log(`🔗 ${chalk.grey(`Verifying L1CrossDomainMessenger`)}`)
   const L1CrossDomainMessengerAddress = await Lib_AddressManager.getAddress(
-    'L1CrossDomainMessenger'
+    'OVM_L1CrossDomainMessenger'
   )
   const L1CrossDomainMessengerContract = getContractFactory(
     'L1CrossDomainMessenger'
