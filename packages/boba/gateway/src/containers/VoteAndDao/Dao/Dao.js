@@ -27,7 +27,7 @@ import Select from 'components/select/Select'
 
 import { selectLatestProposalState, selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 import { fetchLockRecords } from 'actions/veBobaAction'
 import { selectLockRecords } from 'selectors/veBobaSelector'
@@ -56,6 +56,7 @@ function DAO({
 
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
+  const layer = useSelector(selectLayer());
   const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
   const hasLiveProposal = useSelector(selectLatestProposalState)
 
@@ -89,7 +90,7 @@ function DAO({
         </Box>
         <DividerLine />
         {
-          !accountEnabled ?
+          (!accountEnabled || layer !== 'L2' )?
             <Button
               fullWidth={true}
               variant="outlined"

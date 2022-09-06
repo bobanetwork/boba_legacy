@@ -29,7 +29,7 @@ import {
   onSavePoolVote
 } from 'actions/veBobaAction'
 
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectLockRecords } from 'selectors/veBobaSelector'
 
 import { ContentEmpty } from 'containers/Global.styles'
@@ -54,6 +54,7 @@ function Vote({
 
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
+  const layer = useSelector(selectLayer())
 
   const [ selectedNft, setSelectedNft ] = useState(null);
   const [ poolsVote, setPoolsVote ] = useState(null);
@@ -102,12 +103,11 @@ function Vote({
   }, [ selectedNft ]);
 
   useEffect(() => {
-    if (!!accountEnabled) {
+    if (!!accountEnabled && layer === 'L2') {
       dispatch(fetchLockRecords());
       dispatch(fetchPools());
     }
-  }, [ accountEnabled, dispatch ]);
-
+  }, [ accountEnabled, dispatch, layer ]);
 
   return <>
     <Box display="flex" flexDirection="column" gap={2}>
@@ -125,8 +125,7 @@ function Vote({
       }
     </Box>
     <Action>
-      {!accountEnabled
-        ?
+      {(!accountEnabled || layer !== 'L2') ?
         <Button
           fullWidth={true}
           variant="outlined"

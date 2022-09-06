@@ -185,7 +185,6 @@ function Home() {
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
-      dispatch(fetchLockRecords())
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
       dispatch(fetchGas())

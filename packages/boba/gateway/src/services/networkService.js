@@ -5145,14 +5145,8 @@ class NetworkService {
         this.provider
       )
 
-
-      /*
-      :TODO : should have check for active_period,
-       - need to discuss logic once
-      */
       await baseVoter.distribute(gaugeAddress);
 
-      console.log(`Distribute successfully!`);
 
       return true;
     } catch (error) {
@@ -5193,10 +5187,8 @@ class NetworkService {
 
         // vote percentage
         const votePercentage = (votes / totalWeigths) * 100;
-        // guage address w.r.to poolId to check weather it's claimable;
+        // guage address needed to distribute w.r.to pool.
         const gaugeAddress = await baseVoter.gauges(poolId);
-
-        const claimable = await baseVoter.claimable(gaugeAddress);
 
         let usedTokens = [];
         for (let j = 0; j < records.length; j++) {
@@ -5218,8 +5210,7 @@ class NetworkService {
           totalVotes: votes.toFixed(2),
           votePercentage,
           gaugeAddress,
-          usedTokens,
-          isClaimable: !!Number(claimable) /// if claimable > 0 then pool can be destributed
+          usedTokens
         })
       }
 

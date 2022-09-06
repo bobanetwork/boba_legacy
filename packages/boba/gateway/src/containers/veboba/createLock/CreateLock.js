@@ -171,7 +171,7 @@ function CreateLock({
         <Typography variant="body2"> {conversioRation()* value } ve BOBA </Typography>
       </S.InlineContainer>
       {
-        !accountEnabled ?
+        !accountEnabled || layer !== 'L2'?
           <Button
             fullWidth={true}
             variant="outlined"

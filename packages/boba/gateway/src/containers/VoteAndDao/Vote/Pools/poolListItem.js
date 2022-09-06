@@ -115,10 +115,10 @@ function PoolListItem({
             onChange={handleVoteChange}
           />
         </Box>
-      {/* </G.TableCell>
+        {/* </G.TableCell>
       <G.TableCell pl={1} py={2}> */}
         <Box display="flex" flexDirection="column" alignItems="flex-start">
-          {pool.isClaimable ?<Button
+          <Button
             fullWidth={true}
             variant="outlined"
             color="primary"
@@ -126,7 +126,7 @@ function PoolListItem({
             onClick={() => onDistribute(pool.guageAddress)}
           >
             Destribute
-          </Button> : null}
+          </Button>
         </Box>
       </G.TableCell>
     </G.TableBody>

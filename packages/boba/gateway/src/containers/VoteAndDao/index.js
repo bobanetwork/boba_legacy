@@ -7,7 +7,7 @@ import PageTitle from 'components/pageTitle/PageTitle';
 import Tabs from 'components/tabs/Tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLockRecords } from 'selectors/veBobaSelector';
-import { selectAccountEnabled } from 'selectors/setupSelector';
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector';
 import { fetchLockRecords } from 'actions/veBobaAction';
 import Vote from './Vote/Vote';
 import Dao from './Dao/Dao';
@@ -26,6 +26,7 @@ function VoteAndDAO() {
   const dispatch = useDispatch()
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
+  const layer = useSelector(selectLayer())
 
 
   async function connectToBOBA() {
@@ -33,10 +34,10 @@ function VoteAndDAO() {
   }
 
   useEffect(() => {
-    if (!!accountEnabled) {
+    if (!!accountEnabled && layer === 'L2') {
       dispatch(fetchLockRecords());
     }
-  }, [ accountEnabled, dispatch ]);
+  }, [ accountEnabled, dispatch, layer ]);
 
   useEffect(() => {
     if (!!accountEnabled) {
