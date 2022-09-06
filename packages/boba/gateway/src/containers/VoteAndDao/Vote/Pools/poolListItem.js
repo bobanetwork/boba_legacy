@@ -69,7 +69,7 @@ function PoolListItem({
 
   return <ListItemContent>
     <G.TableBody>
-      <G.TableCell pl={1} py={2}>
+      <G.TableCell width="20%" pl={1} py={2}>
         <img src={bobaLogo} alt="boba logo" width={25} height={25} />
         <Box display="flex" flexDirection="column">
           <Typography variant="body2">
@@ -80,17 +80,17 @@ function PoolListItem({
           </Typography>
         </Box>
       </G.TableCell>
-      <G.TableCell pl={1} py={2}>
+      <G.TableCell width="20%" pl={1} py={2}>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Typography variant="body2">
             {pool.totalVotes}
           </Typography>
           <Typography variant="body4" sx={{ opacity: 0.65 }}>
-            {pool.votePercentage}%
+            {pool.votePercentage.toFixed(2)}%
           </Typography>
         </Box>
       </G.TableCell>
-      <G.TableCell pl={1} py={2}>
+      <G.TableCell width="20%" pl={1} py={2}>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Typography variant="body2">
             {myVote.value || 0}
@@ -100,7 +100,7 @@ function PoolListItem({
           </Typography>
         </Box>
       </G.TableCell>
-      <G.TableCell pl={1} py={2} width="40%" flex="2">
+      <G.TableCell pl={1} py={2} width="30%" flex="2">
         <Box display="flex" width="100%" alignItems="center" justifyContent="space-around" gap={2}>
           <Typography variant="body2">
             {selectedVote}%
@@ -115,8 +115,8 @@ function PoolListItem({
             onChange={handleVoteChange}
           />
         </Box>
-        {/* </G.TableCell>
-      <G.TableCell pl={1} py={2}> */}
+      </G.TableCell>
+      <G.TableCell width="10%" pl={1} py={2}>
         <Box display="flex" flexDirection="column" alignItems="flex-start">
           <Button
             fullWidth={true}

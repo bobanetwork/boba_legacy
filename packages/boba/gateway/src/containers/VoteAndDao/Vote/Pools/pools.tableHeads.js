@@ -26,14 +26,14 @@ export const poolsTableHeads = [
       textAlign: 'center'
     }
   }
-  // ,
-  // {
-  //   label: 'Action',
-  //   isSort: false,
-  //   size: '10%',
-  //   flex: 2,
-  //   sx: {
-  //     textAlign: 'center'
-  //   }
-  // }
+  ,
+  {
+    label: 'Action',
+    isSort: false,
+    size: '10%',
+    flex: 1,
+    sx: {
+      textAlign: 'center'
+    }
+  }
 ]
