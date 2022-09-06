@@ -268,6 +268,7 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService.state.L1RelayerCostFee = BigNumber.from('4')
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('6')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('7')
+    gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee = BigNumber.from('8')
 
     // Write two files
     await gasPriceOracleService._writeL1ETHFee()
@@ -282,6 +283,7 @@ describe('gas-price-oracle', () => {
 
     expect(l2HistoryJSON.L2BOBACollectFee).to.be.eq('6')
     expect(l2HistoryJSON.L2BOBABillingCollectFee).to.be.eq('7')
+    expect(l2HistoryJSON.L2SecondaryFeeTokenCollectFee).to.be.eq('8')
 
     const l1DumpsPath = path.resolve(__dirname, '../data/l1History.json')
     expect(fs.existsSync(l1DumpsPath)).to.be.true
@@ -301,6 +303,7 @@ describe('gas-price-oracle', () => {
     gasPriceOracleService.state.L1RelayerCostFee = BigNumber.from('0')
     gasPriceOracleService.state.L2BOBACollectFee = BigNumber.from('0')
     gasPriceOracleService.state.L2BOBABillingCollectFee = BigNumber.from('0')
+    gasPriceOracleService.state.L2SecondaryFeeTokenCollectFee = BigNumber.from('0')
 
     // Write two files
     await gasPriceOracleService._writeL1ETHFee()

@@ -322,15 +322,15 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     /* eslint-disable */
     // adjust the collectFeeHistory if it is not correct
     // if vaultBalance is larger than collectFeeHistory, then we need to adjust the collectFeeHistory
-    const _adjustCollectFee = (collectFeeHistory: BigNumber,vaultBalance: BigNumber) => {
+    const _adjustCollectFee = (collectFeeHistory: BigNumber,vaultBalance: BigNumber, prefix: string) => {
       if (collectFeeHistory.lt(vaultBalance)) {
-        collectFeeHistory = vaultBalance
+        this.state[`${prefix}CollectFee`] = vaultBalance
       }
     }
 
-    _adjustCollectFee(this.state.L2BOBACollectFee, ETHVaultBalance)
-    _adjustCollectFee(this.state.L2BOBABillingCollectFee, L2BOBABillingVaultBalance)
-    _adjustCollectFee(this.state.L2SecondaryFeeTokenCollectFee, L2SecondaryFeeTokenVaultBalance)
+    _adjustCollectFee(this.state.L2BOBACollectFee, ETHVaultBalance, 'L2BOBA')
+    _adjustCollectFee(this.state.L2BOBABillingCollectFee, L2BOBABillingVaultBalance, 'L2BOBABilling')
+    _adjustCollectFee(this.state.L2SecondaryFeeTokenCollectFee, L2SecondaryFeeTokenVaultBalance, 'L2SecondaryFeeToken')
     /* eslint-enable */
 
     this.state.L2BOBAVaultBalance = ETHVaultBalance
