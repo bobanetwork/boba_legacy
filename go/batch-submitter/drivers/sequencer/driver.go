@@ -236,7 +236,6 @@ func (d *Driver) CraftBatchTx(
 		opts.NoSend = true
 
 		tx, err := d.rawCtcContract.RawTransact(opts, batchCallData)
-
 		switch {
 		case err == nil:
 			return tx, totalTxSize, nil

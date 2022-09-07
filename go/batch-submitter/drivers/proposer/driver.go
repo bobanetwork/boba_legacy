@@ -192,12 +192,9 @@ func (d *Driver) CraftBatchTx(
 
 	opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
 
-	log.Info("opts", "opts", opts)
-
 	if err != nil {
 		return nil, totalStateRootSize, err
 	}
-
 	opts.Context = ctx
 	opts.Nonce = nonce
 	opts.NoSend = true
