@@ -30,8 +30,8 @@ BondManager
 CanonicalTransactionChain
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x27Fa8742C6eC377F45aaE68eB060547a6770D432">
-<code>0x27Fa8742C6eC377F45aaE68eB060547a6770D432</code>
+<a href="https://moonbase.moonscan.io/address/0xa8bD51a7F46321587921A33fa3c752b426c74754">
+<code>0xa8bD51a7F46321587921A33fa3c752b426c74754</code>
 </a>
 </td>
 </tr>
@@ -40,8 +40,8 @@ CanonicalTransactionChain
 ChainStorageContainer-CTC-batches
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0xCf068B31F0E8bc2a169Ef05BA3fC3deeA90678aD">
-<code>0xCf068B31F0E8bc2a169Ef05BA3fC3deeA90678aD</code>
+<a href="https://moonbase.moonscan.io/address/0xfD3B000a734F69EE973cb7dfebA6f51Eb1cfE3a5">
+<code>0xfD3B000a734F69EE973cb7dfebA6f51Eb1cfE3a5</code>
 </a>
 </td>
 </tr>
@@ -50,8 +50,8 @@ ChainStorageContainer-CTC-batches
 ChainStorageContainer-CTC-queue
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x42Bb56b188E505D2FfDDBd46cCF092667fa9b27C">
-<code>0x42Bb56b188E505D2FfDDBd46cCF092667fa9b27C</code>
+<a href="https://moonbase.moonscan.io/address/0xb39Bb11616d21665111b86af1d7f4cDe3Ff11cB3">
+<code>0xb39Bb11616d21665111b86af1d7f4cDe3Ff11cB3</code>
 </a>
 </td>
 </tr>
@@ -60,8 +60,8 @@ ChainStorageContainer-CTC-queue
 ChainStorageContainer-SCC-batches
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x1614CDF9Af7D10a2D0D59Bc37edE750C411602Ba">
-<code>0x1614CDF9Af7D10a2D0D59Bc37edE750C411602Ba</code>
+<a href="https://moonbase.moonscan.io/address/0xa4c329f70634F5713e1E6539e543278343CaB887">
+<code>0xa4c329f70634F5713e1E6539e543278343CaB887</code>
 </a>
 </td>
 </tr>
@@ -110,8 +110,8 @@ Proxy__L1StandardBridge
 StateCommitmentChain
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x59A798dcff6406369217cbef8bad549De196f3C6">
-<code>0x59A798dcff6406369217cbef8bad549De196f3C6</code>
+<a href="https://moonbase.moonscan.io/address/0x5E41Eaac5319CDf336c51969E2F164A686138B28">
+<code>0x5E41Eaac5319CDf336c51969E2F164A686138B28</code>
 </a>
 </td>
 </tr>
@@ -290,3 +290,4 @@ Boba_GasPriceOracle
 </td>
 </tr>
 </table>
+
