@@ -231,8 +231,6 @@ func (d *Driver) CraftBatchTx(
 
 		opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
 
-		log.Info("stopped here")
-
 		if err != nil {
 			return nil, totalTxSize, err
 		}
@@ -241,6 +239,9 @@ func (d *Driver) CraftBatchTx(
 		opts.NoSend = true
 
 		tx, err := d.rawCtcContract.RawTransact(opts, batchCallData)
+
+		log.Info("stopped here", err)
+
 		switch {
 		case err == nil:
 			return tx, totalTxSize, nil
