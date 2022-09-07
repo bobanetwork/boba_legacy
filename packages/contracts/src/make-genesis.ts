@@ -190,6 +190,10 @@ export const makeL2GenesisFile = async (
       if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 31338) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamLocalBytecode
       }
+      // Moonbeam testnet
+      if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 1297) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamTestnetBytecode
+      }
       // Moonbeam Mainnet
       if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 1294) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamMainnetBytecode

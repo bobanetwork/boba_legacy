@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import * as fs from 'fs'
 
 // Load state dump from `geth dump` - format should be [{},{},{}]
-import rawStateDump from '../deployment/state-dump.raw.json'
+import rawStateDump from '../deployment/state-dump.regenesis.json'
 // State dump from /packages/contracts
 import coreStateDump from '@eth-optimism/contracts/dist/dumps/state-dump.latest.json'
 ;(async () => {
