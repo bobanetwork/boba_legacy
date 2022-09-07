@@ -226,9 +226,6 @@ func (d *Driver) CraftBatchTx(
 
 		log.Info(name+" batch constructed", "num_txs", len(batchElements), "length", len(batchCallData))
 
-		log.Info(name+" batch constructed", "keyID", d.cfg.KeyId)
-		log.Info(name+" batch constructed", "ChainID", d.cfg.ChainID)
-
 		opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
 
 		if err != nil {
@@ -242,7 +239,6 @@ func (d *Driver) CraftBatchTx(
 
 		switch {
 		case err == nil:
-			log.Info("get txs", "tx", tx, "totalTxSize", totalTxSize)
 			return tx, totalTxSize, nil
 
 		// If the transaction failed because the backend does not support
@@ -259,7 +255,6 @@ func (d *Driver) CraftBatchTx(
 			return tx, totalTxSize, err
 
 		default:
-			log.Info("get txs", "tx", nil, "totalTxSize", totalTxSize, "err", err)
 			return nil, totalTxSize, err
 		}
 	}

@@ -188,8 +188,6 @@ func (d *Driver) CraftBatchTx(
 
 	d.metrics.NumElementsPerBatch.Observe(float64(len(stateRoots)))
 
-	log.Info(name+" batch constructed", "keyID", d.cfg.KeyId)
-	log.Info(name+" batch constructed", "ChainID", d.cfg.ChainID)
 	log.Info(name+" batch constructed", "num_state_roots", len(stateRoots))
 
 	opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
@@ -199,8 +197,6 @@ func (d *Driver) CraftBatchTx(
 	if err != nil {
 		return nil, totalStateRootSize, err
 	}
-
-	log.Info("stopped here")
 
 	opts.Context = ctx
 	opts.Nonce = nonce
