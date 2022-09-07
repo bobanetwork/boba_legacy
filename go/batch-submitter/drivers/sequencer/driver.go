@@ -226,7 +226,12 @@ func (d *Driver) CraftBatchTx(
 
 		log.Info(name+" batch constructed", "num_txs", len(batchElements), "length", len(batchCallData))
 
+		log.Info(name+" batch constructed", "keyID", d.cfg.KeyId)
+		log.Info(name+" batch constructed", "ChainID", d.cfg.ChainID)
+
 		opts, err := ethawskmssigner.NewAwsKmsTransactorWithChainID(&d.cfg.KMS, d.cfg.KeyId, d.cfg.ChainID)
+
+		log.Info("stopped here")
 
 		if err != nil {
 			return nil, totalTxSize, err
