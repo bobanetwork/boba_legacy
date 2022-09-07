@@ -1173,4 +1173,24 @@ describe('LayerZero Bridges', () => {
       AltL1Bridge.connect(signer1).setMaxTransferAmountPerDay(2)
     ).to.be.revertedWith('Ownable: caller is not the owner')
   })
+
+  it('should set dstChainId', async () => {
+    await AltL1Bridge.setDstChainId('100')
+    await EthBridge.setDstChainId('200')
+
+    expect(await EthBridge.dstChainId()).to.be.eq(BigNumber.from('200'))
+    expect(await AltL1Bridge.dstChainId()).to.be.eq(BigNumber.from('100'))
+  })
+
+  it('Only the owner should be able to set dstChainId', async () => {
+    const [, signer1] = await ethers.getSigners()
+    // EthBridge
+    await expect(
+      EthBridge.connect(signer1).setDstChainId(2)
+    ).to.be.revertedWith('Ownable: caller is not the owner')
+    // AltL1Bridge
+    await expect(
+      AltL1Bridge.connect(signer1).setDstChainId(2)
+    ).to.be.revertedWith('Ownable: caller is not the owner')
+  })
 })
