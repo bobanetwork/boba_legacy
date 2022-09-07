@@ -240,10 +240,9 @@ func (d *Driver) CraftBatchTx(
 
 		tx, err := d.rawCtcContract.RawTransact(opts, batchCallData)
 
-		log.Info("stopped here", err)
-
 		switch {
 		case err == nil:
+			log.Info("get txs", "tx", tx, "totalTxSize", totalTxSize)
 			return tx, totalTxSize, nil
 
 		// If the transaction failed because the backend does not support
@@ -260,6 +259,7 @@ func (d *Driver) CraftBatchTx(
 			return tx, totalTxSize, err
 
 		default:
+			log.Info("get txs", "tx", nil, "totalTxSize", totalTxSize, "err", err)
 			return nil, totalTxSize, err
 		}
 	}
