@@ -1,6 +1,17 @@
 
 Boba Network shares the same [JSON-RPC API (opens new window)](https://eth.wiki/json-rpc/API) as Ethereum. Some new custom methods have been introduced and some other have been made unsupported for operation.
 
+### Debug JSON-RPC methods
+
+You can use the lightning replica node to debug your transactions.
+
+**Example**
+
+```
+curl https://lightning-replica.boba.network/ -X POST --header 'Content-type: application/json' --data '{"jsonrpc":"2.0", "method":"debug_traceTransaction", "params":["0xf97b6fdce473b96d9cb00bb45d8fbfbc2911f383c7d525ec9d84d916cc30d347", {}], "id":1}'
+```
+
+
 ### Custom JSON-RPC methods
 
 #### `eth_getBlockRange`

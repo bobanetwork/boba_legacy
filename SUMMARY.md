@@ -4,7 +4,7 @@
 * [Bug Bounty Program](bug-bounty.md)
 * [FAQ](faq.md)
 
-* User Documentation
+* User Docs
   * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
   * [Fraud Detection](boba\_community/fraud-detector/README.md)
   * [NFTs](boba\_documentation/user/003\_nfts.md)
@@ -18,7 +18,7 @@
   * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
   * [Turing Implementation](packages/boba/turing/README.md)
 
-* Developer Docs
+* For Developers
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
@@ -29,6 +29,8 @@
   * [Fees](boba\_documentation/developer/fee-scheme.md)
   * [Contract Addresses Boba/Ethereum](boba\_documentation/developer/network-parameters.md)
   * [Contract Addresses Boba/Moonbeam](boba\_documentation/developer/network-moonbeam.md)
+  * [Contract Addresses Boba/Fantom](boba\_documentation/developer/network-fantom.md)
+  * [Contract Addresses Boba/Avalanche](boba\_documentation/developer/network-avalanche.md)
   * [xDomain Transaction Status](boba\_documentation/developer/xdomain-tx-status.md)
   * [Verifying Contracts](boba\_documentation/developer/verify-smart-contracts.md)
   * [Using The Graph](packages/boba/subgraph/README.md)

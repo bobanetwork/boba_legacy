@@ -8,7 +8,7 @@ Price Feed oracles allow smart contracts to work with external data and open the
 
 ## 1. Boba-Straw
 
-Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
+Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. The price data is submitted based on the 0.25% price change threshold, but the maximal frequency is once every 10 minutes per market. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
 
 ### Feeds supported
 
@@ -123,18 +123,93 @@ For the latest completed round call **`latestRound(base, quote)`**.
 To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 ## 2. Witnet Price Feeds
+The Witnet multichain decentralized oracle enables smart contracts to realize their true potential by giving them access to all sorts of valuable data sets, and by attesting and delivering that information securely thanks to its strong cryptoeconomic guarantees.
 
-Witnet is a decentralized oracle network, with multiple price feeds currently live on Boba. The price feed is backed by several witnesses/witnet nodes whose data are aggregated and averaged to provide a decentralized and reliable price. It easy to listen to Witnet's price feed. Please refer to Witnet's official guide at [https://docs.witnet.io](https://docs.witnet.io).
+Witnet can power most DeFi primitives like price feeds, stablecoins, synthetics, etc., as well as acting as a reliable source of randomness for creating uniqueness in NFTs.
 
 ### Feeds supported
+A complete list of publicly available Witnet data feeds on Boba can be found in the Witnet Data Feeds website: [https://feeds.witnet.io/boba](https://feeds.witnet.io/boba)
 
-*Mainnet*: [BOBA/USDT, BTC/USD, ETH/USD, FRAX/USDT, USDC/USD, USDT/USD]
+[Request a new price feed on Boba](https://tally.so/r/wMZDAn) or [Create your own data feed](https://docs.witnet.io/smart-contracts/witnet-web-oracle/make-a-get-request).
 
-*Rinkeby*: [BOBA/USDT, BTC/USD, ETH/USD, FRAX/USDT, FXS/USDT, OMG/BTC, OMG/ETH, OMG/USDT, USDC/USD, USDT/USD]
+### How To Use Witnet Price Feeds
+
+Witnet price feeds can be integrated into your own Boba Mainnet contracts in two different ways:
+
+1. [Integrate through proxy](https://docs.witnet.io/smart-contracts/witnet-data-feeds/using-witnet-data-feeds#reading-multiple-currency-pairs-from-the-router) Recommended for testing and upgradability.
+   This is the preferred way to consume the Witnet-powered price feeds. Through using the ***Price Feeds Router***.
+
+2. [Integrate directly](https://docs.witnet.io/smart-contracts/witnet-data-feeds/using-witnet-data-feeds#reading-last-price-and-timestamp-from-a-price-feed-contract-serving-a-specific-pair) Optimized for gas cost and decentralization
+
+The ***WitnetPriceRouter*** smart contract is deployed in all the [supported chains](https://docs.witnet.io/smart-contracts/witnet-data-feeds/addresses) and allows your own smart contracts and Web3 applications to get the latest price of any of the [supported currency pairs](https://docs.witnet.io/smart-contracts/witnet-data-feeds/price-feeds-registry#currency-pairs) by providing the identifier of the pair to a single Solidity method. This removes the need to know the actual contract addresses handling the price updates from the Witnet oracle.
+
+### Reading multiple price pairs from the router
+
+**WitnetPriceRouter**
+
+*Mainnet*: [0x93f61D0D5F623144e7C390415B70102A9Cc90bA5](https://bobascan.com/address/0x93f61D0D5F623144e7C390415B70102A9Cc90bA5/read-contract)
+
+*Rinkeby*: [0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a](https://testnet.bobascan.com/address/0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a/read-contract)
+
+The Price Router contract is the easiest and most convenient way to consume Witnet price feeds on any of the [supported chains](/smart-contracts/supported-chains).
+
+#### Solidity example
+
+The example below shows how to read the price of two different assets from the Witnet Price Router:
+
+```javascript
+ // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.11;
+import "witnet-solidity-bridge/contracts/interfaces/IWitnetPriceRouter.sol";
+contract MyContract {
+    IWitnetPriceRouter immutable public router;
+    /**
+     * IMPORTANT: pass the WitnetPriceRouter address depending on
+     * the network you are using! Please find available addresses here:
+     * https://docs.witnet.io/smart-contracts/price-feeds/contract-addresses
+     */
+    constructor(IWitnetPriceRouter _router))
+        router = _router;
+    }
+    /// Returns the BTC / USD price (6 decimals), ultimately provided by the Witnet oracle.
+    function getBtcUsdPrice() public view returns (int256 _price) {
+        (_price,,) = router.valueFor(bytes4(0x24beead4));
+    }
+    /// Returns the ETH / USD price (6 decimals), ultimately provided by the Witnet oracle.
+    function getEthUsdPrice() public view returns (int256 _price) {
+        (_price,,) = router.valueFor(bytes4(0x3d15f701));
+    }
+    /// Returns the BTC / ETH price (6 decimals), derived from the ETH/USD and
+    /// the BTC/USD pairs that were ultimately provided by the Witnet oracle.
+    function getBtcEthPrice() public view returns (int256 _price) {
+        return (1000000 * getBtcUsdPrice()) / getEthUsdPrice();
+    }
+}
+```
+
+#### Javascript example
+
+You may also read the latest price of any of the supported currency pairs from your **Web3** application by interacting directly with the Price Router contract:
+
+```javascript
+web3 = Web3(Web3.HTTPProvider('https://mainnet.boba.network'))
+abi = '[{ "inputs": [{ "internalType": "bytes32", "name": "_id", "type": "bytes32" }], "name": "valueFor", "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }, { "internalType": "uint256", "name": "", "type": "uint256" }, { "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }]'
+addr = '0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a'
+contract = web3.eth.contract(address=addr, abi=abi)
+// get last value for "Price-BOBA/USDT-6"
+valueFor = contract.functions.valueFor().call("0xf723bde1")
+print("Price-BOBA/USDT-6:", valueFor[0])
+print("> lastTimestamp:", valueFor[1])
+print("> latestUpdateStatus:", valueFor[2])
+```
+
+For more information about Witnet please refer to:
+
+[website](https://witnet.io/) | [docs](https://docs.witnet.io/) | [github](https://github.com/witnet) | [twitter](https://twitter.com/witnet_io) | [telegram](https://t.me/witnetio) | [discord](https://discord.gg/witnet)
 
 ## 3. Turing
 
-Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../packages/boba/turing/README.md). See [calling APIs](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract) for detailed instructions.
+Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../boba_documentation/developer/turing.md).
 
 Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
 
