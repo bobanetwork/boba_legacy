@@ -185,6 +185,10 @@ import "./lzApp/NonblockingLzApp.sol";
      *    Admin    *
      **************/
 
+    function setDstChainId(uint16 _dstChainId) external onlyOwner {
+        dstChainId = _dstChainId;
+    }
+
     function setUseCustomAdapterParams(bool _useCustomAdapterParams, uint _dstGasAmount) external onlyOwner() {
         useCustomAdapterParams = _useCustomAdapterParams;
         // set dstGas lookup, since only one dstchainId is allowed and its known
