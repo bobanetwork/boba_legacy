@@ -3,13 +3,14 @@ import { closeModal } from 'actions/uiAction';
 
 import Modal from 'components/modal/Modal';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectNetwork } from 'selectors/setupSelector';
+import { useDispatch } from 'react-redux';
+
+// network service
+import networkService from 'services/networkService';
 
 function WrongNetworkModal({open}) {
 
   const dispatch = useDispatch();
-  const network = useSelector(selectNetwork());
 
   function handleClose () {
     dispatch(closeModal('wrongNetworkModal'));
@@ -26,7 +27,7 @@ function WrongNetworkModal({open}) {
     >
       <Box display="flex" alignItems="center" justifyContent="center">
         <Typography variant='body2'>
-          Please connect to the {network} network
+          Please connect to the {networkService.L1ChainAsset.l2Name} network
         </Typography>
       </Box>
     </Modal>

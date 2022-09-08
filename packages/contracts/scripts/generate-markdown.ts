@@ -35,10 +35,18 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
   {
     folder: 'bobafuji',
     name: 'Boba Avalanche (public testnet)',
-    chainid: 3428,
+    chainid: 4328,
     rpc: 'https://testnet.avax.boba.network',
     l1Explorer: 'https://testnet.snowtrace.io',
     l2Explorer: 'https://blockexplorer.testnet.avax.boba.network',
+  },
+  {
+    folder: 'bobaavax',
+    name: 'Boba Avalanche (public mainnet)',
+    chainid: 43288,
+    rpc: 'https://avax.boba.network',
+    l1Explorer: 'https://snowtrace.io',
+    l2Explorer: 'https://blockexplorer.avax.boba.network',
   },
   {
     folder: 'bobabase',
