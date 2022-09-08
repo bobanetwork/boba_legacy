@@ -174,7 +174,7 @@ class OptimismEnv {
 
     this.layerZeroEnableTest = LAYER_ZERO_ENABLE_TEST
     this.layerZeroChain = LAYER_ZERO_CHAIN
-    this.layerZeroBridge = LAYER_ZERO_BRIDGE
+    this.layerZeroBridges = LAYER_ZERO_BRIDGE.split(',')
     this.layerZeroLatestBlock = LAYER_ZERO_LATEST_BLOCK
   }
 
