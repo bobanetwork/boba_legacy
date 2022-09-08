@@ -48,18 +48,22 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       prefix,
       `monitoring ${this.layerZeroChain} with ${JSON.stringify(this.chainInfo)}`
     )
-    this.isETH = this.layerZeroChain.search(/EthBridgeTo/) === 0
     this.latestBlock = 0
     this.currentBlock = this.chainInfo.latestBlock
     this.chainID = this.chainInfo.chainID
 
-    const abi = this.isETH ? EthBridgeJson.abi : AltL1Bridge.abi
-
     this.bridgeContracts = []
-    this.chainInfo.bridgeAddresses.forEach((address) => {
-      const contract = new ethers.Contract(address, abi, this.L1Provider)
+    for (let i = 0; i < this.layerZeroBridges.length; i++) {
+      const bridgeName = this.layerZeroBridges[i]
+      const isFromETH = bridgeName.search(/EthBridgeTo/) > -1
+      const abi = isFromETH ? EthBridgeJson.abi : AltLBridge.abi
+      const contract = new ethers.Contract(
+        bridgeAddresses[i],
+        abi,
+        this.L1Provider
+      )
       this.bridgeContracts.push(contract)
-    })
+    }
   }
 
   async initScan() {
@@ -73,7 +77,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       this.bridgeDstChainIDs.push(destChainID)
       console.log(
         prefix,
-        `monitor bridge ${contract.Address} with dstChainID ${destChain}`
+        `monitor bridge ${this.bridgeContracts[i].address} with dstChainID ${destChainID}`
       )
     }
 
@@ -103,10 +107,11 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       const upperBlock = Math.min(i + 999, endBlock)
       console.log(prefix, `scan blockRange`, i, upperBlock)
 
-      for (let j = 0; i < this.bridgeContracts.length; j++) {
+      for (let j = 0; j < this.bridgeContracts.length; j++) {
         await this.scanBlock(
           i,
           upperBlock,
+          this.layerZeroBridges[j],
           this.bridgeContracts[j],
           this.bridgeDstChainIDs[j]
         )
@@ -117,9 +122,9 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     }
   }
 
-  async scanBlock(startBlock, endBlock, bridgeContract, dstChainID) {
+  async scanBlock(startBlock, endBlock, bridgeName, bridgeContract, dstChainID) {
     const logs = await bridgeContract.queryFilter(
-      this.isETH
+      bridgeName.search(/EthBridgeTo/) > -1
         ? [
           bridgeContract.filters.ERC20DepositInitiated(),
           bridgeContract.filters.ERC20WithdrawalFinalized(),
@@ -133,10 +138,20 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     )
 
     for (const l of logs) {
+      const eventNames = [
+        'ERC20DepositInitiated',
+        'ERC20WithdrawalFinalized',
+        'WithdrawalInitiated',
+        'DepositFinalized',
+      ]
+      if (!eventNames.includes(l.event)) {
+        continue
+      }
+
       const tx = await l.getTransaction()
       const eventData = {
         chainID: this.chainID,
-        targetChain: dstChainID,
+        targetChainID: dstChainID,
         hash: l.transactionHash,
         blockHash: l.blockHash,
         blockNumber: l.blockNumber,

@@ -138,6 +138,7 @@ class DatabaseService extends OptimismEnv {
     await query(`CREATE TABLE IF NOT EXISTS layerZeroTx
       (
         chainID INT NOT NULL,
+        targetChainID INT NOT NULL,
         hash VARCHAR(255) NOT NULL,
         blockHash VARCHAR(255) NOT NULL,
         blockNumber INT NOT NULL,
@@ -523,6 +524,7 @@ class DatabaseService extends OptimismEnv {
   async insertLayerZeroTx(eventData) {
     const tx = {
       chainID: eventData.chainID,
+      targetChainID: eventData.targetChainID,
       hash: eventData.hash.toString(),
       blockHash: eventData.blockHash.toString(),
       blockNumber: eventData.blockNumber.toString(),
@@ -546,6 +548,7 @@ class DatabaseService extends OptimismEnv {
     await query(`INSERT IGNORE INTO layerZeroTx
       SET hash='${tx.hash}',
       chainID='${tx.chainID}',
+      targetChainID='${tx.targetChainID}',
       blockHash='${tx.blockHash}',
       blockNumber='${tx.blockNumber}',
       txFrom='${tx.txFrom}',
