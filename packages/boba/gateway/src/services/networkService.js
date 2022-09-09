@@ -808,7 +808,8 @@ class NetworkService {
                                'WAGMIv0',
                                'WAGMIv1',
                                'WAGMIv2', 'WAGMIv2-Oolong',
-                               'WAGMIv3', 'WAGMIv3-Oolong'
+                               'WAGMIv3', 'WAGMIv3-Oolong',
+                               'CGT'
                               ]
 
       //not all tokens are on Rinkeby
@@ -875,6 +876,12 @@ class NetworkService {
           allTokens[key] = {
             'L1': 'OLO',
             'L2': '0x5008F837883EA9a07271a1b5eB0658404F5a9610'
+          }
+        }
+        else if(key === 'CGT') {
+          allTokens[key] = {
+            'L1': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a',
+            'L2': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a'
           }
         }
         else {
