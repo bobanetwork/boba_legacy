@@ -6,7 +6,7 @@
   "ChainStorageContainer-SCC-batches": "0xc4243ecE585B843c7cf92E65617A4211FA580dDb",
   "L1MultiMessageRelayer": "0x87e062dE99Ed71aF9b22dDA63e1b6D43333798f8",
   "AddressManager": "0x00220f8ce1c4be8436574e575fE38558d85e2E6b",
-  "OVM_L1CrossDomainMessenger": "0xc9e667B797408bEa03cb6813D796CE8B0e753103",
+  "OVM_L1CrossDomainMessenger": "0x19FF7f546b66f69e859E07B61444c3d3EF35ABC5",
   "Proxy__L1CrossDomainMessenger": "0x0fc742332ae6D447d6619D93985Aa288B81CBb0C",
   "Proxy__L1StandardBridge": "0xf188F1e92B2c78956D2859b84684BFD17103e22c",
   "StateCommitmentChain": "0x1ef85D873Cf451C8B9a45DbE40b478E991F51210",
