@@ -52,10 +52,6 @@ import {
   fetchExits
 } from 'actions/networkAction'
 
-import networkService from 'services/networkService'
-
-import { setBaseState } from 'actions/setupAction'
-
 /********   SELECTORS ********/
 import {
   selectBaseEnabled,
@@ -77,8 +73,6 @@ import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Wallet from 'containers/wallet/Wallet'
-
-import { Box, Container } from '@mui/material'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -285,15 +279,6 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "History" &&
-              <Transactions />
-            }
-            {pageDisplay === "BobaScope" &&
-              <BobaScope />
-            }
-            {pageDisplay === "Wallet" &&
-              <Wallet />
-            }
             <Outlet />
           </Container>
           <PageFooter/>

@@ -64,11 +64,9 @@ const PageFooter = ({maintenance}) => {
         {!isMobile && <GasSwitcher />}
         <S.LinkWrapper>
           <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('BobaScope'))
-            }}
+            to="/bobascope"
           >BobaScope</S.FooterLink>
-          <S.FooterLink
+          <S.FooterLinkExt
             href={networkService.blockExplorerUrls}
             component="a"
             target="_blank"
