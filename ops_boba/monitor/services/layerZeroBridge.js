@@ -149,6 +149,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       }
 
       const tx = await l.getTransaction()
+      const block = await this.L1Provider.getBlock(l.blockNumber)
       const eventData = {
         chainID: this.chainID,
         targetChainID: dstChainID,
@@ -163,6 +164,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
         crossTxTo: l.args._to,
         amount: l.args._amount,
         event: l.event,
+        timestamp: block.timestamp,
       }
 
       await this.databaseService.insertLayerZeroTx(eventData)

@@ -142,6 +142,7 @@ class DatabaseService extends OptimismEnv {
         hash VARCHAR(255) NOT NULL,
         blockHash VARCHAR(255) NOT NULL,
         blockNumber INT NOT NULL,
+        timestamp INT,
         txFrom VARCHAR(255),
         txTo VARCHAR(255),
         l1Token VARCHAR(255),
@@ -536,6 +537,7 @@ class DatabaseService extends OptimismEnv {
       crossTxTo: eventData.crossTxTo,
       amount: eventData.amount.toString(),
       event: eventData.event,
+      timestamp: eventData.timestamp,
     }
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
@@ -558,6 +560,7 @@ class DatabaseService extends OptimismEnv {
       crossTxFrom='${tx.crossTxFrom}',
       crossTxTo='${tx.crossTxTo}',
       amount='${tx.amount}',
+      timestamp='${tx.timestamp}',
       event='${tx.event}'
     `)
     con.end()
