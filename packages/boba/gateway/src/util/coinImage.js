@@ -29,6 +29,7 @@ import wagmiv2Logo from 'images/wagmiv2.png'
 import wagmiv3Logo from 'images/wagmiv3.png'
 import wagmiv2OLOLogo from 'images/wagmiv2olo.png'
 import oloLogo from 'images/olo.svg'
+import CGTLogo from 'images/CGT.svg'
 
 export const getCoinImage = (symbol) => {
 
@@ -133,6 +134,9 @@ export const getCoinImage = (symbol) => {
       break;
     case "OLO":
       logo = oloLogo;
+      break;
+    case "CGT":
+      logo = CGTLogo;
       break;
     default:
       logo = ethLogo;
