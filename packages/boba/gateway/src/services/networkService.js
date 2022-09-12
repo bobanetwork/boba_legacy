@@ -4149,7 +4149,6 @@ class NetworkService {
         let forVotes = parseInt(formatEther(proposalData.forVotes))
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
-        // console.log(['proposalData',proposalData])
         let startTimestamp = proposalData.startTimestamp.toString()
         let endTimestamp = proposalData.endTimestamp.toString()
 
@@ -4160,7 +4159,7 @@ class NetworkService {
         let description = proposalRaw.description.toString()
 
         proposalList.push({
-           id: proposalID.toString(),
+           id: proposalID?.toString(),
            proposal,
            description,
            totalVotes: forVotes + againstVotes,
