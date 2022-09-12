@@ -40,7 +40,7 @@ import Pending from './TX_Pending'
 import * as S from './History.styles'
 import * as styles from './TX_All.module.scss'
 
-import useInterval from 'util/useInterval'
+import useInterval from 'hooks/useInterval'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
