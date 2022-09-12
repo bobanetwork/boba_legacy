@@ -6,6 +6,7 @@ const OptimismEnv = require('./utilities/optimismEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
 const { Logger } = require('@eth-optimism/common-ts')
+import { createClient } from '@layerzerolabs/scan-client';
 
 const EthBridgeJson = require('@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
 const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
@@ -20,9 +21,12 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
 
     this.databaseService = new DatabaseService()
 
+
     const layerZeroAddresses = this.layerZeroEnableTest
       ? layerZeroTestnetAddresses
       : layerZeroMainnetAddresses;
+
+    this.layerZeroScanner = this.layerZeroEnableTest ? createClient('testnet') : createClient('mainnet');
 
     if (layerZeroAddresses.BOBA_Bridges[this.layerZeroChain] === undefined) {
       throw new Error(
@@ -150,6 +154,35 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
 
       const tx = await l.getTransaction()
       const block = await this.L1Provider.getBlock(l.blockNumber)
+      const result = await this.layerZeroScanner.getMessagesBySrcTxHash(
+        l.transactionHash
+      )
+      let url = ''
+      if (len(result.messages) > 0) {
+        const message = result.messages[0]
+        if (message.status !== 'INFLIGHT') {
+          // [
+          //   {
+          //     srcUaAddress: '0x9d1b1669c73b033dfe47ae5a0164ab96df25b944',
+          //     dstUaAddress: '0x352d8275aae3e0c2404d9f68f6cee084b5beb3dd',
+          //     updated: 1662991680,
+          //     created: 1662991522,
+          //     srcChainId: 106,
+          //     dstChainId: 110,
+          //     dstTxHash: '0xed243b4f381971719cc3799f5f989f8d4344fcfebf46224d92370b432d381208',
+          //     dstTxError: null,
+          //     srcTxHash: '0x05efb7a5f9dfc90c999c63c81c28de17c23d2233850a732fe411c01c74053e0d',
+          //     srcBlockHash: '0x318285210d3951b3b3895258d5cdd8181677ee02e15a5424036ff595d8b37318',
+          //     srcBlockNumber: '19798751',
+          //     srcUaNonce: 93,
+          //     status: 'DELIVERED'
+          //   }
+          // ]
+          // https://layerzeroscan.com/106/address/0x9d1b1669c73b033dfe47ae5a0164ab96df25b944/message/110/address/0x352d8275aae3e0c2404d9f68f6cee084b5beb3dd/nonce/93
+          url = `https://layerzeroscan.com/${message.srcChainId}/address/${message.srcUaAddress}/message/${message.dstChainId}/address/${message.dstUaAddress}/nonce/${message.srcUaNonce}`
+        }
+      }
+
       const eventData = {
         chainID: this.chainID,
         targetChainID: dstChainID,
@@ -165,6 +198,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
         amount: l.args._amount,
         event: l.event,
         timestamp: block.timestamp,
+        reference: url,
       }
 
       await this.databaseService.insertLayerZeroTx(eventData)
