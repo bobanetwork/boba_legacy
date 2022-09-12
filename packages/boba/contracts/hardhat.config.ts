@@ -52,6 +52,9 @@ const config: HardhatUserConfig = {
     bobaavax: {
       url: 'https://avax.boba.network',
     },
+    bnb: {
+      url: 'https://bscrpc.com',
+    },
   },
   solidity: {
     compilers: [
@@ -117,6 +120,7 @@ const config: HardhatUserConfig = {
       bobabeam: 'DEFAULT_KEY',
       snowtrace: process.env.SNOWTRACE_KEY,
       bobaavax: 'DEFAULT_KEY',
+      bnb: process.env.BSCSCAN_KEY,
     },
     customChains: [
       {
@@ -157,6 +161,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.avax.boba.network/api',
           browserURL: 'https://blockexplorer.avax.boba.network/',
+        },
+      },
+      {
+        network: 'bnb',
+        chainId: 56,
+        urls: {
+          apiURL: 'https://api.bscscan.com/api',
+          browserURL: 'https://bscscan.com/',
         },
       },
     ],
