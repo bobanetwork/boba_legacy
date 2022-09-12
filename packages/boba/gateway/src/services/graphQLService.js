@@ -1,14 +1,13 @@
 const apollo = require('@apollo/client')
 const fetch = require('cross-fetch')
 
-require('dotenv').config()
-
+import { APP_CHAIN } from 'util/constant'
 class GraphQLService {
 
   getBridgeEndpoint = () => {
-    if(process.env.REACT_APP_CHAIN === 'mainnet') {
+    if(APP_CHAIN === 'mainnet') {
       return `https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph`
-    } else if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+    } else if (APP_CHAIN === 'rinkeby') {
       return `https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges`
     } else {
       return ''
