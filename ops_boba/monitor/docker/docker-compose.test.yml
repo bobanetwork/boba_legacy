@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0.18
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=BOBAV1
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    command: "--character-set-server=utf8mb4 --max-connections=100000"
+    ports:
+     - "3306:3306"
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+    tmpfs:
+      - /var/lib/mysql
