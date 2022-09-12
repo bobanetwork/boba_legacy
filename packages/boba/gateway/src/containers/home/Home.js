@@ -15,67 +15,18 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Outlet } from 'react-router-dom'
+import { Box, Container, Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
 
-import { selectModalState } from 'selectors/uiSelector'
-import PageHeader from 'components/pageHeader/PageHeader'
-import useInterval from 'util/useInterval'
-
-import { Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
+/**** styles *****/
 import * as S from './Home.styles'
-import PageTitle from 'components/pageTitle/PageTitle'
-
 import turing from '../../images/boba2/turing.png'
 
-import {
-  fetchBalances,
-  fetchGas,
-  addTokenList,
-  fetchExits
-} from 'actions/networkAction'
-
-import {
-  getMonsterInfo
-} from 'actions/nftAction'
-
+/**** serice *****/
 import networkService from 'services/networkService'
 
-import { setBaseState } from 'actions/setupAction'
-import {
-  selectBaseEnabled,
-  selectAccountEnabled,
-  selectNetwork,
-  selectLayer
-} from 'selectors/setupSelector'
-
 /**** ACTIONS and SELECTORS *****/
-
-import { checkVersion } from 'actions/serviceAction'
-import { closeAlert, closeError } from 'actions/uiAction'
-import { selectAlert, selectError } from 'selectors/uiSelector'
-
-import DepositModal from 'containers/modals/deposit/DepositModal'
-import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
-
-import TransferModal from 'containers/modals/transfer/TransferModal'
-import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
-
-import ExitModal from 'containers/modals/exit/ExitModal'
-
-import FarmWrapper from 'containers/farm/FarmWrapper'
-import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
-import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
-
-import SaveWrapper from 'containers/save/SaveWrapper'
-
-import DAO from 'containers/dao/Dao'
-import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
-import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
-import NewProposalModal from 'containers/modals/dao/NewProposalModal'
-import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
-import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
-import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
-import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
-
+import { setBaseState } from 'actions/setupAction'
 import {
   fetchDaoBalance,
   fetchDaoVotes,
@@ -89,32 +40,58 @@ import {
   fetchAirdropStatusL1,
   fetchAirdropStatusL2
 } from 'actions/airdropAction'
-
+import { checkVersion } from 'actions/serviceAction'
+import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
-
-import Airdrop from 'containers/airdrop/Airdrop'
-import Transactions from 'containers/history/History'
-import BobaScope from 'containers/bobaScope/BobaScope'
-import Help from 'containers/help/Help'
-import Ecosystem from 'containers/ecosystem/Ecosystem'
-import Wallet from 'containers/wallet/Wallet'
-import Bridge from 'containers/bridge/Bridge'
-import MonsterWrapper from 'containers/monster/MonsterWrapper'
-import Lock from 'containers/veboba/Lock'
-
-import { Box, Container } from '@mui/material'
-
-import PageFooter from 'components/pageFooter/PageFooter'
-
-import Alert from 'components/alert/Alert'
-
-import { POLL_INTERVAL } from 'util/constant'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import { trackPageView } from 'util/googleAnalytics'
 import { fetchLockRecords } from 'actions/veBobaAction'
+import {
+  fetchBalances,
+  fetchGas,
+  addTokenList,
+  fetchExits
+} from 'actions/networkAction'
+import {
+  getMonsterInfo
+} from 'actions/nftAction'
 
+/********   SELECTORS ********/
+import {
+  selectBaseEnabled,
+  selectAccountEnabled,
+  selectNetwork,
+} from 'selectors/setupSelector'
+import { selectAlert, selectError } from 'selectors/uiSelector'
+import { selectModalState } from 'selectors/uiSelector'
+
+/******** MODALs ********/
+import DepositModal from 'containers/modals/deposit/DepositModal'
+import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
+import TransferModal from 'containers/modals/transfer/TransferModal'
+import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
+import ExitModal from 'containers/modals/exit/ExitModal'
+import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
+import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
+import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
+import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
+import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
+import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
+import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
+import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
+
+/******** COMPONENTS ********/
+import PageTitle from 'components/pageTitle/PageTitle'
+import PageHeader from 'components/pageHeader/PageHeader'
+import PageFooter from 'components/pageFooter/PageFooter'
+import Alert from 'components/alert/Alert'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import Zendesk from 'components/zendesk/Zendesk'
+
+/******** UTILS ********/
+import { POLL_INTERVAL } from 'util/constant'
+import useInterval from 'hooks/useInterval'
+import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 
 require('dotenv').config()
 
@@ -122,15 +99,12 @@ function Home() {
 
   const dispatch = useDispatch()
   const theme = useTheme()
-
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
 
   const [ mobileMenuOpen ] = useState(false)
-
-  const pageDisplay = useSelector(selectModalState('page'))
 
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(selectModalState('depositBatchModal'))
@@ -157,7 +131,6 @@ function Home() {
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
 
   const network = useSelector(selectNetwork())
-  const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -240,13 +213,8 @@ function Home() {
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
-  useEffect(() => {
-    trackPageView(pageDisplay)
-  }, [pageDisplay])
-
-
-  console.log("Home - account enabled:", accountEnabled, "layer:", layer, "Base enabled:", baseEnabled)
-  console.log(pageDisplay);
+  // Invoking GA analysis page view hooks
+  useGoogleAnalytics();
 
   return (
     <>
@@ -352,42 +320,7 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "History" &&
-              <Transactions />
-            }
-            {pageDisplay === "BobaScope" &&
-              <BobaScope />
-            }
-            {pageDisplay === "Wallet" &&
-              <Wallet />
-            }
-            {pageDisplay === "Farm" &&
-              <FarmWrapper />
-            }
-            {pageDisplay === "Save" &&
-              <SaveWrapper />
-            }
-            {pageDisplay === "DAO" &&
-              <DAO />
-            }
-            {pageDisplay === "Airdrop" &&
-              <Airdrop />
-            }
-            {pageDisplay === "Help" &&
-              <Help />
-            }
-            {pageDisplay === "Ecosystem" &&
-              <Ecosystem />
-            }
-            {pageDisplay === "Bridge" &&
-              <Bridge />
-            }
-            { pageDisplay === "Monster" &&
-              <MonsterWrapper />
-            }
-            { pageDisplay === "Lock" &&
-              <Lock />
-            }
+            <Outlet />
           </Container>
           <PageFooter/>
         </Box>

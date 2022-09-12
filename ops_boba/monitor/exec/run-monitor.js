@@ -47,6 +47,7 @@ const main = async () => {
   const exitMonitorService = require('../services/exitMonitor')
   const l1BridgeMonitorService = require('../services/l1BridgeMonitor')
   const messageMonitorService = require('../services/messageMonitor')
+  const LayerZeroBridgeMonitor = require('../services/layerZeroBridge')
 
   // l1 message monitor
   const messageService = new messageMonitorService()
@@ -85,6 +86,11 @@ const main = async () => {
 
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
+
+  // monitor layerZero bridge:
+  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
+  await layerZeroBridgeMonitor.initScan()
+  await layerZeroBridgeMonitor.startMonitor()
 
   // enable the tx response time report
   if (
@@ -136,8 +142,8 @@ const main = async () => {
 }
 
 ;(async () => {
-  main().catch()
+main().catch()
 })().catch((err) => {
-  console.log(err)
-  process.exit(1)
+console.log(err)
+process.exit(1)
 })

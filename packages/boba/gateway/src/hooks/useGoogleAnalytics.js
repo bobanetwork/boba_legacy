@@ -13,24 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import store from 'store'
-import App from 'layout'
-import './index.scss'
-import SentryWrapper from 'components/SentryWrapper/SentryWrapper'
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import analytics from 'util/analytics';
 
-// https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange
-if (window.ethereum) {
-  window.ethereum.autoRefreshOnNetworkChange = false
+const useGoogleAnalytics = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    analytics.init()
+  }, []);
+
+
+  useEffect(() => {
+    analytics.sendPageView(location.pathname)
+  }, [ location ]);
+
 }
 
-ReactDOM.render(
-  <SentryWrapper>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </SentryWrapper>,
-  document.getElementById('root')
-)
+
+export default useGoogleAnalytics;

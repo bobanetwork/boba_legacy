@@ -81,6 +81,12 @@ const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 const NUMBER_OF_BLOCKS_TO_FETCH = env.NUMBER_OF_BLOCKS_TO_FETCH || 10000000
 
+// layerZero env
+const LAYER_ZERO_ENABLE_TEST = Boolean(env.LAYER_ZERO_ENABLE_TEST) || true
+const LAYER_ZERO_CHAIN = env.LAYER_ZERO_CHAIN || 'Testnet'
+const LAYER_ZERO_BRIDGE = env.LAYER_ZERO_BRIDGE || 'EthBridgeToAvalanche'
+const LAYER_ZERO_LATEST_BLOCK = Number(env.LAYER_ZERO_LATEST_BLOCK) || 0
+
 class OptimismEnv {
   constructor() {
     this.logger = new Logger({ name: this.name })
@@ -162,7 +168,12 @@ class OptimismEnv {
 
     this.l1BlockConfirmation = L1_BLOCK_CONFIRMATION
 
-    this.sequencerPublishWindow = null
+    this.sequencerPublishWindow = 0
+
+    this.layerZeroEnableTest = LAYER_ZERO_ENABLE_TEST
+    this.layerZeroChain = LAYER_ZERO_CHAIN
+    this.layerZeroBridge = LAYER_ZERO_BRIDGE
+    this.layerZeroLatestBlock = LAYER_ZERO_LATEST_BLOCK
   }
 
   async initOptimismEnv() {
