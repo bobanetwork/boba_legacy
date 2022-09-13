@@ -6,7 +6,6 @@ const OptimismEnv = require('./utilities/optimismEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
 const { Logger } = require('@eth-optimism/common-ts')
-import { createClient } from '@layerzerolabs/scan-client';
 
 const EthBridgeJson = require('@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
 const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
@@ -26,7 +25,9 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       ? layerZeroTestnetAddresses
       : layerZeroMainnetAddresses;
 
-    this.layerZeroScanner = this.layerZeroEnableTest ? createClient('testnet') : createClient('mainnet');
+    this.layerZeroURL = this.layerZeroEnableTest
+      ? 'https://api-testnet.layerzero-scan.com/tx/'
+      : 'https://api-mainnet.layerzero-scan.com/tx/'
 
     if (layerZeroAddresses.BOBA_Bridges[this.layerZeroChain] === undefined) {
       throw new Error(
@@ -154,9 +155,9 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
 
       const tx = await l.getTransaction()
       const block = await this.L1Provider.getBlock(l.blockNumber)
-      const result = await this.layerZeroScanner.getMessagesBySrcTxHash(
-        l.transactionHash
-      )
+      const response = await fetch(this.layerZeroURL + l.transactionHash)
+      const result = await response.json()
+
       let url = ''
       if (len(result.messages) > 0) {
         const message = result.messages[0]
