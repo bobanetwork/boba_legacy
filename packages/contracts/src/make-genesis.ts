@@ -214,6 +214,10 @@ export const makeL2GenesisFile = async (
       if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 9728) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbTestnetBytecode
       }
+      // Bnb Mainnet
+      if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 56288) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbMainnetBytecode
+      }
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')
