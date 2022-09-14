@@ -89,6 +89,7 @@ function Vote({
 
     if (res) {
       dispatch(fetchPools());
+      dispatch(fetchLockRecords());
       dispatch(
         openAlert(`Pool has been distributed successfully!`)
       )

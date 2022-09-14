@@ -101,7 +101,7 @@ function PoolListItem({
         </Box>
       </G.TableCell>
       <G.TableCell pl={1} py={2} width="30%" flex="2">
-        <Box display="flex" width="100%" alignItems="center" justifyContent="space-around" gap={2}>
+        <Box display="flex" width="100%" alignItems="center" justifyContent="space-around" gap={2} px={1}>
           <Typography variant="body2">
             {selectedVote}%
           </Typography>
@@ -112,6 +112,16 @@ function PoolListItem({
             min={0}
             max={100}
             value={selectedVote}
+            marks={[
+              {
+                value: 0,
+                label: '0'
+              },
+              {
+                value: 100,
+                label: '100'
+              }
+            ]}
             onChange={handleVoteChange}
           />
         </Box>
