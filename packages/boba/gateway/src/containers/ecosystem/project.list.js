@@ -34,6 +34,7 @@ import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
+import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 
 /**
  * thematical order of type.
@@ -399,6 +400,16 @@ export const projectList = [
     "type": "gamefi",
     "image": futuructaLogo,
     "description": "Merge simple objects to get improved ones, solve puzzles and complete quests!"
+  },
+  {
+    "title": "Rabby Wallet",
+    "canLaunch": true,
+    "link": "https://rabby.io",
+    "telegram": "https://t.me/rabby_io",
+    "twitter": "https://twitter.com/Rabby_io",
+    "type": "wallet",
+    "image": rabbyLogo,
+    "description": "The game-changing wallet for Ethereum and all EVM chains."
   },
 ]
 
