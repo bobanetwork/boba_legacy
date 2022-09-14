@@ -389,7 +389,17 @@ export const projectList = [
      "type": "defi",
      "image": symbiosisLogo,
      "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
-  },
+   },
+  {
+     "title": "Beamer",
+     "canLaunch": true,
+     "link": "https://www.beamerbridge.com/",
+     "twitter": "https://twitter.com/BeamerBridge",
+     "discord": "https://discord.com/invite/uvTYkzsBdA",
+     "type": "bridge",
+     "image": beamerbridge,
+     "description": "Beam your ERC20 assets between EVM compatible rollups with certainty, speed and security"
+   },
   {
     "title": "Futuructa",
     "canLaunch": true,
