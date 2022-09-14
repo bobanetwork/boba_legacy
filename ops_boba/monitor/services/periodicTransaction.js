@@ -20,20 +20,6 @@ module.exports.sendTransactionPeriodically = async () => {
     return
   }
 
-  // const tx = {
-  //   to: wallet.address,
-  //   value: ethers.utils.parseEther(configs.periodicEthAmount + ''),
-  //   gasLimit: 500000,
-  // }
-  // try {
-  //   const transaction = await wallet.sendTransaction(tx)
-  //   await transaction.wait()
-  // } catch (e) {
-  //   logger.error('Error while transfer ETH periodically in L2', {
-  //     error: e.message,
-  //   })
-  // }
-
   const startingTime = new Date()
   try {
     const tx = await bobaContract.transfer(
