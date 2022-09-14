@@ -10,6 +10,9 @@ const L2LPJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool
 const { logger } = require('./utilities/logger')
 const configs = require('./utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
+const fs = require('fs')
+const path = require('path')
+const DatabaseService = require('./database.service')
 
 const supportedTokens = [
   'USDT',
@@ -204,7 +207,10 @@ const logL2Pool = async (blockNumber) => {
   })
 }
 
-const logBalance = (provider, blockNumber, networkName) => {
+const logBalance = async (provider, blockNumber, networkName) => {
+  // load boba straw
+  let [BobaStrawCostFee, BobaStrawBalance] = await loadBobaStraw()
+
   const promiseData =
     networkName === configs.OMGXNetwork.L1
       ? [
@@ -234,6 +240,34 @@ const logBalance = (provider, blockNumber, networkName) => {
               return address.contract.availableFunds()
             })
           )
+
+          let BOBAStrawFeeIncreased = ethers.BigNumber.from('0')
+          const BOBAStrawLatestBalance = amounts.reduce((acc, cur) => {
+            return acc.add(cur)
+          }, ethers.BigNumber.from('0'))
+          if (BOBAStrawLatestBalance.gt(BobaStrawBalance)) {
+            BobaStrawBalance = BOBAStrawLatestBalance
+          }
+          BOBAStrawFeeIncreased = BobaStrawBalance.sub(BOBAStrawLatestBalance)
+
+          BobaStrawBalance = BOBAStrawLatestBalance
+          BobaStrawCostFee = BobaStrawCostFee.add(BOBAStrawFeeIncreased)
+
+          logger.info({
+            BobaStrawBalance: Number(
+              Number(
+                ethers.utils.formatEther(BobaStrawBalance.toString())
+              ).toFixed(6)
+            ),
+            BobaStrawCostFee: Number(
+              Number(
+                ethers.utils.formatEther(BobaStrawCostFee.toString())
+              ).toFixed(6)
+            ),
+          })
+
+          await writeBobaStraw(BobaStrawCostFee, BobaStrawBalance)
+
           for (let i = 0; i < amounts.length; i++) {
             oracleAddresses[i].amount = ethers.BigNumber.from(amounts[i])
               .div(bobaDecimal)
@@ -350,6 +384,20 @@ const logData = (provider, blockNumber, networkName) => {
       }
     })
     .catch(logError('Error while getting block', 'block', { ...metadata }))
+}
+
+const loadBobaStraw = async () => {
+  const db = new DatabaseService()
+  const BobaStrawBalance = ethers.BigNumber.from((await db.getBobaStrawBalance()).value)
+  const BobaStrawCostFee = ethers.BigNumber.from((await db.getBobaStrawCostFee()).value)
+
+  return [BobaStrawCostFee, BobaStrawBalance]
+}
+
+const writeBobaStraw = async (BobaStrawCostFee, BobaStrawBalance) => {
+  const db = new DatabaseService()
+  await db.updateBobaStrawBalance(JSON.stringify({"value": BobaStrawBalance.toString()}))
+  await db.updateBobaStrawCostFee(JSON.stringify({"value": BobaStrawCostFee.toString()}))
 }
 
 module.exports.validateMonitoring = () => {
