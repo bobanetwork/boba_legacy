@@ -277,6 +277,21 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // BNB mainnet
+  56: {
+    l1: {
+      AddressManager: '0xeb989B25597259cfa51Bd396cE1d4B085EC4c753',
+      L1CrossDomainMessenger: '0x31338a7D5d123E18a9a71447136B54B6D28241ae',
+      L1CrossDomainMessengerFast: '0x31338a7D5d123E18a9a71447136B54B6D28241ae',
+      L1StandardBridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
+      StateCommitmentChain: '0xeF85fA550e6EC5486121313C895EDe1005e2397f',
+      CanonicalTransactionChain: '0xA0E38a8FE293E9e95c6A4a882F396F1c80e9e2e4',
+      BondManager: '0xEB6652A4eb6e0d003Fbb3DD76Ae72694175191cd',
+      L1MultiMessageRelayer: '0x1E633Dcd0d3D349126983D58988051F7c62c543D',
+      L1MultiMessageRelayerFast: '0x1E633Dcd0d3D349126983D58988051F7c62c543D',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
 }
 
 /**
@@ -490,6 +505,18 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  56: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
