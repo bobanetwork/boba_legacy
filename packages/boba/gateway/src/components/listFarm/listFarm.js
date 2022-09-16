@@ -11,8 +11,6 @@ import Button from 'components/button/Button';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import networkService from 'services/networkService'
-
 import { getCoinImage } from 'util/coinImage';
 
 import { Box, Typography, Fade, CircularProgress } from '@mui/material';
@@ -36,6 +34,7 @@ class ListFarm extends React.Component {
       showStakesOnly,
       accountEnabled,
     } = this.props;
+    const { netLayer } = this.props.setup
 
     this.state = {
       balance,
@@ -52,6 +51,8 @@ class ListFarm extends React.Component {
       loading: false,
       // provider status
       accountEnabled,
+      // layer we are on
+      netLayer,
     }
 
   }
@@ -62,7 +63,12 @@ class ListFarm extends React.Component {
 
   componentDidUpdate(prevState) {
 
+    const { netLayer } = this.props.setup
     const { poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props
+
+    if (prevState.setup.netLayer !== netLayer) {
+      this.setState({ netLayer })
+    }
 
     if (!isEqual(prevState.poolInfo, poolInfo)) {
       this.setState({ poolInfo });
@@ -159,7 +165,7 @@ class ListFarm extends React.Component {
     const {
       poolInfo, userInfo,
       dropDownBox, showAll, showStakesOnly,
-      loading, L1orL2Pool, accountEnabled
+      loading, L1orL2Pool, accountEnabled, netLayer
     } = this.state;
 
     const pageLoading = Object.keys(poolInfo).length === 0;
@@ -179,7 +185,7 @@ class ListFarm extends React.Component {
 
     // L1orL2Pool: L1LP || L2LP
     // networkService.L1OrL2 L1 || L2
-    const disabled = !L1orL2Pool.includes(networkService.L1orL2)
+    const disabled = !L1orL2Pool.includes(netLayer)
     const symbol = poolInfo.symbol
     const name = poolInfo.name
     const decimals = poolInfo.decimals
@@ -476,10 +482,10 @@ class ListFarm extends React.Component {
                     <Typography variant="body2" component="div">Staked</Typography>
                     <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                      <Button variant="contained" onClick={() => { !disabled && this.handleWithdrawToken() }}>
+                      <Button variant="contained" disabled={disabled} onClick={() => { !disabled && this.handleWithdrawToken() }}>
                         Unstake
                       </Button>
-                      <Button variant="contained" onClick={() => { !disabled && this.handleStakeToken() }}>
+                      <Button variant="contained" disabled={disabled} onClick={() => { !disabled && this.handleStakeToken() }}>
                         Stake More
                       </Button>
                     </Box>
@@ -497,6 +503,7 @@ class ListFarm extends React.Component {
 
 const mapStateToProps = state => ({
   farm: state.farm,
+  setup: state.setup,
 })
 
 export default connect(mapStateToProps)(ListFarm)

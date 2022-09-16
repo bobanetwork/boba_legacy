@@ -2338,35 +2338,35 @@ class NetworkService {
 
       updateSignatureStatus_depositLP(true)
 
-      const opts = {
-        fromBlock: -4000
-      }
-      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+      // const opts = {
+      //   fromBlock: -4000
+      // }
+      // const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      // console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
+      // const time_stop = new Date().getTime()
+      // console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+      // const data = {
+      //   "key": process.env.REACT_APP_SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": true,
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": receipt.transactionHash,
+      //   "cdmBlock": receipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkGateway
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
-      return receipt
+      return true
 
     } catch (error) {
       console.log("NS: depositL1LP error:", error)

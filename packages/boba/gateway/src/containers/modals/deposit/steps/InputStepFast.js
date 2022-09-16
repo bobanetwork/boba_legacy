@@ -152,7 +152,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
     let res
 
-    if(token.symbol === 'ETH') {
+    if(token.symbol === networkService.L1NativeTokenSymbol) {
 
       console.log("ETH Fast Bridge")
 
@@ -162,9 +162,9 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
         dispatch(setActiveHistoryTab('Bridge to L2'))
         dispatch(
           openAlert(
-            `ETH was bridged. You will receive approximately
+            `${networkService.L1NativeTokenSymbol} was bridged. You will receive approximately
             ${((Number(value) * (100 - Number(feeRateN)))/100).toFixed(3)}
-            ETH on L2`
+            ${networkService.L1NativeTokenSymbol} on L2`
           )
         )
         handleClose()
