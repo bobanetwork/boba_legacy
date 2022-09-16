@@ -4158,13 +4158,6 @@ class NetworkService {
 
         let hasVoted = null
 
-        // NOTE: as per the veBoba getReciept expecting params as proposalId & tokenId so this will break
-        /*
-          if (this.account) {
-            hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
-          }
-        */
-
         let description = proposalRaw.description.toString()
 
         proposalList.push({
