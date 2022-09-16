@@ -149,15 +149,15 @@ export const projectList = [
     "description": "Bridge Crypto from CEX to Layer2 faster and cheaper."
   },
   {
-    "title": "WitNet",
+    "title": "Witnet Oracle",
     "canLaunch": false,
     "link": "https://witnet.io/",
     "telegram": "https://t.me/witnetio",
     "twitter": "https://twitter.com/witnet_io",
-    "discord": "https://discord.gg/X4uurfP",
-    "type": "tools",
+    "discord": "https://discord.gg/witnet",
+    "type": "tool",
     "image": witnetLogo,
-    "description": "Multi-chain secure data input. Price feeds, randomness and HTTP adapters."
+    "description": "A trustless multi-chain oracle whose security is founded on strong cryptoeconomic incentives."
   },
   {
     "title": "Boba Punks",
