@@ -227,8 +227,6 @@ class NetworkService {
       this.networkGateway
     ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
 
-    console.log("Verifier response: ", response)
-
     if (response.status === 200) {
       const status = response.data.result
       return status
@@ -4152,7 +4150,7 @@ class NetworkService {
         let forVotes = parseInt(formatEther(proposalData.forVotes))
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
-        let startBlock = proposalData.startBlock.toString()
+        // console.log(['proposalData',proposalData])
         let startTimestamp = proposalData.startTimestamp.toString()
         let endTimestamp = proposalData.endTimestamp.toString()
 
@@ -4160,9 +4158,12 @@ class NetworkService {
 
         let hasVoted = null
 
-        if( this.account ) {
-          hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
-        }
+        // NOTE: as per the veBoba getReciept expecting params as proposalId & tokenId so this will break
+        /*
+          if (this.account) {
+            hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
+          }
+        */
 
         let description = proposalRaw.description.toString()
 
@@ -4175,7 +4176,6 @@ class NetworkService {
            againstVotes,
            abstainVotes,
            state: proposalStates[state],
-           startBlock,
            startTimestamp,
            endTimestamp,
            hasVoted: hasVoted
@@ -4829,7 +4829,13 @@ class NetworkService {
       return
     }
 
+    if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE) {
+      console.log('NS: Lock not yet supported')
+      return
+    }
+
     try {
+
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA, //check ve address is present
         veJson.abi,

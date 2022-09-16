@@ -40,7 +40,7 @@ function ListProposal({
     const dispatch = useDispatch()
     const classes = useStyles()
 
-    const [ votePercent, setVotePercent ] = useState(undefined)
+    const [ votePercent, setVotePercent ] = useState(0)
 
     useEffect(() => {
         const init = async () => {
