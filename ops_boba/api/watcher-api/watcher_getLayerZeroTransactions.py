@@ -27,7 +27,7 @@ def watcher_getLayerZeroTransaction(event, context):
     with con.cursor() as cur:
         try:
             cur.execute("""SELECT
-        chainID, targetChainID, hash, blockNumber, amount, event, timestamp
+        chainID, targetChainID, hash, blockNumber, amount, event, timestamp, reference
         FROM layerZeroTx
         WHERE `crossTxFrom`=%s AND blockNumber <= %s AND blockNumber >= %s ORDER BY blockNumber""", (address, toRange, fromRange))
             transactionsDataRaw = cur.fetchall()
@@ -40,7 +40,8 @@ def watcher_getLayerZeroTransaction(event, context):
                     "event_type": transactionDataRaw[5],
                     "destination_chain": transactionDataRaw[1],
                     "timestamp": transactionDataRaw[6],
-                    "block_number": transactionDataRaw[3]
+                    "block_number": transactionDataRaw[3],
+                    "reference": transactionDataRaw[7]
                 })
 
         except Exception as e:
