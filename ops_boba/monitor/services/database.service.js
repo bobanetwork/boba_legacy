@@ -8,6 +8,8 @@ const OptimismEnv = require('./utilities/optimismEnv')
 class DatabaseService extends OptimismEnv {
   constructor() {
     super(...arguments)
+    this.MySQLStartTimeReceipt = parseInt(new Date().getTime() / 1000, 10)
+    this.MySQLStartTimeLog = parseInt(new Date().getTime() / 1000, 10)
   }
 
   async initMySQL() {
@@ -135,6 +137,12 @@ class DatabaseService extends OptimismEnv {
         status VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
+    await query(`CREATE TABLE IF NOT EXISTS dataStorage
+      (
+        ${'`'}name${'`'} VARCHAR(255) NOT NULL,
+        ${'`'}value${'`'} TEXT NOT NULL,
+        PRIMARY KEY ( ${'`'}name${'`'} )
+      )`)
     await query(`CREATE TABLE IF NOT EXISTS layerZeroTx
       (
         chainID INT NOT NULL,
@@ -154,12 +162,14 @@ class DatabaseService extends OptimismEnv {
         reference VARCAR(255),
         PRIMARY KEY ( hash, blockNumber)
       )`)
-
     con.end()
     this.logger.info('Initialized the database.')
   }
 
   async insertBlockData(blockData) {
+    if (blockData === null) {
+      return
+    }
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
       port: this.MySQLPort,
@@ -220,7 +230,6 @@ class DatabaseService extends OptimismEnv {
       timestamp='${tx.timestamp}'
     `)
     con.end()
-    this.logger.info('L2 Transaction', tx)
   }
 
   async insertReceiptData(receiptData) {
@@ -583,6 +592,20 @@ class DatabaseService extends OptimismEnv {
     return latestBlock
   }
 
+  async getNewestReceiptFromReceiptTable() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const latestReceipt = await query(`SELECT MAX(blockNumber) from receipt`)
+    con.end()
+    return latestReceipt
+  }
+
   async getNewestBlockFromStateRootTable() {
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
@@ -727,6 +750,72 @@ class DatabaseService extends OptimismEnv {
       })
     }
     con.end()
+  }
+
+  async updateBobaStrawCostFee(payload) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT INTO dataStorage (${'`'}name${'`'}, ${'`'}value${'`'})
+      VALUES ('BobaStrawCostFee', '${payload}')
+      ON DUPLICATE KEY UPDATE
+      ${'`'}value${'`'} = '${payload}'
+    `)
+    con.end()
+  }
+
+  async getBobaStrawCostFee() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const payload = await query(
+      `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawCostFee'`
+    )
+    con.end()
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload[0].value)
+  }
+
+  async updateBobaStrawBalance(payload) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT INTO dataStorage (${'`'}name${'`'}, ${'`'}value${'`'})
+      VALUES ('BobaStrawBalance', '${payload}')
+      ON DUPLICATE KEY UPDATE
+      ${'`'}value${'`'} = '${payload}'
+    `)
+    con.end()
+  }
+
+  async getBobaStrawBalance() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const payload = await query(
+      `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawBalance'`
+    )
+    con.end()
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload[0].value)
   }
 }
 
