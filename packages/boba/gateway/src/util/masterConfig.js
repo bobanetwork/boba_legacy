@@ -112,6 +112,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://moonbase.moonscan.io/tx/`,
         symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
       },
       L2: {
         name: "BobaBase",
@@ -139,6 +140,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://api-moonbeam.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://moonscan.io/tx/`,
         symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
       },
       L2: {
         name: "BobaBeam",
@@ -166,6 +168,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://api-testnet.ftmscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://testnet.ftmscan.com/tx/`,
         symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
       },
       L2: {
         name: "BobaOpera Testnet",
@@ -193,6 +196,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://api-testnet.snowtrace.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://testnet.snowtrace.io/tx/`,
         symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
       },
       L2: {
         name: "Boba Avalanche Testnet",
@@ -220,6 +224,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://api.snowtrace.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://snowtrace.io/tx/`,
         symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
       },
       L2: {
         name: "Boba Avalanche Mainnet",
@@ -247,6 +252,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
         blockExplorer: `https://api-testnet.bscscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
         transaction: `https://https://testnet.bscscan.com//tx/`,
         symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
       },
       L2: {
         name: "Boba BNB Testnet",

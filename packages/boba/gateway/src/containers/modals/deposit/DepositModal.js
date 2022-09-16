@@ -20,6 +20,7 @@ import Modal from 'components/modal/Modal'
 import { closeModal } from 'actions/uiAction'
 
 import InputStep from './steps/InputStep'
+import InputStepFast from './steps/InputStepFast'
 import { fetchTransactions } from 'actions/networkAction'
 
 function DepositModal({ open, token, fast }) {
@@ -32,8 +33,12 @@ function DepositModal({ open, token, fast }) {
   }
 
   return (
-    <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={"500px"}>
-      <InputStep handleClose={handleClose} token={token}/>
+    <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={!!fast ? "" : "500px"}>
+      {!!fast ? (
+          <InputStepFast handleClose={handleClose} token={token}/>
+        ) : (
+          <InputStep handleClose={handleClose} token={token}/>
+      )}
     </Modal>
   )
 }

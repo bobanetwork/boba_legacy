@@ -23,12 +23,12 @@ export const menuItems = [
     title: "History",
     url: "/history"
   },
-  // {
-  //   key: 'Farm',
-  //   icon: "EarnIcon",
-  //   title: "Earn",
-  //   url: "/farm",
-  // },
+  {
+    key: 'Farm',
+    icon: "EarnIcon",
+    title: "Earn",
+    url: "/farm",
+  },
   // {
   //   key: 'Lock',
   //   icon: "LockIcon",
