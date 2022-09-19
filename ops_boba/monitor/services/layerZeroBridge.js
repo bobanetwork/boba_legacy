@@ -128,19 +128,39 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async scanBlock(startBlock, endBlock, bridgeName, bridgeContract, dstChainID) {
-    const logs = await bridgeContract.queryFilter(
-      bridgeName.search(/EthBridgeTo/) > -1
-        ? [
-          bridgeContract.filters.ERC20DepositInitiated(),
-          bridgeContract.filters.ERC20WithdrawalFinalized(),
-        ]
-        : [
-          bridgeContract.filters.WithdrawalInitiated(),
-          bridgeContract.filters.DepositFinalized(),
+    const getEvents = async (events, startBlock, endBlock) => {
+      let logs = []
+      for (const event of events) {
+        const log = await this.bridgeContract.queryFilter(
+          event,
+          Number(startBlock),
+          Number(endBlock)
+        )
+        logs = logs.concat(log)
+      }
+      return logs
+    }
+
+    let logs = []
+    if (this.ETH) {
+      logs = await getEvents(
+        [
+          this.bridgeContract.filters.ERC20DepositInitiated(),
+          this.bridgeContract.filters.ERC20WithdrawalFinalized(),
         ],
-      Number(startBlock),
-      Number(endBlock)
-    )
+        startBlock,
+        endBlock
+      )
+    } else {
+      logs = await getEvents(
+        [
+          this.bridgeContract.filters.WithdrawalInitiated(),
+          this.bridgeContract.filters.DepositFinalized(),
+        ],
+        startBlock,
+        endBlock
+      )
+    }
 
     for (const l of logs) {
       const eventNames = [
@@ -203,8 +223,6 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       await this.databaseService.insertLayerZeroTx(eventData)
     }
   }
-
-
 
   errorCatcher(func, param) {
     return (async () => {
