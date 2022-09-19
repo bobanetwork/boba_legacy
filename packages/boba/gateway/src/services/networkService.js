@@ -709,15 +709,14 @@ class NetworkService {
         const L1a = addresses['TK_L1'+key]
         if (typeof L1a === 'undefined' || typeof L2a === 'undefined') {
           console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
-          return false
-        } else {
           if (typeof networkService.L1ChainAsset.supportedTokenAddresses[key] !== 'undefined') {
             allTokens[key] = networkService.L1ChainAsset.supportedTokenAddresses[key]
-          } else {
-            allTokens[key] = {
-              'L1': L1a,
-              'L2': L2a
-            }
+          }
+          return false
+        } else {
+          allTokens[key] = {
+            'L1': L1a,
+            'L2': L2a
           }
         }
 
