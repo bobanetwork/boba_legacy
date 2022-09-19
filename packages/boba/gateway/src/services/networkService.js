@@ -172,6 +172,7 @@ const L1ChainAssets = {
     l2Name: 'Bobabeam',
     icon: (bool) => <MoonbeamIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokenAddresses: {},
     foundation: false,
   },
   'bobaOperaTestnet': {
@@ -179,6 +180,7 @@ const L1ChainAssets = {
     l2Name: 'Bobaopera Testnet',
     icon: (bool) => <FantomIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokenAddresses: {},
     foundation: true,
   },
   'bobaFuji': {
@@ -186,13 +188,17 @@ const L1ChainAssets = {
     l2Name: 'Boba Avalanche Testnet',
     icon: (bool) => <AvaxIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokenAddresses: {},
     foundation: true,
   },
   'bobaAvax': {
     name: 'Avalanche Mainnet C-Chain',
     l2Name: 'Boba Avalanche Mainnet',
     icon: (bool) => <AvaxIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'EVO'],
+    supportedTokenAddresses: {
+      'EVO': {'L1': '0x42006Ab57701251B580bDFc24778C43c9ff589A1', 'L2': '0xc8849f32138de93F6097199C5721a9EfD91ceE01'}
+    },
     foundation: false,
   },
   'bobaBnbTestnet': {
@@ -200,6 +206,7 @@ const L1ChainAssets = {
     l2Name: 'Boba BNB Testnet',
     icon: (bool) => <BnbIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokenAddresses: {},
     foundation: true,
   }
 }
@@ -704,9 +711,13 @@ class NetworkService {
           console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
           return false
         } else {
-          allTokens[key] = {
-            'L1': L1a,
-            'L2': L2a
+          if (typeof networkService.L1ChainAsset.supportedTokenAddresses[key] !== 'undefined') {
+            allTokens[key] = networkService.L1ChainAsset.supportedTokenAddresses[key]
+          } else {
+            allTokens[key] = {
+              'L1': L1a,
+              'L2': L2a
+            }
           }
         }
 
