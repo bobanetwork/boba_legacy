@@ -8,7 +8,7 @@ class GraphQLService {
     if (APP_CHAIN === 'mainnet') {
       return `https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph`
     } else if (APP_CHAIN === 'rinkeby') {
-      return `https://graph.rinkeby.boba.network:8000/subgraphs/name/boba/Bridges`
+      return `https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges`
     } else {
       return ''
     }
