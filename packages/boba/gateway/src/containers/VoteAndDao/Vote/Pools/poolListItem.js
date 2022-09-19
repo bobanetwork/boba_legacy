@@ -133,7 +133,7 @@ function PoolListItem({
             variant="outlined"
             color="primary"
             size="small"
-            onClick={() => onDistribute(pool.guageAddress)}
+            onClick={() => onDistribute(pool.gaugeAddress)}
           >
             Destribute
           </Button>

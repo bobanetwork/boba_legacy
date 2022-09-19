@@ -19,6 +19,5 @@ const POOL_DETAIL_MAPPING = {
 
 
 export const getPoolDetail = (poolId) => {
-  console.log(`🔑 => ${poolId}`)
   return POOL_DETAIL_MAPPING[ poolId ]
 }

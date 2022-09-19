@@ -44,7 +44,6 @@ import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
-import { fetchLockRecords } from 'actions/veBobaAction'
 import {
   fetchBalances,
   fetchGas,

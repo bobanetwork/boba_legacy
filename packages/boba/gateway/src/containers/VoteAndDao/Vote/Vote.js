@@ -30,7 +30,7 @@ import {
 } from 'actions/veBobaAction'
 
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectLockRecords } from 'selectors/veBobaSelector'
+import { selectLockRecords, selectPools } from 'selectors/veBobaSelector'
 
 import { ContentEmpty } from 'containers/Global.styles'
 
@@ -55,9 +55,10 @@ function Vote({
   const nftRecords = useSelector(selectLockRecords);
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer = useSelector(selectLayer())
+  const pools = useSelector(selectPools)
 
   const [ selectedNft, setSelectedNft ] = useState(null);
-  const [ poolsVote, setPoolsVote ] = useState(null);
+  const [ poolsVote, setPoolsVote ] = useState({});
   const [ usedVotingPower, setUsedVotingPower ] = useState(0);
 
   const onPoolVoteChange = (poolId, value) => {
@@ -74,6 +75,7 @@ function Vote({
       weights: Object.values(poolsVote),
     }))
     if (res) {
+      setSelectedNft(null)
       dispatch(fetchLockRecords());
       dispatch(fetchPools());
       dispatch(
@@ -97,11 +99,31 @@ function Vote({
   }
 
   useEffect(() => {
-    if (selectedNft) {
-      let usedPower = (selectedNft.usedWeights / selectedNft.balance) * 100
-      setUsedVotingPower(parseInt(usedPower))
+    if (selectedNft && pools.length > 0) {
+      let usedVotes = {};
+      pools.forEach((pool) => {
+        let tokenUsed = pool.usedTokens.find((t) => t.tokenId === selectedNft.tokenId)
+        if (tokenUsed) {
+          let nftBalance = parseInt(selectedNft.balance);
+          let poolVote = Number(tokenUsed.vote);
+          let votePercent = parseInt((poolVote / nftBalance) * 100);
+
+          usedVotes = {
+            ...usedVotes,
+            [pool.poolId]: votePercent
+          }
+        }
+      })
+      setPoolsVote(usedVotes)
     }
-  }, [ selectedNft ]);
+  }, [ selectedNft, pools ]);
+
+  useEffect(() => {
+    if (Object.keys(poolsVote).length > 0) {
+      let powerSum = Object.values(poolsVote).reduce((s, a) => s + a, 0);
+      setUsedVotingPower(parseInt(powerSum))
+    }
+  },[poolsVote])
 
   useEffect(() => {
     if (!!accountEnabled && layer === 'L2') {
@@ -144,7 +166,7 @@ function Vote({
             color="primary"
             size="medium"
             onClick={onVote}
-            disabled={!selectedNft || !poolsVote}
+            disabled={!selectedNft || !Object.keys(poolsVote) || Number(usedVotingPower) > 100}
           >
             Submit Vote
           </Button>

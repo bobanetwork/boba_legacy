@@ -272,8 +272,6 @@ class NetworkService {
       key: APP_AIRDROP
     })
 
-    console.log("L1 response:", response)
-
     if (response.status === 201) {
       const status = response.data
       return status
@@ -1292,9 +1290,6 @@ class NetworkService {
   }
 
   async getExits() {
-
-    console.log("getExits()")
-
     // NOT SUPPORTED on LOCAL
     if (this.networkGateway === 'local') return
 
@@ -4871,11 +4866,6 @@ class NetworkService {
       return
     }
 
-    if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE) {
-      console.log('NS: Lock not yet supported')
-      return
-    }
-
     try {
 
       const ve = new ethers.Contract(
@@ -5106,7 +5096,7 @@ class NetworkService {
     weights
   }) {
     if (this.account === null) {
-      console.log('NS: fetchPools() error - called but account === null')
+      console.log('NS: savePoolVote() error - called but account === null')
       return
     }
 
@@ -5142,11 +5132,10 @@ class NetworkService {
       const baseVoter = new ethers.Contract(
         allAddresses.BASE_V1_VOTER,
         voterJson.abi,
-        this.provider
+        this.provider.getSigner()
       )
-
-      await baseVoter.distribute(gaugeAddress);
-
+        console.log('gaugeAddress',gaugeAddress)
+      await baseVoter['distribute(address)'](gaugeAddress);
 
       return true;
     } catch (error) {
