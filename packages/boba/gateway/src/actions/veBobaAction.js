@@ -6,19 +6,6 @@ import { createAction } from "./createAction";
  **** VE Boba Actions ***
  ************************/
 
-/**
- * @VeBobaAction actions can have.
- *  - number of locks
- *  - createLock
- *  - increaseLockAmount
- *  - extendLockTime
- *  - withdrawLock
- *  - fetchLockRecords
- *
- * // Vote page
- *  - fetchPools
- */
-
 export function createLock(payload) {
   return createAction('LOCK/CREATE', () => networkService.createLock(payload))
 }

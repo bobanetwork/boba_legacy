@@ -4144,7 +4144,6 @@ class NetworkService {
 
       const descriptionList = await GraphQLService.queryBridgeProposalCreated()
       const proposalGroup = groupBy(descriptionList.data.governorProposalCreateds, 'to');
-
       const delegatorList = [ allAddresses.GovernorBravoDelegator, allAddresses.GovernorBravoDelegatorV2 ];
 
       for (let delegator of delegatorList) {
@@ -4154,7 +4153,7 @@ class NetworkService {
         } else if(delegator === allAddresses.GovernorBravoDelegatorV2) {
           delegateCheck = delegateCheckV2;
         }
-        const proposals = proposalGroup[delegator.toLowerCase()]
+        const proposals = proposalGroup[ delegator.toLowerCase() ]
         const proposalCounts = await delegateCheck.proposalCount()
         const totalProposals = await proposalCounts.toNumber()
 
@@ -4209,8 +4208,10 @@ class NetworkService {
       if (this.account) {
         const latestProposalIdRaw = await delegateCheckV2.latestProposalIds(this.account);
         const latestProposalId = await latestProposalIdRaw.toNumber();
-        const latestProposalState = await delegateCheckV2.state(latestProposalId);
-        hasLiveProposal = [ 0, 1 ].includes(latestProposalState) /// pending & active proposal check.
+        if (latestProposalId) { /// only if proposalId greater than 0
+          const latestProposalState = await delegateCheckV2.state(latestProposalId);
+          hasLiveProposal = [ 0, 1 ].includes(latestProposalState) /// pending & active proposal check.
+        }
       }
 
       return {
