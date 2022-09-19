@@ -65,6 +65,11 @@ import { selectModalState } from 'selectors/uiSelector'
 import DepositModal from 'containers/modals/deposit/DepositModal'
 import TransferModal from 'containers/modals/transfer/TransferModal'
 import ExitModal from 'containers/modals/exit/ExitModal'
+
+import FarmWrapper from 'containers/farm/FarmWrapper'
+import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
+import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
+
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -114,6 +119,9 @@ function Home() {
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
   const lock = useSelector(selectModalState('lock'))
+
+  const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
+  const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
 
   const network = useSelector(selectNetwork())
   const baseEnabled = useSelector(selectBaseEnabled())
@@ -190,6 +198,9 @@ function Home() {
       {!!transferModalState && <TransferModal open={transferModalState} token={token} />}
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
+
+      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
+      {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
 
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
