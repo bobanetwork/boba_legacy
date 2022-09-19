@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactZendesk from "react-zendesk";
+import { APP_ZENDESK_KEY } from 'util/constant';
 
 const setting = {
   color: {
@@ -23,7 +24,7 @@ const setting = {
 
 const Zendesk = () => {
 
-  if (!process.env.REACT_APP_ZENDESK_KEY) {
+  if (!APP_ZENDESK_KEY) {
     // incase of no zendesk key return
     return null;
   }
@@ -37,7 +38,7 @@ const Zendesk = () => {
         window.zE("webWidget", "open");
       });
     }}
-    zendeskKey={process.env.REACT_APP_ZENDESK_KEY}
+    zendeskKey={APP_ZENDESK_KEY}
   />
 }
 

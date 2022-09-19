@@ -13,23 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-require('dotenv').config()
+import { APP_CHAIN, ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG } from './constant'
 
 let NETWORK
 
-if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+if (APP_CHAIN === 'rinkeby') {
   NETWORK = {
     rinkeby: {
       OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
-      MM_Label:         `Rinkeby`,
-      addressManager:   `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`,
+      MM_Label: `Rinkeby`,
+      addressManager: `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`,
       L1: {
         name: "Rinkeby",
         chainId: 4,
         chainIdHex: '0x4',
-        rpcUrl: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
-        blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_ID}`,
+        blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: `https://rinkeby.etherscan.io/tx/`
       },
       L2: {
@@ -57,19 +57,19 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`
     }
   }
-} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+} else if (APP_CHAIN === 'mainnet') {
   NETWORK = {
     mainnet: {
       OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
       VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
-      MM_Label:         `Mainnet`,
-      addressManager:   `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`,
+      MM_Label: `Mainnet`,
+      addressManager: `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`,
       L1: {
         name: "Mainnet",
         chainId: 1,
         chainIdHex: '0x1',
-        rpcUrl: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
-        blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+        blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: ` https://etherscan.io/tx/`,
       },
       L2: {
@@ -97,12 +97,12 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`
     }
   }
-} else if (process.env.REACT_APP_CHAIN === 'local') {
+} else if (APP_CHAIN === 'local') {
   NETWORK = {
     local: {
       OMGX_WATCHER_URL: null, //Does not exist on local
-      MM_Label:         `Local`,
-      addressManager:   `0x5FbDB2315678afecb367f032d93F642f64180aa3`,
+      MM_Label: `Local`,
+      addressManager: `0x5FbDB2315678afecb367f032d93F642f64180aa3`,
       L1: {
         name: "Local L1",
         chainId: 31337,
@@ -122,7 +122,7 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
 }
 
 const BaseServices = {
-  WALLET_SERVICE:   `https://api-service.boba.network/`,
+  WALLET_SERVICE: `https://api-service.boba.network/`,
   //relevant to local?
   SERVICE_OPTIMISM_API_URL: `https://zlba6djrv6.execute-api.us-west-1.amazonaws.com/prod/`,
   //relevant to local?
@@ -137,14 +137,14 @@ const BaseServices = {
   RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
 }
 
-export function getNetwork () {
+export function getNetwork() {
   return NETWORK
 }
 
-export function getBaseServices () {
+export function getBaseServices() {
   return BaseServices
 }
 
-export function getMaxHealthBlockLag () {
-  return process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG || 100
+export function getMaxHealthBlockLag() {
+  return MAX_HEALTH_BLOCK_LAG || 100
 }
