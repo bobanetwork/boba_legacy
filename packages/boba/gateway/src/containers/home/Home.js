@@ -74,6 +74,7 @@ import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import CastVoteModal from 'containers/modals/dao/CastVoteModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -120,6 +121,7 @@ function Home() {
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
   const lock = useSelector(selectModalState('lock'))
+  const proposalId = useSelector(selectModalState('proposalId'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -127,6 +129,7 @@ function Home() {
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
   const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
+  const castVoteModalState = useSelector(selectModalState('castVoteModal'))
 
   const network = useSelector(selectNetwork())
   const baseEnabled = useSelector(selectBaseEnabled())
@@ -229,6 +232,7 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
+      {!!castVoteModalState && <CastVoteModal open={castVoteModalState} proposalId={proposalId} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}

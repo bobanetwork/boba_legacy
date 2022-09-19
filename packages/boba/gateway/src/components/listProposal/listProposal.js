@@ -16,8 +16,8 @@ limitations under the License. */
 import { Circle } from '@mui/icons-material'
 import { Box, LinearProgress, Link, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { castProposalVote, executeProposal, queueProposal } from 'actions/daoAction'
-import { openAlert } from 'actions/uiAction'
+import { executeProposal, queueProposal } from 'actions/daoAction'
+import { openAlert, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -54,9 +54,8 @@ function ListProposal({
     }, [ proposal ])
 
 
-    const updateVote = async (id, userVote, label) => {
-        let res = await dispatch(castProposalVote({ id, userVote }));
-        if (res) dispatch(openAlert(`${label}`))
+    const onVote = (id) => {
+      dispatch(openModal('castVoteModal', null, null, null, null, id))
     }
 
     const doQueueProposal = async () => {
@@ -223,22 +222,8 @@ function ListProposal({
                             <Button
                                 type="primary"
                                 variant="outlined"
-                                onClick={(e) => { updateVote(proposal.id, 1, 'Cast Vote For') }}
-                            >Vote For</Button>
-                        }
-                        {proposal.state === 'Active' && !hasVoted &&
-                            <Button
-                                type="primary"
-                                variant="outlined"
-                                onClick={(e) => { updateVote(proposal.id, 0, 'Cast Vote Against') }}
-                            >Vote Against</Button>
-                        }
-                        {proposal.state === 'Active' && !hasVoted &&
-                            <Button
-                                type="outline"
-                                variant="outlined"
-                                onClick={(e) => { updateVote(proposal.id, 2, 'Cast Vote Abstain') }}
-                            >Vote Abstain</Button>
+                                onClick={(e) => { onVote(proposal.id) }}
+                            >Vote</Button>
                         }
                         {proposal.state === 'Queued' &&
                             <Button type="primary" variant="outlined" onClick={(e) => { doExecuteProposal() }}>EXECUTE</Button>
