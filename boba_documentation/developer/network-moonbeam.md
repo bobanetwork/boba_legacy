@@ -11,7 +11,7 @@ description: A collection of links and addresses to get started on Boba-Moonbeam
 - [Bobabeam L2 (1294) for the Moonbeam L1 (1284)](#bobabeam-l2--1294--for-the-moonbeam-l1--1284-)
   * [Bobabeam Addresses (tbd)](#bobabeam-addresses--tbd-)
   * [Bobabeam Links and Endpoints (tbd)](#bobabeam-links-and-endpoints--tbd-)
-  
+
 # Bobabase L2 (1297) for the Moonbase Testnet (1287)
 
 ## Testnet Fountain for Developers on Bobabase L2
@@ -26,7 +26,7 @@ The standard bridges for `GLMR` (aka `DEV` on Moonbase) and `BOBA` are active, s
 
 If you have unusual `getLogs` needs, especially calls from `0 to latest`, the main RPC will block you, since this is how most DoS attacks work. In those cases, we encourage you to run your own RPC endpoint on your own replica of Bobabase. We have prepared Docker images for you, so this should only take a few minutes. To access these images:
 
-* clone the `boba_base` repo
+* clone the `boba` repo
 * switch to `alt-l1` branch.
 * Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node) folder
 
