@@ -226,7 +226,7 @@ class Farm extends React.Component {
                 onClick={() => this.handleChange(null, `${networkService.L1NativeTokenSymbol} Pool`)}
                 variant="body2"
                 component="span">
-                {networkService.L1ChainAsset.name} Pool
+                {networkService.L1ChainAsset.name} Pools
               </Typography>
               <Typography
                 className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
