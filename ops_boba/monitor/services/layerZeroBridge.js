@@ -88,10 +88,8 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async scanBlockRange(startBlock, endBlock) {
-    console.log(prefix, `scan from block ${startBlock} to block ${endBlock}`)
     for (let i = startBlock; i <= endBlock; i += 1000) {
       const upperBlock = Math.min(i + 999, endBlock)
-      console.log(prefix, `scan blockRange`, i, upperBlock)
 
       await this.scanBlock(i, upperBlock)
       this.currentBlock = upperBlock
@@ -133,6 +131,10 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
         startBlock,
         endBlock
       )
+    }
+
+    if (logs.length !== 0) {
+      console.log(prefix, `found evnets from ${startBlock} to ${endBlock}`)
     }
 
     for (const l of logs) {
