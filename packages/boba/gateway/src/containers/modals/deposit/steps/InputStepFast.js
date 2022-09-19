@@ -108,7 +108,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       setValidValue(false)
       setValue(value)
       return false
-    } else if (token.symbol === 'ETH' && (Number(cost) + Number(value)) > Number(feeBalance)) {
+    } else if (token.symbol === networkService.L1NativeTokenSymbol && (Number(cost) + Number(value)) > Number(feeBalance)) {
       //insufficient ETH to cover the ETH amount plus gas
       setValidValue(false)
       setValue(value)

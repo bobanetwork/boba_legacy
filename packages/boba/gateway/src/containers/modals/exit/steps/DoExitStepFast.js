@@ -64,6 +64,8 @@ import {
    selectBobaPriceRatio,
 } from 'selectors/setupSelector'
 
+import networkService from 'services/networkService'
+
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   console.log([`DO EXIT STEP FAST`, token])
 
@@ -138,12 +140,12 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       return false
     }
     else if (
-      token.symbol === 'ETH' &&
+      token.symbol === 'BOBA' &&
       (Number(value) + feeETH) > balance) {
       if(feeUseBoba)
-        setErrorString('Warning: ETH amount + fees > balance. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+        setErrorString('Warning: BOBA amount + fees > balance. Even if you pay in BOBA, you still need to maintain a minimum BOBA balance in your wallet')
       else
-        setErrorString('Warning: ETH amount + fees > balance')
+        setErrorString('Warning: BOBA amount + fees > balance')
       setValidValue(false)
       setValue(value)
       return false
@@ -151,11 +153,11 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     else if (
       //pay BOBA, exit BOBA - check BOBA amount
       feeUseBoba &&
-      token.symbol === 'BOBA' &&
+      token.symbol === networkService.L1NativeTokenSymbol &&
       (Number(value) + feeBOBA + exitFee) > balance)
     {
       // insufficient BOBA to cover the BOBA amount plus gas plus exitFee
-      setErrorString('Warning: BOBA amount + fees > balance')
+      setErrorString(`Warning: ${networkService.L1NativeTokenSymbol} amount + fees > balance`)
       setValidValue(false)
       setValue(value)
       return false
@@ -167,9 +169,9 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     {
       // insufficient ETH to cover exit fees
       if(feeUseBoba)
-        setErrorString('Warning: ETH balance too low. Even if you pay in BOBA, you still need to maintain a minimum ETH balance in your wallet')
+        setErrorString(`Warning: BOBA balance too low. Even if you pay in ${networkService.L1NativeTokenSymbol}, you still need to maintain a minimum BOBA balance in your wallet`)
       else
-        setErrorString('Warning: ETH balance too low to cover gas')
+        setErrorString('Warning: BOBA balance too low to cover gas')
       setValidValue(false)
       setValue(value)
       return false
@@ -179,7 +181,7 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       feeUseBoba &&
       (feeBOBA + exitFee) > Number(feeBalanceBOBA))
     {
-      setErrorString('Warning: BOBA balance too low to cover gas/fees')
+      setErrorString(`Warning: ${networkService.L1NativeTokenSymbol} balance too low to cover gas/fees`)
       setValidValue(false)
       setValue(value)
       return false
@@ -283,19 +285,19 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       const balance = Number(logAmount(token.balance, token.decimals))
 
       // because of MetaMask issue always have to limit ETH
-      if(token.symbol === 'ETH') {
+      if(token.symbol === 'BOBA') {
         if(balance - safeCost > 0.0)
           setMax_Float(balance - safeCost)
         else
           setMax_Float(0.0)
       }
-      else if (token.symbol === 'BOBA' && feeUseBoba) {
+      else if (token.symbol === networkService.L1NativeTokenSymbol && feeUseBoba) {
         if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
           setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
         else
           setMax_Float(0.0)
       }
-      else if (token.symbol === 'BOBA' && !feeUseBoba) {
+      else if (token.symbol === networkService.L1NativeTokenSymbol && !feeUseBoba) {
         if(balance - exitFee > 0.0)
           setMax_Float(balance - exitFee)
         else
@@ -317,18 +319,18 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   let estGas = ''
   if(feeETH && Number(feeETH) > 0) {
     if(feeUseBoba) {
-      estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
+      estGas = `${Number(feeBOBA).toFixed(4)} ${networkService.L1NativeTokenSymbol}`
     } else {
-      estGas = `${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} BOBA`
     }
   }
 
   // prohibit ExitAll when paying with the token that is to be exited
   let allowUseAll = true
-  if(token.symbol === 'ETH') {
+  if(token.symbol === 'BOBA') {
     allowUseAll = false
   }
-  else if (token.symbol === 'BOBA' && feeUseBoba) {
+  else if (token.symbol === networkService.L1NativeTokenSymbol && feeUseBoba) {
     allowUseAll = false
   }
 

@@ -226,14 +226,14 @@ class Farm extends React.Component {
                 onClick={() => this.handleChange(null, `${networkService.L1NativeTokenSymbol} Pool`)}
                 variant="body2"
                 component="span">
-                {networkService.L1NativeTokenSymbol} Pool
+                {networkService.L1ChainAsset.name} Pool
               </Typography>
               <Typography
                 className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Boba L2 Pool')}
                 variant="body2"
                 component="span">
-                Boba Pools
+                {networkService.L1ChainAsset.l2Name} Pools
               </Typography>
             </S.PageSwitcher>
 
