@@ -47,6 +47,7 @@ const main = async () => {
   const exitMonitorService = require('../services/exitMonitor')
   const l1BridgeMonitorService = require('../services/l1BridgeMonitor')
   const messageMonitorService = require('../services/messageMonitor')
+  const LayerZeroBridgeMonitor = require('../services/layerZeroBridge')
 
   // l1 message monitor
   const messageService = new messageMonitorService()
@@ -76,17 +77,35 @@ const main = async () => {
   // block
   const blockService = new BlockMonitorService()
   await blockService.initConnection()
-  await blockService.initScan()
+
+  try {
+    await blockService.initScan()
+  } catch (error) {
+    ;`Failed to scan initial blocks - error: ${error}`
+  }
 
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 
-  // enable the periodic transaction and check on Mainnet
-  if (process.env.STAGE === 'mainnet') {
+  // monitor layerZero bridge:
+  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
+  await layerZeroBridgeMonitor.initScan()
+  await layerZeroBridgeMonitor.startMonitor()
+
+  // enable the tx response time report
+  if (
+    process.env.SERVICE_MONITOR_ENABLE_TX_RESPONSE_TIME?.toLowerCase() ===
+    'true'
+  ) {
     if (configs.enableTxResponseTime) {
       loop(() => loopLogTx()).catch()
     }
+  }
 
+  // enable the LP balance check
+  if (
+    process.env.SERVICE_MONITOR_ENABLE_BALANCE_MONITOR?.toLowerCase() === 'true'
+  ) {
     const L1_MONITOR_INTERVAL = process.env.L1_MONITOR_INTERVAL || 5 * 60
     const L2_MONITOR_INTERVAL = process.env.L2_MONITOR_INTERVAL || 5 * 60
 
@@ -112,14 +131,19 @@ const main = async () => {
         'Addresses Monitoring: Env variables for monitoring is missing!'
       )
     }
+  }
 
+  // Enable the periodic transaction
+  if (
+    process.env.SERVICE_MONITOR_ENABLE_LOOP_TRANSFER?.toLowerCase() === 'true'
+  ) {
     loop(() => loopTransferTx()).catch()
   }
 }
 
 ;(async () => {
-  main().catch()
+main().catch()
 })().catch((err) => {
-  console.log(err)
-  process.exit(1)
+console.log(err)
+process.exit(1)
 })

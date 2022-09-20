@@ -60,6 +60,9 @@ const config: HardhatUserConfig = {
     mainnet: {
       url: process.env.L1_NODE_WEB3_URL || '',
     },
+    'boba-mainnet': {
+      url: 'https://mainnet.boba.network',
+    },
   },
   mocha: {
     timeout: 50000,
@@ -113,7 +116,20 @@ const config: HardhatUserConfig = {
     outputFile: process.env.CI ? 'gas-report.txt' : undefined,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_KEY,
+      'boba-mainnet': process.env.BOBA_MAINNET_KEY,
+    },
+    customChains: [
+      {
+        network: 'boba-mainnet',
+        chainId: 288,
+        urls: {
+          apiURL: 'https://api.bobascan.com/api',
+          browserURL: 'https://bobascan.com',
+        },
+      },
+    ],
   },
 }
 

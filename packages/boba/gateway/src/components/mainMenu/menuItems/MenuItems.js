@@ -1,52 +1,58 @@
-import React from 'react'
-import { menuItems } from '../menuItems'
-import * as S from './MenuItems.styles'
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { useTheme } from '@mui/material'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { selectModalState } from 'selectors/uiSelector'
-import { setPage } from 'actions/uiAction'
 import { selectMonster } from 'selectors/setupSelector'
 
-function MenuItems ({ setOpen }) {
+import { menuItems } from '../menuItems'
 
+import * as S from './MenuItems.styles'
+import { ENABLE_LOCK_PAGE } from 'util/constant'
+
+const MenuItems = () => {
+
+  const theme = useTheme()
   const monsterNumber = useSelector(selectMonster())
   const monstersAdded = menuItems.some(item => item.key === 'Monster')
+  const [ menuList, setMenuList ] = useState([]);
 
-  if(monsterNumber > 0 && !monstersAdded) {
-    menuItems.push({
-      key: 'Monster',
-      icon: "MonsterIcon",
-      title: "MonsterVerse",
-      url: "/"
-    })
-  }
+  useEffect(() => {
+    setMenuList(menuItems)
+  },[])
 
-  const pageDisplay = useSelector(selectModalState('page'))
-  const dispatch = useDispatch()
+  useEffect(() => {
+    if (monsterNumber > 0 && !monstersAdded) {
+      setMenuList([
+        ...menuItems,
+        {
+          key: 'Monster',
+          icon: "MonsterIcon",
+          title: "MonsterVerse",
+          url: "/monster"
+        }
+      ])
+    }
+  }, [ monsterNumber, monstersAdded ]);
 
   return (
     <S.Nav>
-      {menuItems.map((item) => {
-        if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE && item.key === 'Lock') {
+      {menuList.map((item) => {
+        if (!+ENABLE_LOCK_PAGE && item.key === 'Lock') {
           return null;
         }
-        const isActive = pageDisplay === item.key
+
         return (
-            <S.MenuItem
-              key={item.key}
-              onClick={() => {
-                if (item.url.startsWith('http')) {
-                  window.open(item.url)
-                  setOpen(false)
-                } else {
-                  dispatch(setPage(item.key))
-                  setOpen(false)
-                }
-              }}
-              selected={isActive}
-            >
-              {item.title}
-            </S.MenuItem>
+          <S.MenuItem
+            style={({ isActive }) => {
+              return {
+                color: isActive ? theme.palette.secondary.main : 'inherit'
+              }
+            }}
+            key={item.key}
+            to={item.url}
+          >
+            {item.title}
+          </S.MenuItem>
         )
       })}
     </S.Nav>

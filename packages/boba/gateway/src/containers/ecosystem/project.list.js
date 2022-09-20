@@ -33,6 +33,9 @@ import umaprotocolLogo from '../../images/ecosystem/umaprotocol.webp'
 import unidexLogo from '../../images/ecosystem/unidex.webp'
 import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
+import futuructaLogo from '../../images/ecosystem/futuructa.webp'
+import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
+import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 
 /**
  * thematical order of type.
@@ -147,15 +150,15 @@ export const projectList = [
     "description": "Bridge Crypto from CEX to Layer2 faster and cheaper."
   },
   {
-    "title": "WitNet",
+    "title": "Witnet Oracle",
     "canLaunch": false,
     "link": "https://witnet.io/",
     "telegram": "https://t.me/witnetio",
     "twitter": "https://twitter.com/witnet_io",
-    "discord": "https://discord.gg/X4uurfP",
-    "type": "tools",
+    "discord": "https://discord.gg/witnet",
+    "type": "tool",
     "image": witnetLogo,
-    "description": "Multi-chain secure data input. Price feeds, randomness and HTTP adapters."
+    "description": "A trustless multi-chain oracle whose security is founded on strong cryptoeconomic incentives."
   },
   {
     "title": "Boba Punks",
@@ -388,10 +391,41 @@ export const projectList = [
      "image": symbiosisLogo,
      "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
    },
+  {
+     "title": "Beamer",
+     "canLaunch": true,
+     "link": "https://www.beamerbridge.com/",
+     "twitter": "https://twitter.com/BeamerBridge",
+     "discord": "https://discord.com/invite/uvTYkzsBdA",
+     "type": "bridge",
+     "image": beamerbridge,
+     "description": "Beam your ERC20 assets between EVM compatible rollups with certainty, speed and security"
+   },
+  {
+    "title": "Futuructa",
+    "canLaunch": true,
+    "link": "https://metaforra.com/futuructa/",
+    "telegram": "https://t.me/metaforra_games",
+    "twitter": "https://twitter.com/metaforra_com",
+    "discord": "https://discord.gg/PyRaQmay2Z",
+    "type": "gamefi",
+    "image": futuructaLogo,
+    "description": "Merge simple objects to get improved ones, solve puzzles and complete quests!"
+  },
+  {
+    "title": "Rabby Wallet",
+    "canLaunch": true,
+    "link": "https://rabby.io",
+    "telegram": "https://t.me/rabby_io",
+    "twitter": "https://twitter.com/Rabby_io",
+    "type": "wallet",
+    "image": rabbyLogo,
+    "description": "The game-changing wallet for Ethereum and all EVM chains."
+  },
 ]
 
 export const loadProjectByCategory = () => {
-  const typeOrder = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
+  const typeOrder = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
   const projectByType = groupBy(projectList, 'type')
   const orderProjects = {}
   typeOrder.forEach((key) => {
