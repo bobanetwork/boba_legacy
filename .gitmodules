@@ -9,3 +9,7 @@
 [submodule "bedrock/reference-optimistic-geth"]
 	path = bedrock/reference-optimistic-geth
 	url = https://github.com/bobanetwork/reference-optimistic-geth
+
+[submodule "boba_community/bobarians/lib/forge-std"]
+	path = boba_community/bobarians/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
