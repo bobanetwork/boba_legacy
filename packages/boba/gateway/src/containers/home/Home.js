@@ -15,17 +15,36 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Outlet } from 'react-router-dom'
+import { Box, Container, Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
 
-import { selectModalState } from 'selectors/uiSelector'
-import PageHeader from 'components/pageHeader/PageHeader'
-import useInterval from 'util/useInterval'
-
-import { Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
+/**** styles *****/
 import * as S from './Home.styles'
-import PageTitle from 'components/pageTitle/PageTitle'
-
 import turing from '../../images/boba2/turing.png'
 
+/**** serice *****/
+import networkService from 'services/networkService'
+
+/**** ACTIONS and SELECTORS *****/
+import { setBaseState } from 'actions/setupAction'
+import {
+  fetchDaoBalance,
+  fetchDaoVotes,
+  fetchDaoBalanceX,
+  fetchDaoVotesX,
+  fetchDaoProposals,
+  getProposalThreshold
+} from 'actions/daoAction'
+
+import {
+  fetchAirdropStatusL1,
+  fetchAirdropStatusL2
+} from 'actions/airdropAction'
+import { checkVersion } from 'actions/serviceAction'
+import { closeAlert, closeError } from 'actions/uiAction'
+import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
+import { fetchVerifierStatus } from 'actions/verifierAction'
+import { fetchLockRecords } from 'actions/veBobaAction'
 import {
   fetchBalances,
   fetchGas,
@@ -33,22 +52,16 @@ import {
   fetchExits
 } from 'actions/networkAction'
 
-import networkService from 'services/networkService'
-
-import { setBaseState } from 'actions/setupAction'
+/********   SELECTORS ********/
 import {
   selectBaseEnabled,
   selectAccountEnabled,
   selectNetwork,
-  selectLayer
 } from 'selectors/setupSelector'
-
-/**** ACTIONS and SELECTORS *****/
-
-import { checkVersion } from 'actions/serviceAction'
-import { closeAlert, closeError } from 'actions/uiAction'
 import { selectAlert, selectError } from 'selectors/uiSelector'
+import { selectModalState } from 'selectors/uiSelector'
 
+/******** MODALs ********/
 import DepositModal from 'containers/modals/deposit/DepositModal'
 import TransferModal from 'containers/modals/transfer/TransferModal'
 import ExitModal from 'containers/modals/exit/ExitModal'
@@ -61,18 +74,18 @@ import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Wallet from 'containers/wallet/Wallet'
 
-import { Box, Container } from '@mui/material'
-
+/******** COMPONENTS ********/
+import PageTitle from 'components/pageTitle/PageTitle'
+import PageHeader from 'components/pageHeader/PageHeader'
 import PageFooter from 'components/pageFooter/PageFooter'
-
 import Alert from 'components/alert/Alert'
-
-import { POLL_INTERVAL } from 'util/constant'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import { trackPageView } from 'util/googleAnalytics'
-import { fetchLockRecords } from 'actions/veBobaAction'
-
 import Zendesk from 'components/zendesk/Zendesk'
+
+/******** UTILS ********/
+import { POLL_INTERVAL } from 'util/constant'
+import useInterval from 'hooks/useInterval'
+import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 
 require('dotenv').config()
 
@@ -80,15 +93,12 @@ function Home() {
 
   const dispatch = useDispatch()
   const theme = useTheme()
-
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const errorMessage = useSelector(selectError)
   const alertMessage = useSelector(selectAlert)
 
   const [ mobileMenuOpen ] = useState(false)
-
-  const pageDisplay = useSelector(selectModalState('page'))
 
   const depositModalState = useSelector(selectModalState('depositModal'))
 
@@ -106,7 +116,6 @@ function Home() {
   const lock = useSelector(selectModalState('lock'))
 
   const network = useSelector(selectNetwork())
-  const layer = useSelector(selectLayer())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -171,10 +180,8 @@ function Home() {
     }
   }, [ dispatch, accountEnabled, maintenance ])
 
-  useEffect(() => {
-    trackPageView(pageDisplay)
-  }, [pageDisplay])
-
+  // Invoking GA analysis page view hooks
+  useGoogleAnalytics();
 
   return (
     <>
@@ -272,15 +279,7 @@ function Home() {
             width: '100vw',
             marginRight: 'unset'
           }}>
-            {pageDisplay === "History" &&
-              <Transactions />
-            }
-            {pageDisplay === "BobaScope" &&
-              <BobaScope />
-            }
-            {pageDisplay === "Wallet" &&
-              <Wallet />
-            }
+            <Outlet />
           </Container>
           <PageFooter/>
         </Box>

@@ -66,6 +66,9 @@ const config: HardhatUserConfig = {
     moonbeam: {
       url: 'https://rpc.api.moonbeam.network',
     },
+    snowtrace: {
+      url: 'https://api.avax.network/ext/bc/C/rpc',
+    },
   },
   mocha: {
     timeout: 50000,
@@ -123,6 +126,7 @@ const config: HardhatUserConfig = {
       mainnet: process.env.ETHERSCAN_KEY,
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
       moonbeam: process.env.MOONBEAM_KEY,
+      snowtrace: process.env.SNOWTRACE_KEY,
     },
     customChains: [
       {
@@ -139,6 +143,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-moonbeam.moonscan.io/api',
           browserURL: 'https://moonscan.io/',
+        },
+      },
+      {
+        network: 'snowtrace',
+        chainId: 43114,
+        urls: {
+          apiURL: 'https://api.snowtrace.io/api',
+          browserURL: 'https://snowtrace.io',
         },
       },
     ],

@@ -83,6 +83,7 @@ import addresses_BobaOperaTestnet from "@boba/register/addresses/addressesBobaOp
 import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79"
 import addresses_BobaBnbTestnet from "@boba/register/addresses/addressBobaBnbTestnet_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa"
 import addresses_BobaBeam from "@boba/register/addresses/addressBobaBeam_0x564c10A60af35a07f0EA8Be3106a4D81014b21a0"
+import addresses_BobaAvax from "@boba/register/addresses/addressBobaAvax_0x00220f8ce1c4be8436574e575fE38558d85e2E6b"
 
 import { bobaBridges } from 'util/bobaBridges'
 
@@ -126,6 +127,11 @@ if (process.env.REACT_APP_CHAIN === 'bobaFuji') {
     ...addresses_BobaFuji,
   }
 }
+if (process.env.REACT_APP_CHAIN === 'bobaAvax') {
+  allAddresses = {
+    ...addresses_BobaAvax
+  }
+}
 if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
   allAddresses = {
     ...addresses_BobaBnbTestnet,
@@ -133,7 +139,7 @@ if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
 }
 
 // suported chains
-const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet', 'bobaBeam']
+const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet', 'bobaBeam', 'bobaAvax']
 
 // assets for different chains
 const L1ChainAssets = {
@@ -153,21 +159,28 @@ const L1ChainAssets = {
   },
   'bobaOperaTestnet': {
     name: 'Fantom Testenet',
-    l2Name: 'Boba',
+    l2Name: 'Bobaopera Testnet',
     icon: (bool) => <FantomIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
     foundation: true,
   },
   'bobaFuji': {
     name: 'Avalanche Testnet',
-    l2Name: 'Boba',
+    l2Name: 'Boba Avalanche Testnet',
     icon: (bool) => <AvaxIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
     foundation: true,
   },
+  'bobaAvax': {
+    name: 'Avalanche Mainnet C-Chain',
+    l2Name: 'Boba Avalanche Mainnet',
+    icon: (bool) => <AvaxIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    foundation: false,
+  },
   'bobaBnbTestnet': {
     name: 'BNB Testnet',
-    l2Name: 'Boba',
+    l2Name: 'Boba BNB Testnet',
     icon: (bool) => <BnbIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
     foundation: true,

@@ -202,6 +202,10 @@ export const makeL2GenesisFile = async (
       if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 4328) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheTestnetByteCode
       }
+      // Avalanche Mainnet
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 43288) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheMainnetByteCode
+      }
       // Bnb local
       if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 31338) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbLocalBytecode

@@ -206,6 +206,33 @@ if (process.env.REACT_APP_CHAIN === 'rinkeby') {
       twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`
     }
  }
+} else if (process.env.REACT_APP_CHAIN === 'bobaAvax') {
+  NETWORK = {
+    bobaAvax: {
+      OMGX_WATCHER_URL: `https://api-watcher.avax.boba.network/`,
+      MM_Label:         `Boba Avalanche Mainnet`,
+      addressManager:   `0x00220f8ce1c4be8436574e575fE38558d85e2E6b`,
+      L1: {
+        name: "Avalanche Mainnet",
+        chainId: 43114,
+        chainIdHex: '0xA86A',
+        rpcUrl: `https://api.avax.network/ext/bc/C/rpc`,
+        blockExplorer: `https://api.snowtrace.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://snowtrace.io/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+      },
+      L2: {
+        name: "Boba Avalanche Mainnet",
+        chainId: 43288,
+        chainIdHex: '0xA918',
+        rpcUrl: `https://avax.boba.network`,
+        blockExplorer: `https://blockexplorer.avax.boba.network/`,
+        transaction: `https://blockexplorer.avax.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`
+    }
+ }
 } else if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
   NETWORK = {
     bobaBnbTestnet: {
@@ -276,7 +303,7 @@ const BaseServices = {
   // Testnet meta transaction
   BOBAOPERATESTNET_META_TRANSACTION: `https://api-meta-transaction.testnet.bobaopera.boba.network/`,
   // Mainnet meta transaction
-  BOBAAVALANCHE_META_TRANSACTION: `https://api-meta-transaction.avax.boba.network/`,
+  BOBAAVAX_META_TRANSACTION: `https://api-meta-transaction.avax.boba.network/`,
   // Testnet meta transaction
   BOBAFUJI_META_TRANSACTION: `https://api-meta-transaction.testnet.avax.boba.network/`,
   // Mainnet meta transaction

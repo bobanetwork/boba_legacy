@@ -29,9 +29,24 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 // import { initGa } from 'util/googleAnalytics'
 
-function App () {
+// import Airdrop from 'containers/airdrop/Airdrop'
+import Transactions from 'containers/history/History'
+import BobaScope from 'containers/bobaScope/BobaScope'
+// import Help from 'containers/help/Help'
+// import Ecosystem from 'containers/ecosystem/Ecosystem'
+import Wallet from 'containers/wallet/Wallet'
+// import Bridge from 'containers/bridge/Bridge'
+// import MonsterWrapper from 'containers/monster/MonsterWrapper'
+// import Lock from 'containers/veboba/Lock'
+// import FarmWrapper from 'containers/farm/FarmWrapper'
+// import Dao from 'containers/dao/Dao'
+// import SaveWrapper from 'containers/save/SaveWrapper'
+// import Projects from 'containers/ecosystem/Projects'
+
+function App() {
 
   const dispatch = useDispatch()
+
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
 
@@ -69,7 +84,7 @@ function App () {
       },
     },
     typography: {
-      fontFamily: ["MrEavesXL", 'Roboto'].join(','),
+      fontFamily: [ "MrEavesXL", 'Roboto' ].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,
@@ -124,7 +139,7 @@ function App () {
             color: '#031313',
             "&.Mui-disabled": {
               background: light ? 'transparent' : 'rgba(255, 255, 255, 0.04)',
-              color: light ? 'rgba(0, 0, 0, 0.5)' :'rgba(255, 255, 255, 0.5)',
+              color: light ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
               border: light ? '1px solid rgba(0, 0, 0, 0.5)' : 'none',
             }
           },
@@ -203,7 +218,7 @@ function App () {
             },
           },
           {
-            props: { variant: 'small'},
+            props: { variant: 'small' },
             style: {
               fontSize: '14px',
               background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
@@ -217,13 +232,13 @@ function App () {
             },
           },
           {
-            props: { size: 'large'},
+            props: { size: 'large' },
             style: {
               fontSize: '1rem',
             },
           },
           {
-            props: { size: 'small'},
+            props: { size: 'small' },
             style: {
               fontSize: '0.8rem',
             },
@@ -254,9 +269,7 @@ function App () {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-
     // initGa(); disable GA at this place better and single liner.
-
   }, [ dispatch ])
 
 
@@ -274,10 +287,27 @@ function App () {
               backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`
             }}
           >
-            <Notification/>
+            <Notification />
             <Suspense fallback={<>Loading...</>}>
               <Routes>
-                <Route exact path="/" element={<Home />} />
+                <Route exact path="/" element={<Home />} >
+                  {/* <Route index element={<Bridge />} /> */}
+                  <Route path="/history" element={<Transactions />} />
+                  <Route path="/bobascope" element={<BobaScope />} />
+                  <Route index element={<Wallet />} />
+                  <Route path="wallet" element={<Wallet />} />
+                  {/* <Route path="/farm" element={<FarmWrapper />} /> */}
+                  {/* <Route path="/save" element={<SaveWrapper />} /> */}
+                  {/* <Route path="/dao" element={<Dao />} /> */}
+                  {/* <Route path="/airdrop" element={<Airdrop />} /> */}
+                  {/* <Route path="/help" element={<Help />} /> */}
+                  {/* <Route path="/ecosystem" element={<Ecosystem />} > */}
+                    {/* <Route path=":category" element={<Projects />} /> */}
+                  {/* </Route> */}
+                  {/* <Route path="/bridge" element={<Bridge />} /> */}
+                  {/* <Route path="/monster" element={<MonsterWrapper />} /> */}
+                  {/* <Route path="/lock" element={<Lock />} /> */}
+                </Route>
               </Routes>
             </Suspense>
           </div>
