@@ -161,7 +161,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     }
 
     if (logs.length !== 0) {
-      console.log(prefix, `found evnets from ${startBlock} to ${endBlock}`)
+      console.log(prefix, `found events from ${startBlock} to ${endBlock}`)
     }
 
     for (const l of logs) {
