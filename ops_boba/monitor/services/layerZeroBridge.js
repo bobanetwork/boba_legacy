@@ -88,10 +88,8 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async scanBlockRange(startBlock, endBlock) {
-    console.log(prefix, `scan from block ${startBlock} to block ${endBlock}`)
     for (let i = startBlock; i <= endBlock; i += 1000) {
       const upperBlock = Math.min(i + 999, endBlock)
-      console.log(prefix, `scan blockRange`, i, upperBlock)
 
       await this.scanBlock(i, upperBlock)
       this.currentBlock = upperBlock
@@ -101,19 +99,43 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async scanBlock(startBlock, endBlock) {
-    const logs = await this.bridgeContract.queryFilter(
-      this.isETH
-        ? [
+    const getEvents = async (events, startBlock, endBlock) => {
+      let logs = []
+      for (const event of events) {
+        const log = await this.bridgeContract.queryFilter(
+          event,
+          Number(startBlock),
+          Number(endBlock)
+        )
+        logs = logs.concat(log)
+      }
+      return logs
+    }
+
+    let logs = []
+    if (this.ETH) {
+      logs = await getEvents(
+        [
           this.bridgeContract.filters.ERC20DepositInitiated(),
           this.bridgeContract.filters.ERC20WithdrawalFinalized(),
-        ]
-        : [
+        ],
+        startBlock,
+        endBlock
+      )
+    } else {
+      logs = await getEvents(
+        [
           this.bridgeContract.filters.WithdrawalInitiated(),
           this.bridgeContract.filters.DepositFinalized(),
         ],
-      Number(startBlock),
-      Number(endBlock)
-    )
+        startBlock,
+        endBlock
+      )
+    }
+
+    if (logs.length !== 0) {
+      console.log(prefix, `found evnets from ${startBlock} to ${endBlock}`)
+    }
 
     for (const l of logs) {
       const tx = await l.getTransaction()
@@ -131,12 +153,9 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
         amount: l.args._amount,
         event: l.event,
       }
-
       await this.databaseService.insertLayerZeroTx(eventData)
     }
   }
-
-
 
   errorCatcher(func, param) {
     return (async () => {

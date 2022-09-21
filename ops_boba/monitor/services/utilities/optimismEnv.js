@@ -82,7 +82,8 @@ const OVM_L2_CROSS_DOMAIN_MESSENGER =
 const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
 // layerZero env
-const LAYER_ZERO_ENABLE_TEST = Boolean(env.LAYER_ZERO_ENABLE_TEST) || true
+const LAYER_ZERO_ENABLE_TEST =
+  env.LAYER_ZERO_ENABLE_TEST === 'true' ? true : false
 const LAYER_ZERO_CHAIN = env.LAYER_ZERO_CHAIN || 'Testnet'
 const LAYER_ZERO_BRIDGE = env.LAYER_ZERO_BRIDGE || 'EthBridgeToAvalanche'
 const LAYER_ZERO_LATEST_BLOCK = Number(env.LAYER_ZERO_LATEST_BLOCK) || 0

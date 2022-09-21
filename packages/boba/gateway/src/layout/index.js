@@ -38,7 +38,7 @@ import Wallet from 'containers/wallet/Wallet'
 // import Bridge from 'containers/bridge/Bridge'
 // import MonsterWrapper from 'containers/monster/MonsterWrapper'
 // import Lock from 'containers/veboba/Lock'
-// import FarmWrapper from 'containers/farm/FarmWrapper'
+import FarmWrapper from 'containers/farm/FarmWrapper'
 // import Dao from 'containers/dao/Dao'
 // import SaveWrapper from 'containers/save/SaveWrapper'
 // import Projects from 'containers/ecosystem/Projects'
@@ -296,7 +296,7 @@ function App() {
                   <Route path="/bobascope" element={<BobaScope />} />
                   <Route index element={<Wallet />} />
                   <Route path="wallet" element={<Wallet />} />
-                  {/* <Route path="/farm" element={<FarmWrapper />} /> */}
+                  <Route path="/farm" element={<FarmWrapper />} />
                   {/* <Route path="/save" element={<SaveWrapper />} /> */}
                   {/* <Route path="/dao" element={<Dao />} /> */}
                   {/* <Route path="/airdrop" element={<Airdrop />} /> */}

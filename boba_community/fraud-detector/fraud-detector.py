@@ -24,14 +24,7 @@ logger = logging.getLogger('fraud-detector')
 logger.setLevel(logging.DEBUG)
 #logger.addHandler(logging.StreamHandler())
 
-logger.debug (os.environ['L1_NODE_WEB3_URL'])
-logger.debug (os.environ['L1_CONFIRMATIONS'])
-logger.debug (os.environ['L2_NODE_WEB3_URL'])
-logger.debug (os.environ['VERIFIER_WEB3_URL'])
-logger.debug (os.environ['ADDRESS_MANAGER_ADDRESS'])
-logger.debug (os.environ['L1_DEPLOYMENT_BLOCK'])
-logger.debug (os.environ['L2_START_BLOCK'])
-logger.debug (os.environ['L2_CHECK_INTERVAL'])
+logger.debug (os.environ)
 
 l1_confirmations = int(os.environ['L1_CONFIRMATIONS'])
 # These can be changed from the defaults to start at a previously verified
@@ -47,6 +40,12 @@ element_start = int(os.environ['L2_START_BLOCK'])
 # in the SCC, and this can be determined using the L1 RPC only.
 l2_check_interval = int(os.environ['L2_CHECK_INTERVAL'])
 last_l2check = 0
+
+# Optional rate limit on the number of L1 queries sent per minute.
+# Internally represented per-second to simplify calculations.
+l1_per_sec = 0
+if 'L1_PER_MINUTE' in os.environ:
+  l1_per_sec = float(os.environ['L1_PER_MINUTE']) / 60.0
 
 Matched = {
   'Block':0, # Highest good block, and its corresponding state root
@@ -138,12 +137,32 @@ checkpoint = [ element_start, l1_base ]
 last_saved = l1_base
 l3_block = 0
 
+rlStart = time.time()
+rlCount = 0
+def l1RateLimit():
+  global rlStart
+  global rlCount
+
+  if l1_per_sec:
+    rlCount += 1
+    when = rlStart + (rlCount / l1_per_sec)
+    now = time.time()
+
+    if now < when:
+      #logger.debug("rate limited, sleeping " + str(when-now))
+      time.sleep(when - now)
+    else:
+      # If not limited on the current request, reset the interval
+      rlStart = now
+      rlCount = 0
+
 def doEvent(event, force_L2):
   global rCount
   global Matched
   global l3_block
   global l2_check_interval,last_l2check
 
+  l1RateLimit()
   t = rpc[1].eth.get_transaction(event.transactionHash)
 
   (junk, ib) = scc_contract.decode_function_input(t.input)
@@ -243,6 +262,7 @@ def fpLoop():
     toBlock = min(startBlock+batch_size, l1_tip) - 1
     #print("Scanning from",startBlock,"to",toBlock)
 
+    l1RateLimit()
     batch = rpc[1].eth.getLogs({
       "fromBlock":startBlock,
       "toBlock":toBlock,
@@ -264,6 +284,7 @@ def fpLoop():
       time.sleep(30)
       continue
 
+    l1RateLimit()
     batch = rpc[1].eth.getLogs({
       "fromBlock":startBlock,
       "toBlock":toBlock,
