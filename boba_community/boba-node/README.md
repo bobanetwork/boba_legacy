@@ -1,18 +1,18 @@
-# Running a Boba node (replica)
+# Running a Boba node for multi-chains (replica)
 
 The [boba_community/boba-node](../../boba_community/boba-node) repo runs a replica of the Boba L2geth, which is useful for generating analytics for blockexplorers and other specialized use cases.
 
 ## Basic Considerations
 
-1. Running a local Boba node (replica) does not allow you to mine ETH, OMG, or BOBA. There is no mining on L2.
+1. Running a local Boba node (replica) does not allow you to mine BOBA. There is no mining on L2.
 
-2. If you looking for best possible rpc read data (lowest possible latency) you are **strongly advised** not to run your own node, but to use **https://lightning-replica.boba.network**. This is an autoscaling rpc endpoint that speaks directly to the core Boba L2 geth.
+2. If you looking for best possible rpc read data (lowest possible latency) you are **strongly advised** not to run your own node, but to use **https://replica.avax.boba.network**. This is an autoscaling rpc endpoint that speaks directly to the core Boba L2 geth.
 
-3. The Boba L2 is (at present) a single proposer/sequencer system and the only way to write transactions is via **https://mainnet.boba.network**. You cannot use a local node to write transactions.
+3. The Boba L2 is (at present) a single proposer/sequencer system and the only way to write transactions is via **https://avaxt.boba.network**. You cannot use a local node to write transactions.
 
-4. If your application _does not need autoscaling and low latency_, and can tolerate sync delays, you can run your own Boba node (replica). This replica will try to follow the core L2 geth via data provided by Infura and **https://lightning-replica.boba.network**, so it will necessarily lag behind **https://lightning-replica.boba.network**.
+4. If your application _does not need autoscaling and low latency_, and can tolerate sync delays, you can run your own Boba node (replica). This replica will try to follow the core L2 geth via data provided by L1 node and **https://replica.avax.boba.network**, so it will necessarily lag behind **https://replica.avax..boba.network**.
 
-5. Please design your rpc connectors in a resource efficient manner. Notably, calling `eth_getLogs(fromBlock: 0)` 1000 times per second serves no conceivable purpose since the Ethereum blocktime is 12 seconds and the Boba blocktime is > 1 second. All that does is to degrade your replica and trigger rate-limiting and/or IP blocking at **https://lightning-replica.boba.network**.
+5. Please design your rpc connectors in a resource efficient manner. Notably, calling `eth_getLogs(fromBlock: 0)` 1000 times per second serves no conceivable purpose since the Ethereum blocktime is 12 seconds and the Boba blocktime is > 1 second. All that does is to degrade your replica and trigger rate-limiting and/or IP blocking at **https://replica.avax.boba.network**.
 
 ## Prerequisites
 
@@ -27,6 +27,7 @@ The [boba_community/boba-node](../../boba_community/boba-node) repo runs a repli
 
 ```bash
 $ git clone https://github.com/bobanetwork/boba.git
+$ git checkout alt-l1
 $ cd boba_community/boba-node
 ```
 
@@ -35,32 +36,22 @@ $ cd boba_community/boba-node
 ```yaml
 # release tag
 RELEASE_VERSION=v0.X.X
-
-L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY # for mainnet
-# Or ...
-L2_NODE_WEB3_URL=https://rinkeby.infura.io/v3/YOUR_INFURA_KEY # for rinkeby
 ```
 
 **Pull images**
 
 ```bash
-$ docker compose pull # for mainnet
-# or...
-$ docker compose -f docker-compose-rinkeby.yml pull #for rinkeby
+$ docker compose -f docker-compose-bobabeam.yml pull # for bobabeam
+# or
+$ docker compose -f docker-compose-bobaavax.yml up #for boba avalanche L2
 ```
 
 **Start your replica node**
 
 ```bash
-$ docker-compose up  # for mainnet
+$ docker compose -f docker-compose-bobabeam.yml up #for bobabeam
 # or
-$ docker compose -f docker-compose-rinkeby.yml up #for rinkeby
-# or
-$ docker compose -f docker-compose-bobabase.yml up #for bobabase
-# or
-$ docker compose -f docker-compose-bobaopera-testnet.yml up #for bobaopera testnet
-# or
-$ docker compose -f docker-compose-bobafuji.yml up #for boba avalanche L2
+$ docker compose -f docker-compose-bobaavax.yml up #for boba avalanche L2
 ```
 
 The DTL will first sync with the chain. During the sync, you will see the DTL and Replica gradually catch up with the Boba L2. This can take several minutes to several hours, depending on which chain you are replicating.
@@ -88,15 +79,9 @@ replica    | DEBUG[04-22|20:38:45.941] Total fee                                
 There will be occasional updates to both services. You can update them by updating `RELEASE_VERSION` in the `.env` file first, then running:
 
 ```bash
-docker compose pull
+$ docker compose -f docker-compose-bobabeam.yml pull # for bobabeam
 # or
-$ docker compose -f docker-compose-rinkeby.yml pull #for rinkeby
-# or
-$ docker compose -f docker-compose-bobabase.yml pull #for bobabase
-# or
-$ docker compose -f docker-compose-bobaopera-testnet.yml pull #for bobaopera testnet
-# or
-$ docker compose -f docker-compose-bobafuji.yml pull #for boba avalanche L2
+$ docker compose -f docker-compose-bobaavax.yml up #for boba avalanche L2
 ```
 
 and bringing the services up again. **We suggest you keep the storage volume of the replica mounted on the host**. The replica stores its data in `/root/.ethereum/`.

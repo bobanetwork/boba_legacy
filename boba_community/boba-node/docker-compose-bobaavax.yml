@@ -67,7 +67,7 @@ services:
       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
       # sequencer http endpoint
-      SEQUENCER_CLIENT_HTTP: https://bobabeam.boba.network
+      SEQUENCER_CLIENT_HTTP: https://avax.boba.network
     logging:
       driver: "json-file"
       options:
