@@ -210,7 +210,7 @@ export const getRelayedMessageEventsFromGraph = async (
   }
   let entity: any
   if (fast) {
-    entity = data.data.fastRelayedMessageEntities
+    entity = data.data.relayedMessageFastEntities
   } else {
     entity = data.data.relayedMessageEntities
   }

@@ -89,16 +89,29 @@ function ListToken({
             <S.DropdownWrapper>
 
               {enabled && chain === 'L1' &&
+                <>
                   <Button
                     onClick={() => { handleModalClick('depositModal', token, false) }}
                     color='primary'
-                    variant="contained"
+                    variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
                     fullWidth
                   >
                     Bridge to L2
                   </Button>
+
+                  <Button
+                    onClick={() => { handleModalClick('depositModal', token, true) }}
+                    color='primary'
+                    disabled={disabled}
+                    variant="outlined"
+                    tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
+                    fullWidth
+                  >
+                    Fast Bridge to L2
+                  </Button>
+                </>
               }
 
               {enabled && chain === 'L2' &&
@@ -106,12 +119,22 @@ function ListToken({
                   <Button
                     onClick={() => { handleModalClick('exitModal', token, false) }}
                     color="primary"
-                    variant="contained"
+                    variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
                     fullWidth
                   >
                     Bridge to L1
+                  </Button>
+
+                  <Button
+                    onClick={() => { handleModalClick('exitModal', token, true) }}
+                    variant="outlined"
+                    disabled={disabled}
+                    tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
+                    fullWidth
+                  >
+                    Fast Bridge to L1
                   </Button>
 
                   <Button
@@ -172,12 +195,23 @@ function ListToken({
               <Button
                 onClick={() => { handleModalClick('depositModal', token, false) }}
                 color='primary'
-                variant="contained"
+                variant="outlined"
                 disabled={disabled}
                 tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
                 fullWidth
               >
                 Bridge to L2
+              </Button>
+
+              <Button
+                onClick={() => { handleModalClick('depositModal', token, true) }}
+                color='primary'
+                disabled={disabled}
+                variant="outlined"
+                tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
+                fullWidth
+              >
+                Fast Bridge to L2
               </Button>
             </>
           }
@@ -186,13 +220,25 @@ function ListToken({
               <Button
                 onClick={() => { handleModalClick('exitModal', token, false) }}
                 color='primary'
-                variant="contained"
+                variant="outlined"
                 disabled={disabled}
                 tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
                 fullWidth
               >
                 Bridge to L1
               </Button>
+
+              <Button
+                onClick={() => { handleModalClick('exitModal', token, true) }}
+                variant="outlined"
+                disabled={disabled}
+                tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
+                fullWidth
+              >
+                Fast Bridge to L1
+              </Button>
+
+
               <Button
                 onClick={() => { handleModalClick('transferModal', token, false) }}
                 variant="contained"

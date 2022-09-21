@@ -20,6 +20,7 @@ import Modal from 'components/modal/Modal'
 import { closeModal } from 'actions/uiAction'
 
 import DoExitStep from './steps/DoExitStep'
+import DoExitStepFast from './steps/DoExitStepFast'
 import { fetchTransactions } from 'actions/networkAction'
 
 function ExitModal({ open, token, fast, minHeight }) {
@@ -33,7 +34,11 @@ function ExitModal({ open, token, fast, minHeight }) {
 
   return (
     <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={!!fast ? "" : "350px"}>
-      <DoExitStep handleClose={handleClose} token={token}/>
+      {!!fast ? (
+        <DoExitStepFast handleClose={handleClose} token={token} />
+      ) : (
+        <DoExitStep handleClose={handleClose} token={token}/>
+      )}
     </Modal>
   )
 }
