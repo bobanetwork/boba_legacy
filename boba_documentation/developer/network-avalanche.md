@@ -12,7 +12,7 @@ description: A collection of links and addresses to get started on Boba-Avalanch
   - [Analytics and eth_getLogs for Boba Avalanche Mainnet](#Analytics-and-eth-getlogs-for-boba-avalanche-mainnet)
   - [Boba Avalanche L2 Addresses](#boba-avalanche-l2-addresses)
   - [Boba Avalanche L2 Links and Endpoints](#boba-avalanche-l2-links-and-endpoints)
-  
+
 
 # Boba Avalanche Testnet L2 (4328) for the Avalanche Testnet (43113)
 
@@ -57,7 +57,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 |               |                                                              |
 | ------------- | ------------------------------------------------------------ |
-| ChainID       | 43288                                                        |
+| ChainID       | 4328                                                         |
 | RPC           | [https://testnet.avax.boba.network](https://testnet.avax.boba.network) |
 | Replica RPC   | [https://replica.testnet.avax.boba.network](https://replica.testnet.avax.boba.network) |
 | Gateway       | [https://gateway.testnet.avax.boba.network](https://gateway.testnet.avax.boba.network) |
@@ -88,13 +88,13 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
  ```
 
 
-## Boba Avalanche Addresses (tbd)
+## Boba Avalanche Addresses
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobaavax/README.md](../../packages/contracts/deployments/bobaavax/README.md)
 
 For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba Avalanche address registration dump](../../packages/boba/register/addresses/addressBobaAvax_0x00220f8ce1c4be8436574e575fE38558d85e2E6b.json).
 
-## Boba Avalanche Links and Endpoints (tbd)
+## Boba Avalanche Links and Endpoints
 
 |               |                                                              |
 | ------------- | ------------------------------------------------------------ |
