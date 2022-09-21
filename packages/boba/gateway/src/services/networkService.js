@@ -98,8 +98,7 @@ import GraphQLService from "./graphQLService"
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
 import { bobaBridges } from 'util/bobaBridges'
-
-require('dotenv').config()
+import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -110,13 +109,13 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 
 let allAddresses = {}
 // preload allAddresses
-if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+if (APP_CHAIN === 'rinkeby') {
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
     L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool
   }
-} else if (process.env.REACT_APP_CHAIN === 'mainnet') {
+} else if (APP_CHAIN === 'mainnet') {
   allAddresses = {
     ...addresses_Mainnet,
     L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
@@ -227,8 +226,6 @@ class NetworkService {
       this.networkGateway
     ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
 
-    console.log("Verifier response: ", response)
-
     if (response.status === 200) {
       const status = response.data.result
       return status
@@ -247,7 +244,7 @@ class NetworkService {
       this.networkGateway
     ).post('get.l1.airdrop', {
       address: this.account,
-      key: process.env.REACT_APP_AIRDROP
+      key: APP_AIRDROP
     })
 
     console.log("L1 response:", response)
@@ -271,7 +268,7 @@ class NetworkService {
       this.networkGateway
     ).post('get.l2.airdrop', {
       address: this.account,
-      key: process.env.REACT_APP_AIRDROP
+      key: APP_AIRDROP
     })
 
     if (response.status === 201) {
@@ -319,7 +316,7 @@ class NetworkService {
         this.networkGateway
       ).post('initiate.l1.airdrop', {
           address: this.account,
-          key: process.env.REACT_APP_AIRDROP
+          key: APP_AIRDROP
       })
 
       if (response.status === 201) {
@@ -372,7 +369,7 @@ class NetworkService {
         this.networkGateway
       ).post('send.l1.airdrop', {
           address: this.account,
-          key: process.env.REACT_APP_AIRDROP
+          key: APP_AIRDROP
       })
 
       if (response.status === 201) {
@@ -424,7 +421,7 @@ class NetworkService {
         this.networkGateway
       ).post('send.l2.airdrop', {
           address: this.account,
-          key: process.env.REACT_APP_AIRDROP
+          key: APP_AIRDROP
       })
 
       if (response.status === 201) {
@@ -1752,7 +1749,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
@@ -2534,7 +2531,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": true,
         "startTime": time_start,
@@ -3167,7 +3164,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": true,
         "startTime": time_start,
@@ -3244,7 +3241,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": true,
         "startTime": time_start,
@@ -3705,7 +3702,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
@@ -3822,7 +3819,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": false, //since we are going L2->L1
         "startTime": time_start,
@@ -4152,7 +4149,6 @@ class NetworkService {
         let forVotes = parseInt(formatEther(proposalData.forVotes))
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
-        let startBlock = proposalData.startBlock.toString()
         let startTimestamp = proposalData.startTimestamp.toString()
         let endTimestamp = proposalData.endTimestamp.toString()
 
@@ -4160,14 +4156,10 @@ class NetworkService {
 
         let hasVoted = null
 
-        if( this.account ) {
-          hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
-        }
-
         let description = proposalRaw.description.toString()
 
         proposalList.push({
-           id: proposalID.toString(),
+           id: proposalID?.toString(),
            proposal,
            description,
            totalVotes: forVotes + againstVotes,
@@ -4175,7 +4167,6 @@ class NetworkService {
            againstVotes,
            abstainVotes,
            state: proposalStates[state],
-           startBlock,
            startTimestamp,
            endTimestamp,
            hasVoted: hasVoted
@@ -4829,7 +4820,13 @@ class NetworkService {
       return
     }
 
+    if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE) {
+      console.log('NS: Lock not yet supported')
+      return
+    }
+
     try {
+
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA, //check ve address is present
         veJson.abi,

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { Typography } from '@mui/material';
+import { APP_CHAIN, APP_ENV, SENTRY_DSN } from 'util/constant';
 
 
 /**
@@ -17,13 +18,13 @@ const SentryWrapper = ({
 }) => {
 
   useEffect(() => {
-    const dns = process.env.REACT_APP_SENTRY_DSN;
+    const dns = SENTRY_DSN;
     // if no sentry dsn pass don't even initialize.
     if (dns) {
       // Sentry initializations.
       Sentry.init({
-        dsn: process.env.REACT_APP_SENTRY_DSN,
-        environment: process.env.REACT_APP_ENV,
+        dsn: SENTRY_DSN,
+        environment: `${APP_ENV}-${APP_CHAIN}`,
         integrations: [
           new Sentry.Integrations.GlobalHandlers({
             onunhandledrejection: false,  /// will avoid to send unhandle browser error.
@@ -45,7 +46,7 @@ const SentryWrapper = ({
         ],
         tracesSampleRate: 1.0,
         initialScope: {
-          tags: { 'network': process.env.REACT_APP_CHAIN }
+          tags: { 'network': APP_CHAIN }
         },
         beforeSend: (event, hint) => {
           // Avoid sending the sentry events on local env.

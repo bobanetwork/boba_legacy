@@ -35,6 +35,7 @@ import witnetLogo from '../../images/ecosystem/witnet.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
+import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 
 /**
  * thematical order of type.
