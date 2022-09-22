@@ -53,8 +53,7 @@ function TokenPage() {
   const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
   const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
 
-  // const disabled = depositLoading || exitLoading
-  const disabled = false
+  const disabled = depositLoading || exitLoading
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
