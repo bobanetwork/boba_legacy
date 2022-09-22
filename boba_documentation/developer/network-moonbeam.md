@@ -23,7 +23,7 @@ There is a Bobabase testnet [fountain](https://gateway.bobabase.boba.network) fo
 
 The standard bridges for `GLMR` (aka `DEV` on Moonbase) and `BOBA` are active, so you can can both bridge and exit `GLMR` and `BOBA` from Moonbase to Bobabase and back. The exit delay (the fraud proof window) has been set to 5 minutes (it's normally 7 days) to make development easier.
 
-## Analytics and eth_getLogs for Bobabse
+## Analytics and eth_getLogs for Bobabase
 
 If you have unusual `getLogs` needs, especially calls from `0 to latest`, the main RPC will block you, since this is how most DoS attacks work. In those cases, we encourage you to run your own RPC endpoint on your own replica of Bobabase. We have prepared Docker images for you, so this should only take a few minutes. To access these images:
 
