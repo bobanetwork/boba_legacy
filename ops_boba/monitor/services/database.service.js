@@ -159,7 +159,7 @@ class DatabaseService extends OptimismEnv {
         crossTxTo VARCHAR(255),
         amount VARCHAR(255),
         event VARCHAR(255),
-        reference VARCAR(255),
+        reference VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber)
       )`)
     con.end()
