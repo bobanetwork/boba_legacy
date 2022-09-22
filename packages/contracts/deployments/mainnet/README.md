@@ -3,6 +3,139 @@
 - **Chain ID**: 288
 - **Public RPC**: https://mainnet.boba.network
 - **Block Explorer**: https://blockexplorer.boba.network
+## Layer 1 Contracts
+<table>
+<tr>
+<th>
+<img width="506px" height="0px" />
+<p><small>Contract</small></p>
+</th>
+<th>
+<img width="506px" height="0px" />
+<p><small>Address</small></p>
+</th>
+</tr>
+<tr>
+<td>
+BondManager
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x60660e6CDEb423cf847dD11De4C473130D65b627">
+<code>0x60660e6CDEb423cf847dD11De4C473130D65b627</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+CanonicalTransactionChain
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0xfBd2541e316948B259264c02f370eD088E04c3Db">
+<code>0xfBd2541e316948B259264c02f370eD088E04c3Db</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-CTC-batches
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x17148284d2da2f38c96346f1776C1BF7D7691231">
+<code>0x17148284d2da2f38c96346f1776C1BF7D7691231</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-CTC-queue
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x5f003030884B3a105809a0Eb0C0C28Ac40ECCD8d">
+<code>0x5f003030884B3a105809a0Eb0C0C28Ac40ECCD8d</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+ChainStorageContainer-SCC-batches
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x13992B9f327faCA11568BE18a8ad3E9747e87d93">
+<code>0x13992B9f327faCA11568BE18a8ad3E9747e87d93</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+L1MultiMessageRelayer
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x5fD2CF99586B9D92f56CbaD0A3Ea4DF256A0070B">
+<code>0x5fD2CF99586B9D92f56CbaD0A3Ea4DF256A0070B</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Lib_AddressManager
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089">
+<code>0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__L1CrossDomainMessenger
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x6D4528d192dB72E282265D6092F4B872f9Dff69e">
+<code>0x6D4528d192dB72E282265D6092F4B872f9Dff69e</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__L1StandardBridge
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00">
+<code>0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__OVM_L1CrossDomainMessenger
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0x6D4528d192dB72E282265D6092F4B872f9Dff69e">
+<code>0x6D4528d192dB72E282265D6092F4B872f9Dff69e</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+Proxy__OVM_L1StandardBridge
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00">
+<code>0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00</code>
+</a>
+</td>
+</tr>
+<tr>
+<td>
+StateCommitmentChain
+</td>
+<td align="center">
+<a href="https://etherscan.io/address/0xdE7355C971A5B733fe2133753Abd7e5441d441Ec">
+<code>0xdE7355C971A5B733fe2133753Abd7e5441d441Ec</code>
+</a>
+</td>
+</tr>
+</table>
 
 ## Layer 2 Contracts
 <table>
