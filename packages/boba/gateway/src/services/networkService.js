@@ -102,6 +102,7 @@ import AvaxIcon from 'components/icons/AvaxIcon.js'
 import BnbIcon from 'components/icons/BnbIcon.js'
 
 require('dotenv').config()
+import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -351,8 +352,6 @@ class NetworkService {
     const response = await verifierWatcherAxiosInstance(
       this.networkGateway
     ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
-
-    console.log("Verifier response: ", response)
 
     if (response.status === 200) {
       const status = response.data.result
@@ -2451,7 +2450,7 @@ class NetworkService {
       console.log("TX finish time:", time_stop)
 
       const data = {
-        "key": process.env.REACT_APP_SPEED_CHECK,
+        "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": true,
         "startTime": time_start,
@@ -3316,7 +3315,6 @@ class NetworkService {
         let forVotes = parseInt(formatEther(proposalData.forVotes))
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
-        let startBlock = proposalData.startBlock.toString()
         let startTimestamp = proposalData.startTimestamp.toString()
         let endTimestamp = proposalData.endTimestamp.toString()
 
@@ -3324,14 +3322,10 @@ class NetworkService {
 
         let hasVoted = null
 
-        if( this.account ) {
-          hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
-        }
-
         let description = proposalRaw.description.toString()
 
         proposalList.push({
-           id: proposalID.toString(),
+           id: proposalID?.toString(),
            proposal,
            description,
            totalVotes: forVotes + againstVotes,
@@ -3339,7 +3333,6 @@ class NetworkService {
            againstVotes,
            abstainVotes,
            state: proposalStates[state],
-           startBlock,
            startTimestamp,
            endTimestamp,
            hasVoted: hasVoted
@@ -3993,7 +3986,13 @@ class NetworkService {
       return
     }
 
+    if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE) {
+      console.log('NS: Lock not yet supported')
+      return
+    }
+
     try {
+
       const ve = new ethers.Contract(
         allAddresses.Ve_BOBA, //check ve address is present
         veJson.abi,

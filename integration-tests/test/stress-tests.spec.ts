@@ -174,7 +174,7 @@ describe('stress tests', () => {
   })
 
   describe('C-C-C-Combo breakers', () => {
-    it(`{tag:boba} ${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (txs serial, suites parallel)`, async () => {
+    it(`{numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (txs serial, suites parallel)`, async () => {
       await Promise.all([
         executeRepeatedL1ToL2Transactions(env, wallets, {
           contract: L2SimpleStorage,
@@ -200,9 +200,11 @@ describe('stress tests', () => {
       expect((await L1SimpleStorage.totalCount()).toNumber()).to.equal(
         wallets.length
       )
-    }).timeout(STRESS_TEST_TIMEOUT)
+    })
+      .timeout(STRESS_TEST_TIMEOUT)
+      .retries(3)
 
-    it(`{tag:boba} ${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (all parallel)`, async () => {
+    it(`${numTransactions} L2 transactions, L1 => L2 transactions, L2 => L1 transactions (all parallel)`, async () => {
       await Promise.all([
         executeL1ToL2TransactionsParallel(env, wallets, {
           contract: L2SimpleStorage,

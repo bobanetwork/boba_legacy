@@ -88,11 +88,10 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import Zendesk from 'components/zendesk/Zendesk'
 
 /******** UTILS ********/
-import { POLL_INTERVAL } from 'util/constant'
+import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 
-require('dotenv').config()
 
 function Home() {
 
@@ -130,7 +129,7 @@ function Home() {
   const handleErrorClose = () => dispatch(closeError())
   const handleAlertClose = () => dispatch(closeAlert())
 
-  const maintenance = process.env.REACT_APP_STATUS === 'maintenance' ? true : false
+  const maintenance = APP_STATUS === 'maintenance' ? true : false
 
   useEffect(() => {
     const body = document.getElementsByTagName('body')[ 0 ]

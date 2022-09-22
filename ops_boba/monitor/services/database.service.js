@@ -8,6 +8,8 @@ const OptimismEnv = require('./utilities/optimismEnv')
 class DatabaseService extends OptimismEnv {
   constructor() {
     super(...arguments)
+    this.MySQLStartTimeReceipt = parseInt(new Date().getTime() / 1000, 10)
+    this.MySQLStartTimeLog = parseInt(new Date().getTime() / 1000, 10)
   }
 
   async initMySQL() {
@@ -135,12 +137,20 @@ class DatabaseService extends OptimismEnv {
         status VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber, depositToken, depositAmount )
       )`)
+    await query(`CREATE TABLE IF NOT EXISTS dataStorage
+      (
+        ${'`'}name${'`'} VARCHAR(255) NOT NULL,
+        ${'`'}value${'`'} TEXT NOT NULL,
+        PRIMARY KEY ( ${'`'}name${'`'} )
+      )`)
     await query(`CREATE TABLE IF NOT EXISTS layerZeroTx
       (
         chainID INT NOT NULL,
+        targetChainID INT NOT NULL,
         hash VARCHAR(255) NOT NULL,
         blockHash VARCHAR(255) NOT NULL,
         blockNumber INT NOT NULL,
+        timestamp INT,
         txFrom VARCHAR(255),
         txTo VARCHAR(255),
         l1Token VARCHAR(255),
@@ -149,14 +159,17 @@ class DatabaseService extends OptimismEnv {
         crossTxTo VARCHAR(255),
         amount VARCHAR(255),
         event VARCHAR(255),
+        reference VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber)
       )`)
-
     con.end()
     this.logger.info('Initialized the database.')
   }
 
   async insertBlockData(blockData) {
+    if (blockData === null) {
+      return
+    }
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
       port: this.MySQLPort,
@@ -522,6 +535,7 @@ class DatabaseService extends OptimismEnv {
   async insertLayerZeroTx(eventData) {
     const tx = {
       chainID: eventData.chainID,
+      targetChainID: eventData.targetChainID,
       hash: eventData.hash.toString(),
       blockHash: eventData.blockHash.toString(),
       blockNumber: eventData.blockNumber.toString(),
@@ -533,6 +547,8 @@ class DatabaseService extends OptimismEnv {
       crossTxTo: eventData.crossTxTo,
       amount: eventData.amount.toString(),
       event: eventData.event,
+      timestamp: eventData.timestamp,
+      reference: eventData.reference,
     }
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
@@ -545,6 +561,7 @@ class DatabaseService extends OptimismEnv {
     await query(`INSERT IGNORE INTO layerZeroTx
       SET hash='${tx.hash}',
       chainID='${tx.chainID}',
+      targetChainID='${tx.targetChainID}',
       blockHash='${tx.blockHash}',
       blockNumber='${tx.blockNumber}',
       txFrom='${tx.txFrom}',
@@ -554,6 +571,8 @@ class DatabaseService extends OptimismEnv {
       crossTxFrom='${tx.crossTxFrom}',
       crossTxTo='${tx.crossTxTo}',
       amount='${tx.amount}',
+      timestamp='${tx.timestamp}',
+      reference='${tx.reference}',
       event='${tx.event}'
     `)
     con.end()
@@ -571,6 +590,20 @@ class DatabaseService extends OptimismEnv {
     const latestBlock = await query(`SELECT MAX(blockNumber) from block`)
     con.end()
     return latestBlock
+  }
+
+  async getNewestReceiptFromReceiptTable() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const latestReceipt = await query(`SELECT MAX(blockNumber) from receipt`)
+    con.end()
+    return latestReceipt
   }
 
   async getNewestBlockFromStateRootTable() {
@@ -717,6 +750,72 @@ class DatabaseService extends OptimismEnv {
       })
     }
     con.end()
+  }
+
+  async updateBobaStrawCostFee(payload) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT INTO dataStorage (${'`'}name${'`'}, ${'`'}value${'`'})
+      VALUES ('BobaStrawCostFee', '${payload}')
+      ON DUPLICATE KEY UPDATE
+      ${'`'}value${'`'} = '${payload}'
+    `)
+    con.end()
+  }
+
+  async getBobaStrawCostFee() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const payload = await query(
+      `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawCostFee'`
+    )
+    con.end()
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload[0].value)
+  }
+
+  async updateBobaStrawBalance(payload) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT INTO dataStorage (${'`'}name${'`'}, ${'`'}value${'`'})
+      VALUES ('BobaStrawBalance', '${payload}')
+      ON DUPLICATE KEY UPDATE
+      ${'`'}value${'`'} = '${payload}'
+    `)
+    con.end()
+  }
+
+  async getBobaStrawBalance() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const payload = await query(
+      `SELECT ${'`'}value${'`'} from dataStorage WHERE ${'`'}name${'`'}= 'BobaStrawBalance'`
+    )
+    con.end()
+    return payload.length === 0 ? { value: '0' } : JSON.parse(payload[0].value)
   }
 }
 

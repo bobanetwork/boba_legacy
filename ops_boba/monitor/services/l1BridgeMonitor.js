@@ -317,7 +317,17 @@ class l1BridgeMonitorService extends OptimismEnv {
       const transaction = await this.L1Provider.getTransaction(
         eachCrossDomainMessage.hash
       )
-      const resolved = await this.watcher.toCrossChainMessage(transaction)
+      // Solve a special case caused by across bridge
+      let resolved
+      try {
+        resolved = await this.watcher.toCrossChainMessage(transaction)
+      } catch {
+        const messages = this.watcher.getMessagesByTransaction(transaction)
+        // we pick the target address is L2StandardBridge
+        resolved = messages.filter(
+          (i) => i.target === '0x4200000000000000000000000000000000000010'
+        )
+      }
       const latestL2Block = await this.L2Provider.getBlockNumber()
       let l2Message = null
       const CDMReceipt = await this.watcher.getMessageReceipt(resolved, {
