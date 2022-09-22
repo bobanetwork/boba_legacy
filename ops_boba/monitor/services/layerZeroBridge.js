@@ -140,7 +140,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     }
 
     let logs = []
-    if (this.ETH) {
+    if (bridgeName.search(/EthBridgeTo/) > -1) {
       logs = await getEvents(
         [
           bridgeContract.filters.ERC20DepositInitiated(),
