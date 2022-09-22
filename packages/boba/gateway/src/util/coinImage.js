@@ -33,6 +33,7 @@ import glmrLogo from 'images/glmr.svg'
 import moonbase from 'images/moonbase.png'
 import avaxLogo from 'images/avax.svg'
 import evoLogo from 'images/evo.png'
+import CGTLogo from 'images/CGT.svg'
 
 export const getCoinImage = (symbol) => {
 
@@ -152,6 +153,9 @@ export const getCoinImage = (symbol) => {
       break;
     case "EVO":
       logo = evoLogo;
+      break;
+    case "CGT":
+      logo = CGTLogo;
       break;
     default:
       logo = ethLogo;

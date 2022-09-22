@@ -1,12 +1,13 @@
 import ReactGA from "react-ga4"
+import { GA4_MEASUREMENT_ID } from "./constant";
 
 export const init = () => {
   if (window.location.hostname === 'localhost') {
     return null;
   }
-  if (process.env.REACT_APP_GA4_MEASUREMENT_ID) {
+  if (GA4_MEASUREMENT_ID) {
     // init if the GA4 Measurement Id is available.
-    ReactGA.initialize(process.env.REACT_APP_GA4_MEASUREMENT_ID);
+    ReactGA.initialize(GA4_MEASUREMENT_ID);
   }
 }
 
