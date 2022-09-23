@@ -108,7 +108,7 @@ import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
 import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { TARGET_CHAIN_URL, APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -121,8 +121,8 @@ let supportedAltL1Chains = []
 let allAddresses = {}
 // preload allAddresses
 if (APP_CHAIN === 'rinkeby') {
-  const bobaBridges = chain_Rinkeby.BOBA_Bridges.Rinkeby;
-  const l0Protocols = chain_Rinkeby.Layer_Zero_Protocol.Rinkeby;
+  const bobaBridges = layerZeroTestnet.BOBA_Bridges.Testnet;
+  const l0Protocols = layerZeroTestnet.Layer_Zero_Protocol.Testnet;
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
@@ -1222,11 +1222,10 @@ class NetworkService {
     if (this.networkGateway === 'local') return
     if (this.account === null) return
 
-    console.log("Getting transactions...")
-
     let txL1 = []
     let txL1pending = []
     let txL2 = []
+    let txL0 = []
 
     const responseL1 = await etherScanInstance(
       this.networkGateway,
@@ -1246,45 +1245,54 @@ class NetworkService {
       }
     }
 
-    //console.log("responseL1",txL1)
-
     const responseL2 = await omgxWatcherAxiosInstance(
       this.networkGateway
     ).post('get.l2.transactions', {
       address: this.account,
-      fromRange:  0,
+      fromRange: 0,
       toRange: 1000,
     })
 
-    //console.log("responseL2",responseL2)
-
     if (responseL2.status === 201) {
-      //add the chain: 'L2' field
-      txL2 = responseL2.data.map(v => ({...v, chain: 'L2'}))
+      txL2 = responseL2.data.map(v => ({ ...v, chain: 'L2' }))
+    }
+
+    const responseL0 = await omgxWatcherAxiosInstance(
+      this.networkGateway
+    ).post('get.layerzero.transactions', {
+      address: this.account,
+      fromRange: 0,
+      toRange: 12418344,
+    })
+
+    if (responseL0.status === 201) {
+      txL0 = responseL0.data.map((v) => ({
+        ...v,
+        hash: v.tx_hash,
+        blockNumber: parseInt(v.block_number),
+        timeStamp: parseInt(v.timestamp),     //fix bug - sometimes this is string, sometimes an integer
+        chain: 'L0',
+        altL1: true,
+      }))
     }
 
     const responseL1pending = await omgxWatcherAxiosInstance(
       this.networkGateway
     ).post('get.l1.transactions', {
       address: this.account,
-      fromRange:  0,
+      fromRange: 0,
       toRange: 1000,
     })
 
-    //console.log("responseL1pending",responseL1pending)
-
     if (responseL1pending.status === 201) {
       //add the chain: 'L1pending' field
-      txL1pending = responseL1pending.data.map(v => ({...v, chain: 'L1pending'}))
-      //console.log("txL1pending",txL1pending)
-      const annotated = //await this.parseTransaction(
-        [
-          ...txL1,
-          ...txL2,
-          ...txL1pending //the new data product
-        ]
-      //)
-      //console.log("annotated:",annotated)
+      txL1pending = responseL1pending.data.map(v => ({ ...v, chain: 'L1pending' }))
+      const annotated = [
+        ...txL1,
+        ...txL2,
+        ...txL0,
+        ...txL1pending //the new data product
+      ]
       return annotated
     }
 
@@ -4904,7 +4912,6 @@ class NetworkService {
       return
     }
     try {
-      console.log(`🏃 Estimate Fee Cross Chain Deposit`);
       const pResponse = supportedAltL1Chains.map(async (type) => {
         let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
         let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
@@ -4983,15 +4990,6 @@ class NetworkService {
       let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
       let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
       let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
-
-      console.log({
-        type,
-        PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
-        ETH_L1_BOBA_ADDRESS,
-        ALT_L1_BOBA_ADDRESS,
-        L0_ETH_ENDPOINT
-      })
-
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(
         PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
@@ -5005,11 +5003,6 @@ class NetworkService {
         L2StandardERC20Json.abi,
         this.provider
       );
-
-
-      let preEthBOBABalance = await EthBOBA.balanceOf(this.account)
-
-      console.log(`💵 Existing ETH Boba BALANCE  ${ethers.utils.formatEther(preEthBOBABalance)}`)
 
       /* L0 endpoint contract*/
       const ETHLayzerZeroEndpoint = new ethers.Contract(

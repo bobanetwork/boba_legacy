@@ -43,6 +43,7 @@ function Transaction({
   oriHash,
   amountTx,
   completion = '',
+  tx_ref= null
 }) {
 
   const [dropDownBox, setDropDownBox] = useState(false)
@@ -136,7 +137,8 @@ function Transaction({
             <Typography variant="body3" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
               {oriChain}&nbsp;Hash:&nbsp;
               <a
-                href={chainLink({hash:oriHash, chain: oriChain})}
+                href={
+                  oriChain == 'L0' ? tx_ref : chainLink({ hash: oriHash, chain: oriChain })}
                 target={'_blank'}
                 rel='noopener noreferrer'
                 style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB', fontSize: '0.8em'}}

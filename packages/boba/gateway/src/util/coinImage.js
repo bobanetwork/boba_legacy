@@ -139,6 +139,7 @@ export const getCoinImage = (symbol) => {
       break;
     case "CGT":
       logo = CGTLogo;
+      break;
     case "AVAX":
       logo = avaxLog;
       break;

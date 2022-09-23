@@ -54,12 +54,10 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   const [ validValue, setValidValue ] = useState(false)
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT_ALTL1/CREATE' ]))
-  console.log(`😄  depositLoading`,depositLoading)
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
   const depositFees = useSelector(selectAltL1DepositCost)
-  console.log([`depositFes`, depositFees]);
 
   const maxValue = logAmount(token.balance, token.decimals)
 
