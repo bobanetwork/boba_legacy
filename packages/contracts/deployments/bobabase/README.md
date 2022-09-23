@@ -30,8 +30,8 @@ BondManager
 CanonicalTransactionChain
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x9986e1251e60E443c464641029262F5ee76fD448">
-<code>0x9986e1251e60E443c464641029262F5ee76fD448</code>
+<a href="https://moonbase.moonscan.io/address/0xa8bD51a7F46321587921A33fa3c752b426c74754">
+<code>0xa8bD51a7F46321587921A33fa3c752b426c74754</code>
 </a>
 </td>
 </tr>
@@ -40,8 +40,8 @@ CanonicalTransactionChain
 ChainStorageContainer-CTC-batches
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x6C5DAF7031eD4Fd093Df3443d933232be6cc3034">
-<code>0x6C5DAF7031eD4Fd093Df3443d933232be6cc3034</code>
+<a href="https://moonbase.moonscan.io/address/0xfD3B000a734F69EE973cb7dfebA6f51Eb1cfE3a5">
+<code>0xfD3B000a734F69EE973cb7dfebA6f51Eb1cfE3a5</code>
 </a>
 </td>
 </tr>
@@ -50,8 +50,8 @@ ChainStorageContainer-CTC-batches
 ChainStorageContainer-CTC-queue
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x8C75fb8E10C374b9480186374c44f279B609426D">
-<code>0x8C75fb8E10C374b9480186374c44f279B609426D</code>
+<a href="https://moonbase.moonscan.io/address/0xb39Bb11616d21665111b86af1d7f4cDe3Ff11cB3">
+<code>0xb39Bb11616d21665111b86af1d7f4cDe3Ff11cB3</code>
 </a>
 </td>
 </tr>
@@ -60,8 +60,8 @@ ChainStorageContainer-CTC-queue
 ChainStorageContainer-SCC-batches
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x9A877854B7E44559303EdFF69E58f1541b45BB19">
-<code>0x9A877854B7E44559303EdFF69E58f1541b45BB19</code>
+<a href="https://moonbase.moonscan.io/address/0xa4c329f70634F5713e1E6539e543278343CaB887">
+<code>0xa4c329f70634F5713e1E6539e543278343CaB887</code>
 </a>
 </td>
 </tr>
@@ -110,8 +110,8 @@ Proxy__L1StandardBridge
 StateCommitmentChain
 </td>
 <td align="center">
-<a href="https://moonbase.moonscan.io/address/0x7Af512914Ab422f9D38aC5eEfc94fa5106FA74C2">
-<code>0x7Af512914Ab422f9D38aC5eEfc94fa5106FA74C2</code>
+<a href="https://moonbase.moonscan.io/address/0x5E41Eaac5319CDf336c51969E2F164A686138B28">
+<code>0x5E41Eaac5319CDf336c51969E2F164A686138B28</code>
 </a>
 </td>
 </tr>
