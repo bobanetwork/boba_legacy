@@ -1262,7 +1262,7 @@ class NetworkService {
     ).post('get.layerzero.transactions', {
       address: this.account,
       fromRange: 0,
-      toRange: 12418344,
+      toRange: 1000,
     })
 
     if (responseL0.status === 201) {

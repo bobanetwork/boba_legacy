@@ -43,7 +43,9 @@ function Transaction({
   oriHash,
   amountTx,
   completion = '',
-  tx_ref= null
+  tx_ref = null,
+  eventType,
+  toChain
 }) {
 
   const [dropDownBox, setDropDownBox] = useState(false)
@@ -134,6 +136,9 @@ function Transaction({
             {completion !== '' &&
               <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{completion}</Typography>
             }
+            {toChain && <Typography variant="overline" style={{ lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)' }}>
+              {toChain}
+            </Typography>}
             <Typography variant="body3" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
               {oriChain}&nbsp;Hash:&nbsp;
               <a
@@ -161,6 +166,9 @@ function Transaction({
           <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
             {typeTX}
           </Typography>
+          {eventType ? <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
+            {eventType}
+          </Typography> : null}
           {amountTx ?
             <Typography
               variant="overline"

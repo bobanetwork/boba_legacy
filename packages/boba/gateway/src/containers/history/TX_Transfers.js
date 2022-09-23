@@ -42,7 +42,7 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
 
     let timeLabel = moment.unix(i.timeStamp).format('lll')
 
-    let amountTx = logAmount(i.amount, 18, 3);
+    let amountTx = `logAmount(i.amount, 18, 3) BOBA`;
 
     return (
       <Transaction
@@ -57,6 +57,8 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
         oriHash={i.hash}
         amountTx={amountTx}
         tx_ref={i.reference}
+        eventType={i.event_type}
+        toChain={i.destination_chain}
       />
     )
   })
