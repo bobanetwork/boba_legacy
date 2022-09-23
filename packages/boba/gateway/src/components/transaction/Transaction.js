@@ -138,7 +138,7 @@ function Transaction({
               {oriChain}&nbsp;Hash:&nbsp;
               <a
                 href={
-                  oriChain == 'L0' ? tx_ref : chainLink({ hash: oriHash, chain: oriChain })}
+                  oriChain === 'L0' ? tx_ref : chainLink({ hash: oriHash, chain: oriChain })}
                 target={'_blank'}
                 rel='noopener noreferrer'
                 style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
