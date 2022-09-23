@@ -6,6 +6,7 @@ import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
+import { ROUTES_PATH } from 'util/constant'
 
 const PageFooter = ({maintenance}) => {
 
@@ -63,13 +64,13 @@ const PageFooter = ({maintenance}) => {
         {!isMobile && <GasSwitcher />}
         <S.LinkWrapper>
           <S.FooterLink
-            to="/help"
+            to={ROUTES_PATH.HELP}
           >FAQs</S.FooterLink>
             <S.FooterLink
-              to="/airdrop"
+              to={ROUTES_PATH.AIRDROP}
           >AirDrop</S.FooterLink>
           <S.FooterLink
-            to="/bobascope"
+            to={ROUTES_PATH.BOBASCOPE}
           >BobaScope</S.FooterLink>
           <S.FooterLinkExt
             href="https://bobascan.com"
