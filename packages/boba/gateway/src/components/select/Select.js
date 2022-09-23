@@ -34,7 +34,8 @@ function Select({
   error = '',
   className,
   newSelect = false,
-  isMulti
+  isMulti,
+  isLoading = false,
 }) {
   const theme = useTheme();
   const selected = options.find(i => i.value === value);
@@ -128,6 +129,7 @@ function Select({
         onChange={onSelect}
         isMulti={isMulti}
         options={options}
+        isLoading={isLoading}
         styles={{
           control: (base) => ({
             ...base,

@@ -39,6 +39,7 @@ function CastVoteModal({ open, proposalId }) {
   const [ tokens, setTokens ] = useState([])
   const [ nftOptions, setNftOptions ] = useState([]);
   const [ filterOptions, setFilterOptions ] = useState([]);
+  const [ loadingOptions, setloadingOptions ] = useState([]);
 
   const loading = useSelector(selectLoading([ 'PROPOSAL/CAST/VOTE' ]))
 
@@ -65,15 +66,17 @@ function CastVoteModal({ open, proposalId }) {
 
   useEffect(() => {
     async function filterUsedTokens() {
+      setloadingOptions(true);
       const filterOptionP = nftOptions.map(async (token) => {
         const receipt = await networkService.checkProposalVote(proposalId, token.value);
-        console.log(`🧾 🧾  ${token.value} - ${proposalId} - ${receipt} - ${receipt.hasVoted} `);
         if (!receipt || !receipt.hasVoted) {
           return token;
         }
       }).filter(Boolean)
 
-      const filterTokens = await Promise.all(filterOptionP);
+      const tokensRes = await Promise.all(filterOptionP);
+      const filterTokens = tokensRes.filter(Boolean)
+      setloadingOptions(false);
       setFilterOptions(filterTokens);
     }
 
@@ -149,6 +152,7 @@ function CastVoteModal({ open, proposalId }) {
             value={tokens}
             newSelect={true}
             isMulti={true}
+            isLoading={loadingOptions}
           />
         </Box>
       </Box>

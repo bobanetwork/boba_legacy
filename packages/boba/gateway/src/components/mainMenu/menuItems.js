@@ -44,6 +44,12 @@ export const menuItems = [
     url: ROUTES_PATH.STAKE
   },
   {
+    key: 'Lock',
+    icon: "LockIcon",
+    title: "Lock",
+    url: "/lock",
+  },
+  {
     key: 'DAO',
     icon: "DAOIcon",
     title: "DAO",
