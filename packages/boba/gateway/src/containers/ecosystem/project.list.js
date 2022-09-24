@@ -37,6 +37,11 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 
+// Boba gateways and block explorers
+import BobaavaxLogo from '../../images/bobaLinks/Bobaavax.svg'
+import BobabnbLogo from '../../images/bobaLinks/Bobabnb.svg'
+import BobabeamLogo from '../../images/bobaLinks/Bobabeam.svg'
+
 /**
  * thematical order of type.
  *
@@ -427,6 +432,117 @@ export const projectList = [
 export const loadProjectByCategory = () => {
   const typeOrder = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
   const projectByType = groupBy(projectList, 'type')
+  const orderProjects = {}
+  typeOrder.forEach((key) => {
+    orderProjects[ key ] = projectByType[key]
+  })
+  return orderProjects
+}
+
+
+export const BobaProjectList = [
+  {
+    title: 'Boba Avalanche Gateway',
+    canLaunch: true,
+    link: 'https://gateway.avax.boba.network',
+    type: 'mainnet',
+    image: BobaavaxLogo,
+    description: 'Boba Avalanche is a bridge between Avalanche and Boba L2.',
+  },
+  {
+    title: 'BOBA Avalanche Testnet Gateway',
+    canLaunch: true,
+    link: 'https://gateway.testnet.avax.boba.network',
+    type: 'testnet',
+    image: BobaavaxLogo,
+    description: 'Boba Avalanche is a bridge between Avalanche Fuji Testnet and Boba L2.',
+  },
+  {
+    title: 'Boba Avalanche Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.avax.boba.network',
+    type: 'mainnet',
+    image: BobaavaxLogo,
+    description: 'Block explorer for Boba Avalanche.',
+  },
+  {
+    title: 'BOBA Avalanche Testnet Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.testnet.avax.boba.network',
+    type: 'testnet',
+    image: BobaavaxLogo,
+    description: 'Block explorer for Boba Avalanche Testnet.',
+  },
+  {
+    title: 'BOBA BNB Gateway',
+    canLaunch: true,
+    link: 'https://gateway.bnb.boba.network',
+    type: 'mainnet',
+    image: BobabnbLogo,
+    description: 'Boba BNB is a bridge between BNB chain and Boba L2.',
+  },
+  {
+    title: 'BOBA BNB Testnet Gateway',
+    canLaunch: true,
+    link: 'https://gateway.testnet.bnb.boba.network',
+    type: 'testnet',
+    image: BobabnbLogo,
+    description: 'Boba BNB is a bridge between BNB Testnet and Boba L2.',
+  },
+  {
+    title: 'BOBA BNB Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.bnb.boba.network',
+    type: 'mainnet',
+    image: BobabnbLogo,
+    description: 'Block explorer for Boba BNB.',
+  },
+  {
+    title: 'BOBA BNB Testnet Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.testnet.bnb.boba.network',
+    type: 'testnet',
+    image: BobabnbLogo,
+    description: 'Block explorer for Boba BNB Testnet.',
+  },
+  {
+    title: 'BOBA Moonbeam Gateway',
+    canLaunch: true,
+    link: 'https://gateway.bobabeam.boba.network',
+    type: 'mainnet',
+    image: BobabeamLogo,
+    description: 'Boba Moonbeam is a bridge between Moonbeam and Boba L2.',
+  },
+  {
+    title: 'BOBA Moonbase Testnet Gateway',
+    canLaunch: true,
+    link: 'https://gateway.bobabase.boba.network',
+    type: 'testnet',
+    image: BobabeamLogo,
+    description: 'Boba Moonbase is a bridge between Moonbase and Boba L2.',
+  },
+  {
+    title: 'BOBA Moonbeam Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.bobabeam.boba.network',
+    type: 'mainnet',
+    image: BobabeamLogo,
+    description: 'Block explorer for Bobabeam.',
+  },
+  {
+    title: 'BOBA Moonbase Testnet Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.bobabase.boba.network',
+    type: 'testnet',
+    image: BobabeamLogo,
+    description: 'Block explorer for Bobabase.',
+  },
+]
+
+
+export const loadBobaProjectByCategory = () => {
+  const typeOrder = [ 'mainnet', 'testnet' ]
+  const projectByType = groupBy(BobaProjectList, 'type')
   const orderProjects = {}
   typeOrder.forEach((key) => {
     orderProjects[ key ] = projectByType[key]
