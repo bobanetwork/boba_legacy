@@ -49,3 +49,22 @@ export const EXPIRY_OPTIONS = [
 
 
 export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
+
+/*********************
+ * Routes Constants **
+ *********************/
+
+export const ROUTES_PATH = {
+  BRIDGE: '/bridge',
+  ECOSYSTEM: '/ecosystem',
+  WALLET: '/wallet',
+  HISTORY: '/history',
+  EARN: '/earn',
+  LOCK: '/lock',
+  STAKE: '/stake',
+  DAO: '/dao',
+  HELP: '/help',
+  BOBASCOPE: '/bobascope',
+  AIRDROP: '/airdrop',
+  MONSTER: '/monster',
+}
