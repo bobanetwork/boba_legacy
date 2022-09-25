@@ -42,6 +42,7 @@ import Dao from 'containers/dao/Dao'
 import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
 import { ROUTES_PATH } from 'util/constant'
+import Metatags from 'components/metatags/Metatags'
 
 function App() {
 
@@ -286,6 +287,7 @@ function App() {
               backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`
             }}
           >
+            <Metatags />
             <Notification />
             <Suspense fallback={<>Loading...</>}>
               <Routes>
