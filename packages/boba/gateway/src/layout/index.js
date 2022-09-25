@@ -305,7 +305,7 @@ function App() {
                   <Route path={ROUTES_PATH.AIRDROP} element={<Airdrop />} />
                   <Route path={ROUTES_PATH.HELP} element={<Help />} />
                   <Route path={ROUTES_PATH.MONSTER} element={<MonsterWrapper />} />
-                  <Route path="/links" element={<Ecosystem ecosystemType='BOBA'/>} >
+                  <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
                   <Route path="*" element={<Navigate to="/" />} />

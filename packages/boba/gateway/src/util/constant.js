@@ -58,6 +58,7 @@ export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet',
 export const ROUTES_PATH = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
+  BOBA_CHAINS: '/bobachains',
   WALLET: '/wallet',
   HISTORY: '/history',
   EARN: '/earn',

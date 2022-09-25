@@ -52,7 +52,7 @@ export const menuItems = [
   {
     key: 'LinksToBobaChains',
     icon: "LinksToBobaChainsIcon",
-    title: "Links To BOBA Chains",
-    url: "/links"
+    title: "BOBA Chains",
+    url: ROUTES_PATH.BOBA_CHAINS
   }
 ]
