@@ -64,10 +64,10 @@ export const ROUTES_PATH = {
   EARN: '/earn',
   LOCK: '/lock',
   STAKE: '/stake',
-  DAO: '/dao',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
   AIRDROP: '/airdrop',
   MONSTER: '/monster',
+  VOTE_DAO: '/votedao',
 }
 export const PER_PAGE = 8

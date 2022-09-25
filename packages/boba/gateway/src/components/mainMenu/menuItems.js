@@ -32,12 +32,6 @@ export const menuItems = [
     url: ROUTES_PATH.EARN
   },
   {
-    key: 'Lock',
-    icon: "LockIcon",
-    title: "Lock",
-    url: ROUTES_PATH.LOCK
-  },
-  {
     key: 'Stake',
     icon: "StakeIcon",
     title: "Stake",
@@ -50,15 +44,15 @@ export const menuItems = [
     url: "/lock",
   },
   {
-    key: 'DAO',
-    icon: "DAOIcon",
-    title: "DAO",
-    url: ROUTES_PATH.DAO
-  },
-  {
     key: 'LinksToBobaChains',
     icon: "LinksToBobaChainsIcon",
     title: "BOBA Chains",
     url: ROUTES_PATH.BOBA_CHAINS
+  },
+  {
+    key: 'Vote',
+    icon: "VoteIcon",
+    title: "Vote&Dao",
+    url: ROUTES_PATH.VOTE_DAO
   }
 ]
