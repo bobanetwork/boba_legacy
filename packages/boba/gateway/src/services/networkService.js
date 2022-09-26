@@ -100,9 +100,9 @@ import MoonbaseIcon from 'components/icons/MoonbaseIcon.js'
 import FantomIcon from 'components/icons/FantomIcon.js'
 import AvaxIcon from 'components/icons/AvaxIcon.js'
 import BnbIcon from 'components/icons/BnbIcon.js'
+import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
 
 require('dotenv').config()
-import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -222,7 +222,7 @@ const L1ChainAssets = {
     name: 'Binance Smart Chain Mainnet',
     l2Name: 'Boba BNB Mainnet',
     icon: (bool) => <BnbIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'BUSD', 'USDC', "USDT"],
     supportedTokenAddresses: {},
     foundation: false,
   }

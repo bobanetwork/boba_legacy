@@ -72,6 +72,9 @@ const config: HardhatUserConfig = {
     bnb: {
       url: 'https://bscrpc.com',
     },
+    bobabnb: {
+      url: 'https://bnb.boba.network',
+    },
   },
   mocha: {
     timeout: 50000,
@@ -131,6 +134,7 @@ const config: HardhatUserConfig = {
       moonbeam: process.env.MOONBEAM_KEY,
       snowtrace: process.env.SNOWTRACE_KEY,
       bnb: process.env.BSCSCAN_KEY,
+      bobabnb: 'DEFAULT_LEY',
     },
     customChains: [
       {
@@ -163,6 +167,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.bscscan.com/api',
           browserURL: 'https://bscscan.com/',
+        },
+      },
+      {
+        network: 'bobabnb',
+        chainId: 56288,
+        urls: {
+          apiURL: 'https://blockexplorer.bnb.boba.network/api',
+          browserURL: 'https://blockexplorer.bnb.boba.network',
         },
       },
     ],
