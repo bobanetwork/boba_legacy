@@ -47,6 +47,7 @@ export const EXPIRY_OPTIONS = [
 ]
 
 
+export const BOBA_PROJECTS_CATEGORY = [ 'mainnet', 'testnet' ]
 
 export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
 
@@ -57,6 +58,7 @@ export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet',
 export const ROUTES_PATH = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
+  BOBA_CHAINS: '/bobachains',
   WALLET: '/wallet',
   HISTORY: '/history',
   EARN: '/earn',
