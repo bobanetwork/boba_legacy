@@ -6,30 +6,36 @@ import Telegram from 'components/icons/TelegramIcon'
 import DiscordIcon from 'components/icons/DiscordIcon'
 import React, { useEffect, useState } from 'react'
 import * as S from './Ecosystem.styles'
-import { loadProjectByCategory } from './project.list'
+import { loadProjectByCategory, loadBobaProjectByCategory } from './project.list'
 
 import Tooltip from 'components/tooltip/Tooltip'
 import Button from 'components/button/Button'
 
 const PROJECT_CAT = [ 'defi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
+const BOBA_PROJECT_CAT = ['mainnet', 'testnet']
 
-function ECOSYSTEM() {
+function ECOSYSTEM({ecosystemType}) {
 
   const [ projectByCategory, setprojectByCategory ] = useState({})
 
   const [ category, setCategory ] = useState('defi')
 
   useEffect(() => {
-    setprojectByCategory(loadProjectByCategory())
+    if (ecosystemType !== 'BOBA') {
+      setprojectByCategory(loadProjectByCategory())
+    } else {
+      setprojectByCategory(loadBobaProjectByCategory())
+      setCategory('mainnet')
+    }
     return () => {
       setprojectByCategory({})
     }
-  }, [])
+  }, [ecosystemType])
 
   return (
     <S.EcoSystemPageContainer>
       <S.CategoryList>
-        {PROJECT_CAT.map((cat, i) => {
+        {(ecosystemType !== 'BOBA' ? PROJECT_CAT : BOBA_PROJECT_CAT).map((cat, i) => {
           return <Button
             key={i}
             onClick={() => {
