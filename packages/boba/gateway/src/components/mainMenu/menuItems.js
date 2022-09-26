@@ -48,5 +48,11 @@ export const menuItems = [
     icon: "DAOIcon",
     title: "DAO",
     url: ROUTES_PATH.DAO
+  },
+  {
+    key: 'LinksToBobaChains',
+    icon: "LinksToBobaChainsIcon",
+    title: "BOBA Chains",
+    url: ROUTES_PATH.BOBA_CHAINS
   }
 ]
