@@ -38,9 +38,11 @@ import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 
 // Boba gateways and block explorers
+import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
 import BobaavaxLogo from '../../images/bobaLinks/Bobaavax.svg'
 import BobabnbLogo from '../../images/bobaLinks/Bobabnb.svg'
 import BobabeamLogo from '../../images/bobaLinks/Bobabeam.svg'
+import BobaftmLogo from '../../images/bobaLinks/Bobaftm.svg'
 
 /**
  * thematical order of type.
@@ -442,6 +444,38 @@ export const loadProjectByCategory = () => {
 
 export const BobaProjectList = [
   {
+    title: 'Boba Ethereum Gateway',
+    canLaunch: true,
+    link: 'https://gateway.boba.network',
+    type: 'mainnet',
+    image: BobaethLogo,
+    description: 'Boba Ethereum is a bridge between Ethereum and Boba L2.',
+  },
+  {
+    title: 'Boba Ethereum Testnet Gateway',
+    canLaunch: true,
+    link: 'https://gateway.rinkeby.boba.network',
+    type: 'testnet',
+    image: BobaethLogo,
+    description: 'Boba Ethereum is a bridge between Ethereum Rinkeby and Boba L2.',
+  },
+  {
+    title: 'Boba Ethereum Block Explorer',
+    canLaunch: true,
+    link: 'https://bobascan.com',
+    type: 'mainnet',
+    image: BobaethLogo,
+    description: 'Block explorer for Boba Ethereum.',
+  },
+  {
+    title: 'BOBA Ethereum Testnet Block Explorer',
+    canLaunch: true,
+    link: 'https://testnet.bobascan.com',
+    type: 'testnet',
+    image: BobaethLogo,
+    description: 'Block explorer for Boba Ethereum Rinkeby.',
+  },
+  {
     title: 'Boba Avalanche Gateway',
     canLaunch: true,
     link: 'https://gateway.avax.boba.network',
@@ -536,6 +570,38 @@ export const BobaProjectList = [
     type: 'testnet',
     image: BobabeamLogo,
     description: 'Block explorer for Bobabase.',
+  },
+  {
+    title: 'BOBA Fantom Gateway',
+    canLaunch: true,
+    link: 'https://gateway.bobaopera.boba.network',
+    type: 'mainnet',
+    image: BobaftmLogo,
+    description: 'Boba Fantom is a bridge between Fantom and Boba L2.',
+  },
+  {
+    title: 'BOBA Fantom Testnet Gateway',
+    canLaunch: true,
+    link: 'https://gateway.testnet.bobaopera.boba.network',
+    type: 'testnet',
+    image: BobaftmLogo,
+    description: 'Boba Fantom is a bridge between Fantom Testnet and Boba L2.',
+  },
+  {
+    title: 'BOBA Fantom Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.bobaopera.boba.network',
+    type: 'mainnet',
+    image: BobaftmLogo,
+    description: 'Block explorer for Bobaopera.',
+  },
+  {
+    title: 'BOBA Fantom Testnet Block Explorer',
+    canLaunch: true,
+    link: 'https://blockexplorer.testnet.bobaopera.boba.network',
+    type: 'testnet',
+    image: BobaftmLogo,
+    description: 'Block explorer for Bobaopera Testnet.',
   },
 ]
 
