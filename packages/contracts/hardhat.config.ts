@@ -69,6 +69,9 @@ const config: HardhatUserConfig = {
     snowtrace: {
       url: 'https://api.avax.network/ext/bc/C/rpc',
     },
+    bobaavax: {
+      url: 'https://avax.boba.network',
+    },
     bnb: {
       url: 'https://bscrpc.com',
     },
@@ -134,7 +137,8 @@ const config: HardhatUserConfig = {
       moonbeam: process.env.MOONBEAM_KEY,
       snowtrace: process.env.SNOWTRACE_KEY,
       bnb: process.env.BSCSCAN_KEY,
-      bobabnb: 'DEFAULT_LEY',
+      bobabnb: 'DEFAULT_KEY',
+      bobaavax: 'DEFAULT_KEY',
     },
     customChains: [
       {
@@ -159,6 +163,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.snowtrace.io/api',
           browserURL: 'https://snowtrace.io',
+        },
+      },
+      {
+        network: 'bobaavax',
+        chainId: 43288,
+        urls: {
+          apiURL: 'https://blockexplorer.avax.boba.network/api',
+          browserURL: 'https://blockexplorer.avax.boba.network',
         },
       },
       {
