@@ -204,7 +204,7 @@ const L1ChainAssets = {
     name: 'Avalanche Mainnet C-Chain',
     l2Name: 'Boba Avalanche Mainnet',
     icon: (bool) => <AvaxIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'EVO'],
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'EVO', 'USDT.e', 'USDt', 'USDC.e', 'BUSD.e', 'BUSD', 'DAI.e'],
     supportedTokenAddresses: {
       'EVO': {'L1': '0x42006Ab57701251B580bDFc24778C43c9ff589A1', 'L2': '0xc8849f32138de93F6097199C5721a9EfD91ceE01'}
     },
@@ -1278,7 +1278,7 @@ class NetworkService {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if(token.balance.lte(new BN(1000000))) {
+        if(token.balance.lte(new BN(100000))) {
           //do nothing
         }
         else if (token.layer === 'L1') {
