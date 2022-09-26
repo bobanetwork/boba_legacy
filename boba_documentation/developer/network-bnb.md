@@ -5,12 +5,13 @@ description: A collection of links and addresses to get started on Boba-BNB
 - [Boba BNB Testnet L2 (9728) for the BNB Testnet (97)](#boba-bnb-testnet-l2--9728--for-the-bnb-testnet--97-)
   * [Testnet Fountain for Developers on Boba BNB Testnet L2](#testnet-fountain-for-developers-on-boba-bnb-testnet-l2)
   * [Bridging](#bridging)
-  * [Analytics and eth_getLogs](#analytics-and-eth-getlogs)
+  * [Analytics and eth_getLogs for Boba BNB Testnet](#analytics-and-eth-getlogs-for-boba-bnb-testnet)
   * [Boba BNB Testnet Addresses](#boba-bnb-testnet-addresses)
   * [Boba BNB Testnet Links and Endpoints](#boba-bnb-testnet-links-and-endpoints)
 - [Boba BNB  L2 (56288) for the BNB L1 (56)](#boba-bnb-testnet-l2--56288--for-the-bnb-l1--56-)
-  * [Boba BNB Addresses (tbd)](#boba-bnb-addresses--tbd-)
-  * [Boba BNB Links and Endpoints (tbd)](#boba-bnb-links-and-endpoints--tbd-)
+  * [Boba BNB Addresses](#boba-bnb-addresses)
+  * [Analytics and eth_getLogs for Boba BNB](#analytics-and-eth-getlogs-for-boba-bnb)
+  * [Boba BNB Links and Endpoints](#boba-bnb-links-and-endpoints)
   
 # Boba BNB Testnet L2 (9728) for the BNB Testnet (97)
 
@@ -62,19 +63,42 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 # Boba BNB L2 (56288) for the BNB L1 (56)
 
-## Boba BNB Addresses (tbd)
+## Analytics and eth_getLogs for Bobabeam
+
+To access these images:
+
+* clone the `boba` repo
+
+* switch to `alt-l1` branch.
+
+* Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node) folder
+
+  ```
+  RELEASE_VERSION=v0.X.X
+  ```
+
+The bobabeam's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabnb.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node)
+
+```bash
+$ docker compose -f docker-compose-bobabnb.yml pull
+$ docker compose -f docker-compose-bobabnb.yml up
+```
+
+
+
+## Boba BNB Addresses
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobabnb/README.md](../../packages/contracts/deployments/bobabnb/README.md)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB address registration dump](../../packages/boba/register/addresses/addressesBobaBNB_0xTBATBATBATBA.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB address registration dump](../../packages/boba/register/addresses/addressBobaBnb_0xeb989B25597259cfa51Bd396cE1d4B085EC4c753.json).
 
 ## Boba BNB Links and Endpoints (tbd)
 
-|               |                            |
-| ------------- | -------------------------- |
-| ChainID       | 56288                      |
-| RPC Read      | [https://tbd](https://tbd) |
-| Write RPC     | [https://tbd](https://tbd) |
-| Gateway       | [https://tbd](https://tbd) |
-| Blockexplorer | [https://tbd](https://tbd) |
-| Websocket     | [wss://tbd](wss://tbd)     |
+|               |                                                              |
+| ------------- | ------------------------------------------------------------ |
+| ChainID       | 56288                                                        |
+| RPC           | [https://bnb.boba.network](https://bnb.boba.network)         |
+| Replica RPC   | [https://replica.bnb.boba.network](https://replica.bnb.boba.network) |
+| Gateway       | [https://gateway.bnb.boba.network](https://gateway.bnb.boba.network) |
+| Blockexplorer | [https://blockexplorer.bnb.boba.network](https://blockexplorer.bnb.boba.network) |
+| Websocket     | [wss://wss.bnb.boba.network](wss://wss.bnb.boba.network)     |
