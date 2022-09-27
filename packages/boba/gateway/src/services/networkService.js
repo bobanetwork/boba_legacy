@@ -4145,17 +4145,13 @@ class NetworkService {
         let forVotes = parseInt(formatEther(proposalData.forVotes))
         let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
 
-        let startBlock = proposalData.startBlock.toString()
+
         let startTimestamp = proposalData.startTimestamp.toString()
         let endTimestamp = proposalData.endTimestamp.toString()
 
         let proposal = await delegateCheck.getActions(i+2)
 
         let hasVoted = null
-
-        if( this.account ) {
-          hasVoted = await delegateCheck.getReceipt(proposalID, this.account)
-        }
 
         let description = proposalRaw.description.toString()
 
@@ -4168,7 +4164,6 @@ class NetworkService {
            againstVotes,
            abstainVotes,
            state: proposalStates[state],
-           startBlock,
            startTimestamp,
            endTimestamp,
            hasVoted: hasVoted
@@ -4819,6 +4814,11 @@ class NetworkService {
   async fetchLockRecords() {
     if (this.account === null) {
       console.log('NS: fetchLockRecords() error - called but account === null')
+      return
+    }
+
+    if (!+process.env.REACT_APP_ENABLE_LOCK_PAGE) {
+      console.log('NS: lock not yet supported')
       return
     }
 
