@@ -19,7 +19,6 @@ import { createAction } from './createAction'
 import store from 'store'
 
 export function setEnableAccount(enabled) {
-  console.log("setEnableAccount:", enabled)
   return function (dispatch) {
     return dispatch({ type: 'SETUP/ACCOUNT/SET', payload: enabled })
   }

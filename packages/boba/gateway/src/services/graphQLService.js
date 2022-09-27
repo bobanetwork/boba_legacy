@@ -1,14 +1,13 @@
-const apollo = require('@apollo/client')
-const fetch = require('cross-fetch')
-
-require('dotenv').config()
+import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
+import fetch from 'cross-fetch';
+import { APP_CHAIN } from 'util/constant'
 
 class GraphQLService {
 
   getBridgeEndpoint = () => {
-    if(process.env.REACT_APP_CHAIN === 'mainnet') {
+    if (APP_CHAIN === 'mainnet') {
       return `https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph`
-    } else if (process.env.REACT_APP_CHAIN === 'rinkeby') {
+    } else if (APP_CHAIN === 'rinkeby') {
       return `https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges`
     } else {
       return ''
@@ -17,7 +16,7 @@ class GraphQLService {
 
   async queryBridgeProposalCreated() {
 
-    const query = apollo.gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
+    const query = gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
 
     /*
     curl -g -X POST \
@@ -32,13 +31,13 @@ class GraphQLService {
 
     */
 
-    const client = new apollo.ApolloClient({
+    const client = new ApolloClient({
       uri: this.getBridgeEndpoint(),
-      link: new apollo.HttpLink({
+      link: new HttpLink({
         uri: this.getBridgeEndpoint(),
         fetch
       }),
-      cache: new apollo.InMemoryCache()
+      cache: new InMemoryCache()
     })
 
     return await client.query({ query })
@@ -46,7 +45,7 @@ class GraphQLService {
 
   async queryMonsterTransfer(walletAddress) {
 
-    const query = apollo.gql(`query GetTUMOEvents($wallet: Bytes!) {
+    const query = gql(`query GetTUMOEvents($wallet: Bytes!) {
       turingMonstersTransferEvents(where: {
         to: $wallet }) { tokenId, to, from } }`)
 
@@ -75,13 +74,13 @@ class GraphQLService {
     }
     */
 
-    const client = new apollo.ApolloClient({
+    const client = new ApolloClient({
       uri: this.getBridgeEndpoint(),
-      link: new apollo.HttpLink({
+      link: new HttpLink({
         uri: this.getBridgeEndpoint(),
         fetch
       }),
-      cache: new apollo.InMemoryCache()
+      cache: new InMemoryCache()
     })
 
     return await client.query({

@@ -25,8 +25,6 @@ const MYSQL_PASSWORD = env.MYSQL_PASSWORD
 const MYSQL_DATABASE_NAME = env.MYSQL_DATABASE_NAME || 'OMGXV1'
 const MYSQL_DBNAME_TX = env.MYSQL_DBNAME_TX
 const MYSQL_DBNAME_RECEIPT = env.MYSQL_DBNAME_RECEIPT
-const MYSQL_LOG_START_TIME = Number(env.MYSQL_LOG_START_TIME) || 0
-const MYSQL_RECEIPT_START_TIME = Number(env.MYSQL_RECEIPT_START_TIME) || 0
 
 const ADDRESS_MANAGER_ADDRESS = env.ADDRESS_MANAGER_ADDRESS
 const L2_MESSENGER_ADDRESS =
@@ -81,6 +79,15 @@ const OVM_L2_CROSS_DOMAIN_MESSENGER =
 
 const L1_BLOCK_CONFIRMATION = env.L1_BLOCK_CONFIRMATION || 0
 
+const NUMBER_OF_BLOCKS_TO_FETCH = env.NUMBER_OF_BLOCKS_TO_FETCH || 10000000
+
+// layerZero env
+const LAYER_ZERO_ENABLE_TEST =
+  env.LAYER_ZERO_ENABLE_TEST === 'true' ? true : false
+const LAYER_ZERO_CHAIN = env.LAYER_ZERO_CHAIN || 'Testnet'
+const LAYER_ZERO_BRIDGES = env.LAYER_ZERO_BRIDGES || 'Proxy__EthBridgeToAvalanche'
+const LAYER_ZERO_LATEST_BLOCK = Number(env.LAYER_ZERO_LATEST_BLOCK) || 0
+
 class OptimismEnv {
   constructor() {
     this.logger = new Logger({ name: this.name })
@@ -104,8 +111,6 @@ class OptimismEnv {
     this.MySQLDatabaseName = MYSQL_DATABASE_NAME
     this.MySQLDatabaseNameTx = MYSQL_DBNAME_TX
     this.MySQLDatabaseNameReceipt = MYSQL_DBNAME_RECEIPT
-    this.MySQLStartTimeLog = MYSQL_LOG_START_TIME
-    this.MySQLStartTimeReceipt = MYSQL_RECEIPT_START_TIME
 
     this.addressManagerAddress = ADDRESS_MANAGER_ADDRESS
     this.L1CrossDomainMessenger = null
@@ -113,7 +118,7 @@ class OptimismEnv {
     this.OVM_L2CrossDomainMessenger = L2_MESSENGER_ADDRESS
     this.OVM_L2StandardBridge = OVM_L2_STANDARD_BRIDGE_ADDRESS
 
-    this.numberBlockToFetch = 10000000
+    this.numberBlockToFetch = NUMBER_OF_BLOCKS_TO_FETCH
     this.transactionMonitorInterval = TRANSACTION_MONITOR_INTERVAL
     this.crossDomainMessageMonitorInterval =
       CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL
@@ -163,6 +168,13 @@ class OptimismEnv {
     this.watcher = null
 
     this.l1BlockConfirmation = L1_BLOCK_CONFIRMATION
+
+    this.sequencerPublishWindow = 0
+
+    this.layerZeroEnableTest = LAYER_ZERO_ENABLE_TEST
+    this.layerZeroChain = LAYER_ZERO_CHAIN
+    this.layerZeroBridges = LAYER_ZERO_BRIDGES.split(',')
+    this.layerZeroLatestBlock = LAYER_ZERO_LATEST_BLOCK
   }
 
   async initOptimismEnv() {
@@ -201,6 +213,11 @@ class OptimismEnv {
       StateCommitmentChainJson.abi,
       this.L1Provider
     )
+
+    this.sequencerPublishWindow = (
+      await this.StateCommitmentChainContract.SEQUENCER_PUBLISH_WINDOW()
+    ).toNumber()
+
     // Load L1 Standard Bridge
     this.OVM_L1StandardBridgeContract = new ethers.Contract(
       this.Proxy__L1StandardBridge,

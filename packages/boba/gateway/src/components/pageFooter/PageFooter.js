@@ -1,17 +1,15 @@
 import { IconButton } from '@mui/material'
 import { Telegram, Twitter } from '@mui/icons-material'
-import { setPage } from 'actions/uiAction'
 import DiscordIcon from 'components/icons/DiscordIcon'
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
+import { ROUTES_PATH } from 'util/constant'
 
 const PageFooter = ({maintenance}) => {
 
-  const dispatch = useDispatch()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -29,12 +27,12 @@ const PageFooter = ({maintenance}) => {
       <S.FooterDivider />
       <S.FooterLinkWrapper>
         <S.LinkWrapper>
-          <S.FooterLink
+          <S.FooterLinkExt
             href="https://docs.boba.network"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Docs</S.FooterLink>
+          >Boba Docs</S.FooterLinkExt>
         </S.LinkWrapper>
         <S.FooterDividerMobile />
         <S.SocialWrapper>
@@ -47,12 +45,12 @@ const PageFooter = ({maintenance}) => {
           <IconButton href="https://boba.eco/telegram" target='_blank' aria-label="telegram">
             <Telegram sx={{opacity: 0.65}} />
           </IconButton>
-          <S.FooterLink
+          <S.FooterLinkExt
             href="https://boba.network"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Website</S.FooterLink>
+          >Boba Website</S.FooterLinkExt>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>
     </S.Wrapper>
@@ -66,32 +64,26 @@ const PageFooter = ({maintenance}) => {
         {!isMobile && <GasSwitcher />}
         <S.LinkWrapper>
           <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('Help'))
-            }}
+            to={ROUTES_PATH.HELP}
           >FAQs</S.FooterLink>
-          <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('Airdrop'))
-            }}
+            <S.FooterLink
+              to={ROUTES_PATH.AIRDROP}
           >AirDrop</S.FooterLink>
           <S.FooterLink
-            onClick={() => {
-              dispatch(setPage('BobaScope'))
-            }}
+            to={ROUTES_PATH.BOBASCOPE}
           >BobaScope</S.FooterLink>
-          <S.FooterLink
+          <S.FooterLinkExt
             href="https://bobascan.com"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Blockexplorer</S.FooterLink>
-          <S.FooterLink
+          >Blockexplorer</S.FooterLinkExt>
+          <S.FooterLinkExt
             href="https://docs.boba.network"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
-          >Boba Docs</S.FooterLink>
+          >Boba Docs</S.FooterLinkExt>
         </S.LinkWrapper>
         </S.FooterLinkWrapperLeft>
         <S.FooterDividerMobile />
@@ -105,13 +97,13 @@ const PageFooter = ({maintenance}) => {
           <IconButton href="https://boba.eco/telegram" target='_blank' aria-label="telegram">
             <Telegram sx={{opacity: 0.65}} />
           </IconButton>
-          <S.FooterLink
+          <S.FooterLinkExt
             href="https://boba.network"
             component="a"
             target="_blank"
             sx={{ whiteSpace: 'nowrap'}}
           >Boba Website
-          </S.FooterLink>
+          </S.FooterLinkExt>
         </S.SocialWrapper>
       </S.FooterLinkWrapper>
     </S.Wrapper>

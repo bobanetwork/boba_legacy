@@ -37,7 +37,7 @@ import FastExits from './FastExits'
 import * as styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
-import useInterval from 'util/useInterval'
+import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
 import Connect from 'containers/connect/Connect'

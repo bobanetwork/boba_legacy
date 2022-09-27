@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { SELLER_OPTIMISM_API_URL } from 'util/constant'
 
 const _sellerAxiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_SELLER_OPTIMISM_API_URL,
+  baseURL: SELLER_OPTIMISM_API_URL,
 })
 
 _sellerAxiosInstance.interceptors.request.use((config) => {

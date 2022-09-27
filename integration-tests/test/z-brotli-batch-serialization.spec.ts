@@ -44,7 +44,10 @@ describe('Batch Serialization', () => {
 
     // make sure that bacth submitter submits all L2 block data to L1 CTC contract
     const lastestL2Block = await env.l2Provider.getBlockNumber()
-    while (_prevTotalElements + _batchSize < lastestL2Block) {
+    while (
+      _prevTotalElements + _batchSize < lastestL2Block &&
+      logs.length === 0
+    ) {
       await sleep(1000)
       tip = await env.l1Provider.getBlockNumber()
       logs = await ctc.queryFilter(
