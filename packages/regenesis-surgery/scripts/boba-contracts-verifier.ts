@@ -8,9 +8,9 @@ import chalk from 'chalk'
 import contractList from '../deployment/mainnet/addresses.json'
 
 // load abi
-import L1LiquidityPoolJson from '../deployment/artifacts-boba/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LiquidityPoolJson from '../deployment/artifacts-boba/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
-import Lib_ResolvedDelegateProxyJson from '../deployment/artifacts-boba/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
+import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import Lib_ResolvedDelegateProxyJson from '@boba/contracts/artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
 
 dotenv.config()
 
