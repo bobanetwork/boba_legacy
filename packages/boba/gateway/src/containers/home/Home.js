@@ -388,6 +388,9 @@ function Home() {
             { pageDisplay === "Lock" &&
               <Lock />
             }
+            {pageDisplay === "LinksToBobaChains" &&
+              <Ecosystem ecosystemType='BOBA'/>
+            }
           </Container>
           <PageFooter/>
         </Box>
