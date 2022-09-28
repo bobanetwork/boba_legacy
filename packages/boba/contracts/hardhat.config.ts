@@ -58,6 +58,9 @@ const config: HardhatUserConfig = {
     bobabnb: {
       url: 'https://bnb.boba.network',
     },
+    fantom: {
+      url: 'https://rpc.fantom.network',
+    },
   },
   solidity: {
     compilers: [
@@ -125,6 +128,7 @@ const config: HardhatUserConfig = {
       bobaavax: 'DEFAULT_KEY',
       bnb: process.env.BSCSCAN_KEY,
       bobabnb: 'DEFAULT_KEY',
+      fantom: process.env.FTMSCAN_KEY,
     },
     customChains: [
       {
@@ -181,6 +185,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.bnb.boba.network/api',
           browserURL: 'https://blockexplorer.bnb.boba.network/',
+        },
+      },
+      {
+        network: 'fantom',
+        chainId: 250,
+        urls: {
+          apiURL: 'https://api.ftmscan.com/api',
+          browserURL: 'https://ftmscan.com',
         },
       },
     ],
