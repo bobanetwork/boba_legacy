@@ -42,7 +42,7 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
 
     let timeLabel = moment.unix(i.timeStamp).format('lll')
 
-    let amountTx = `logAmount(i.amount, 18, 3) BOBA`;
+    let amountTx = `${logAmount(i.amount, 18, 3)} BOBA`;
 
     return (
       <Transaction
