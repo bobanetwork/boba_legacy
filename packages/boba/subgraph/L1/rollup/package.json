@@ -10,15 +10,18 @@
     "prepare:fuji:rollup": "mustache config/fuji.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:bobaavax:rollup": "mustache config/bobaavax.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:bobabnbtestnet:rollup": "mustache config/bobabnbtestnet.json subgraph.template.rollup.yaml > subgraph.yaml",
+    "prepare:bobabnb:rollup": "mustache config/bobabnb.json subgraph.template.rollup.yaml > subgraph.yaml",
     "prepare:bobabase:addressManager": "mustache config/bobabase.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "prepare:bobabeam:addressManager": "mustache config/bobabeam.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "prepare:bobaoperatestnet:addressManager": "mustache config/bobaoperatestnet.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "prepare:fuji:addressManager": "mustache config/fuji.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "prepare:bobaavax:addressManager": "mustache config/bobaavax.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "prepare:bobabnbtestnet:addressManager": "mustache config/bobabnbtestnet.json subgraph.template.addressManager.yaml > subgraph.yaml",
+    "prepare:bobabnb:addressManager": "mustache config/bobabnb.json subgraph.template.addressManager.yaml > subgraph.yaml",
     "deploy:subgraph:bobabase:rollup": "graph deploy --product hosted-service bobanetwork/bobabase-rollup",
     "deploy:subgraph:bobabeam:rollup": "graph deploy --product hosted-service bobanetwork/bobabeam-rollup",
     "deploy:subgraph:bobabnbtestnet:rollup": "graph deploy --product hosted-service bobanetwork/bobabnb-tn-rollup",
+    "deploy:subgraph:bobabnb:rollup": "graph deploy --product hosted-service bobanetwork/bobabnb-rollup",
     "deploy:subgraph:bobaoperatestnet:rollup": "graph deploy --product hosted-service bobanetwork/bobaopera-tn-rollup",
     "deploy:subgraph:fuji:rollup": "graph deploy --product hosted-service bobanetwork/bobafuji-rollup",
     "deploy:subgraph:bobaavax:rollup": "graph deploy --product hosted-service bobanetwork/bobaavax-rollup",
@@ -27,7 +30,8 @@
     "deploy:subgraph:bobaoperatestnet:addressManager": "graph deploy --product hosted-service bobanetwork/bobaopera-tn-address-manager",
     "deploy:subgraph:fuji:addressManager": "graph deploy --product hosted-service bobanetwork/bobafuji-address-manager",
     "deploy:subgraph:bobaavax:addressManager": "graph deploy --product hosted-service bobanetwork/bobaavax-address-manager",
-    "deploy:subgraph:bobabnbtestnet:addressManager": "graph deploy --product hosted-service bobanetwork/bobabnb-tn-address-manager"
+    "deploy:subgraph:bobabnbtestnet:addressManager": "graph deploy --product hosted-service bobanetwork/bobabnb-tn-address-manager",
+    "deploy:subgraph:bobabnb:addressManager": "graph deploy --product hosted-service bobanetwork/bobabnb-address-manager"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.29.0",

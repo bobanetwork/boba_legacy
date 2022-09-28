@@ -61,7 +61,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     for (let i = 0; i < this.layerZeroBridges.length; i++) {
       const bridgeName = this.layerZeroBridges[i]
       const isFromETH = bridgeName.search(/EthBridgeTo/) > -1
-      const abi = isFromETH ? EthBridgeJson.abi : AltLBridge.abi
+      const abi = isFromETH ? EthBridgeJson.abi : AltL1Bridge.abi
       const contract = new ethers.Contract(
         bridgeAddresses[i],
         abi,
@@ -129,7 +129,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     const getEvents = async (events, startBlock, endBlock) => {
       let logs = []
       for (const event of events) {
-        const log = await this.bridgeContract.queryFilter(
+        const log = await bridgeContract.queryFilter(
           event,
           Number(startBlock),
           Number(endBlock)
@@ -143,8 +143,8 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     if (this.ETH) {
       logs = await getEvents(
         [
-          this.bridgeContract.filters.ERC20DepositInitiated(),
-          this.bridgeContract.filters.ERC20WithdrawalFinalized(),
+          bridgeContract.filters.ERC20DepositInitiated(),
+          bridgeContract.filters.ERC20WithdrawalFinalized(),
         ],
         startBlock,
         endBlock
@@ -152,8 +152,8 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     } else {
       logs = await getEvents(
         [
-          this.bridgeContract.filters.WithdrawalInitiated(),
-          this.bridgeContract.filters.DepositFinalized(),
+          bridgeContract.filters.WithdrawalInitiated(),
+          bridgeContract.filters.DepositFinalized(),
         ],
         startBlock,
         endBlock
@@ -181,7 +181,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
       const result = await response.json()
 
       let url = ''
-      if (len(result.messages) > 0) {
+      if (result.messages.length > 0) {
         const message = result.messages[0]
         // [
         //   {

@@ -142,9 +142,9 @@ class FarmDepositModal extends React.Component {
       }
 
       if(bobaFeeChoice)
-        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
+        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), 18)
       else
-        fee = utils.formatUnits(cost_BN, stakeToken.decimals)
+        fee = utils.formatUnits(cost_BN, 18)
 
       // if the max amount is less than the gas,
       // set the max amount to zero

@@ -6,4 +6,5 @@
 - [Bobabase (public testnet)](./bobabase#readme)
 - [Bobaopera (public testnet)](./bobaoperatestnet#readme)
 - [Boba BNB (public testnet)](./bobabnbtestnet#readme)
+- [Boba BNB (public mainnet)](./bobabnb#readme)
 - [Bobabeam (public mainnet)](./bobabeam#readme)

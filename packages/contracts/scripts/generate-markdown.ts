@@ -73,6 +73,14 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     l2Explorer: 'https://blockexplorer.testnet.bnb.boba.network',
   },
   {
+    folder: 'bobabnb',
+    name: 'Boba BNB (public mainnet)',
+    chainid: 56288,
+    rpc: 'https://bnb.boba.network',
+    l1Explorer: 'https://bscscan.com/',
+    l2Explorer: 'https://blockexplorer.bnb.boba.network',
+  },
+  {
     folder: 'bobabeam',
     name: 'Bobabeam (public mainnet)',
     chainid: 1294,

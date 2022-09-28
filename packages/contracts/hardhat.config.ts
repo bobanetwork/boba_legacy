@@ -69,6 +69,15 @@ const config: HardhatUserConfig = {
     snowtrace: {
       url: 'https://api.avax.network/ext/bc/C/rpc',
     },
+    bobaavax: {
+      url: 'https://avax.boba.network',
+    },
+    bnb: {
+      url: 'https://bscrpc.com',
+    },
+    bobabnb: {
+      url: 'https://bnb.boba.network',
+    },
   },
   mocha: {
     timeout: 50000,
@@ -127,6 +136,9 @@ const config: HardhatUserConfig = {
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
       moonbeam: process.env.MOONBEAM_KEY,
       snowtrace: process.env.SNOWTRACE_KEY,
+      bnb: process.env.BSCSCAN_KEY,
+      bobabnb: 'DEFAULT_KEY',
+      bobaavax: 'DEFAULT_KEY',
     },
     customChains: [
       {
@@ -151,6 +163,30 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.snowtrace.io/api',
           browserURL: 'https://snowtrace.io',
+        },
+      },
+      {
+        network: 'bobaavax',
+        chainId: 43288,
+        urls: {
+          apiURL: 'https://blockexplorer.avax.boba.network/api',
+          browserURL: 'https://blockexplorer.avax.boba.network',
+        },
+      },
+      {
+        network: 'bnb',
+        chainId: 56,
+        urls: {
+          apiURL: 'https://api.bscscan.com/api',
+          browserURL: 'https://bscscan.com/',
+        },
+      },
+      {
+        network: 'bobabnb',
+        chainId: 56288,
+        urls: {
+          apiURL: 'https://blockexplorer.bnb.boba.network/api',
+          browserURL: 'https://blockexplorer.bnb.boba.network',
         },
       },
     ],

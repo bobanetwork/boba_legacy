@@ -746,8 +746,13 @@ describe('gas-price-oracle', () => {
         tempGasPriceOracleService.options.bobaFeeRatio100X) /
         100
     )
-    expect(marketPriceRatio.toNumber()).to.be.eq(calculatedMarketPriceRatio)
-    expect(priceRatio.toNumber()).to.be.eq(calculatedPriceRatio)
+
+    /* eslint-disable */
+    expect(marketPriceRatio.toNumber()).to.be.gte(calculatedMarketPriceRatio - 2)
+    expect(marketPriceRatio.toNumber()).to.be.lte(calculatedMarketPriceRatio + 2)
+    expect(priceRatio.toNumber()).to.be.gte(calculatedPriceRatio - 2)
+    expect(priceRatio.toNumber()).to.be.lte(calculatedPriceRatio + 2)
+    /* eslint-enable */
 
     // Don't update the price ratio if the price is the same
     const preBlockNumber = await wallet8.provider.getBlockNumber()

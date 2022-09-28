@@ -286,20 +286,20 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
       // because of MetaMask issue always have to limit ETH
       if(token.symbol === 'BOBA') {
-        if(balance - safeCost > 0.0)
-          setMax_Float(balance - safeCost)
+        if(balance - safeCost - exitFee > 0.0)
+          setMax_Float(balance - safeCost - exitFee)
         else
           setMax_Float(0.0)
       }
       else if (token.symbol === networkService.L1NativeTokenSymbol && feeUseBoba) {
-        if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
-          setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
+        if(balance - safeCost * feePriceRatio > 0.0)
+          setMax_Float(balance - safeCost * feePriceRatio)
         else
           setMax_Float(0.0)
       }
       else if (token.symbol === networkService.L1NativeTokenSymbol && !feeUseBoba) {
-        if(balance - exitFee > 0.0)
-          setMax_Float(balance - exitFee)
+        if(balance > 0.0)
+          setMax_Float(balance)
         else
           setMax_Float(0.0)
       }

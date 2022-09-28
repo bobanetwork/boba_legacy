@@ -157,6 +157,21 @@ export const getCoinImage = (symbol) => {
     case "CGT":
       logo = CGTLogo;
       break;
+    case "USDT.e":
+      logo = usdtLogo;
+      break;
+    case "DAI.e":
+      logo = daiLogo;
+      break;
+    case "USDC.e":
+      logo = usdcLogo;
+      break;
+    case "BUSD.e":
+      logo = busdLogo;
+      break;
+    case "USDt":
+      logo = usdtLogo;
+      break;
     default:
       logo = ethLogo;
       break;

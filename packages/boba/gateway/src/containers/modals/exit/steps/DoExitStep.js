@@ -228,21 +228,21 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
       const balance = Number(logAmount(token.balance, token.decimals))
 
       // because of MetaMask issue always have to limit ETH
-      if(token.symbol === 'ETH') {
-        if(balance - safeCost > 0.0)
-          setMax_Float(balance - safeCost)
+      if(token.symbol === 'BOBA') {
+        if(balance - safeCost - exitFee > 0.0)
+          setMax_Float(balance - safeCost - exitFee)
         else
           setMax_Float(0.0)
       }
-      else if (token.symbol === 'BOBA' && feeUseBoba) {
-        if(balance - (safeCost * feePriceRatio) - exitFee > 0.0)
-          setMax_Float(balance - (safeCost * feePriceRatio) - exitFee)
+      else if (token.symbol === networkService.L1NativeTokenSymbol && feeUseBoba) {
+        if(balance - safeCost * feePriceRatio > 0.0)
+          setMax_Float(balance - safeCost * feePriceRatio)
         else
           setMax_Float(0.0)
       }
-      else if (token.symbol === 'BOBA' && !feeUseBoba) {
-        if(balance - exitFee > 0.0)
-          setMax_Float(balance - exitFee)
+      else if (token.symbol === networkService.L1NativeTokenSymbol && !feeUseBoba) {
+        if(balance > 0.0)
+          setMax_Float(balance)
         else
           setMax_Float(0.0)
       }
