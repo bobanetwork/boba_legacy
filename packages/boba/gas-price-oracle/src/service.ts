@@ -826,7 +826,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     number: BigNumber | string,
     decimal = 6
   ): Number {
-    return Number(Number(number).toFixed(decimal))
+    return Number(Number(utils.formatEther(number.toString())).toFixed(decimal))
   }
 
   private _formatBigNumberToEtherUSD(
@@ -834,7 +834,9 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     price: number,
     decimal = 6
   ): Number {
-    return Number((Number(number) * price).toFixed(decimal))
+    return Number(
+      (Number(utils.formatEther(number.toString())) * price).toFixed(decimal)
+    )
   }
 
   private _formatBigNumberToUnits(
