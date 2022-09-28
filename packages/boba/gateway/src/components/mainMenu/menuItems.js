@@ -44,15 +44,15 @@ export const menuItems = [
     url: "/lock",
   },
   {
-    key: 'LinksToBobaChains',
-    icon: "LinksToBobaChainsIcon",
-    title: "BOBA Chains",
-    url: ROUTES_PATH.BOBA_CHAINS
-  },
-  {
     key: 'Vote',
     icon: "VoteIcon",
     title: "Vote&Dao",
     url: ROUTES_PATH.VOTE_DAO
+  },
+  {
+    key: 'LinksToBobaChains',
+    icon: "LinksToBobaChainsIcon",
+    title: "BOBA Chains",
+    url: ROUTES_PATH.BOBA_CHAINS
   }
 ]

@@ -4160,7 +4160,7 @@ class NetworkService {
         for (let i = 0; i < totalProposals; i++) {
           const proposalRaw = proposals[i]
 
-          if(typeof(proposalRaw) === 'undefined') continue
+          if (typeof (proposalRaw) === 'undefined') continue
 
           let proposalID = proposalRaw.proposalId
 
@@ -4255,9 +4255,10 @@ class NetworkService {
     try {
       const delegateCheck = await this.delegateContract
         .connect(this.provider.getSigner())
-        .attach(allAddresses.GovernorBravoDelegator)
+        .attach(allAddresses.GovernorBravoDelegatorV2)
 
-      const res = await delegateCheck.castVote(id, userVote, tokenIds, { gasLimit: 3000000 })
+      const res = await delegateCheck.castVote(id, userVote, tokenIds)
+
       return res;
 
     } catch (error) {
