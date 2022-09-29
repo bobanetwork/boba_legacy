@@ -9,20 +9,23 @@ import Tooltip from 'components/tooltip/Tooltip'
 
 import { useParams } from 'react-router-dom'
 import * as S from './Ecosystem.styles'
-import { loadProjectByCategory } from './project.list'
+import { loadProjectByCategory, loadBobaProjectByCategory } from './project.list'
 
-
-const Projects = () => {
+const Projects = ({projectType}) => {
   const [ projectByCategory, setprojectByCategory ] = useState({})
 
   const params = useParams();
 
   useEffect(() => {
-    setprojectByCategory(loadProjectByCategory())
+    if (projectType === 'BOBA') {
+      setprojectByCategory(loadBobaProjectByCategory())
+    } else {
+      setprojectByCategory(loadProjectByCategory())
+    }
     return () => {
       setprojectByCategory({})
     }
-  }, [])
+  }, [projectType])
 
   return <>
     {Object.keys(projectByCategory).length > 0 ? projectByCategory[ params.category ].map((project, i) => {
@@ -67,8 +70,7 @@ const Projects = () => {
           </S.TileFooter>
         </S.ProjectContainer>
       </S.ProjectListItem>
-    }) : null}</>
-
+    }) : <div></div>}</>
 
 }
 
