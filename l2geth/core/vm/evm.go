@@ -386,7 +386,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	// Check the rType
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
-	rVersion := int(rest[28]) // 0 for legacy, 1 for current
+	rVersion := int(rest[28]) // 0 for legacy, 2 for current
 
 	if rType != 1 {
 		log.Error("TURING bobaTuringCall:Wrong state (rType != 1)", "rType", rType)
@@ -478,7 +478,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	}
 
 	pLen := new(big.Int).SetBytes(payload[:32])
-	if rVersion > 0 {
+	if rVersion >= 2 {
 		payload = payload[32:]
 
 		if pLen.Cmp(big.NewInt(int64(len(payload)))) != 0 {
@@ -543,7 +543,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	// Calculate the calldata limit for a legacy request
 	lenLimit := startIDXpayload + 4 + 160
 
-	if rVersion > 0 {
+	if rVersion >= 2 {
 		lenLimit = turingMaxLenCD // Absolute maximum; actual limit will depend on gas
 
 		rLen := big.NewInt(int64(len(responseString)))

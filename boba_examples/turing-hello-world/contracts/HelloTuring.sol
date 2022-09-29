@@ -25,7 +25,7 @@ contract HelloTuring {
 
         bytes memory encRequest = abi.encode(a);
 
-        bytes memory encResponse = myHelper.TuringTxV1(_url, encRequest);
+        bytes memory encResponse = myHelper.TuringTxV2(_url, encRequest);
 
         uint256 product = abi.decode(encResponse, (uint256));
 
@@ -46,7 +46,7 @@ contract HelloTuring {
       uint256 sum = 0;
 
       bytes memory encRequest = abi.encode(a,b);
-      bytes memory encResponse = myHelper.TuringTxV1(_url, encRequest);
+      bytes memory encResponse = myHelper.TuringTxV2(_url, encRequest);
 
       uint256[] memory ary = abi.decode(encResponse, (uint256[]));
 

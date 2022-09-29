@@ -116,7 +116,7 @@ contract TuringHelper is ITuringHelper, Ownable {
      need to include a timestamp and/or more details about the
      offchain interaction.
   */
-  function TuringTxV1(string memory _url, bytes memory _payload)
+  function TuringTxV2(string memory _url, bytes memory _payload)
     public onlyPermittedCaller override returns (bytes memory) {
       require (_payload.length > 0, "Turing:TuringTx:no payload");
 
@@ -124,7 +124,7 @@ contract TuringHelper is ITuringHelper, Ownable {
          because that would stay inside the EVM and not give l2geth
          a place to intercept and re-write the call.
       */
-      bytes memory response = Self.GetResponse(0x01000001, _url, _payload);
+      bytes memory response = Self.GetResponse(0x02000001, _url, _payload);
       emit OffchainResponse(0x01, response);
       return response;
   }
