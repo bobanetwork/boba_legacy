@@ -14,6 +14,7 @@
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
   * [Turing KYC](boba\_community/turing-kyc/README.md)
   * [Turing Monster Minting](boba\_community/turing-monsters/README.md)
+  * [Turing Time Dilation](HybridCompute_Tutorial/README.md)
   * [Turing Wizard](boba\_community/turing-start/README.md)
   * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
   * [Turing Implementation](packages/boba/turing/README.md)
