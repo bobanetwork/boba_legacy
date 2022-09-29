@@ -202,6 +202,21 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Fantom mainnet
+  250: {
+    l1: {
+      AddressManager: '0x4e7325bcf09e091Bb8119258B885D4ef687B7386',
+      L1CrossDomainMessenger: '0x64Fca36c52628e40de8684C4C3B5EdB22Fd2eFd9',
+      L1CrossDomainMessengerFast: '0x64Fca36c52628e40de8684C4C3B5EdB22Fd2eFd9',
+      L1StandardBridge: '0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8',
+      StateCommitmentChain: '0xF764C4f8D2982432239A110Cf6B08e95631cE564',
+      CanonicalTransactionChain: '0x6001C473E020D3562Ea436B61aE4d2e91e7078cE',
+      BondManager: '0xCcA5a1CB9fAD5F2A5b88D95440dA7c83EC031Cb1',
+      L1MultiMessageRelayer: '0xD8DcA5fC53a83Cf06ec744a7226C23951a353A0f',
+      L1MultiMessageRelayerFast: '0xD8DcA5fC53a83Cf06ec744a7226C23951a353A0f',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
   // Avalanche local
   43112: {
     l1: {
@@ -517,6 +532,18 @@ export const BRIDGE_ADAPTER_DATA: {
     ETH: {
       Adapter: ETHBridgeAdapter,
       l1Bridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  250: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
