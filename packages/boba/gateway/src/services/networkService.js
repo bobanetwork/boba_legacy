@@ -90,6 +90,7 @@ import addresses_BobaBnbTestnet from "@boba/register/addresses/addressBobaBnbTes
 import addresses_BobaBeam from "@boba/register/addresses/addressBobaBeam_0x564c10A60af35a07f0EA8Be3106a4D81014b21a0"
 import addresses_BobaAvax from "@boba/register/addresses/addressBobaAvax_0x00220f8ce1c4be8436574e575fE38558d85e2E6b"
 import addresses_BobaBnb from "@boba/register/addresses/addressBobaBnb_0xeb989B25597259cfa51Bd396cE1d4B085EC4c753"
+import addresses_BobaOpera from "@boba/register/addresses/addressBobaOpera_0x4e7325bcf09e091Bb8119258B885D4ef687B7386"
 
 import { bobaBridges } from 'util/bobaBridges'
 
@@ -163,9 +164,16 @@ if (process.env.REACT_APP_CHAIN === 'bobaBnb') {
     L2LPAddress: addresses_BobaBnb.Proxy__L2LiquidityPool
   }
 }
+if (process.env.REACT_APP_CHAIN === 'bobaOpera') {
+  allAddresses = {
+    ...addresses_BobaOpera,
+    L1LPAddress: addresses_BobaOpera.Proxy__L1LiquidityPool,
+    L2LPAddress: addresses_BobaOpera.Proxy__L2LiquidityPool
+  }
+}
 
 // suported chains
-const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet', 'bobaBeam', 'bobaAvax', 'bobaBnb']
+const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaBnbTestnet', 'bobaBeam', 'bobaAvax', 'bobaBnb', 'bobaOpera']
 
 // assets for different chains
 const L1ChainAssets = {
@@ -225,7 +233,15 @@ const L1ChainAssets = {
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'BUSD', 'USDC', "USDT"],
     supportedTokenAddresses: {},
     foundation: false,
-  }
+  },
+  'bobaOpera': {
+    name: 'Fantom Mainnet',
+    l2Name: 'Bobaopera Mainnet',
+    icon: (bool) => <FantomIcon selected={bool}/>,
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'USDC', 'DAI'],
+    supportedTokenAddresses: {},
+    foundation: false,
+  },
 }
 
 let allTokens = {}
