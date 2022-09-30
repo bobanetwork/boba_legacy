@@ -32,6 +32,16 @@ function Select ({
   const selected = options.find(i => i.value === value);
 
   function renderOption (i) {
+    if (i.image && i.title) {
+      return (
+        <>
+          {i.image}
+          <Typography variant="body2">
+            {i.title}
+          </Typography>
+        </>
+      )
+    }
     if (i.title && i.subTitle) {
       return `${i.title} - ${i.subTitle}`;
     }
