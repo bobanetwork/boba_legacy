@@ -29,11 +29,9 @@ def watcher_getLayerZeroTransaction(event, context):
             cur.execute("""SELECT
         chainID, targetChainID, hash, blockNumber, amount, event, timestamp, reference
         FROM layerZeroTx
-        WHERE `crossTxFrom`=%s AND blockNumber <= %s AND blockNumber >= %s ORDER BY blockNumber""", (address, toRange, fromRange))
+        WHERE `crossTxFrom`=%s ORDER BY CAST(blockNumber as unsigned) DESC LIMIT %s OFFSET %s""", (address, toRange - fromRange, fromRange))
             transactionsDataRaw = cur.fetchall()
-            print("total", len(transactionsDataRaw))
             for transactionDataRaw in transactionsDataRaw:
-                print("FOUND")
                 transactionData.append({
                     "tx_hash": transactionDataRaw[2],
                     "amount": transactionDataRaw[4],
