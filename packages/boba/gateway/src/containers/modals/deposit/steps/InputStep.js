@@ -66,7 +66,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       )
     }
     if (res) {
-      dispatch(setActiveHistoryTab('Bridge to L2'))
+      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
       handleClose()
     }
 

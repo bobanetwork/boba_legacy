@@ -83,6 +83,12 @@ import veJson from "../deployment/contracts/ve.json"
 // import voterJson from "../deployment/contracts/BaseV1Voter.json"
 // import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
+// multi chain alt l1s ABI's
+// import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
+import ETHL1BridgeJson from "../deployment/contracts/crosschain/EthBridge.json"
+import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardERC20.json"
+import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
+
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
@@ -97,6 +103,10 @@ import GraphQLService from "./graphQLService"
 
 import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
+
+import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
+import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
+
 import { bobaBridges } from 'util/bobaBridges'
 import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
 
@@ -106,21 +116,32 @@ const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
+let supportedAltL1Chains = []
 
 let allAddresses = {}
 // preload allAddresses
 if (APP_CHAIN === 'rinkeby') {
+  const bobaBridges = layerZeroTestnet.BOBA_Bridges.Testnet;
+  const l0Protocols = layerZeroTestnet.Layer_Zero_Protocol.Testnet;
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool,
+    ...bobaBridges,
+    ...l0Protocols
   }
+  supportedAltL1Chains = ['BNB', 'Fantom', 'Avalanche']
 } else if (APP_CHAIN === 'mainnet') {
+  const bobaBridges = layerZeroMainnet.BOBA_Bridges.Mainnet;
+  const l0Protocols = layerZeroMainnet.Layer_Zero_Protocol.Mainnet;
   allAddresses = {
     ...addresses_Mainnet,
     L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool,
+    ...bobaBridges,
+    ...l0Protocols
   }
+  supportedAltL1Chains = ['Moonbeam']
 }
 let allTokens = {}
 
@@ -200,6 +221,9 @@ class NetworkService {
 
     // support token
     this.supportedTokens = []
+
+    // support alt l1 tokens
+    this.supportedAltL1Chains = supportedAltL1Chains
   }
 
   bindProviderListeners() {
@@ -714,16 +738,15 @@ class NetworkService {
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L1']['rpcUrl']
       )
+
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L2']['rpcUrl']
       )
 
       if (networkGateway === 'rinkeby') {
         addresses = addresses_Rinkeby
-        console.log('Rinkeby Addresses:', addresses)
       } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
-        console.log('Mainnet Addresses:', addresses)
       }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
@@ -794,7 +817,6 @@ class NetworkService {
         L1StandardBridgeJson.abi,
         this.L1Provider
       )
-      console.log("L1StandardBridgeContract:", this.L1StandardBridgeContract.address)
 
       this.supportedTokens = [ 'USDT',   'DAI', 'USDC',  'WBTC',
                                'REP',    'BAT',  'ZRX', 'SUSHI',
@@ -1200,11 +1222,10 @@ class NetworkService {
     if (this.networkGateway === 'local') return
     if (this.account === null) return
 
-    console.log("Getting transactions...")
-
     let txL1 = []
     let txL1pending = []
     let txL2 = []
+    let txL0 = []
 
     const responseL1 = await etherScanInstance(
       this.networkGateway,
@@ -1224,45 +1245,54 @@ class NetworkService {
       }
     }
 
-    //console.log("responseL1",txL1)
-
     const responseL2 = await omgxWatcherAxiosInstance(
       this.networkGateway
     ).post('get.l2.transactions', {
       address: this.account,
-      fromRange:  0,
+      fromRange: 0,
       toRange: 1000,
     })
 
-    //console.log("responseL2",responseL2)
-
     if (responseL2.status === 201) {
-      //add the chain: 'L2' field
-      txL2 = responseL2.data.map(v => ({...v, chain: 'L2'}))
+      txL2 = responseL2.data.map(v => ({ ...v, chain: 'L2' }))
+    }
+
+    const responseL0 = await omgxWatcherAxiosInstance(
+      this.networkGateway
+    ).post('get.layerzero.transactions', {
+      address: this.account,
+      fromRange: 0,
+      toRange: 1000,
+    })
+
+    if (responseL0.status === 201) {
+      txL0 = responseL0.data.map((v) => ({
+        ...v,
+        hash: v.tx_hash,
+        blockNumber: parseInt(v.block_number),
+        timeStamp: parseInt(v.timestamp),     //fix bug - sometimes this is string, sometimes an integer
+        chain: 'L0',
+        altL1: true,
+      }))
     }
 
     const responseL1pending = await omgxWatcherAxiosInstance(
       this.networkGateway
     ).post('get.l1.transactions', {
       address: this.account,
-      fromRange:  0,
+      fromRange: 0,
       toRange: 1000,
     })
 
-    //console.log("responseL1pending",responseL1pending)
-
     if (responseL1pending.status === 201) {
       //add the chain: 'L1pending' field
-      txL1pending = responseL1pending.data.map(v => ({...v, chain: 'L1pending'}))
-      //console.log("txL1pending",txL1pending)
-      const annotated = //await this.parseTransaction(
-        [
-          ...txL1,
-          ...txL2,
-          ...txL1pending //the new data product
-        ]
-      //)
-      //console.log("annotated:",annotated)
+      txL1pending = responseL1pending.data.map(v => ({ ...v, chain: 'L1pending' }))
+      const annotated = [
+        ...txL1,
+        ...txL2,
+        ...txL0,
+        ...txL1pending //the new data product
+      ]
       return annotated
     }
 
@@ -1404,7 +1434,7 @@ class NetworkService {
 
       if(NFTs && Number(monsterBalance) > 0) {
         //console.log("checking monsters")
-        for (const [ key, value ] of Object.entries(NFTs)) {
+        for (const [ , value ] of Object.entries(NFTs)) {
           //console.log(`${key} value: ${value.name}`)
           if(value.name === 'TuringMonster') {
             const owner = await contract.ownerOf(value.tokenID)
@@ -4860,6 +4890,176 @@ class NetworkService {
       }
     } catch (error) {
       console.log("NS: Ve: fetchLockRecords error:", error)
+      return error;
+    }
+  }
+
+
+  /*************************************************
+   **************** Alt L1 Functions ***************
+   *************************************************/
+
+  /**
+   * Get Cross Chain Deposit Fee
+   * @getAltL1DepositFee
+   *   - as of now we are just supporting BOBA so no need to check for other tokens.
+  */
+
+
+  async getAltL1DepositFee() {
+    if (this.account === null) {
+      console.log('NS: depositErc20ToL1() error - called but account === null')
+      return
+    }
+    try {
+      const pResponse = supportedAltL1Chains.map(async (type) => {
+        let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
+        let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
+        let L0_CHAIN_ID = allAddresses.Layer_Zero_ChainId;
+        let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
+        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
+
+        // Layer zero doesn't support moonbase
+        // return 0 for those bridges that haven't been implemented yet
+        if (typeof ALT_L1_BOBA_ADDRESS === 'undefined' || typeof PROXY_ETH_L1_BRIDGE_ADDRESS_TO === 'undefined') {
+          return {type, fee: '0' }
+        }
+
+        const Proxy__EthBridge = new ethers.Contract(
+          PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
+          ETHL1BridgeJson.abi,
+          this.provider.getSigner()
+        );
+
+        const ETHLayzerZeroEndpoint = new ethers.Contract(
+          L0_ETH_ENDPOINT,
+          LZEndpointMockJson.abi,
+          this.provider.getSigner()
+        );
+
+        const payload = ethers.utils.defaultAbiCoder.encode(
+          [ "address", "address", "address", "address", "uint256", "bytes" ],
+          [
+            ETH_L1_BOBA_ADDRESS,
+            ALT_L1_BOBA_ADDRESS,
+            this.account,
+            this.account,
+            ethers.utils.parseEther('1'),
+            "0x",
+          ]
+        );
+
+        console.log(`🆙 loading 💵 FEE for ${type}`);
+        const estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
+          L0_CHAIN_ID,
+          Proxy__EthBridge.address,
+          payload,
+          false,
+          "0x"
+        );
+        console.log(`💵 FEE for ${type} => ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
+
+        return { type, ...estimatedFee, fee: ethers.utils.formatEther(estimatedFee._nativeFee) }
+      })
+      const fees = await Promise.all(pResponse);
+      let result = {};
+      fees.forEach((fee) => result[ fee.type ] = fee);
+      return result
+
+    } catch (error) {
+      console.log('NS: getAltL1DepositFee() error - called but account === null')
+      return error
+    }
+  }
+
+   /**
+   * Multichain Deposit to alt l1s Only support boba as of now.
+   *
+  */
+
+  async depositErc20ToL1({
+    value,
+    type
+  }) {
+    if (this.account === null) {
+      console.log('NS: depositErc20ToL1() error - called but account === null')
+      return
+    }
+    try {
+      let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
+      let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
+      let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
+      /* proxy eth bridge contract */
+      const Proxy__EthBridge = new ethers.Contract(
+        PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
+        ETHL1BridgeJson.abi,
+        this.provider.getSigner()
+      );
+
+      /* eth boba bridge contract */
+      const EthBOBA = new ethers.Contract(
+        ETH_L1_BOBA_ADDRESS,
+        L2StandardERC20Json.abi,
+        this.provider
+      );
+
+      /* L0 endpoint contract*/
+      const ETHLayzerZeroEndpoint = new ethers.Contract(
+        L0_ETH_ENDPOINT,
+        LZEndpointMockJson.abi,
+        this.provider.getSigner()
+      );
+
+      let approveTx = await EthBOBA
+        .connect(this.provider.getSigner())
+        .approve(
+        Proxy__EthBridge.address,
+        ethers.utils.parseEther(value)
+      );
+
+      console.log(`⏲  Waiting for approval`)
+
+      await approveTx.wait();
+
+      console.log(`✅  approval done`)
+
+      let payload = ethers.utils.defaultAbiCoder.encode(
+        ["address", "address", "address", "address", "uint256", "bytes"],
+        [
+          ETH_L1_BOBA_ADDRESS,
+          ALT_L1_BOBA_ADDRESS,
+          this.account,
+          this.account,
+          ethers.utils.parseEther(value),
+          "0x",
+        ]
+      );
+
+      let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
+        allAddresses.Layer_Zero_ChainId,
+        Proxy__EthBridge.address,
+        payload,
+        false,
+        "0x"
+      );
+
+      console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
+
+      await Proxy__EthBridge.depositERC20(
+        ETH_L1_BOBA_ADDRESS,
+        ALT_L1_BOBA_ADDRESS,
+        ethers.utils.parseEther(value),
+        ethers.constants.AddressZero,
+        "0x", // adapterParams
+        "0x",
+        { value: estimatedFee._nativeFee }
+      );
+
+      console.log(`🔥 🔥 🔥 🔥 🔥  ${value} AMT TRANSFER  👉  ${type} !`);
+      return true;
+    } catch (error) {
+      console.log("NS: Ve: depositErc20ToL1 error:", error)
       return error;
     }
   }
