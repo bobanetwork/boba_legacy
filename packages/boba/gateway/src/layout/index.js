@@ -304,7 +304,7 @@ function App() {
                   </Route>
                   <Route path="/bridge" element={<Bridge />} />
                   <Route path="/monster" element={<MonsterWrapper />} />
-                  <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA' />} >
+                  <Route path="/bobachains" element={<Ecosystem ecosystemType='BOBA' />} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
                   <Route path="/lock" element={<Lock />} />
