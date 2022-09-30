@@ -41,6 +41,7 @@ import FarmWrapper from 'containers/farm/FarmWrapper'
 import Dao from 'containers/dao/Dao'
 import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
+import { ROUTES_PATH } from 'util/constant'
 
 function App() {
 
@@ -303,6 +304,9 @@ function App() {
                   </Route>
                   <Route path="/bridge" element={<Bridge />} />
                   <Route path="/monster" element={<MonsterWrapper />} />
+                  <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA' />} >
+                    <Route path=":category" element={<Projects projectType='BOBA' />} />
+                  </Route>
                   <Route path="/lock" element={<Lock />} />
                 </Route>
               </Routes>

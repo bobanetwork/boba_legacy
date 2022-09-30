@@ -2,26 +2,30 @@ import React, { useEffect } from 'react'
 import * as S from './Ecosystem.styles'
 import Button from 'components/button/Button'
 import { Outlet, useNavigate, useParams } from 'react-router-dom'
-import { ECOSYSTEM_CATEGORY } from 'util/constant'
+import { ECOSYSTEM_CATEGORY, BOBA_PROJECTS_CATEGORY, ROUTES_PATH } from 'util/constant'
 
-function ECOSYSTEM() {
+function ECOSYSTEM({ ecosystemType }) {
   const navigate = useNavigate();
   const params = useParams();
 
   useEffect(() => {
     if (!params.category) {
-      navigate(`/ecosystem/defi`)
+      if (ecosystemType !== 'BOBA') {
+        navigate(`${ROUTES_PATH.ECOSYSTEM}/defi`)
+      } else {
+        navigate(`${ROUTES_PATH.BOBA_CHAINS}/mainnet`)
+      }
     }
-  }, [ params, navigate ]);
+  }, [params, navigate, ecosystemType]);
 
   return (
     <S.EcoSystemPageContainer>
       <S.CategoryList>
-        {ECOSYSTEM_CATEGORY.map((cat, i) => {
+        {(ecosystemType !== 'BOBA' ? ECOSYSTEM_CATEGORY : BOBA_PROJECTS_CATEGORY).map((cat, i) => {
           return <Button
             key={i}
             onClick={() => {
-              navigate(`/ecosystem/${cat}`)
+              navigate(`${ecosystemType !== 'BOBA' ? ROUTES_PATH.ECOSYSTEM : ROUTES_PATH.BOBA_CHAINS}/${cat}`)
             }}
             sx={{ textTransform: 'uppercase' }}
             variant={params.category === cat ? "contained" : "standard"}
@@ -39,8 +43,5 @@ function ECOSYSTEM() {
       </S.ProjectListContainer>
     </S.EcoSystemPageContainer>
   )
-
 }
-
-
 export default React.memo(ECOSYSTEM);

@@ -46,5 +46,11 @@ export const menuItems = [
     icon: "DAOIcon",
     title: "DAO",
     url: "/dao"
+  },
+  {
+    key: 'LinksToBobaChains',
+    icon: "LinksToBobaChainsIcon",
+    title: "BOBA Chains",
+    url: "/bobachains"
   }
 ]
