@@ -6,7 +6,7 @@ description: Faucets
 
 ### Ethereum Rinkeby
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://gateway.testnet.avax.boba.network/wallet).
+If you do not have Rinkeby ETH, you can get some from [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://gateway.rinkeby.boba.network/wallet).
 
 ### Avalanche Fuji
 
@@ -14,11 +14,7 @@ If you do not have Fuji Avax, you can get some from [Fuji Faucet](https://faucet
 
 ### Fantom Opera
 
-If you do not have Opera FTN, you can get some from [FTN Faucet](https://faucet.fantom.network/). For Opera BOBA, use the [BOBA faucet](https://gateway.testnet.bobaopera.boba.network/wallet).
-
-### BNB testnet
-
-If you do not have testnet BNB, you can get some from [BNB Faucet](https://testnet.binance.org/faucet-smart). For testnet BOBA, use the [BOBA faucet](https://gateway.testnet.bnb.boba.network/wallet).
+If you do not have Opera FTM, you can get some from [FTM Faucet](https://faucet.fantom.network/). For Opera BOBA, use the [BOBA faucet](https://gateway.testnet.bobaopera.boba.network/wallet).
 
 ### BNB testnet
 
