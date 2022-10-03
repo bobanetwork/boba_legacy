@@ -9,8 +9,9 @@ description: A collection of links and addresses to get started on Boba-Fantom
   * [Bobaopera Testnet Addresses](#bobaopera-testnet-addresses)
   * [Bobaopera Testnet Links and Endpoints](#bobaopera-testnet-links-and-endpoints)
 - [Bobaopera L2 (301) for the Fantom L1 (250)](#bobaopera-l2--301--for-the-fantom-l1--250-)
-  * [Bobaopera Addresses (tbd)](#bobaopera-addresses--tbd-)
-  * [Bobaopera Links and Endpoints (tbd)](#bobaopera-links-and-endpoints--tbd-)
+  * [Bobaopera Addresses](#bobaopera-addresses)
+  * [Analytics and eth_getLogs for Bobaopera](#analytics-and-eth-getlogs-for-bobaopera)
+  * [Bobaopera Links and Endpoints](#bobaopera-links-and-endpoints)
 
 # Bobaopera Testnet L2 (4051) for the Fantom Testnet (4002)
 
@@ -51,16 +52,37 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ## Bobaopera Testnet Links and Endpoints
 
-|               |                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------- |
-| ChainID       | 4051                                                                               |
-| RPC           | [https://testnet.bobaopera.boba.network](https://testnet.bobaopera.boba.network)                     |
-| Replica RPC   | [https://testnet.bobaopera.boba.network](https://testnet.bobaopera.boba.network)     |
-| Gateway       | [https://gateway.testnet.bobaopera.boba.network](https://gateway.testnet.bobaopera.boba.network)     |
+|               |                                                              |
+| ------------- | ------------------------------------------------------------ |
+| ChainID       | 4051                                                         |
+| RPC           | [https://testnet.bobaopera.boba.network](https://testnet.bobaopera.boba.network) |
+| Replica RPC   | [https://replica.testnet.bobaopera.boba.network](https://replica.testnet.bobaopera.boba.network) |
+| Gateway       | [https://gateway.testnet.bobaopera.boba.network](https://gateway.testnet.bobaopera.boba.network) |
 | Blockexplorer | [https://blockexplorer.testnet.bobaopera.boba.network](https://blockexplorer.testnet.bobaopera.boba.network) |
-| Websocket     | [wss://wss.testnet.bobaopera.boba.network](wss://wss.testnet.bobaopera.boba.network)                 |
+| Websocket     | [wss://wss.testnet.bobaopera.boba.network](wss://wss.testnet.bobaopera.boba.network) |
 
 # Bobaopera L2 (301) for the Fantom L1 (250)
+
+## Analytics and eth_getLogs for Bobaopera
+
+To access these images:
+
+* clone the `boba` repo
+
+* switch to `alt-l1` branch.
+
+* Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node) folder
+
+  ```
+  RELEASE_VERSION=v0.X.X
+  ```
+
+The bobaopera's docker-compose file is in [`boba-community/boba-node/docker-compose-bobaopera.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba_community/boba-node)
+
+```bash
+$ docker compose -f docker-compose-bobaopera.yml pull
+$ docker compose -f docker-compose-bobaopera.yml up
+```
 
 ## Bobaopera Addresses (tbd)
 
@@ -70,11 +92,11 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ## Bobaopera Links and Endpoints (tbd)
 
-|               |                                                                                  |
-| ------------- | -------------------------------------------------------------------------------- |
-| ChainID       | 301                                                                             |
-| RPC Read      | [https://tbd](https://tbd)                     |
-| Write RPC     | [https://tbd](https://tbd)                     |
-| Gateway       | [https://tbd](https://tbd)                     |
-| Blockexplorer | [https://tbd](https://tbd)                     |
-| Websocket     | [wss://tbd](wss://tbd)                         |
+|               |                                                              |
+| ------------- | ------------------------------------------------------------ |
+| ChainID       | 301                                                          |
+| RPC           | [https://bobaopera.boba.network](https://bobaopera.boba.network) |
+| Replica RPC   | [https://replica.bobaopera.boba.network](https://replica.bobaopera.boba.network) |
+| Gateway       | [https://gateway.bobaopera.boba.network](https://gateway.bobaopera.boba.network) |
+| Blockexplorer | [https://blockexplorer.bobaopera.boba.network](https://blockexplorer.bobaopera.boba.network) |
+| Websocket     | [wss://wss.bobaopera.boba.network](wss://wss.bobaopera.boba.network) |
