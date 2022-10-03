@@ -19,6 +19,7 @@
   * [Turing Implementation](packages/boba/turing/README.md)
 
 * For Developers
+  * [Testnet faucets for developers](boba\_documentation/developer/faucets.md)
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
