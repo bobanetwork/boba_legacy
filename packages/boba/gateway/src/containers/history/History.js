@@ -48,6 +48,8 @@ import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
 
+import networkService from 'services/networkService'
+
 function History() {
 
   const theme = useTheme()
@@ -139,7 +141,7 @@ function History() {
           <Tabs
             onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
             activeTab={activeTab}
-            tabs={['All', 'Ethereum to Boba Ethereum L2', 'Boba Ethereum L2 to Ethereum', 'Bridge between L1s', 'Pending']}
+            tabs={['All', `${networkService.L1ChainAsset.name} to ${networkService.L1ChainAsset.l2Name}`, `${networkService.L1ChainAsset.l2Name} to ${networkService.L1ChainAsset.name}`, 'Bridge between L1s', 'Pending']}
           />
 
           {activeTab === 'All' && (
@@ -149,14 +151,14 @@ function History() {
             />
           )}
 
-          {activeTab === 'Ethereum to Boba Ethereum L2' &&
+          {activeTab === `${networkService.L1ChainAsset.name} to ${networkService.L1ChainAsset.l2Name}` &&
             <Deposits
               searchHistory={searchHistory}
               transactions={transactions}
             />
           }
 
-          {activeTab === 'Boba Ethereum L2 to Ethereum' &&
+          {activeTab === `${networkService.L1ChainAsset.l2Name} to ${networkService.L1ChainAsset.name}` &&
             <Exits
               searchHistory={searchHistory}
               transactions={transactions}

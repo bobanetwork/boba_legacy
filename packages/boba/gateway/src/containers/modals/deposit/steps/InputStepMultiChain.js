@@ -54,7 +54,6 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   const [ altL1Bridge, setAltL1Bridge ] = useState(networkService.L1ChainAsset.l1NameShort)
 
   const [ validValue, setValidValue ] = useState(false)
-
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT_ALTL1/CREATE' ]))
 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)

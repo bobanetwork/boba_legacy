@@ -28,6 +28,8 @@ import Transaction from 'components/transaction/Transaction'
 
 import * as S from './History.styles';
 
+import networkService from 'services/networkService'
+
 const PER_PAGE = 10
 
 function TX_Deposits({ searchHistory, transactions }) {
@@ -125,7 +127,7 @@ function TX_Deposits({ searchHistory, transactions }) {
                     title={`Hash: ${i.hash}`}
                     time={moment.unix(i.timeStamp).format('lll')}
                     blockNumber={`Block ${i.blockNumber}`}
-                    chain={`Ethereum to Boba Ethereum L2 ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
+                    chain={`${networkService.L1ChainAsset.name} to ${networkService.L1ChainAsset.l2Name} ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
                     typeTX={`TX Type: ${metaData}`}
                     detail={details}
                     oriChain={chain}

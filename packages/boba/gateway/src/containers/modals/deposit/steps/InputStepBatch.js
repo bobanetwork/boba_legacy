@@ -101,7 +101,7 @@ function InputStepBatch({ isBridge, handleClose }) {
     )
 
     if (res) {
-      dispatch(setActiveHistoryTab('Boba Ethereum L2 to Ethereum'))
+      dispatch(setActiveHistoryTab(`${networkService.L1ChainAsset.l2Name} to ${networkService.L1ChainAsset.name}`))
       dispatch(
         openAlert(
           `Your funds were bridged to the L1LP in batch.`

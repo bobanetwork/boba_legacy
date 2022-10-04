@@ -11,6 +11,8 @@ import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
 import { BRIDGE_TYPE } from 'util/constant'
 
+import networkService from 'services/networkService'
+
 function ListToken({
   token,
   chain,
@@ -111,7 +113,7 @@ function ListToken({
                   >
                     Fast Bridge to L2
                 </Button>
-                {token.symbol === 'BOBA' &&
+                {token.symbol === 'BOBA' && !networkService.L1ChainAsset.foundation &&
                   <Button
                     onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
                     color='primary'
@@ -226,7 +228,7 @@ function ListToken({
               >
                 Fast Bridge to L2
             </Button>
-            {token.symbol === 'BOBA' &&
+            {token.symbol === 'BOBA' && !networkService.L1ChainAsset.foundation &&
 
               <Button
                 onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
