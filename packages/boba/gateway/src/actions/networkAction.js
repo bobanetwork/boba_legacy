@@ -97,6 +97,11 @@ export function depositErc20(value, currency, currencyL2) {
   )
 }
 
+//DEPOSIT ERC20 to Alt L1 bridge
+export function depositErc20ToL1(payload) {
+  return createAction('DEPOSIT_ALTL1/CREATE', () => networkService.depositErc20ToL1(payload))
+}
+
 //FARM
 export function farmL1(value_Wei_String, currencyAddress) {
   return createAction('FARM/CREATE', () =>
@@ -115,7 +120,7 @@ export function getReward(currencyAddress, value_Wei_String, L1orL2Pool) {
 }
 
 export function withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool) {
-  console.log("Withdrawing ERC20 Liquidity")
+
   return createAction('FARM/WITHDRAW', () =>
     networkService.withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool)
   )

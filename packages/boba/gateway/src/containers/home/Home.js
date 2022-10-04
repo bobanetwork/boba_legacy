@@ -56,7 +56,7 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-  selectNetwork,
+  selectNetwork
 } from 'selectors/setupSelector'
 import { selectAlert, selectError } from 'selectors/uiSelector'
 import { selectModalState } from 'selectors/uiSelector'

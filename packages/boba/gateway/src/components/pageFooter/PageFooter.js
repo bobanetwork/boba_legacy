@@ -7,6 +7,7 @@ import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
 import networkService from 'services/networkService'
+import { ROUTES_PATH } from 'util/constant'
 
 const PageFooter = ({maintenance}) => {
 
@@ -64,7 +65,13 @@ const PageFooter = ({maintenance}) => {
         {!isMobile && <GasSwitcher />}
         <S.LinkWrapper>
           <S.FooterLink
-            to="/bobascope"
+            to={ROUTES_PATH.HELP}
+          >FAQs</S.FooterLink>
+            <S.FooterLink
+              to={ROUTES_PATH.AIRDROP}
+          >AirDrop</S.FooterLink>
+          <S.FooterLink
+            to={ROUTES_PATH.BOBASCOPE}
           >BobaScope</S.FooterLink>
           <S.FooterLinkExt
             href={networkService.blockExplorerUrls}

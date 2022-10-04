@@ -9,6 +9,7 @@ import { selectLookupPrice } from 'selectors/lookupSelector'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
+import { BRIDGE_TYPE } from 'util/constant'
 
 function ListToken({
   token,
@@ -91,8 +92,8 @@ function ListToken({
               {enabled && chain === 'L1' &&
                 <>
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, false) }}
-                    color='primary'
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
+                    color='neutral'
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -100,9 +101,8 @@ function ListToken({
                   >
                     Bridge to L2
                   </Button>
-
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, true) }}
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
                     color='primary'
                     disabled={disabled}
                     variant="outlined"
@@ -110,8 +110,20 @@ function ListToken({
                     fullWidth
                   >
                     Fast Bridge to L2
+                </Button>
+                {token.symbol === 'BOBA' &&
+                  <Button
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
+                    color='primary'
+                    disabled={disabled}
+                    variant="contained"
+                    tooltip="A multi-chain bridge to Alt L1."
+                    fullWidth
+                  >
+                    Bridge to alt L1
                   </Button>
-                </>
+                }
+              </>
               }
 
               {enabled && chain === 'L2' &&
@@ -187,14 +199,15 @@ function ListToken({
         <S.TableCell
           sx={{
             gap: '5px',
-            width: '40%'
+            width: '40%',
+            justifyContent: 'flex-start'
           }}
         >
           {enabled && chain === 'L1' &&
             <>
               <Button
-                onClick={() => { handleModalClick('depositModal', token, false) }}
-                color='primary'
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
+                color='neutral'
                 variant="outlined"
                 disabled={disabled}
                 tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -204,7 +217,7 @@ function ListToken({
               </Button>
 
               <Button
-                onClick={() => { handleModalClick('depositModal', token, true) }}
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
                 color='primary'
                 disabled={disabled}
                 variant="outlined"
@@ -212,7 +225,19 @@ function ListToken({
                 fullWidth
               >
                 Fast Bridge to L2
+            </Button>
+            {token.symbol === 'BOBA' &&
+
+              <Button
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
+                color='primary'
+                disabled={disabled}
+                variant="contained"
+                fullWidth
+              >
+                Bridge to alt L1
               </Button>
+            }
             </>
           }
           {enabled && chain === 'L2' &&

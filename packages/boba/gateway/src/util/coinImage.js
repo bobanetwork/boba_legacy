@@ -34,6 +34,8 @@ import moonbase from 'images/moonbase.png'
 import avaxLogo from 'images/avax.svg'
 import evoLogo from 'images/evo.png'
 import CGTLogo from 'images/CGT.svg'
+import avaxLog from 'images/avax.svg'
+import glmrLog from 'images/glmr.svg'
 
 export const getCoinImage = (symbol) => {
 
