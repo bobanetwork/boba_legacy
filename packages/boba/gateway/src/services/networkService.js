@@ -72,10 +72,10 @@ import veJson from "../deployment/contracts/ve.json"
 // import dispatcherJson from "../deployment/contracts/BaseV1Dispatcher.json"
 
 // multi chain alt l1s ABI's
-// import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
-import ETHL1BridgeJson from "../deployment/contracts/crosschain/EthBridge.json"
-import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardERC20.json"
-import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
+import AltL1BridgeJson from "@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json"
+import ETHL1BridgeJson from "@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json"
+import L2StandardERC20Json from "@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json"
+import LZEndpointMockJson from "@boba/contracts/artifacts/contracts/test-helpers/mocks/LZEndpointMock.sol/LZEndpointMock.json"
 
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
@@ -122,9 +122,9 @@ const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 const L2_SecondaryFeeToken_Address = '0x4200000000000000000000000000000000000023'
-let supportedAltL1Chains = []
 
 let allAddresses = {}
+
 // preload allAddresses
 if (process.env.REACT_APP_CHAIN === 'bobaBase') {
   allAddresses = {
@@ -132,15 +132,16 @@ if (process.env.REACT_APP_CHAIN === 'bobaBase') {
     L1LPAddress: addresses_BobaBase.Proxy__L1LiquidityPool,
     L2LPAddress: addresses_BobaBase.Proxy__L2LiquidityPool
   }
-  supportedAltL1Chains = ['Moonbeam']
 }
 if (process.env.REACT_APP_CHAIN === 'bobaBeam') {
   allAddresses = {
     ...addresses_BobaBeam,
     L1LPAddress: addresses_BobaBeam.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_BobaBeam.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_BobaBeam.Proxy__L2LiquidityPool,
+    ...layerZeroMainnet.BOBA_Bridges.Mainnet,
+    ...layerZeroMainnet.Layer_Zero_Protocol.Moonbeam,
+    layerZeroTargetChainID: layerZeroMainnet.Layer_Zero_Protocol.Mainnet.Layer_Zero_ChainId,
   }
-  supportedAltL1Chains = ['Moonbeam']
 }
 if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
   allAddresses = {
@@ -160,7 +161,10 @@ if (process.env.REACT_APP_CHAIN === 'bobaAvax') {
   allAddresses = {
     ...addresses_BobaAvax,
     L1LPAddress: addresses_BobaAvax.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_BobaAvax.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_BobaAvax.Proxy__L2LiquidityPool,
+    ...layerZeroMainnet.BOBA_Bridges.Mainnet,
+    ...layerZeroMainnet.Layer_Zero_Protocol.Avalanche,
+    layerZeroTargetChainID: layerZeroMainnet.Layer_Zero_Protocol.Mainnet.Layer_Zero_ChainId,
   }
 }
 if (process.env.REACT_APP_CHAIN === 'bobaBnbTestnet') {
@@ -174,7 +178,10 @@ if (process.env.REACT_APP_CHAIN === 'bobaBnb') {
   allAddresses = {
     ...addresses_BobaBnb,
     L1LPAddress: addresses_BobaBnb.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_BobaBnb.Proxy__L2LiquidityPool
+    L2LPAddress: addresses_BobaBnb.Proxy__L2LiquidityPool,
+    ...layerZeroMainnet.BOBA_Bridges.Mainnet,
+    ...layerZeroMainnet.Layer_Zero_Protocol.BNB,
+    layerZeroTargetChainID: layerZeroMainnet.Layer_Zero_Protocol.Mainnet.Layer_Zero_ChainId,
   }
 }
 
@@ -185,6 +192,7 @@ const supportedMultiChains = ['bobaBase', 'bobaOperaTestnet', 'bobaFuji', 'bobaB
 const L1ChainAssets = {
   'bobaBase': {
     name: 'Moonbase',
+    l1NameShort: 'Moonbase',
     l2Name: 'Bobabase',
     icon: (bool) => <MoonbaseIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
@@ -192,6 +200,7 @@ const L1ChainAssets = {
   },
   'bobaBeam': {
     name: 'Moonbeam',
+    l1NameShort: 'Moonbeam',
     l2Name: 'Bobabeam',
     icon: (bool) => <MoonbeamIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
@@ -200,6 +209,7 @@ const L1ChainAssets = {
   },
   'bobaOperaTestnet': {
     name: 'Fantom Testenet',
+    l1NameShort: 'Fantom',
     l2Name: 'Bobaopera Testnet',
     icon: (bool) => <FantomIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
@@ -208,6 +218,7 @@ const L1ChainAssets = {
   },
   'bobaFuji': {
     name: 'Avalanche Testnet',
+    l1NameShort: 'Avalanche',
     l2Name: 'Boba Avalanche Testnet',
     icon: (bool) => <AvaxIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
@@ -216,6 +227,7 @@ const L1ChainAssets = {
   },
   'bobaAvax': {
     name: 'Avalanche Mainnet C-Chain',
+    l1NameShort: 'Avalanche',
     l2Name: 'Boba Avalanche Mainnet',
     icon: (bool) => <AvaxIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'EVO', 'USDT.e', 'USDt', 'USDC.e', 'BUSD.e', 'BUSD', 'DAI.e'],
@@ -226,6 +238,7 @@ const L1ChainAssets = {
   },
   'bobaBnbTestnet': {
     name: 'BNB Testnet',
+    l1NameShort: 'BNB',
     l2Name: 'Boba BNB Testnet',
     icon: (bool) => <BnbIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
@@ -234,6 +247,7 @@ const L1ChainAssets = {
   },
   'bobaBnb': {
     name: 'Binance Smart Chain Mainnet',
+    l1NameShort: 'BNB',
     l2Name: 'Boba BNB Mainnet',
     icon: (bool) => <BnbIcon selected={bool}/>,
     supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'BUSD', 'USDC', "USDT"],
@@ -342,7 +356,7 @@ class NetworkService {
 
     this.L1ChainAsset = L1ChainAssets[this.chain]
     // support alt l1 tokens
-    this.supportedAltL1Chains = supportedAltL1Chains
+    this.supportedAltL1Chains = [L1ChainAssets[this.chain].l1NameShort]
   }
 
   bindProviderListeners() {
@@ -4072,12 +4086,12 @@ class NetworkService {
       return
     }
     try {
-      const pResponse = supportedAltL1Chains.map(async (type) => {
+      const pResponse = this.supportedAltL1Chains.map(async (type) => {
         let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
-        let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
-        let L0_CHAIN_ID = allAddresses.Layer_Zero_ChainId;
-        let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
-        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
+        let ETH_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
+        let L0_TARGET_CHAIN_ID = allAddresses.layerZeroTargetChainID;
+        let ALT_L1_BOBA_ADDRESS = allAddresses.Eth_TK_BOBA;
+        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__${type}BridgeToEth`];
 
         // Layer zero doesn't support moonbase
         // return 0 for those bridges that haven't been implemented yet
@@ -4087,7 +4101,7 @@ class NetworkService {
 
         const Proxy__EthBridge = new ethers.Contract(
           PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
-          ETHL1BridgeJson.abi,
+          AltL1BridgeJson.abi,
           this.provider.getSigner()
         );
 
@@ -4111,7 +4125,7 @@ class NetworkService {
 
         console.log(`🆙 loading 💵 FEE for ${type}`);
         const estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-          L0_CHAIN_ID,
+          L0_TARGET_CHAIN_ID,
           Proxy__EthBridge.address,
           payload,
           false,
@@ -4147,13 +4161,14 @@ class NetworkService {
     }
     try {
       let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
-      let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
-      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
-      let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
+      let L0_TARGET_CHAIN_ID = allAddresses.layerZeroTargetChainID;
+      let ETH_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
+      let ALT_L1_BOBA_ADDRESS = allAddresses.Eth_TK_BOBA;
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__${type}BridgeToEth`];
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(
         PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
-        ETHL1BridgeJson.abi,
+        AltL1BridgeJson.abi,
         this.provider.getSigner()
       );
 
@@ -4197,7 +4212,7 @@ class NetworkService {
       );
 
       let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-        allAddresses.Layer_Zero_ChainId,
+        L0_TARGET_CHAIN_ID,
         Proxy__EthBridge.address,
         payload,
         false,
@@ -4206,9 +4221,8 @@ class NetworkService {
 
       console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
-      await Proxy__EthBridge.depositERC20(
+      await Proxy__EthBridge.withdraw(
         ETH_L1_BOBA_ADDRESS,
-        ALT_L1_BOBA_ADDRESS,
         ethers.utils.parseEther(value),
         ethers.constants.AddressZero,
         "0x", // adapterParams

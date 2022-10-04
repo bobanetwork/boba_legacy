@@ -117,10 +117,10 @@ function ListToken({
                     color='primary'
                     disabled={disabled}
                     variant="contained"
-                    tooltip="A multi-chain bridge to Alt L1."
+                    tooltip="A multi-chain bridge to Ethereum."
                     fullWidth
                   >
-                    Bridge to alt L1
+                    Bridge to Ethereum
                   </Button>
                 }
               </>
@@ -235,7 +235,7 @@ function ListToken({
                 variant="contained"
                 fullWidth
               >
-                Bridge to alt L1
+                Bridge to Ethereum
               </Button>
             }
             </>
