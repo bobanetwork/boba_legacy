@@ -122,9 +122,9 @@ const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 const L2_SecondaryFeeToken_Address = '0x4200000000000000000000000000000000000023'
+let supportedAltL1Chains = []
 
 let allAddresses = {}
-let supportedAltL1Chains =[]
 // preload allAddresses
 if (process.env.REACT_APP_CHAIN === 'bobaBase') {
   allAddresses = {
@@ -140,6 +140,7 @@ if (process.env.REACT_APP_CHAIN === 'bobaBeam') {
     L1LPAddress: addresses_BobaBeam.Proxy__L1LiquidityPool,
     L2LPAddress: addresses_BobaBeam.Proxy__L2LiquidityPool
   }
+  supportedAltL1Chains = ['Moonbeam']
 }
 if (process.env.REACT_APP_CHAIN === 'bobaOperaTestnet') {
   allAddresses = {
