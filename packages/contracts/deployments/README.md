@@ -8,3 +8,4 @@
 - [Boba BNB (public testnet)](./bobabnbtestnet#readme)
 - [Boba BNB (public mainnet)](./bobabnb#readme)
 - [Bobabeam (public mainnet)](./bobabeam#readme)
+- [Bobaopera (public mainnet)](./bobabopera#readme)
