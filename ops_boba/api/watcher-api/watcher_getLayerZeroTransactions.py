@@ -3,7 +3,7 @@ import yaml
 import pymysql
 
 
-def watcher_getLayerZeroTransaction(event, context):
+def watcher_getLayerZeroTransactions(event, context):
     # Parse incoming event
     body = json.loads(event["body"])
     address = body.get("address")
