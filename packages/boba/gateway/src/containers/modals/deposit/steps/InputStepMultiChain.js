@@ -22,9 +22,10 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
+import parse from 'html-react-parser'
 import Select from 'components/select/Select'
-import { selectAltL1DepositCost } from 'selectors/balanceSelector'
-import { fetchAltL1DepositFee } from 'actions/balanceAction'
+import { selectAltL1DepositCost, selectL1FeeBalance } from 'selectors/balanceSelector'
+import { fetchAltL1DepositFee, fetchL1FeeBalance } from 'actions/balanceAction'
 
 import networkService from 'services/networkService'
 
@@ -58,6 +59,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
   const depositFees = useSelector(selectAltL1DepositCost)
+  const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
   const maxValue = logAmount(token.balance, token.decimals)
 
@@ -96,6 +98,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
+    dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
     dispatch(fetchAltL1DepositFee())
   },[dispatch])
 
@@ -148,6 +151,16 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
       ...provided,
       color: state.isSelected ? '#282828' : '#909090',
     }),
+  }
+
+  let ETHstring = ''
+  let warning = false
+
+  if (depositFees[altL1Bridge]) {
+    if(Number(depositFees[altL1Bridge].fee) > Number(feeBalance)) {
+      warning = true
+      ETHstring = `WARNING: your L1 ${networkService.L1NativeTokenSymbol} balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.`
+    }
   }
 
   return (
@@ -204,6 +217,12 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           </Typography>
         )}
 
+        {warning && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            {parse(ETHstring)}
+          </Typography>
+        )}
+
       </Box>
       <WrapperActionsModal>
         <Button
@@ -222,7 +241,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           variant="contained"
           loading={depositLoading}
           tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to alt L1"}
-          disabled={!validValue || !altL1Bridge}
+          disabled={!validValue || !altL1Bridge || warning}
           triggerTime={new Date()}
           fullWidth={isMobile}
         >

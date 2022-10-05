@@ -119,10 +119,12 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 let supportedAltL1Chains = []
 
 let allAddresses = {}
+let l0AllProtocols = {}
 // preload allAddresses
 if (APP_CHAIN === 'rinkeby') {
   const bobaBridges = layerZeroTestnet.BOBA_Bridges.Testnet;
   const l0Protocols = layerZeroTestnet.Layer_Zero_Protocol.Testnet;
+  l0AllProtocols = layerZeroTestnet.Layer_Zero_Protocol;
   allAddresses = {
     ...addresses_Rinkeby,
     L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
@@ -134,6 +136,7 @@ if (APP_CHAIN === 'rinkeby') {
 } else if (APP_CHAIN === 'mainnet') {
   const bobaBridges = layerZeroMainnet.BOBA_Bridges.Mainnet;
   const l0Protocols = layerZeroMainnet.Layer_Zero_Protocol.Mainnet;
+  l0AllProtocols = layerZeroMainnet.Layer_Zero_Protocol;
   allAddresses = {
     ...addresses_Mainnet,
     L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
@@ -141,7 +144,7 @@ if (APP_CHAIN === 'rinkeby') {
     ...bobaBridges,
     ...l0Protocols
   }
-  supportedAltL1Chains = ['Moonbeam']
+  supportedAltL1Chains = ['Moonbeam','BNB', 'Fantom', 'Avalanche']
 }
 let allTokens = {}
 
@@ -4915,7 +4918,7 @@ class NetworkService {
       const pResponse = supportedAltL1Chains.map(async (type) => {
         let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
         let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
-        let L0_CHAIN_ID = allAddresses.Layer_Zero_ChainId;
+        let L0_TARGET_CHAIN_ID = l0AllProtocols[type].Layer_Zero_ChainId;
         let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
         let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
 
@@ -4950,8 +4953,9 @@ class NetworkService {
         );
 
         console.log(`🆙 loading 💵 FEE for ${type}`);
+        console.log("L0_TARGET_CHAIN_ID: ", L0_TARGET_CHAIN_ID)
         const estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-          L0_CHAIN_ID,
+          L0_TARGET_CHAIN_ID,
           Proxy__EthBridge.address,
           payload,
           false,
@@ -4987,6 +4991,7 @@ class NetworkService {
     }
     try {
       let L0_ETH_ENDPOINT = allAddresses.Layer_Zero_Endpoint;
+      let L0_TARGET_CHAIN_ID = l0AllProtocols[type].Layer_Zero_ChainId;
       let ETH_L1_BOBA_ADDRESS = allAddresses.TK_L1BOBA;
       let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
       let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
@@ -5037,7 +5042,7 @@ class NetworkService {
       );
 
       let estimatedFee = await ETHLayzerZeroEndpoint.estimateFees(
-        allAddresses.Layer_Zero_ChainId,
+        L0_TARGET_CHAIN_ID,
         Proxy__EthBridge.address,
         payload,
         false,
