@@ -22,9 +22,10 @@ import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
-import Select from 'components/select/Select'
-import { selectAltL1DepositCost } from 'selectors/balanceSelector'
-import { fetchAltL1DepositFee } from 'actions/balanceAction'
+import parse from 'html-react-parser'
+
+import { selectAltL1DepositCost, selectL1FeeBalance } from 'selectors/balanceSelector'
+import { fetchAltL1DepositFee, fetchL1FeeBalance } from 'actions/balanceAction'
 
 import networkService from 'services/networkService'
 
@@ -50,7 +51,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   const dispatch = useDispatch()
 
   const [ value, setValue ] = useState('')
-  const [ altL1Bridge, setAltL1Bridge ] = useState('')
+  const [ altL1Bridge, setAltL1Bridge ] = useState(networkService.L1ChainAsset.l1NameShort)
 
   const [ validValue, setValidValue ] = useState(false)
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT_ALTL1/CREATE' ]))
@@ -58,6 +59,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
   const depositFees = useSelector(selectAltL1DepositCost)
+  const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
   const maxValue = logAmount(token.balance, token.decimals)
 
@@ -96,6 +98,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   useEffect(() => {
+    dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
     dispatch(fetchAltL1DepositFee())
   },[dispatch])
 
@@ -139,25 +142,24 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
       </Box>)
   }
 
-  const onBridgeChange = (e) => {
-    setAltL1Bridge(e.target.value)
-  }
+  let ETHstring = ''
+  let warning = false
 
-  const customStyles = {
-    option: (provided, state) => ({
-      ...provided,
-      color: state.isSelected ? '#282828' : '#909090',
-    }),
+  if (depositFees[altL1Bridge]) {
+    if(Number(depositFees[altL1Bridge].fee) > Number(feeBalance)) {
+      warning = true
+      ETHstring = `WARNING: your L1 ${networkService.L1NativeTokenSymbol} balance of ${Number(feeBalance).toFixed(4)} is not sufficient to cover this transaction.`
+    }
   }
 
   return (
     <>
       <Box>
         <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
-          Bridge {token && token.symbol ? token.symbol : ''} to Alt L1s
+          Bridge {token && token.symbol ? token.symbol : ''} to Ethereum
         </Typography>
 
-        <Box display="flex" fullWidth py={2} flexDirection="column"
+        {/* <Box display="flex" fullWidth py={2} flexDirection="column"
         >
           <Select
             options={options}
@@ -167,10 +169,10 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
             sx={{ marginBottom: '20px' }}
             value={altL1Bridge}
           />
-        </Box>
+        </Box> */}
 
         <Input
-          label="Amount to bridge to alt L1s"
+          label="Amount to bridge to Ethereum"
           placeholder="0.0"
           value={value}
           type="number"
@@ -194,13 +196,19 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
         {!!altL1Bridge && depositFees? <>
           <Typography variant='body2' sx={{ mt: 2 }}>
-            Estimated fee for bridging {value} {token.symbol} is {depositFees[altL1Bridge].fee} ETH
+            Estimated fee for bridging {value} {token.symbol} is {depositFees[altL1Bridge].fee} {networkService.L1NativeTokenSymbol}
           </Typography>
         </> : null}
 
         {!!convertToUSD && (
           <Typography variant="body2" sx={{ mt: 2 }}>
             {`Amount in USD ${amountToUsd(value, lookupPrice, token).toFixed(2)}`}
+          </Typography>
+        )}
+
+        {warning && (
+          <Typography variant="body2" sx={{mt: 2, color: 'red'}}>
+            {parse(ETHstring)}
           </Typography>
         )}
 
@@ -222,7 +230,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           variant="contained"
           loading={depositLoading}
           tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to alt L1"}
-          disabled={!validValue || !altL1Bridge}
+          disabled={!validValue || !altL1Bridge || warning}
           triggerTime={new Date()}
           fullWidth={isMobile}
         >

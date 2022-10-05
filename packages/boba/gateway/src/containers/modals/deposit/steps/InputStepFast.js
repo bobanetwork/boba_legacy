@@ -159,7 +159,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       res = await dispatch(depositL1LP(token.address, value_Wei_String))
 
       if (res) {
-        dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+        dispatch(setActiveHistoryTab(`${networkService.L1ChainAsset.Name} to ${networkService.L1ChainAsset.l2name}`))
         dispatch(
           openAlert(
             `${networkService.L1NativeTokenSymbol} was bridged. You will receive approximately
@@ -195,7 +195,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     )
 
     if (res) {
-      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      dispatch(setActiveHistoryTab(`${networkService.L1ChainAsset.Name} to ${networkService.L1ChainAsset.l2name}`))
       dispatch(
         openAlert(
           `${token.symbol} was bridged to the L1LP. You will receive approximately
