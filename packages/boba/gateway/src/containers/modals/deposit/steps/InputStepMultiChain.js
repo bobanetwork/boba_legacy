@@ -241,7 +241,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
           variant="contained"
           loading={depositLoading}
           tooltip={depositLoading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to bridge your funds to alt L1"}
-          disabled={!validValue || !altL1Bridge}
+          disabled={!validValue || !altL1Bridge || warning}
           triggerTime={new Date()}
           fullWidth={isMobile}
         >
