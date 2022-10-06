@@ -2843,8 +2843,20 @@ class NetworkService {
         //getting eth balance
         //console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
-        tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
-        tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
+        try {
+          tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
+        } catch (error) {
+          if (tokenAddress === '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a') {
+            tokenSymbol = 'CGT'
+          }
+        }
+        try {
+          tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
+        } catch (error) {
+          if (tokenAddress === '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a') {
+            tokenName = 'Curio Governance Token'
+          }
+        }
         decimals = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).decimals()
       }
 
