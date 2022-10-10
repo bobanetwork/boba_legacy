@@ -1,0 +1,503 @@
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8.9;
+
+/* External Imports */
+import '@openzeppelin/contracts/utils/math/SafeMath.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+
+/**
+ * @title Teleportation
+ *
+ * Shout out to optimisim for providing the inspiration for this contract:
+ * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L1/teleportr/TeleportrDeposit.sol
+ * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L2/teleportr/TeleportrDisburser.sol
+ */
+contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
+    using SafeMath for uint256;
+    using SafeERC20 for IERC20;
+
+    /**************
+     *   Struct   *
+     **************/
+    struct Disbursement {
+        uint256 amount;
+        address addr;
+    }
+
+    /*************
+     * Variables *
+     *************/
+
+    address public disburser;
+    address public owner;
+    address public BobaTokenAddress;
+
+    // The minimum amount that be deposited in a receive.
+    uint256 public minDepositAmount;
+    // The maximum amount that be deposited in a receive.
+    uint256 public maxDepositAmount;
+    // The total number of successful deposits received.
+    uint256 public totalDeposits;
+    /// The total number of disbursements processed.
+    uint256 public totalDisbursements;
+
+    // set maximum amount of tokens can be transferred in 24 hours
+    uint256 public maxTransferAmountPerDay;
+    // The total amount of tokens transferred in 24 hours
+    uint256 public transferredAmount;
+    // The timestamp of the checkpoint
+    uint256 public transferTimestampCheckPoint;
+
+    /********************
+     *       Events     *
+     ********************/
+
+    event MinDepositAmountSet(
+        uint256 previousAmount,
+        uint256 newAmount
+    );
+
+    event MaxDepositAmountSet(
+        uint256 previousAmount,
+        uint256 newAmount
+    );
+
+    event MaxTransferAmountPerDaySet(
+        uint256 previousAmount,
+        uint256 newAmount
+    );
+
+    event NativeBOBABalanceWithdrawn(
+        address indexed owner,
+        uint256 balance
+    );
+
+    event BOBABalanceWithdrawn(
+        address indexed owner,
+        uint256 balance
+    );
+
+    event BobaReceived(
+        uint256 indexed depositId,
+        address indexed emitter,
+        uint256 indexed amount
+    );
+
+    event DisbursementSuccess(
+        uint256 indexed depositId,
+        address indexed to,
+        uint256 amount
+    );
+
+    event DisbursementFailed(
+        uint256 indexed depositId,
+        address indexed to,
+        uint256 amount
+    );
+
+    event DisburserTransferred(
+        address newDisburser
+    );
+
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    /********************
+     *    Constructor   *
+     ********************/
+
+    constructor() {
+        totalDisbursements = 0;
+    }
+
+    /**********************
+     * Function Modifiers *
+     **********************/
+
+    modifier onlyDisburser() {
+        require(msg.sender == disburser || disburser == address(0), 'Caller is not the disburser');
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner || owner == address(0), 'Caller is not the owner');
+        _;
+    }
+
+    modifier onlyNotInitialized() {
+        require(address(BobaTokenAddress) == address(0), "Contract has been initialized");
+        _;
+    }
+
+    modifier onlyInitialized() {
+        require(address(BobaTokenAddress) != address(0), "Contract has not yet been initialized");
+        _;
+    }
+
+    modifier onlyAltL2s() {
+        require(address(BobaTokenAddress) == 0x4200000000000000000000000000000000000006, "Only alt L2s can call this function");
+        _;
+    }
+
+    modifier onlyNotAltL2s() {
+        require(address(BobaTokenAddress) != 0x4200000000000000000000000000000000000006, "Only not alt L2s can call this function");
+        _;
+    }
+
+    /********************
+     * Fall back Functions *
+     ********************/
+
+    receive()
+        external
+        payable
+        onlyAltL2s()
+    {}
+
+    /********************
+     * Public Functions *
+     ********************/
+
+    /**
+     * @dev Initialize this contract.
+     *
+     * @param _BobaTokenAddress BOBA token address
+     * @param _minDepositAmount The initial minimum deposit amount.
+     * @param _maxDepositAmount The initial maximum deposit amount.
+     */
+    function initialize(
+        address _BobaTokenAddress,
+        uint256 _minDepositAmount,
+        uint256 _maxDepositAmount
+    )
+        external
+        onlyOwner()
+        onlyNotInitialized()
+        initializer()
+    {
+        require(_BobaTokenAddress != address(0), "zero address not allowed");
+        minDepositAmount = _minDepositAmount;
+        maxDepositAmount = _maxDepositAmount;
+        totalDeposits = 0;
+        BobaTokenAddress = _BobaTokenAddress;
+        disburser = msg.sender;
+        owner = msg.sender;
+
+       // set maximum amount of tokens can be transferred in 24 hours
+        transferTimestampCheckPoint = block.timestamp;
+        maxTransferAmountPerDay = 100_000e18;
+
+        __Context_init_unchained();
+        __Pausable_init_unchained();
+        __ReentrancyGuard_init_unchained();
+
+        emit MinDepositAmountSet(0, _minDepositAmount);
+        emit MaxDepositAmountSet(0, _maxDepositAmount);
+        emit MaxTransferAmountPerDaySet(0, maxTransferAmountPerDay);
+        emit DisburserTransferred(owner);
+        emit OwnershipTransferred(owner);
+    }
+
+    /**
+     * @dev Accepts deposits that will be disbursed to the sender's address on target L2.
+     * The method reverts if the amount is less than the current
+     * minDepositAmount, the amount is greater than the current
+     * maxDepositAmount.
+     *
+     * @param _amount The amount of BOBA to deposit.
+     */
+    function teleportBOBA(uint256 _amount)
+        external
+        onlyNotAltL2s()
+        whenNotPaused()
+    {
+        require(_amount >= minDepositAmount, "Deposit amount is too small");
+        require(_amount <= maxDepositAmount, "Deposit amount is too big");
+
+        // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
+        // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
+        if (block.timestamp < transferTimestampCheckPoint + 86400) {
+            transferredAmount += _amount;
+            require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
+        } else {
+            transferredAmount = _amount;
+            require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
+            transferTimestampCheckPoint = block.timestamp;
+        }
+
+        IERC20(BobaTokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
+
+        unchecked {
+            totalDeposits += 1;
+        }
+
+        emit BobaReceived(totalDeposits, msg.sender, _amount);
+    }
+
+    /**
+     * @dev Accepts deposits that will be disbursed to the sender's address on target L2.
+     * The method reverts if the amount is less than the current
+     * minDepositAmount, the amount is greater than the current
+     * maxDepositAmount.
+     *
+     * @param _amount The amount of BOBA to deposit.
+     */
+    function teleportNativeBOBA(uint256 _amount)
+        external
+        payable
+        onlyAltL2s()
+        whenNotPaused()
+    {
+        require(_amount >= minDepositAmount, "Deposit amount is too small");
+        require(_amount <= maxDepositAmount, "Deposit amount is too big");
+        require(_amount == msg.value, "Amount does not match msg.value");
+
+        // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
+        // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
+        if (block.timestamp < transferTimestampCheckPoint + 86400) {
+            transferredAmount += _amount;
+            require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
+        } else {
+            transferredAmount = _amount;
+            require(transferredAmount <= maxTransferAmountPerDay, "max amount per day exceeded");
+            transferTimestampCheckPoint = block.timestamp;
+        }
+
+        unchecked {
+            totalDeposits += 1;
+        }
+
+        emit BobaReceived(totalDeposits, msg.sender, _amount);
+    }
+
+    /**
+     * @dev Accepts a list of Disbursements and forwards the amount paid to
+     * the contract to each recipient. The method reverts if there are zero
+     * disbursements, the total amount to forward differs from the amount sent
+     * in the transaction, or the _nextDepositId is unexpected. Failed
+     * disbursements will not cause the method to revert, but will instead be
+     * held by the contract and availabe for the owner to withdraw.
+     *
+     * @param _nextDepositId The depositId of the first Dispursement.
+     * @param _disbursements A list of Disbursements to process.
+     */
+    function disburseNativeBOBA(uint256 _nextDepositId, Disbursement[] calldata _disbursements)
+        external
+        payable
+        onlyDisburser()
+        onlyAltL2s()
+        whenNotPaused()
+    {
+        // Ensure there are disbursements to process.
+        uint256 _numDisbursements = _disbursements.length;
+        require(_numDisbursements > 0, "No disbursements");
+
+        // Ensure the _nextDepositId matches our expected value.
+        uint256 _depositId = totalDisbursements;
+        require(_depositId == _nextDepositId, "Unexpected next deposit id");
+        unchecked {
+            totalDisbursements += _numDisbursements;
+        }
+
+        // Ensure the amount sent in the transaction is equal to the sum of the
+        // disbursements.
+        uint256 _totalDisbursed = 0;
+        for (uint256 i = 0; i < _numDisbursements; i++) {
+            _totalDisbursed += _disbursements[i].amount;
+        }
+
+        // Ensure the balance is enough to cover the disbursements.
+        require(_totalDisbursed <= address(this).balance, "Insufficient balance to disburse");
+
+        // Process disbursements.
+        for (uint256 i = 0; i < _numDisbursements; i++) {
+            uint256 _amount = _disbursements[i].amount;
+            address _addr = _disbursements[i].addr;
+
+            // Deliver the dispursement amount to the receiver. If the
+            // disbursement fails, the amount will be kept by the contract
+            // rather than reverting to prevent blocking progress on other
+            // disbursements.
+
+            // slither-disable-next-line calls-loop,reentrancy-events
+            (bool success, ) = _addr.call{ value: _amount, gas: 1000000 }("");
+            if (success) emit DisbursementSuccess(_depositId, _addr, _amount);
+            else emit DisbursementFailed(_depositId, _addr, _amount);
+
+            unchecked {
+                _depositId += 1;
+            }
+        }
+    }
+
+    /**
+     * @dev Accepts a list of Disbursements and forwards the amount paid to
+     * the contract to each recipient. The method reverts if there are zero
+     * disbursements, the total amount to forward differs from the amount sent
+     * in the transaction, or the _nextDepositId is unexpected. Failed
+     * disbursements will not cause the method to revert, but will instead be
+     * held by the contract and availabe for the owner to withdraw.
+     *
+     * @param _nextDepositId The depositId of the first Dispursement.
+     * @param _disbursements A list of Disbursements to process.
+     */
+    function disburseBOBA(uint256 _nextDepositId, Disbursement[] calldata _disbursements)
+        external
+        payable
+        onlyDisburser()
+        onlyNotAltL2s()
+        whenNotPaused()
+    {
+        // Ensure there are disbursements to process.
+        uint256 _numDisbursements = _disbursements.length;
+        require(_numDisbursements > 0, "No disbursements");
+
+        // Ensure the _nextDepositId matches our expected value.
+        uint256 _depositId = totalDisbursements;
+        require(_depositId == _nextDepositId, "Unexpected next deposit id");
+        unchecked {
+            totalDisbursements += _numDisbursements;
+        }
+
+        // Ensure the amount sent in the transaction is equal to the sum of the
+        // disbursements.
+        uint256 _totalDisbursed = 0;
+        for (uint256 i = 0; i < _numDisbursements; i++) {
+            _totalDisbursed += _disbursements[i].amount;
+        }
+
+        // Ensure the balance is enough to cover the disbursements.
+        require(_totalDisbursed <= IERC20(BobaTokenAddress).balanceOf(address(this)), "Insufficient balance to disburse");
+
+        // Process disbursements.
+        for (uint256 i = 0; i < _numDisbursements; i++) {
+            uint256 _amount = _disbursements[i].amount;
+            address _addr = _disbursements[i].addr;
+
+            // Deliver the dispursement amount to the receiver. If the
+            // disbursement fails, the amount will be kept by the contract
+            // rather than reverting to prevent blocking progress on other
+            // disbursements.
+
+            // slither-disable-next-line calls-loop,reentrancy-events
+            IERC20(BobaTokenAddress).safeTransferFrom(address(this), _addr, _amount);
+            emit DisbursementSuccess(_depositId, _addr, _amount);
+
+            unchecked {
+                _depositId += 1;
+            }
+        }
+    }
+
+    /********************
+     * Admin Functions *
+     ********************/
+
+    /**
+     * @dev Pause contract
+     */
+    function pause() external onlyOwner() {
+        _pause();
+    }
+
+    /**
+     * @dev UnPause contract
+     */
+    function unpause() external onlyOwner() {
+        _unpause();
+    }
+
+    /**
+     * @dev Sends the contract's current balance to the owner.
+     */
+    function withdrawNativeBOBABalance()
+        external
+        onlyOwner()
+        onlyInitialized()
+        onlyAltL2s()
+    {
+        uint256 _balance = address(this).balance;
+        payable(owner).transfer(_balance);
+        emit NativeBOBABalanceWithdrawn(owner, _balance);
+    }
+
+    /**
+     * @dev Sends the contract's current balance to the owner.
+     */
+    function withdrawBOBABalance()
+        external
+        onlyOwner()
+        onlyInitialized()
+        onlyNotAltL2s()
+    {
+        uint256 _balance = IERC20(BobaTokenAddress).balanceOf(address(this));
+        IERC20(BobaTokenAddress).safeTransfer(owner, _balance);
+        emit BOBABalanceWithdrawn(owner, _balance);
+    }
+
+    /**
+     * @dev transfer disburser role to new address
+     *
+     * @param _newDisburser new disburser of this contract
+     */
+    function transferDisburser(
+        address _newDisburser
+    )
+        external
+        onlyDisburser()
+    {
+        require(_newDisburser != address(0), 'New disburser cannot be the zero address');
+        disburser = _newDisburser;
+        emit DisburserTransferred(_newDisburser);
+    }
+
+    /**
+     * @dev transfer ownership
+     *
+     * @param _newOwner new admin owner of this contract
+     */
+    function transferOwnership(
+        address _newOwner
+    )
+        external
+        onlyOwner()
+    {
+        require(_newOwner != address(0), 'New owner cannot be the zero address');
+        owner = _newOwner;
+        emit OwnershipTransferred(_newOwner);
+    }
+
+
+    /**
+     * @notice Sets the minimum amount that can be deposited in a receive.
+     *
+     * @param _minDepositAmount The new minimum deposit amount.
+     */
+    function setMinAmount(uint256 _minDepositAmount) external onlyOwner() {
+        emit MinDepositAmountSet(minDepositAmount, _minDepositAmount);
+        minDepositAmount = _minDepositAmount;
+    }
+
+    /**
+     * @dev Sets the maximum amount that can be deposited in a receive.
+     *
+     * @param _maxDepositAmount The new maximum deposit amount.
+     */
+    function setMaxAmount(uint256 _maxDepositAmount) external onlyOwner() {
+        emit MaxDepositAmountSet(maxDepositAmount, _maxDepositAmount);
+        maxDepositAmount = _maxDepositAmount;
+    }
+
+    /**
+     * @dev Sets maximum amount of disbursements that can be processed in a day
+     *
+     * @param _maxTransferAmountPerDay The new maximum daily transfer amount.
+     */
+    function setMaxTransferAmountPerDay(uint256 _maxTransferAmountPerDay) external onlyOwner() {
+        emit MaxDepositAmountSet(maxTransferAmountPerDay, _maxTransferAmountPerDay);
+        maxTransferAmountPerDay = _maxTransferAmountPerDay;
+    }
+}
