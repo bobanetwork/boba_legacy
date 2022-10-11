@@ -32,3 +32,21 @@ functions:
           cors: true
     layers:
       - ${file(env-bobafuji.yml):LAYERS}
+  boba_swapSecondaryFeeToken:
+    handler: metaTransaction_swapNativeTokenForBOBA.mainnetHandler
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-bobafuji.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-bobafuji.yml):SUBNET_ID_1}
+        - ${file(env-bobafuji.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.swapSecondaryFeeToken
+          method: post
+          cors: true
+    layers:
+      - ${file(env-bobafuji.yml):LAYERS}
+

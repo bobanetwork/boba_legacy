@@ -190,6 +190,34 @@ if (APP_CHAIN === 'rinkeby') {
       twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobaopera%20Testnet%20for%20Fantom%20`
     }
  }
+} else if (process.env.REACT_APP_CHAIN === 'bobaOpera') {
+  NETWORK = {
+    bobaOpera: {
+      OMGX_WATCHER_URL: `https://api-watcher.bobaopera.boba.network/`,
+      MM_Label:         `Bobaopera`,
+      addressManager:   `0x4e7325bcf09e091Bb8119258B885D4ef687B7386`,
+      L1: {
+        name: "Fantom Mainnet",
+        chainId: 250,
+        chainIdHex: '0xFA',
+        rpcUrl: `https://rpc.fantom.network`,
+        blockExplorer: `https://api.ftmscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
+        transaction: `https://ftmscan.com/tx/`,
+        symbol: process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL,
+        tokenName: process.env.REACT_APP_L1_NATIVE_TOKEN_NAME,
+      },
+      L2: {
+        name: "Bobaopera Mainnet",
+        chainId: 301,
+        chainIdHex: '0x12D',
+        rpcUrl: `https://bobaopera.boba.network`,
+        blockExplorer: `https://blockexplorer.bobaopera.boba.network/`,
+        transaction: `https://blockexplorer.bobaopera.boba.network/tx/`,
+      },
+      gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+      twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobaopera%20Testnet%20for%20Fantom%20`
+    }
+ }
 } else if (process.env.REACT_APP_CHAIN === 'bobaFuji') {
   NETWORK = {
     bobaFuji: {

@@ -186,6 +186,10 @@ export const makeL2GenesisFile = async (
       if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 4051) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomTestnetBytecode
       }
+      // Fantom Testnet
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 301) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomMainnetBytecode
+      }
       // Moonbeam local
       if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 31338) {
         dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamLocalBytecode

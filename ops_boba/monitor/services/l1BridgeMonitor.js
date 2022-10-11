@@ -330,10 +330,15 @@ class l1BridgeMonitorService extends OptimismEnv {
       }
       const latestL2Block = await this.L2Provider.getBlockNumber()
       let l2Message = null
-      const CDMReceipt = await this.watcher.getMessageReceipt(resolved, {
-        fromBlock: latestL2Block - 10 * 5000,
-        toBlock: latestL2Block,
-      })
+      let i = 0
+      let CDMReceipt = null
+      while (CDMReceipt === null && i < 4) {
+        CDMReceipt = await this.watcher.getMessageReceipt(resolved, {
+          fromBlock: latestL2Block - (i + 1) * 5000,
+          toBlock: latestL2Block - i * 5000,
+        })
+        i += 1
+      }
       if (CDMReceipt !== null) {
         l2Message = CDMReceipt.transactionReceipt
       }

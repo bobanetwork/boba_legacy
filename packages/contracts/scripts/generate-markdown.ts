@@ -88,6 +88,14 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     l1Explorer: 'https://moonscan.io/',
     l2Explorer: 'https://blockexplorer.bobabeam.boba.network',
   },
+  {
+    folder: 'bobaopera',
+    name: 'bobaopera (public mainnet)',
+    chainid: 301,
+    rpc: 'https://bobaopera.boba.network',
+    l1Explorer: 'https://ftmscan.com/',
+    l2Explorer: 'https://blockexplorer.bobaopera.boba.network',
+  },
 ]
 
 // List of contracts that are part of a deployment but aren't meant to be used by the general
