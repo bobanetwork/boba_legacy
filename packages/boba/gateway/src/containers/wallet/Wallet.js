@@ -131,7 +131,7 @@ function Wallet() {
             >
               Using {networkService.L1NativeTokenSymbol} requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
               otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
-              EMERGENCY SWAP to swap BOBA for 1 BOBA at market rates.
+              EMERGENCY SWAP to swap {networkService.L1NativeTokenSymbol} for 1 BOBA at market rates.
             </Typography>
           </G.AlertInfo>
           <Button
