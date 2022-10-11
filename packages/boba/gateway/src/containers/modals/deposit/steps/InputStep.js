@@ -20,6 +20,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
 
+import networkService from 'services/networkService'
+
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
@@ -67,7 +69,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       )
     }
     if (res) {
-      dispatch(setActiveHistoryTab('Bridge to L2'))
+      dispatch(setActiveHistoryTab(`${networkService.L1ChainAsset.Name} to ${networkService.L1ChainAsset.l2name}`))
       handleClose()
     }
 

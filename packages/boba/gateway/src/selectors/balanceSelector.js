@@ -81,6 +81,10 @@ export function selectFastDepositCost (state) {
   return state.balance.fastDepositCost
 }
 
+export function selectAltL1DepositCost(state) {
+  return state.balance.altL1DepositCost
+}
+
 export function selectFastDepositBatchCost (state) {
   return state.balance.fastDepositBatchCost
 }

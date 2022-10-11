@@ -106,7 +106,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
     return (
       <Transaction
         key={`${index}`}
-        chain='Bridge to L1'
+        chain='Boba Ethereum L2 to Ethereum'
         title={`${chain} Hash: ${i.hash}`}
         blockNumber={`Block ${i.blockNumber}`}
         time={timeLabel}

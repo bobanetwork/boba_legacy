@@ -25,15 +25,15 @@ import { setTheme } from 'actions/uiAction'
 import Home from 'containers/home/Home'
 import Notification from 'containers/notification/Notification'
 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 // import { initGa } from 'util/googleAnalytics'
 
 // import Airdrop from 'containers/airdrop/Airdrop'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
-// import Help from 'containers/help/Help'
-// import Ecosystem from 'containers/ecosystem/Ecosystem'
+import Help from 'containers/help/Help'
+import Ecosystem from 'containers/ecosystem/Ecosystem'
 import Wallet from 'containers/wallet/Wallet'
 // import Bridge from 'containers/bridge/Bridge'
 // import MonsterWrapper from 'containers/monster/MonsterWrapper'
@@ -41,7 +41,8 @@ import Wallet from 'containers/wallet/Wallet'
 import FarmWrapper from 'containers/farm/FarmWrapper'
 // import Dao from 'containers/dao/Dao'
 // import SaveWrapper from 'containers/save/SaveWrapper'
-// import Projects from 'containers/ecosystem/Projects'
+import Projects from 'containers/ecosystem/Projects'
+import { ROUTES_PATH } from 'util/constant'
 
 function App() {
 
@@ -291,22 +292,26 @@ function App() {
             <Suspense fallback={<>Loading...</>}>
               <Routes>
                 <Route exact path="/" element={<Home />} >
-                  {/* <Route index element={<Bridge />} /> */}
-                  <Route path="/history" element={<Transactions />} />
-                  <Route path="/bobascope" element={<BobaScope />} />
                   <Route index element={<Wallet />} />
-                  <Route path="wallet" element={<Wallet />} />
-                  <Route path="/farm" element={<FarmWrapper />} />
-                  {/* <Route path="/save" element={<SaveWrapper />} /> */}
-                  {/* <Route path="/dao" element={<Dao />} /> */}
-                  {/* <Route path="/airdrop" element={<Airdrop />} /> */}
-                  {/* <Route path="/help" element={<Help />} /> */}
-                  {/* <Route path="/ecosystem" element={<Ecosystem />} > */}
+                  {/* <Route index element={<Bridge />} /> */}
+                  {/* <Route path={ROUTES_PATH.BRIDGE} element={<Bridge />} /> */}
+                  {/* <Route path={ROUTES_PATH.ECOSYSTEM} element={<Ecosystem />} > */}
                     {/* <Route path=":category" element={<Projects />} /> */}
                   {/* </Route> */}
-                  {/* <Route path="/bridge" element={<Bridge />} /> */}
-                  {/* <Route path="/monster" element={<MonsterWrapper />} /> */}
-                  {/* <Route path="/lock" element={<Lock />} /> */}
+                  <Route path={ROUTES_PATH.WALLET} element={<Wallet />} />
+                  <Route path={ROUTES_PATH.HISTORY} element={<Transactions />} />
+                  <Route path={ROUTES_PATH.EARN} element={<FarmWrapper />} />
+                  {/* <Route path={ROUTES_PATH.STAKE} element={<SaveWrapper />} /> */}
+                  {/* <Route path={ROUTES_PATH.LOCK} element={<Lock />} /> */}
+                  {/* <Route path={ROUTES_PATH.DAO} element={<Dao />} /> */}
+                  <Route path={ROUTES_PATH.BOBASCOPE} element={<BobaScope />} />
+                  {/* <Route path={ROUTES_PATH.AIRDROP} element={<Airdrop />} /> */}
+                  <Route path={ROUTES_PATH.HELP} element={<Help />} />
+                  {/* <Route path={ROUTES_PATH.MONSTER} element={<MonsterWrapper />} /> */}
+                  <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
+                    <Route path=":category" element={<Projects projectType='BOBA' />} />
+                  </Route>
+                  <Route path="*" element={<Navigate to="/" />} />
                 </Route>
               </Routes>
             </Suspense>

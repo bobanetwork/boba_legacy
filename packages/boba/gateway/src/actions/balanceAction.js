@@ -62,6 +62,10 @@ export function fetchFastDepositCost(address) {
     return createAction('FETCH/FASTDEPOSIT/COST', () => networkService.getFastDepositCost(address))
 }
 
+export function fetchAltL1DepositFee() {
+    return createAction('FETCH/ALTL1DEPOSIT/COST', () => networkService.getAltL1DepositFee())
+}
+
 export function fetchFastDepositBatchCost(tokenList) {
   return createAction('FETCH/FASTDEPOSIT/BATCH/COST', () => networkService.getFastDepositBatchCost(tokenList))
 }

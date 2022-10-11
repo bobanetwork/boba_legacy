@@ -36,6 +36,7 @@ import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
 import All from './TX_All'
 import Pending from './TX_Pending'
+import Transfers from './TX_Transfers'
 
 import * as S from './History.styles'
 import * as styles from './TX_All.module.scss'
@@ -46,6 +47,8 @@ import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
+
+import networkService from 'services/networkService'
 
 function History() {
 
@@ -138,7 +141,7 @@ function History() {
           <Tabs
             onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
             activeTab={activeTab}
-            tabs={['All', 'Bridge to L2', 'Bridge to L1', 'Pending']}
+            tabs={['All', `${networkService.L1ChainAsset.name} to ${networkService.L1ChainAsset.l2Name}`, `${networkService.L1ChainAsset.l2Name} to ${networkService.L1ChainAsset.name}`, 'Bridge between L1s', 'Pending']}
           />
 
           {activeTab === 'All' && (
@@ -148,15 +151,22 @@ function History() {
             />
           )}
 
-          {activeTab === 'Bridge to L2' &&
+          {activeTab === `${networkService.L1ChainAsset.name} to ${networkService.L1ChainAsset.l2Name}` &&
             <Deposits
               searchHistory={searchHistory}
               transactions={transactions}
             />
           }
 
-          {activeTab === 'Bridge to L1' &&
+          {activeTab === `${networkService.L1ChainAsset.l2Name} to ${networkService.L1ChainAsset.name}` &&
             <Exits
+              searchHistory={searchHistory}
+              transactions={transactions}
+            />
+          }
+
+          {activeTab === 'Bridge between L1s' &&
+            <Transfers
               searchHistory={searchHistory}
               transactions={transactions}
             />

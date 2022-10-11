@@ -9,6 +9,9 @@ import { selectLookupPrice } from 'selectors/lookupSelector'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
+import { BRIDGE_TYPE } from 'util/constant'
+
+import networkService from 'services/networkService'
 
 function ListToken({
   token,
@@ -91,8 +94,8 @@ function ListToken({
               {enabled && chain === 'L1' &&
                 <>
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, false) }}
-                    color='primary'
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
+                    color='neutral'
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -100,9 +103,8 @@ function ListToken({
                   >
                     Bridge to L2
                   </Button>
-
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, true) }}
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
                     color='primary'
                     disabled={disabled}
                     variant="outlined"
@@ -110,8 +112,20 @@ function ListToken({
                     fullWidth
                   >
                     Fast Bridge to L2
+                </Button>
+                {token.symbol === 'BOBA' && !networkService.L1ChainAsset.foundation &&
+                  <Button
+                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
+                    color='primary'
+                    disabled={disabled}
+                    variant="contained"
+                    tooltip="A multi-chain bridge to Ethereum."
+                    fullWidth
+                  >
+                    Bridge to Ethereum
                   </Button>
-                </>
+                }
+              </>
               }
 
               {enabled && chain === 'L2' &&
@@ -187,14 +201,15 @@ function ListToken({
         <S.TableCell
           sx={{
             gap: '5px',
-            width: '40%'
+            width: '40%',
+            justifyContent: 'flex-start'
           }}
         >
           {enabled && chain === 'L1' &&
             <>
               <Button
-                onClick={() => { handleModalClick('depositModal', token, false) }}
-                color='primary'
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
+                color='neutral'
                 variant="outlined"
                 disabled={disabled}
                 tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -204,7 +219,7 @@ function ListToken({
               </Button>
 
               <Button
-                onClick={() => { handleModalClick('depositModal', token, true) }}
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
                 color='primary'
                 disabled={disabled}
                 variant="outlined"
@@ -212,7 +227,19 @@ function ListToken({
                 fullWidth
               >
                 Fast Bridge to L2
+            </Button>
+            {token.symbol === 'BOBA' && !networkService.L1ChainAsset.foundation &&
+
+              <Button
+                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
+                color='primary'
+                disabled={disabled}
+                variant="contained"
+                fullWidth
+              >
+                Bridge to Ethereum
               </Button>
+            }
             </>
           }
           {enabled && chain === 'L2' &&
