@@ -51,9 +51,9 @@ function PoolListItem({
     if (token) {
       let tokenUsed = pool.usedTokens.find((t) => t.tokenId === token.tokenId);
       if (tokenUsed) {
-        let tokenBalance = parseInt(token.balance);
+        let tokenBalance = Number(token.balance);
         let poolVote = Number(tokenUsed.vote);
-        let votePercent = parseInt((poolVote / tokenBalance) * 100);
+        let votePercent = Number((poolVote / tokenBalance) * 100);
         setMyVote({
           value: poolVote.toFixed(2),
           votePercent,
@@ -103,7 +103,7 @@ function PoolListItem({
       <G.TableCell pl={1} py={2} width="30%" flex="2">
         <Box display="flex" width="100%" alignItems="center" justifyContent="space-around" gap={2} px={1}>
           <Typography variant="body2">
-            {selectedVote}%
+            {selectedVote.toFixed(2)}%
           </Typography>
           <Slider
             defaultValue={0}
