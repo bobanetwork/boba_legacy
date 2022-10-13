@@ -28,6 +28,7 @@ const initialState = {
   fastExitCost: '',
   classicExitCost: '',
   fastDepositCost: '',
+  altL1DepositCost: '',
   fastDepositBatchCost: '',
   l1FeeBalance: '',
   l2BalanceETH: '',
@@ -123,6 +124,11 @@ function balanceReducer(state = initialState, action) {
       return {
         ...state,
         fastDepositCost: action.payload
+      }
+    case 'FETCH/ALTL1DEPOSIT/COST/SUCCESS':
+      return {
+        ...state,
+        altL1DepositCost: action.payload
       }
     case 'FETCH/FASTDEPOSIT/BATCH/COST/SUCCESS':
       return {

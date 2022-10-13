@@ -21,7 +21,9 @@ import { closeModal } from 'actions/uiAction'
 
 import InputStep from './steps/InputStep'
 import InputStepFast from './steps/InputStepFast'
+import InputStepMultiChain from './steps/InputStepMultiChain'
 import { fetchTransactions } from 'actions/networkAction'
+import { BRIDGE_TYPE } from 'util/constant'
 
 function DepositModal({ open, token, fast }) {
 
@@ -34,11 +36,22 @@ function DepositModal({ open, token, fast }) {
 
   return (
     <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={!!fast ? "" : "500px"}>
-      {!!fast ? (
+
+      {
+        BRIDGE_TYPE.FAST_BRIDGE === fast ? <InputStepFast handleClose={handleClose} token={token}/> : null
+      }
+      {
+        BRIDGE_TYPE.CLASSIC_BRIDGE === fast ? <InputStep handleClose={handleClose} token={token}/> : null
+      }
+      {
+        BRIDGE_TYPE.MULTI_CHAIN_BRIDGE === fast ? <InputStepMultiChain handleClose={handleClose} token={token}/> : null
+      }
+
+      {/* {!!fast ? (
           <InputStepFast handleClose={handleClose} token={token}/>
         ) : (
           <InputStep handleClose={handleClose} token={token}/>
-      )}
+      )} */}
     </Modal>
   )
 }
