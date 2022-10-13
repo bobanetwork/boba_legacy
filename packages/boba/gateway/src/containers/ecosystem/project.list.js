@@ -36,6 +36,7 @@ import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
+import ghostncolorsLogo from '../../images/ecosystem/ghostncolorsLogo.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -428,6 +429,16 @@ export const projectList = [
     "type": "wallet",
     "image": rabbyLogo,
     "description": "The game-changing wallet for Ethereum and all EVM chains."
+  },
+  {
+    "title": "GhostNColors",
+    "canLaunch": true,
+    "link": "https://ghostncolors-crypto.ipns.dweb.link/",
+    "telegram": "https://t.me/+WRDqqtNg2FQ4OTgx",
+    "twitter": "https://twitter.com/GhostNColors",
+    "type": "nft",
+    "image": ghostncolorsLogo,
+    "description": "Mint your Ghost."
   },
 ]
 
