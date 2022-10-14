@@ -66,7 +66,7 @@ const main = async () => {
   )
   const MIN_OVERHEAD = config.uint(
     'min-overhead',
-    parseInt(env.MIN, 10) || 30000
+    parseInt(env.MIN_OVERHEAD, 10) || 30000
   )
 
   // minimum l1 base fee
