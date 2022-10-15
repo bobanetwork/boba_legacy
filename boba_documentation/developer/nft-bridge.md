@@ -54,33 +54,31 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IL2StandardERC721.sol";
 
 contract L2StandardERC721 is IL2StandardERC721, ERC721 {
-  // This is required
-  // This is your L1 NFT contract address
-  // When we register your NFT contracts in our bridge, we make sure that
-  // we only have one pair for your L1 NFT contract.
+  // [This is mandatory]
+  // This is your L1 NFT contract address. Only one pair of your NFT contracts can be registered in the NFT bridges.
   address public override l1Contract;
-  // This is required
+  // [This is not mandatory] You can use other names or other ways to only allow l2 NFT bridge to mint and burn tokens
   // This is L2 NFT brigde contract address
   address public l2Bridge;
 	
-  // This is required
+  // [This is not mandatory]
   // Only l2Brigde (L2 NFT bridge) can mint or burn NFTs
   modifier onlyL2Bridge {
     require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
     _;
   }
   
-  // This is required
-  // We need to verify that l1Contract method is implemented in this contract
+  // [This is mandatory] 
+  // You must export this interface `IL2StandardERC721.l1Contract.selector`
   function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
     bytes4 bridgingSupportedInterface = IL2StandardERC721.l1Contract.selector
       ^ IL2StandardERC721.mint.selector
       ^ IL2StandardERC721.burn.selector;
     return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
   }
-	
+	  
+  // [The input is madatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
   // [SECURITY] Make sure that only L2 NFT bridge can mint tokens
-  // The input must be `address _to, uint256 _tokenId, bytes memory _data`
   function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
     _mint(_to, _tokenId);
     
@@ -138,24 +136,22 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IL1StandardERC721.sol";
 
 contract L1StandardERC721 is IL1StandardERC721, ERC721 {
-  // This is required
-  // This is your L2 NFT contract address
-  // When we register your NFT contracts in our bridge, we make sure that
-  // we only have one pair for your L1 NFT contract.
+  // [This is mandatory]
+  // This is your L1 NFT contract address. Only one pair of your NFT contracts can be registered in the NFT bridges.
   address public override l2Contract;
-  // This is required
+  // [This is not mandatory] You can use other names or other ways to only allow l1 NFT bridge to mint and burn tokens
   // This is L1 NFT brigde contract address
   address public l1Bridge;
 	
-  // This is required
+  // [This is not mandatory]
   // Only l1Brigde (L1 NFT bridge) can mint or burn NFTs
   modifier onlyL1Bridge {
     require(msg.sender == l1Bridge, "Only L1 Bridge can mint and burn");
     _;
   }
   
-  // This is required
-  // We need to verify that l1Contract method is implemented in this contract
+  // [This is mandatory]
+  // You must export this interface `IL1StandardERC721.l2Contract.selector`
   function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
     bytes4 bridgingSupportedInterface = IL1StandardERC721.l2Contract.selector
       ^ IL1StandardERC721.mint.selector
@@ -172,7 +168,8 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
     emit Mint(_to, _tokenId);
   }
 
-  // [SECURITY] Make sure that only L1 NFT bridge can burn tokens
+  // [The input is madatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
+  // [SECURITY] Make sure that only L1 NFT bridge can mint tokens
   function burn(uint256 _tokenId) public virtual override onlyL1Bridge {
     _burn(_tokenId);
 
