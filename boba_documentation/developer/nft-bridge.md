@@ -77,7 +77,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
     return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
   }
 	  
-  // [The input is madatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
+  // [The input is mandatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
   // [SECURITY] Make sure that only L2 NFT bridge can mint tokens
   function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
     _mint(_to, _tokenId);
@@ -168,7 +168,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
     emit Mint(_to, _tokenId);
   }
 
-  // [The input is madatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
+  // [The input is mandatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
   // [SECURITY] Make sure that only L1 NFT bridge can mint tokens
   function burn(uint256 _tokenId) public virtual override onlyL1Bridge {
     _burn(_tokenId);
