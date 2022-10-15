@@ -181,7 +181,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
 }
 ```
 
-> NOTE: Once you have your L2 NFT contract address, please contact us so we can register that address in the L1 and L2 NFT bridges.
+> NOTE: Once you have your L1 NFT contract address, please contact us so we can register that address in the L1 and L2 NFT bridges.
 
 ## How to bridge NFTs
 
