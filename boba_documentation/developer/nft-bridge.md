@@ -1,6 +1,6 @@
 # BOBA NFT Bridge
 
-Boba NFT bridges support **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
+BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1 and the [L2NFTBridge](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on L2. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
 
 * Native L1 NFT: the original NFT contract was deployed on L1
 * Native L2 NFT: the original NFT contract was deployed on L2
@@ -336,6 +336,54 @@ IL2StandardERC721(_l2Contract).mint(_to, _tokenId, _data);
 ```
 
 so your NFT contract should decode `_data` and write into the smart contract.
+
+To bridge the NFT with the extra data, you need to call these functions of NFT bridges:
+
+```javascript
+// This example is for the L1 native NFT. L2 native NFT is similar to this one.
+
+// Approve L1 NFT contract first
+const approveL1Tx = await L1NFT.approve(L1_NFT_BRIDGE_ADDRESS, TOKEN_ID)
+await approveL1Tx.wait()
+
+// Deposit with extra data
+const depositTx = await L1NFTBrige.depositNFTWithExtraData(
+  L1_NFT_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  9999999 // L2 gas
+)
+await depositTx.wait()
+
+// Or deposit to another wallet
+const depositToTx = await L1NFTBrige.depositNFTWithExtraDataTo(
+  L1_NFT_CONTRACT_ADDRESS,
+  TARGET_WALLET_ADDRESS,
+  TOKEN_ID,
+  9999999 // L2 gas
+)
+await depositToTx.wait()
+
+// Approve L2 NFT contract first
+const approveL2Tx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
+await approveL2Tx.wait()
+
+// You can use the standard function to withdraw
+const withdrawTx = await L2NFTBrige.withdraw(
+  L2_NFT_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  9999999 // L2 gas
+)
+await withdrawTx.wait()
+
+// Or withdraw to another wallet
+const withdrawToTx = await L2NFTBrige.withdrawTo(
+  L2_NFT_CONTRACT_ADDRESS,
+  TARGET_WALLET_ADDRESS,
+  TOKEN_ID,
+  9999999 // L2 gas
+)
+await withdrawToTx.wait()
+```
 
 ## NFT bridge addresses
 
