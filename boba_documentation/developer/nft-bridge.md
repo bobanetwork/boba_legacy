@@ -43,7 +43,7 @@ If you want to deploy your own L2 NFT contract, please follow requirements:
 	function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {}
 	```
 
-​		The input must be `address _to, uint256 _tokenId, bytes memory _data`, even though you might need them all.
+  The input must be `address _to, uint256 _tokenId, bytes memory _data`, even though you might need them all.
 
 * In your L2 NFT contract, you must add the following code to bypass our interface check in our NFT bridge
 
@@ -54,45 +54,44 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IL2StandardERC721.sol";
 
 contract L2StandardERC721 is IL2StandardERC721, ERC721 {
-	// This is required
-	// This is your L1 NFT contract address
-	// When we register your NFT contracts in our bridge, we make sure that
-	// we only have one pair for your L1 NFT contract.
-	address public override l1Contract;
-	// This is required
-	// This is L2 NFT brigde contract address
-	address public l2Bridge;
+  // This is required
+  // This is your L1 NFT contract address
+  // When we register your NFT contracts in our bridge, we make sure that
+  // we only have one pair for your L1 NFT contract.
+  address public override l1Contract;
+  // This is required
+  // This is L2 NFT brigde contract address
+  address public l2Bridge;
 	
-	// This is required
-	// Only l2Brigde (L2 NFT bridge) can mint or burn NFTs
-	modifier onlyL2Bridge {
-  	require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
+  // This is required
+  // Only l2Brigde (L2 NFT bridge) can mint or burn NFTs
+  modifier onlyL2Bridge {
+    require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
     _;
   }
   
   // This is required
   // We need to verify that l1Contract method is implemented in this contract
-	function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
-		bytes4 bridgingSupportedInterface = IL2StandardERC721.l1Contract.selector
-			^ IL2StandardERC721.mint.selector
+  function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
+    bytes4 bridgingSupportedInterface = IL2StandardERC721.l1Contract.selector
+      ^ IL2StandardERC721.mint.selector
       ^ IL2StandardERC721.burn.selector;
-
-     return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
-	}
+    return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
+  }
 	
-	// [SECURITY] Make sure that only L2 NFT bridge can mint tokens
-	// The input must be `address _to, uint256 _tokenId, bytes memory _data`
-	function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
-			_mint(_to, _tokenId);
-
-     emit Mint(_to, _tokenId);
+  // [SECURITY] Make sure that only L2 NFT bridge can mint tokens
+  // The input must be `address _to, uint256 _tokenId, bytes memory _data`
+  function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
+    _mint(_to, _tokenId);
+    
+    emit Mint(_to, _tokenId);
   }
 
-	// [SECURITY] Make sure that only L2 NFT bridge can burn tokens
-	function burn(uint256 _tokenId) public virtual override onlyL2Bridge {
-  	_burn(_tokenId);
-
-    emit Burn(_tokenId);
+  // [SECURITY] Make sure that only L2 NFT bridge can burn tokens
+  function burn(uint256 _tokenId) public virtual override onlyL2Bridge {
+  _burn(_tokenId);
+  
+  emit Burn(_tokenId);
   }
 }
 ```
@@ -125,8 +124,11 @@ If you want to deploy your own L1 NFT contract, please follow requirements:
 * The `mint` function in your L1 NFT contract should be overriden by 
 
   ```solidity
-  function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {}
+  function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {}
   ```
+  
+  The input must be `address _to, uint256 _tokenId, bytes memory _data`, even though you might need them all.
+  
 * In your L1 NFT contract, you must add the following code to bypass our interface check in our NFT bridge
 
 ```solidity
@@ -136,43 +138,43 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IL1StandardERC721.sol";
 
 contract L1StandardERC721 is IL1StandardERC721, ERC721 {
-	// This is required
-	// This is your L2 NFT contract address
-	// When we register your NFT contracts in our bridge, we make sure that
-	// we only have one pair for your L1 NFT contract.
-	address public override l2Contract;
-	// This is required
-	// This is L1 NFT brigde contract address
+  // This is required
+  // This is your L2 NFT contract address
+  // When we register your NFT contracts in our bridge, we make sure that
+  // we only have one pair for your L1 NFT contract.
+  address public override l2Contract;
+  // This is required
+  // This is L1 NFT brigde contract address
   address public l1Bridge;
 	
-	// This is required
-	// Only l1Brigde (L1 NFT bridge) can mint or burn NFTs
+  // This is required
+  // Only l1Brigde (L1 NFT bridge) can mint or burn NFTs
   modifier onlyL1Bridge {
-  	require(msg.sender == l1Bridge, "Only L1 Bridge can mint and burn");
-  	_;
+    require(msg.sender == l1Bridge, "Only L1 Bridge can mint and burn");
+    _;
   }
   
   // This is required
   // We need to verify that l1Contract method is implemented in this contract
-	function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
- 		bytes4 bridgingSupportedInterface = IL1StandardERC721.l2Contract.selector
-    	^ IL1StandardERC721.mint.selector
+  function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
+    bytes4 bridgingSupportedInterface = IL1StandardERC721.l2Contract.selector
+      ^ IL1StandardERC721.mint.selector
       ^ IL1StandardERC721.burn.selector;
 
-     return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
-	}
+    return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
+  }
 	
-	// [SECURITY] Make sure that only L1 NFT bridge can mint tokens
-	// The input must be `address _to, uint256 _tokenId, bytes memory _data`
-	function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {
-			_mint(_to, _tokenId);
+  // [SECURITY] Make sure that only L1 NFT bridge can mint tokens
+  // The input must be `address _to, uint256 _tokenId, bytes memory _data`
+  function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {
+    _mint(_to, _tokenId);
 
-     emit Mint(_to, _tokenId);
+    emit Mint(_to, _tokenId);
   }
 
-	// [SECURITY] Make sure that only L1 NFT bridge can burn tokens
-	function burn(uint256 _tokenId) public virtual override onlyL1Bridge {
-  	_burn(_tokenId);
+  // [SECURITY] Make sure that only L1 NFT bridge can burn tokens
+  function burn(uint256 _tokenId) public virtual override onlyL1Bridge {
+    _burn(_tokenId);
 
     emit Burn(_tokenId);
   }
@@ -312,7 +314,7 @@ To enable the bridge to pick up the exposed extra data that you would want to br
 
 ```javascript
 function bridgeExtraData(uint256 tokenId) public view returns(bytes memory) {
-	return abi.encode(data_1[tokenId], data_2[tokenId], data_3[tokenId]);
+  return abi.encode(data_1[tokenId], data_2[tokenId], data_3[tokenId]);
 }
 ```
 
@@ -322,11 +324,11 @@ For example,
 
 ```javascript
 function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
-	bytes4 bridgingSupportedInterface = IL1StandardERC721.l2Contract.selector
-		^ IL1StandardERC721.mint.selector
+  bytes4 bridgingSupportedInterface = IL1StandardERC721.l2Contract.selector
+    ^ IL1StandardERC721.mint.selector
     ^ IL1StandardERC721.burn.selector;
 
-    return _interfaceId == this.bridgeExtraData.selector || super.supportsInterface(_interfaceId) || bridgingSupportedInterface;
+  return _interfaceId == this.bridgeExtraData.selector || super.supportsInterface(_interfaceId) || bridgingSupportedInterface;
 }
 ```
 
