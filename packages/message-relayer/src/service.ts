@@ -81,6 +81,8 @@ interface MessageRelayerOptions {
   maxWaitTxTimeS: number
 
   isFastRelayer: boolean
+
+  enableRelayerFilter: boolean
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -120,7 +122,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     messenger: CrossChainMessenger
     highestCheckedL2Tx: number
     //filter
-    filter: Array<any>
+    relayerFilter: Array<any>
+    fastRelayerFilter: Array<any>
     lastFilterPollingTimestamp: number
     //batch system
     timeOfLastRelayS: number
@@ -153,7 +156,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.highestCheckedL2Tx = this.options.fromL2TransactionIndex || 1
 
     // filter
-    this.state.filter = []
+    this.state.relayerFilter = []
+    this.state.fastRelayerFilter = []
     this.state.lastFilterPollingTimestamp = 0
 
     //batch system
@@ -448,13 +452,21 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             // each message to L1.
             for (const message of messages) {
               // filter out messages not meant for this relayer
+              const isFastRelayerMessage =
+                this.state.fastRelayerFilter.includes(message.target)
+              const isRelayerMessage = this.state.relayerFilter.includes(
+                message.target
+              )
               if (this.options.isFastRelayer) {
-                if (!this.state.filter.includes(message.target)) {
+                if (!isFastRelayerMessage) {
                   this.logger.info('Message not intended for target, skipping.')
                   continue
                 }
               } else {
-                if (this.state.filter.includes(message.target)) {
+                if (
+                  (this.options.enableRelayerFilter && !isRelayerMessage) ||
+                  isFastRelayerMessage
+                ) {
                   this.logger.info('Message not intended for target, skipping.')
                   continue
                 }
@@ -517,11 +529,22 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           // export L1LIQPOOL=$(echo $ADDRESSES | jq -r '.L1LiquidityPool')
           // export L1M=$(echo $ADDRESSES | jq -r '.L1Message')
           // echo '["'$L1LIQPOOL'", "'$L1M'"]' > dist/dumps/whitelist.json
-          const filterSelect = [filter.Proxy__L1LiquidityPool, filter.L1Message]
+          const fastRelayerFilterSelect = [
+            filter.Proxy__L1LiquidityPool,
+            filter.L1Message,
+          ]
+          const relayerFilterSelect = [
+            filter.Proxy__L1StandardBridge,
+            filter.Proxy__L1NFTBridge,
+          ]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()
-          this.state.filter = filterSelect
-          this.logger.info('Found the filter', { filterSelect })
+          this.state.fastRelayerFilter = fastRelayerFilterSelect
+          this.state.relayerFilter = relayerFilterSelect
+          this.logger.info('Found the two filter', {
+            relayerFilterSelect,
+            fastRelayerFilterSelect,
+          })
         }
       }
     } catch {
