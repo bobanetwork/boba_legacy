@@ -1,6 +1,6 @@
 # BOBA NFT Bridge
 
-BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1 and the [L2NFTBridge](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on L2. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
+BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1 and the [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on L2. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
 
 * Native L1 NFT: the original NFT contract was deployed on L1
 * Native L2 NFT: the original NFT contract was deployed on L2
@@ -16,7 +16,7 @@ bytes4 erc721 = 0x80ac58cd;
 require(ERC165Checker.supportsInterface(_l1Contract, erc721), "L1 NFT is not ERC721 compatible");
 ```
 
-After verifying the interface, please deploy [L2StandardERC721](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/standards/L2StandardERC721.sol) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
+After verifying the interface, please deploy [L2StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L2StandardERC721.sol) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
 
 ```js
 const Factory__L2StandardERC721 = new ethers.ContractFactory(
@@ -98,7 +98,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
 
 ## Native L2 NFT - developer requirements
 
-Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/standards/L1StandardERC721.sol) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
+Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L1StandardERC721.sol) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
 ```js
 const Factory__L1StandardERC721 = new ethers.ContractFactory(
