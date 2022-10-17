@@ -401,7 +401,7 @@ export const projectList = [
   {
      "title": "Beamer",
      "canLaunch": true,
-     "link": "https://www.beamerbridge.com/",
+     "link": "https://app.beamerbridge.com/",
      "twitter": "https://twitter.com/BeamerBridge",
      "discord": "https://discord.com/invite/uvTYkzsBdA",
      "type": "bridge",

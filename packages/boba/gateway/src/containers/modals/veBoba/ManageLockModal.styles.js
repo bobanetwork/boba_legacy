@@ -5,17 +5,6 @@ export const Container = styled(Box)(({ theme }) => ({
 
 }))
 
-export const ThumbnailContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.secondary,
-  borderRadius: theme.palette.primary.borderRadius,
-  border: '1px solid rgba(255, 255, 255, 0.15)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '4rem',
-  width: '4rem',
-}))
-
 export const LockFormContainer = styled(Grid)(({ theme }) => ({
   borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,

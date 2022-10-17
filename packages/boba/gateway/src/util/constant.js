@@ -17,7 +17,6 @@ export const ETHERSCAN_API_KEY = process.env.REACT_APP_ETHERSCAN_API
 export const MAX_HEALTH_BLOCK_LAG = process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION
 export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
-export const ENABLE_LOCK_PAGE = process.env.REACT_APP_ENABLE_LOCK_PAGE
 export const SELLER_OPTIMISM_API_URL = process.env.REACT_APP_SELLER_OPTIMISM_API_URL
 export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_API_URL
 export const APP_AIRDROP = process.env.REACT_APP_AIRDROP
@@ -65,9 +64,10 @@ export const ROUTES_PATH = {
   EARN: '/earn',
   LOCK: '/lock',
   STAKE: '/stake',
-  DAO: '/dao',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
   AIRDROP: '/airdrop',
   MONSTER: '/monster',
+  VOTE_DAO: '/votedao',
 }
+export const PER_PAGE = 8
