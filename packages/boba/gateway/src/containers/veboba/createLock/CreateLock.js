@@ -168,10 +168,10 @@ function CreateLock({
       </S.InlineContainer>
       <S.InlineContainer>
         <Typography variant="body2">Your voting power will be</Typography>
-        <Typography variant="body2"> {conversioRation()* value } ve BOBA </Typography>
+        <Typography variant="body2"> {(conversioRation() * value).toFixed(2) } ve BOBA </Typography>
       </S.InlineContainer>
       {
-        !accountEnabled ?
+        !accountEnabled || layer !== 'L2'?
           <Button
             fullWidth={true}
             variant="outlined"

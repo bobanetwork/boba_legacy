@@ -38,10 +38,10 @@ import Bridge from 'containers/bridge/Bridge'
 import MonsterWrapper from 'containers/monster/MonsterWrapper'
 import Lock from 'containers/veboba/Lock'
 import FarmWrapper from 'containers/farm/FarmWrapper'
-import Dao from 'containers/dao/Dao'
 import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
 import { ROUTES_PATH } from 'util/constant'
+import VoteAndDao from 'containers/VoteAndDao'
 
 function App() {
 
@@ -300,7 +300,6 @@ function App() {
                   <Route path={ROUTES_PATH.EARN} element={<FarmWrapper />} />
                   <Route path={ROUTES_PATH.STAKE} element={<SaveWrapper />} />
                   <Route path={ROUTES_PATH.LOCK} element={<Lock />} />
-                  <Route path={ROUTES_PATH.DAO} element={<Dao />} />
                   <Route path={ROUTES_PATH.BOBASCOPE} element={<BobaScope />} />
                   <Route path={ROUTES_PATH.AIRDROP} element={<Airdrop />} />
                   <Route path={ROUTES_PATH.HELP} element={<Help />} />
@@ -308,6 +307,7 @@ function App() {
                   <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
+                  <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Route>
               </Routes>

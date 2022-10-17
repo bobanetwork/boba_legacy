@@ -7,7 +7,6 @@ import { selectMonster } from 'selectors/setupSelector'
 import { menuItems } from '../menuItems'
 
 import * as S from './MenuItems.styles'
-import { ENABLE_LOCK_PAGE } from 'util/constant'
 
 const MenuItems = () => {
 
@@ -37,10 +36,6 @@ const MenuItems = () => {
   return (
     <S.Nav>
       {menuList.map((item) => {
-        if (!+ENABLE_LOCK_PAGE && item.key === 'Lock') {
-          return null;
-        }
-
         return (
           <S.MenuItem
             style={({ isActive }) => {

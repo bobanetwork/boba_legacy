@@ -22,6 +22,11 @@ import { useTheme } from '@emotion/react';
 
 function Pager ({ currentPage, totalPages, isLastPage, onClickNext, onClickBack, label }) {
   const theme = useTheme();
+
+  if (totalPages <= 1) {
+    return null;
+  }
+
   return (
     <S.PagerContainer>
       <div className={styles.numberLeft}>{label}</div>
@@ -53,33 +58,6 @@ function Pager ({ currentPage, totalPages, isLastPage, onClickNext, onClickBack,
       </S.PagerContent>
     </S.PagerContainer>
   )
-
-  // return (
-  //   <div className={styles.Pager}>
-  //     <div className={styles.numberLeft}>{label}</div>
-  //     <div className={styles.numberRight}>
-  //       <div className={styles.number}>{`Page ${currentPage} of ${totalPages}`}</div>
-  //       <div
-  //         className={[
-  //           styles.box,
-  //           currentPage === 1 ? styles.disabled : ''
-  //         ].join(' ')}
-  //         onClick={onClickBack}
-  //       >
-  //         <NavigateBefore className={styles.icon} />
-  //       </div>
-  //       <div
-  //         className={[
-  //           styles.box,
-  //           isLastPage ? styles.disabled : ''
-  //         ].join(' ')}
-  //         onClick={onClickNext}
-  //       >
-  //         <NavigateNext className={styles.icon} />
-  //       </div>
-  //       </div>
-  //   </div>
-  // );
 }
 
 export default Pager;

@@ -4,7 +4,7 @@ import { Box, Typography, IconButton, Divider } from '@mui/material'
 export const Container = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-around',
-  margin: '20px auto',
+  margin: '0 auto',
   width: '100%',
   gap: '10px',
   [ theme.breakpoints.down('sm') ]: {
@@ -15,9 +15,9 @@ export const Container = styled(Box)(({ theme }) => ({
   },
 }))
 
-export const ContentEmpty = styled(Box)(({ theme }) => ({
+export const ContentEmpty = styled(Box)(({ theme, minHeight, p }) => ({
   width: '100%',
-  minHeight: '400px',
+  minHeight: minHeight || '400px',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -123,4 +123,63 @@ export const PageSwitcher = styled(Box)(({ theme }) => ({
     }
   },
 
+}));
+
+
+export const ThumbnailContainer = styled(Box)(({ theme }) => ({
+  background: theme.palette.background.secondary,
+  borderRadius: theme.palette.primary.borderRadius,
+  border: '1px solid rgba(255, 255, 255, 0.15)',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '3rem',
+  width: '3rem',
+}))
+
+
+// Table Styled Component
+export const TableHeading = styled(Box)(({ theme }) => ({
+  width: '100%',
+  padding: "10px",
+  display: "flex",
+  alignItems: "center",
+  flexDirection: 'row',
+  justifyContent: "space-between",
+  borderBottom: theme.palette.primary.borderBottom,
+  [ theme.breakpoints.down('md') ]: {
+    justifyContent: 'flex-start',
+    marginBottom: "5px",
+    'div:last-child': {
+      display: 'none'
+     }
+  },
+}));
+
+export const TableHeadingItem = styled(Typography)`
+  width: 20%;
+  gap: 5px;
+`;
+
+export const TableBody = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  textAlign: 'center',
+  width: '100%',
+  [ theme.breakpoints.down('sm') ]: {
+    gap: '10px'
+  }
+}))
+
+export const TableCell = styled(Box)(({ theme, isMobile, width, flex }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  width: width || '20%',
+  flex: flex || 1,
+  [ theme.breakpoints.down('sm') ]: {
+    minWidth: '20%',
+    width: isMobile ? '10%' : 'unset'
+  }
 }));
