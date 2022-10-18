@@ -121,6 +121,9 @@ type Config struct {
 	// batch submitter can accept
 	MaxL1GasPrice uint64
 
+	// MaxGasLimit is the maximum gas limit that the batch submitter can accept
+	MaxGasLimit uint64
+
 	// LogLevel is the lowest log level that will be output.
 	LogLevel string
 
@@ -182,6 +185,7 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		ClearPendingTxs:         ctx.GlobalBool(flags.ClearPendingTxsFlag.Name),
 		/* Optional Flags */
 		MaxL1GasPrice:       ctx.GlobalUint64(flags.MaxL1GasPriceFlag.Name),
+		MaxGasLimit:         ctx.GlobalUint64(flags.MaxGasLimitFlag.Name),
 		LogLevel:            ctx.GlobalString(flags.LogLevelFlag.Name),
 		LogTerminal:         ctx.GlobalBool(flags.LogTerminalFlag.Name),
 		SentryEnable:        ctx.GlobalBool(flags.SentryEnableFlag.Name),
