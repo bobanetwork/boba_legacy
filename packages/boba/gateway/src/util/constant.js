@@ -7,6 +7,7 @@ import moment from 'moment'
 require('dotenv').config()
 
 export const POLL_INTERVAL = process.env.REACT_APP_POLL_INTERVAL || 20000
+export const GAS_POLL_INTERVAL = process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
 export const GA4_MEASUREMENT_ID = process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV = process.env.REACT_APP_ENV || 'dev'
 export const APP_CHAIN = process.env.REACT_APP_CHAIN
