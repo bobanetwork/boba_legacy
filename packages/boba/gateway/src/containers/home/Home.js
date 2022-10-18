@@ -43,10 +43,9 @@ import {
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
-import { fetchVerifierStatus } from 'actions/verifierAction'
+
 import {
   fetchBalances,
-  fetchGas,
   addTokenList,
   fetchExits
 } from 'actions/networkAction'
@@ -189,8 +188,6 @@ function Home() {
       dispatch(getMonsterInfo())       // account specific
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
-      dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
     }
@@ -200,8 +197,6 @@ function Home() {
     if (maintenance) return
     // load the following functions when the home page is open
     checkVersion()
-    dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
