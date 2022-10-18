@@ -103,8 +103,7 @@ import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376a
 import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
 import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 
-import tokenInfoMainnet from "@boba/register/addresses/tokenInfoMainnet"
-import tokenInfoRinkeby from "@boba/register/addresses/tokenInfoRinkeby"
+import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
 import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
@@ -120,7 +119,6 @@ let supportedAltL1Chains = []
 
 let allAddresses = {}
 let l0AllProtocols = {}
-let tokenInfo = {}
 // preload allAddresses
 if (APP_CHAIN === 'rinkeby') {
   const bobaBridges = layerZeroTestnet.BOBA_Bridges.Testnet;
@@ -134,7 +132,6 @@ if (APP_CHAIN === 'rinkeby') {
     ...l0Protocols
   }
   supportedAltL1Chains = ['BNB', 'Fantom', 'Avalanche']
-  tokenInfo = tokenInfoRinkeby
 } else if (APP_CHAIN === 'mainnet') {
   const bobaBridges = layerZeroMainnet.BOBA_Bridges.Mainnet;
   const l0Protocols = layerZeroMainnet.Layer_Zero_Protocol.Mainnet;
@@ -147,7 +144,6 @@ if (APP_CHAIN === 'rinkeby') {
     ...l0Protocols
   }
   supportedAltL1Chains = ['Moonbeam','BNB', 'Fantom', 'Avalanche']
-  tokenInfo = tokenInfoMainnet
 }
 let allTokens = {}
 
@@ -233,7 +229,7 @@ class NetworkService {
     this.supportedAltL1Chains = supportedAltL1Chains
 
     // token info
-    this.tokenInfo = tokenInfo
+    this.tokenInfo = {}
   }
 
   bindProviderListeners() {
@@ -739,6 +735,9 @@ class NetworkService {
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L2']['rpcUrl']
       )
+
+      const chainId = (await this.L1Provider.getNetwork()).chainId
+      this.tokenInfo = tokenInfo[chainId]
 
       if (networkGateway === 'rinkeby') {
         addresses = addresses_Rinkeby
@@ -2870,7 +2869,7 @@ class NetworkService {
         //getting eth balance
         //console.log("Getting balance for:", tokenAddress)
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
-        const tokenInfoFiltered = tokenInfo.L1[utils.getAddress(tokenAddress)]
+        const tokenInfoFiltered = this.tokenInfo.L1[utils.getAddress(tokenAddress)]
         if (tokenInfo) {
           tokenSymbol = tokenInfoFiltered.symbol
           tokenName = tokenInfoFiltered.name
@@ -2972,7 +2971,7 @@ class NetworkService {
         decimals = 18
       } else {
         tokenBalance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(allAddresses.L2LPAddress)
-        const tokenInfoFiltered = tokenInfo.L2[utils.getAddress(tokenAddress)]
+        const tokenInfoFiltered = this.tokenInfo.L2[utils.getAddress(tokenAddress)]
         if (tokenInfo) {
           tokenSymbol = tokenInfoFiltered.symbol
           tokenName = tokenInfoFiltered.name
