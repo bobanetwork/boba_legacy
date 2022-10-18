@@ -351,7 +351,7 @@ const turingParse_v0 = (
     // the (0, 8) here is correct because were operating on the hex string
     // methodID for GetResponse is 7d93616c -> [125 147 97 108]
     // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
-    if (turingCall === '7d93616c' || turingCall === '493d57d6') {
+    if (turingCall === '7d93616c' || turingCall === '493d57d6' || turingCall === 'a886988e') {
       // we have a Turing payload
       turing = sequencerTransaction.slice(-turingLength)
       sequencerTransaction = sequencerTransaction.slice(3, -turingLength)
@@ -416,7 +416,7 @@ const turingParse_v1 = (
 
     // methodID for GetResponse is 7d93616c -> [125 147 97 108]
     // methodID for GetRandom   is 493d57d6 -> [ 73  61 87 214]
-    if (turingCall === '7d93616c' || turingCall === '493d57d6') {
+    if (turingCall === '7d93616c' || turingCall === '493d57d6' || turingCall === 'a886988e') {
       // we are all set! we have a Turing v1 payload
       const turingHexString = dataHexString.slice(-turingLength)
       dataHexString = dataHexString.slice(6, -turingLength)

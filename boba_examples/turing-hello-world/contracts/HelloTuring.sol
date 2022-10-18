@@ -79,6 +79,71 @@ contract HelloTuring {
         return result;
     }
 
+    // A method of generating a cached random number using the V2 API. Use with caution
+    // as a hostile client may be able to force a desired outcome by submitting repeated
+    // transactions to eth_estimateGas() before sending one as a real transaction
+    
+    function getSingleRandomV2()
+    public returns (uint256) {
+
+	bytes32 sKey = keccak256("123");
+        uint256 r1;
+	bytes32 r2;
+	(r1, r2) = myHelper.TuringRandomV2(sKey,0,0x1122334455667788112233445566778811223344556677881122334455667788);
+	
+	require(r1 == 0, "Should return 0 for cNum==0");
+	r1 = uint256(r2);
+	
+        emit GetRandom(r1);
+        return r1;
+    }
+    
+   // function nextRandomV2(uint256 cNum, uint256 cNext) {
+   // 
+   // }
+    
+    // This should fail to generate and reveal a V2 random number in a single Tx.    
+    function cheatRandomV2() public {
+ 	bytes32 sKey = keccak256("abc");
+	
+	uint256 cSecret = 1234;
+	bytes32 cHash = keccak256(abi.encodePacked(cSecret));
+	
+        uint256 r1;
+	bytes32 r2;
+	
+	(r1, r2) = myHelper.TuringRandomV2(sKey, 0, cHash);
+	
+	(r1, r2) = myHelper.TuringRandomV2(sKey, cSecret, "0x");
+
+	emit GetRandom(r1);
+    }
+    
+    // Called repeatedly to generate a sequence of random numbers
+    // Stage number is used as the client secret.
+    bytes32 prevHash; 
+    function seqRandomV2(uint32 stage, bool last) public {
+      bytes32 sKey = keccak256("qwerty");
+      uint256 cNum = stage;
+      bytes32 cNextHash;
+
+      if (!last) {
+        cNextHash = keccak256(abi.encodePacked(cNum + 1));
+      }
+      uint256 rNum;
+      bytes32 rNextHash;
+      
+      (rNum, rNextHash) = myHelper.TuringRandomV2(sKey, cNum, cNextHash);
+      emit GetRandom(rNum);
+      
+      if (stage != 0) {
+        // Recover the server secret and test it against prevHash
+	uint256 sNum = rNum ^ cNum;
+	bytes32 sHash = keccak256(abi.encodePacked(sNum));
+	require(sHash == prevHash, "Server secret does not match prevHash");
+      }
+      prevHash = rNextHash;
+    }
 }
 
 

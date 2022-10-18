@@ -20,6 +20,7 @@ interface ITuringHelper {
     function TuringTx(string memory _url, bytes memory _payload) external returns (bytes memory);
 
     function TuringRandom() external returns (uint256);
+    function TuringRandomV2(bytes32, uint256, bytes32) external returns (uint256,bytes32);
 
     function Turing42() external returns (uint256);
 }

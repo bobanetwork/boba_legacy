@@ -93,6 +93,14 @@ contract TuringHelper is ITuringHelper, Ownable {
     return _random;
   }
 
+  function GetRandomV2(uint32 rType, bytes32 _session, uint256 _num, uint256 _next)
+    public returns (uint256, uint256) {
+
+    require (msg.sender == address(this), "Turing:GetResponse:msg.sender != address(this)");
+    require ((rType & 0x00ffffff) == 2, string(GetErrorCode(rType)));
+    return (_num, _next);
+  }
+
   function Get42(uint32 rType, uint256 _random)
     public returns (uint256) {
 
@@ -135,6 +143,82 @@ contract TuringHelper is ITuringHelper, Ownable {
       return response;
   }
 
+  /* Version 2 extends the capabilities of the RNG to preserve internal state across multiple
+     transactions, and adds a mechanism for the client to supply its own randomness so that a
+     malicious server cannot force a pre-determined outcome. This mode requires both client and
+     server to publish commitments in one transaction, revealing their secrets in a subsequent Tx.
+
+     Note that the server-side cache will eventually expire and may be lost in the event of node
+     restarts or other maintenance operations. Client applications must be able to recover from
+     cache-miss conditions.
+     
+     It is possible to use the V2 cache mechanism to generate a random number within a single
+     transaction, using the cache to preserve a result between an eth_estimateGas() call and the
+     actual transaction. This has security implications but may be suitable for some use cases.
+     
+     Because there is a single cache in the l2geth node, a session key is calculated at various
+     stages to isolate requests. The key from the client is hashed along with the msg.sender in
+     this contract, and is hashed again with the address of the helper contract inside l2geth.
+     
+     The protocol to generate random numbers is for the user to first pick a session ID which
+     has not been used previously (the current timestamp or block number could be used). The
+     user then locally generates and stores a random number X1. The user calls TuringRandomV2
+     supplying the session ID, 0 for "num", and the keccak256 hash H(X1) for "next".
+     
+     In response to this call, the server generates its random secret Y1 and stores it in its
+     internal cache using H(X1) as part of the key. The server returns H(Y1) in its 'rNext' field
+     
+     A client application has the option of using H(Y1) as its "random" number and making
+     no further transactions using the same session ID. Y1 is generated and the cache is
+     populated during the first eth_estimateGas() call for the transaction, and the cached value
+     will be used in the actual transaction provided that it has not expired. To support this
+     special-case mode of operation, the server's rNum field will also be populated with H(Y1)
+     during an eth_estimateGas() call or during a real transaction in which a cache entry was
+     found. In the case of a real transaction with a cache miss, rNum will be set to 0.
+     
+     Continuing with the normal sequence, the client will save the value of H(Y1) from the
+     server response and then prepare the next transaction by generating and storing another
+     secret X2. Using the same session key as the previous transaction, the client calls
+     TuringRandomV2(session, X1, H(X2)). The server generates another secret Y2 and stores
+     this into the cache keyed by H(X2), as was done for the first transaction.
+     
+     The server next calculates H(X1) and retrieves the corresponding cache entry containing
+     its secret Y1 (returning an error on a cache miss). The server computes Z1 = (X1 xor Y1)
+     and returns this as its rNum, with H(Y2) as its rNext. Becasuse both sides committed to
+     particular values of X1 and Y1 while not revealing their contents, Z1 is assured to be
+     unpredictable by either party.
+     
+     The client may recover Y1 by calculating (Z1 xor X1), and may then verify that a 
+     calculated H(Y1) matches the commitment returned from the previous transaction.
+     [FIXME - may enforce this in the contract, at the cost of some storage]
+     
+     This sequence may continue indefinitely. To terminate the sequence the client calls
+     TuringRandomV2(session, Xn, 0), i.e. completing the protocol for the current number and
+     signalling that it has not generated an X(n+1). The server response contains (Zn, 0).
+     
+     There is no explicit mechanism to remove cache entries after use. Instead the server will
+     periodically purge entries which are older than some threshold (value TBD and subject to
+     change).
+     
+     The current block number is included when a cache entry is stored, and is checked on a
+     cache retrieval to ensure that the chain has advanced by a sufficient amount (currently
+     set to 1 block but future updates may introduce a larger confirmation depth). If a
+     client application needs to generate more than 1 random number per block then they must
+     be done in separate sessions.
+  */     
+
+  function TuringRandomV2(bytes32 sKey, uint256 num, uint256 next)
+    public onlyPermittedCaller returns (uint256, uint256)
+  {
+    uint256 rNum;
+    uint256 rNext;
+    
+    bytes32 session = keccak256(abi.encodePacked(msg.sender, sKey));
+    (rNum, rNext) = Self.GetRandomV2(0x02000001, session, num, next);
+    
+    emit OffchainRandom(0x02, num);
+    return (num, next);
+  }
   function Turing42()
     public onlyPermittedCaller returns (uint256) {
 

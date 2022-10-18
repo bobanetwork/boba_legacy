@@ -114,7 +114,7 @@ describe('Turing 256 Bit Random Number', () => {
   })
 
   it('Should register and fund your Turing helper contract in turingCredit', async () => {
-    const depositAmount = utils.parseEther('0.20')
+    const depositAmount = utils.parseEther('4.20')
 
     const approveTx = await L2BOBAToken.approve(
       turingCredit.address,
@@ -153,6 +153,102 @@ describe('Turing 256 Bit Random Number', () => {
     const tr = await random.getRandom(gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+  })
+  var lastRandom
+
+  it('should get a single cached V2 random', async () => {
+    const tr = await random.getSingleRandomV2(gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+    lastRandom = result
+  })
+
+  it('should get the same cached V2 random', async () => {
+    const tr = await random.getSingleRandomV2(gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+    expect(result).to.equal(lastRandom)
+  })
+
+  // This presently fails a DEPTH > 1 check, which doesn't return
+  // an explicit error code (should be fixed). In a future version
+  // of the system this test should be modified to check for two
+  // conflicting Txns in a single block (not possible in current Boba)
+  it('should fail to cheat V2 random', async () => {
+    try {
+      const tr = await random.cheatRandomV2(gasOverride)
+      await tr.wait()
+      expect(1).to.equal(0)
+    } catch(e) {
+      expect(e.toString()).to.contain("SERVER_ERROR")
+    }
+  })
+
+  it('should start a V2 sequence (0)', async () => {
+    const tr = await random.seqRandomV2(0, false, gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+  })
+
+   it('should continue a V2 sequence (1)', async () => {
+    const tr = await random.seqRandomV2(1, false, gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+  })
+
+  // This attempts to change the cNum to one which does not
+  // match the cNextHash from the previous call (should be 2,
+  // here we send 12). 
+  it('should fail to cheat a V2 sequence (2A)', async () => {
+    try {
+      const tr = await random.seqRandomV2(12, false, gasOverride)
+      await tr.wait()
+      expect(1).to.equal(0)
+    } catch(e) {
+      expect(e.toString()).to.contain("Missing cache entry")
+    }
+  })
+
+   it('should continue a V2 sequence (2)', async () => {
+    const tr = await random.seqRandomV2(2, false, gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+  })
+
+  it('should end a V2 sequence (3)', async () => {
+    const tr = await random.seqRandomV2(3, true, gasOverride)
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    
     const rawData = res.events[0].data
     const numberHexString = '0x' + rawData.slice(-64)
     const result = BigInt(numberHexString)

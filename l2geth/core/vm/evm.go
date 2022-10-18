@@ -214,109 +214,90 @@ func (evm *EVM) Interpreter() Interpreter {
 	return evm.interpreter
 }
 
-// In response to an off-chain Turing request, obtain the requested data and
-// rewrite the parameters so that the contract can be called without reverting.
-func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
-
-	var ret hexutil.Bytes
-
-	rest := input[4:]
-
-	//some things are easier with a hex string
-	inputHexUtil := hexutil.Bytes(input)
-
-	/* The input and calldata have a well defined structure
-	1/ The methodID (4 bytes)
-	2/ The rType (32 bytes)
-	3/ The return placeholder uint256
-	*/
-
-	// If things fail, we'll return an integer parameter which will fail a
-	// "require" in the contract.
-	retError := make([]byte, len(inputHexUtil))
-	copy(retError, inputHexUtil)
-
-	// Check the rType
-	// 1 for Request, 2 for Response, integer >= 10 for various failures
-	rType := int(rest[31])
-	if rType != 1 {
-		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
-		retError[35] = 10 // Wrong input state
-		return retError
-	}
-
-	rlen := len(rest)
-	if rlen < 2*32 {
-		log.Error("TURING bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
-		retError[35] = 11 // Calldata too short
-		return retError
-	}
-
-	// Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
-	one := big.NewInt(1)
-	two := big.NewInt(2)
-	max := new(big.Int)
-	// Max random value 2^256 - 1
-	max = max.Exp(two, big.NewInt(int64(256)), nil).Sub(max, one)
-	n, err := rand.Int(rand.Reader, max)
-
-	if err != nil {
-		log.Error("TURING bobaTuringRandom:Random Number Generation Failed", "err", err)
-		retError[35] = 16 // RNG Failure
-		return retError
-	}
-
-	//generate a BigInt random number
-	randomBigInt := n
-
-	log.Debug("TURING bobaTuringRandom:Random number",
-		"randomBigInt", randomBigInt)
-
-	// build the calldata
-	methodID := make([]byte, 4)
-	copy(methodID, inputHexUtil[0:4])
-	ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
-	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomBigInt))...)
-
-	log.Debug("TURING bobaTuringRandom:Modified parameters",
-		"newValue", ret)
-
-	return ret
-}
-
 const turingCacheExpire = 5 * time.Second
 const turingCacheClean = 60 * time.Second
 
-type turingCacheEntry struct {
+type commonCacheEntry struct {
 	expires time.Time
+}
+
+type turingCacheEntry struct {
+	commonCacheEntry
 	value   []byte
 }
 
-type turingCache struct {
-	lock      sync.RWMutex
-	entries   map[common.Hash]*turingCacheEntry
-	nextClean time.Time
+type cacher interface {
+	IsExpired(time.Time) bool
+	GetExpires() time.Time
+	SetExpires(time.Time)
 }
 
-func (cache *turingCache) Init() {
+type tCacher interface {
+	cacher
+	GetTuring() []byte
+}
+type rCacher interface {
+	cacher
+	GetRandom() (*big.Int, *big.Int)
+}
+
+type randomCacheEntry struct {
+	commonCacheEntry
+	secret   *big.Int
+	blockNum *big.Int
+}
+
+func (ent *randomCacheEntry) GetRandom() (*big.Int, *big.Int) {
+	return ent.secret, ent.blockNum
+}
+
+func (ent *turingCacheEntry) GetTuring() ([]byte) {
+	return ent.value
+}
+
+type commonCache struct {
+	lock      sync.RWMutex
+	nextClean time.Time
+	entries map[common.Hash] cacher
+}
+
+func (cc *commonCacheEntry) IsExpired(t time.Time) bool {
+	return t.After(cc.expires)
+}
+func (cc *commonCacheEntry) GetExpires() time.Time {
+	return cc.expires
+}
+func (cc *commonCacheEntry) SetExpires(when time.Time) {
+	cc.expires = when
+}
+
+type turingCache struct {
+	commonCache
+}
+
+type randomCache struct {
+	commonCache
+}
+
+func (cache *commonCache) Init() {
 	log.Debug("TURING Cache init")
-	cache.entries = make(map[common.Hash]*turingCacheEntry)
+	cache.entries = make(map[common.Hash] cacher)
 	cache.nextClean = time.Now().Add(turingCacheClean)
 }
 
-func (cache *turingCache) Get(key common.Hash) []byte {
-	ret := []byte{}
+func (cache *commonCache) GetEnt(key common.Hash) cacher {
+	var ret cacher
 
 	cache.lock.Lock()
-	if tCache.entries == nil {
-		tCache.Init()
+	if cache.entries == nil {
+		cache.Init()
 	}
 	if ent, hit := cache.entries[key]; hit {
-		if time.Now().Before(ent.expires) {
-			log.Debug("TURING Cache hit", "key", key, "expires", ent.expires)
-			ret = ent.value
+		if !ent.IsExpired(time.Now()) {  //.Before(ent.(commonCacheEntry).expires) {
+			log.Debug("TURING Cache hit", "key", key, "expires", ent.GetExpires())
+			ret = ent
 		} else {
-			log.Debug("TURING Cache expired", "key", key, "expires", ent.expires)
+			log.Debug("TURING Cache expired", "key", key, "expires", ent.GetExpires())
 			delete(cache.entries, key)
 		}
 	}
@@ -324,21 +305,26 @@ func (cache *turingCache) Get(key common.Hash) []byte {
 	return ret
 }
 
-func (cache *turingCache) Put(key common.Hash, value []byte) {
+func (cache *commonCache) Put(key common.Hash, ent cacher) {
 	cache.lock.Lock()
-	newEnt := &turingCacheEntry{value: value, expires: time.Now().Add(turingCacheExpire)}
-	cache.entries[key] = newEnt
-	log.Debug("TURING Cache insert", "key", key, "expires", newEnt.expires)
+	if cache.entries == nil {
+		cache.Init()
+	}
+
+	ent.SetExpires(time.Now().Add(turingCacheExpire))
+	cache.entries[key] = ent
+	log.Debug("MMDBG commonCache insert", "key", key, "expires", ent.GetExpires())
 	cache.lock.Unlock()
 }
 
-func (cache *turingCache) Trim() {
+func (cache *commonCache) Trim() {
 	cache.lock.Lock()
 	if time.Now().After(cache.nextClean) {
 		log.Debug("TURING scanning cache for expired entries")
 
 		for key, element := range cache.entries {
-			if time.Now().After(element.expires) {
+			//if time.Now().After(element.expires) {
+			if element.IsExpired(time.Now()) {
 				delete(cache.entries, key)
 			}
 		}
@@ -347,7 +333,47 @@ func (cache *turingCache) Trim() {
 	cache.lock.Unlock()
 }
 
+func (cache *turingCache) Put(key common.Hash, value []byte) {
+	newEnt := new(turingCacheEntry)
+	newEnt.value = value
+
+	cache.commonCache.Put(key, tCacher(newEnt))
+	log.Debug("TURING Cache insert", "key", key)
+}
+
+func (cache *randomCache) Put(key common.Hash, secret *big.Int, blockNum *big.Int) {
+	newEnt := new(randomCacheEntry)
+	newEnt.secret = secret
+	newEnt.blockNum = blockNum
+
+	cache.commonCache.Put(key, rCacher(newEnt))
+	log.Debug("TURING Random Cache insert", "key", key)
+}
+
+func (cache *randomCache) Get(key common.Hash) (bool, *big.Int, *big.Int) {
+	var ent cacher
+	ent = cache.GetEnt(key)
+	
+	if ent == nil {
+		return false, nil, nil
+	} else {
+		r1, r2 := ent.(rCacher).GetRandom()
+		return true, r1, r2
+	}
+}
+
+func (cache *turingCache) Get(key common.Hash)(bool, []byte) {
+	var ent cacher
+	ent = cache.GetEnt(key)
+	if ent == nil {
+		return false, nil
+	} else {
+		return true, ent.(tCacher).GetTuring()
+	}
+}
+
 var tCache turingCache
+var rCache randomCache
 
 // In response to an off-chain Turing request, obtain the requested data and
 // rewrite the parameters so that the contract can be called without reverting.
@@ -413,7 +439,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 
 	log.Debug("TURING Cache key", "key", key, "mayBlock", mayBlock)
 
-	ret := tCache.Get(key)
+	_, ret := tCache.Get(key)
 
 	if len(ret) != 0 {
 		return ret, 0
@@ -570,6 +596,227 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	return ret, 0
 }
 
+// In response to an off-chain Turing request, obtain the requested data and
+// rewrite the parameters so that the contract can be called without reverting.
+func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.Bytes {
+
+	var ret hexutil.Bytes
+
+	rest := input[4:]
+
+	//some things are easier with a hex string
+	inputHexUtil := hexutil.Bytes(input)
+
+	/* The input and calldata have a well defined structure
+	1/ The methodID (4 bytes)
+	2/ The rType (32 bytes)
+	3/ The return placeholder uint256
+	*/
+
+	// If things fail, we'll return an integer parameter which will fail a
+	// "require" in the contract.
+	retError := make([]byte, len(inputHexUtil))
+	copy(retError, inputHexUtil)
+
+	// Check the rType
+	// 1 for Request, 2 for Response, integer >= 10 for various failures
+	rType := int(rest[31])
+	if rType != 1 {
+		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
+		retError[35] = 10 // Wrong input state
+		return retError
+	}
+
+	rlen := len(rest)
+	if rlen < 2*32 {
+		log.Error("TURING bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
+		retError[35] = 11 // Calldata too short
+		return retError
+	}
+
+	// Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
+	one := big.NewInt(1)
+	two := big.NewInt(2)
+	max := new(big.Int)
+	// Max random value 2^256 - 1
+	max = max.Exp(two, big.NewInt(int64(256)), nil).Sub(max, one)
+	n, err := rand.Int(rand.Reader, max)
+
+	if err != nil {
+		log.Error("TURING bobaTuringRandom:Random Number Generation Failed", "err", err)
+		retError[35] = 16 // RNG Failure
+		return retError
+	}
+
+	//generate a BigInt random number
+	randomBigInt := n
+
+	log.Debug("TURING bobaTuringRandom:Random number",
+		"randomBigInt", randomBigInt)
+
+	// build the calldata
+	methodID := make([]byte, 4)
+	copy(methodID, inputHexUtil[0:4])
+	ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 2))...) // the usual prefix and the rType, now changed to 2
+	ret = append(ret, hexutil.MustDecode(fmt.Sprintf("0x%064x", randomBigInt))...)
+
+	log.Debug("TURING bobaTuringRandom:Modified parameters",
+		"newValue", ret)
+
+	return ret
+}
+
+func bobaBigRandom() (*big.Int, error) {
+
+	// Generate cryptographically strong pseudo-random int between 0 - 2^256 - 1
+	one := big.NewInt(1)
+	two := big.NewInt(2)
+	max := new(big.Int)
+	// Max random value 2^256 - 1
+	max = max.Exp(two, big.NewInt(int64(256)), nil).Sub(max, one)
+	n, err := rand.Int(rand.Reader, max)
+	
+	return n,err
+}
+
+// Helper function to convert a big.Int into a zero-padded uint256 representation which
+// can be hashed to the same result as a Solidity keccak256(abi.encodePacked(val)).
+func U256(val *big.Int) []byte {
+	var ret []byte
+	x := len(val.Bytes())
+	ret = make([]byte, 32 - x)
+	ret = append(ret, val.Bytes()...)
+	return ret
+}
+
+func (evm *EVM) bobaTuringRandomV2(input []byte, caller common.Address, mayBlock bool, blockNum *big.Int) hexutil.Bytes {
+
+	var ret hexutil.Bytes
+
+	rest := input[4:]
+
+	//some things are easier with a hex string
+	inputHexUtil := hexutil.Bytes(input)
+
+	// If things fail, we'll return an integer parameter which will fail a
+	// "require" in the contract.
+	retError := make([]byte, len(inputHexUtil))
+	copy(retError, inputHexUtil)
+	
+	ret = retError
+	
+	log.Debug("MMDBG bobaTuringRandomV2", "caller", caller, "mayBlock", mayBlock, "BN", blockNum, "rest", hexutil.Bytes(rest))
+
+	rType := int(rest[31])
+	rVersion := int(rest[28]) // 0 for legacy, 2 for current
+	if rType != 1 {
+		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
+		retError[35] = 10 // Wrong input state
+		return retError
+	}
+	if rVersion != 2 {
+		log.Error("TURING bobaTuringRandom:Wrong version (rVersion != 2)", "rType", rType)
+		retError[35] = 10 // Wrong input state
+		return retError
+	}
+
+	rlen := len(rest)
+	if rlen != 4*32 {
+		log.Error("TURING bobaTuringRandom:Calldata wrong size", "len < 2*32", rlen)
+		retError[35] = 11 // Calldata too short
+		return retError
+	}
+	
+	sKey := rest[32:64]
+	cNum := new(big.Int).SetBytes(rest[64:96])
+	cNext := new(common.Hash)
+	cNext.SetBytes(rest[96:128])
+	
+	log.Debug("MMDBG params", "sKey", hexutil.Bytes(sKey), "cNum", cNum, "cNext", cNext)
+	
+	sNum := new(big.Int)
+	sNext := new(common.Hash)
+	sRand := new(big.Int)
+	sBN := new(big.Int)
+	
+	var err error
+	var found bool
+	var zeroHash common.Hash
+
+	if *cNext != zeroHash {
+		// Generate a Put cache key from H(caller + sKey + cNext)
+		hasher := sha3.NewLegacyKeccak256()
+		hasher.Write(caller.Bytes())
+		hasher.Write(sKey)
+		hasher.Write(cNext.Bytes())
+		key := common.BytesToHash(hasher.Sum(nil))
+
+		found, sRand, sBN = rCache.Get(key)		
+		if !found {
+			sRand, err = bobaBigRandom()
+			if err != nil {
+				log.Error("TURING bobaTuringRandom:Random Number Generation Failed", "err", err)
+				retError[35] = 16 // RNG Failure
+				return retError
+			}
+			log.Debug("MMDBG Put cache", "key", key, "BN", evm.Context.BlockNumber, "secret", hexutil.Bytes(sRand.Bytes()))
+			rCache.Put(key, sRand, evm.Context.BlockNumber)
+		} else {
+			log.Debug("MMDBG rCache hit for", "key", key, "sRand", hexutil.Bytes(sRand.Bytes()), "sBN", sBN)
+		}
+
+		h2 := sha3.NewLegacyKeccak256()
+		h2.Write(U256(sRand))
+		sNext.SetBytes(h2.Sum(nil))
+
+		log.Debug("MMDBG TURING bobaTuringRandom:Random number",
+			"sRand", hexutil.Bytes(sRand.Bytes()), "sNext", hexutil.Bytes(sNext.Bytes()))
+	}
+
+	if cNum.Cmp(bigZero) != 0 {
+		// Generate a Get cache key from H(caller + sKey + H(cNum))
+		h2 := sha3.NewLegacyKeccak256()
+		h2.Write(U256(cNum))
+		cHash := new(common.Hash)
+		cHash.SetBytes(h2.Sum(nil))
+
+		hasher := sha3.NewLegacyKeccak256()
+		hasher.Write(caller.Bytes())
+		hasher.Write(sKey)
+		hasher.Write(cHash.Bytes())
+		key := common.BytesToHash(hasher.Sum(nil))
+		log.Debug("MMDBG Get cache", "key", key)
+
+		found, sRand, sBN = rCache.Get(key)
+		if !found {
+			log.Warn("MMDBG randCache miss", "sKey", hexutil.Bytes(sKey), "key", key)
+			retError[35] = 20 // Missing cache entry
+			return retError
+		} else if sBN.Cmp(evm.Context.BlockNumber) == 0 {
+			retError[35] = 16 // RNG Failure, could assign a new code.
+			log.Warn("MMDBG returning err16 for sameBN conflict", "retError", retError)
+			return retError
+		} else {
+			sNum.Xor(cNum, sRand)
+			log.Debug("MMDBG xor", "x", cNum, "y", sRand, "z", sNum)
+		}
+	}
+
+	// build the calldata
+	methodID := make([]byte, 4)
+	copy(methodID, inputHexUtil[0:4])
+	ret = append(methodID, hexutil.MustDecode(fmt.Sprintf("0x%064x", 0x02000002))...) //  rType now changed to 2
+	ret = append(ret, sKey...)
+	ret = append(ret, U256(sNum)...)
+	ret = append(ret, sNext.Bytes()...)
+
+	log.Debug("TURING bobaTuringRandomV2:Modified parameters",
+		"newValue", ret)
+	return ret
+}
+
+
+
 // Call executes the contract associated with the addr with the given input as
 // parameters. It also handles any necessary value transfer required and takes
 // the necessary steps to create accounts and reverses the state in case of an
@@ -632,6 +879,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	}
 
 	isTuring2 := false
+	isGetRand := false
 	isGetRand2 := false
 
 	// Geth test sometimes calls this with length zero input; this check is needed for tests to complete
@@ -640,8 +888,12 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		isTuring2 = bytes.Equal(input[:4], []byte{125, 147, 97, 108})
 
 		//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
-		isGetRand2 = bytes.Equal(input[:4], []byte{73, 61, 87, 214})
+		isGetRand = bytes.Equal(input[:4], []byte{73, 61, 87, 214})
+		
+		//methodID for GetRandomV2 is a886988e -> [168, 134, 152, 142]
+		isGetRand2 = bytes.Equal(input[:4], []byte{168, 134, 152, 142})
 	}
+	log.Debug("MMDBG isTuring", "method", hexutil.Bytes(input[:4]))
 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
@@ -650,9 +902,9 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 	// Sanity and depth checks
 	prefix_str := "Regular"
-	if isTuring2 || isGetRand2 {
+	if isTuring2 || isGetRand || isGetRand2 {
 		prefix_str = "TURING"
-		log.Debug("TURING REQUEST START", "input", hexutil.Bytes(input), "len(evm.Context.Turing)", len(evm.Context.Turing))
+		log.Debug("TURING REQUEST START", "tDepth", evm.Context.TuringDepth, "input", hexutil.Bytes(input), "len(evm.Context.Turing)", len(evm.Context.Turing))
 		// Check 1. can only run Turing once anywhere in the call stack
 		if evm.Context.TuringDepth > 1 {
 			log.Error("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
@@ -672,10 +924,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// We sometimes use a short evm.Context.Turing payload for debug purposes, hence the < 2.
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
+
+			mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
 			if isTuring2 {
 				// If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
 				// As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
-				mayBlock := (evm.Context.GasPrice.Cmp(bigZero) == 0)
 				log.Debug("TURING preCall", "mayBlock", mayBlock, "gasPrice", evm.Context.GasPrice)
 				updated_input, _ = evm.bobaTuringCall(input, caller.Address(), mayBlock)
 
@@ -692,14 +945,18 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 					log.Debug("TURING Deducting calldata gas", "had", contract.Gas, "len", len(updated_input), "Mul", evm.Context.TuringGasMul, "deducting", turingGas)
 					contract.UseGas(turingGas)
 				}
-			} else if isGetRand2 {
+			} else if isGetRand {
 				updated_input = evm.bobaTuringRandom(input, caller.Address())
+			} else if isGetRand2 {
+				log.Debug("MMDBG bobaTuringRandomV2 pre-call", "mayBlock", mayBlock, "ctx", evm.Context)
+				updated_input = evm.bobaTuringRandomV2(input, caller.Address(), mayBlock, evm.Context.BlockNumber)
 			} // there is no other option
 			ret, err = run(evm, contract, updated_input, false)
 			log.Debug("TURING NEW CALL", "updated_input", updated_input, "ret", hexutil.Bytes(ret), "err", err)
 			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
-			evm.Context.TuringDepth++
+			evm.Context.TuringDepth += 2 	// FIXME - This is initialized differently in Sequencer or Replica mode.
+							// Workaround is to incr. by 2 to avoid calling twice in Sequencer mode.
 		} else {
 			// We are in Verifier/Replica mode
 			// Turing for this Transaction has already been run elsewhere - replay using
