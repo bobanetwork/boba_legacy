@@ -461,6 +461,8 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
 
         if (pairNFT.baseNetwork == Network.L1) {
+            // replyNeeded helps store the status if a message needs to be sent back to the other layer
+            bool replyNeeded = false;
             // Check the target token is compliant and
             // verify the deposited token on L1 matches the L2 deposited token representation here
             if (
@@ -470,11 +472,18 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             ) {
                 // When a deposit is finalized, we credit the account on L2 with the same amount of
                 // tokens.
-                IL2StandardERC721(_l2Contract).mint(_to, _tokenId, _data);
-                emit DepositFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+                try IL2StandardERC721(_l2Contract).mint(_to, _tokenId, _data) {
+                    emit DepositFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+                } catch {
+                    replyNeeded = true;
+                }
             } else {
+                replyNeeded = true;
+            }
+
+            if (replyNeeded) {
                 // Either the L2 token which is being deposited-into disagrees about the correct address
-                // of its L1 token, or does not support the correct interface.
+                // of its L1 token, or does not support the correct interface, or maybe the l2 mint reverted
                 // This should only happen if there is a  malicious L2 token, or if a user somehow
                 // specified the wrong L2 token address to deposit into.
                 // In either case, we stop the process here and construct a withdrawal
