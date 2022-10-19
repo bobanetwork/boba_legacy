@@ -170,6 +170,7 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         external
         onlyOwner()
         onlyNotInitialized()
+        initializer()
     {
         require(_BobaTokenAddress != address(0), "zero address not allowed");
         minDepositAmount = _minDepositAmount;
