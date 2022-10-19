@@ -1181,6 +1181,7 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL1).to.deep.eq(ethers.constants.AddressZero)
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
+  })
 
   describe('L1 native NFT - with Unique Data tests', async () => {
     before(async () => {
