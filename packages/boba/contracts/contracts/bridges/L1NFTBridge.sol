@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 // @unsupported: ovm
+
+/**
+ Note: This contract has not been audited, excercise caution when using this on mainnet
+ */
 pragma solidity >0.7.5;
 pragma experimental ABIEncoderV2;
 

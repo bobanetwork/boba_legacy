@@ -2,6 +2,8 @@
 
 <img width="1097" alt="Boba NFT Bridge" src="https://user-images.githubusercontent.com/46272347/145503571-0b5e34c9-c55e-4ff8-8749-19a130d32958.png">
 
+> **Note: These contracts have not been audited, excercise caution when using them on mainnet**
+
 Boba NFT bridges support **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
 
 * Native L1 NFT: the original NFT contract was deployed on L1
