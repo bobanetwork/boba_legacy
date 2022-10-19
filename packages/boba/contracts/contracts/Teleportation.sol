@@ -24,6 +24,8 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
     struct Disbursement {
         uint256 amount;
         address addr;
+        uint256 sourceChainId;
+        uint256 depositId;
     }
 
     /*************
@@ -34,14 +36,16 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
     address public owner;
     address public BobaTokenAddress;
 
+    mapping(uint256 => bool) public supportedChains;
+
     // The minimum amount that be deposited in a receive.
     uint256 public minDepositAmount;
     // The maximum amount that be deposited in a receive.
     uint256 public maxDepositAmount;
     // The total number of successful deposits received.
-    uint256 public totalDeposits;
+    mapping (uint256 => uint256) public totalDeposits;
     /// The total number of disbursements processed.
-    uint256 public totalDisbursements;
+    mapping (uint256 => uint256) public totalDisbursements;
 
     // set maximum amount of tokens can be transferred in 24 hours
     uint256 public maxTransferAmountPerDay;
@@ -80,21 +84,24 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
     );
 
     event BobaReceived(
+        uint256 indexed sourceChainId,
         uint256 indexed depositId,
         address indexed emitter,
-        uint256 indexed amount
+        uint256 amount
     );
 
     event DisbursementSuccess(
         uint256 indexed depositId,
         address indexed to,
-        uint256 amount
+        uint256 amount,
+        uint256 sourceChainId
     );
 
     event DisbursementFailed(
         uint256 indexed depositId,
         address indexed to,
-        uint256 amount
+        uint256 amount,
+        uint256 sourceChainId
     );
 
     event DisburserTransferred(
@@ -105,13 +112,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         address newOwner
     );
 
-    /********************
-     *    Constructor   *
-     ********************/
-
-    constructor() {
-        totalDisbursements = 0;
-    }
+    event ChainSupported(
+        uint256 indexed chainId,
+        bool supported
+    );
 
     /**********************
      * Function Modifiers *
@@ -148,16 +152,6 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
     }
 
     /********************
-     * Fall back Functions *
-     ********************/
-
-    receive()
-        external
-        payable
-        onlyAltL2s()
-    {}
-
-    /********************
      * Public Functions *
      ********************/
 
@@ -176,12 +170,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         external
         onlyOwner()
         onlyNotInitialized()
-        initializer()
     {
         require(_BobaTokenAddress != address(0), "zero address not allowed");
         minDepositAmount = _minDepositAmount;
         maxDepositAmount = _maxDepositAmount;
-        totalDeposits = 0;
         BobaTokenAddress = _BobaTokenAddress;
         disburser = msg.sender;
         owner = msg.sender;
@@ -202,20 +194,46 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
     }
 
     /**
+     * @dev add the support between this chain and the given chain.
+     *
+     * @param _chainId The target chain Id to support.
+     */
+    function addSupportedChain(uint256 _chainId) external onlyOwner() onlyInitialized() {
+        supportedChains[_chainId] = true;
+        totalDeposits[_chainId] = 0;
+        totalDisbursements[_chainId] = 0;
+
+        emit ChainSupported(_chainId, true);
+    }
+
+    /**
+     * @dev remove the support between this chain and the given chain.
+     *
+     * @param _chainId The target chain Id not to support.
+     */
+    function removeSupportedChain(uint256 _chainId) external onlyOwner() onlyInitialized() {
+        supportedChains[_chainId] = false;
+
+        emit ChainSupported(_chainId, false);
+    }
+
+    /**
      * @dev Accepts deposits that will be disbursed to the sender's address on target L2.
      * The method reverts if the amount is less than the current
      * minDepositAmount, the amount is greater than the current
      * maxDepositAmount.
      *
      * @param _amount The amount of BOBA to deposit.
+     * @param _toChainId The destination chain ID.
      */
-    function teleportBOBA(uint256 _amount)
+    function teleportBOBA(uint256 _amount, uint256 _toChainId)
         external
         onlyNotAltL2s()
         whenNotPaused()
     {
         require(_amount >= minDepositAmount, "Deposit amount is too small");
         require(_amount <= maxDepositAmount, "Deposit amount is too big");
+        require(supportedChains[_toChainId], "Target chain is not supported");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
@@ -231,10 +249,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         IERC20(BobaTokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
 
         unchecked {
-            totalDeposits += 1;
+            totalDeposits[_toChainId] += 1;
         }
 
-        emit BobaReceived(totalDeposits, msg.sender, _amount);
+        emit BobaReceived(_toChainId, totalDeposits[_toChainId], msg.sender, _amount);
     }
 
     /**
@@ -244,8 +262,9 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
      * maxDepositAmount.
      *
      * @param _amount The amount of BOBA to deposit.
+     * @param _toChainId The destination chain ID.
      */
-    function teleportNativeBOBA(uint256 _amount)
+    function teleportNativeBOBA(uint256 _amount, uint256 _toChainId)
         external
         payable
         onlyAltL2s()
@@ -254,6 +273,7 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         require(_amount >= minDepositAmount, "Deposit amount is too small");
         require(_amount <= maxDepositAmount, "Deposit amount is too big");
         require(_amount == msg.value, "Amount does not match msg.value");
+        require(supportedChains[_toChainId], "Target chain is not supported");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
@@ -267,10 +287,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         }
 
         unchecked {
-            totalDeposits += 1;
+            totalDeposits[_toChainId] += 1;
         }
 
-        emit BobaReceived(totalDeposits, msg.sender, _amount);
+        emit BobaReceived(_toChainId, totalDeposits[_toChainId], msg.sender, _amount);
     }
 
     /**
@@ -281,10 +301,9 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
      * disbursements will not cause the method to revert, but will instead be
      * held by the contract and availabe for the owner to withdraw.
      *
-     * @param _nextDepositId The depositId of the first Dispursement.
      * @param _disbursements A list of Disbursements to process.
      */
-    function disburseNativeBOBA(uint256 _nextDepositId, Disbursement[] calldata _disbursements)
+    function disburseNativeBOBA(Disbursement[] calldata _disbursements)
         external
         payable
         onlyDisburser()
@@ -295,13 +314,6 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         uint256 _numDisbursements = _disbursements.length;
         require(_numDisbursements > 0, "No disbursements");
 
-        // Ensure the _nextDepositId matches our expected value.
-        uint256 _depositId = totalDisbursements;
-        require(_depositId == _nextDepositId, "Unexpected next deposit id");
-        unchecked {
-            totalDisbursements += _numDisbursements;
-        }
-
         // Ensure the amount sent in the transaction is equal to the sum of the
         // disbursements.
         uint256 _totalDisbursed = 0;
@@ -310,12 +322,20 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         }
 
         // Ensure the balance is enough to cover the disbursements.
-        require(_totalDisbursed <= address(this).balance, "Insufficient balance to disburse");
+        require(_totalDisbursed == msg.value, "Disbursement total != amount sent");
 
         // Process disbursements.
         for (uint256 i = 0; i < _numDisbursements; i++) {
             uint256 _amount = _disbursements[i].amount;
             address _addr = _disbursements[i].addr;
+            uint256 _sourceChainId = _disbursements[i].sourceChainId;
+            uint256 _depositId = _disbursements[i].depositId;
+
+            // Ensure the depositId matches our expected value.
+            require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
+            unchecked {
+                totalDisbursements[_sourceChainId] += 1;
+            }
 
             // Deliver the dispursement amount to the receiver. If the
             // disbursement fails, the amount will be kept by the contract
@@ -324,12 +344,8 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
 
             // slither-disable-next-line calls-loop,reentrancy-events
             (bool success, ) = _addr.call{ value: _amount, gas: 1000000 }("");
-            if (success) emit DisbursementSuccess(_depositId, _addr, _amount);
-            else emit DisbursementFailed(_depositId, _addr, _amount);
-
-            unchecked {
-                _depositId += 1;
-            }
+            if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
+            else emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
         }
     }
 
@@ -341,10 +357,9 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
      * disbursements will not cause the method to revert, but will instead be
      * held by the contract and availabe for the owner to withdraw.
      *
-     * @param _nextDepositId The depositId of the first Dispursement.
      * @param _disbursements A list of Disbursements to process.
      */
-    function disburseBOBA(uint256 _nextDepositId, Disbursement[] calldata _disbursements)
+    function disburseBOBA(Disbursement[] calldata _disbursements)
         external
         payable
         onlyDisburser()
@@ -355,13 +370,6 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
         uint256 _numDisbursements = _disbursements.length;
         require(_numDisbursements > 0, "No disbursements");
 
-        // Ensure the _nextDepositId matches our expected value.
-        uint256 _depositId = totalDisbursements;
-        require(_depositId == _nextDepositId, "Unexpected next deposit id");
-        unchecked {
-            totalDisbursements += _numDisbursements;
-        }
-
         // Ensure the amount sent in the transaction is equal to the sum of the
         // disbursements.
         uint256 _totalDisbursed = 0;
@@ -369,13 +377,20 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
             _totalDisbursed += _disbursements[i].amount;
         }
 
-        // Ensure the balance is enough to cover the disbursements.
-        require(_totalDisbursed <= IERC20(BobaTokenAddress).balanceOf(address(this)), "Insufficient balance to disburse");
+        IERC20(BobaTokenAddress).safeTransferFrom(msg.sender, address(this), _totalDisbursed);
 
         // Process disbursements.
         for (uint256 i = 0; i < _numDisbursements; i++) {
             uint256 _amount = _disbursements[i].amount;
             address _addr = _disbursements[i].addr;
+            uint256 _sourceChainId = _disbursements[i].sourceChainId;
+            uint256 _depositId = _disbursements[i].depositId;
+
+            // Ensure the depositId matches our expected value.
+            require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
+            unchecked {
+                totalDisbursements[_sourceChainId] += 1;
+            }
 
             // Deliver the dispursement amount to the receiver. If the
             // disbursement fails, the amount will be kept by the contract
@@ -383,11 +398,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
             // disbursements.
 
             // slither-disable-next-line calls-loop,reentrancy-events
-            IERC20(BobaTokenAddress).safeTransferFrom(address(this), _addr, _amount);
-            emit DisbursementSuccess(_depositId, _addr, _amount);
-
-            unchecked {
-                _depositId += 1;
+            try IERC20(BobaTokenAddress).transferFrom(address(this), _addr, _amount) {
+                emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
+            } catch {
+                emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
             }
         }
     }
