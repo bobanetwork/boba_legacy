@@ -1103,10 +1103,11 @@ describe('NFT Bridge Test', async () => {
       )
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
-      const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
+      await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token'
+      )
 
       expect(ownerL1).to.deep.eq(env.l1Wallet.address)
-      expect(ownerL2).to.deep.eq(ethers.constants.AddressZero)
     })
   })
 
@@ -1119,8 +1120,8 @@ describe('NFT Bridge Test', async () => {
       )
 
       Factory__L1ERC721 = new ContractFactory(
-        L2ERC721FailingMintJson.abi,
-        L2ERC721FailingMintJson.bytecode,
+        L1ERC721FailingMintJson.abi,
+        L1ERC721FailingMintJson.bytecode,
         env.l1Wallet
       )
 
@@ -1175,10 +1176,11 @@ describe('NFT Bridge Test', async () => {
         L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
 
-      const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
+      await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token'
+      )
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
 
-      expect(ownerL1).to.deep.eq(ethers.constants.AddressZero)
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
     })
   })
