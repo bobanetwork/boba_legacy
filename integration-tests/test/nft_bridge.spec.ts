@@ -2218,7 +2218,7 @@ describe('NFT Bridge Test', async () => {
     })
 
     it('{tag:boba} should deposit NFT back without sending data for non-native token', async () => {
-      const approveTX = await L1ERC721.connect(env.l2Wallet).approve(
+      const approveTX = await L1ERC721.connect(env.l1Wallet).approve(
         L1Bridge.address,
         DUMMY_TOKEN_ID
       )
