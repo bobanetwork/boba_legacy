@@ -1,6 +1,6 @@
 # BOBA NFT Bridge
 
-BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1 and the [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on L2. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
+BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1 and the [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on L2. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth. **These two contracts have not been audited, exercise caution when using this on mainnet.**
 
 * Native L1 NFT: the original NFT contract was deployed on L1
 * Native L2 NFT: the original NFT contract was deployed on L2
