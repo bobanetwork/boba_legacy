@@ -200,9 +200,8 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
      * @param _chainId The target chain Id to support.
      */
     function addSupportedChain(uint256 _chainId) external onlyOwner() onlyInitialized() {
+        require(supportedChains[_chainId] == false, "Chain is already supported");
         supportedChains[_chainId] = true;
-        totalDeposits[_chainId] = 0;
-        totalDisbursements[_chainId] = 0;
 
         emit ChainSupported(_chainId, true);
     }
@@ -213,6 +212,7 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
      * @param _chainId The target chain Id not to support.
      */
     function removeSupportedChain(uint256 _chainId) external onlyOwner() onlyInitialized() {
+        require(supportedChains[_chainId] == true, "Chain is already not supported");
         supportedChains[_chainId] = false;
 
         emit ChainSupported(_chainId, false);
@@ -249,11 +249,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
 
         IERC20(BobaTokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
 
+        emit BobaReceived(_toChainId, totalDeposits[_toChainId], msg.sender, _amount);
         unchecked {
             totalDeposits[_toChainId] += 1;
         }
-
-        emit BobaReceived(_toChainId, totalDeposits[_toChainId], msg.sender, _amount);
     }
 
     /**
@@ -287,11 +286,10 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
             transferTimestampCheckPoint = block.timestamp;
         }
 
+        emit BobaReceived(_toChainId, totalDeposits[_toChainId], msg.sender, _amount);
         unchecked {
             totalDeposits[_toChainId] += 1;
         }
-
-        emit BobaReceived(_toChainId, totalDeposits[_toChainId], msg.sender, _amount);
     }
 
     /**
@@ -399,7 +397,7 @@ contract Teleportation is ReentrancyGuardUpgradeable, PausableUpgradeable {
             // disbursements.
 
             // slither-disable-next-line calls-loop,reentrancy-events
-            try IERC20(BobaTokenAddress).transferFrom(address(this), _addr, _amount) {
+            try IERC20(BobaTokenAddress).transfer(_addr, _amount) {
                 emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
             } catch {
                 emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
