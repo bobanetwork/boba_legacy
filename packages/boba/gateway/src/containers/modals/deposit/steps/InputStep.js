@@ -23,7 +23,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   const dispatch = useDispatch()
   const [ enableToL2Account, setEnableToL2Account ] = useState(false);
-  const [ recipient, setRecipient ] = useState(null);
+  const [ recipient, setRecipient ] = useState('');
   const [ value, setValue ] = useState('')
   const [ value_Wei_String, setValue_Wei_String ] = useState('0')  //support for Use Max
 

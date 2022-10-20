@@ -28,7 +28,7 @@ if (APP_CHAIN === 'rinkeby') {
         name: "Rinkeby",
         chainId: 4,
         chainIdHex: '0x4',
-        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_ID}`,
+        rpcUrl:  "https://rpc.ankr.com/eth_rinkeby",//`https://goerli.infura.io/v3/${INFURA_ID}`,
         blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: `https://rinkeby.etherscan.io/tx/`
       },

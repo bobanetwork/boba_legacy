@@ -2554,7 +2554,7 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      let depositTx;
+      let depositTX;
 
       if (!recipient) {
         // incase no recipient
