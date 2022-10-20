@@ -1108,7 +1108,7 @@ describe('NFT Bridge Test', async () => {
       )
 
       expect(ownerL1).to.deep.eq(env.l1Wallet.address)
-    })
+    }).timeout(100000)
   })
 
   describe('L2 native NFT - failing mint on L1', async () => {
@@ -1182,7 +1182,7 @@ describe('NFT Bridge Test', async () => {
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
 
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
-    })
+    }).timeout(100000)
   })
 
   describe('L1 native NFT - with Unique Data tests', async () => {
