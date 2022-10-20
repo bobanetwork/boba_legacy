@@ -38,6 +38,7 @@ const initialState = {
   alert: null,
   error: null,
   lock: null,
+  proposalId: null,
   activeHistoryTab: 'All',
   activeDataTab: 'Seven Day Queue',
 };
@@ -53,6 +54,7 @@ function uiReducer (state = initialState, action) {
         token: action.token,
         tokenIndex: action.tokenIndex,
         lock: action.lock, // incase of lock record
+        proposalId: action.proposalId, // incase of vote on proposal
       }
     case 'UI/MODAL/CLOSE':
       return { ...state, [action.payload]: false }

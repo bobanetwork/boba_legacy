@@ -115,6 +115,12 @@ const main = async () => {
     parseInt(env.RESUBMISSION_TIMEOUT, 10) || 60
   )
 
+  // enable filter for message relayer
+  const ENABLE_RELAYER_FILTER = config.bool(
+    'enable-relayer-filter',
+    env.ENABLE_RELAYER_FILTER === 'true'
+  )
+
   if (!L1_NODE_WEB3_URL) {
     throw new Error('Must pass L1_NODE_WEB3_URL')
   }
@@ -163,6 +169,7 @@ const main = async () => {
     multiRelayLimit: MULTI_RELAY_LIMIT,
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
     isFastRelayer: FAST_RELAYER,
+    enableRelayerFilter: ENABLE_RELAYER_FILTER,
   })
 
   await service.start()
