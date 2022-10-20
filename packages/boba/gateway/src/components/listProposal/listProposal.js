@@ -16,8 +16,8 @@ limitations under the License. */
 import { Circle } from '@mui/icons-material'
 import { Box, LinearProgress, Link, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { castProposalVote, executeProposal, queueProposal } from 'actions/daoAction'
-import { openAlert } from 'actions/uiAction'
+import { executeProposal, queueProposal } from 'actions/daoAction'
+import { openAlert, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
@@ -54,9 +54,8 @@ function ListProposal({
     }, [ proposal ])
 
 
-    const updateVote = async (id, userVote, label) => {
-        let res = await dispatch(castProposalVote({ id, userVote }));
-        if (res) dispatch(openAlert(`${label}`))
+    const onVote = (id) => {
+      dispatch(openModal('castVoteModal', null, null, null, null, id))
     }
 
     const doQueueProposal = async () => {
@@ -74,13 +73,13 @@ function ListProposal({
             let descList = description.split('@@')
             if (descList[ 1 ] !== '') {
                 //should validate http link
-                return <>{descList[ 0 ]}&nbsp;&nbsp;<Link
-                    color="inherit"
-                    variant="body2"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={descList[ 1 ]}
-                  >MORE DETAILS</Link></>
+              return <Typography variant="body2" display="flex">&nbsp;{descList[ 0 ]}&nbsp;&nbsp;<Link
+                color="inherit"
+                variant="body2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={descList[ 1 ]}
+              >More details</Link></Typography>
             } else {
                 return <>{descList[ 0 ]}</>
             }
@@ -91,8 +90,7 @@ function ListProposal({
     const startTime = moment.unix(proposal.startTimestamp).format('lll')
     const endTime = moment.unix(proposal.endTimestamp).format('lll')
 
-    let hasVoted = false
-    if(proposal.hasVoted && proposal.hasVoted.hasVoted) hasVoted = true
+    let hasVoted = proposal.hasVoted
 
     return (
         <S.Wrapper>
@@ -106,26 +104,30 @@ function ListProposal({
                     xs={12}
                     md={12}
                 >
-                    <Typography variant="body2" style={{ fontWeight: '700' }}>
-                        Proposal {proposal.id} : <FormatDescription description={proposal.description} />
-                    </Typography>
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" component="span" style={{ fontWeight: '700' }}> Proposal {proposal.id} : </Typography> <FormatDescription description={proposal.description} />
+                    </Box>
                     <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', my: '10px' }}>
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography style={{ fontSize: '0.8em', opacity: '0.65', lineHeight: '1.2em' }}>
-                                Voting Time
-                            </Typography>
-                            <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
-                                <Typography component="span" variant='body3' sx={{opacity: 0.65}}>
-                                    {startTime}
-                                </Typography >
-                                &nbsp; - &nbsp;
-                                <Typography component="span" variant='body3' sx={{opacity: 0.65}}>
-                                    {endTime}
-                                </Typography >
-                            </Typography>
+                          <Typography style={{ fontSize: '0.8em', opacity: '0.65', lineHeight: '1.2em' }}>
+                            Voting Time
+                          </Typography>
+                          <Box display="flex" alignItems="center">
+                            <Typography component="span" variant='body3' sx={{ opacity: 0.65, fontSize: '0.8em' }}>
+                              {startTime}
+                            </Typography >
+                            &nbsp; - &nbsp;
+                            <Typography component="span" variant='body3' sx={{ opacity: 0.65, fontSize: '0.8em' }}>
+                              {endTime}
+                            </Typography >
+                          </Box>
+
+                          <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
+
+                          </Typography>
                         </Box>
                         <Typography variant="overline" style={{ fontSize: '0.8em', lineHeight: '1.2em' }}>
-                            Status: &nbsp;
+                            {/* Status: &nbsp; */}
                             {proposal.state === 'Defeated' && proposal.totalVotes < 1000000 &&
                                 <span style={{ color: 'red' }}>
                                     <Circle sx={{ height: "10px", width: "10px" }} />&nbsp;
@@ -220,22 +222,8 @@ function ListProposal({
                             <Button
                                 type="primary"
                                 variant="outlined"
-                                onClick={(e) => { updateVote(proposal.id, 1, 'Cast Vote For') }}
-                            >Vote For</Button>
-                        }
-                        {proposal.state === 'Active' && !hasVoted &&
-                            <Button
-                                type="primary"
-                                variant="outlined"
-                                onClick={(e) => { updateVote(proposal.id, 0, 'Cast Vote Against') }}
-                            >Vote Against</Button>
-                        }
-                        {proposal.state === 'Active' && !hasVoted &&
-                            <Button
-                                type="outline"
-                                variant="outlined"
-                                onClick={(e) => { updateVote(proposal.id, 2, 'Cast Vote Abstain') }}
-                            >Vote Abstain</Button>
+                                onClick={(e) => { onVote(proposal.id) }}
+                            >Vote</Button>
                         }
                         {proposal.state === 'Queued' &&
                             <Button type="primary" variant="outlined" onClick={(e) => { doExecuteProposal() }}>EXECUTE</Button>

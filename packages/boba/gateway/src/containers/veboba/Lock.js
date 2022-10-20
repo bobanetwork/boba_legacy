@@ -9,7 +9,7 @@ import * as S from './Lock.styles'
 import CreateLock from './createLock/CreateLock'
 import LockRecords from './Records/Records'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 const data = [
   { name: '0', uv: 0 },
@@ -22,12 +22,13 @@ const data = [
 function Lock() {
   const dispatch = useDispatch();
   const accountEnabled = useSelector(selectAccountEnabled())
+  const layer = useSelector(selectLayer())
 
   useEffect(() => {
-    if (!!accountEnabled) {
+    if (!!accountEnabled && layer === 'L2') {
       dispatch(fetchLockRecords());
     }
-  }, [ accountEnabled, dispatch ]);
+  }, [ accountEnabled,layer, dispatch ]);
 
 
   return <S.PageContainer>

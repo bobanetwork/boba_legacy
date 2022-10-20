@@ -18,3 +18,4 @@ gateway.boba.betwork.
 | REACT_APP_GA4_MEASUREMENT_ID | Yes      | N/A          | Google analytics api key                                        |
 | REACT_APP_SENTRY_DSN         | Yes      | N/A          | Sentry DSN url to catch the error on frontend                   |
 | REACT_APP_ENABLE_LOCK_PAGE   | No       | N/A          | to enable the lock page on gateway menu                         |
+| REACT_APP_GAS_POLL_INTERVAL   | Yes       | 30000          | Poll interval to fetch the gas price and verifier status                         |
