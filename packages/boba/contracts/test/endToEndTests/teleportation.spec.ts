@@ -63,7 +63,7 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should revert when initialize again', async () => {
+    it('should revert when initialize again', async () => {
       await expect(
         Proxy__Teleportation.initialize(
           L2Boba.address,
@@ -73,41 +73,41 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Contract has been initialized')
     })
 
-    it.only('should add the supported chain', async () => {
+    it('should add the supported chain', async () => {
       await Proxy__Teleportation.addSupportedChain(4)
       expect(await Proxy__Teleportation.supportedChains(4)).to.eq(true)
     })
 
-    it.only('should not add the supported chain if it is added', async () => {
+    it('should not add the supported chain if it is added', async () => {
       await expect(
         Proxy__Teleportation.addSupportedChain(4)
       ).to.be.revertedWith('Chain is already supported')
     })
 
-    it.only('should not add the supported chain if caller is not owner', async () => {
+    it('should not add the supported chain if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).addSupportedChain(4)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should remove the supported chain', async () => {
+    it('should remove the supported chain', async () => {
       await Proxy__Teleportation.removeSupportedChain(4)
       expect(await Proxy__Teleportation.supportedChains(4)).to.eq(false)
     })
 
-    it.only('should not remove if it is already not supported', async () => {
+    it('should not remove if it is already not supported', async () => {
       await expect(
         Proxy__Teleportation.removeSupportedChain(4)
       ).to.be.revertedWith('Chain is already not supported')
     })
 
-    it.only('should not remove the supported chain if caller is not owner', async () => {
+    it('should not remove the supported chain if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).removeSupportedChain(4)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should teleport BOBA tokens and emit event', async () => {
+    it('should teleport BOBA tokens and emit event', async () => {
       await Proxy__Teleportation.addSupportedChain(4)
       const _amount = ethers.utils.parseEther('100')
       const preBalance = await L2Boba.balanceOf(signerAddress)
@@ -125,7 +125,7 @@ describe('BOBA Teleportation', async () => {
       expect(preBalance.sub(_amount)).to.be.eq(postBalance)
     })
 
-    it.only('should not teleport BOBA tokens if the amount exceeds the daily limit', async () => {
+    it('should not teleport BOBA tokens if the amount exceeds the daily limit', async () => {
       const maxTransferAmountPerDay =
         await Proxy__Teleportation.maxTransferAmountPerDay()
       const transferredAmount = await Proxy__Teleportation.transferredAmount()
@@ -136,7 +136,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('max amount per day exceeded')
     })
 
-    it.only('should reset the transferred amount', async () => {
+    it('should reset the transferred amount', async () => {
       await ethers.provider.send('evm_increaseTime', [86400])
       const _amount = ethers.utils.parseEther('1')
       const transferTimestampCheckPoint =
@@ -149,7 +149,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.not.eq(transferTimestampCheckPoint)
     })
 
-    it.only('should revert if call teleportNativeBOBA function', async () => {
+    it('should revert if call teleportNativeBOBA function', async () => {
       const _amount = ethers.utils.parseEther('1')
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(
@@ -157,7 +157,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Only alt L2s can call this function')
     })
 
-    it.only('should revert if _toChainId is not supported', async () => {
+    it('should revert if _toChainId is not supported', async () => {
       const _amount = ethers.utils.parseEther('10')
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(
@@ -165,7 +165,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Target chain is not supported')
     })
 
-    it.only('should disburse BOBA tokens', async () => {
+    it('should disburse BOBA tokens', async () => {
       const preBalance = await L2Boba.balanceOf(Proxy__Teleportation.address)
       const preSignerBalance = await L2Boba.balanceOf(signerAddress)
       const payload = [
@@ -196,7 +196,7 @@ describe('BOBA Teleportation', async () => {
       expect(postSignerBalance).to.be.eq(preSignerBalance)
     })
 
-    it.only('should disburse BOBA tokens and emit events', async () => {
+    it('should disburse BOBA tokens and emit events', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
@@ -212,7 +212,7 @@ describe('BOBA Teleportation', async () => {
         .withArgs(2, signerAddress, _amount, 4)
     })
 
-    it.only('should not disburse BOBA tokens if the depositId is worng', async () => {
+    it('should not disburse BOBA tokens if the depositId is worng', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
@@ -228,7 +228,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Unexpected next deposit id')
     })
 
-    it.only('should not disburse tokens if it is not approved', async () => {
+    it('should not disburse tokens if it is not approved', async () => {
       const _amount = ethers.utils.parseEther('101')
       const payload = [
         {
@@ -243,7 +243,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('ERC20: transfer amount exceeds allowance')
     })
 
-    it.only('should not disburse tokens if caller is not disburser', async () => {
+    it('should not disburse tokens if caller is not disburser', async () => {
       const _amount = ethers.utils.parseEther('100')
       await L2Boba.transfer(signer2Address, _amount)
       const payload = [
@@ -263,7 +263,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Caller is not the disburser')
     })
 
-    it.only('should revert if disburse the native BOBA token', async () => {
+    it('should revert if disburse the native BOBA token', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
@@ -278,7 +278,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Only alt L2s can call this function')
     })
 
-    it.only('should transfer disburser to another wallet', async () => {
+    it('should transfer disburser to another wallet', async () => {
       await Proxy__Teleportation.transferDisburser(signer2Address)
       expect(await Proxy__Teleportation.disburser()).to.be.eq(signer2Address)
       await Proxy__Teleportation.connect(signer2).transferDisburser(
@@ -286,13 +286,13 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should not transfer disburser to another wallet if caller is not owner', async () => {
+    it('should not transfer disburser to another wallet if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).transferDisburser(signer2Address)
       ).to.be.revertedWith('Caller is not the disburser')
     })
 
-    it.only('should withdraw BOBA balance', async () => {
+    it('should withdraw BOBA balance', async () => {
       const preSignerBalnce = await L2Boba.balanceOf(signerAddress)
       const preBalance = await L2Boba.balanceOf(Proxy__Teleportation.address)
       await Proxy__Teleportation.withdrawBOBABalance()
@@ -304,13 +304,13 @@ describe('BOBA Teleportation', async () => {
       expect(postBalance.toString()).to.be.eq('0')
     })
 
-    it.only('should not withdraw BOBA balance if caller is not owner', async () => {
+    it('should not withdraw BOBA balance if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).withdrawBOBABalance()
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should pause contract', async () => {
+    it('should pause contract', async () => {
       await Proxy__Teleportation.pause()
       expect(await Proxy__Teleportation.paused()).to.be.eq(true)
       await expect(Proxy__Teleportation.teleportBOBA(1, 4)).to.be.revertedWith(
@@ -321,7 +321,7 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should unpause contract', async () => {
+    it('should unpause contract', async () => {
       await Proxy__Teleportation.unpause()
       expect(await Proxy__Teleportation.paused()).to.be.eq(false)
       const _amount = ethers.utils.parseEther('100')
@@ -382,7 +382,7 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should revert when initialize again', async () => {
+    it('should revert when initialize again', async () => {
       await expect(
         Proxy__Teleportation.initialize(
           '0x4200000000000000000000000000000000000006',
@@ -392,41 +392,41 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Contract has been initialized')
     })
 
-    it.only('should add the supported chain', async () => {
+    it('should add the supported chain', async () => {
       await Proxy__Teleportation.addSupportedChain(4)
       expect(await Proxy__Teleportation.supportedChains(4)).to.eq(true)
     })
 
-    it.only('should not add the supported chain if it is added', async () => {
+    it('should not add the supported chain if it is added', async () => {
       await expect(
         Proxy__Teleportation.addSupportedChain(4)
       ).to.be.revertedWith('Chain is already supported')
     })
 
-    it.only('should not add the supported chain if caller is not owner', async () => {
+    it('should not add the supported chain if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).addSupportedChain(4)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should remove the supported chain', async () => {
+    it('should remove the supported chain', async () => {
       await Proxy__Teleportation.removeSupportedChain(4)
       expect(await Proxy__Teleportation.supportedChains(4)).to.eq(false)
     })
 
-    it.only('should not remove if it is already not supported', async () => {
+    it('should not remove if it is already not supported', async () => {
       await expect(
         Proxy__Teleportation.removeSupportedChain(4)
       ).to.be.revertedWith('Chain is already not supported')
     })
 
-    it.only('should not remove the supported chain if caller is not owner', async () => {
+    it('should not remove the supported chain if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).removeSupportedChain(4)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should teleport BOBA tokens and emit event', async () => {
+    it('should teleport BOBA tokens and emit event', async () => {
       await Proxy__Teleportation.addSupportedChain(4)
       const _amount = ethers.utils.parseEther('100')
       const preBalance = await ethers.provider.getBalance(signerAddress)
@@ -448,7 +448,7 @@ describe('BOBA Teleportation', async () => {
       expect(preBalance.sub(_amount)).to.be.eq(postBalance.add(gasFee))
     })
 
-    it.only('should not teleport BOBA tokens if the amount exceeds the daily limit', async () => {
+    it('should not teleport BOBA tokens if the amount exceeds the daily limit', async () => {
       const maxTransferAmountPerDay =
         await Proxy__Teleportation.maxTransferAmountPerDay()
       const _amount = ethers.utils.parseEther('200')
@@ -463,7 +463,7 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should reset the transferred amount', async () => {
+    it('should reset the transferred amount', async () => {
       await ethers.provider.send('evm_increaseTime', [86400])
       const _amount = ethers.utils.parseEther('1')
       const transferTimestampCheckPoint =
@@ -478,14 +478,14 @@ describe('BOBA Teleportation', async () => {
       ).to.be.not.eq(transferTimestampCheckPoint)
     })
 
-    it.only('should revert if call teleportBOBA function', async () => {
+    it('should revert if call teleportBOBA function', async () => {
       const _amount = ethers.utils.parseEther('1')
       await expect(
         Proxy__Teleportation.teleportBOBA(_amount, 4)
       ).to.be.revertedWith('Only not alt L2s can call this function')
     })
 
-    it.only('should revert if msg.value is wrong', async () => {
+    it('should revert if msg.value is wrong', async () => {
       await expect(
         Proxy__Teleportation.teleportNativeBOBA(
           ethers.utils.parseEther('20'),
@@ -495,7 +495,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Amount does not match msg.value')
     })
 
-    it.only('should revert if _toChainId is not supported', async () => {
+    it('should revert if _toChainId is not supported', async () => {
       const _amount = ethers.utils.parseEther('10')
       await expect(
         Proxy__Teleportation.teleportNativeBOBA(_amount, 100, {
@@ -504,7 +504,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Target chain is not supported')
     })
 
-    it.only('should disburse BOBA tokens', async () => {
+    it('should disburse BOBA tokens', async () => {
       const preBalance = await ethers.provider.getBalance(
         Proxy__Teleportation.address
       )
@@ -539,7 +539,7 @@ describe('BOBA Teleportation', async () => {
       expect(postSignerBalance).to.be.eq(preSignerBalance.sub(gasFee))
     })
 
-    it.only('should disburse BOBA tokens and emit events', async () => {
+    it('should disburse BOBA tokens and emit events', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
@@ -556,7 +556,7 @@ describe('BOBA Teleportation', async () => {
         .withArgs(2, signerAddress, _amount, 4)
     })
 
-    it.only('should not disburse BOBA tokens if the depositId is worng', async () => {
+    it('should not disburse BOBA tokens if the depositId is worng', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
@@ -571,7 +571,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Unexpected next deposit id')
     })
 
-    it.only('should not disburse tokens if msg.value is wrong', async () => {
+    it('should not disburse tokens if msg.value is wrong', async () => {
       const _amount = ethers.utils.parseEther('101')
       const payload = [
         {
@@ -586,7 +586,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Disbursement total != amount sent')
     })
 
-    it.only('should not disburse tokens if caller is not disburser', async () => {
+    it('should not disburse tokens if caller is not disburser', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
@@ -603,7 +603,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Caller is not the disburser')
     })
 
-    it.only('should transfer disburser to another wallet', async () => {
+    it('should transfer disburser to another wallet', async () => {
       await Proxy__Teleportation.transferDisburser(signer2Address)
       expect(await Proxy__Teleportation.disburser()).to.be.eq(signer2Address)
       await Proxy__Teleportation.connect(signer2).transferDisburser(
@@ -611,13 +611,13 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should not transfer disburser to another wallet if caller is not owner', async () => {
+    it('should not transfer disburser to another wallet if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).transferDisburser(signer2Address)
       ).to.be.revertedWith('Caller is not the disburser')
     })
 
-    it.only('should withdraw BOBA balance', async () => {
+    it('should withdraw BOBA balance', async () => {
       const preSignerBalnce = await ethers.provider.getBalance(signerAddress)
       const preBalance = await ethers.provider.getBalance(
         Proxy__Teleportation.address
@@ -634,13 +634,13 @@ describe('BOBA Teleportation', async () => {
       expect(postBalance.toString()).to.be.eq('0')
     })
 
-    it.only('should not withdraw BOBA balance if caller is not owner', async () => {
+    it('should not withdraw BOBA balance if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).withdrawNativeBOBABalance()
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should pause contract', async () => {
+    it('should pause contract', async () => {
       await Proxy__Teleportation.pause()
       expect(await Proxy__Teleportation.paused()).to.be.eq(true)
       await expect(
@@ -651,7 +651,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Pausable: paused')
     })
 
-    it.only('should unpause contract', async () => {
+    it('should unpause contract', async () => {
       await Proxy__Teleportation.unpause()
       expect(await Proxy__Teleportation.paused()).to.be.eq(false)
       const _amount = ethers.utils.parseEther('100')
@@ -716,7 +716,7 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should transferOwnership', async () => {
+    it('should transferOwnership', async () => {
       await Proxy__Teleportation.transferOwnership(signer2Address)
       expect(await Proxy__Teleportation.owner()).to.be.eq(signer2Address)
       await Proxy__Teleportation.connect(signer2).transferOwnership(
@@ -724,20 +724,20 @@ describe('BOBA Teleportation', async () => {
       )
     })
 
-    it.only('should not transferOwnership if caller is not owner', async () => {
+    it('should not transferOwnership if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).transferOwnership(signer2Address)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should set minimum amount', async () => {
+    it('should set minimum amount', async () => {
       await Proxy__Teleportation.setMinAmount(ethers.utils.parseEther('1'))
       expect(
         (await Proxy__Teleportation.minDepositAmount()).toString()
       ).to.be.eq(ethers.utils.parseEther('1'))
     })
 
-    it.only('should not set minimum amount if caller is not owner', async () => {
+    it('should not set minimum amount if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).setMinAmount(
           ethers.utils.parseEther('1')
@@ -745,14 +745,14 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should set maximum amount', async () => {
+    it('should set maximum amount', async () => {
       await Proxy__Teleportation.setMaxAmount(ethers.utils.parseEther('1'))
       expect(
         (await Proxy__Teleportation.maxDepositAmount()).toString()
       ).to.be.eq(ethers.utils.parseEther('1'))
     })
 
-    it.only('should not set maximum amount if caller is not owner', async () => {
+    it('should not set maximum amount if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).setMaxAmount(
           ethers.utils.parseEther('1')
@@ -760,7 +760,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it.only('should set daily limit', async () => {
+    it('should set daily limit', async () => {
       await Proxy__Teleportation.setMaxTransferAmountPerDay(
         ethers.utils.parseEther('1')
       )
@@ -769,7 +769,7 @@ describe('BOBA Teleportation', async () => {
       ).to.be.eq(ethers.utils.parseEther('1'))
     })
 
-    it.only('should not set daily limit if caller is not owner', async () => {
+    it('should not set daily limit if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).setMaxTransferAmountPerDay(
           ethers.utils.parseEther('1')
