@@ -2078,7 +2078,7 @@ describe('NFT Bridge Test', async () => {
       expect(l2TokenURI).to.deep.eq(l1TokenURI)
     })
 
-    it('should deposit NFT back without sending data for non-native token', async () => {
+    it('{tag:boba} should deposit NFT back without sending data for non-native token', async () => {
       const approveTX = await L1ERC721.connect(env.l1Wallet).approve(
         L1Bridge.address,
         DUMMY_TOKEN_ID
@@ -2278,7 +2278,6 @@ describe('NFT Bridge Test', async () => {
     })
   })
 
-
   describe('L1 native NFT - failing mint on L2', async () => {
     before(async () => {
       Factory__L1ERC721 = new ContractFactory(
@@ -2331,9 +2330,34 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      await env.waitForRevertXDomainTransactionL2(
-        L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999)
+      const depositTx = await env.waitForXDomainTransaction(
+        await L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )
+
+      // submit a random l2 tx, so the relayer is unstuck for the tests
+      await env.l2Wallet_2.sendTransaction({
+        to: env.l2Wallet_2.address,
+        value: utils.parseEther('0.01'),
+        gasLimit: 1000000,
+      })
+
+      const backTx = await env.messenger.l2Provider.getTransaction(
+        depositTx.remoteReceipt.transactionHash
+      )
+      await env.waitForXDomainTransaction(backTx)
+
+      // check event DepositFailed is emittted
+      const returnedlogIndex = await getFilteredLogIndex(
+        depositTx.remoteReceipt,
+        L2NFTBridge.abi,
+        L2Bridge.address,
+        'DepositFailed'
+      )
+      const ifaceL2NFTBridge = new ethers.utils.Interface(L2NFTBridge.abi)
+      const log = ifaceL2NFTBridge.parseLog(
+        depositTx.remoteReceipt.logs[returnedlogIndex]
+      )
+      expect(log.args._tokenId).to.deep.eq(DUMMY_TOKEN_ID)
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
