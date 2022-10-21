@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 // @unsupported: ovm
+
+/**
+ Note: This contract has not been audited, exercise caution when using this on mainnet
+ */
 pragma solidity >0.7.5;
 pragma experimental ABIEncoderV2;
 
@@ -407,6 +411,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
 
             emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
         } else {
+            // replyNeeded helps store the status if a message needs to be sent back to the other layer
+            bool replyNeeded = false;
             // Check the target token is compliant and
             // verify the deposited token on L2 matches the L1 deposited token representation here
             if (
@@ -416,9 +422,16 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             ) {
                 // When a deposit is finalized, we credit the account on L2 with the same amount of
                 // tokens.
-                IL1StandardERC721(_l1Contract).mint(_to, _tokenId, _data);
-                emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+                try IL1StandardERC721(_l1Contract).mint(_to, _tokenId, _data) {
+                    emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
+                } catch {
+                    replyNeeded = true;
+                }
             } else {
+                replyNeeded = true;
+            }
+
+            if (replyNeeded) {
                 bytes memory message = abi.encodeWithSelector(
                     iL2NFTBridge.finalizeDeposit.selector,
                     _l1Contract,

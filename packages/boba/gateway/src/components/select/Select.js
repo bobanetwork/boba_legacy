@@ -14,33 +14,52 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import { Select as MuiSelect, MenuItem, useTheme, Typography } from '@mui/material';
+import ReactSelect from 'react-select';
+import { Select as MuiSelect, MenuItem, useTheme, Typography, Box } from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
 import { ArrowDropDownOutlined } from '@mui/icons-material';
+import {
+  Option,
+  MultiValue,
+  SingleValue
+} from './Custom.select';
 
-function Select ({
+function Select({
   label,
   value,
   options,
   onSelect,
   loading,
   error = '',
-  className
+  className,
+  newSelect = false,
+  isMulti,
+  isLoading = false,
 }) {
   const theme = useTheme();
   const selected = options.find(i => i.value === value);
 
-  function renderOption (i) {
+  function renderOption(i) {
+    let title = '';
     if (i.title && i.subTitle) {
-      return `${i.title} - ${i.subTitle}`;
+      title = `${i.title} - ${i.subTitle}`;
     }
     if (i.title && !i.subTitle) {
-      return i.title;
+      title = i.title;
     }
     if (i.subTitle && !i.title) {
-      return i.subTitle;
+      title = i.subTitle;
     }
+
+    return (
+      <>
+        {i.image ? i.image : null}
+        <Typography variant="body2">
+          {title}
+        </Typography>
+      </>
+    )
   }
 
   const renderLoading = (
@@ -52,14 +71,14 @@ function Select ({
   const renderSelect = (
     <>
       <MuiSelect
-        IconComponent={()=> <ArrowDropDownOutlined />}
+        IconComponent={() => <ArrowDropDownOutlined />}
         className={styles.select}
         value={value}
         onChange={onSelect}
         autoWidth
         MenuProps={{
           sx: {
-            '&& .Mui-selected':{
+            '&& .Mui-selected': {
               backgroundColor: 'transparent !important',
               color: '#BAE21A'
             }
@@ -77,10 +96,10 @@ function Select ({
                   {i.title}
                 </Typography>
                 <Typography variant="body3" sx={{ opacity: 0.65, color: 'inherit' }}>
-                    {i.description}
+                  {i.description}
                 </Typography>
               </div>
-            : renderOption(i)}
+              : renderOption(i)}
           </MenuItem>
         ))}
       </MuiSelect>
@@ -97,6 +116,64 @@ function Select ({
       </div>
     </>
   );
+
+  // TODO: Make use of react-select across all.
+  if (newSelect) {
+    return <Box className={[
+      styles.Select,
+      className
+    ].join(' ')}>
+      {label && <Box className={styles.label}>{label}</Box>}
+      <ReactSelect
+        value={value}
+        onChange={onSelect}
+        isMulti={isMulti}
+        options={options}
+        isLoading={isLoading}
+        styles={{
+          control: (base) => ({
+            ...base,
+            background: theme.palette.background.default,
+            borderRadius: theme.palette.primary.borderRadius,
+            padding: '5px 10px',
+            width: '100%',
+            border: '1px solid rgba(255, 255, 255, 0.14)'
+          }),
+          indicatorSeparator: (base) => ({
+            ...base,
+            display: 'none'
+          }),
+          container: (base) => ({
+            ...base,
+            background: theme.palette.background.default
+          }),
+          singleValue: (base) => ({
+            ...base,
+            background: 'transperant',
+            color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
+            padding: '5px'
+          }),
+          multiValue: (base) => ({
+            ...base,
+            background: theme.palette.background.secondary,
+            color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
+            marginRight: '5px',
+            paddingRight: '5px',
+          }),
+          valueContainer: (base) => ({
+            ...base,
+            background: theme.palette.background.default
+          })
+        }}
+        theme={theme}
+        components={{
+          Option,
+          MultiValue,
+          SingleValue
+        }}
+      />
+    </Box>
+  }
 
   return (
     <div
