@@ -130,7 +130,7 @@ function FeeSwitcher() {
 
   if (layer !== 'L2') {
     return <S.FeeSwitcherWrapper>
-      <Tooltip title={'After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ETH as the gas fee token according to your choice.'}>
+      <Tooltip title={`After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ${networkService.L1NativeTokenSymbol} as the gas fee token according to your choice.`}>
         <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
       </Tooltip>
       <Typography variant="body2">Fee</Typography>
