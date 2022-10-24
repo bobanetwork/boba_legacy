@@ -197,7 +197,7 @@ function TokenPage() {
 
             <Typography variant="body3" sx={{ opacity: 0.65, marginBottom: "10px" }}>
               Welcome developers.
-              For 10 testnet BOBA, tweet your Boba Bubble and
+              For testnet BOBA and ETH, tweet your Boba Bubble and
               then paste the tweet link in the field below.
             </Typography>
 
