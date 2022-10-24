@@ -993,13 +993,13 @@ class NetworkService {
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4,
+          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
           fastRelayer: false,
         })
         this.fastWatcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4,
+          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
           fastRelayer: true,
         })
       }
