@@ -13,7 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { APP_CHAIN, ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG } from './constant'
+import {
+  APP_CHAIN, ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
+  RINKEBY_L1_NAME,
+  RINKEBY_L1_CHAIN_ID,
+  RINKEBY_L1_CHAIN_ID_HEX,
+  RINKEBY_L1_RPC_URL,
+  RINKEBY_L2_NAME,
+  RINKEBY_L2_CHAIN_ID,
+  RINKEBY_L2_CHAIN_ID_HEX,
+  RINKEBY_L2_RPC_URL,
+} from './constant'
 
 let NETWORK
 
@@ -25,18 +35,18 @@ if (APP_CHAIN === 'rinkeby') {
       MM_Label: `Rinkeby`,
       addressManager: `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`,
       L1: {
-        name: "Rinkeby",
-        chainId: 4,
-        chainIdHex: '0x4',
-        rpcUrl:  "https://rpc.ankr.com/eth_rinkeby",
+        name: RINKEBY_L1_NAME,
+        chainId: Number(RINKEBY_L1_CHAIN_ID),
+        chainIdHex: RINKEBY_L1_CHAIN_ID_HEX,
+        rpcUrl: RINKEBY_L1_RPC_URL,
         blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: `https://rinkeby.etherscan.io/tx/`
       },
       L2: {
-        name: "BOBA Rinkeby L2",
-        chainId: 28,
-        chainIdHex: '0x1C',
-        rpcUrl: `https://rinkeby.boba.network`,
+        name: RINKEBY_L2_NAME,
+        chainId: Number(RINKEBY_L2_CHAIN_ID),
+        chainIdHex: RINKEBY_L2_CHAIN_ID_HEX,
+        rpcUrl: RINKEBY_L2_RPC_URL,
         blockExplorer: `https://testnet.bobascan.com/`,
         transaction: `https://testnet.bobascan.com/tx/`
       },

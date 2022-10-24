@@ -24,6 +24,17 @@ export const APP_AIRDROP = process.env.REACT_APP_AIRDROP
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 
+// Rinkeby Chain Configs.
+export const RINKEBY_L1_NAME= process.env.REACT_APP_RINKEBY_L1_NAME
+export const RINKEBY_L1_CHAIN_ID= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID
+export const RINKEBY_L1_CHAIN_ID_HEX= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID_HEX
+export const RINKEBY_L1_RPC_URL= process.env.REACT_APP_RINKEBY_L1_RPC_URL
+export const RINKEBY_L2_NAME= process.env.REACT_APP_RINKEBY_L2_NAME
+export const RINKEBY_L2_CHAIN_ID= process.env.REACT_APP_RINKEBY_L2_CHAIN_ID
+export const RINKEBY_L2_CHAIN_ID_HEX= process.env.REACT_APP_RINKEBY_L2_CHAIN_ID_HEX
+export const RINKEBY_L2_RPC_URL= process.env.REACT_APP_RINKEBY_L2_RPC_URL
+
+
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",
   CLASSIC_BRIDGE: "CLASSIC_BRIDGE",
