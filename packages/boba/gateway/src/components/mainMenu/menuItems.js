@@ -1,33 +1,41 @@
+import { ROUTES_PATH } from "util/constant";
+
 export const menuItems = [
   {
     key: 'Bridge',
     icon: "WalletIcon",
     title: "Bridge",
-    url: "/bridge"
+    url: ROUTES_PATH.BRIDGE
   },
   {
     key: 'Ecosystem',
     icon: "SafeIcon",
     title: "Ecosystem",
-    url: "/ecosystem"
+    url: ROUTES_PATH.ECOSYSTEM
   },
   {
     key: 'Wallet',
     icon: "WalletIcon",
     title: "Wallet",
-    url: "/wallet"
+    url: ROUTES_PATH.WALLET
   },
   {
     key: 'History',
     icon: "HistoryIcon",
     title: "History",
-    url: "/history"
+    url: ROUTES_PATH.HISTORY
   },
   {
-    key: 'Farm',
+    key: 'Earn',
     icon: "EarnIcon",
     title: "Earn",
-    url: "/farm",
+    url: ROUTES_PATH.EARN
+  },
+  {
+    key: 'Stake',
+    icon: "StakeIcon",
+    title: "Stake",
+    url: ROUTES_PATH.STAKE
   },
   {
     key: 'Lock',
@@ -36,15 +44,15 @@ export const menuItems = [
     url: "/lock",
   },
   {
-    key: 'Save',
-    icon: "SaveIcon",
-    title: "Stake",
-    url: "/save",
+    key: 'Vote',
+    icon: "VoteIcon",
+    title: "Vote&Dao",
+    url: ROUTES_PATH.VOTE_DAO
   },
   {
-    key: 'DAO',
-    icon: "DAOIcon",
-    title: "DAO",
-    url: "/dao"
+    key: 'LinksToBobaChains',
+    icon: "LinksToBobaChainsIcon",
+    title: "BOBA Chains",
+    url: ROUTES_PATH.BOBA_CHAINS
   }
 ]

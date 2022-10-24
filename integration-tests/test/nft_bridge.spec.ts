@@ -20,6 +20,9 @@ import L2ERC721ExtraDataJson from '../artifacts/contracts/TestExtraDataL2Standar
 import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
+import L1ERC721FailingMintJson from '../artifacts/contracts/TestFailingMintL1StandardERC721.sol/TestFailingMintL1StandardERC721.json'
+import L2ERC721FailingMintJson from '../artifacts/contracts/TestFailingMintL2StandardERC721.sol/TestFailingMintL2StandardERC721.json'
+
 import { OptimismEnv } from './shared/env'
 import { ethers } from 'hardhat'
 
@@ -2076,7 +2079,7 @@ describe('NFT Bridge Test', async () => {
     })
 
     it('{tag:boba} should deposit NFT back without sending data for non-native token', async () => {
-      const approveTX = await L1ERC721.connect(env.l2Wallet).approve(
+      const approveTX = await L1ERC721.connect(env.l1Wallet).approve(
         L1Bridge.address,
         DUMMY_TOKEN_ID
       )
@@ -2273,6 +2276,170 @@ describe('NFT Bridge Test', async () => {
       expect(ownerL2).to.be.deep.eq(env.l2Wallet.address)
       expect(tokenURI).to.be.deep.eq(DUMMY_URI_1 + 'xyz')
     })
+  })
+
+  describe('L1 native NFT - failing mint on L2', async () => {
+    before(async () => {
+      Factory__L1ERC721 = new ContractFactory(
+        ERC721Json.abi,
+        ERC721Json.bytecode,
+        env.l1Wallet
+      )
+
+      Factory__L2ERC721 = new ContractFactory(
+        L2ERC721FailingMintJson.abi,
+        L2ERC721FailingMintJson.bytecode,
+        env.l2Wallet
+      )
+
+      L1ERC721 = await Factory__L1ERC721.deploy('Test', 'TST')
+
+      await L1ERC721.deployTransaction.wait()
+
+      L2ERC721 = await Factory__L2ERC721.deploy(
+        L2Bridge.address,
+        L1ERC721.address,
+        'Test',
+        'TST',
+        '' // base-uri
+      )
+
+      await L2ERC721.deployTransaction.wait()
+
+      // register NFT
+      const registerL1BridgeTx = await L1Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L1'
+      )
+      await registerL1BridgeTx.wait()
+
+      const registerL2BridgeTx = await L2Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L1'
+      )
+      await registerL2BridgeTx.wait()
+    })
+
+    it('{tag:boba} should try deposit NFT to L2', async () => {
+      // mint nft
+      const mintTx = await L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID)
+      await mintTx.wait()
+
+      const approveTx = await L1ERC721.approve(L1Bridge.address, DUMMY_TOKEN_ID)
+      await approveTx.wait()
+
+      const depositTx = await env.waitForXDomainTransaction(
+        await L1Bridge.depositNFT(L1ERC721.address, DUMMY_TOKEN_ID, 9999999)
+      )
+
+      // submit a random l2 tx, so the relayer is unstuck for the tests
+      await env.l2Wallet_2.sendTransaction({
+        to: env.l2Wallet_2.address,
+        value: utils.parseEther('0.01'),
+        gasLimit: 1000000,
+      })
+
+      const backTx = await env.messenger.l2Provider.getTransaction(
+        depositTx.remoteReceipt.transactionHash
+      )
+      await env.waitForXDomainTransaction(backTx)
+
+      // check event DepositFailed is emittted
+      const returnedlogIndex = await getFilteredLogIndex(
+        depositTx.remoteReceipt,
+        L2NFTBridge.abi,
+        L2Bridge.address,
+        'DepositFailed'
+      )
+      const ifaceL2NFTBridge = new ethers.utils.Interface(L2NFTBridge.abi)
+      const log = ifaceL2NFTBridge.parseLog(
+        depositTx.remoteReceipt.logs[returnedlogIndex]
+      )
+      expect(log.args._tokenId).to.deep.eq(DUMMY_TOKEN_ID)
+
+      const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
+      await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token'
+      )
+
+      expect(ownerL1).to.deep.eq(env.l1Wallet.address)
+    }).timeout(100000)
+  })
+
+  describe('L2 native NFT - failing mint on L1', async () => {
+    before(async () => {
+      Factory__L2ERC721 = new ContractFactory(
+        ERC721Json.abi,
+        ERC721Json.bytecode,
+        env.l2Wallet
+      )
+
+      Factory__L1ERC721 = new ContractFactory(
+        L1ERC721FailingMintJson.abi,
+        L1ERC721FailingMintJson.bytecode,
+        env.l1Wallet
+      )
+
+      // deploy a L2 native NFT token each time if existing contracts are used for tests
+      L2ERC721 = await Factory__L2ERC721.deploy('Test', 'TST')
+
+      await L2ERC721.deployTransaction.wait()
+
+      L1ERC721 = await Factory__L1ERC721.deploy(
+        L1Bridge.address,
+        L2ERC721.address,
+        'Test',
+        'TST',
+        '' // base-uri
+      )
+
+      await L1ERC721.deployTransaction.wait()
+
+      // register NFT
+      const registerL1BridgeTx = await L1Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L2'
+      )
+      await registerL1BridgeTx.wait()
+
+      const registerL2BridgeTx = await L2Bridge.registerNFTPair(
+        L1ERC721.address,
+        L2ERC721.address,
+        'L2'
+      )
+      await registerL2BridgeTx.wait()
+    })
+
+    it('{tag:boba} should try exit NFT from L2', async () => {
+      // mint nft
+      const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
+      await mintTx.wait()
+
+      const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
+      await approveTx.wait()
+
+      // Approve BOBA
+      const exitFee = await BOBABillingContract.exitFee()
+      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
+        L2Bridge.address,
+        exitFee
+      )
+      await approveBOBATX.wait()
+
+      await env.waitForRevertXDomainTransactionL1(
+        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
+      )
+
+      await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
+        'ERC721: owner query for nonexistent token'
+      )
+      const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
+
+      expect(ownerL2).to.deep.eq(env.l2Wallet.address)
+    }).timeout(100000)
   })
 
   describe('Bridges pause tests', async () => {

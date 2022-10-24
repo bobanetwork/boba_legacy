@@ -59,7 +59,6 @@ function Input({
   async function handlePaste() {
     try {
       const text = await navigator.clipboard.readText()
-      console.log("copy:",text)
       if (text) {
         onChange({ target: { value: text } })
       }
