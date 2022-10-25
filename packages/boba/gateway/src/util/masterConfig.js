@@ -18,11 +18,7 @@ import {
   RINKEBY_L1_NAME,
   RINKEBY_L1_CHAIN_ID,
   RINKEBY_L1_CHAIN_ID_HEX,
-  RINKEBY_L1_RPC_URL,
-  RINKEBY_L2_NAME,
-  RINKEBY_L2_CHAIN_ID,
-  RINKEBY_L2_CHAIN_ID_HEX,
-  RINKEBY_L2_RPC_URL,
+  RINKEBY_L1_RPC_URL
 } from './constant'
 
 let NETWORK
@@ -43,10 +39,10 @@ if (APP_CHAIN === 'rinkeby') {
         transaction: `https://rinkeby.etherscan.io/tx/`
       },
       L2: {
-        name: RINKEBY_L2_NAME,
-        chainId: Number(RINKEBY_L2_CHAIN_ID),
-        chainIdHex: RINKEBY_L2_CHAIN_ID_HEX,
-        rpcUrl: RINKEBY_L2_RPC_URL,
+        name: "BOBA Rinkeby L2",
+        chainId: 28,
+        chainIdHex: '0x1C',
+        rpcUrl: `https://rinkeby.boba.network`,
         blockExplorer: `https://testnet.bobascan.com/`,
         transaction: `https://testnet.bobascan.com/tx/`
       },
