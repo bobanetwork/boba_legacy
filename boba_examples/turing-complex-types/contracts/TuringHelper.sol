@@ -104,7 +104,7 @@ contract TuringHelper is ITuringHelper, Ownable {
   /* Called from the external contract. It takes an api endponit URL
      and an abi-encoded request payload.
   */
-  function TuringTxV1(string memory _url, bytes memory _payload)
+  function TuringTxV2(string memory _url, bytes memory _payload)
   public onlyPermittedCaller override returns (bytes memory) {
     require (_payload.length > 0, "Turing:TuringTx:no payload");
 
@@ -113,13 +113,13 @@ contract TuringHelper is ITuringHelper, Ownable {
        a place to intercept and re-write the call.
     */
 
-    bytes memory response = Self.GetResponse(0x01000001, _url, _payload);
+    bytes memory response = Self.GetResponse(0x02000001, _url, _payload);
     emit OffchainResponse(0x01, response);
     return response;
   }
 
   /* Legacy version which includes a Length prefix on the off-chain
-     request and response. For new development, use TuringTxV1
+     request and response. For new development, use TuringTxV2
   */
   function TuringTx(string memory _url, bytes memory _payload)
   public onlyPermittedCaller override returns (bytes memory) {
