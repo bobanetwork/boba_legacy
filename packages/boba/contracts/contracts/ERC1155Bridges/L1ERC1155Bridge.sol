@@ -455,11 +455,11 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
             IL1StandardERC1155(_l1Contract).burnBatch(msg.sender, _tokenIds, _amounts);
 
-            // Construct calldata for l2ERC1155Bridge.finalizeDeposit(_to, _amount)
+            // Construct calldata for l2ERC1155Bridge.finalizeDepositBatch(_to, _amount)
             bytes memory message;
 
             message = abi.encodeWithSelector(
-                iL2ERC1155Bridge.finalizeDeposit.selector,
+                iL2ERC1155Bridge.finalizeDepositBatch.selector,
                 _l1Contract,
                 l2Contract,
                 _from,
