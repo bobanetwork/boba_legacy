@@ -36,6 +36,7 @@ import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
+import sushicom from '../../images/ecosystem/sushicom.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -52,6 +53,17 @@ import BobaftmLogo from '../../images/bobaLinks/Bobaftm.svg'
  */
 
 export const projectList = [
+  {
+    "title": "Sushi",
+    "canLaunch": true,
+    "link": "https://sushi.com/",
+    "telegram": "",
+    "twitter": "https://twitter.com/SushiSwap",
+    "discord": "https://discord.gg/2D7G3bsnFa",
+    "type": "defi",
+    "image": sushicom,
+    "description": "Decentralized Exchange Made For Everybody. Swap, earn, stack yields, lend, borrow, leverage all on one decentralized, community driven platform. Welcome home to DeFi."
+  },
   {
     "title": "OolongSwap",
     "canLaunch": true,
