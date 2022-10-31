@@ -32,7 +32,9 @@ contract L1StandardERC1155 is IL1StandardERC1155, ERC1155 {
     function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC1155) returns (bool) {
         bytes4 bridgingSupportedInterface = IL1StandardERC1155.l2Contract.selector
             ^ IL1StandardERC1155.mint.selector
-            ^ IL1StandardERC1155.burn.selector;
+            ^ IL1StandardERC1155.burn.selector
+            ^ IL1StandardERC1155.mintBatch.selector
+            ^ IL1StandardERC1155.burnBatch.selector;
         return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
     }
 

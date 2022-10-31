@@ -6,7 +6,7 @@ import "@boba/contracts/contracts/standards/L1StandardERC1155.sol";
 /**
 * A Failing mint L1ERC1155 contract
 */
-contract TestFailingMintL1StandardERC721 is L1StandardERC1155 {
+contract TestFailingMintL1StandardERC1155 is L1StandardERC1155 {
     /**
      * @param _l1Bridge Address of the L1 standard bridge.
      * @param _l2Contract Address of the corresponding L2 token contract.

@@ -14,7 +14,6 @@ let Factory__Proxy__L2BillingContract: ContractFactory
 let Factory__L2BillingContract: ContractFactory
 
 let Proxy__L2LiquidityPool: Contract
-Proxy__L2LiquidityPool
 let Proxy__L2BillingContract: Contract
 let L2BillingContract: Contract
 let DiscretionaryExitFee: Contract

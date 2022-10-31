@@ -14,8 +14,8 @@ import L2StandardERC1155Json from '@boba/contracts/artifacts/contracts/standards
 import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
-import L1ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL1StandardERC1155.sol/TestFailingMintL1StandardERC721.json'
-import L2ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL2StandardERC1155.sol/TestFailingMintL2StandardERC721.json'
+import L1ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL1StandardERC1155.sol/TestFailingMintL1StandardERC1155.json'
+import L2ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL2StandardERC1155.sol/TestFailingMintL2StandardERC1155.json'
 
 import { OptimismEnv } from './shared/env'
 import { ethers } from 'hardhat'

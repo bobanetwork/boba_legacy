@@ -105,10 +105,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         owner = _newOwner;
     }
 
-    function onlyOwnerCheck() public view returns (bool) {
-        return msg.sender == owner;
-    }
-
     /**
      * @dev Configure gas.
      *
@@ -181,7 +177,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             baseNetwork = Network.L1;
         }
         else {
-            require(ERC165Checker.supportsInterface(_l1Contract, 0xbcf6686a), "L1 contract is not bridgable");
+            require(ERC165Checker.supportsInterface(_l1Contract, 0xc8a973c4), "L1 contract is not bridgable");
             baseNetwork = Network.L2;
         }
 
@@ -346,9 +342,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             uint256 balance = IL1StandardERC1155(_l1Contract).balanceOf(msg.sender, _tokenId);
-            require(
-                _amount <= balance || IL1StandardERC1155(_l1Contract).isApprovedForAll(msg.sender, address(this))
-            );
+            require(_amount <= balance, "Amount exceeds balance");
 
             IL1StandardERC1155(_l1Contract).burn(msg.sender, _tokenId, _amount);
 
@@ -449,10 +443,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
             require(pairToken.l2Contract == l2Contract, "L2 token Contract Address Error");
 
-            // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
-            // usage
-            require(IL1StandardERC1155(_l1Contract).isApprovedForAll(msg.sender, address(this)));
-
             IL1StandardERC1155(_l1Contract).burnBatch(msg.sender, _tokenIds, _amounts);
 
             // Construct calldata for l2ERC1155Bridge.finalizeDepositBatch(_to, _amount)
@@ -513,7 +503,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             // verify the deposited token on L2 matches the L1 deposited token representation here
             if (
                 // check with interface of IL1StandardERC1155
-                ERC165Checker.supportsInterface(_l1Contract, 0xbcf6686a) &&
+                ERC165Checker.supportsInterface(_l1Contract, 0xc8a973c4) &&
                 _l2Contract == IL1StandardERC1155(_l1Contract).l2Contract()
             ) {
                 // When a deposit is finalized, we credit the account on L2 with the same amount of
@@ -585,7 +575,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             // verify the deposited token on L2 matches the L1 deposited token representation here
             if (
                 // check with interface of IL1StandardERC1155
-                ERC165Checker.supportsInterface(_l1Contract, 0xbcf6686a) &&
+                ERC165Checker.supportsInterface(_l1Contract, 0xc8a973c4) &&
                 _l2Contract == IL1StandardERC1155(_l1Contract).l2Contract()
             ) {
                 // When a deposit is finalized, we credit the account on L2 with the same amount of
