@@ -59,7 +59,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     }
 
     // Maps L1 token to tokenId to L2 token contract deposited for the native L1 token
-    mapping(address => mapping (uint256 => address)) public deposits;
+    mapping(address => mapping (uint256 => uint256)) public deposits;
     // Maps L1 token address to tokenInfo
     mapping(address => PairTokenInfo) public pairTokenInfo;
 
@@ -334,7 +334,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 message
             );
 
-            deposits[_l1Contract][_tokenId] = pairToken.l2Contract;
+            deposits[_l1Contract][_tokenId] += _amount;
         } else {
             address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
             require(pairToken.l2Contract == l2Contract, "L2 token Contract Address Error");
@@ -437,7 +437,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             );
 
             for (uint256 i = 0; i < _tokenIds.length; i++) {
-                deposits[_l1Contract][_tokenIds[i]] = pairToken.l2Contract;
+                deposits[_l1Contract][_tokenIds[i]] += _amounts[i];
             }
         } else {
             address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
@@ -489,11 +489,10 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         PairTokenInfo storage pairToken = pairTokenInfo[_l1Contract];
 
         if (pairToken.baseNetwork == Network.L1) {
-            // needs to verify comes from correct l2Contract
-            require(deposits[_l1Contract][_tokenId] == _l2Contract, "Incorrect Burn");
-
             // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer
             IERC1155(_l1Contract).safeTransferFrom(address(this), _to, _tokenId, _amount, _data);
+
+            deposits[_l1Contract][_tokenId] -= _amount;
 
             emit WithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _amount, _data);
         } else {
@@ -559,9 +558,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         PairTokenInfo storage pairToken = pairTokenInfo[_l1Contract];
 
         if (pairToken.baseNetwork == Network.L1) {
-            // needs to verify comes from correct l2Contract
+            // remove the amount from the deposits
             for (uint256 i = 0; i < _tokenIds.length; i++) {
-                require(deposits[_l1Contract][_tokenIds[i]] == _l2Contract, "Incorrect Burn");
+                deposits[_l1Contract][_tokenIds[i]] -= _amounts[i];
             }
 
             // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer

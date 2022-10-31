@@ -68,7 +68,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     }
 
     // Maps L2 token to tokenId to L1 token contract deposited for the native L2 token
-    mapping(address => mapping (uint256 => address)) public exits;
+    mapping(address => mapping (uint256 => uint256)) public exits;
     // Maps L2 token address to tokenInfo
     mapping(address => PairTokenInfo) public pairTokenInfo;
 
@@ -429,7 +429,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 message
             );
 
-            exits[_l2Contract][_tokenId] = pairToken.l1Contract;
+            exits[_l2Contract][_tokenId] += _amount;
         }
         emit WithdrawalInitiated(pairToken.l1Contract, _l2Contract, msg.sender, _to, _tokenId, _amount, _data);
     }
@@ -530,7 +530,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             );
 
             for (uint256 i = 0; i < _tokenIds.length; i++) {
-                exits[_l2Contract][_tokenIds[i]] = pairToken.l1Contract;
+                exits[_l2Contract][_tokenIds[i]] += _amounts[i];
             }
         }
         emit WithdrawalBatchInitiated(pairToken.l1Contract, _l2Contract, msg.sender, _to, _tokenIds, _amounts, _data);
@@ -609,8 +609,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 emit DepositFailed(_l1Contract, _l2Contract, _from, _to, _tokenId, _amount, _data);
             }
         } else {
-            // needs to verify comes from correct l1Contract
-            require(exits[_l2Contract][_tokenId] == _l1Contract, "Incorrect Deposit");
+            exits[_l2Contract][_tokenId] -= _amount;
             // When a deposit is finalized on L2, the L2 Bridge transfers the token to the depositer
             IERC1155(_l2Contract).safeTransferFrom(
                 address(this),
@@ -692,9 +691,9 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 emit DepositBatchFailed(_l1Contract, _l2Contract, _from, _to, _tokenIds, _amounts, _data);
             }
         } else {
-            // needs to verify comes from correct l1Contract
+            // remove the amount from the exits
             for (uint256 i = 0; i < _tokenIds.length; i++) {
-                require(exits[_l2Contract][_tokenIds[i]] == _l1Contract, "Incorrect Deposit");
+                exits[_l2Contract][_tokenIds[i]] -= _amounts[i];
             }
             // When a deposit is finalized on L2, the L2 Bridge transfers the token to the depositer
             IERC1155(_l2Contract).safeBatchTransferFrom(
