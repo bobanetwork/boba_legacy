@@ -410,10 +410,10 @@ await tx.wait()
 
 #### BNB Testnet
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### Fantom Testnet
 
