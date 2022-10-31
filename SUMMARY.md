@@ -42,6 +42,7 @@
   * [JSON-RPC API](boba\_documentation/developer/json-rpc-api.md)
   * [Price Oracles](boba\_documentation/developer/price-feeds.md)
   * [NFT Bridging](boba\_documentation/developer/nft-bridge.md)
+  * [ERC1155 Bridging](boba\_documentation/developer/erc1155-bridge.md)
   * [Token Bridging](boba\_documentation/developer/bridge-l1-and-l2/bridge-basics.md)
     * [Using the Standard Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/standard-bridge.md)
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
