@@ -352,61 +352,54 @@ await tx.wait()
 
 #### Ethereum
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### Avalanche
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### Moonbeam
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### BNB Mainnet
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### Fantom 
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 ### Testnet
 
-#### Rinkeby
-
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
-
 #### Avalanche Testnet (Fuji)
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### Moonbase
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### BNB Testnet
 
@@ -417,7 +410,7 @@ await tx.wait()
 
 #### Fantom Testnet
 
-| Layer | Contract Name          | Contract Address |
-| ----- | ---------------------- | ---------------- |
-| L1    | Proxy__L1ERC1155Bridge |                  |
-| L2    | Proxy__L2ERC1155Bridge |                  |
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
