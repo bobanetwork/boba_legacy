@@ -474,8 +474,9 @@ contract Teleportation is PausableUpgradeable {
      * @param _minDepositAmount The new minimum deposit amount.
      */
     function setMinAmount(uint256 _minDepositAmount) external onlyOwner() {
-        emit MinDepositAmountSet(minDepositAmount, _minDepositAmount);
+        uint256 pastMinDepositAmount = minDepositAmount;
         minDepositAmount = _minDepositAmount;
+        emit MinDepositAmountSet(pastMinDepositAmount, minDepositAmount);
     }
 
     /**
@@ -484,8 +485,9 @@ contract Teleportation is PausableUpgradeable {
      * @param _maxDepositAmount The new maximum deposit amount.
      */
     function setMaxAmount(uint256 _maxDepositAmount) external onlyOwner() {
-        emit MaxDepositAmountSet(maxDepositAmount, _maxDepositAmount);
+        uint256 pastMaxDepositAmount = maxDepositAmount;
         maxDepositAmount = _maxDepositAmount;
+        emit MaxDepositAmountSet(pastMaxDepositAmount, maxDepositAmount);
     }
 
     /**
@@ -494,7 +496,8 @@ contract Teleportation is PausableUpgradeable {
      * @param _maxTransferAmountPerDay The new maximum daily transfer amount.
      */
     function setMaxTransferAmountPerDay(uint256 _maxTransferAmountPerDay) external onlyOwner() {
-        emit MaxDepositAmountSet(maxTransferAmountPerDay, _maxTransferAmountPerDay);
+        uint256 pastMaxTransferAmountPerDay = maxTransferAmountPerDay;
         maxTransferAmountPerDay = _maxTransferAmountPerDay;
+        emit MaxDepositAmountSet(pastMaxTransferAmountPerDay, maxTransferAmountPerDay);
     }
 }
