@@ -37,6 +37,7 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
+import foxtrotCommand from '../../images/ecosystem/foxtrotCommand.webp'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -441,6 +442,17 @@ export const projectList = [
     "image": rabbyLogo,
     "description": "The game-changing wallet for Ethereum and all EVM chains."
   },
+  {
+    "title": "Foxtrot Command",
+    "canLaunch": true,
+    "link": "https://foxtrotcommand.com",
+    "telegram": "https://t.me/FoxtrotCommand",
+    "twitter": "https://twitter.com/foxtrotcommand",
+    "discord": "http://discord.gg/Pp3CZ6UUX3",
+    "type": "gamefi",
+    "image": foxtrotCommand,
+    "description": "Foxtrot Command is a fast and extremely competitive trading card game with new mechanics and the innovative double lane system. Compete against other players and upgrade your deck to reach the top of the leaderboard"
+  }
 ]
 
 export const loadProjectByCategory = () => {
