@@ -7,6 +7,10 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /**
+ Note: This contract has not been audited, exercise caution when using this on mainnet
+ */
+
+/**
  * @title Teleportation
  *
  * Shout out to optimisim for providing the inspiration for this contract:
