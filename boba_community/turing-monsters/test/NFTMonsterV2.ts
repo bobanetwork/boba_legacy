@@ -10,7 +10,7 @@ import ERC721Json from "../artifacts/contracts/NFTMonsterV2.sol/NFTMonsterV2.jso
 import L2BridgeMessengerMockJson from "../artifacts/contracts/L2BridgeMockMessenger.sol/L2BridgeMockMessenger.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L2NFTBridgeJson from '@boba/contracts/artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json'
 
 const cfg = hre.network.config
 

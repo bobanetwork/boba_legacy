@@ -18,7 +18,7 @@ contract ComplexType {
 
         // You can send here whatever you want
         bytes memory encRequest = abi.encode(wallet_, someID_);
-        bytes memory byteRes = turingHelper.TuringTxV1(_turingUri, encRequest);
+        bytes memory byteRes = turingHelper.TuringTxV2(_turingUri, encRequest);
         // Decode returned data into its expected types
         (uint256[] memory someNumbers, string[] memory someTextArray, string memory someOtherText) = abi.decode(byteRes, (uint256[], string[], string));
 

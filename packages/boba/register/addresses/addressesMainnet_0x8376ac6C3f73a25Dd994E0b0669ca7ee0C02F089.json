@@ -86,5 +86,6 @@
   "Boba_GasPriceOracle":"0x5d0763cf905DA3689B072FD19baD8dF823b2c349",
   "Proxy__Boba_GasPriceOracle":"0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51",
   "BobaBillingContract": "0x4a792F51CCc616b82EF74d2478C732e161c5E6b1",
-  "Proxy__BobaBillingContract": "0x29F373e4869e69faaeCD3bF747dd1d965328b69f"
+  "Proxy__BobaBillingContract": "0x29F373e4869e69faaeCD3bF747dd1d965328b69f",
+  "L2StandardTokenFactory": "0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826"
 }

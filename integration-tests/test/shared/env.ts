@@ -471,15 +471,21 @@ export class OptimismEnv {
     }
   }
 
-  // async waitForRevertXDomainTransaction(
-  //   tx: Promise<TransactionResponse> | TransactionResponse
-  // ) {
-  //   const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
-  //   const [xDomainMsgHash] = await this.messenger.getMessageHashesFromL2Tx(
-  //     remoteReceipt.transactionHash
-  //   )
-  //   await this.messenger.getL1TransactionReceipt(xDomainMsgHash)
-  // }
+  async waitForRevertXDomainTransactionL2(
+    tx: Promise<TransactionResponse> | TransactionResponse
+  ) {
+    const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
+    const backTx = await this.messenger.l2Provider.getTransaction(remoteReceipt.transactionHash)
+    await this.waitForXDomainTransaction(backTx)
+  }
+
+  async waitForRevertXDomainTransactionL1(
+    tx: Promise<TransactionResponse> | TransactionResponse
+  ) {
+    const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
+    const backTx = await this.messenger.l1Provider.getTransaction(remoteReceipt.transactionHash)
+    await this.waitForXDomainTransaction(backTx)
+  }
 
   // async waitForRevertXDomainTransactionFast(
   //   tx: Promise<TransactionResponse> | TransactionResponse

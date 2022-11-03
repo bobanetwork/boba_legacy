@@ -9,8 +9,8 @@
     "build:contracts": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
     "test:local": "hardhat --network boba_local test",
-    "test:rinkeby": "hardhat --network boba_rinkeby test",
-    "test:mainnet": "hardhat --network boba_mainnet test"
+    "test:rinkeby": "hardhat --network boba_rinkeby test test/hello-world.spec.ts",
+    "test:mainnet": "hardhat --network boba_mainnet test test/hello-world.spec.ts"
   },
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.15",
