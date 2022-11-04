@@ -37,6 +37,7 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
+import foxwalletLogo from '../../images/ecosystem/FoxWallet-app-bg-Black.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -440,6 +441,18 @@ export const projectList = [
     "type": "wallet",
     "image": rabbyLogo,
     "description": "The game-changing wallet for Ethereum and all EVM chains."
+  },
+   {
+    "title": "FoxWallet",
+    "canLaunch": true,
+    "link": "https://foxwallet.com/",
+    "twitter": "https://twitter.com/FoxWallet",
+    "telegram": "https://t.me/FoxWallet_EN",
+    "youtube": "https://www.youtube.com/channel/UCt9O4HUkuNutXvFoN6NZh-w",
+    "discord": "https://discord.com/invite/JVjVbe3Zth",
+    "type": "wallet",
+    "image": foxwalletLogo,
+    "description": "Multi-chain decentralized mobile wallet, dedicated to creating an entrance and connection to the Web3 world."
   },
 ]
 
