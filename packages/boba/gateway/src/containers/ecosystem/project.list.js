@@ -37,7 +37,7 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
-import foxwalletLogo from '../../images/ecosystem/FoxWallet-app-bg-Black.png'
+import foxwalletLogo from '../../images/ecosystem/foxwalletLogo.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
