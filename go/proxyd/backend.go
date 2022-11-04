@@ -3,19 +3,24 @@ package proxyd
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"math/rand"
 	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -24,39 +29,66 @@ const (
 )
 
 var (
-	ErrInvalidRequest = &RPCErr{
-		Code:    -32601,
-		Message: "invalid request",
-	}
 	ErrParseErr = &RPCErr{
-		Code:    -32700,
-		Message: "parse error",
+		Code:          -32700,
+		Message:       "parse error",
+		HTTPErrorCode: 400,
 	}
 	ErrInternal = &RPCErr{
-		Code:    JSONRPCErrorInternal,
-		Message: "internal error",
+		Code:          JSONRPCErrorInternal,
+		Message:       "internal error",
+		HTTPErrorCode: 500,
 	}
 	ErrMethodNotWhitelisted = &RPCErr{
-		Code:    JSONRPCErrorInternal - 1,
-		Message: "rpc method is not whitelisted",
+		Code:          JSONRPCErrorInternal - 1,
+		Message:       "rpc method is not whitelisted",
+		HTTPErrorCode: 403,
 	}
 	ErrBackendOffline = &RPCErr{
-		Code:    JSONRPCErrorInternal - 10,
-		Message: "backend offline",
+		Code:          JSONRPCErrorInternal - 10,
+		Message:       "backend offline",
+		HTTPErrorCode: 503,
 	}
 	ErrNoBackends = &RPCErr{
-		Code:    JSONRPCErrorInternal - 11,
-		Message: "no backends available for method",
+		Code:          JSONRPCErrorInternal - 11,
+		Message:       "no backends available for method",
+		HTTPErrorCode: 503,
 	}
 	ErrBackendOverCapacity = &RPCErr{
-		Code:    JSONRPCErrorInternal - 12,
-		Message: "backend is over capacity",
+		Code:          JSONRPCErrorInternal - 12,
+		Message:       "backend is over capacity",
+		HTTPErrorCode: 429,
 	}
 	ErrBackendBadResponse = &RPCErr{
-		Code:    JSONRPCErrorInternal - 13,
-		Message: "backend returned an invalid response",
+		Code:          JSONRPCErrorInternal - 13,
+		Message:       "backend returned an invalid response",
+		HTTPErrorCode: 500,
 	}
+	ErrTooManyBatchRequests = &RPCErr{
+		Code:    JSONRPCErrorInternal - 14,
+		Message: "too many RPC calls in batch request",
+	}
+	ErrGatewayTimeout = &RPCErr{
+		Code:          JSONRPCErrorInternal - 15,
+		Message:       "gateway timeout",
+		HTTPErrorCode: 504,
+	}
+	ErrOverRateLimit = &RPCErr{
+		Code:          JSONRPCErrorInternal - 16,
+		Message:       "over rate limit",
+		HTTPErrorCode: 429,
+	}
+
+	ErrBackendUnexpectedJSONRPC = errors.New("backend returned an unexpected JSON-RPC response")
 )
+
+func ErrInvalidRequest(msg string) *RPCErr {
+	return &RPCErr{
+		Code:          -32601,
+		Message:       msg,
+		HTTPErrorCode: 400,
+	}
+}
 
 type Backend struct {
 	Name                 string
@@ -64,14 +96,16 @@ type Backend struct {
 	wsURL                string
 	authUsername         string
 	authPassword         string
-	redis                Redis
-	client               *http.Client
+	rateLimiter          BackendRateLimiter
+	client               *LimitedHTTPClient
 	dialer               *websocket.Dialer
 	maxRetries           int
 	maxResponseSize      int64
 	maxRPS               int
 	maxWSConns           int
 	outOfServiceInterval time.Duration
+	stripTrailingXFF     bool
+	proxydIP             string
 }
 
 type BackendOpt func(b *Backend)
@@ -119,21 +153,45 @@ func WithMaxWSConns(maxConns int) BackendOpt {
 	}
 }
 
+func WithTLSConfig(tlsConfig *tls.Config) BackendOpt {
+	return func(b *Backend) {
+		if b.client.Transport == nil {
+			b.client.Transport = &http.Transport{}
+		}
+		b.client.Transport.(*http.Transport).TLSClientConfig = tlsConfig
+	}
+}
+
+func WithStrippedTrailingXFF() BackendOpt {
+	return func(b *Backend) {
+		b.stripTrailingXFF = true
+	}
+}
+
+func WithProxydIP(ip string) BackendOpt {
+	return func(b *Backend) {
+		b.proxydIP = ip
+	}
+}
+
 func NewBackend(
 	name string,
 	rpcURL string,
 	wsURL string,
-	redis Redis,
+	rateLimiter BackendRateLimiter,
+	rpcSemaphore *semaphore.Weighted,
 	opts ...BackendOpt,
 ) *Backend {
 	backend := &Backend{
 		Name:            name,
 		rpcURL:          rpcURL,
 		wsURL:           wsURL,
-		redis:           redis,
+		rateLimiter:     rateLimiter,
 		maxResponseSize: math.MaxInt64,
-		client: &http.Client{
-			Timeout: 5 * time.Second,
+		client: &LimitedHTTPClient{
+			Client:      http.Client{Timeout: 5 * time.Second},
+			sem:         rpcSemaphore,
+			backendName: name,
 		},
 		dialer: &websocket.Dialer{},
 	}
@@ -142,16 +200,20 @@ func NewBackend(
 		opt(backend)
 	}
 
+	if !backend.stripTrailingXFF && backend.proxydIP == "" {
+		log.Warn("proxied requests' XFF header will not contain the proxyd ip address")
+	}
+
 	return backend
 }
 
-func (b *Backend) Forward(ctx context.Context, req *RPCReq) (*RPCRes, error) {
-	// if !b.Online() {
-	// 	RecordRPCError(ctx, b.Name, req.Method, ErrBackendOffline)
-	// 	return nil, ErrBackendOffline
-	// }
+func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]*RPCRes, error) {
+	if !b.Online() {
+		RecordBatchRPCError(ctx, b.Name, reqs, ErrBackendOffline)
+		return nil, ErrBackendOffline
+	}
 	if b.IsRateLimited() {
-		RecordRPCError(ctx, b.Name, req.Method, ErrBackendOverCapacity)
+		RecordBatchRPCError(ctx, b.Name, reqs, ErrBackendOverCapacity)
 		return nil, ErrBackendOverCapacity
 	}
 
@@ -159,10 +221,34 @@ func (b *Backend) Forward(ctx context.Context, req *RPCReq) (*RPCRes, error) {
 	// <= to account for the first attempt not technically being
 	// a retry
 	for i := 0; i <= b.maxRetries; i++ {
-		RecordRPCForward(ctx, b.Name, req.Method, RPCRequestSourceHTTP)
-		respTimer := prometheus.NewTimer(rpcBackendRequestDurationSumm.WithLabelValues(b.Name, req.Method))
-		res, err := b.doForward(req)
-		if err != nil {
+		RecordBatchRPCForward(ctx, b.Name, reqs, RPCRequestSourceHTTP)
+		metricLabelMethod := reqs[0].Method
+		if isBatch {
+			metricLabelMethod = "<batch>"
+		}
+		timer := prometheus.NewTimer(
+			rpcBackendRequestDurationSumm.WithLabelValues(
+				b.Name,
+				metricLabelMethod,
+				strconv.FormatBool(isBatch),
+			),
+		)
+
+		res, err := b.doForward(ctx, reqs, isBatch)
+		switch err {
+		case nil: // do nothing
+		// ErrBackendUnexpectedJSONRPC occurs because infura responds with a single JSON-RPC object
+		// to a batch request whenever any Request Object in the batch would induce a partial error.
+		// We don't label the the backend offline in this case. But the error is still returned to
+		// callers so failover can occur if needed.
+		case ErrBackendUnexpectedJSONRPC:
+			log.Debug(
+				"Reecived unexpected JSON-RPC response",
+				"name", b.Name,
+				"req_id", GetReqID(ctx),
+				"err", err,
+			)
+		default:
 			lastError = err
 			log.Warn(
 				"backend request failed, trying again",
@@ -170,30 +256,15 @@ func (b *Backend) Forward(ctx context.Context, req *RPCReq) (*RPCRes, error) {
 				"req_id", GetReqID(ctx),
 				"err", err,
 			)
-			respTimer.ObserveDuration()
-			RecordRPCError(ctx, b.Name, req.Method, err)
-			time.Sleep(calcBackoff(i))
+			timer.ObserveDuration()
+			RecordBatchRPCError(ctx, b.Name, reqs, err)
+			sleepContext(ctx, calcBackoff(i))
 			continue
 		}
-		respTimer.ObserveDuration()
-		if res.IsError() {
-			RecordRPCError(ctx, b.Name, req.Method, res.Error)
-			log.Info(
-				"backend responded with RPC error",
-				"code", res.Error.Code,
-				"msg", res.Error.Message,
-				"req_id", GetReqID(ctx),
-				"source", "rpc",
-				"auth", GetAuthCtx(ctx),
-			)
-		} else {
-			log.Info("forwarded RPC request",
-				"method", req.Method,
-				"auth", GetAuthCtx(ctx),
-				"req_id", GetReqID(ctx),
-			)
-		}
-		return res, nil
+		timer.ObserveDuration()
+
+		MaybeRecordErrorsInRPCRes(ctx, b.Name, reqs, res)
+		return res, err
 	}
 
 	b.setOffline()
@@ -201,17 +272,17 @@ func (b *Backend) Forward(ctx context.Context, req *RPCReq) (*RPCRes, error) {
 }
 
 func (b *Backend) ProxyWS(clientConn *websocket.Conn, methodWhitelist *StringSet) (*WSProxier, error) {
-	// if !b.Online() {
-	// 	return nil, ErrBackendOffline
-	// }
+	if !b.Online() {
+		return nil, ErrBackendOffline
+	}
 	if b.IsWSSaturated() {
 		return nil, ErrBackendOverCapacity
 	}
 
-	backendConn, _, err := b.dialer.Dial(b.wsURL, nil)
+	backendConn, _, err := b.dialer.Dial(b.wsURL, nil) // nolint:bodyclose
 	if err != nil {
 		b.setOffline()
-		if err := b.redis.DecBackendWSConns(b.Name); err != nil {
+		if err := b.rateLimiter.DecBackendWSConns(b.Name); err != nil {
 			log.Error("error decrementing backend ws conns", "name", b.Name, "err", err)
 		}
 		return nil, wrapErr(err, "error dialing backend")
@@ -222,7 +293,7 @@ func (b *Backend) ProxyWS(clientConn *websocket.Conn, methodWhitelist *StringSet
 }
 
 func (b *Backend) Online() bool {
-	online, err := b.redis.IsBackendOnline(b.Name)
+	online, err := b.rateLimiter.IsBackendOnline(b.Name)
 	if err != nil {
 		log.Warn(
 			"error getting backend availability, assuming it is offline",
@@ -239,7 +310,7 @@ func (b *Backend) IsRateLimited() bool {
 		return false
 	}
 
-	usedLimit, err := b.redis.IncBackendRPS(b.Name)
+	usedLimit, err := b.rateLimiter.IncBackendRPS(b.Name)
 	if err != nil {
 		log.Error(
 			"error getting backend used rate limit, assuming limit is exhausted",
@@ -257,7 +328,7 @@ func (b *Backend) IsWSSaturated() bool {
 		return false
 	}
 
-	incremented, err := b.redis.IncBackendWSConns(b.Name, b.maxWSConns)
+	incremented, err := b.rateLimiter.IncBackendWSConns(b.Name, b.maxWSConns)
 	if err != nil {
 		log.Error(
 			"error getting backend used ws conns, assuming limit is exhausted",
@@ -271,7 +342,7 @@ func (b *Backend) IsWSSaturated() bool {
 }
 
 func (b *Backend) setOffline() {
-	err := b.redis.SetBackendOffline(b.Name, b.outOfServiceInterval)
+	err := b.rateLimiter.SetBackendOffline(b.Name, b.outOfServiceInterval)
 	if err != nil {
 		log.Warn(
 			"error setting backend offline",
@@ -281,10 +352,20 @@ func (b *Backend) setOffline() {
 	}
 }
 
-func (b *Backend) doForward(rpcReq *RPCReq) (*RPCRes, error) {
-	body := mustMarshalJSON(rpcReq)
+func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool) ([]*RPCRes, error) {
+	isSingleElementBatch := len(rpcReqs) == 1
 
-	httpReq, err := http.NewRequest("POST", b.rpcURL, bytes.NewReader(body))
+	// Single element batches are unwrapped before being sent
+	// since Alchemy handles single requests better than batches.
+
+	var body []byte
+	if isSingleElementBatch {
+		body = mustMarshalJSON(rpcReqs[0])
+	} else {
+		body = mustMarshalJSON(rpcReqs)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", b.rpcURL, bytes.NewReader(body))
 	if err != nil {
 		return nil, wrapErr(err, "error creating backend request")
 	}
@@ -293,12 +374,32 @@ func (b *Backend) doForward(rpcReq *RPCReq) (*RPCRes, error) {
 		httpReq.SetBasicAuth(b.authUsername, b.authPassword)
 	}
 
-	httpReq.Header.Set("content-type", "application/json")
+	xForwardedFor := GetXForwardedFor(ctx)
+	if b.stripTrailingXFF {
+		xForwardedFor = stripXFF(xForwardedFor)
+	} else if b.proxydIP != "" {
+		xForwardedFor = fmt.Sprintf("%s, %s", xForwardedFor, b.proxydIP)
+	}
 
-	httpRes, err := b.client.Do(httpReq)
+	httpReq.Header.Set("content-type", "application/json")
+	httpReq.Header.Set("X-Forwarded-For", xForwardedFor)
+
+	httpRes, err := b.client.DoLimited(httpReq)
 	if err != nil {
 		return nil, wrapErr(err, "error in backend request")
 	}
+
+	metricLabelMethod := rpcReqs[0].Method
+	if isBatch {
+		metricLabelMethod = "<batch>"
+	}
+	rpcBackendHTTPResponseCodesTotal.WithLabelValues(
+		GetAuthCtx(ctx),
+		b.Name,
+		metricLabelMethod,
+		strconv.Itoa(httpRes.StatusCode),
+		strconv.FormatBool(isBatch),
+	).Inc()
 
 	// Alchemy returns a 400 on bad JSONs, so handle that case
 	if httpRes.StatusCode != 200 && httpRes.StatusCode != 400 {
@@ -306,17 +407,67 @@ func (b *Backend) doForward(rpcReq *RPCReq) (*RPCRes, error) {
 	}
 
 	defer httpRes.Body.Close()
-	resB, err := ioutil.ReadAll(io.LimitReader(httpRes.Body, b.maxResponseSize))
+	resB, err := io.ReadAll(io.LimitReader(httpRes.Body, b.maxResponseSize))
 	if err != nil {
 		return nil, wrapErr(err, "error reading response body")
 	}
 
-	res := new(RPCRes)
-	if err := json.Unmarshal(resB, res); err != nil {
-		return nil, ErrBackendBadResponse
+	var res []*RPCRes
+	if isSingleElementBatch {
+		var singleRes RPCRes
+		if err := json.Unmarshal(resB, &singleRes); err != nil {
+			return nil, ErrBackendBadResponse
+		}
+		res = []*RPCRes{
+			&singleRes,
+		}
+	} else {
+		if err := json.Unmarshal(resB, &res); err != nil {
+			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
+			if responseIsNotBatched(resB) {
+				return nil, ErrBackendUnexpectedJSONRPC
+			}
+			return nil, ErrBackendBadResponse
+		}
 	}
 
+	if len(rpcReqs) != len(res) {
+		return nil, ErrBackendUnexpectedJSONRPC
+	}
+
+	// capture the HTTP status code in the response. this will only
+	// ever be 400 given the status check on line 318 above.
+	if httpRes.StatusCode != 200 {
+		for _, res := range res {
+			res.Error.HTTPErrorCode = httpRes.StatusCode
+		}
+	}
+
+	sortBatchRPCResponse(rpcReqs, res)
 	return res, nil
+}
+
+func responseIsNotBatched(b []byte) bool {
+	var r RPCRes
+	return json.Unmarshal(b, &r) == nil
+}
+
+// sortBatchRPCResponse sorts the RPCRes slice according to the position of its corresponding ID in the RPCReq slice
+func sortBatchRPCResponse(req []*RPCReq, res []*RPCRes) {
+	pos := make(map[string]int, len(req))
+	for i, r := range req {
+		key := string(r.ID)
+		if _, ok := pos[key]; ok {
+			panic("bug! detected requests with duplicate IDs")
+		}
+		pos[key] = i
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		l := res[i].ID
+		r := res[j].ID
+		return pos[string(l)] < pos[string(r)]
+	})
 }
 
 type BackendGroup struct {
@@ -324,11 +475,15 @@ type BackendGroup struct {
 	Backends []*Backend
 }
 
-func (b *BackendGroup) Forward(ctx context.Context, rpcReq *RPCReq) (*RPCRes, error) {
+func (b *BackendGroup) Forward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool) ([]*RPCRes, error) {
+	if len(rpcReqs) == 0 {
+		return nil, nil
+	}
+
 	rpcRequestsTotal.Inc()
 
 	for _, back := range b.Backends {
-		res, err := back.Forward(ctx, rpcReq)
+		res, err := back.Forward(ctx, rpcReqs, isBatch)
 		if errors.Is(err, ErrMethodNotWhitelisted) {
 			return nil, err
 		}
@@ -353,7 +508,7 @@ func (b *BackendGroup) Forward(ctx context.Context, rpcReq *RPCReq) (*RPCRes, er
 		if err != nil {
 			log.Error(
 				"error forwarding request to backend",
-				"name", b.Name,
+				"name", back.Name,
 				"req_id", GetReqID(ctx),
 				"auth", GetAuthCtx(ctx),
 				"err", err,
@@ -406,7 +561,7 @@ func (b *BackendGroup) ProxyWS(ctx context.Context, clientConn *websocket.Conn, 
 
 func calcBackoff(i int) time.Duration {
 	jitter := float64(rand.Int63n(250))
-	ms := math.Min(math.Pow(2, float64(i))*1000+jitter, 10000)
+	ms := math.Min(math.Pow(2, float64(i))*1000+jitter, 3000)
 	return time.Duration(ms) * time.Millisecond
 }
 
@@ -415,6 +570,7 @@ type WSProxier struct {
 	clientConn      *websocket.Conn
 	backendConn     *websocket.Conn
 	methodWhitelist *StringSet
+	clientConnMu    sync.Mutex
 }
 
 func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, methodWhitelist *StringSet) *WSProxier {
@@ -437,12 +593,13 @@ func (w *WSProxier) Proxy(ctx context.Context) error {
 
 func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 	for {
-		outConn := w.backendConn
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
 		if err != nil {
 			errC <- err
-			outConn.WriteMessage(websocket.CloseMessage, formatWSError(err))
+			if err := w.backendConn.WriteMessage(websocket.CloseMessage, formatWSError(err)); err != nil {
+				log.Error("error writing backendConn message", "err", err)
+			}
 			return
 		}
 
@@ -451,7 +608,7 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 		// Route control messages to the backend. These don't
 		// count towards the total RPC requests count.
 		if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
-			err := outConn.WriteMessage(msgType, msg)
+			err := w.backendConn.WriteMessage(msgType, msg)
 			if err != nil {
 				errC <- err
 				return
@@ -463,34 +620,53 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 
 		// Don't bother sending invalid requests to the backend,
 		// just handle them here.
-		reqs, err := w.prepareClientMsg(msg)
-		for _, req := range reqs {
-			if err != nil {
-				method := MethodUnknown
-
+		req, err := w.prepareClientMsg(msg)
+		if err != nil {
+			var id json.RawMessage
+			method := MethodUnknown
+			if req != nil {
+				id = req.ID
 				method = req.Method
-
-				log.Info(
-					"error preparing client message",
-					"auth", GetAuthCtx(ctx),
-					"req_id", GetReqID(ctx),
-					"err", err,
-				)
-				outConn = w.clientConn
-				msg = mustMarshalJSON(NewRPCErrorRes(req.ID, err))
-				RecordRPCError(ctx, BackendProxyd, method, err)
-			} else {
-				RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
-				log.Info(
-					"forwarded WS message to backend",
-					"method", req.Method,
-					"auth", GetAuthCtx(ctx),
-					"req_id", GetReqID(ctx),
-				)
 			}
+			log.Info(
+				"error preparing client message",
+				"auth", GetAuthCtx(ctx),
+				"req_id", GetReqID(ctx),
+				"err", err,
+			)
+			msg = mustMarshalJSON(NewRPCErrorRes(id, err))
+			RecordRPCError(ctx, BackendProxyd, method, err)
+
+			// Send error response to client
+			err = w.writeClientConn(msgType, msg)
+			if err != nil {
+				errC <- err
+				return
+			}
+			continue
 		}
 
-		err = outConn.WriteMessage(msgType, msg)
+		// Send eth_accounts requests directly to the client
+		if req.Method == "eth_accounts" {
+			msg = mustMarshalJSON(NewRPCRes(req.ID, emptyArrayResponse))
+			RecordRPCForward(ctx, BackendProxyd, "eth_accounts", RPCRequestSourceWS)
+			err = w.writeClientConn(msgType, msg)
+			if err != nil {
+				errC <- err
+				return
+			}
+			continue
+		}
+
+		RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
+		log.Info(
+			"forwarded WS message to backend",
+			"method", req.Method,
+			"auth", GetAuthCtx(ctx),
+			"req_id", GetReqID(ctx),
+		)
+
+		err = w.backendConn.WriteMessage(msgType, msg)
 		if err != nil {
 			errC <- err
 			return
@@ -504,7 +680,9 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 		msgType, msg, err := w.backendConn.ReadMessage()
 		if err != nil {
 			errC <- err
-			w.clientConn.WriteMessage(websocket.CloseMessage, formatWSError(err))
+			if err := w.writeClientConn(websocket.CloseMessage, formatWSError(err)); err != nil {
+				log.Error("error writing clientConn message", "err", err)
+			}
 			return
 		}
 
@@ -512,7 +690,7 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 
 		// Route control messages directly to the client.
 		if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
-			err := w.clientConn.WriteMessage(msgType, msg)
+			err := w.writeClientConn(msgType, msg)
 			if err != nil {
 				errC <- err
 				return
@@ -522,27 +700,33 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 
 		res, err := w.parseBackendMsg(msg)
 		if err != nil {
-			msg = mustMarshalJSON(NewRPCErrorRes(res.ID, err))
-		}
-		if res.IsError() {
-			log.Info(
-				"backend responded with RPC error",
-				"code", res.Error.Code,
-				"msg", res.Error.Message,
-				"source", "ws",
-				"auth", GetAuthCtx(ctx),
-				"req_id", GetReqID(ctx),
-			)
-			RecordRPCError(ctx, w.backend.Name, MethodUnknown, res.Error)
+			var id json.RawMessage
+			if res != nil {
+				id = res.ID
+			}
+			msg = mustMarshalJSON(NewRPCErrorRes(id, err))
+			log.Info("backend responded with error", "err", err)
 		} else {
-			log.Info(
-				"forwarded WS message to client",
-				"auth", GetAuthCtx(ctx),
-				"req_id", GetReqID(ctx),
-			)
+			if res.IsError() {
+				log.Info(
+					"backend responded with RPC error",
+					"code", res.Error.Code,
+					"msg", res.Error.Message,
+					"source", "ws",
+					"auth", GetAuthCtx(ctx),
+					"req_id", GetReqID(ctx),
+				)
+				RecordRPCError(ctx, w.backend.Name, MethodUnknown, res.Error)
+			} else {
+				log.Info(
+					"forwarded WS message to client",
+					"auth", GetAuthCtx(ctx),
+					"req_id", GetReqID(ctx),
+				)
+			}
 		}
 
-		err = w.clientConn.WriteMessage(msgType, msg)
+		err = w.writeClientConn(msgType, msg)
 		if err != nil {
 			errC <- err
 			return
@@ -553,28 +737,27 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 func (w *WSProxier) close() {
 	w.clientConn.Close()
 	w.backendConn.Close()
-	if err := w.backend.redis.DecBackendWSConns(w.backend.Name); err != nil {
+	if err := w.backend.rateLimiter.DecBackendWSConns(w.backend.Name); err != nil {
 		log.Error("error decrementing backend ws conns", "name", w.backend.Name, "err", err)
 	}
 	activeBackendWsConnsGauge.WithLabelValues(w.backend.Name).Dec()
 }
 
-func (w *WSProxier) prepareClientMsg(msg []byte) ([]RPCReq, error) {
-	reqs, _, err := ParseRPCReq(bytes.NewReader(msg))
-	for _, req := range reqs {
-		if err != nil {
-			return nil, err
-		}
-
-		if !w.methodWhitelist.Has(req.Method) {
-			return reqs, ErrMethodNotWhitelisted
-		}
-
-		if w.backend.IsRateLimited() {
-			return reqs, ErrBackendOverCapacity
-		}
+func (w *WSProxier) prepareClientMsg(msg []byte) (*RPCReq, error) {
+	req, err := ParseRPCReq(msg)
+	if err != nil {
+		return nil, err
 	}
-	return reqs, nil
+
+	if !w.methodWhitelist.Has(req.Method) {
+		return req, ErrMethodNotWhitelisted
+	}
+
+	if w.backend.IsRateLimited() {
+		return req, ErrBackendOverCapacity
+	}
+
+	return req, nil
 }
 
 func (w *WSProxier) parseBackendMsg(msg []byte) (*RPCRes, error) {
@@ -584,6 +767,13 @@ func (w *WSProxier) parseBackendMsg(msg []byte) (*RPCRes, error) {
 		return res, ErrBackendBadResponse
 	}
 	return res, nil
+}
+
+func (w *WSProxier) writeClientConn(msgType int, msg []byte) error {
+	w.clientConnMu.Lock()
+	err := w.clientConn.WriteMessage(msgType, msg)
+	w.clientConnMu.Unlock()
+	return err
 }
 
 func mustMarshalJSON(in interface{}) []byte {
@@ -602,4 +792,72 @@ func formatWSError(err error) []byte {
 		}
 	}
 	return m
+}
+
+func sleepContext(ctx context.Context, duration time.Duration) {
+	select {
+	case <-ctx.Done():
+	case <-time.After(duration):
+	}
+}
+
+type LimitedHTTPClient struct {
+	http.Client
+	sem         *semaphore.Weighted
+	backendName string
+}
+
+func (c *LimitedHTTPClient) DoLimited(req *http.Request) (*http.Response, error) {
+	if err := c.sem.Acquire(req.Context(), 1); err != nil {
+		tooManyRequestErrorsTotal.WithLabelValues(c.backendName).Inc()
+		return nil, wrapErr(err, "too many requests")
+	}
+	defer c.sem.Release(1)
+	return c.Do(req)
+}
+
+func RecordBatchRPCError(ctx context.Context, backendName string, reqs []*RPCReq, err error) {
+	for _, req := range reqs {
+		RecordRPCError(ctx, backendName, req.Method, err)
+	}
+}
+
+func MaybeRecordErrorsInRPCRes(ctx context.Context, backendName string, reqs []*RPCReq, resBatch []*RPCRes) {
+	log.Info("forwarded RPC request",
+		"backend", backendName,
+		"auth", GetAuthCtx(ctx),
+		"req_id", GetReqID(ctx),
+		"batch_size", len(reqs),
+	)
+
+	var lastError *RPCErr
+	for i, res := range resBatch {
+		if res.IsError() {
+			lastError = res.Error
+			RecordRPCError(ctx, backendName, reqs[i].Method, res.Error)
+		}
+	}
+
+	if lastError != nil {
+		log.Info(
+			"backend responded with RPC error",
+			"backend", backendName,
+			"last_error_code", lastError.Code,
+			"last_error_msg", lastError.Message,
+			"req_id", GetReqID(ctx),
+			"source", "rpc",
+			"auth", GetAuthCtx(ctx),
+		)
+	}
+}
+
+func RecordBatchRPCForward(ctx context.Context, backendName string, reqs []*RPCReq, source string) {
+	for _, req := range reqs {
+		RecordRPCForward(ctx, backendName, req.Method, source)
+	}
+}
+
+func stripXFF(xff string) string {
+	ipList := strings.Split(xff, ", ")
+	return strings.TrimSpace(ipList[0])
 }
