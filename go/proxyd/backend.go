@@ -243,7 +243,7 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 		// callers so failover can occur if needed.
 		case ErrBackendUnexpectedJSONRPC:
 			log.Debug(
-				"Reecived unexpected JSON-RPC response",
+				"Received unexpected JSON-RPC response",
 				"name", b.Name,
 				"req_id", GetReqID(ctx),
 				"err", err,
