@@ -1,8 +1,9 @@
-import { BigNumber, Contract } from 'ethers'
+import { BigNumber, Contract, providers } from 'ethers'
 
 export interface ChainInfo {
   chainId: number
   url: string
+  provider: providers.StaticJsonRpcProvider
   testnet: boolean
   name: string
   teleportationAddress: string

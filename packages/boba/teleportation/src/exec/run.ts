@@ -71,17 +71,20 @@ const main = async () => {
     (acc, cur) => {
       const chain = BobaChains[cur]
       if (chain.isMainnet === !chain.testnet && chain.chainId !== chainId) {
+        chain.provider = new providers.StaticJsonRpcProvider(chain.url)
         acc.push({ chainId: cur, ...chain })
       }
       return acc
     },
     []
   )
+  const BOBA_TOKEN_ADDRESS = BobaChains[chainId].BobaTokenAddress
 
   const service = new TeleportationService({
     l2RpcProvider: l2Provider,
     chainId,
     teleportationAddress: TELEPORTATION_ADDRESS,
+    bobaTokenAddress: BOBA_TOKEN_ADDRESS,
     disburserWallet,
     selectedBobaChains,
     pollingInterval: POLLING_INTERVAL,

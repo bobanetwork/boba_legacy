@@ -1,8 +1,8 @@
 /* Imports: External */
 import { Contract, Wallet, BigNumber, providers, EventFilter } from 'ethers'
-import { LevelUp } from 'levelup'
-import level from 'level'
 import { orderBy } from 'lodash'
+import fs, { promises as fsPromise } from 'fs'
+import path from 'path'
 
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
@@ -15,9 +15,6 @@ import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/sta
 /* Imports: Interface */
 import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
 
-/* Imports: Config */
-import { BobaChains } from './utils/chains'
-
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
 
@@ -26,6 +23,9 @@ interface TeleportationOptions {
 
   // Address of the teleportation contract
   teleportationAddress: string
+
+  // Address of the L2 BOBA token
+  bobaTokenAddress: string
 
   // Wallet
   disburserWallet: Wallet
@@ -47,7 +47,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   }
 
   private state: {
-    db: LevelUp
     Teleportation: Contract
     // This is only for Mainnet and Goerli L2s
     BOBAToken: Contract
@@ -55,15 +54,12 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     supportedChains: ChainInfo[]
     // the contract of the chain that users deposit token
     depositTeleportations: DepositTeleportations[]
-  }
+  } = {} as any
 
   protected async _init(): Promise<void> {
     this.logger.info('Initializing teleportation service...', {
       options: this.options,
     })
-
-    this.state.db = level(this.options.dbPath)
-    await this.state.db.open()
 
     this.logger.info('Connecting to Teleportation contract...')
     this.state.Teleportation = new Contract(
@@ -77,7 +73,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
     this.logger.info('Connecting to BOBAToken contract...')
     this.state.BOBAToken = new Contract(
-      BobaChains[this.options.chainId].tokenAddress,
+      this.options.bobaTokenAddress,
       L2StandardERC20Json.abi,
       this.options.disburserWallet
     )
@@ -96,19 +92,23 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     // check if all chains are supported
     // if the chain is supported, then store the contract of the chain and the balance info
     // to the state
+    this.state.supportedChains = []
+    this.state.depositTeleportations = []
     for (const chain of this.options.selectedBobaChains) {
       const chainId = chain.chainId
-      const isSupported = await this.state.Teleportation.supportChains(chainId)
+      const isSupported = await this.state.Teleportation.supportedChains(
+        chainId
+      )
       if (!isSupported) {
         throw new Error(
           `Chain ${chainId} is not supported by the contract ${this.state.Teleportation.address}`
         )
       } else {
-        this.state.supportedChains.push(chain)
+        this.state.supportedChains = [...this.state.supportedChains, chain]
         const depositTeleportation = new Contract(
           chain.teleportationAddress,
           TeleportationJson.abi,
-          new providers.StaticJsonRpcProvider(chain.url)
+          chain.provider
         )
         const totalDisbursements =
           await this.state.Teleportation.totalDisbursements(chainId)
@@ -146,25 +146,19 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
   }
 
-  protected async _watchTeleportation(
+  async _watchTeleportation(
     depositTeleportation: DepositTeleportations,
     latestBlock: number
   ): Promise<any> {
     let lastBlock: number
-    let lastDisbursement: BigNumber
     const chainId = depositTeleportation.chainId.toString()
     try {
-      const depositInfo = JSON.parse(await this.state.db.get(chainId))
-      lastBlock = depositInfo.lastBlock
-      lastDisbursement = BigNumber.from(depositInfo.lastDisbursement)
+      lastBlock = await this._getDepositInfo(chainId)
     } catch (e) {
       this.logger.warn(`No deposit info found ${chainId}`)
       lastBlock = depositTeleportation.height
-      lastDisbursement = await this.state.Teleportation.totalDisbursements(
-        chainId
-      )
       // store the new deposit info
-      await this._putDepositInfo(chainId, lastBlock, lastDisbursement)
+      await this._putDepositInfo(chainId, lastBlock)
     }
     const events = await this._getEvents(
       this.state.Teleportation.filters.BobaReceived(),
@@ -174,7 +168,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     return events
   }
 
-  protected async _disbureTeleportation(
+  async _disbureTeleportation(
     depositTeleportation: DepositTeleportations,
     events: any,
     latestBlock: number
@@ -183,34 +177,30 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     // parse events
     if (events.length === 0) {
       // update the deposit info if no events are found
-      this._updateLatestBlockInDepositInfo(chainId, latestBlock)
+      this._putDepositInfo(chainId, latestBlock)
     } else {
       const lastDisbursement =
         await this.state.Teleportation.totalDisbursements(chainId)
       // eslint-disable-next-line prefer-const
-      let disbursement: Disbursement[]
+      let disbursement = []
 
       for (const event of events) {
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
         const emitter = event.args.emitter
-        // two cases:
-        // 1. the lastDisbursement is 0 and depositId is 0
-        // this mean that we have not disbursed any token yet
-        // 2. the lastDisbursement is not 0 and depositId is not 0
-        // we need to make sure that lastDisbursement is smaller than depositId
-        // if not, we need to skip this process
-        if (
-          (lastDisbursement.eq(0) && depositId.eq(0)) ||
-          depositId.gt(lastDisbursement)
-        ) {
-          disbursement.push({
-            amount: amount.toString(),
-            addr: emitter,
-            depositId: depositId.toString(),
-            sourceChainId: sourceChainId.toString(),
-          })
+
+        // we disburse tokens only if depositId is greater or equal to the last disbursement
+        if (depositId.gte(lastDisbursement)) {
+          disbursement = [
+            ...disbursement,
+            {
+              amount: amount.toString(),
+              addr: emitter,
+              depositId: depositId.toNumber(),
+              sourceChainId: sourceChainId.toString(),
+            },
+          ]
         }
       }
 
@@ -221,7 +211,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
   }
 
-  protected async _disburseTx(
+  async _disburseTx(
     disbursement: Disbursement[],
     chainId: number,
     latestBlock: number
@@ -237,7 +227,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDisbursements = slicedDisbursement.reduce((acc, cur) => {
           return acc.add(BigNumber.from(cur.amount))
         }, BigNumber.from('0'))
-        if (this.options.chainId === 288 || this.options.chainId === 2888) {
+        if (
+          this.options.bobaTokenAddress !==
+          '0x4200000000000000000000000000000000000006'
+        ) {
           // approve BOBA token
           const approveTx = await this.state.BOBAToken.approve(
             this.state.Teleportation.address,
@@ -258,14 +251,14 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         sliceStart = sliceEnd
         sliceEnd = Math.min(sliceEnd + 10, numberOfDisbursement)
       }
-      this._updateLatestBlockInDepositInfo(chainId, latestBlock)
+      this._putDepositInfo(chainId, latestBlock)
     } catch (e) {
       this.logger.error(e)
     }
   }
 
   // get events from the contract
-  protected async _getEvents(
+  async _getEvents(
     event: EventFilter,
     fromBlock: number,
     toBlock: number
@@ -288,43 +281,36 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     return events
   }
 
-  protected async _putDepositInfo(
+  async _putDepositInfo(
     chainId: number | string,
-    latestBlock: number,
-    lastDisbursement: BigNumber
-  ): Promise<void> {
-    await this.state.db.put(
-      chainId.toString(),
-      JSON.stringify({
-        latestBlock,
-        lastDisbursement: lastDisbursement.toString(),
-      })
-    )
-  }
-
-  protected async _updateLatestBlockInDepositInfo(
-    chainId: number,
     latestBlock: number
   ): Promise<void> {
+    const dumpsPath = path.resolve(__dirname, this.options.dbPath)
+    if (!fs.existsSync(dumpsPath)) {
+      fs.mkdirSync(dumpsPath)
+    }
     try {
-      const depositInfo = JSON.parse(await this.state.db.get(chainId))
-      const lastDisbursement = BigNumber.from(depositInfo.lastDisbursement)
-      await this._putDepositInfo(chainId, latestBlock, lastDisbursement)
-    } catch (e) {
-      this.logger.warn(`No deposit info found ${chainId}`)
+      const addrsPath = path.resolve(dumpsPath, `depositInfo-${chainId}.json`)
+      await fsPromise.writeFile(addrsPath, JSON.stringify({ latestBlock }))
+    } catch (error) {
+      this.logger.error(`Failed to put depositInfo! - ${error}`)
     }
   }
 
-  protected async _updateLastDisbursementInDepositInfo(
-    chainId: number,
-    lastDisbursement: BigNumber
-  ): Promise<void> {
-    try {
-      const depositInfo = JSON.parse(await this.state.db.get(chainId))
-      const latestBlock = depositInfo.latestBlock
-      await this._putDepositInfo(chainId, latestBlock, lastDisbursement)
-    } catch (e) {
-      this.logger.warn(`No deposit info found ${chainId}`)
+  async _getDepositInfo(chainId: number | string): Promise<any> {
+    const dumpsPath = path.resolve(
+      __dirname,
+      `${this.options.dbPath}/depositInfo-${chainId}.json`
+    )
+    if (fs.existsSync(dumpsPath)) {
+      const historyJsonRaw = await fsPromise.readFile(dumpsPath)
+      const historyJSON = JSON.parse(historyJsonRaw.toString())
+      if (historyJSON.latestBlock) {
+        return historyJSON.latestBlock
+      } else {
+        return 0
+      }
     }
+    return 0
   }
 }

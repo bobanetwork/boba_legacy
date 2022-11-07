@@ -29,7 +29,10 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-no-focused-test": "^0.5.0",
     "tslint-plugin-prettier": "^2.3.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "ethereum-waffle": "^3.3.0",
+    "mocha": "^8.3.1",
+    "@types/mocha": "^8.2.2"
   },
   "dependencies": {
     "@eth-optimism/contracts": "^0.5.11",
@@ -37,8 +40,6 @@
     "bcfg": "^0.1.6",
     "dotenv": "^8.2.0",
     "ethers": "^5.1.0",
-    "level": "^6.0.1",
-    "levelup": "^4.4.0",
     "lodash": "^4.17.21"
   }
 }
