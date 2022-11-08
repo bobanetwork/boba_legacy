@@ -45,6 +45,7 @@
   * [Token Bridging](boba\_documentation/developer/bridge-l1-and-l2/bridge-basics.md)
     * [Using the Standard Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/standard-bridge.md)
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
+  * [Boba Teleportation](boba\_documentation/developer/teleportation.md)
   * [Token Addresses](boba\_documentation/developer/token-addresses.md)
 
 * [Other](packages/README.md)
