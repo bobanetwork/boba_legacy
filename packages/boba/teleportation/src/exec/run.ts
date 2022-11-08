@@ -42,10 +42,6 @@ const main = async () => {
     'event-per-polling-interval',
     parseInt(env.EVENT_PER_POLLING_INTERVAL, 10) || 1000
   )
-  const IS_MAINNET = config.bool(
-    'is-mainnet',
-    env.IS_MAINNET === 'true' || false
-  )
   const DATABASE_PATH = config.str('database-path', env.DATABASE_PATH || './db')
 
   if (!L2_NODE_WEB3_URL) {
@@ -65,12 +61,12 @@ const main = async () => {
   const disburserWallet = new Wallet(TELEPORTATION_DISBURSER_KEY, l2Provider)
 
   // get all boba chains and exclude the current chain
-  console.log(`Looking for ${IS_MAINNET ? 'mainnet' : 'testnet'}`)
   const chainId = (await l2Provider.getNetwork()).chainId
+  const isTestnet = BobaChains[chainId].testnet
   const selectedBobaChains: ChainInfo[] = Object.keys(BobaChains).reduce(
     (acc, cur) => {
       const chain = BobaChains[cur]
-      if (chain.isMainnet === !chain.testnet && chain.chainId !== chainId) {
+      if (isTestnet === chain.testnet && Number(cur) !== chainId) {
         chain.provider = new providers.StaticJsonRpcProvider(chain.url)
         acc.push({ chainId: cur, ...chain })
       }
