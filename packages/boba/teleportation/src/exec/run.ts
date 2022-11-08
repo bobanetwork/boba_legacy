@@ -23,10 +23,6 @@ const main = async () => {
 
   const env = process.env
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
-  const TELEPORTATION_ADDRESS = config.str(
-    'teleportation-address',
-    env.TELEPORTATION_ADDRESS
-  )
   // This private key is used to send funds to the contract and initiate the tx,
   // so it should have enough BOBA balance
   const TELEPORTATION_DISBURSER_KEY = config.str(
@@ -34,6 +30,7 @@ const main = async () => {
     env.TELEPORTATION_DISBURSER_KEY
   )
 
+  // Optional
   const POLLING_INTERVAL = config.uint(
     'polling-interval',
     parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60
@@ -42,19 +39,16 @@ const main = async () => {
     'event-per-polling-interval',
     parseInt(env.EVENT_PER_POLLING_INTERVAL, 10) || 1000
   )
-  const DATABASE_PATH = config.str('database-path', env.DATABASE_PATH || './db')
+  const DATABASE_PATH = config.str(
+    'database-path',
+    env.DATABASE_PATH || '../db'
+  )
 
   if (!L2_NODE_WEB3_URL) {
     throw new Error('Must pass L2_NODE_WEB3_URL')
   }
-  if (!TELEPORTATION_ADDRESS) {
-    throw new Error('Must pass TELEPORTATION_ADDRESS')
-  }
   if (!TELEPORTATION_DISBURSER_KEY) {
     throw new Error('Must pass TELEPORTATION_DISBURSER_KEY')
-  }
-  if (EVENT_PER_POLLING_INTERVAL === 0) {
-    console.warn('TELEPORTATION_BLOCK_HEIGHT is 0')
   }
 
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
@@ -75,6 +69,7 @@ const main = async () => {
     []
   )
   const BOBA_TOKEN_ADDRESS = BobaChains[chainId].BobaTokenAddress
+  const TELEPORTATION_ADDRESS = BobaChains[chainId].teleportationAddress
 
   const service = new TeleportationService({
     l2RpcProvider: l2Provider,
