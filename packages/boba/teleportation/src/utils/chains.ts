@@ -4,7 +4,7 @@ export const BobaChains = {
     testnet: false,
     name: 'Boba Ethereum Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
-    height: 870424,
+    height: 873302,
     BobaTokenAddress: '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7',
   },
   1294: {
