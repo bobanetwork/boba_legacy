@@ -201,6 +201,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
               sourceChainId: sourceChainId.toString(),
             },
           ]
+          this.logger.info(
+            `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter}`
+          )
         }
       }
 
@@ -251,6 +254,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         sliceStart = sliceEnd
         sliceEnd = Math.min(sliceEnd + 10, numberOfDisbursement)
       }
+      this.logger.info(
+        `Disbursement successful - chainId: ${chainId} - slicedDisbursement:${JSON.stringify(
+          disbursement
+        )} - latestBlock: ${latestBlock}`
+      )
       this._putDepositInfo(chainId, latestBlock)
     } catch (e) {
       this.logger.error(e)
