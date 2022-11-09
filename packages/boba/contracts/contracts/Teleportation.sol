@@ -328,6 +328,7 @@ contract Teleportation is PausableUpgradeable {
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
+            require(supportedChains[_sourceChainId], "Source chain is not supported");
             totalDisbursements[_sourceChainId] += 1;
 
             // Deliver the disbursement amount to the receiver. If the
@@ -381,6 +382,7 @@ contract Teleportation is PausableUpgradeable {
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
+            require(supportedChains[_sourceChainId], "Source chain is not supported");
             totalDisbursements[_sourceChainId] += 1;
 
             // Deliver the dispursement amount to the receiver. If the
