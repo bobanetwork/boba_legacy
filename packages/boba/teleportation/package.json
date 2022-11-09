@@ -9,7 +9,7 @@
     "test/**/*.ts"
   ],
   "scripts": {
-    "start:service": "node ./exec/run-gas-price-oracle.js",
+    "start:service": "node ./exec/run-teleportation.js",
     "start": "yarn start:service",
     "build": "tsc -p ./tsconfig.build.json",
     "clean": "rimraf  dist/ ./tsconfig.build.tsbuildinfo",

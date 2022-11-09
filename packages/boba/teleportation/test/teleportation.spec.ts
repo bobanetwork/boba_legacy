@@ -158,6 +158,7 @@ describe('teleportation', () => {
     )
     expect(events.length).to.be.eq(1)
     expect(events[0].args.sourceChainId).to.be.eq(chainId)
+    expect(events[0].args.toChainId).to.be.eq(chainId)
     expect(events[0].args.depositId).to.be.eq(0)
     expect(events[0].args.emitter).to.be.eq(signerAddr)
     expect(events[0].args.amount).to.be.eq(utils.parseEther('10'))
