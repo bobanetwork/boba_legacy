@@ -187,7 +187,15 @@ function Input({
         {paste && (
           <Box
             onClick={handlePaste}
-            sx={{color: theme.palette.secondary.main, opacity: 0.9, cursor: 'pointer', position: 'relative', right: '70px', fontSize: '14px', zIndex: '100'}}
+            sx={{
+              color: theme.palette.secondary.main,
+              opacity: 0.9,
+              cursor: 'pointer',
+              position: 'absolute',
+              right: '70px',
+              fontSize: '14px',
+              zIndex: '100'
+            }}
           >
             PASTE
           </Box>
