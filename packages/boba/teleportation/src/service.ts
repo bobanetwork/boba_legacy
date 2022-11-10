@@ -128,21 +128,27 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
       for (const depositTeleportation of this.state.depositTeleportations) {
         // search BobaReceived events
         const latestBlock =
           await depositTeleportation.Teleportation.provider.getBlockNumber()
-        const events = await this._watchTeleportation(
-          depositTeleportation,
-          latestBlock
-        )
-        await this._disbureTeleportation(
-          depositTeleportation,
-          events,
-          latestBlock
-        )
+        try {
+          const events = await this._watchTeleportation(
+            depositTeleportation,
+            latestBlock
+          )
+          await this._disbureTeleportation(
+            depositTeleportation,
+            events,
+            latestBlock
+          )
+        } catch (err) {
+          this.logger.error('Error while running teleportation', {
+            err,
+          })
+        }
       }
+      await sleep(this.options.pollingInterval)
     }
   }
 
@@ -155,12 +161,13 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     try {
       lastBlock = await this._getDepositInfo(chainId)
     } catch (e) {
-      this.logger.warn(`No deposit info found ${chainId}`)
+      this.logger.warn(`No deposit info found in chainId - ${chainId}`)
       lastBlock = depositTeleportation.height
       // store the new deposit info
       await this._putDepositInfo(chainId, lastBlock)
     }
     const events = await this._getEvents(
+      depositTeleportation.Teleportation,
       this.state.Teleportation.filters.BobaReceived(),
       lastBlock,
       latestBlock
@@ -267,6 +274,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
   // get events from the contract
   async _getEvents(
+    contract: Contract,
     event: EventFilter,
     fromBlock: number,
     toBlock: number
@@ -278,7 +286,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         startBlock + this.options.eventPerPollingInterval,
         toBlock
       )
-      const partialEvents = await this.state.Teleportation.queryFilter(
+      const partialEvents = await contract.queryFilter(
         event,
         startBlock,
         endBlock
@@ -316,9 +324,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       if (historyJSON.latestBlock) {
         return historyJSON.latestBlock
       } else {
-        return 0
+        throw new Error("Can't find latestBlock in depositInfo")
       }
     }
-    return 0
+    throw new Error("Can't find latestBlock in depositInfo")
   }
 }
