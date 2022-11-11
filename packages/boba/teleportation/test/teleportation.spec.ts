@@ -32,7 +32,7 @@ describe('teleportation', () => {
 
   let selectedBobaChains: ChainInfo[]
   const pollingInterval: number = 1000
-  const eventPerPollingInterval = 1000
+  const blockRangePerPolling = 1000
   const dbPath = './db'
 
   before(async () => {
@@ -120,7 +120,7 @@ describe('teleportation', () => {
       disburserWallet: wallet1,
       selectedBobaChains,
       pollingInterval,
-      eventPerPollingInterval,
+      blockRangePerPolling,
       dbPath,
     })
     return teleportationService
