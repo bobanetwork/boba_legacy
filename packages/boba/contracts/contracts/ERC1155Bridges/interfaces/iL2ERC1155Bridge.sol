@@ -75,7 +75,8 @@ interface iL2ERC1155Bridge {
         bytes calldata _data,
         uint32 _l1Gas
     )
-        external;
+        external
+        payable;
 
     function withdrawBatch(
         address _l2Contract,
@@ -84,7 +85,8 @@ interface iL2ERC1155Bridge {
         bytes calldata _data,
         uint32 _l1Gas
     )
-        external;
+        external
+        payable;
 
     function withdrawTo(
         address _l2Contract,
@@ -94,7 +96,8 @@ interface iL2ERC1155Bridge {
         bytes calldata _data,
         uint32 _l1Gas
     )
-        external;
+        external
+        payable;
 
     function withdrawBatchTo(
         address _l2Contract,
@@ -104,7 +107,8 @@ interface iL2ERC1155Bridge {
         bytes calldata _data,
         uint32 _l1Gas
     )
-        external;
+        external
+        payable;
 
     function finalizeDeposit(
         address _l1Contract,

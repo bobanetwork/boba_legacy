@@ -231,6 +231,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -258,6 +259,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -286,6 +288,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -314,6 +317,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
