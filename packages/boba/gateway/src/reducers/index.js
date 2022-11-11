@@ -26,7 +26,6 @@ import queueReducer from './queueReducer'
 import tokenReducer from './tokenReducer'
 import nftReducer from './nftReducer'
 import feeReducer from './feeReducer'
-import gasReducer from './gasReducer'
 import uiReducer from './uiReducer'
 import setupReducer from './setupReducer'
 import notificationReducer from './notificationReducer'
@@ -53,7 +52,6 @@ const rootReducer = combineReducers({
   tokenList: tokenReducer,
   nft: nftReducer,
   fees: feeReducer,
-  gas: gasReducer,
   ui: uiReducer,
   setup: setupReducer,
   notification: notificationReducer,

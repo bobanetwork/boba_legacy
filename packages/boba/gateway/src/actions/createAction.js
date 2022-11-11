@@ -53,9 +53,6 @@ export function createAction (key, asyncAction) {
 
       //deal with metamask errors - they will have a 'code' field so we can detect those
       if(response && response.hasOwnProperty('message') && response.hasOwnProperty('code')) {
-
-        console.log("Error keys:", Object.keys(response))
-        console.log("Error code:", response.code)
         Sentry.captureMessage(response.reason)
         if(response.hasOwnProperty('reason')) console.log("Error reason:", response.reason)
 
@@ -102,7 +99,6 @@ export function createAction (key, asyncAction) {
       return true
 
     } catch (error) {
-
       console.log("Unhandled error RAW:", {error, key, asyncAction})
       Sentry.captureException(error);
       return false

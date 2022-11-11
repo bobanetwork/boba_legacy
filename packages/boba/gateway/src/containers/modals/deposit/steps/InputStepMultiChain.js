@@ -23,7 +23,6 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import parse from 'html-react-parser'
-
 import { selectAltL1DepositCost, selectL1FeeBalance } from 'selectors/balanceSelector'
 import { fetchAltL1DepositFee, fetchL1FeeBalance } from 'actions/balanceAction'
 
