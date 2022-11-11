@@ -11,7 +11,7 @@ All configuration is done via environment variables. See all variables at [.env.
 | L2_NODE_WEB3_URL            | The endpoint of Layer 2                 |         |
 | TELEPORTATION_DISBURSER_KEY | The pk of disburser                     |         |
 | POLLING_INTERVAL            | The polling interval of fetching events | 60s     |
-| EVENT_PER_POLLING_INTERVAL  | The polling range of events             | 1000    |
+| BLOCK_RANGE_PER_POLLING     | The blcock range of each polling        | 1000    |
 | DATABASE_PATH               | The database location                   | ../db   |
 
 ## Building & Running

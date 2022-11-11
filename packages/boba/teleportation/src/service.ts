@@ -34,7 +34,7 @@ interface TeleportationOptions {
 
   pollingInterval: number
 
-  eventPerPollingInterval: number
+  blockRangePerPolling: number
 
   dbPath: string
 }
@@ -283,7 +283,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     let startBlock = fromBlock
     while (startBlock < toBlock) {
       const endBlock = Math.min(
-        startBlock + this.options.eventPerPollingInterval,
+        startBlock + this.options.blockRangePerPolling,
         toBlock
       )
       const partialEvents = await contract.queryFilter(

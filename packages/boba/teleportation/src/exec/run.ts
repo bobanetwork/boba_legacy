@@ -35,9 +35,9 @@ const main = async () => {
     'polling-interval',
     parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60
   )
-  const EVENT_PER_POLLING_INTERVAL = config.uint(
-    'event-per-polling-interval',
-    parseInt(env.EVENT_PER_POLLING_INTERVAL, 10) || 1000
+  const BLOCK_RANGE_PER_POLLING = config.uint(
+    'block-range-per-polling',
+    parseInt(env.BLOCK_RANGE_PER_POLLING, 10) || 1000
   )
   const DATABASE_PATH = config.str(
     'database-path',
@@ -79,7 +79,7 @@ const main = async () => {
     disburserWallet,
     selectedBobaChains,
     pollingInterval: POLLING_INTERVAL,
-    eventPerPollingInterval: EVENT_PER_POLLING_INTERVAL,
+    blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
     dbPath: DATABASE_PATH,
   })
 
