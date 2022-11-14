@@ -40,6 +40,7 @@ interface TeleportationOptions {
 }
 
 const optionSettings = {}
+const bobaTokenAddressOnAltL2s = '0x4200000000000000000000000000000000000006'
 
 export class TeleportationService extends BaseService<TeleportationOptions> {
   constructor(options: TeleportationOptions) {
@@ -137,7 +138,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             depositTeleportation,
             latestBlock
           )
-          await this._disbureTeleportation(
+          await this._disburseTeleportation(
             depositTeleportation,
             events,
             latestBlock
@@ -175,7 +176,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     return events
   }
 
-  async _disbureTeleportation(
+  async _disburseTeleportation(
     depositTeleportation: DepositTeleportations,
     events: any,
     latestBlock: number
@@ -237,10 +238,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDisbursements = slicedDisbursement.reduce((acc, cur) => {
           return acc.add(BigNumber.from(cur.amount))
         }, BigNumber.from('0'))
-        if (
-          this.options.bobaTokenAddress !==
-          '0x4200000000000000000000000000000000000006'
-        ) {
+        if (this.options.bobaTokenAddress !== bobaTokenAddressOnAltL2s) {
           // approve BOBA token
           const approveTx = await this.state.BOBAToken.approve(
             this.state.Teleportation.address,
