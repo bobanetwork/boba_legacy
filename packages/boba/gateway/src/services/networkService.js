@@ -106,7 +106,7 @@ import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { APP_AIRDROP, APP_CHAIN, RINKEBY_L1_CHAIN_ID, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'

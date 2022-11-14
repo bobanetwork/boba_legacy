@@ -74,7 +74,6 @@ export const ROUTES_PATH = {
   STAKE: '/stake',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
-  AIRDROP: '/airdrop',
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
 }
