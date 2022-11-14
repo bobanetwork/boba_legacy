@@ -361,7 +361,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
         require(msg.value == billingContract.exitFee(), "Not enough fee");
-        (bool sent,) = billingContractAddress.call{value: billingContract.exitFee()}("");
+        (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
         require(sent, "Failed to send BOBA");
 
         PairTokenInfo storage pairToken = pairTokenInfo[_l2Contract];
@@ -468,7 +468,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
         require(msg.value == billingContract.exitFee(), "Not enough fee");
-        (bool sent,) = billingContractAddress.call{value: billingContract.exitFee()}("");
+        (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
         require(sent, "Failed to send BOBA");
 
         PairTokenInfo storage pairToken = pairTokenInfo[_l2Contract];
