@@ -114,7 +114,7 @@ describe('BOBA Teleportation', async () => {
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportBOBA(_amount, 4))
         .to.emit(Proxy__Teleportation, 'BobaReceived')
-        .withArgs(4, 31337, 0, signerAddress, _amount)
+        .withArgs(31337, 4, 0, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '1'
       )
@@ -328,7 +328,7 @@ describe('BOBA Teleportation', async () => {
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportBOBA(_amount, 4))
         .to.emit(Proxy__Teleportation, 'BobaReceived')
-        .withArgs(4, 31337, 2, signerAddress, _amount)
+        .withArgs(31337, 4, 2, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '3'
       )
@@ -434,7 +434,7 @@ describe('BOBA Teleportation', async () => {
         Proxy__Teleportation.teleportNativeBOBA(4, { value: _amount })
       )
         .to.emit(Proxy__Teleportation, 'BobaReceived')
-        .withArgs(4, 31337, 0, signerAddress, _amount)
+        .withArgs(31337, 4, 0, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '1'
       )
@@ -650,7 +650,7 @@ describe('BOBA Teleportation', async () => {
         Proxy__Teleportation.teleportNativeBOBA(4, { value: _amount })
       )
         .to.emit(Proxy__Teleportation, 'BobaReceived')
-        .withArgs(4, 31337, 2, signerAddress, _amount)
+        .withArgs(31337, 4, 2, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '3'
       )

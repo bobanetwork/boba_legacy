@@ -87,8 +87,8 @@ contract Teleportation is PausableUpgradeable {
     );
 
     event BobaReceived(
-        uint256 indexed toChainId,
         uint256 sourceChainId,
+        uint256 indexed toChainId,
         uint256 indexed depositId,
         address indexed emitter,
         uint256 amount
@@ -251,7 +251,7 @@ contract Teleportation is PausableUpgradeable {
 
         IERC20(BobaTokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
 
-        emit BobaReceived(_toChainId, block.chainid, totalDeposits[_toChainId], msg.sender, _amount);
+        emit BobaReceived(block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
         totalDeposits[_toChainId] += 1;
     }
 
@@ -284,7 +284,7 @@ contract Teleportation is PausableUpgradeable {
             transferTimestampCheckPoint = block.timestamp;
         }
 
-        emit BobaReceived(_toChainId, block.chainid, totalDeposits[_toChainId], msg.sender, msg.value);
+        emit BobaReceived(block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, msg.value);
         totalDeposits[_toChainId] += 1;
     }
 
@@ -337,7 +337,7 @@ contract Teleportation is PausableUpgradeable {
             // disbursements.
 
             // slither-disable-next-line calls-loop,reentrancy-events
-            (bool success, ) = _addr.call{ value: _amount }("");
+            (bool success, ) = _addr.call{ gas: 21000, value: _amount }("");
             if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
             else emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
         }
