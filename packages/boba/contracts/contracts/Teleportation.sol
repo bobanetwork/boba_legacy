@@ -337,7 +337,7 @@ contract Teleportation is PausableUpgradeable {
             // disbursements.
 
             // slither-disable-next-line calls-loop,reentrancy-events
-            (bool success, ) = _addr.call{ gas: 21000, value: _amount }("");
+            (bool success, ) = _addr.call{ gas: 3000, value: _amount }("");
             if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
             else emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
         }
