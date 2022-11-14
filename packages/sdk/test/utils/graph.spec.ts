@@ -10,7 +10,6 @@ describe('subgraph tests', () => {
   let provider: ethers.providers.Provider
   beforeEach(async () => {
     provider = new ethers.providers.JsonRpcProvider(
-      'https://rpc.testnet.fantom.network'
     )
   })
 
