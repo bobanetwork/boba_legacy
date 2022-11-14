@@ -370,7 +370,7 @@ class NetworkService {
 
     this.L1ChainAsset = L1ChainAssets[this.chain]
     // support alt l1 tokens
-    this.supportedAltL1Chains = supportedAltL1Chains
+    this.supportedAltL1Chains = [L1ChainAssets[this.chain].l1NameShort]
 
     // token info
     this.tokenInfo = {}
@@ -687,6 +687,9 @@ class NetworkService {
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
         nw[networkGateway]['L2']['rpcUrl']
       )
+
+      const chainId = (await this.L1Provider.getNetwork()).chainId
+      this.tokenInfo = tokenInfo[chainId]
 
       if (this.supportedMultiChains.includes(networkGateway)) {
         addresses = allAddresses

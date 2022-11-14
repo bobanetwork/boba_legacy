@@ -47,7 +47,8 @@ import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import {
   fetchBalances,
   addTokenList,
-  fetchExits
+  fetchExits,
+  fetchGas
 } from 'actions/networkAction'
 
 /********   SELECTORS ********/
