@@ -121,6 +121,12 @@ const main = async () => {
     env.ENABLE_RELAYER_FILTER === 'true'
   )
 
+  // add the whitelist of addresses to the filter
+  const RELAYER_FILTER_WHITELIST = config.str(
+    'relayer-filter-whitelist',
+    env.RELAYER_FILTER_WHITELIST
+  )
+
   if (!L1_NODE_WEB3_URL) {
     throw new Error('Must pass L1_NODE_WEB3_URL')
   }
@@ -170,6 +176,7 @@ const main = async () => {
     resubmissionTimeout: RESUBMISSION_TIMEOUT * 1000,
     isFastRelayer: FAST_RELAYER,
     enableRelayerFilter: ENABLE_RELAYER_FILTER,
+    relayerFilterWhitelist: RELAYER_FILTER_WHITELIST,
   })
 
   await service.start()
