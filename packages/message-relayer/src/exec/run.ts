@@ -124,7 +124,7 @@ const main = async () => {
   // add the whitelist of addresses to the filter
   const RELAYER_FILTER_WHITELIST = config.str(
     'relayer-filter-whitelist',
-    env.RELAYER_FILTER_WHITELIST
+    env.RELAYER_FILTER_WHITELIST || ''
   )
 
   if (!L1_NODE_WEB3_URL) {
