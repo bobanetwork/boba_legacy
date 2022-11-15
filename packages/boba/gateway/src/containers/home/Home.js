@@ -43,11 +43,9 @@ import {
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
-import { fetchVerifierStatus } from 'actions/verifierAction'
-import { fetchLockRecords } from 'actions/veBobaAction'
+
 import {
   fetchBalances,
-  fetchGas,
   addTokenList,
   fetchExits
 } from 'actions/networkAction'
@@ -69,7 +67,6 @@ import ExitModal from 'containers/modals/exit/ExitModal'
 import FarmWrapper from 'containers/farm/FarmWrapper'
 import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
-
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -118,6 +115,7 @@ function Home() {
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
   const lock = useSelector(selectModalState('lock'))
+  const proposalId = useSelector(selectModalState('proposalId'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
