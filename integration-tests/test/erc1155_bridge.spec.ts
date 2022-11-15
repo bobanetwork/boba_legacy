@@ -975,19 +975,19 @@ describe('ERC1155 Bridge Test', async () => {
         )
       )
 
-      // check event WithdrawalInitiated is emitted with empty data
-      const returnedlogIndex = await getFilteredLogIndex(
-        depositTx.receipt,
-        L1ERC1155BridgeJson.abi,
-        L1Bridge.address,
-        'DepositInitiated'
-      )
-      const ifaceL1Bridge = new ethers.utils.Interface(L1ERC1155BridgeJson.abi)
-      const log = ifaceL1Bridge.parseLog(
-        depositTx.receipt.logs[returnedlogIndex]
-      )
+      // // check event WithdrawalInitiated is emitted with empty data
+      // const returnedlogIndex = await getFilteredLogIndex(
+      //   depositTx.receipt,
+      //   L1ERC1155BridgeJson.abi,
+      //   L1Bridge.address,
+      //   'DepositInitiated'
+      // )
+      // const ifaceL1Bridge = new ethers.utils.Interface(L1ERC1155BridgeJson.abi)
+      // const log = ifaceL1Bridge.parseLog(
+      //   depositTx.receipt.logs[returnedlogIndex]
+      // )
 
-      expect(log.args._data).to.deep.eq('0x')
+      // expect(log.args._data).to.deep.eq('0x')
 
       const postL1Balance = await L1ERC1155.balanceOf(
         env.l1Wallet.address,
