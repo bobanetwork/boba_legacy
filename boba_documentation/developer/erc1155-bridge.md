@@ -346,6 +346,25 @@ const tx = await L1ERC1155Brige.deposit(
 await tx.wait()
 ```
 
+### NOTE
+
+To bridge tokens from Alt L2s to Alt L1, you need to add the BOBA as the value to cover the exit fee.
+
+```javascript
+const exitFee = await BOBABillingContract.exitFee()
+const tx = await L2ERC1155Brige.withdraw(
+  L2_ERC1155_TOKEN_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  TOKEN_AMOUNT,
+  DATA, // event data - you can pass `0x` if you don't want to emit any data in the events
+  9999999, // L2 gas
+  {value: exitFee} // exit fee
+)
+await tx.wait()
+```
+
+ 
+
 ## ERC1155 bridge addresses
 
 ### Mainnet
