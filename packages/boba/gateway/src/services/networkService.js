@@ -993,13 +993,13 @@ class NetworkService {
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4,
+          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
           fastRelayer: false,
         })
         this.fastWatcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4,
+          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
           fastRelayer: true,
         })
       }
@@ -1736,9 +1736,15 @@ class NetworkService {
   }
 
   //Move ETH from L1 to L2 using the standard deposit system
-  depositETHL2 = async (value_Wei_String) => {
+  /******
+   * Deposit ETH from L1 to L2.
+   * Deposit ETH from L1 to another L2 account.
+   * */
 
-    //console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
+  async depositETHL2({
+    recipient = null,
+    value_Wei_String
+  }) {
 
     updateSignatureStatus_depositTRAD(false)
 
@@ -1747,14 +1753,31 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTX = await this.L1StandardBridgeContract
-        .connect(this.provider.getSigner()).depositETH(
-          this.L2GasLimit,
-          utils.formatBytes32String(new Date().getTime().toString()),
-          {
-            value: value_Wei_String
-          }
-      )
+      let depositTX;
+
+      if (!recipient) {
+        depositTX = await this.L1StandardBridgeContract
+          .connect(this.provider.getSigner())
+          .depositETH(
+            this.L2GasLimit,
+            utils.formatBytes32String(new Date().getTime().toString()),
+            {
+              value: value_Wei_String
+            }
+          )
+      } else {
+        depositTX = await this.L1StandardBridgeContract
+          .connect(this.provider.getSigner())
+          .depositETHTo(
+            recipient,
+            this.L2GasLimit,
+            utils.formatBytes32String(new Date().getTime().toString()),
+            {
+              value: value_Wei_String
+            }
+          )
+      }
+
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
@@ -2473,7 +2496,11 @@ class NetworkService {
   }
 
   //Used to move ERC20 Tokens from L1 to L2 using the classic deposit
-  async depositErc20(value_Wei_String, currency, currencyL2) {
+  async depositErc20({
+    recipient = null,
+    value_Wei_String,
+    currency,
+    currencyL2 }) {
 
     updateSignatureStatus_depositTRAD(false)
 
@@ -2527,7 +2554,11 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTX = await this.L1StandardBridgeContract
+      let depositTX;
+
+      if (!recipient) {
+        // incase no recipient
+        depositTX = await this.L1StandardBridgeContract
         .connect(this.provider.getSigner()).depositERC20(
           currency,
           currencyL2,
@@ -2535,6 +2566,19 @@ class NetworkService {
           this.L2GasLimit,
           utils.formatBytes32String(new Date().getTime().toString())
         )
+      } else {
+        // deposit ERC20 to L2 account address.
+        depositTX = await this.L1StandardBridgeContract
+          .connect(this.provider.getSigner())
+          .depositERC20To(
+          currency,
+          currencyL2,
+          recipient,
+          value_Wei_String,
+          this.L2GasLimit,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
+      }
 
       console.log("depositTxStatus:",depositTX)
 
