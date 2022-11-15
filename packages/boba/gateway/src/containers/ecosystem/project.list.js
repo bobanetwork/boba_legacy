@@ -150,7 +150,7 @@ export const projectList = [
   {
     "title": "Unidex",
     "canLaunch": true,
-    "link": "https://unidexbeta.app/trading",
+    "link": "https://app.unidex.exchange/trading",
     "telegram": "https://t.me/unidexfinance",
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",
