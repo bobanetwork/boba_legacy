@@ -7,7 +7,9 @@ export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   background: theme.palette.background.secondary,
   borderRadius: '12px',
-  padding: '0'
+  padding: '0',
+  cursor: 'pointer',
+
 }));
 
 export const LayerContent = styled(Box)(({ theme }) => ({

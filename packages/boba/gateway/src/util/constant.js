@@ -1,5 +1,17 @@
-import moment from 'moment'
+import React from 'react';
 
+import moment from 'moment'
+import EthereumIcon from 'components/icons/chain/L1/EthereumIcon';
+import BNBIcon from 'components/icons/chain/L1/BNBIcon';
+import AvalancheIcon from 'components/icons/chain/L1/AvalancheIcon';
+import FantomIcon from 'components/icons/chain/L1/FantomIcon';
+import MoonbeamIcon from 'components/icons/chain/L1/MoonbeamIcon';
+
+import BobaIcon from 'components/icons/chain/L2/BobaIcon';
+import BobaBNBIcon from 'components/icons/chain/L2/BobaBNBIcon';
+import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon';
+import BobaFantomIcon from 'components/icons/chain/L2/BobaFantomIcon';
+import BobabeamIcon from 'components/icons/chain/L2/BobabeamIcon';
 
 /**************
  * Env Params *
@@ -73,3 +85,20 @@ export const ROUTES_PATH = {
   DAO: '/DAO',
 }
 export const PER_PAGE = 8
+
+
+export const L1Icons = {
+  ethereum: <EthereumIcon />,
+  bnb: <BNBIcon />,
+  avax: <AvalancheIcon />,
+  fantom: <FantomIcon />,
+  moonbeam: <MoonbeamIcon />,
+}
+
+export const L2Icons = {
+  ethereum: <BobaIcon />,
+  bnb: <BobaBNBIcon />,
+  avax: <BobaAvaxIcon />,
+  fantom: <BobaFantomIcon />,
+  moonbeam: <BobabeamIcon />,
+}
