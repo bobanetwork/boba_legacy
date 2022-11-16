@@ -20,7 +20,7 @@ To withdraw to L1:
 
 This example will walk you through the process of bridging any L2 native ERC721 to L1 (Ethereum) and also bridging them back to L2.
 
-This example is towards bridging in/out a Layer-2 native ERC721 (meaning a NFT originally deployed to L2 Boba). However, the bridge can support the same features with Layer-1 NFTs as well, for which please refer to the [more elaborate documentation](../../packages/boba/contracts/contracts/bridges/README.md).
+This example is towards bridging in/out a Layer-2 native ERC721 (meaning a NFT originally deployed to L2 Boba). However, the bridge can support the same features with Layer-1 NFTs as well, for which please refer to the [more elaborate documentation](../../packages/boba/contracts/contracts/ERC721Bridges/README.md).
 
 ## Quickstart - Rinkeby
 
@@ -168,7 +168,7 @@ NFT bridged back to L2 successfully!
 #################################
 ```
 
-Thanks for making it to the end of the tutorial! 
+Thanks for making it to the end of the tutorial!
 
 And, as promised - to clear the air about what super-special NFTs mean in terms of the bridge and how your bridging can be gas effective for them.
 

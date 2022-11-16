@@ -65,8 +65,6 @@ import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2Billing
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
 import OMGJson from '../deployment/contracts/OMG.json'
-import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
-import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
@@ -106,7 +104,7 @@ import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { APP_CHAIN, RINKEBY_L1_CHAIN_ID, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -263,208 +261,6 @@ class NetworkService {
       console.log("Bad verifier response")
       return false
     }
-  }
-
-  async fetchAirdropStatusL1() {
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('get.l1.airdrop', {
-      address: this.account,
-      key: APP_AIRDROP
-    })
-
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
-    }
-
-  }
-
-  async fetchAirdropStatusL2() {
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('get.l2.airdrop', {
-      address: this.account,
-      key: APP_AIRDROP
-    })
-
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
-    }
-
-  }
-
-  async initiateAirdrop(callData) {
-
-    console.log("Initiating airdrop")
-    console.log("getAirdropL1(callData)",callData.merkleProof)
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL1,
-      BobaAirdropL1Json.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL1Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.initiateClaim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l1.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('initiate.l1.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L1 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L1 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
-  }
-
-  async getAirdropL1(callData) {
-
-    console.log("getAirdropL1")
-    console.log("getAirdropL1(callData)",callData.merkleProof)
-    console.log("this.account:",this.account)
-
-    //Interact with contract
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL1,
-      BobaAirdropL1Json.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL1Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.claim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l1.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.l1.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L1 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L1 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
-  }
-
-  async getAirdropL2(callData) {
-
-    console.log("getAirdropL2(callData)",callData)
-    console.log("this.account:",this.account)
-
-    //Interact with contract
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL2,
-      BobaAirdropJson.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL2Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.claim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l2.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.l2.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L2 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L2 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
   }
 
   async getBobaFeeChoice() {
@@ -770,14 +566,6 @@ class NetworkService {
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
       console.log("DiscretionaryExitFee:",allAddresses.DiscretionaryExitFee)
 
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
-      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
-      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
-
       //L2CrossDomainMessenger is a predeploy, so add by hand....
       allAddresses = {
         ...allAddresses,
@@ -993,13 +781,13 @@ class NetworkService {
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4,
+          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
           fastRelayer: false,
         })
         this.fastWatcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 4,
+          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
           fastRelayer: true,
         })
       }
@@ -1736,9 +1524,15 @@ class NetworkService {
   }
 
   //Move ETH from L1 to L2 using the standard deposit system
-  depositETHL2 = async (value_Wei_String) => {
+  /******
+   * Deposit ETH from L1 to L2.
+   * Deposit ETH from L1 to another L2 account.
+   * */
 
-    //console.log("this.L1StandardBridgeContract:",this.L1StandardBridgeContract)
+  async depositETHL2({
+    recipient = null,
+    value_Wei_String
+  }) {
 
     updateSignatureStatus_depositTRAD(false)
 
@@ -1747,14 +1541,31 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTX = await this.L1StandardBridgeContract
-        .connect(this.provider.getSigner()).depositETH(
-          this.L2GasLimit,
-          utils.formatBytes32String(new Date().getTime().toString()),
-          {
-            value: value_Wei_String
-          }
-      )
+      let depositTX;
+
+      if (!recipient) {
+        depositTX = await this.L1StandardBridgeContract
+          .connect(this.provider.getSigner())
+          .depositETH(
+            this.L2GasLimit,
+            utils.formatBytes32String(new Date().getTime().toString()),
+            {
+              value: value_Wei_String
+            }
+          )
+      } else {
+        depositTX = await this.L1StandardBridgeContract
+          .connect(this.provider.getSigner())
+          .depositETHTo(
+            recipient,
+            this.L2GasLimit,
+            utils.formatBytes32String(new Date().getTime().toString()),
+            {
+              value: value_Wei_String
+            }
+          )
+      }
+
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
@@ -2473,7 +2284,11 @@ class NetworkService {
   }
 
   //Used to move ERC20 Tokens from L1 to L2 using the classic deposit
-  async depositErc20(value_Wei_String, currency, currencyL2) {
+  async depositErc20({
+    recipient = null,
+    value_Wei_String,
+    currency,
+    currencyL2 }) {
 
     updateSignatureStatus_depositTRAD(false)
 
@@ -2527,7 +2342,11 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
-      const depositTX = await this.L1StandardBridgeContract
+      let depositTX;
+
+      if (!recipient) {
+        // incase no recipient
+        depositTX = await this.L1StandardBridgeContract
         .connect(this.provider.getSigner()).depositERC20(
           currency,
           currencyL2,
@@ -2535,6 +2354,19 @@ class NetworkService {
           this.L2GasLimit,
           utils.formatBytes32String(new Date().getTime().toString())
         )
+      } else {
+        // deposit ERC20 to L2 account address.
+        depositTX = await this.L1StandardBridgeContract
+          .connect(this.provider.getSigner())
+          .depositERC20To(
+          currency,
+          currencyL2,
+          recipient,
+          value_Wei_String,
+          this.L2GasLimit,
+          utils.formatBytes32String(new Date().getTime().toString())
+        )
+      }
 
       console.log("depositTxStatus:",depositTX)
 

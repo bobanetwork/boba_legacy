@@ -5,8 +5,8 @@ import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 
 import { getFilteredLogIndex } from './shared/utils'
 
-import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
-import L2NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L1NFTBridge from '@boba/contracts/artifacts/contracts/ERC721Bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridge from '@boba/contracts/artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json'
 import L1ERC721Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json'
 import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
 import ERC721Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC721.sol/L1ERC721.json'
