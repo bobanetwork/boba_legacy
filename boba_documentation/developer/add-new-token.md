@@ -24,7 +24,7 @@ The [L2StandardTokenFactory](https://github.com/bobanetwork/boba/blob/release/v0
 
 | Network                               | Contract Address                           | Block Explorer URL                                           |
 | ------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ |
-| Boba Rinkeby (Ethereum Rinkeby L2)    | 0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826 | https://testnet.bobascan.com/address/0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826#writeContract |
+| Boba Goerli (Ethereum Goerli L2)      | 0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826 | https://testnet.bobascan.com/address/0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826#writeContract |
 | Bobaavax  Testnet (Avalanche Fuji L2) | 0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826 | https://blockexplorer.testnet.avax.boba.network/address/0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826/write-contract#address-tabs |
 | Bobabase (Moonbase L2)                | 0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826 | https://blockexplorer.bobabase.boba.network/address/0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826/write-contract#address-tabs |
 | Bobabnb Testnet (BNB Testnet L2)      | 0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826 | https://blockexplorer.testnet.bnb.boba.network/address/0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826/write-contract#address-tabs |
@@ -83,7 +83,7 @@ const depositTxStatus = await L1StandardERC20.depositERC20(
 
 | L1               | Contract Name           | Contract Address                           |
 | ---------------- | ----------------------- | ------------------------------------------ |
-| Ethereum Rinkeby | Proxy__L1StandardBridge | 0xDe085C82536A06b40D20654c2AbA342F2abD7077 |
+| Ethereum Goerli | Proxy__L1StandardBridge | 0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2 |
 | Avalanche Fuji   | Proxy__L1StandardBridge | 0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56 |
 | Moonbase         | Proxy__L1StandardBridge | 0xEcca5FEd8154420403549f5d8F123fcE69fae806 |
 | BNB Testnet      | Proxy__L1StandardBridge | 0xBf0939120b4F5E3196b9E12cAC291e03dD058e9a |

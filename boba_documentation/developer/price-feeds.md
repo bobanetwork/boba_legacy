@@ -14,13 +14,13 @@ Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's imple
 
 *Mainnet*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
 
-*Rinkeby*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
+*Goerli*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
 
 *Fee*: free
 
 [[*Quick-Link - Mainnet*]](https://blockexplorer.boba.network/address/0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1)
 
-[[*Quick-Link - Rinkeby*]](https://blockexplorer.rinkeby.boba.network/address/0xf3EBFc93C53694E3679c52ACacB9C7fD6d7f362E)
+[[*Quick-Link - Goerli*]](https://blockexplorer.goerli.boba.network/address/0xf3EBFc93C53694E3679c52ACacB9C7fD6d7f362E)
 
 ### I want to be a data source
 
@@ -76,7 +76,7 @@ To fetch price feed data directly into your contracts, make your contract call t
 
 *Feed Registry (Mainnet)*: 0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1
 
-*Feed Registry (Rinkeby)*: 0xf3EBFc93C53694E3679c52ACacB9C7fD6d7f362E
+*Feed Registry (Goerli)*: 0xf3EBFc93C53694E3679c52ACacB9C7fD6d7f362E
 
 Feeds are registered to the registry in the form of base/quote pairs, these terms used here and throughout - 'base' refers to the crypto asset/token and 'quote' refers to the asset (or fiat currency) to use as a reference for the price.
 

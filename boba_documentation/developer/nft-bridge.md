@@ -37,7 +37,7 @@ await L2StandardERC721.deployTransaction.wait()
 If you want to deploy your own L2 NFT contract, please follow requirements:
 
 * Your L2 NFT contract must be [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible and implemented `ERC165`  and `ERC721` interfaces.
-* The `mint` function in your L2 NFT contract should be overriden by 
+* The `mint` function in your L2 NFT contract should be overriden by
 
 	```solidity
 	function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {}
@@ -60,15 +60,15 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
   // [This is not mandatory] You can use other names or other ways to only allow l2 NFT bridge to mint and burn tokens
   // This is L2 NFT brigde contract address
   address public l2Bridge;
-	
+
   // [This is not mandatory]
   // Only l2Brigde (L2 NFT bridge) can mint or burn NFTs
   modifier onlyL2Bridge {
     require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
     _;
   }
-  
-  // [This is mandatory] 
+
+  // [This is mandatory]
   // You must export this interface `IL2StandardERC721.l1Contract.selector`
   function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
     bytes4 bridgingSupportedInterface = IL2StandardERC721.l1Contract.selector
@@ -76,19 +76,19 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
       ^ IL2StandardERC721.burn.selector;
     return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
   }
-	  
+
   // [The input is mandatory] The input must be `address _to, uint256 _tokenId, bytes memory _data`
   // [SECURITY] Make sure that only L2 NFT bridge can mint tokens
   function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {
     _mint(_to, _tokenId);
-    
+
     emit Mint(_to, _tokenId);
   }
 
   // [SECURITY] Make sure that only L2 NFT bridge can burn tokens
   function burn(uint256 _tokenId) public virtual override onlyL2Bridge {
   _burn(_tokenId);
-  
+
   emit Burn(_tokenId);
   }
 }
@@ -119,14 +119,14 @@ await L2StandardERC721.deployTransaction.wait()
 If you want to deploy your own L1 NFT contract, please follow requirements:
 
 * Your L1 NFT contract must be [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible and implemented `ERC165`  and `ERC721` interfaces.
-* The `mint` function in your L1 NFT contract should be overriden by 
+* The `mint` function in your L1 NFT contract should be overriden by
 
   ```solidity
   function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {}
   ```
-  
+
   The input must be `address _to, uint256 _tokenId, bytes memory _data`, even though you might need them all.
-  
+
 * In your L1 NFT contract, you must add the following code to bypass our interface check in our NFT bridge
 
 ```solidity
@@ -142,14 +142,14 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
   // [This is not mandatory] You can use other names or other ways to only allow l1 NFT bridge to mint and burn tokens
   // This is L1 NFT brigde contract address
   address public l1Bridge;
-	
+
   // [This is not mandatory]
   // Only l1Brigde (L1 NFT bridge) can mint or burn NFTs
   modifier onlyL1Bridge {
     require(msg.sender == l1Bridge, "Only L1 Bridge can mint and burn");
     _;
   }
-  
+
   // [This is mandatory]
   // You must export this interface `IL1StandardERC721.l2Contract.selector`
   function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC721) returns (bool) {
@@ -159,7 +159,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
 
     return _interfaceId == bridgingSupportedInterface || super.supportsInterface(_interfaceId);
   }
-	
+
   // [SECURITY] Make sure that only L1 NFT bridge can mint tokens
   // The input must be `address _to, uint256 _tokenId, bytes memory _data`
   function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {
@@ -329,7 +329,7 @@ function supportsInterface(bytes4 _interfaceId) public view virtual override ret
 }
 ```
 
-On the other side, our NFT bridge mints the NFT using the function 
+On the other side, our NFT bridge mints the NFT using the function
 
 ```solidity
 IL2StandardERC721(_l2Contract).mint(_to, _tokenId, _data);
@@ -417,7 +417,7 @@ await withdrawToTx.wait()
 | L1    | Proxy__L1NFTBridge | 0x76bD545C03391d4e6E3d5cC2B5617c94C6038c86 |
 | L2    | Proxy__L2NFTBridge | 0xA774C3f4572C5BA93F75D802ea7Dc6F93228e5cc |
 
-#### Fantom 
+#### Fantom
 
 | Layer | Contract Name      | Contract Address                           |
 | ----- | ------------------ | ------------------------------------------ |
@@ -426,7 +426,7 @@ await withdrawToTx.wait()
 
 ### Testnet
 
-#### Rinkeby
+#### Goerli
 
 | Layer | Contract Name      | Contract Address                           |
 | ----- | ------------------ | ------------------------------------------ |
