@@ -151,7 +151,6 @@ function Home() {
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
-      console.log("Calling initializeBase for", network)
       const initialized = await networkService.initializeBase( network )
       if (!initialized) {
         console.log("Failed to boot L1 and L2 base providers for", network)
