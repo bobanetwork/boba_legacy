@@ -27,10 +27,10 @@ if (window.ethereum) {
 }
 
 ReactDOM.render(
-  <SentryWrapper>
-    <Provider store={store}>
+  <Provider store={store}>
+    <SentryWrapper>
       <App />
-    </Provider>
-  </SentryWrapper>,
+    </SentryWrapper>
+  </Provider>,
   document.getElementById('root')
 )
