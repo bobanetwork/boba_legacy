@@ -4,7 +4,7 @@ Price Feed oracles allow smart contracts to work with external data and open the
 
 1. Boba-Straw
 2. Witnet
-3. Turing
+3. Hybrid Compute
 
 ## 1. Boba-Straw
 
@@ -145,11 +145,11 @@ The ***WitnetPriceRouter*** smart contract is deployed in all the [supported cha
 
 ### Reading multiple price pairs from the router
 
-**WitnetPriceRouter**
+**WitnetPriceRouter**documentation
 
 *Mainnet*: [0x93f61D0D5F623144e7C390415B70102A9Cc90bA5](https://bobascan.com/address/0x93f61D0D5F623144e7C390415B70102A9Cc90bA5/read-contract)
 
-*Rinkeby*: [0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a](https://testnet.bobascan.com/address/0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a/read-contract)
+*Goerli*: [0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a](https://testnet.bobascan.com/address/0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a/read-contract)
 
 The Price Router contract is the easiest and most convenient way to consume Witnet price feeds on any of the [supported chains](/smart-contracts/supported-chains).
 
@@ -207,14 +207,14 @@ For more information about Witnet please refer to:
 
 [website](https://witnet.io/) | [docs](https://docs.witnet.io/) | [github](https://github.com/witnet) | [twitter](https://twitter.com/witnet_io) | [telegram](https://t.me/witnetio) | [discord](https://discord.gg/witnet)
 
-## 3. Turing
+## 3. Hybrid Compute
 
-Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../boba_documentation/developer/turing.md).
+Hybrid Compute is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Hybrid Compute gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Hybrid Compute works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Hybrid Compute [here](../../boba_documentation/developer/hybrid_compute.md).
 
-Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
+Note: Unlike a feed contract where every data query remains on-chain, Hybrid Compute requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
 
 ### Feeds supported
 
-*Rinkeby/Mainnet*: potentially everything, dependent on your source
+*Goerli/Mainnet*: potentially everything, dependent on your source
 
-*Fee*: 0.01 BOBA per Turing request
+*Fee*: 0.01 BOBA per Hybrind Compute request

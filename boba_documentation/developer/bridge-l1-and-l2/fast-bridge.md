@@ -100,7 +100,7 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 | Network | URL                                                          |
 | ------- | ------------------------------------------------------------ |
 | Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Rinkeby | [Rinkeby Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
+| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
 
 ## Links
 
@@ -111,10 +111,10 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 | Proxy__L1LiquidityPool | 0x1A26ef6575B7BBB864d984D9255C069F6c361a14 |
 | Proxy__L2LiquidityPool | 0x3A92cA39476fF84Dc579C868D4D7dE125513B034 |
 
-### Rinkeby
+### Goerli
 
 | Contract Name          | Contract Address                           |
 | ---------------------- | ------------------------------------------ |
-| Proxy__L1LiquidityPool | 0x12F8d1cD442cf1CF94417cE6309c6D2461Bd91a3 |
-| Proxy__L2LiquidityPool | 0x56851CB42F315D0B90496c86E849167B8Cf7108a |
+| Proxy__L1LiquidityPool | 0x1F32017A84dE07A524b9C6993D35B4bF70e8Dc93 |
+| Proxy__L2LiquidityPool | 0xF121Fd008A17c8C76DF1f003f19523130060B5BA |
 
