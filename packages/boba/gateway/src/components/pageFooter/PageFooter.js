@@ -66,9 +66,6 @@ const PageFooter = ({maintenance}) => {
           <S.FooterLink
             to={ROUTES_PATH.HELP}
           >FAQs</S.FooterLink>
-            <S.FooterLink
-              to={ROUTES_PATH.AIRDROP}
-          >AirDrop</S.FooterLink>
           <S.FooterLink
             to={ROUTES_PATH.BOBASCOPE}
           >BobaScope</S.FooterLink>
