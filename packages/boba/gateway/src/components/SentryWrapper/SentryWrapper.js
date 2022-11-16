@@ -2,12 +2,13 @@ import React, { useEffect } from 'react'
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { Typography } from '@mui/material';
-import { APP_CHAIN, APP_ENV, SENTRY_DSN } from 'util/constant';
+import { APP_ENV, SENTRY_DSN } from 'util/constant';
+import { useSelector } from 'react-redux';
+import { selectCurrentAppChain } from 'selectors/setupSelector';
 
 
 /**
  * It's function which wraps compnent and add sentry integration on top of it.
- *
  *
  * @param {*} children
  * @returns wrapp component
@@ -17,6 +18,8 @@ const SentryWrapper = ({
   children
 }) => {
 
+  const appChain = useSelector(selectCurrentAppChain());
+
   useEffect(() => {
     const dns = SENTRY_DSN;
     // if no sentry dsn pass don't even initialize.
@@ -24,7 +27,7 @@ const SentryWrapper = ({
       // Sentry initializations.
       Sentry.init({
         dsn: SENTRY_DSN,
-        environment: `${APP_ENV}-${APP_CHAIN}`,
+        environment: `${APP_ENV}-${appChain}`,
         integrations: [
           new Sentry.Integrations.GlobalHandlers({
             onunhandledrejection: false,  /// will avoid to send unhandle browser error.
@@ -46,7 +49,7 @@ const SentryWrapper = ({
         ],
         tracesSampleRate: 1.0,
         initialScope: {
-          tags: { 'network': APP_CHAIN }
+          tags: { 'network': appChain }
         },
         beforeSend: (event, hint) => {
           // Avoid sending the sentry events on local env.
@@ -67,7 +70,7 @@ const SentryWrapper = ({
     return () => {
       Sentry.close(2000) // to close the sentry client connection on unmounting.
     };
-  }, []);
+  }, [appChain]);
 
 
   return <>
