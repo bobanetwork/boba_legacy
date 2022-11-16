@@ -142,6 +142,7 @@ function Home() {
       : body.style.overflow = 'auto'
   }, [ mobileMenuOpen ])
 
+  console.log(['network',network])
   // calls only on boot
   useEffect(() => {
     window.scrollTo(0, 0)

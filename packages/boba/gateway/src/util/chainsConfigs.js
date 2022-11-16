@@ -1,7 +1,7 @@
 export const ChainList = [
   {
     icon: 'ethereum',
-    chain: 'ethereum',
+    chain: 'mainnet',
     label: 'Ethereum <> Boba',
     key: 'ethereum'
   },
@@ -34,6 +34,12 @@ export const ChainList = [
     chain: 'goerli',
     label: 'Goerli Ethereum <> Boba',
     key: 'Goerli'
+  },
+  {
+    icon: 'ethereum',
+    chain: 'rinkeby',
+    label: 'Rinkeby Ethereum <> Boba',
+    key: 'rinkeby'
   }
 ]
 
