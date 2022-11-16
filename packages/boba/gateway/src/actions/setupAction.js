@@ -81,3 +81,9 @@ export function setConnect( state ) {
     return dispatch({ type: 'SETUP/CONNECT', payload: state })
   }
 }
+
+export function setCurrentAppChain(chain) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/APPCHAIN/SET', payload: chain })
+  }
+}
