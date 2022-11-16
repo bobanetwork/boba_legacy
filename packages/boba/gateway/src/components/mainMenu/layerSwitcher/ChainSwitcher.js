@@ -6,7 +6,7 @@ import { Menu, MenuItem, Typography } from '@mui/material';
 import ChainSwitcherItem from './ChainSwitcherItem'
 import ChainList from 'util/chainsConfigs';
 import { useDispatch } from 'react-redux';
-import { setCurrentAppChain } from 'actions/setupAction';
+import { setBaseState, setCurrentAppChain } from 'actions/setupAction';
 import { useSelector } from 'react-redux';
 import { selectCurrentAppChain } from 'selectors/setupSelector';
 
@@ -26,6 +26,8 @@ function ChainSwitcher({}) {
 
   const onChainChange = ({ chain }) => {
     dispatch(setCurrentAppChain(chain));
+    // reset baseState to false to trigger initialization on chain change.
+    dispatch(setBaseState(false))
   }
 
   return (

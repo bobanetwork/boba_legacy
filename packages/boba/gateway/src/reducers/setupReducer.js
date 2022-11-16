@@ -30,8 +30,8 @@ const initialState = {
   connectETH: false,
   connectBOBA: false,
   connect: false,
-  appChain: 'ethereum',
-  network: 'ethereum'
+  appChain: 'mainnet',
+  network: 'mainnet'
 }
 
 function setupReducer(state = initialState, action) {
