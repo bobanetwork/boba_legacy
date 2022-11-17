@@ -18,7 +18,7 @@ import React from 'react'
 import { Typography } from '@mui/material'
 
 import * as S from './Transaction.styles'
-import { selectNetwork } from 'selectors/setupSelector'
+import { selectNetwork } from 'selectors/networkSelector'
 import { useSelector } from 'react-redux'
 import { getNetwork } from 'util/masterConfig'
 

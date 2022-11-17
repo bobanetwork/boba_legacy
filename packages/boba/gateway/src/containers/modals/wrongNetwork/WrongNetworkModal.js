@@ -4,7 +4,7 @@ import { closeModal } from 'actions/uiAction';
 import Modal from 'components/modal/Modal';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectNetwork } from 'selectors/setupSelector';
+import { selectNetwork } from 'selectors/networkSelector';
 
 function WrongNetworkModal({open}) {
 

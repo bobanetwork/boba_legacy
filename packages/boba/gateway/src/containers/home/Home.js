@@ -53,8 +53,10 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-  selectNetwork
 } from 'selectors/setupSelector'
+
+import { selectNetwork } from 'selectors/networkSelector'
+
 import { selectAlert, selectError } from 'selectors/uiSelector'
 import { selectModalState } from 'selectors/uiSelector'
 

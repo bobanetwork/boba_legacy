@@ -4,7 +4,7 @@ import { BrowserTracing } from '@sentry/tracing';
 import { Typography } from '@mui/material';
 import { APP_ENV, SENTRY_DSN } from 'util/constant';
 import { useSelector } from 'react-redux';
-import { selectCurrentAppChain } from 'selectors/setupSelector';
+import { selectCurrentAppChain } from 'selectors/networkSelector';
 
 
 /**
