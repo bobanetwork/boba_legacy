@@ -21,7 +21,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import * as S from "./ListFarm.styles"
 
 import { useTheme } from '@emotion/react'
-import { selectNetwork } from 'selectors/setupSelector'
+import { selectNetwork } from 'selectors/networkSelector'
 import { useSelector } from 'react-redux'
 import { getNetwork } from 'util/masterConfig'
 import truncate from 'truncate-middle'

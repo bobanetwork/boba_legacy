@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer, selectNetwork, selectWalletAddress } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer, selectWalletAddress } from 'selectors/setupSelector'
+import { selectNetwork } from 'selectors/networkSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 

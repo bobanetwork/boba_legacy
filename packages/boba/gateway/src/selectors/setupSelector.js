@@ -94,8 +94,3 @@ export function selectMonsterInfo () {
   }
 }
 
-export function selectCurrentAppChain() {
-  return function (state) {
-    return state.setup['appChain']
-  }
-}

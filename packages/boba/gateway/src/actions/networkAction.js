@@ -243,3 +243,9 @@ export function enableBrowserWallet(network) {
 export function getAllAddresses() {
   return createAction('GET/ALL/ADDRESS', () => networkService.getAllAddresses())
 }
+
+export function setCurrentAppChain(chain) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/APPCHAIN/SET', payload: chain })
+  }
+}

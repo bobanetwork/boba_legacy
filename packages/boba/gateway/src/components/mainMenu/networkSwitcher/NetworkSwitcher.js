@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import * as S from './NetworkSwitcher.styles.js'
 
-import { selectNetwork } from 'selectors/setupSelector'
+import { selectNetwork } from 'selectors/networkSelector'
 import { Box, Typography } from '@mui/material'
 
 import NetworkIcon from 'components/icons/NetworkIcon'
