@@ -36,18 +36,12 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import {
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2
-} from 'actions/airdropAction'
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
-import { fetchVerifierStatus } from 'actions/verifierAction'
-import { fetchLockRecords } from 'actions/veBobaAction'
+
 import {
   fetchBalances,
-  fetchGas,
   addTokenList,
   fetchExits
 } from 'actions/networkAction'
@@ -75,6 +69,7 @@ import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import CastVoteModal from 'containers/modals/dao/CastVoteModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
@@ -121,6 +116,7 @@ function Home() {
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
   const lock = useSelector(selectModalState('lock'))
+  const proposalId = useSelector(selectModalState('proposalId'))
 
   const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
   const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
@@ -128,6 +124,7 @@ function Home() {
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
   const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
+  const castVoteModalState = useSelector(selectModalState('castVoteModal'))
 
   const network = useSelector(selectNetwork())
   const baseEnabled = useSelector(selectBaseEnabled())
@@ -175,8 +172,6 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchAirdropStatusL1()) // account specific
-      dispatch(fetchAirdropStatusL2()) // account specific
       dispatch(fetchDaoBalance())      // account specific
       dispatch(fetchDaoVotes())        // account specific
       dispatch(fetchDaoBalanceX())     // account specific
@@ -185,11 +180,8 @@ function Home() {
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
-      dispatch(fetchLockRecords())
     }
     if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
-      dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
     }
@@ -199,8 +191,6 @@ function Home() {
     if (maintenance) return
     // load the following functions when the home page is open
     checkVersion()
-    dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
     dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
@@ -231,6 +221,7 @@ function Home() {
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
+      {!!castVoteModalState && <CastVoteModal open={castVoteModalState} proposalId={proposalId} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}

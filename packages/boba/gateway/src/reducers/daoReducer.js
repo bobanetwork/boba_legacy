@@ -19,7 +19,8 @@ const initialState = {
   balanceX: 0,
   votesX: 0,
   proposalThreshold: 0,
-  proposalList: []
+  proposalList: [],
+  hasLiveProposal: false,
 }
 
 function daoReducer(state = initialState, action) {

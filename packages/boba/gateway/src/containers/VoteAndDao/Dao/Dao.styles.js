@@ -9,6 +9,7 @@ export const DaoPageContainer = styled(Box)(({ theme }) => ({
   padding: '10px',
   paddingTop: '0px',
   width: '70%',
+  gap: '10px',
   [theme.breakpoints.between('md', 'lg')]: {
     width: '90%',
     padding: '0px',
@@ -42,19 +43,12 @@ export const DaoWalletContainer = styled(Box)(({ theme }) => ({
   padding: '0px 20px',
   minHeight: '700px',
   width: '30%',
+  gap: '10px',
   borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondary,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
   },
-}));
-
-export const DaoWalletAction = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-around',
-  width: '100%',
-  margin: '10px auto',
-  gap: '10px',
 }));
 
 export const DaoProposalContainer = styled(Box)(({ theme }) => ({
@@ -77,7 +71,7 @@ export const DaoProposalHead = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   alignSelf: 'flex-start',
   justifyContent: 'space-between',
-  padding: '24px 0px',
+  padding: '15px 0px',
   width: '100%',
   margin: '5px',
   [theme.breakpoints.down('sm')]: {
