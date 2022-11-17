@@ -960,6 +960,11 @@ class NetworkService {
       chainId: '0x' + nw[network].L2.chainId.toString(16),
       chainName: nw[network].L2.name,
       rpcUrls: [nw[network].L2.rpcUrl],
+      nativeCurrency: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
       blockExplorerUrls
     }
 
@@ -3973,7 +3978,7 @@ class NetworkService {
 
   async fetchProposals() {
 
-    if (!this.delegateContract) return
+    if (!this.delegateContract || this.networkGateway === 'goerli') return
 
     const delegateCheckV1 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
     const delegateCheckV2 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)

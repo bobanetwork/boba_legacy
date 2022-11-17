@@ -498,7 +498,7 @@
         "symbol": "USDC",
         "decimals": 6
       },
-      "0xcb9b561c91dda1a9bac33f7716a4d5586b7f5649": {
+      "0xCb9b561c91dDA1A9bAc33F7716a4d5586B7F5649": {
         "name": "OMG Token",
         "symbol": "OMG",
         "decimals": 18
@@ -515,7 +515,7 @@
         "symbol": "USDC",
         "decimals": 6
       },
-      "0x080bf38b43a1441873116002d36ccb583464cf45": {
+      "0x080bf38b43a1441873116002d36CCB583464cF45": {
         "name": "OMG Token",
         "symbol": "OMG",
         "decimals": 18
