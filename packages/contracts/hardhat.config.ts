@@ -64,7 +64,7 @@ const config: HardhatUserConfig = {
       url: 'https://mainnet.boba.network',
     },
     goerli: {
-      url: process.env.L1_NODE_WEB3_URL,
+      url: process.env.L1_NODE_WEB3_URL || '',
     },
   },
   mocha: {
