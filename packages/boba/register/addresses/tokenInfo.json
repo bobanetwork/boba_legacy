@@ -485,5 +485,46 @@
         "decimals": 18
       }
     }
+  },
+  "5": {
+    "L1": {
+      "0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1": {
+        "name": "Boba Token",
+        "symbol": "BOBA",
+        "decimals": 18
+      },
+      "0x07865c6E87B9F70255377e024ace6630C1Eaa37F": {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6
+      },
+      "0xcb9b561c91dda1a9bac33f7716a4d5586b7f5649": {
+        "name": "OMG Token",
+        "symbol": "OMG",
+        "decimals": 18
+      }
+    },
+    "L2": {
+      "0x4200000000000000000000000000000000000023": {
+        "name": "Boba Token",
+        "symbol": "BOBA",
+        "decimals": 18
+      },
+      "0x429582bDe1B0E011C48d883354050938f194743F": {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6
+      },
+      "0x080bf38b43a1441873116002d36ccb583464cf45": {
+        "name": "OMG Token",
+        "symbol": "OMG",
+        "decimals": 18
+      },
+      "0x01c9DC8B9c66D61a56Db7bF3F5303Cd9E9c85B1F": {
+        "name": "xBOBA Token",
+        "symbol": "xBOBA",
+        "decimals": 18
+      }
+    }
   }
 }
