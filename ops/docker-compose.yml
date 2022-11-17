@@ -115,6 +115,8 @@ services:
     build:
       context: ./docker/hardhat
       dockerfile: Dockerfile
+    environment:
+      GAS_PRICE: 54321012345
     ports:
       # expose the service to the host for integration testing
       - ${L1CHAIN_HTTP_PORT:-9545}:8545

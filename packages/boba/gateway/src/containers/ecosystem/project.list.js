@@ -37,6 +37,8 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import ghostncolorsLogo from '../../images/ecosystem/ghostncolorsLogo.png'
+import sushicom from '../../images/ecosystem/sushicom.png'
+
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -53,6 +55,17 @@ import BobaftmLogo from '../../images/bobaLinks/Bobaftm.svg'
  */
 
 export const projectList = [
+  {
+    "title": "Sushi",
+    "canLaunch": true,
+    "link": "https://sushi.com/",
+    "telegram": "",
+    "twitter": "https://twitter.com/SushiSwap",
+    "discord": "https://discord.gg/2D7G3bsnFa",
+    "type": "defi",
+    "image": sushicom,
+    "description": "Decentralized Exchange Made For Everybody. Swap, earn, stack yields, lend, borrow, leverage all on one decentralized, community driven platform. Welcome home to DeFi."
+  },
   {
     "title": "OolongSwap",
     "canLaunch": true,
@@ -139,7 +152,7 @@ export const projectList = [
   {
     "title": "Unidex",
     "canLaunch": true,
-    "link": "https://unidexbeta.app/trading",
+    "link": "https://app.unidex.exchange/trading",
     "telegram": "https://t.me/unidexfinance",
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",

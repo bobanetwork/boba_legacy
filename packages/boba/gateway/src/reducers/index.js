@@ -26,7 +26,6 @@ import queueReducer from './queueReducer'
 import tokenReducer from './tokenReducer'
 import nftReducer from './nftReducer'
 import feeReducer from './feeReducer'
-import gasReducer from './gasReducer'
 import uiReducer from './uiReducer'
 import setupReducer from './setupReducer'
 import notificationReducer from './notificationReducer'
@@ -34,7 +33,6 @@ import farmReduer from './farmReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
-import airdropReducer from './airdropReducer'
 import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
@@ -53,14 +51,12 @@ const rootReducer = combineReducers({
   tokenList: tokenReducer,
   nft: nftReducer,
   fees: feeReducer,
-  gas: gasReducer,
   ui: uiReducer,
   setup: setupReducer,
   notification: notificationReducer,
   farm: farmReduer,
   lookup: lookupReducer,
   dao: daoReducer,
-  airdrop: airdropReducer,
   fixed: fixedReducer,
   verifier: verifierReducer,
   bridge: bridgeReducer,
