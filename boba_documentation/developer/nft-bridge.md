@@ -37,7 +37,7 @@ await L2StandardERC721.deployTransaction.wait()
 If you want to deploy your own L2 NFT contract, please follow requirements:
 
 * Your L2 NFT contract must be [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible and implemented `ERC165`  and `ERC721` interfaces.
-* The `mint` function in your L2 NFT contract should be overriden by
+* The `mint` function in your L2 NFT contract should be overriden by.
 
 	```solidity
 	function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL2Bridge {}
@@ -119,7 +119,7 @@ await L2StandardERC721.deployTransaction.wait()
 If you want to deploy your own L1 NFT contract, please follow requirements:
 
 * Your L1 NFT contract must be [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible and implemented `ERC165`  and `ERC721` interfaces.
-* The `mint` function in your L1 NFT contract should be overriden by
+* The `mint` function in your L1 NFT contract should be overriden by.
 
   ```solidity
   function mint(address _to, uint256 _tokenId, bytes memory _data) public virtual override onlyL1Bridge {}
@@ -430,8 +430,8 @@ await withdrawToTx.wait()
 
 | Layer | Contract Name      | Contract Address                           |
 | ----- | ------------------ | ------------------------------------------ |
-| L1    | Proxy__L1NFTBridge | 0x01F5d5D6de3a8c7A157B22FD331A1F177b7bE043 |
-| L2    | Proxy__L2NFTBridge | 0x5E368E9dce71B624D7DdB155f360E7A4969eB7aA |
+| L1    | Proxy__L1NFTBridge | 0xa2232D3c81EFd46815c1adf48Ed86C5C377cb6e2 |
+| L2    | Proxy__L2NFTBridge | 0xF84979ADeb8D2Dd25f54cF8cBbB05C08eC188e11 |
 
 #### Avalanche Testnet (Fuji)
 
