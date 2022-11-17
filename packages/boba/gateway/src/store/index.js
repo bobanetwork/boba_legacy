@@ -14,15 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { createStore , applyMiddleware } from 'redux'
-import reducers from 'reducers'
+import RootReducer from 'reducers'
 import reduxThunk from 'redux-thunk'
+import persistReducer from 'redux-persist/lib/persistReducer'
+import storage from 'redux-persist/lib/storage'
+import persistStore from 'redux-persist/lib/persistStore'
 
 const initialState = {}
 
-const store = createStore(
-  reducers,
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['network']
+}
+
+const persistedReducer = persistReducer(persistConfig, RootReducer)
+
+export const store = createStore(
+  persistedReducer,
   initialState,
   applyMiddleware(reduxThunk)
 )
 
-export default store
+export default store;
+
+export const persistor = persistStore(store)

@@ -6,9 +6,10 @@ import { Menu, MenuItem, Typography } from '@mui/material';
 import ChainSwitcherItem from './ChainSwitcherItem'
 import ChainList from 'util/chainsConfigs';
 import { useDispatch } from 'react-redux';
-import { setBaseState, setCurrentAppChain } from 'actions/setupAction';
+import { setBaseState} from 'actions/setupAction';
+import { setCurrentAppChain } from 'actions/networkAction';
 import { useSelector } from 'react-redux';
-import { selectCurrentAppChain } from 'selectors/setupSelector';
+import { selectCurrentAppChain } from 'selectors/networkSelector';
 
 function ChainSwitcher({}) {
   const [anchorEl, setAnchorEl] = useState(null);

@@ -24,13 +24,13 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   selectAccountEnabled,
-  selectNetwork,
   selectLayer,
   selectConnectETH,
   selectConnectBOBA,
   selectConnect
 } from 'selectors/setupSelector'
 
+import {selectNetwork} from 'selectors/networkSelector'
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'

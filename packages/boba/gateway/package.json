@@ -57,6 +57,7 @@
     "react-zendesk": "^0.1.13",
     "recharts": "^2.1.10",
     "redux": "^4.1.2",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "sass": "^1.51.0",
     "serve": "^11.3.2",

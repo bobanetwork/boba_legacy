@@ -16,7 +16,8 @@ limitations under the License. */
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import store from 'store'
+import { store, persistor } from 'store'
+import {PersistGate} from 'redux-persist/integration/react'
 import App from 'layout'
 import './index.scss'
 import SentryWrapper from 'components/SentryWrapper/SentryWrapper'
@@ -28,9 +29,11 @@ if (window.ethereum) {
 
 ReactDOM.render(
   <Provider store={store}>
-    <SentryWrapper>
-      <App />
-    </SentryWrapper>
+    <PersistGate loading={null} persistor={persistor}>
+      <SentryWrapper>
+        <App />
+      </SentryWrapper>
+    </PersistGate>
   </Provider>,
   document.getElementById('root')
 )
