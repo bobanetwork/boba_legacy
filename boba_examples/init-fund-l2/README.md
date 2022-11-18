@@ -5,12 +5,12 @@ We've created a simple example for you that moves ETH to the L2 - see `./boba-ex
 
 ### Update .env
 
-First, add a `.env` to `/boba-examples/init-fund-l2`. You will need to provide your private key. 
+First, add a `.env` to `/boba-examples/init-fund-l2`. You will need to provide your private key.
 
 ```bash
-L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/INFURA_KEY
-L2_NODE_WEB3_URL=https://rinkeby.boba.network
-ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
+L1_NODE_WEB3_URL=https://goerli.infura.io/v3/INFURA_KEY
+L2_NODE_WEB3_URL=https://goerli.boba.network
+ADDRESS_MANAGER_ADDRESS=0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148
 PRIVATE_KEY=
 ```
 

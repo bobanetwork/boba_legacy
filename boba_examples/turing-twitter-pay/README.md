@@ -1,7 +1,7 @@
 # Turing Twitter Pay example
 
 ## What does it do?
-This example demonstrates how you can use your Boba Bubble ([get it here](https://gateway.rinkeby.boba.network/)) to send money to the associated wallet address (similar to ENS and other providers, but in a quite different manner from a technical perspective).
+This example demonstrates how you can use your Boba Bubble ([get it here](https://gateway.goerli.boba.network/)) to send money to the associated wallet address (similar to ENS and other providers, but in a quite different manner from a technical perspective).
 
 ![TwitterPay](https://user-images.githubusercontent.com/28724551/178273125-8c4a634a-40ae-48ff-98ef-3fe4e55ff26d.png)
 

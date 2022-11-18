@@ -13,9 +13,9 @@ const config: HardhatUserConfig = {
       url: 'http://localhost:8545',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_USER] : [],
     },
-    boba_rinkeby: {
-      url: 'https://rinkeby.boba.network',
-      bridgeCounterpartUrl: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // public RPC
+    boba_goerli: {
+      url: 'https://goerli.boba.network',
+      bridgeCounterpartUrl: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // public RPC
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_USER] : [],
     } as any,
     boba_mainnet: {

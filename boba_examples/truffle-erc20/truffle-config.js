@@ -9,15 +9,15 @@ const pk_2 = env.pk_2
 module.exports = {
   contracts_build_directory: './build',
   networks: {
-    boba_rinkeby: {
+    boba_goerli: {
       provider: function () {
         return new HDWalletProvider({
           privateKeys: [pk_1, pk_2],
-          providerOrUrl: 'https://rinkeby.boba.network',
+          providerOrUrl: 'https://goerli.boba.network',
         })
       },
-      network_id: 28,
-      host: 'https://rinkeby.boba.network',
+      network_id: 2888,
+      host: 'https://goerli.boba.network',
     }
   },
   compilers: {

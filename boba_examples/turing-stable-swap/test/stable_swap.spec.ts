@@ -31,6 +31,7 @@ let turingCredit: Contract
 let L2BOBAToken: Contract
 let addressesBOBA
 
+import BobaTuringCreditJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json";
 import StableSwapJson from "../artifacts/contracts/StableSwap.sol/StableSwap.json"
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '../../../packages/boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -87,9 +88,9 @@ describe("Stableswap at AWS Lambda", function () {
     const res1 = await tr1.wait()
     console.log("    addingPermittedCaller to TuringHelper", res1.events[0].data)
 
-    if(hre.network.name === 'boba_rinkeby') {
-      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    if(hre.network.name === 'boba_goerli') {
+      BOBAL2Address = '0x4200000000000000000000000000000000000023'
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
     }
     else if(hre.network.name === 'boba_mainnet') {
       BOBAL2Address = '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7'
@@ -112,11 +113,11 @@ describe("Stableswap at AWS Lambda", function () {
     console.log("    BOBA Balance in your account", bobaBalance.toString())
 
     // prepare to register/fund your Turing Helper
-    turingCredit = getContractFactory(
-      'BobaTuringCredit',
+    turingCredit = new ethers.Contract(
+      BobaTuringCreditAddress,
+      BobaTuringCreditJson.abi,
       deployerWallet
-    ).attach(BobaTuringCreditAddress)
-
+    )
   })
 
   it("contract should be whitelisted", async () => {

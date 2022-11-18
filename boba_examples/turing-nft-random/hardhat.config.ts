@@ -21,8 +21,8 @@ const config: HardhatUserConfig = {
       url_l1: 'http://localhost:9545',
       accounts: process.env.LOCAL_PRIVATE_KEY !== undefined ? [process.env.LOCAL_PRIVATE_KEY] : [],
     } as any,
-    boba_rinkeby: {
-      url: 'https://rinkeby.boba.network',
+    boba_goerli: {
+      url: 'https://goerli.boba.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     boba_mainnet: {

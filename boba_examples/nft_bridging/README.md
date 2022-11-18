@@ -22,22 +22,22 @@ This example will walk you through the process of bridging any L2 native ERC721 
 
 This example is towards bridging in/out a Layer-2 native ERC721 (meaning a NFT originally deployed to L2 Boba). However, the bridge can support the same features with Layer-1 NFTs as well, for which please refer to the [more elaborate documentation](../../packages/boba/contracts/contracts/ERC721Bridges/README.md).
 
-## Quickstart - Rinkeby
+## Quickstart - Goerli
 
 If you don't have much time and are looking to quickly run through the example, just keep looking at this section. However, If you want a more enhanced understanding, which is encouraged, skip forward to the [next section](#getting-started-with-the-example)
 
-Alright, if you are still here, we don't have much time, so we will try running through the example on Boba-Rinkeby
+Alright, if you are still here, we don't have much time, so we will try running through the example on Boba-Goerli
 
-- Step 1: set up your env according to the ``.env.example`. You will need a Rinkeby infura endpoint and an account with some Rinkeby Eth (> 0.01 ETH)
+- Step 1: set up your env according to the ``.env.example`. You will need a Goerli infura endpoint and an account with some Goerli Eth (> 0.01 ETH)
 
-- Step 2: You are all set! Since we are on Boba Rinkeby we will use the Boba NFT Bridges on Rinkeby, but to use your own ERC721s with the bridge, the Boba Team will need to register your contracts on the bridges - please pm us. For the sake of this tutorial, we have set you up with a pre-deployed contract that is registered on the bridge!
+- Step 2: You are all set! Since we are on Boba Goerli we will use the Boba NFT Bridges on Goerli, but to use your own ERC721s with the bridge, the Boba Team will need to register your contracts on the bridges - please pm us. For the sake of this tutorial, we have set you up with a pre-deployed contract that is registered on the bridge!
 
 To quickly run the example, do:
 
 ```bash
 $ yarn
 $ yarn compile
-$ yarn start:rinkeby
+$ yarn start:goerli
 ```
 When the script has finished running, you would have minted -> and initiated a NFT withdraw to L1! Your bridged NFT will arrive on L1 after the 7 day fraud-proof-window.
 
@@ -121,7 +121,7 @@ Additionally, to enable the L1 representation NFTs to represent the metadat corr
 ### Registering pair on NFT Bridges
 
 Finally, to enable your contracts to be used on the NFT Bridge contracts - register the L1ERC721/L2ERC721 pair on both the L1/L2NFTBridge contracts. For the sake of this tutorial - you should be able to complete this step on the local stack (with the priv key on env.example) However, *doing this on prod environments - you will need help from the operators of the NFT Briges*.
-Please reach out to the team to register your ERC721 pair on the official Boba NFT Bridges on Mainnet/Rinkeby.
+Please reach out to the team to register your ERC721 pair on the official Boba NFT Bridges on Mainnet/Goerli.
 
 ```
 And registered the L2ERC721 and L1ERC721 to the NFTBridges!

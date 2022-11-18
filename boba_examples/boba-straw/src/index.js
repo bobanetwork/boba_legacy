@@ -26,9 +26,7 @@ const main = async () => {
   const args = process.argv.slice(2)
   let ethFlag = args.includes('eth') || args.includes('ETH')
   let bobaFlag = args.includes('boba') || args.includes('BOBA')
-  let omgFlag = args.includes('omg') || args.includes('OMG')
-  let wbtcFlag = args.includes('wbtc') || args.includes('WBTC')
-  if (!(ethFlag || bobaFlag || omgFlag || wbtcFlag)) {
+  if (!(ethFlag || bobaFlag)) {
     ethFlag = bobaFlag = omgFlag = wbtcFlag = true
   }
 
@@ -118,60 +116,6 @@ const main = async () => {
     )
     await submitBOBAUSDPairRoundTx.wait()
     console.log(`Submitted BOBA - USD: ${submitBOBAUSDPairRoundTx.hash}`)
-  }
-
-  // OMG - USD pair
-  if (omgFlag) {
-    const OMGPrice = 4.73
-
-    const OMGUSDPairAdress = await addressManager.getAddress('BobaStraw_OMGUSD')
-    const OMGUSDPair = new Contract(
-      OMGUSDPairAdress,
-      FluxAggregatorJson.abi,
-      l2Wallet
-    )
-
-    const OMGUSDPairRoundID = await OMGUSDPair.latestRound()
-
-    const OMGUSDPairState = await OMGUSDPair.oracleRoundState(
-      l2Wallet.address,
-      OMGUSDPairRoundID.toNumber() + 1
-    )
-    console.log(`OMG - USD state: ${OMGUSDPairState}`)
-
-    const submitOMGUSDPairRoundTx = await OMGUSDPair.submit(
-      OMGUSDPairRoundID.toNumber() + 1,
-      utils.parseUnits(OMGPrice.toString(), 8)
-    )
-    await submitOMGUSDPairRoundTx.wait()
-    console.log(`Submitted OMG - USD: ${submitOMGUSDPairRoundTx.hash}`)
-  }
-
-  // WBTC - USD pair
-  if (wbtcFlag) {
-    const WBTCPrice = 36765.32
-
-    const WBTCUSDPairAdress = await addressManager.getAddress('BobaStraw_WBTCUSD')
-    const WBTCUSDPair = new Contract(
-      WBTCUSDPairAdress,
-      FluxAggregatorJson.abi,
-      l2Wallet
-    )
-
-    const WBTCUSDPairRoundID = await WBTCUSDPair.latestRound()
-
-    const WBTCUSDPairState = await WBTCUSDPair.oracleRoundState(
-      l2Wallet.address,
-      WBTCUSDPairRoundID.toNumber() + 1
-    )
-    console.log(`WBTC - USD state: ${WBTCUSDPairState}`)
-
-    const submitWBTCUSDPairRoundTx = await WBTCUSDPair.submit(
-      WBTCUSDPairRoundID.toNumber() + 1,
-      utils.parseUnits(WBTCPrice.toString(), 8)
-    )
-    await submitWBTCUSDPairRoundTx.wait()
-    console.log(`Submitted WBTC - USD: ${submitWBTCUSDPairRoundTx.hash}`)
   }
 
   // Withdraw balance

@@ -4,7 +4,7 @@ const { Watcher } = require('../../../packages/core-utils/dist/watcher')
 const chalk = require('chalk')
 require('dotenv').config()
 
-const SampleERC721Json = require('../quickStart-Rinkeby/SampleERC721.json')
+const SampleERC721Json = require('../quickStart-Goerli/SampleERC721.json')
 const L1StandardERC721Json = require('@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json')
 const L1NFTBridgeJson = require('@boba/contracts/artifacts/contracts/ERC721Bridges/L1NFTBridge.sol/L1NFTBridge.json')
 const L2NFTBridgeJson = require('@boba/contracts/artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json')
@@ -15,7 +15,7 @@ const { bridgeBackToL2 } = require('./bridgeBackToL2')
 const main = async () => {
   const env = process.env
   const L1_NODE_WEB3_URL = env.L1_NODE_WEB3_URL
-  const L2_NODE_WEB3_URL = 'https://rinkeby.boba.network'
+  const L2_NODE_WEB3_URL = 'https://goerli.boba.network'
   const ADDRESS_MANAGER_ADDRESS = '0x93A96D6A5beb1F661cf052722A1424CDDA3e9418'
   const PRIV_KEY = env.PRIV_KEY
   const L2ERC721Address = '0x8b9BB8EcB0F9C4328D6eB78947bfAa6eb2B2F289'
@@ -62,7 +62,7 @@ const main = async () => {
   ).attach(L1StandardBridgeAddress)
 
   console.log(
-    'Bridging some Rinkeby ETH over to Boba, please wait for around 3 mins...'
+    'Bridging some Goerli ETH over to Boba, please wait for around 3 mins...'
   )
 
   const depositTx = await L1StandardBridge.depositETH(8_000_000, '0x', {
@@ -84,7 +84,7 @@ const main = async () => {
     'Currently, you would have to reach out to the Boba team, in order to'
   )
   console.log(
-    'have your very own ERC721 contract to be used on the Boba NFT Bridges on Rinkeby'
+    'have your very own ERC721 contract to be used on the Boba NFT Bridges on Goerli'
   )
   console.log(
     'For the sake of this tutorial, we have pre-deployed a bridgeable ERC721 contract pair for you to use'
@@ -148,14 +148,14 @@ const main = async () => {
     )
   )
   const [msgHash1] = await watcher.getMessageHashesFromL2Tx(withdrawTxHash)
-//   await watcher.getL1TransactionReceipt(msgHash1)
+  await watcher.getL1TransactionReceipt(msgHash1)
 
-//   const L1NFTOwner = await L1StandardERC721.ownerOf(tokenId)
-//   console.log('#################################')
-//   console.log('Your address: ', l1Wallet.address)
-//   console.log('L1NFT owner: ', L1NFTOwner)
-//   console.log(chalk.green('NFT bridged to L1 successfully!'))
-//   console.log('#################################')
+  const L1NFTOwner = await L1StandardERC721.ownerOf(tokenId)
+  console.log('#################################')
+  console.log('Your address: ', l1Wallet.address)
+  console.log('L1NFT owner: ', L1NFTOwner)
+  console.log(chalk.green('NFT bridged to L1 successfully!'))
+  console.log('#################################')
 }
 
 try {

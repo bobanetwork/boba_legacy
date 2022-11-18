@@ -110,13 +110,13 @@ $ cd packages/boba/turing
 $ yarn test:local
 ```
 
-**Note: Testing on Rinkeby**
+**Note: Testing on Goerli**
 
-To test on Rinkeby, you need a private key with both ETH and BOBA on the Boba L2; the private key needs to be provided in `hardhat.config.js`. Just replace all the zeros with your key:
+To test on Goerli, you need a private key with both ETH and BOBA on the Boba L2; the private key needs to be provided in `hardhat.config.js`. Just replace all the zeros with your key:
 
 ```javascript
-    boba_rinkeby: {
-      url: 'https://rinkeby.boba.network',
+    boba_goerli: {
+      url: 'https://goerli.boba.network',
       accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
     },
 ```
@@ -125,7 +125,7 @@ Then, run:
 
 ```bash
 $ cd packages/boba/turing
-$ yarn test:rinkeby
+$ yarn test:goerli
 ```
 
 The tests will perform some basic floating point math, provide some random numbers, and get the latest BTC-USD exchange rate:
