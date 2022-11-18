@@ -38,7 +38,7 @@ RELEASE_VERSION=v0.X.X
 
 L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY # for mainnet
 # Or ...
-L2_NODE_WEB3_URL=https://goerli.infura.io/v3/YOUR_INFURA_KEY # for goerli
+L1_NODE_WEB3_URL=https://goerli.infura.io/v3/YOUR_INFURA_KEY # for goerli
 ```
 
 **Pull images**
