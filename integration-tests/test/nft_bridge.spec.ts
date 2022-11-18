@@ -2169,14 +2169,6 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
-      // Approve BOBA
-      const exitFee = await BOBABillingContract.exitFee()
-      const approveBOBATX = await L2BOBAToken.connect(env.l2Wallet).approve(
-        L2Bridge.address,
-        exitFee
-      )
-      await approveBOBATX.wait()
-
       await env.waitForRevertXDomainTransactionL1(
         L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
       )

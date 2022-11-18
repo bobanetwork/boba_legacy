@@ -219,9 +219,9 @@ export async function addToken ( tokenContractAddressL1 ) {
 
     store.dispatch({
       type: 'TOKEN/GET/FAILURE',
-      payload: {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'},
+      payload: {currency: _tokenContractAddressL1, addressL1: _tokenContractAddressL1, addressL2: '', symbol: 'Not found', error: 'Not found'},
     })
 
-    return {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'};
+    return {currency: _tokenContractAddressL1, addressL1: _tokenContractAddressL1, addressL2: '', symbol: 'Not found', error: 'Not found'};
   }
 }

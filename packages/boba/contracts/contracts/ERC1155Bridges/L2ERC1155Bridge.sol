@@ -73,7 +73,8 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     mapping(address => PairTokenInfo) public pairTokenInfo;
 
     // billing contract address
-    address public billingContractAddress;
+    address payable public billingContractAddress;
+
     /***************
      * Constructor *
      ***************/
@@ -159,7 +160,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
      * @param _billingContractAddress billing contract address
      */
     function configureBillingContractAddress(
-        address _billingContractAddress
+        address payable _billingContractAddress
     )
         public
         onlyOwner()
@@ -230,6 +231,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -257,6 +259,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -285,6 +288,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -313,6 +317,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         uint32 _l1Gas
     )
         external
+        payable
         virtual
         override
         nonReentrant()
@@ -355,7 +360,9 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     {
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        require(msg.value == billingContract.exitFee(), "Not enough fee");
+        (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
+        require(sent, "Failed to send BOBA");
 
         PairTokenInfo storage pairToken = pairTokenInfo[_l2Contract];
         require(pairToken.l1Contract != address(0), "Can't Find L1 token Contract");
@@ -460,7 +467,9 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     {
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
+        require(msg.value == billingContract.exitFee(), "Not enough fee");
+        (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
+        require(sent, "Failed to send BOBA");
 
         PairTokenInfo storage pairToken = pairTokenInfo[_l2Contract];
         require(pairToken.l1Contract != address(0), "Can't Find L1 token Contract");
