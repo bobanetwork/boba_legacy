@@ -6,7 +6,7 @@
 # funds to various child processes. The child processes then randomly perform
 # various operations like onboarding L1->L2, exiting L2->L1, staking liquidity
 # pools, or sending payments to each other. More capabilities can be added
-# in the future e.g. trading ERC20 tokens, simulated gambling, auctions, 
+# in the future e.g. trading ERC20 tokens, simulated gambling, auctions,
 # multi-level marketing where a child account recruits others and then collects
 # a fee on their future transactions, ...
 #
@@ -39,7 +39,7 @@ fund_balance = Web3.toWei(0.5, 'ether')
 
 min_lp_balance = Web3.toWei(11.0, 'ether')
 
-# Emit warning messages if any child has been waiting "slow_secs" or more. Shut down at "stuck_secs". 
+# Emit warning messages if any child has been waiting "slow_secs" or more. Shut down at "stuck_secs".
 slow_secs = 600
 stuck_secs = 1800
 giveup_secs = 2700
@@ -61,7 +61,7 @@ assert(num_children * (min_balance * 10) <= Web3.toWei(env['max_fund_eth'],'ethe
 
 class Child:
   def __init__(self, A, num, acct, parent):
-     
+
     self.num = num
     self.acct = acct
     # Optional parameter to force all children to start on one chain
@@ -83,7 +83,7 @@ class Child:
 
     A.addr_names[acct.address] = "Child_" + str(num)
     # Could cache L1, L2 balances
-    
+
   def buildAndSubmit(self, ctx, func, params):
     params['from'] = self.acct.address
     params['nonce'] = ctx.rpc[self.on_chain].eth.get_transaction_count(self.acct.address)
@@ -166,7 +166,7 @@ def ctrlC(sig, frame):
     for c in children:
       if not c.exiting:
         print("*** Child",c.num,"acct",c.acct.address,"in op",c.op,"on chain",c.on_chain,"ts",c.ts,"need_tx",c.need_tx)
-        
+
   print("+---------------------+")
   print("")
 
@@ -191,7 +191,7 @@ addrs = []
 children = []
 
 gasPrice = [0]*3
-# Rinkeby seems to work at 0.5 gwei, ~75s
+# Goerli seems to work at 0.5 gwei, ~75s
 gasPrice[1] = Web3.toWei(env['gas_price_gwei'][0],'gwei')  # FIXME - try to estimate it (fails on local network)
 gasPrice[2] = Web3.toWei(env['gas_price_gwei'][1],'gwei') # This one is fixed
 
@@ -271,7 +271,7 @@ def Watch(ctx, c, op, tx=None):
 
   c.ts.append(time.time())
 
-  s = "OP_WATCH," + "{:03d}".format(c.num) + "," + op + "," + str(c.on_chain) 
+  s = "OP_WATCH," + "{:03d}".format(c.num) + "," + op + "," + str(c.on_chain)
   start_at = c.ts[0]
 
   s += "," + "{:014.8f}".format(c.ts[1] - start_at)
@@ -320,7 +320,7 @@ def Finish(c,success=1):
   shutdown.total_ops += 1
 
   op_log.write(op_str)
-  op_log.flush() 
+  op_log.flush()
   logLock.release()
   old_op = c.op
 
@@ -335,7 +335,7 @@ def Finish(c,success=1):
   else:
     print("Putting child",c.num,"into idleQueue after failed operation:", old_op)
     shutdown.num_fails += 1
-    if shutdown.num_fails > max_fail and shutdown.level == 0: 
+    if shutdown.num_fails > max_fail and shutdown.level == 0:
       print("*** Maximum failure count reached, starting shutdown")
       shutdown.level = 1
     idleQueue.put(c)
@@ -471,7 +471,7 @@ def AddLiquidity_2(ctx, chain, acct,amount):
   r = ctx.rpc[chain].eth.send_raw_transaction(signed_tx.rawTransaction)
   return r
 
-# FIXME - this is used by the Funder to transfer L1->L2 if needed on startup. Can't quite unify it with 
+# FIXME - this is used by the Funder to transfer L1->L2 if needed on startup. Can't quite unify it with
 # the Onramp_trad code path used by the workers.
 def Onramp_2(ctx, acct, amount):
   chain = 1
@@ -512,7 +512,7 @@ def Onramp_trad(ctx,c):
 
   c.on_chain = 2
   WatchEv(ctx,c,"SO",ret)
-   
+
 def Onramp_fast(ctx,c):
   acct = c.acct
   chain = 1
@@ -596,7 +596,7 @@ def FastExit(ctx, c, ng):
     print("Falling back to traditional exit")
     SlowExit(ctx,c,ng)
   else:
-    Start(ctx,c,optype)  
+    Start(ctx,c,optype)
     amount = Web3.toWei(bb - min_balance, 'wei')
 
     print("DBG exit amount = ",amount,"bb",bb)
@@ -691,7 +691,7 @@ def dispatch(ctx, prefix, c):
         Onramp_fast(ctx, c)
       elif RollDice(ctx,c, env['op_pct'][0][2]):
         lPrint(ctx.log, prefix + "will traditonal-onramp")
-        Onramp_trad(ctx, c)    
+        Onramp_trad(ctx, c)
       elif RollDice(ctx,c, env['op_pct'][0][3]):
         bal = ctx.rpc[c.on_chain].eth.getBalance(c.acct.address)
         if c.staked_NG:
@@ -701,14 +701,14 @@ def dispatch(ctx, prefix, c):
         AddLiquidity_NG(ctx, c, Web3.toWei(bal / 4.0,'wei'))
       elif RollDice(ctx,c, env['op_pct'][0][4]):
         lPrint(ctx.log, prefix + "will use NG unified onramp")
-        Onramp_NG(ctx, c)    
+        Onramp_NG(ctx, c)
       else:
        lPrint(ctx.log, prefix + "Will send funds")
        SendFunds(ctx, c)
     else:
       if not c.approved[2]:
         lPrint(ctx.log, prefix + "Approving contracts")
-        # Currently synchronous, could do multi-step waits for completion 
+        # Currently synchronous, could do multi-step waits for completion
         Approve(ctx, boba_addrs['Proxy__L2LiquidityPool'], c.acct)
         if env['ng_enabled']:
           Approve(ctx, boba_addrs['L2_EthPool'], c.acct)
@@ -741,7 +741,7 @@ def dispatch(ctx, prefix, c):
         SlowExit(ctx, c, True)
       else:
         lPrint(ctx.log, prefix + "Will send funds")
-        SendFunds(ctx, c) 
+        SendFunds(ctx, c)
 
 def worker_thread(env, A, num, cx, ch):
   ctx = Context(env, A, "./logs/worker-"+str(num)+".log",None)
@@ -758,7 +758,7 @@ def worker_thread(env, A, num, cx, ch):
         lPrint(ctx.log, "Worker " + str(num) + " readyQueue is empty")
         wasBusy = False
 
-    if not c:  
+    if not c:
       time.sleep(2)
       continue
 
@@ -787,13 +787,13 @@ def worker_thread(env, A, num, cx, ch):
     elif c.on_chain == 2 and b1 >= min_balance:
       lPrint(ctx.log, prefix + "balance low, switching to chain 1")
       c.on_chain = 1
-    else:  
+    else:
       lPrint(ctx.log, prefix + "has insufficient funding on either chain")
       idleQueue.put(c)
       continue
 
     dispatch(ctx, prefix, c)
-    ctx.log.flush() 
+    ctx.log.flush()
     time.sleep(env['op_delay'])
 
   ctx.log.write("# Finished at " + time.asctime(time.gmtime()) + "\n")
@@ -854,7 +854,7 @@ def block_watcher(env, A, ch):
     FS = ctx.contracts['SB_2'].events.DepositFinalized()
     if env['ng_enabled']:
       NP = ctx.contracts['L2_EthPool'].events.PoolPaidL2()
-     
+
   while shutdown.level < 2:
     while (next + env['confirmations'][ch-1]) > w3.eth.block_number and shutdown.level < 2:
       time.sleep(3)
@@ -874,7 +874,7 @@ def block_watcher(env, A, ch):
     if len(b.uncles) > 0:
       print("***WARNING - block has uncles:",b.uncles)
       header += "[UNCLES]"
-      
+
     if len(b.transactions) == 0:
       header += " [No transactions]"
       wPrint(log, ch, header)
@@ -940,12 +940,12 @@ def block_watcher(env, A, ch):
           elif i in tx:
             val = tx[i]
           else:
-            continue  
+            continue
           pr[i] = A.addrName(val)
         if 'gas' in pr and 'gasUsed' in pr:
           if pr['gasUsed'] > pr['gas']:
             wPrint(log, ch, "*** GAS MISMATCH, gasUsed " + str(pr['gasUsed']) + " > gas " + str(pr['gas']))
-     
+
         wPrint(log, ch, "sys TX " + Web3.toHex(t) + " " + str(pr))
 
         if pr['to'] == 'CanonicalTransactionChain':
@@ -1003,7 +1003,7 @@ def block_watcher(env, A, ch):
             wPrint(log,ch, "            NOTE got event before tx for addr " + match) # This is no longer a warning; should be handled OK, and happens if Confirmations is set higher than the DTL value
           else:
             Finish(c,success)
-        elif match in addrs:  
+        elif match in addrs:
           wPrint(log,ch, "     *****  WARNING Found unmatched event for addr " + match)
           evMissed.append(match)
         elif match == funder.address:
@@ -1014,7 +1014,7 @@ def block_watcher(env, A, ch):
     if ign_count > 0:
       # FIXME - there is a small race condition where a txn could go through before the
       # txhash is registered. Should keep a history of ignored txns and cross-reference
-      # against the txWatch. 
+      # against the txWatch.
       wPrint(log, ch, "ignored " + str(ign_count) + " foreign transactions")
 
     listLock.acquire()
@@ -1031,7 +1031,7 @@ def block_watcher(env, A, ch):
     try: # can get "broken pipe" with "tee"
       sys.stdout.flush()
     except:
-      pass  
+      pass
     next += 1
 
     if (next % 10) == 0 and ch == 1 and ctcCount > 0 and sccCount > 0:
@@ -1042,7 +1042,7 @@ def block_watcher(env, A, ch):
       wPrint(log, ch, s)
 
   # Print final stats on thread exit.
-  if ch == 1 and ctcCount > 0 and sccCount > 0:  
+  if ch == 1 and ctcCount > 0 and sccCount > 0:
     ctcAvg = int(ctcGasUsed / ctcCount)
     sccAvg = int(sccGasUsed / sccCount)
     s =  "+++ GAS_STATS_FINAL +++ CTC used total " + str(ctcGasUsed) + " gas in " + str(ctcCount) + " tx (avg " + str(ctcAvg) + ")"
@@ -1083,7 +1083,7 @@ if (balStart[2] / (balStart[1] + balStart[2])) < 0.4:
     lPrint(gCtx.log, "Waiting for transfer to arrive on L2")
     time.sleep(10)
     tries += 1
-    myAssert(tries < 60)  
+    myAssert(tries < 60)
   lPrint(gCtx.log, "Funder L1->L2 transfer completed on L2. Recalculating start values.")
 
   balStart[1] = gCtx.rpc[1].eth.getBalance(funder.address)
@@ -1115,7 +1115,7 @@ if t[2] < min_lp_balance:
 else:
   lPrint(gCtx.log, "LP[2] has sufficient liquidity: " + str(Web3.fromWei(t[2],'ether')))
 
-if env['ng_enabled']:  
+if env['ng_enabled']:
   t = gCtx.contracts['L1_EthPool'].functions.availL1Balance().call()
   if t < min_lp_balance:
 
@@ -1132,7 +1132,7 @@ if env['ng_enabled']:
     })
 
     st = gCtx.rpc[1].eth.account.sign_transaction(t2, funder.key)
-    r = gCtx.rpc[1].eth.send_raw_transaction(st.rawTransaction) 
+    r = gCtx.rpc[1].eth.send_raw_transaction(st.rawTransaction)
 
     rcpt = gCtx.rpc[1].eth.wait_for_transaction_receipt(r)
     lPrint(gCtx.log, "Added liquidity to L1_EthPool, status " + str(rcpt.status))
@@ -1142,7 +1142,7 @@ if env['ng_enabled']:
 
 funder.setNonces(gCtx.rpc)
 
-# Process initial funding ops in batches to avoid overloading the L1 (Rinkeby)
+# Process initial funding ops in batches to avoid overloading the L1 (Goerli)
 def InitialFunding(env):
   lPrint(gCtx.log, "InitialFunding thread starting, num_children = " + str(len(children)))
   batchTx = []
@@ -1182,7 +1182,7 @@ def InitialFunding(env):
           shutdown.level = 1
   lPrint(gCtx.log, "InitialFunding thread done.")
 
-for i in range(0,num_workers):  
+for i in range(0,num_workers):
   t = threading.Thread(target=worker_thread, args=(env, A, i,None,0,))
   threads.append(t)
   t.start()
@@ -1244,7 +1244,7 @@ account_log.flush()
 
 start_time = time.time()
 
-while shutdown.level < 2:  
+while shutdown.level < 2:
   c = None
   while c is None and shutdown.level < 2: # FIXME
     listLock.acquire()
@@ -1271,7 +1271,7 @@ while shutdown.level < 2:
       ps += ":" + str(Web3.fromWei(gCtx.contracts['L2_EthPool'].functions.availL2Balance().call(),'ether'))
       lPrint(gCtx.log, ps)
 
-    s = ""  
+    s = ""
     now = time.time()
     slowTx = set()
     tMax = 0
@@ -1375,7 +1375,7 @@ lPrint(gCtx.log, s)
 lPrint(gCtx.log, "Main cleaning up")
 if len(evWatch) == 0 and len(txWatch) == 0 and shutdown.num_done == num_children:
   op_log.write("# Clean exit at " + time.asctime(time.gmtime()) +"\n")
-else:  
+else:
   op_log.write("# Dirty shutdown at " + time.asctime(time.gmtime()) +"\n")
 
 op_log.close()

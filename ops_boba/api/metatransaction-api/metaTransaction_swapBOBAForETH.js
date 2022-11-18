@@ -168,7 +168,7 @@ module.exports.mainnetHandler = async (event, context, callback) => {
 }
 
 // Return error message
-module.exports.rinkebyHandler = async (event, context, callback) => {
+module.exports.goerliHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
   const [Boba_GasPriceOracle, L2Boba] = loadContracts()

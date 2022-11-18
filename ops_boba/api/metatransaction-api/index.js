@@ -1,16 +1,13 @@
-import {
-  rinkebyHandler,
-  mainnetHandler,
-} from './metaTransaction_swapBOBAForETH'
+import { goerliHandler, mainnetHandler } from './metaTransaction_swapBOBAForETH'
 
 import {
-  rinkebyHandler as rinkebyHandlerFaucet,
+  goerliHandler as goerliHandlerFaucet,
   mainnetHandler as mainnetHandlerFaucet,
 } from './metaTransaction_getTestnetETH'
 
 export {
-  rinkebyHandler as rinkebySwapBOBAForETH,
+  goerliHandler as goerliSwapBOBAForETH,
   mainnetHandler as mainnetSwapBOBAForETH,
-  rinkebyHandlerFaucet as rinkebyGetTestnetETH,
+  goerliHandlerFaucet as goerliGetTestnetETH,
   mainnetHandlerFaucet as mainnetGetTestnetETH,
 }

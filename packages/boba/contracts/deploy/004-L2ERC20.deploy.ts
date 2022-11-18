@@ -71,7 +71,7 @@ const deployFn: DeployFunction = async (hre) => {
       (hre as any).deployConfig.network === 'local' ||
       token.symbol === 'TEST'
     ) {
-      //do not deploy existing tokens on Rinkeby or Mainnet
+      //do not deploy existing tokens on Goerli or Mainnet
       //only deploy tokens if it's the TEST token or we are on local
 
       let supply = initialSupply_18

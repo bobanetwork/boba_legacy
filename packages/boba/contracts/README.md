@@ -34,7 +34,7 @@ $ BUILD=1 DAEMON=0 ./up_local.sh
 
 ```
 
-Create a `.env` file in the root directory of the contracts folder. Add environment-specific variables on new lines in the form of `NAME=VALUE`. Examples are given in the `.env.example` file. Just pick which net you want to work on and copy either the "Rinkeby" _or_ the "Local" envs to your `.env`.
+Create a `.env` file in the root directory of the contracts folder. Add environment-specific variables on new lines in the form of `NAME=VALUE`. Examples are given in the `.env.example` file. Just pick which net you want to work on and copy either the "Goerli" _or_ the "Local" envs to your `.env`.
 
 ```bash
 
@@ -47,7 +47,7 @@ TEST_PRIVATE_KEY_1=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f
 TEST_PRIVATE_KEY_2=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
 TEST_PRIVATE_KEY_3=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 TARGET_GAS_LIMIT=9000000000
-CHAIN_ID=28 #for Rinkeby
+CHAIN_ID=2888 #for Goerli
 TEST=1 #This deploys the ERC20 test token
 
 ```

@@ -1,8 +1,13 @@
 import {
-  rinkebySwapBOBAForETH,
+  goerliSwapBOBAForETH,
   mainnetSwapBOBAForETH,
-  rinkebyGetTestnetETH,
+  goerliGetTestnetETH,
   mainnetGetTestnetETH,
 } from './metatransaction-api'
 
-export { rinkebySwapBOBAForETH, mainnetSwapBOBAForETH, rinkebyGetTestnetETH, mainnetGetTestnetETH }
+export {
+  goerliSwapBOBAForETH,
+  mainnetSwapBOBAForETH,
+  goerliGetTestnetETH,
+  mainnetGetTestnetETH,
+}

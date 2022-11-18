@@ -60,7 +60,7 @@ A round started for reporting by an oracle, will have to meet the min number of 
 
 Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call ***`getFeed(base, quote)`***). The addresses listed here might be outdated! Prices returned are in decimals (8) of the underlying quote.
 
-### Rinkeby
+### Goerli
 
 [ETH-USD](https://testnet.bobascan.com/address/0xcEb40458ad6Dabe9cfC90A2ad062a071809c4E84#transactions) \
 [BOBA-USD](https://testnet.bobascan.com/address/0xd05AA5531b8e8DaB3BEe675f133dF3e330d9adA8#transactions) \

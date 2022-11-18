@@ -71,5 +71,5 @@ jobs:
       # - name: Build and push docker images to AWS
       #   working-directory: ./ops_boba
       #   run: |
-      #        rm -rf cloudformation/deployer-rinkeby.yaml cloudformation/dummy-transaction.yaml cloudformation/omgx-monitor.yaml cloudformation/blockexplorer-blockscout.yaml cloudformation/transaction-monitor.yaml
+      #        rm -rf cloudformation/deployer-goerli.yaml cloudformation/dummy-transaction.yaml cloudformation/omgx-monitor.yaml cloudformation/blockexplorer-blockscout.yaml cloudformation/transaction-monitor.yaml
       #        ./cfn-devenv.sh push2aws --from-tag ${{ steps.tag.outputs.VERSION }} --deploy-tag ${{ steps.tag.outputs.VERSION }}

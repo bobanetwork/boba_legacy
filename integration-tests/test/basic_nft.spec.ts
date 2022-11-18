@@ -128,7 +128,7 @@ describe('NFT Test\n', async () => {
       BigNumber.from(String(0)), //starting index for the tokenIDs
       ERC721.address,
       UUID,
-      'BOBA_Rinkeby_28'
+      'BOBA_Goerli_28'
     )
     await ERC721_D.deployTransaction.wait()
 

@@ -6,7 +6,7 @@ To run: python ./stress_tester.py <target> <num_children>
 
 <target>, e.g. "local", refers to a configuration in targets/<target>.json
 
-For Rinkeby you will need to provide an Infura API key (don't check into git).
+For Goerli you will need to provide an Infura API key (don't check into git).
 
 At the start of a test, a specified number of child accounts are created and
 funded. Each child will randomly perform one of the available options, such
@@ -19,7 +19,7 @@ waiting for each child to finish its current operation and then attempting
 to refund any remaining balances to the initial funding account. If an
 operation is stuck, pressing ctrl-C a second time will print some additional
 statistics and then move to the next phase of shutdown. A third ctrl-C will
-kill the process immediately. 
+kill the process immediately.
 
 There are two watcher threads which monitor new blocks on the L1 and L2
 chains, detecting transaction receipts and events for pending operations.

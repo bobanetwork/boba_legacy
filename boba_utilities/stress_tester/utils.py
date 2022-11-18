@@ -109,7 +109,7 @@ class Addrs:
     if addr in self.addr_names:
       return self.addr_names[addr]
     else:
-      return addr  
+      return addr
 
 class Context:
   def __init__(self, env, addrs, logpath=None, logLabel=None):
@@ -129,7 +129,7 @@ class Context:
     self.contracts = {**l1C, **l2C}
 
     gasPrice = [0]*3
-    # Rinkeby seems to work at 0.5 gwei, ~75s
+    # Goerli seems to work at 0.5 gwei, ~75s
     gasPrice[1] = Web3.toWei(env['gas_price_gwei'][0],'gwei')  # FIXME - try to estimate it (fails on local network)
     gasPrice[2] = Web3.toWei(env['gas_price_gwei'][1],'gwei') # This one is fixed
 
@@ -186,7 +186,7 @@ class Context:
     try:
       contracts['OVM_L1CrossDomainMessenger'] = self.loadContract(rpc,boba_addrs['OVM_L1CrossDomainMessenger'],'./contracts/L1CrossDomainMessenger.json')
     except:
-      contracts['OVM_L1CrossDomainMessenger'] = self.loadContract(rpc,boba_addrs['L1CrossDomainMessenger'],'./contracts/L1CrossDomainMessenger.json')  
+      contracts['OVM_L1CrossDomainMessenger'] = self.loadContract(rpc,boba_addrs['L1CrossDomainMessenger'],'./contracts/L1CrossDomainMessenger.json')
     contracts['Proxy__L1CrossDomainMessenger'] = self.loadContract(rpc,boba_addrs['Proxy__L1CrossDomainMessenger'],'./contracts/L1CrossDomainMessenger.json')
 
     if ng:
@@ -221,7 +221,7 @@ class Context:
     if self.log:
       self.log.write(msg + "\n")
 
-def LoadEnv():  
+def LoadEnv():
   if len(sys.argv) < 2:
     print("Usage:",sys.argv[0],"<target>")
     exit(1)
@@ -234,7 +234,7 @@ def LoadEnv():
   except:
     print("Unable to load target definition",env_path)
     exit(1)
-  
+
   return env
 
 def wPrint(log, ch, msg, screenEcho = True):

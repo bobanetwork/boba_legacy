@@ -1,4 +1,4 @@
-# BobaBase Rinkeby (public testnet)
+# BobaBase Goerli (public testnet)
 
 ## Network Info
 - **Chain ID**: 1297

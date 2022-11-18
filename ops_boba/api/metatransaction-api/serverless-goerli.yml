@@ -1,12 +1,12 @@
-service: sls-boba-rinkeby-metaTransaction # NOTE: update this with your service name
+service: sls-boba-goerli-metaTransaction # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stackName: sls-boba-rinkeby-metaTransaction
+  stackName: sls-boba-goerli-metaTransaction
   stage: prod
   region: us-east-1
-  role: ${file(env-rinkeby.yml):ROLE}
+  role: ${file(env-goerli.yml):ROLE}
 
 package:
   exclude:
@@ -16,36 +16,36 @@ package:
 
 functions:
   boba_swapBOBAForETH:
-    handler: metaTransaction_swapBOBAForETH.rinkebyHandler
+    handler: metaTransaction_swapBOBAForETH.goerliHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+        - ${file(env-goerli.yml):SECURITY_GROUPS}
       subnetIds:
-        - ${file(env-rinkeby.yml):SUBNET_ID_1}
-        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+        - ${file(env-goerli.yml):SUBNET_ID_1}
+        - ${file(env-goerli.yml):SUBNET_ID_2}
     events:
       - http:
           path: send.swapBOBAForETH
           method: post
           cors: true
     layers:
-      - ${file(env-rinkeby.yml):LAYERS}
+      - ${file(env-goerli.yml):LAYERS}
   boba_getTestnetETH:
-    handler: metaTransaction_getTestnetETH.rinkebyHandler
+    handler: metaTransaction_getTestnetETH.goerliHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
+        - ${file(env-goerli.yml):SECURITY_GROUPS}
       subnetIds:
-        - ${file(env-rinkeby.yml):SUBNET_ID_1}
-        - ${file(env-rinkeby.yml):SUBNET_ID_2}
+        - ${file(env-goerli.yml):SUBNET_ID_1}
+        - ${file(env-goerli.yml):SUBNET_ID_2}
     events:
       - http:
           path: send.getTestnetETH
           method: post
           cors: true
     layers:
-      - ${file(env-rinkeby.yml):LAYERS}
+      - ${file(env-goerli.yml):LAYERS}

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [[ $STAGE == "all" ]]; then
-  echo 'You set STAGE to rinkeby. Deploying to Rinkeby...'
-  cp env-rinkeby.yml env.yml &&
-  serverless -c serverless-rinkeby.yml deploy &&
+  echo 'You set STAGE to goerli. Deploying to Goerli...'
+  cp env-goerli.yml env.yml &&
+  serverless -c serverless-goerli.yml deploy &&
   rm -rf env.yml &&
   rm -rf .serverless &&
   echo 'You set STAGE to mainnet. Deploying to Mainnet...'
@@ -13,10 +13,10 @@ if [[ $STAGE == "all" ]]; then
   rm -rf .serverless
 fi
 
-if [[ $STAGE == "rinkeby" ]]; then
-  echo 'You set STAGE to rinkeby. Deploying to Rinkeby...'
-  cp env-rinkeby.yml env.yml &&
-  serverless -c serverless-rinkeby.yml deploy &&
+if [[ $STAGE == "goerli" ]]; then
+  echo 'You set STAGE to goerli. Deploying to Goerli...'
+  cp env-goerli.yml env.yml &&
+  serverless -c serverless-goerli.yml deploy &&
   rm -rf env.yml &&
   rm -rf .serverless
 fi

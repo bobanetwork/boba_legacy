@@ -68,7 +68,7 @@ describe('Boba API Tests', async () => {
       process.env.L2_BOBA_ADDRESS = L2Boba.address
     })
 
-    describe('Mainnet and Rinkeby', async () => {
+    describe('Mainnet and Goerli', async () => {
       it('should swap BOBA for ETH', async () => {
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address

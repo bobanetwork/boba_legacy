@@ -76,7 +76,7 @@ You'll need the following:
 * [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying your contracts, it's simpler to use https://rinkeby.boba.network**.
+**Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying your contracts, it's simpler to use https://goerli.boba.network**.
 
 Clone the repository, open it, and install nodejs packages with `yarn`:
 
