@@ -39,9 +39,9 @@ async function main() {
   let BobaTuringCreditAddress
   let WETH
   let Router
-  if (hre.network.name === 'boba_rinkeby') {
-    BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-    BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+  if (hre.network.name === 'boba_goerli') {
+    BOBAL2Address = '0x4200000000000000000000000000000000000023'
+    BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
     WETH = '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000'
     Router = '0x4df04E20cCd9a8B82634754fcB041e86c5FF085A'
   } else if (hre.network.name === 'boba_mainnet') {

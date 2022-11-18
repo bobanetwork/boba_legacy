@@ -19,15 +19,15 @@ As for every chain, you need an account with some ETH (to deploy contracts) and 
 
 // uncomment the correct addresses
 
-// Rinkeby
-// const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-// const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+// Goerli
+// const BOBAL2Address = '0x4200000000000000000000000000000000000023'
+// const BobaTuringCreditGoerliAddress = '0x4200000000000000000000000000000000000020'
 
 // for example if you are on Mainnet-Test, uncomment these
 
 // Mainnet-Test
 const BOBAL2Address = '0x58597818d1B85EF96383884951E846e9D6D03956'
-const BobaTuringCreditRinkebyAddress = '0xE654ba86Ea0B59a6836f86Ec806bfC9449D0aD0A'
+const BobaTuringCreditGoerliAddress = '0xE654ba86Ea0B59a6836f86Ec806bfC9449D0aD0A'
 
 // provide your PK here
 const testPrivateKey = process.env.PRIVATE_KEY ?? '0x____'
@@ -36,18 +36,18 @@ const testPrivateKey = process.env.PRIVATE_KEY ?? '0x____'
 
 You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
 
-## Getting Rinkeby ETH and Rinkeby BOBA
+## Getting Goerli ETH and Goerli BOBA
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Faucet](https://www.rinkebyfaucet.com/), [ChainLink Rinkeby Faucet](https://faucets.chain.link/rinkeby) or [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://faucets.boba.network).
+If you do not have Goerli ETH, you can get some from [Goerli Faucet](https://www.goerlifaucet.com/), [ChainLink Goerli Faucet](https://faucets.chain.link/goerli) or [Goerli Authenticated Faucet](https://www.goerli.io/#faucet). For Goerli BOBA, use the [BOBA faucet](https://faucets.boba.network).
 
 ## Testing the Turing Monster NFT
 
-To run the tests you will also need some Rinkeby ETH on Rinkeby (L1) as the tests also test the NFT bridging functionality.
+To run the tests you will also need some Goerli ETH on Goerli (L1) as the tests also test the NFT bridging functionality.
 
 ```bash
 $ cd boba_community/turing-monsters
 $ yarn build
-$ PRIVATE_KEY=0x... yarn test:rinkeby # for testing on rinkeby, for example
+$ PRIVATE_KEY=0x... yarn test:goerli # for testing on goerli, for example
 
 # other choices are local and mainnet
 ```
@@ -77,7 +77,7 @@ To deploy run:
 ```bash
 $ cd boba_community/turing-monsters
 $ yarn build
-$ PRIVATE_KEY=0x... yarn run deploy -- --network boba_rinkeby
+$ PRIVATE_KEY=0x... yarn run deploy -- --network boba_goerli
 ```
 
 Add the ERC721 as permitted caller to the deployed TuringHelper. Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.

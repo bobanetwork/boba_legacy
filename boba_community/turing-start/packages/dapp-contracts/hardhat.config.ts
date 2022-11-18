@@ -13,15 +13,15 @@ const config: HardhatUserConfig = {
     boba_local: {
       url: 'http://localhost:8545',
     },
-    boba_rinkeby: {
-      url: 'https://rinkeby.boba.network',
+    boba_goerli: {
+      url: 'https://goerli.boba.network',
       accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_2],
     },
     boba_mainnet: {
       url: 'https://mainnet.boba.network',
     },
-    rinkeby: {
-      url: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+    goerli: {
+      url: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
       accounts: [process.env.PRIVATE_KEY, process.env.PRIVATE_KEY_2],
     },
   },

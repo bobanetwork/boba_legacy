@@ -2,7 +2,7 @@
 import { task } from 'hardhat/config'
 import * as types from 'hardhat/internal/core/params/argumentTypes'
 
-const DEFAULT_EM_CHAIN_ID = 28
+const DEFAULT_EM_CHAIN_ID = 2888
 
 task('deploy', 'Deploy contracts to L1 and L2')
   .addOptionalParam(

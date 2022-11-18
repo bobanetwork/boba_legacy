@@ -56,9 +56,9 @@ import { parseEther } from 'ethers/lib/utils'
 
 describe('Turing Helper Factory', function () {
   before(async () => {
-    if (hre.network.name === 'boba_rinkeby') {
-      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    if (hre.network.name === 'boba_goerli') {
+      BOBAL2Address = '0x4200000000000000000000000000000000000023'
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
       WETHAddress = '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000'
       RouterAddress = '0x4df04E20cCd9a8B82634754fcB041e86c5FF085A'
     } else if (hre.network.name === 'boba_mainnet') {
@@ -66,7 +66,7 @@ describe('Turing Helper Factory', function () {
       BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
       WETHAddress = '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000'
       RouterAddress = '0x17C83E2B96ACfb5190d63F5E46d93c107eC0b514'
-    } else if (hre.network.name === 'rinkeby') {
+    } else if (hre.network.name === 'goerli') {
       WETHAddress = '0xc778417e063141139fce010982780140aa0cd5ab'
       RouterAddress = '0x6000eb83c2583AFD25D93cB0629D6b0a0B2F245c'
     } else {

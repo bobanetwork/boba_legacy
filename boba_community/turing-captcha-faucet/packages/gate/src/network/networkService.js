@@ -58,7 +58,7 @@ class NetworkService {
             } else {
                 localStorage.removeItem('wallectConnectionStatus')
                 this.switchChain()
-                return { error: 'Please switch to Boba Rinkeby' }
+                return { error: 'Please switch to Boba Goerli' }
             }
         } catch (error) {
             localStorage.removeItem('wallectConnectionStatus')
@@ -81,9 +81,9 @@ class NetworkService {
     async switchChain() {
         const chainParam = {
             chainId: '0x' + CHAIN_ID,
-            chainName: 'BOBA Rinkeby',
+            chainName: 'BOBA Goerli',
             rpcUrls: [NODE_URL],
-            blockExplorerUrls: ['https://blockexplorer.rinkeby.boba.network'],
+            blockExplorerUrls: ['https://blockexplorer.goerli.boba.network'],
         }
 
         try {

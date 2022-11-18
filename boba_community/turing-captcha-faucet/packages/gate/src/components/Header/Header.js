@@ -47,7 +47,7 @@ function Header() {
                     disabled={walletConnected}
                     className={walletConnected ? 'headerButtonConnect':'headerButton'}
                 >
-                    {walletConnected ? account.slice(0, 20): 'Connect to Boba Rinkeby'}
+                    {walletConnected ? account.slice(0, 20): 'Connect to Boba Goerli'}
                 </Button>
             </div>
         </div>

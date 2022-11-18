@@ -33,8 +33,8 @@ let addressesBOBA
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 const counterPartProvider = new providers.JsonRpcProvider(cfg['bridgeCounterpartUrl']) // for testing the bridging
 
-const BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-const BobaTuringCreditRinkebyAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+const BOBAL2Address = '0x4200000000000000000000000000000000000023'
+const BobaTuringCreditGoerliAddress = '0x4200000000000000000000000000000000000020'
 const testPrivateKey = process.env.PRIVATE_KEY ?? '0x___________'
 const testPrivateKeyNonOwner = process.env.PRIVATE_KEY_2 ?? '0x___________'
 const testWallet = new Wallet(testPrivateKey, local_provider)
@@ -91,7 +91,7 @@ describe("Turing bridgeable NFT Random 256", function () {
     turingCredit = getContractFactory(
       'BobaTuringCredit',
       testWallet
-    ).attach(BobaTuringCreditRinkebyAddress)
+    ).attach(BobaTuringCreditGoerliAddress)
 
 
     Factory__L2NFTBridge = new ContractFactory(

@@ -68,16 +68,16 @@ function Faucet() {
     <div className="faucetContainer">
       <div className="title">Request testnet BOBA or ETH</div>
       <div className="middleText">Get testnet BOBA and ETH for an account
-        on Boba Rinkeby. You can use these testnet tokens to
-        create and test your own smart contracts on Boba Rinkeby.
+        on Boba Goerli. You can use these testnet tokens to
+        create and test your own smart contracts on Boba Goerli.
       </div>
       <div className="middleText">
         You are limited to one BOBA request and one ETH request every 24 hours, and
-        you must have some Rinkeby ETH in your account to use this faucet.
-        If you do not have any Rinkeby ETH, you can get some from{" "}
-        <a target="_blank" href="https://faucets.chain.link/rinkeby">Chainlink Faucet</a>,{" "}
-        <a target="_blank" href="https://faucet.rinkeby.io">Rinkeby Authenticated Faucet</a>,{" "}or
-        {" "}<a target="_blank" href="https://rinkebyfaucet.com">RINKEBY FAUCET</a>.
+        you must have some Goerli ETH in your account to use this faucet.
+        If you do not have any Goerli ETH, you can get some from{" "}
+        <a target="_blank" href="https://faucets.chain.link/goerli">Chainlink Faucet</a>,{" "}
+        <a target="_blank" href="https://faucet.goerli.io">Goerli Authenticated Faucet</a>,{" "}or
+        {" "}<a target="_blank" href="https://goerlifaucet.com">GOERLI FAUCET</a>.
       </div>
       <div className="smallText">Testnet account adddress</div>
       <Input placeholder="" className="faucetInput" value={account ? account : "Wallet not connected"} disabled />
@@ -118,8 +118,8 @@ function Faucet() {
       </Button>
       <div className="smallText" style={{ marginTop: 20 }}>{account && !hasFunds
           ? <span style={{color: 'red'}}>
-            Please bridge some funds from L1 Rinkeby to L2 Boba Rinkeby via our&nbsp;
-            <a href="https://gateway.rinkeby.boba.network/" title="Gateway - Bridge ETH" target="_blank">Gateway</a>.</span>
+            Please bridge some funds from L1 Goerli to L2 Boba Goerli via our&nbsp;
+            <a href="https://gateway.goerli.boba.network/" title="Gateway - Bridge ETH" target="_blank">Gateway</a>.</span>
         : 'Your result will be hashed and compared off-chain through Turing.'}
       </div>
     </div>
