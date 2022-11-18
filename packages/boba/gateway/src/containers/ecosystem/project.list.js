@@ -37,6 +37,7 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
+import babylons from '../../images/ecosystem/babylons.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -400,26 +401,26 @@ export const projectList = [
     "description": "The leading Lending protocol on Boba Network."
   },
   {
-     "title": "Symbiosis",
-     "canLaunch": true,
-     "link": "https://symbiosis.finance/",
-     "telegram": "https://t.me/symbiosis_finance",
-     "twitter": "https://twitter.com/symbiosis_fi",
-     "discord": "https://discord.gg/vmQjR2d7WC",
-     "type": "defi",
-     "image": symbiosisLogo,
-     "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
-   },
+    "title": "Symbiosis",
+    "canLaunch": true,
+    "link": "https://symbiosis.finance/",
+    "telegram": "https://t.me/symbiosis_finance",
+    "twitter": "https://twitter.com/symbiosis_fi",
+    "discord": "https://discord.gg/vmQjR2d7WC",
+    "type": "defi",
+    "image": symbiosisLogo,
+    "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
+  },
   {
-     "title": "Beamer",
-     "canLaunch": true,
-     "link": "https://app.beamerbridge.com/",
-     "twitter": "https://twitter.com/BeamerBridge",
-     "discord": "https://discord.com/invite/uvTYkzsBdA",
-     "type": "bridge",
-     "image": beamerbridge,
-     "description": "Beam your ERC20 assets between EVM compatible rollups with certainty, speed and security"
-   },
+    "title": "Beamer",
+    "canLaunch": true,
+    "link": "https://app.beamerbridge.com/",
+    "twitter": "https://twitter.com/BeamerBridge",
+    "discord": "https://discord.com/invite/uvTYkzsBdA",
+    "type": "bridge",
+    "image": beamerbridge,
+    "description": "Beam your ERC20 assets between EVM compatible rollups with certainty, speed and security"
+  },
   {
     "title": "Futuructa",
     "canLaunch": true,
@@ -441,14 +442,25 @@ export const projectList = [
     "image": rabbyLogo,
     "description": "The game-changing wallet for Ethereum and all EVM chains."
   },
+  {
+    "title": "Babylons NFT Marketplace and web3.0 Infrastructure Services",
+    "canLaunch": true,
+    "link": "https://babylons.io/",
+    "telegram": "https://t.me/babylonsnft",
+    "twitter": "https://twitter.com/BabylonsNFT",
+    "discord": "https://discord.com/invite/babylonsnft",
+    "type": "NFT Marketplace and web3.0 Infrastructure Services",
+    "image": babylons,
+    "description": "Babylons is an ecosystem governed by a unique DAO model serving as a community-governed NFT Platform, a premiere blockchain gaming aggregator, a cutting-edge launchpad and web3.0 technology solutions provider trusted by over 200 partners."
+  }
 ]
 
 export const loadProjectByCategory = () => {
-  const typeOrder = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ]
+  const typeOrder = ['defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token']
   const projectByType = groupBy(projectList, 'type')
   const orderProjects = {}
   typeOrder.forEach((key) => {
-    orderProjects[ key ] = projectByType[key]
+    orderProjects[key] = projectByType[key]
   })
   return orderProjects
 }
@@ -619,11 +631,11 @@ export const BobaProjectList = [
 
 
 export const loadBobaProjectByCategory = () => {
-  const typeOrder = [ 'mainnet', 'testnet' ]
+  const typeOrder = ['mainnet', 'testnet']
   const projectByType = groupBy(BobaProjectList, 'type')
   const orderProjects = {}
   typeOrder.forEach((key) => {
-    orderProjects[ key ] = projectByType[key]
+    orderProjects[key] = projectByType[key]
   })
   return orderProjects
 }
