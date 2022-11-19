@@ -1,6 +1,6 @@
 import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
 import fetch from 'cross-fetch';
-import { APP_CHAIN } from 'util/constant'
+import { APP_CHAIN, TESTNET_NETWORK_NAME } from 'util/constant'
 
 class GraphQLService {
 
@@ -16,7 +16,7 @@ class GraphQLService {
 
   async queryBridgeProposalCreated() {
 
-    const query = gql(`query { governorProposalCreateds { proposalId values description proposer to startTimestamp endTimestamp proposer } }`)
+    const query = gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
 
     /*
     curl -g -X POST \

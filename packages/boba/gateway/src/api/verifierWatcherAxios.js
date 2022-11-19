@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { TESTNET_NETWORK_NAME } from 'util/constant'
 import { getNetwork } from 'util/masterConfig'
 const nw = getNetwork()
 

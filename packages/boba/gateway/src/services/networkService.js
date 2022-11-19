@@ -3885,6 +3885,10 @@ class NetworkService {
   }
 
   // Create Proposal
+  /************************/
+  /*****Old Dao Fix Me.****/
+  /************************/
+  // FIXME:
   async createProposal(payload) {
 
     if( this.L1orL2 !== 'L2' ) return
@@ -3901,10 +3905,17 @@ class NetworkService {
     let value3 = 0
     let description = ''
     let address = ['']
-    let callData = ['']
-    let tokenIds = payload.tokenIds
-    // create proposal only on latest contracts.
-    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+    let callData = [ '' ]
+    // FIXME: Ve DAO From here
+    /*
+      let tokenIds = payload.tokenIds
+      // create proposal only on latest contracts.
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+
+    */
+    // FIXME: Ve DAO Till here
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     if( payload.action === 'text-proposal' ) {
       address = ['0x000000000000000000000000000000000000dEaD']
@@ -3957,7 +3968,6 @@ class NetworkService {
           values,
           signatures,
           callData,
-          tokenIds,
           description
       )
 
@@ -3975,8 +3985,8 @@ class NetworkService {
    * group created proposals by `to` and make use of respective contract to prepare the proposal data list.
    *
   */
-
-  async fetchProposals() {
+  // Use this proposal fetch for veDao.
+  async fetchProposalsVeDao() {
 
     if (!this.delegateContract || this.networkGateway === 'goerli') return
 
@@ -4089,8 +4099,11 @@ class NetworkService {
     }
   }
 
+
+
   //Cast vote for proposal
-  async castProposalVote({id, userVote,tokenIds}) {
+  // FIXME: keeping this to refer in next release will cleanup.
+  async castProposalVoteVeDao({id, userVote,tokenIds}) {
 
     if( !this.delegateContract ) return
 
@@ -5068,6 +5081,117 @@ class NetworkService {
       return error;
     }
   }
+
+  /****************************************
+   ************* STARTS HERE **************
+   ***********OLD DAO REMOVE ME ***********
+   *****************************************/
+
+  // FIXME: remove me once deprecated old dao.
+
+  async fetchProposals() {
+
+    if (!this.delegateContract) return
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+
+    try {
+
+      let proposalList = []
+
+      const proposalCounts = await delegateCheck.proposalCount()
+      const totalProposals = await proposalCounts.toNumber()
+
+      /// @notice An event emitted when a new proposal is created
+      // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
+
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+
+      for (let i = 0; i < totalProposals; i++) {
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
+
+        //this is a number such as 2
+        let proposalData = await delegateCheck.proposals(proposalID)
+
+        const proposalStates = [
+          'Pending',
+          'Active',
+          'Canceled',
+          'Defeated',
+          'Succeeded',
+          'Queued',
+          'Expired',
+          'Executed',
+        ]
+
+        let state = await delegateCheck.state(proposalID)
+
+        let againstVotes = parseInt(formatEther(proposalData.againstVotes))
+        let forVotes = parseInt(formatEther(proposalData.forVotes))
+        let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
+
+        let startTimestamp = proposalData.startTimestamp.toString()
+        let endTimestamp = proposalData.endTimestamp.toString()
+
+        let proposal = await delegateCheck.getActions(i+2)
+
+        let hasVoted = null
+
+        let description = proposalRaw.description.toString()
+
+        proposalList.push({
+           id: proposalID?.toString(),
+           proposal,
+           description,
+           totalVotes: forVotes + againstVotes,
+           forVotes,
+           againstVotes,
+           abstainVotes,
+           state: proposalStates[state],
+           startTimestamp,
+           endTimestamp,
+           hasVoted: hasVoted
+        })
+
+      }
+      return { proposalList }
+    } catch(error) {
+      console.log("NS: fetchProposals error:",error)
+      return error
+    }
+  }
+
+
+  async castProposalVote({id, userVote}) {
+
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: castProposalVote() error - called but account === null')
+      return
+    }
+    try {
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
+      return delegateCheck.castVote(id, userVote)
+    } catch(error) {
+      console.log("NS: castProposalVote error:",error)
+      return error
+    }
+  }
+
+
+  /****************************************
+   ************* END HERE *****************
+   ***********OLD DAO REMOVE ME TILL HERE *
+   *****************************************/
+
+
 
 }
 

@@ -32,6 +32,7 @@ import networkService from 'services/networkService'
 
 import { Md5 } from "ts-md5/dist/md5"
 import { useNavigate } from 'react-router-dom'
+import { TESTNET_NETWORK_NAME } from 'util/constant'
 
 function TokenPage() {
 

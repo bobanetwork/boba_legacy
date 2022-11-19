@@ -23,6 +23,22 @@ export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_A
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 
+// Testnet Constants Configs.
+export const TESTNET_NETWORK_NAME = process.env.REACT_APP_TESTNET_NETWORK_NAME
+
+export const TESTNET_L1_NAME= process.env.REACT_APP_RINKEBY_L1_NAME
+export const TESTNET_L1_CHAIN_ID= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID
+export const TESTNET_L1_CHAIN_ID_HEX= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID_HEX
+export const TESTNET_L1_RPC_URL = process.env.REACT_APP_RINKEBY_L1_RPC_URL
+export const TESTNET_L1_BLOCK_EXPLORER = process.env.REACT_APP_TESTNET_L1_BLOCK_EXPLORER
+export const TESTNET_L1_TRANSACTION = process.env.REACT_APP_TESTNET_L1_TRANSACTION
+export const DISABLE_VE_DAO = process.env.REACT_APP_DISABLE_VE_DAO
+
+
+export const TESTNET_OMG_WATCHER_URL = process.env.REACT_APP_TESTNET_OMGX_WATCHER_URL
+export const TESTNET_VERIFIER_WATCHER_URL = process.env.REACT_APP_TESTNET_VERIFIER_WATCHER_URL
+export const TESTNET_MM_LABEL = process.env.REACT_APP_TESTNET_MM_LABEL
+
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",
   CLASSIC_BRIDGE: "CLASSIC_BRIDGE",
@@ -68,5 +84,6 @@ export const ROUTES_PATH = {
   BOBASCOPE: '/bobascope',
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
+  DAO: '/DAO',
 }
 export const PER_PAGE = 8
