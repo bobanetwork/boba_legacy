@@ -25,12 +25,12 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     l2Explorer: 'https://blockexplorer.boba.network',
   },
   {
-    folder: 'Rinkeby',
-    name: 'Boba Rinkeby (public testnet)',
-    chainid: 28,
-    rpc: 'https://rinkeby.boba.netwokr',
-    l1Explorer: 'https://rinkeby.etherscan.io',
-    l2Explorer: 'https://blockexplorer.rinkeby.boba.network',
+    folder: 'goerli',
+    name: 'Boba Goerli (public testnet)',
+    chainid: 2888,
+    rpc: 'https://goerli.boba.netwokr',
+    l1Explorer: 'https://goerli.etherscan.io',
+    l2Explorer: 'https://testnet.bobascan.com',
   },
 ]
 
