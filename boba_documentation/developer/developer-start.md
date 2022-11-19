@@ -19,9 +19,9 @@ Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a un
 
 ## Deploying standard contracts
 
-For most contracts, the deploy experience is exactly like deploying on Ethereum. You will need to have some ETH (or Rinkeby ETH) on Boba and you will have to change your RPC endpoint to either `https://mainnet.boba.network` or `https://rinkeby.boba.network`. That's it!
+For most contracts, the deploy experience is exactly like deploying on Ethereum. You will need to have some ETH (or Goerli ETH) on Boba and you will have to change your RPC endpoint to either `https://mainnet.boba.network` or `https://goerli.boba.network`. That's it!
 
-The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Rinkeby blockexplorer](https://blockexplorer.rinkeby.boba.network) are similar to Etherscan. The [Mainnet gateway](https://gateway.boba.network) and the [Rinkeby gateway](https://gateway.rinkeby.boba.network) allow you to see your balances and bridge funds, among many other functions.
+The [Mainnet blockexplorer](https://bobascan.com) and the [Goerli blockexplorer](https://testnet.bobascan.com) are similar to Etherscan. The [Mainnet gateway](https://gateway.boba.network) and the [Goerli gateway](https://gateway.goerli.boba.network) allow you to see your balances and bridge funds, among many other functions.
 
 ## Example contracts ready to deploy
 
@@ -65,4 +65,4 @@ The [fraud-detector repo](../../boba_community/fraud-detector/README.md) runs a 
 
 ## Helping to Develop Boba
 
-If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/developer/local-stack.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://rinkeby.boba.network).
+If you would like to help develop Boba, it is straightforward to run the entire system locally, with [just a few commands](../../boba_documentation/developer/local-stack.md). Note: this is only relevant to developers who wish to develop Boba core services. For most test uses, it's simpler to use the [live testnet](https://goerli.boba.network).

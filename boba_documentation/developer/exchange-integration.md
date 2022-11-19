@@ -175,8 +175,8 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 
 | Network | URL                                                                                                                                                                                  |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Rinkeby | [Rinkeby Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesRinkeby\_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
 
 ### Links
 
@@ -187,11 +187,11 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 | Proxy\_\_L1StandardBridge | 0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00 |
 | Proxy\_\_L2StandardBridge | 0x4200000000000000000000000000000000000010 |
 
-#### Rinkeby
+#### Goerli
 
 | Contract Name             | Contract Address                           |
 | ------------------------- | ------------------------------------------ |
-| Proxy\_\_L1StandardBridge | 0xDe085C82536A06b40D20654c2AbA342F2abD7077 |
+| Proxy\_\_L1StandardBridge | 0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2 |
 | Proxy\_\_L2StandardBridge | 0x4200000000000000000000000000000000000010 |
 
 ## Using the Fast Token Bridge
@@ -290,5 +290,5 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
 | Network | URL                                                                                                                                                                                  |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Rinkeby | [Rinkeby Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesRinkeby\_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |

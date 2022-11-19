@@ -4,9 +4,9 @@ description: Faucets
 
 ## Boba Network test token Faucet
 
-### Ethereum Rinkeby
+### Ethereum Goerli
 
-If you do not have Rinkeby ETH, you can get some from [Rinkeby Authenticated Faucet](https://www.rinkeby.io/#faucet). For Rinkeby BOBA, use the [BOBA faucet](https://gateway.rinkeby.boba.network/wallet).
+If you do not have Goerli ETH, you can get some from [Goerli Authenticated Faucet](https://faucetlink.to/goerli). For Goerli BOBA, use the [BOBA faucet](https://gateway.goerli.boba.network/wallet).
 
 ### Avalanche Fuji
 
