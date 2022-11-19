@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
@@ -25,16 +25,12 @@ import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { selectDaoBalance, selectDaoBalanceX, selectDaoVotes, selectDaoVotesX, selectLatestProposalState, selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
+import { selectDaoBalance, selectDaoBalanceX, selectDaoVotes, selectDaoVotesX, selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
-import { selectLockRecords } from 'selectors/veBobaSelector'
-
-
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
-import { setConnectBOBA } from 'actions/setupAction'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Connect from 'containers/connect/Connect'
 
@@ -50,19 +46,17 @@ const PROPOSAL_STATES = [
   { value: 'Executed', label: 'Executed' }
 ]
 
-function OldDao({
-
-}) {
+function OldDao() {
 
   const dispatch = useDispatch()
+
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer = useSelector(selectLayer());
-  const loading = useSelector(selectLoading());
+  const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
 
   let proposals = useSelector(selectProposals)
   proposals = orderBy(proposals, i => i.startTimestamp, 'desc')
 
-  // const [ balance, setBalance ] = useState('--');
   const balance = useSelector(selectDaoBalance)
   const balanceX = useSelector(selectDaoBalanceX)
   const votes = useSelector(selectDaoVotes)
@@ -70,13 +64,6 @@ function OldDao({
   const proposalThreshold = useSelector(selectProposalThreshold)
 
   const [ selectedState, setSelectedState ] = useState(PROPOSAL_STATES[ 0 ])
-
-  // useEffect(() => {
-  //   if (!!accountEnabled) {
-  //     const veBoba = nftRecords.reduce((s, record) => s + Number(record.balance), 0);
-  //     setBalance(veBoba.toFixed(2))
-  //   }
-  // }, [ accountEnabled, nftRecords ]);
 
   return (
     <S.DaoPageContainer>

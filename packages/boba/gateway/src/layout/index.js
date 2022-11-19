@@ -41,7 +41,6 @@ import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
 import { DISABLE_VE_DAO, ROUTES_PATH } from 'util/constant'
 import VoteAndDao from 'containers/VoteAndDao'
-import Dao from 'containers/VoteAndDao/Dao/Dao'
 import OldDao from 'containers/dao/OldDao'
 
 function App() {

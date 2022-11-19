@@ -49,9 +49,7 @@ const PROPOSAL_STATES = [
   { value: 'Executed', label: 'Executed' }
 ]
 
-function DAO({
-
-}) {
+function DAO() {
 
   const dispatch = useDispatch()
 
