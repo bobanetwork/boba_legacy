@@ -46,13 +46,13 @@ async function main() {
   const useTestnet: boolean = true
 
   // use proxy address
-  const BobaTuringCreditAddress = useTestnet ? '0x208c3CE906cd85362bd29467819d3AcbE5FC1614' : '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
+  const BobaTuringCreditAddress = useTestnet ? '0x4200000000000000000000000000000000000023' : '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
   const turingCredit = getContractFactory(
     'BobaTuringCredit',
     testWallet
   ).attach(BobaTuringCreditAddress)
 
-  const BOBAL2Address = useTestnet ? '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309' : '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7'
+  const BOBAL2Address = useTestnet ? '0x4200000000000000000000000000000000000023' : '0xa18bf3994c0cc6e3b63ac420308e5383f53120d7'
   const L2BOBAToken = new Contract(
     BOBAL2Address,
     L2GovernanceERC20Json.abi,
