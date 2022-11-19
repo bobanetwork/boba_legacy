@@ -7,8 +7,8 @@ class GraphQLService {
   getBridgeEndpoint = () => {
     if (APP_CHAIN === 'mainnet') {
       return `https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph`
-    } else if (APP_CHAIN === 'rinkeby') {
-      return `https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges`
+    } else if (APP_CHAIN === 'goerli') {
+      return `https://graph.goerli.boba.network/subgraphs/name/boba/Bridges`
     } else {
       return ''
     }
@@ -22,7 +22,7 @@ class GraphQLService {
     curl -g -X POST \
     -H "Content-Type: application/json" \
     -d '{"query":"{ governorProposalCreateds {proposalId values description proposer}}"}' \
-    https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
+    https://graph.goerli.boba.network/subgraphs/name/boba/Bridges
 
     curl -g -X POST \
     -H "Content-Type: application/json" \
@@ -58,7 +58,7 @@ class GraphQLService {
     curl -g -X POST \
       -H "Content-Type: application/json" \
       -d '{"query":"{ turingMonstersTransferEvents { to from tokenId }}"}' \
-      https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
+      https://graph.goerli.boba.network/subgraphs/name/boba/Bridges
 
     curl -g -X POST \
       -H "Content-Type: application/json" \
