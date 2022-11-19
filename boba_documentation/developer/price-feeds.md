@@ -18,9 +18,9 @@ Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's imple
 
 *Fee*: free
 
-[[*Quick-Link - Mainnet*]](https://blockexplorer.boba.network/address/0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1)
+[[*Quick-Link - Mainnet*]](https://bobascan.com/address/0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1)
 
-[[*Quick-Link - Goerli*]](https://blockexplorer.goerli.boba.network/address/0xE84AAb853C4FBaafd3eD795F67494d4Da1539492)
+[[*Quick-Link - Goerli*]](https://testnet.bobascan.com/address/0xE84AAb853C4FBaafd3eD795F67494d4Da1539492)
 
 ### I want to be a data source
 

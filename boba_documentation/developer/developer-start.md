@@ -21,7 +21,7 @@ Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a un
 
 For most contracts, the deploy experience is exactly like deploying on Ethereum. You will need to have some ETH (or Goerli ETH) on Boba and you will have to change your RPC endpoint to either `https://mainnet.boba.network` or `https://goerli.boba.network`. That's it!
 
-The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Goerli blockexplorer](https://blockexplorer.goerli.boba.network) are similar to Etherscan. The [Mainnet gateway](https://gateway.boba.network) and the [Goerli gateway](https://gateway.goerli.boba.network) allow you to see your balances and bridge funds, among many other functions.
+The [Mainnet blockexplorer](https://bobascan.com) and the [Goerli blockexplorer](https://testnet.bobascan.com) are similar to Etherscan. The [Mainnet gateway](https://gateway.boba.network) and the [Goerli gateway](https://gateway.goerli.boba.network) allow you to see your balances and bridge funds, among many other functions.
 
 ## Example contracts ready to deploy
 

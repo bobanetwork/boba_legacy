@@ -163,7 +163,7 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 | Network | URL                                                          |
 | ------- | ------------------------------------------------------------ |
 | Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json) |
+| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
 
 ## Links
 
