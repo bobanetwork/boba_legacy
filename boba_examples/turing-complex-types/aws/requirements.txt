@@ -1,3 +1,0 @@
-certifi
-web3>=5.29.2
-eth_abi
