@@ -28,7 +28,6 @@ import Notification from 'containers/notification/Notification'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 
-import Airdrop from 'containers/airdrop/Airdrop'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
@@ -299,14 +298,13 @@ function App() {
                   <Route path={ROUTES_PATH.HISTORY} element={<Transactions />} />
                   <Route path={ROUTES_PATH.EARN} element={<FarmWrapper />} />
                   <Route path={ROUTES_PATH.STAKE} element={<SaveWrapper />} />
-                  <Route path={ROUTES_PATH.LOCK} element={<Lock />} />
                   <Route path={ROUTES_PATH.BOBASCOPE} element={<BobaScope />} />
-                  <Route path={ROUTES_PATH.AIRDROP} element={<Airdrop />} />
                   <Route path={ROUTES_PATH.HELP} element={<Help />} />
                   <Route path={ROUTES_PATH.MONSTER} element={<MonsterWrapper />} />
                   <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
+                  <Route path={ROUTES_PATH.LOCK} element={<Lock />} />
                   <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Route>
