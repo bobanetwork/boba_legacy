@@ -241,21 +241,11 @@ L2_L1NativeToken
 </tr>
 <tr>
 <td>
-Lib_ResolvedDelegateBobaProxy
+Proxy__BobaTuringCredit
 </td>
 <td align="center">
 <a href="https://blockexplorer.testnet.bobaopera.boba.network/address/0x4200000000000000000000000000000000000020">
 <code>0x4200000000000000000000000000000000000020</code>
-</a>
-</td>
-</tr>
-<tr>
-<td>
-BobaTuringCredit
-</td>
-<td align="center">
-<a href="https://blockexplorer.testnet.bobaopera.boba.network/address/0x4200000000000000000000000000000000000021">
-<code>0x4200000000000000000000000000000000000021</code>
 </a>
 </td>
 </tr>
