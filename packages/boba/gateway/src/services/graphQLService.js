@@ -16,7 +16,7 @@ class GraphQLService {
 
   async queryBridgeProposalCreated() {
 
-    const query = gql(`query { governorProposalCreateds { proposalId values description proposer to startTimestamp endTimestamp proposer } }`)
+    const query = gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
 
     /*
     curl -g -X POST \
