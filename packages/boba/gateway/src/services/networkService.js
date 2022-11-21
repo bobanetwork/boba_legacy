@@ -514,10 +514,8 @@ class NetworkService {
 
       if (networkGateway === 'rinkeby') {
         addresses = addresses_Rinkeby
-        console.log('Rinkeby Addresses:', addresses)
       } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
-        console.log('Mainnet Addresses:', addresses)
       }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
