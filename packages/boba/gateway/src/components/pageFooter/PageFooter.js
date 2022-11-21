@@ -65,9 +65,6 @@ const PageFooter = ({maintenance}) => {
           <S.FooterLink
             to="/help"
           >FAQs</S.FooterLink>
-            <S.FooterLink
-              to="/airdrop"
-          >AirDrop</S.FooterLink>
           <S.FooterLink
             to="/bobascope"
           >BobaScope</S.FooterLink>

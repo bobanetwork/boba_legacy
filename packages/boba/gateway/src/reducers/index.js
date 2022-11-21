@@ -34,7 +34,6 @@ import farmReduer from './farmReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
-import airdropReducer from './airdropReducer'
 import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
@@ -60,7 +59,6 @@ const rootReducer = combineReducers({
   farm: farmReduer,
   lookup: lookupReducer,
   dao: daoReducer,
-  airdrop: airdropReducer,
   fixed: fixedReducer,
   verifier: verifierReducer,
   bridge: bridgeReducer,

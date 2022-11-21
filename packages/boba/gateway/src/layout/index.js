@@ -28,7 +28,6 @@ import Notification from 'containers/notification/Notification'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 
-import Airdrop from 'containers/airdrop/Airdrop'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
@@ -41,7 +40,6 @@ import FarmWrapper from 'containers/farm/FarmWrapper'
 import Dao from 'containers/dao/Dao'
 import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
-import { ROUTES_PATH } from 'util/constant'
 
 function App() {
 
@@ -297,7 +295,6 @@ function App() {
                   <Route path="/farm" element={<FarmWrapper />} />
                   <Route path="/save" element={<SaveWrapper />} />
                   <Route path="/dao" element={<Dao />} />
-                  <Route path="/airdrop" element={<Airdrop />} />
                   <Route path="/help" element={<Help />} />
                   <Route path="/ecosystem" element={<Ecosystem />} >
                     <Route path=":category" element={<Projects />} />
@@ -307,7 +304,6 @@ function App() {
                   <Route path="/bobachains" element={<Ecosystem ecosystemType='BOBA' />} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
-                  <Route path="/lock" element={<Lock />} />
                 </Route>
               </Routes>
             </Suspense>
