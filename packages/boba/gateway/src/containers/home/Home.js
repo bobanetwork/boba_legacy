@@ -176,8 +176,6 @@ function Home() {
     if (maintenance) return
     // load the following functions when the home page is open
     checkVersion()
-    dispatch(fetchGas())
-    dispatch(fetchVerifierStatus())
   }, [ dispatch, maintenance ])
 
   useEffect(() => {
