@@ -4,23 +4,23 @@ Price Feed oracles allow smart contracts to work with external data and open the
 
 1. Boba-Straw
 2. Witnet
-3. Turing
+3. Hybrid Compute
 
 ## 1. Boba-Straw
 
-Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
+Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. The price data is submitted based on the 0.25% price change threshold, but the maximal frequency is once every 10 minutes per market. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
 
 ### Feeds supported
 
 *Mainnet*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
 
-*Rinkeby*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
+*Goerli*: [ETH/USD, BOBA/USD, WBTC/USD, OMG/USD]
 
 *Fee*: free
 
-[[*Quick-Link - Mainnet*]](https://blockexplorer.boba.network/address/0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1)
+[[*Quick-Link - Mainnet*]](https://bobascan.com/address/0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1)
 
-[[*Quick-Link - Rinkeby*]](https://blockexplorer.rinkeby.boba.network/address/0xf3EBFc93C53694E3679c52ACacB9C7fD6d7f362E)
+[[*Quick-Link - Goerli*]](https://testnet.bobascan.com/address/0xE84AAb853C4FBaafd3eD795F67494d4Da1539492)
 
 ### I want to be a data source
 
@@ -76,7 +76,7 @@ To fetch price feed data directly into your contracts, make your contract call t
 
 *Feed Registry (Mainnet)*: 0x01a109AB8603ad1B6Ef5f3B2B00d4847e6E554b1
 
-*Feed Registry (Rinkeby)*: 0xf3EBFc93C53694E3679c52ACacB9C7fD6d7f362E
+*Feed Registry (Goerli)*: 0xE84AAb853C4FBaafd3eD795F67494d4Da1539492
 
 Feeds are registered to the registry in the form of base/quote pairs, these terms used here and throughout - 'base' refers to the crypto asset/token and 'quote' refers to the asset (or fiat currency) to use as a reference for the price.
 
@@ -123,7 +123,6 @@ For the latest completed round call **`latestRound(base, quote)`**.
 To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 ## 2. Witnet Price Feeds
-
 The Witnet multichain decentralized oracle enables smart contracts to realize their true potential by giving them access to all sorts of valuable data sets, and by attesting and delivering that information securely thanks to its strong cryptoeconomic guarantees.
 
 Witnet can power most DeFi primitives like price feeds, stablecoins, synthetics, etc., as well as acting as a reliable source of randomness for creating uniqueness in NFTs.
@@ -138,7 +137,7 @@ A complete list of publicly available Witnet data feeds on Boba can be found in 
 Witnet price feeds can be integrated into your own Boba Mainnet contracts in two different ways:
 
 1. [Integrate through proxy](https://docs.witnet.io/smart-contracts/witnet-data-feeds/using-witnet-data-feeds#reading-multiple-currency-pairs-from-the-router) Recommended for testing and upgradability.
-   This is the preferred way to consume the Witnet-powered price feeds. Through using the ***Price Feeds Router***.  
+   This is the preferred way to consume the Witnet-powered price feeds. Through using the ***Price Feeds Router***.
 
 2. [Integrate directly](https://docs.witnet.io/smart-contracts/witnet-data-feeds/using-witnet-data-feeds#reading-last-price-and-timestamp-from-a-price-feed-contract-serving-a-specific-pair) Optimized for gas cost and decentralization
 
@@ -146,11 +145,11 @@ The ***WitnetPriceRouter*** smart contract is deployed in all the [supported cha
 
 ### Reading multiple price pairs from the router
 
-**WitnetPriceRouter**
+**WitnetPriceRouter**documentation
 
 *Mainnet*: [0x93f61D0D5F623144e7C390415B70102A9Cc90bA5](https://bobascan.com/address/0x93f61D0D5F623144e7C390415B70102A9Cc90bA5/read-contract)
 
-*Rinkeby*: [0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a](https://testnet.bobascan.com/address/0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a/read-contract)
+*Goerli*: [0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a](https://testnet.bobascan.com/address/0x36928Aeedaaf7D85bcA39aDfB2A39ec529ce221a/read-contract)
 
 The Price Router contract is the easiest and most convenient way to consume Witnet price feeds on any of the [supported chains](/smart-contracts/supported-chains).
 
@@ -161,32 +160,26 @@ The example below shows how to read the price of two different assets from the W
 ```javascript
  // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
-
 import "witnet-solidity-bridge/contracts/interfaces/IWitnetPriceRouter.sol";
-
 contract MyContract {
     IWitnetPriceRouter immutable public router;
-
     /**
-     * IMPORTANT: pass the WitnetPriceRouter address depending on 
+     * IMPORTANT: pass the WitnetPriceRouter address depending on
      * the network you are using! Please find available addresses here:
      * https://docs.witnet.io/smart-contracts/price-feeds/contract-addresses
      */
     constructor(IWitnetPriceRouter _router))
         router = _router;
     }
-
     /// Returns the BTC / USD price (6 decimals), ultimately provided by the Witnet oracle.
     function getBtcUsdPrice() public view returns (int256 _price) {
         (_price,,) = router.valueFor(bytes4(0x24beead4));
     }
-
     /// Returns the ETH / USD price (6 decimals), ultimately provided by the Witnet oracle.
     function getEthUsdPrice() public view returns (int256 _price) {
         (_price,,) = router.valueFor(bytes4(0x3d15f701));
     }
-
-    /// Returns the BTC / ETH price (6 decimals), derived from the ETH/USD and 
+    /// Returns the BTC / ETH price (6 decimals), derived from the ETH/USD and
     /// the BTC/USD pairs that were ultimately provided by the Witnet oracle.
     function getBtcEthPrice() public view returns (int256 _price) {
         return (1000000 * getBtcUsdPrice()) / getEthUsdPrice();
@@ -210,18 +203,18 @@ print("> lastTimestamp:", valueFor[1])
 print("> latestUpdateStatus:", valueFor[2])
 ```
 
-For more information about Witnet please refer to: 
+For more information about Witnet please refer to:
 
-[website](https://witnet.io/) | [docs](https://docs.witnet.io/) | [github](https://github.com/witnet) | [twitter](https://twitter.com/witnet_io) | [telegram](https://t.me/witnetio) | [discord](https://discord.gg/witnet) 
+[website](https://witnet.io/) | [docs](https://docs.witnet.io/) | [github](https://github.com/witnet) | [twitter](https://twitter.com/witnet_io) | [telegram](https://t.me/witnetio) | [discord](https://discord.gg/witnet)
 
-## 3. Turing
+## 3. Hybrid Compute
 
-Turing is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Turing gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Turing works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Turing [here](../../packages/boba/turing/README.md). See [calling APIs](../../packages/boba/turing/README.md#feature-highlight-2-using-turing-to-access-apis-from-within-your-solidity-smart-contract) for detailed instructions.
+Hybrid Compute is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Hybrid Compute gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Hybrid Compute works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Hybrid Compute [here](../../boba_documentation/developer/hybrid_compute.md).
 
-Note: Unlike a feed contract where every data query remains on-chain, Turing requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
+Note: Unlike a feed contract where every data query remains on-chain, Hybrid Compute requests are a call to an external endpoint to retrieve data - which are subject to unavailability or distortion. **Best practices include using decentralized on-chain oracles and/or off-chain 'augmentation' where off-chain compute is used to estimate the reliability of on-chain oracles**.
 
 ### Feeds supported
 
-*Rinkeby/Mainnet*: potentially everything, dependent on your source
+*Goerli/Mainnet*: potentially everything, dependent on your source
 
-*Fee*: 0.01 BOBA per Turing request
+*Fee*: 0.01 BOBA per Hybrind Compute request

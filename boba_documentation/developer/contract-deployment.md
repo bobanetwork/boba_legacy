@@ -4,9 +4,9 @@ description: Contract deployment examples
 
 Please refer to the `./boba_examples` folder. Contract examples include:
 
-1. **hardhat-simple-storage** - shows how to deploy a storage contract to Rinkeby Boba
+1. **hardhat-simple-storage** - shows how to deploy a storage contract to Goerli Boba
 
-2. **init-fund-l2** - shows how to deposit funds from L1 to L2, on Rinkeby Boba
+2. **init-fund-l2** - shows how to deposit funds from L1 to L2, on Goerli Boba
 
 3. **truffle-erc20** Simple ERC20 Token Truffle Tutorial
 
@@ -18,7 +18,7 @@ Welcome to our ERC20 Truffle example. If you're interested in writing your first
 
 Let's begin.
 
-### Step 1: Compile your contracts 
+### Step 1: Compile your contracts
 
 Compiling a contract for Boba is identical to compiling a contract for Ethereum mainchain. Notably, all standard solidity compiler versions can be used. For this ERC20, we will use `0.6.12`. Create a `truffle-config.js` and add the following to it:
 
@@ -35,15 +35,15 @@ const pk_2 = env.pk_2
 module.exports = {
   contracts_build_directory: './build',
   networks: {
-    boba_rinkeby: {
+    boba_goerli: {
       provider: function () {
         return new HDWalletProvider({
           privateKeys: [pk_1, pk_2],
-          providerOrUrl: 'https://rinkeby.boba.network',
+          providerOrUrl: 'https://goerli.boba.network',
         })
       },
-      network_id: 28,
-      host: 'https://rinkeby.boba.network',
+      network_id: 2888,
+      host: 'https://goerli.boba.network',
     }
   },
   compilers: {
@@ -55,7 +55,7 @@ module.exports = {
 
 ```
 
-Now add a `.env` file that follows the format of `env.example` with two private keys. **NOTE: these accounts must be funded, i.e. contain enough Rinkeby ETH to cover the cost of the deployment.** Then,
+Now add a `.env` file that follows the format of `env.example` with two private keys. **NOTE: these accounts must be funded, i.e. contain enough Goerli ETH to cover the cost of the deployment.** Then,
 
 ```sh
 yarn compile
@@ -65,18 +65,18 @@ Yep, it's that easy. You can verify that everything went well by looking for the
 
 ### Step 2: Testing your contract
 
-Woot! It's time to test our contract. Since the JSON RPC provider URL (for Boba Rinkeby) has already been specified in your Truffle config file, all we need to do next is run the test command. Run:
+Woot! It's time to test our contract. Since the JSON RPC provider URL (for Boba Goerli) has already been specified in your Truffle config file, all we need to do next is run the test command. Run:
 
 ```sh
 yarn test:integration
 ```
 
-You should see a set of passing tests for your ERC20 contract. 
+You should see a set of passing tests for your ERC20 contract.
 
 ```bash
 
-$ truffle test ./test/erc20.spec.js --network boba_rinkeby --config truffle-config.js
-Using network 'boba_rinkeby'.
+$ truffle test ./test/erc20.spec.js --network boba_goerli --config truffle-config.js
+Using network 'boba_goerli'.
 
 Compiling your contracts...
 ===========================
@@ -124,10 +124,10 @@ module.exports = function (deployer, accounts) {
 
   // deployment steps
   deployer.deploy(
-    ERC20, 
-    10000, 
-    tokenName, 
-    tokenDecimals, 
+    ERC20,
+    10000,
+    tokenName,
+    tokenDecimals,
     tokenSymbol
   )
 }
@@ -144,9 +144,9 @@ After a few seconds your contract should be deployed. Now you'll see this in you
 
 ```bash
 
-$ yarn deploy          
+$ yarn deploy
 yarn run v1.22.15
-$ truffle migrate --network boba_rinkeby --config truffle-config
+$ truffle migrate --network boba_goerli --config truffle-config
 
 Compiling your contracts...
 ===========================
@@ -156,8 +156,8 @@ Compiling your contracts...
 
 Starting migrations...
 ======================
-> Network name:    'boba_rinkeby'
-> Network id:      28
+> Network name:    'boba_goerli'
+> Network id:      2888
 > Block gas limit: 11000000 (0xa7d8c0)
 
 
