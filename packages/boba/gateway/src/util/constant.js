@@ -20,16 +20,8 @@ export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION
 export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
 export const SELLER_OPTIMISM_API_URL = process.env.REACT_APP_SELLER_OPTIMISM_API_URL
 export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_API_URL
-export const APP_AIRDROP = process.env.REACT_APP_AIRDROP
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
-
-// Rinkeby Chain Configs.
-export const RINKEBY_L1_NAME= process.env.REACT_APP_RINKEBY_L1_NAME
-export const RINKEBY_L1_CHAIN_ID= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID
-export const RINKEBY_L1_CHAIN_ID_HEX= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID_HEX
-export const RINKEBY_L1_RPC_URL= process.env.REACT_APP_RINKEBY_L1_RPC_URL
-
 
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",
@@ -74,7 +66,6 @@ export const ROUTES_PATH = {
   STAKE: '/stake',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
-  AIRDROP: '/airdrop',
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
 }
