@@ -1,3 +1,3 @@
 # Optimism Deployments
 - [Boba (mainnet)](./mainnet#readme)
-- [Boba Rinkeby (public testnet)](./Rinkeby#readme)
+- [Boba Goerli (public testnet)](./goerli#readme)
