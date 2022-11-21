@@ -23,6 +23,8 @@ export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_A
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 
+export const DISABLE_VE_DAO = process.env.REACT_APP_DISABLE_VE_DAO
+
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",
   CLASSIC_BRIDGE: "CLASSIC_BRIDGE",
@@ -68,5 +70,6 @@ export const ROUTES_PATH = {
   BOBASCOPE: '/bobascope',
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
+  VOTE_DAO: '/dao',
 }
 export const PER_PAGE = 8

@@ -7,6 +7,7 @@ import { selectMonster } from 'selectors/setupSelector'
 import { menuItems } from '../menuItems'
 
 import * as S from './MenuItems.styles'
+import { DISABLE_VE_DAO } from 'util/constant'
 
 const MenuItems = () => {
 
@@ -36,6 +37,9 @@ const MenuItems = () => {
   return (
     <S.Nav>
       {menuList.map((item) => {
+        if (!!Number(DISABLE_VE_DAO) && (['Lock','Vote&Dao'].includes(item.key))) {
+          return null;
+        }
         return (
           <S.MenuItem
             style={({ isActive }) => {

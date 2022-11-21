@@ -95,9 +95,7 @@ function VoteAndDAO() {
       <Vote
         connectToBOBA={connectToBOBA}
       />
-      : <Dao
-        connectToBOBA={connectToBOBA}
-      />}
+      : <Dao/>}
 
 
   </S.DaoPageContainer>
