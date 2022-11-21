@@ -51,14 +51,6 @@ function DAO() {
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
 
-  console.table({
-    balance,
-    balanceX,
-    votes,
-    votesX,
-    proposalThreshold
-  })
-
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const baseEnabled = useSelector(selectBaseEnabled())
