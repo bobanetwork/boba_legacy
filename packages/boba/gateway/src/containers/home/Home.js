@@ -27,14 +27,6 @@ import networkService from 'services/networkService'
 
 /**** ACTIONS and SELECTORS *****/
 import { setBaseState } from 'actions/setupAction'
-import {
-  fetchDaoBalance,
-  fetchDaoVotes,
-  fetchDaoBalanceX,
-  fetchDaoVotesX,
-  fetchDaoProposals,
-  getProposalThreshold
-} from 'actions/daoAction'
 
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
@@ -161,8 +153,6 @@ function Home() {
       if (initialized === 'enabled') {
         console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
-        // load DAO to speed up the process
-        dispatch(fetchDaoProposals())
         return true
       }
     }

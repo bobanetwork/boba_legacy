@@ -81,6 +81,13 @@ function OldDao() {
   }, POLL_INTERVAL)
 
 
+  useEffect(() => {
+    if (baseEnabled) {
+      dispatch(getProposalThreshold())
+      dispatch(fetchDaoProposals())
+    }
+  }, [dispatch, baseEnabled]);
+
 
   return (
     <S.DaoPageContainer>
