@@ -241,7 +241,7 @@ L2_L1NativeToken
 </tr>
 <tr>
 <td>
-Lib_ResolvedDelegateBobaProxy
+Proxy__BobaTuringCredit
 </td>
 <td align="center">
 <a href="https://blockexplorer.testnet.bnb.boba.network/address/0x4200000000000000000000000000000000000020">
@@ -249,17 +249,6 @@ Lib_ResolvedDelegateBobaProxy
 </a>
 </td>
 </tr>
-<tr>
-<td>
-BobaTuringCredit
-</td>
-<td align="center">
-<a href="https://blockexplorer.testnet.bnb.boba.network/address/0x4200000000000000000000000000000000000021">
-<code>0x4200000000000000000000000000000000000021</code>
-</a>
-</td>
-</tr>
-<tr>
 <td>
 BobaTuringHelper
 </td>
