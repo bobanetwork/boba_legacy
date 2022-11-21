@@ -41,13 +41,19 @@ export const menuItems = [
     key: 'Lock',
     icon: "LockIcon",
     title: "Lock",
-    url: "/lock",
+    url: ROUTES_PATH.LOCK,
   },
   {
-    key: 'Vote',
+    key: 'Vote&Dao',
     icon: "VoteIcon",
     title: "Vote&Dao",
     url: ROUTES_PATH.VOTE_DAO
+  },
+  {
+    key: 'DAO',
+    icon: "VoteIcon",
+    title: "Dao",
+    url: ROUTES_PATH.DAO
   },
   {
     key: 'LinksToBobaChains',
