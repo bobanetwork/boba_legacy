@@ -1,6 +1,6 @@
 import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
 import fetch from 'cross-fetch';
-import { APP_CHAIN, TESTNET_NETWORK_NAME } from 'util/constant'
+import { APP_CHAIN } from 'util/constant'
 
 class GraphQLService {
 

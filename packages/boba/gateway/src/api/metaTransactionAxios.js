@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { TESTNET_NETWORK_NAME } from 'util/constant';
 import { getBaseServices } from 'util/masterConfig'
 
 export default function metaTransactionAxiosInstance(networkGateway){

@@ -24,8 +24,6 @@ export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 
 // Testnet Constants Configs.
-export const TESTNET_NETWORK_NAME = process.env.REACT_APP_TESTNET_NETWORK_NAME
-
 export const TESTNET_L1_NAME= process.env.REACT_APP_RINKEBY_L1_NAME
 export const TESTNET_L1_CHAIN_ID= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID
 export const TESTNET_L1_CHAIN_ID_HEX= process.env.REACT_APP_RINKEBY_L1_CHAIN_ID_HEX
