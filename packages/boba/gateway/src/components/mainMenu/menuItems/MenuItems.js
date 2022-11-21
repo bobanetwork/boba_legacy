@@ -36,7 +36,7 @@ const MenuItems = () => {
   return (
     <S.Nav>
       {menuList.map((item) => {
-        if (!!Number(DISABLE_VE_DAO) && (['Lock'].includes(item.key))) {
+        if (!!Number(DISABLE_VE_DAO) && (['Lock','Vote&Dao'].includes(item.key))) {
           return null;
         }
         return (
