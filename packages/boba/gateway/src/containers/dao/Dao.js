@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { openError, openModal } from 'actions/uiAction'
@@ -28,13 +28,16 @@ import Select from 'components/select/Select'
 import Connect from 'containers/connect/Connect'
 
 import { selectDaoBalance, selectDaoVotes, selectDaoBalanceX, selectDaoVotesX, selectProposalThreshold } from 'selectors/daoSelector'
-import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
+import { selectLayer, selectAccountEnabled, selectBaseEnabled } from 'selectors/setupSelector'
 import { selectProposals } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 
 import * as S from './Dao.styles'
 import * as G from 'containers/Global.styles'
 import * as styles from './Dao.module.scss'
+import useInterval from 'hooks/useInterval'
+import { POLL_INTERVAL } from 'util/constant'
+import { fetchDaoBalance, fetchDaoBalanceX, fetchDaoProposals, fetchDaoVotes, fetchDaoVotesX, getProposalThreshold } from 'actions/daoAction'
 
 const PER_PAGE = 8
 
@@ -48,9 +51,17 @@ function DAO() {
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
 
+  console.table({
+    balance,
+    balanceX,
+    votes,
+    votesX,
+    proposalThreshold
+  })
+
   let layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
-
+  const baseEnabled = useSelector(selectBaseEnabled())
   const [selectedState, setSelectedState] = useState('All')
 
   const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
@@ -71,6 +82,27 @@ function DAO() {
   const onActionChange = (e) => {
       setSelectedState(e.target.value)
   }
+
+
+  useEffect(() => {
+    if (baseEnabled) {
+      dispatch(getProposalThreshold())
+      dispatch(fetchDaoProposals())
+    }
+  }, [dispatch, baseEnabled]);
+
+  useInterval(() => {
+    if (accountEnabled) {
+      dispatch(fetchDaoBalance())      // account specific
+      dispatch(fetchDaoVotes())        // account specific
+      dispatch(fetchDaoBalanceX())     // account specific
+      dispatch(fetchDaoVotesX())       // account specific
+    }
+    if (baseEnabled) {
+      dispatch(getProposalThreshold())
+      dispatch(fetchDaoProposals())
+    }
+  },POLL_INTERVAL)
 
   const orderedProposals = orderBy(proposals, i => i.startTimestamp, 'desc')
   const paginatedProposals = orderedProposals
@@ -148,7 +180,7 @@ function DAO() {
                   variant="outlined"
                   disabled={!accountEnabled}
                   onClick={() => {
-                    if (Number(votes + votesX) < Number(proposalThreshold)) {
+                    if (Number(Number(votes) + Number(votesX)) < Number(proposalThreshold)) {
                       dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
                     } else {
                       dispatch(openModal('newProposalModal'))
