@@ -70,6 +70,6 @@ export const ROUTES_PATH = {
   BOBASCOPE: '/bobascope',
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
-  VOTE_DAO: '/dao',
+  DAO: '/dao',
 }
 export const PER_PAGE = 8

@@ -24,12 +24,15 @@ import Select from 'components/select/Select'
 
 import { selectDaoBalance, selectDaoBalanceX, selectDaoVotes, selectDaoVotesX, selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
 
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Connect from 'containers/connect/Connect'
+import { fetchDaoBalance, fetchDaoBalanceX, fetchDaoProposals, fetchDaoVotes, fetchDaoVotesX, getProposalThreshold } from 'actions/daoAction'
+import { POLL_INTERVAL } from 'util/constant'
+import useInterval from 'hooks/useInterval'
 
 const PROPOSAL_STATES = [
   { value: 'All', label: 'All' },
@@ -48,6 +51,8 @@ function OldDao() {
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
+
   const layer = useSelector(selectLayer());
   const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
 
@@ -61,6 +66,21 @@ function OldDao() {
   const proposalThreshold = useSelector(selectProposalThreshold)
 
   const [ selectedState, setSelectedState ] = useState(PROPOSAL_STATES[ 0 ])
+
+  useInterval(() => {
+    if(accountEnabled /*== MetaMask is connected*/) {
+      dispatch(fetchDaoBalance())      // account specific
+      dispatch(fetchDaoVotes())        // account specific
+      dispatch(fetchDaoBalanceX())     // account specific
+      dispatch(fetchDaoVotesX())       // account specific
+    }
+    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
+      dispatch(getProposalThreshold())
+      dispatch(fetchDaoProposals())
+    }
+  }, POLL_INTERVAL)
+
+
 
   return (
     <S.DaoPageContainer>
@@ -127,7 +147,7 @@ function OldDao() {
               variant="outlined"
               disabled={!accountEnabled}
               onClick={() => {
-                if (Number(votes + votesX) < Number(proposalThreshold)) {
+                if (Number(Number(votes) + Number(votesX)) < Number(proposalThreshold)) {
                   dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
                 } else {
                   dispatch(openModal('newProposalModal'))

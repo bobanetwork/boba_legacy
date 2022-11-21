@@ -172,18 +172,10 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
       dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
-    }
-    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
-      dispatch(getProposalThreshold())
-      dispatch(fetchDaoProposals())
     }
   }, POLL_INTERVAL)
 
@@ -191,7 +183,6 @@ function Home() {
     if (maintenance) return
     // load the following functions when the home page is open
     checkVersion()
-    dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
   useEffect(() => {
