@@ -40,7 +40,6 @@ import FarmWrapper from 'containers/farm/FarmWrapper'
 import Dao from 'containers/dao/Dao'
 import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
-import { ROUTES_PATH } from 'util/constant'
 
 function App() {
 
