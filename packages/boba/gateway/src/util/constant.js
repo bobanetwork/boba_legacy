@@ -20,7 +20,6 @@ export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
 export const ENABLE_LOCK_PAGE = process.env.REACT_APP_ENABLE_LOCK_PAGE
 export const SELLER_OPTIMISM_API_URL = process.env.REACT_APP_SELLER_OPTIMISM_API_URL
 export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_API_URL
-export const APP_AIRDROP = process.env.REACT_APP_AIRDROP
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 
 
@@ -62,6 +61,5 @@ export const ROUTES_PATH = {
   DAO: '/dao',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
-  AIRDROP: '/airdrop',
   MONSTER: '/monster',
 }

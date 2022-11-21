@@ -28,7 +28,6 @@ import Notification from 'containers/notification/Notification'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 
-import Airdrop from 'containers/airdrop/Airdrop'
 import Transactions from 'containers/history/History'
 import BobaScope from 'containers/bobaScope/BobaScope'
 import Help from 'containers/help/Help'
@@ -297,7 +296,6 @@ function App() {
                   <Route path="/farm" element={<FarmWrapper />} />
                   <Route path="/save" element={<SaveWrapper />} />
                   <Route path="/dao" element={<Dao />} />
-                  <Route path="/airdrop" element={<Airdrop />} />
                   <Route path="/help" element={<Help />} />
                   <Route path="/ecosystem" element={<Ecosystem />} >
                     <Route path=":category" element={<Projects />} />
