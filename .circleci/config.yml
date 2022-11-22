@@ -66,7 +66,7 @@ jobs:
           working_directory: ./packages/boba/bundler
 
       - restore_cache: # special step to restore the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "all.deps" }}
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}
 
       - run:
           name: yarn-install-if-no-cache
@@ -74,13 +74,13 @@ jobs:
           working_directory: ./packages/boba/bundler
 
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "all.deps" }}
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}
           paths:
             - ./packages/boba/bundler/node_modules
-            - ./packages/boba/bundler/node_modules
-            - ./packages/boba/bundler/client/node_modules
-            - ./packages/boba/bundler/common/node_modules
-            - ./packages/boba/bundler/contracts/node_modules
+            - ./packages/boba/bundler/packages/node_modules
+            # - ./packages/boba/bundler/packages/client/node_modules
+            # - ./packages/boba/bundler/packages/common/node_modules
+            # - ./packages/boba/bundler/packages/contracts/node_modules
 
       - run:
           name: yarn-preprocess
@@ -90,7 +90,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - .
+            - ./packages/boba/bundler
 
   test_bundler:
     working_directory: ~/aa # directory where steps will run
