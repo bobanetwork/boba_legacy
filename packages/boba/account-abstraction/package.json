@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "build": "yarn install && yarn compile",
     "clean": "rm -rf cache artifacts typechain typechain-types",
     "compile": "./scripts/hh-wrapper compile",
     "tsc": "tsc",
@@ -12,7 +13,7 @@
     "lint:sol": "solhint -f unix \"contracts/**/*.sol\" --max-warnings 0",
     "gas-calc": "./scripts/gascalc",
     "mocha-gascalc": "TS_NODE_TRANSPILE_ONLY=1 npx ts-mocha --bail gascalc/*",
-    "test": "./scripts/hh-wrapper test",
+    "test": "yarn compile && hardhat test && yarn run runop",
     "coverage": "COVERAGE=1 hardhat coverage",
     "deploy": "./scripts/hh-wrapper deploy",
     "test-dev": "hardhat test --network dev",
