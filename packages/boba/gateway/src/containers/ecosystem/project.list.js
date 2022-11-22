@@ -478,10 +478,10 @@ export const BobaProjectList = [
   {
     title: 'Boba Ethereum Testnet Gateway',
     canLaunch: true,
-    link: 'https://gateway.rinkeby.boba.network',
+    link: 'https://gateway.goerli.boba.network',
     type: 'testnet',
     image: BobaethLogo,
-    description: 'Boba Ethereum is a bridge between Ethereum Rinkeby and Boba L2.',
+    description: 'Boba Ethereum is a bridge between Ethereum Goerli and Boba L2.',
   },
   {
     title: 'Boba Ethereum Block Explorer',
@@ -497,7 +497,7 @@ export const BobaProjectList = [
     link: 'https://testnet.bobascan.com',
     type: 'testnet',
     image: BobaethLogo,
-    description: 'Block explorer for Boba Ethereum Rinkeby.',
+    description: 'Block explorer for Boba Ethereum Goerli.',
   },
   {
     title: 'Boba Avalanche Gateway',
