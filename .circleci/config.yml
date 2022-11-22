@@ -53,6 +53,96 @@ jobs:
                 command: make <<parameters.binary_name>>
                 working_directory: <<parameters.working_directory>>
 
+  build_bundler: # runs not using Workflows must have a `build` job as entry point
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
+
+      - run:
+          name: package-json-all-deps
+          command: yarn create-all-deps
+          working_directory: ./packages/boba/bundler
+
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "all.deps" }}
+
+      - run:
+          name: yarn-install-if-no-cache
+          command:  test -d node_modules/truffle || yarn
+          working_directory: ./packages/boba/bundler
+
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "all.deps" }}
+          paths:
+            - ./packages/boba/bundler/node_modules
+            - ./packages/boba/bundler/node_modules
+            - ./packages/boba/bundler/client/node_modules
+            - ./packages/boba/bundler/common/node_modules
+            - ./packages/boba/bundler/contracts/node_modules
+
+      - run:
+          name: yarn-preprocess
+          command: yarn preprocess
+          working_directory: ./packages/boba/bundler
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  test_bundler:
+    working_directory: ~/aa # directory where steps will run
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: test
+          command: yarn lerna-test | tee /tmp/test-dev-results.log
+          working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-dev-results.log
+  test_flow_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run hardhat-node as standalone process fork
+          name: hardhat-node-process
+          command: yarn hardhat-node
+          background: true
+          working_directory: ./packages/boba/bundler
+      - run: # run tests
+          name: test
+          command: yarn lerna-test-flows | tee /tmp/test-flows-results.log
+          working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-flow-results.log
+
+  lint_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: lint
+          command: yarn lerna-lint
+          working_directory: ./packages/boba/bundler
+  depcheck_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: depcheck
+          command: yarn depcheck
+          working_directory: ./packages/boba/bundler
   integration-tests:
     machine:
       image: ubuntu-2004:202111-02
@@ -104,3 +194,17 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
+      - build_bundler
+      - test_bundler:
+          requires:
+            - build_bundler
+      - test_flow_bundler:
+          requires:
+            - build_bundler
+      - lint_bundler:
+          requires:
+            - build_bundler
+      - depcheck_bundler:
+          requires:
+            - build_bundler
+
