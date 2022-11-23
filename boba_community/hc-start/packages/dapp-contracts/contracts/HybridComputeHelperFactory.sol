@@ -50,9 +50,7 @@ contract HybridComputeHelperFactory is Ownable {
         // }
 
         // add permitted callers in same transaction, for better UX
-        for (uint i = 0; i < permittedCallers.length; i++) {
-            implementation.addPermittedCaller(permittedCallers[i]);
-        }
+        implementation.addPermittedCallers(permittedCallers);
 
         // Add balance to TuringCredit associated with new HybridComputeHelper
         bobaToken.approve(address(turingCredit), amountBoba);

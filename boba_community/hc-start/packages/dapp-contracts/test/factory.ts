@@ -171,7 +171,6 @@ describe('Turing Helper Factory', function () {
       gasOverride
     )
     const res = await implTx.wait()
-    console.log('TX confirmation: ', res)
     expect(res).to.be.ok
 
     const [, implementation] = res.events.find(

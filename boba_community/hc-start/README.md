@@ -36,3 +36,9 @@ This package contains the react app the user actually navigates through.
 
 * **Rinkeby**: [hcb.goerli.boba.network](https://hcb.goerli.boba.network/)
 * **Mainnet**: [hcb.boba.network](https://hcb.boba.network/)
+
+
+### Goerli deployments:
+Helper contract deployed as `0xbfE85eabF9429A5Bf706a313a44817327062Fe28`
+Implementation of Helper at `0x3ecc1B250449B9f3f33037BfE0CB29aF7dC49FF8`
+Factory contract deployed as `0xfB61e269905d67339dD263309c420c19Dc730E6F`
