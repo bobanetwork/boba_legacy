@@ -35,6 +35,7 @@ import { selectLockRecords } from 'selectors/veBobaSelector'
 
 import {DividerLine} from 'containers/Global.styles'
 import * as S from './Dao.styles'
+import { setConnectBOBA } from 'actions/setupAction'
 
 const PROPOSAL_STATES = [
   { value: 'All', label: 'All' },
@@ -48,9 +49,7 @@ const PROPOSAL_STATES = [
   { value: 'Executed', label: 'Executed' }
 ]
 
-function DAO({
-  connectToBOBA
-}) {
+function DAO() {
 
   const dispatch = useDispatch()
 
@@ -79,6 +78,10 @@ function DAO({
     }
   }, [ accountEnabled, nftRecords ]);
 
+
+  async function connectToBOBA() {
+    dispatch(setConnectBOBA(true))
+  }
 
   return (
     <S.DaoPageContent>
