@@ -69,6 +69,9 @@ contract Boba_GasPriceOracle {
     // Decimals of the price ratio
     uint256 public decimals = 0;
 
+    //Minimum alt token
+    uint256 public secondaryFeeTokenMinimum = 2e15;
+
     /*************
      *  Events   *
      *************/
@@ -86,6 +89,7 @@ contract Boba_GasPriceOracle {
     event UpdateDecimals(address, uint256);
     event WithdrawBOBA(address, address);
     event WithdrawSecondaryFeeToken(address, address);
+    event UpdateSecondaryFeeTokenMinimum(address, uint256);
 
     /**********************
      * Function Modifiers *
@@ -152,6 +156,7 @@ contract Boba_GasPriceOracle {
         minPriceRatio = 500;
         marketPriceRatio = 2000;
         decimals = 0;
+        secondaryFeeTokenMinimum = 2e15;
     }
 
     /**
@@ -197,9 +202,8 @@ contract Boba_GasPriceOracle {
      */
     function useSecondaryFeeTokenAsFeeToken() public {
         require(!Address.isContract(msg.sender), "Account not EOA");
-        // Users should have more than 0.002 l1 native token
         require(
-            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(msg.sender) >= 2e18,
+            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(msg.sender) >= secondaryFeeTokenMinimum,
             "Insufficient secondary fee token balance"
         );
         secondaryFeeTokenUsers[msg.sender] = true;
@@ -318,6 +322,17 @@ contract Boba_GasPriceOracle {
             bytes("")
         );
         emit WithdrawSecondaryFeeToken(owner(), feeWallet);
+    }
+
+    /**
+     * Update the minimum secondary fee token minimum
+     * @param _secondaryFeeTokenMinimum the minimum amount
+     */
+    function updateSecondaryFeeTokenMinimum(uint256 _secondaryFeeTokenMinimum) public onlyOwner {
+        // Users should have more than 0.002 l1 native token
+        require(_secondaryFeeTokenMinimum >= 1e15);
+        secondaryFeeTokenMinimum = _secondaryFeeTokenMinimum;
+        emit UpdateSecondaryFeeTokenMinimum(owner(), _secondaryFeeTokenMinimum);
     }
 
     /**
