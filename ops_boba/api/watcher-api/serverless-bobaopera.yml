@@ -116,3 +116,20 @@ functions:
           cors: true
     layers:
       - ${file(env-bobaopera.yml):LAYERS}
+  watcher_getLayerZeroTransactions:
+    handler: watcher_getLayerZeroTransactions.watcher_getLayerZeroTransactions
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-bobaopera.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-bobaopera.yml):SUBNET_ID_1}
+        - ${file(env-bobaopera.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: get.layerzero.transactions
+          method: post
+          cors: true
+    layers:
+      - ${file(env-bobaopera.yml):LAYERS}
