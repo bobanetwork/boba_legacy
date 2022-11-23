@@ -203,7 +203,8 @@ contract Boba_GasPriceOracle {
     function useSecondaryFeeTokenAsFeeToken() public {
         require(!Address.isContract(msg.sender), "Account not EOA");
         require(
-            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(msg.sender) >= secondaryFeeTokenMinimum,
+            L2_L1NativeToken(secondaryFeeTokenAddress).balanceOf(msg.sender) >=
+                secondaryFeeTokenMinimum,
             "Insufficient secondary fee token balance"
         );
         secondaryFeeTokenUsers[msg.sender] = true;
