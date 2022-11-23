@@ -98,12 +98,12 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async startMonitor() {
-    console.log(prefix, `start monitor`)
     this.latestBlock = await this.L1Provider.getBlockNumber()
 
     if (this.currentBlock < this.latestBlock) {
       await this.scanBlockRange(this.currentBlock, this.latestBlock)
     }
+    await sleep(60000)
   }
 
   async scanBlockRange(startBlock, endBlock) {
