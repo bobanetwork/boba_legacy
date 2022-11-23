@@ -2,18 +2,11 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "./HybridComputeHelper.sol";
+import "./TuringHelper.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 interface ITuringCredit {
     function addBalanceTo(uint256, address) external;
-}
-
-interface IRouter {
-    function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external
-    payable
-    returns (uint[] memory amounts);
 }
 
 contract HybridComputeHelperFactory is Ownable {
@@ -21,10 +14,8 @@ contract HybridComputeHelperFactory is Ownable {
     address public turingImplementation;
     ITuringCredit public turingCredit;
     IERC20 public bobaToken;
-    IRouter public router;
-    address[] private pair;
 
-    event HybridComputeHelperDeployed(address indexed owner, HybridComputeHelper proxy, uint256 depositedBoba);
+    event HybridComputeHelperDeployed(address indexed owner, TuringHelper proxy, uint256 depositedBoba);
 
     modifier takePayment(uint256 bobaToDeposit) {
         require(bobaToken.balanceOf(_msgSender()) >= bobaToDeposit, "Not enough tokens");
@@ -33,32 +24,21 @@ contract HybridComputeHelperFactory is Ownable {
         _;
     }
 
-    constructor(address router_, address WETH_, address bobaToken_, address turingImplementation_, address turingCredit_) {
-        pair = new address[](2);
-        pair[0] = address(WETH_);
-        pair[1] = address(bobaToken);
-
+    constructor(address bobaToken_, address turingImplementation_, address turingCredit_) {
         bobaToken = IERC20(bobaToken_);
         turingImplementation = turingImplementation_;
         turingCredit = ITuringCredit(turingCredit_);
-        router = IRouter(router_);
     }
 
     function changeHybridComputeHelperImpl(address turingImplementation_) external onlyOwner {
         turingImplementation = turingImplementation_;
     }
 
-    function deployMinimalETH(address[] memory permittedCallers, uint256 minAmountOutBoba) payable external returns (HybridComputeHelper) {
-        uint256[] memory amounts = router.swapExactETHForTokens{value: msg.value}(
-            minAmountOutBoba, pair, address(this), block.timestamp + 100);
-        return deployMinimal(permittedCallers, amounts[1]);
-    }
-
     // https://github.com/OolongSwap/oolongswap-deployments
-    function deployMinimal(address[] memory permittedCallers, uint256 amountBoba) takePayment(amountBoba) public returns (HybridComputeHelper) {
+    function deployMinimal(address[] memory permittedCallers, uint256 amountBoba) takePayment(amountBoba) public returns (TuringHelper) {
 
         // This will create a minimal proxy for the implementation contract.
-        HybridComputeHelper implementation = HybridComputeHelper(Clones.clone(turingImplementation));
+        TuringHelper implementation = TuringHelper(Clones.clone(turingImplementation));
 
         // Other way, if we just stick with .call we can use this as well: implementation.initialize(_msgSender());
         bytes memory _encodedFunction = abi.encodeWithSignature(
@@ -70,7 +50,9 @@ contract HybridComputeHelperFactory is Ownable {
         // }
 
         // add permitted callers in same transaction, for better UX
-        implementation.addPermittedCallers(permittedCallers);
+        for (uint i = 0; i < permittedCallers.length; i++) {
+            implementation.addPermittedCaller(permittedCallers[i]);
+        }
 
         // Add balance to TuringCredit associated with new HybridComputeHelper
         bobaToken.approve(address(turingCredit), amountBoba);

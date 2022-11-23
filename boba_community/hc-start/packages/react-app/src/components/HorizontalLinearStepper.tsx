@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { StyledStepLabel } from "./index";
 import { StepApproveBoba } from './steps/step-approve-boba';
-import { StepDeployHybridComputeHelper } from "./steps/step-deploy-turing-helper";
+import { StepDeployHybridComputeHelper } from "./steps/step-deploy-hc-helper";
 import { StepDeployAWS } from "./steps/step-deploy-aws";
 import { muiTheme } from "../mui.theme";
 import { BigNumber } from "@ethersproject/bignumber";
@@ -73,7 +73,7 @@ export default function HorizontalLinearStepper(props: IHorizontalLinearStepperP
     component: <StepApproveBoba setAmountBobaTokensToUseWei={setAmountBobaTokensToUseWei}
                                 handleNextStep={handleNext} contractBobaToken={props.contractBobaToken} />,
   }, {
-    label: 'Deploy/Fund Turing',
+    label: 'Deploy/Fund HybridCompute',
     component: <StepDeployHybridComputeHelper amountBobaForFundingWei={amountBobaTokensToUseWei} />,
   }, {
     label: 'Implement AWS lambda',

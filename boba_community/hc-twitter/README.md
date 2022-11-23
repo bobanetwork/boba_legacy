@@ -1,10 +1,15 @@
-# Turing KYC example
+# Turing Faucet
+
+Goerli deployment:
+* Helper contract deployed as `0xd7CcDeCE06b271667ce4de5931e67fc90E108283`
+* TwitterClaim contract deployed on `0x4E98bAbe5364452cD02FC8E0AD7d9E526B68a5D6`
+
 
 ## Basics
 
-Inside the folder, run `yarn install`. You will also need Docker. 
+Inside the folder, run `yarn install`. You will also need Docker.
 
-0. Make sure that your have *AWS SAM* installed. 
+0. Make sure that your have *AWS SAM* installed.
 
 You can find instructions [here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html). Assuming you have the AWS CLI and have everything set up correctly, installing SAM should just take two commands. On a Mac with `homebrew`, for example,
 

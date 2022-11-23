@@ -24,7 +24,7 @@ const cfg = hre.network.config
 const hPort = 1235 // Port for local HTTP server
 let urlStr
 
-const gasOverride = { gasLimit: 3000000 }
+const gasOverride = { gasLimit: 11_000_000 }
 const local_provider = new providers.JsonRpcProvider(cfg['url'])
 
 const deployerPK = hre.network.config.accounts[0]
@@ -41,7 +41,7 @@ let Factory__BobaTuringCredit: ContractFactory
 let Factory__ERC20Mock: ContractFactory
 let erc20Mock: Contract
 let Factory__HybridComputeHelperFactory: ContractFactory
-let turingFactory: Contract
+let hcFactory: Contract
 let Factory__HybridComputeHelper: ContractFactory
 let HybridComputeHelper: Contract
 let turingCredit: Contract
@@ -49,18 +49,17 @@ let L2BOBAToken: Contract
 let addressesBOBA
 
 import HybridComputeHelperFactoryJson from '../artifacts/contracts/HybridComputeHelperFactory.sol/HybridComputeHelperFactory.json'
-import HybridComputeHelperJson from '../artifacts/contracts/HybridComputeHelper.sol/HybridComputeHelper.json'
-import BobaTuringCreditJson from '../../../../../contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
-import L2GovernanceERC20Json from '../../../../../contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import { parseEther } from 'ethers/lib/utils'
+import HybridComputeHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import BobaTuringCreditJson from '../../../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json'
+import L2GovernanceERC20Json from '../../../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 describe('Turing Helper Factory', function () {
   before(async () => {
-    if (hre.network.name === 'boba_rinkeby') {
-      BOBAL2Address = '0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309'
-      BobaTuringCreditAddress = '0x208c3CE906cd85362bd29467819d3AcbE5FC1614'
+    if (hre.network.name === 'boba_goerli') {
+      BOBAL2Address = '0x4200000000000000000000000000000000000023'
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
       WETHAddress = '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000'
-      RouterAddress = '0x4df04E20cCd9a8B82634754fcB041e86c5FF085A'
+      RouterAddress = '0x4df04E20cCd9a8B82634754fcB041e86c5FF085A' // todo ignored
     } else if (hre.network.name === 'boba_mainnet') {
       BOBAL2Address = '0x_________________'
       BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
@@ -76,6 +75,7 @@ describe('Turing Helper Factory', function () {
       addressesBOBA = JSON.parse(result)
       BOBAL2Address = addressesBOBA.TOKENS.BOBA.L2
       BobaTuringCreditAddress = addressesBOBA.BobaTuringCredit
+      //WETHAddress = addressesBOBA.
     }
 
     L2BOBAToken = new Contract(
@@ -90,17 +90,12 @@ describe('Turing Helper Factory', function () {
       deployerWallet
     ).attach(BobaTuringCreditAddress)
 
+
     Factory__HybridComputeHelper = new ContractFactory(
       HybridComputeHelperJson.abi,
       HybridComputeHelperJson.bytecode,
       deployerWallet
     )
-
-    HybridComputeHelper = await upgrades.deployProxy(Factory__HybridComputeHelper)
-    console.log('    Helper contract deployed as', HybridComputeHelper.address)
-    const implementationHybridComputeHelper =
-      await upgrades.erc1967.getImplementationAddress(HybridComputeHelper.address)
-    console.log('    Implementation of Helper at', implementationHybridComputeHelper)
 
     Factory__HybridComputeHelperFactory = new ContractFactory(
       HybridComputeHelperFactoryJson.abi,
@@ -108,19 +103,38 @@ describe('Turing Helper Factory', function () {
       deployerWallet
     )
 
-    turingFactory = await Factory__HybridComputeHelperFactory.deploy(
-      RouterAddress,
-      WETHAddress,
-      BOBAL2Address,
-      implementationHybridComputeHelper,
-      BobaTuringCreditAddress,
-      gasOverride
-    )
+    const redeploy = true
+    if (redeploy) {
+      HybridComputeHelper = await upgrades.deployProxy(
+        Factory__HybridComputeHelper
+      )
+      console.log('    Helper contract deployed as', HybridComputeHelper.address)
+      const implementationHybridComputeHelper =
+        await upgrades.erc1967.getImplementationAddress(
+          HybridComputeHelper.address
+        )
+      console.log('    Implementation of Helper at', implementationHybridComputeHelper)
 
-    console.log('    Factory contract deployed as', turingFactory.address)
+
+      hcFactory = await Factory__HybridComputeHelperFactory.deploy(
+        BOBAL2Address,
+        implementationHybridComputeHelper,
+        BobaTuringCreditAddress,
+        gasOverride
+      )
+    } else {
+      HybridComputeHelper = Factory__HybridComputeHelper.attach(
+        '0x8b3d804c5E71c20802E0bB45bf3cbbC8411f32e8'
+      )
+      hcFactory = Factory__HybridComputeHelperFactory.attach(
+        '0x87Fa68e273943b7e1e7241375F5C6aec30D4aa59'
+      )
+    }
+
+    console.log('    Factory contract deployed as', hcFactory.address)
   })
 
-  it.only('should deploy new funded HybridComputeHelper via Factory (payment in ETH)', async () => {
+  /*it.only('should deploy new funded HybridComputeHelper via Factory (payment in ETH)', async () => {
     const minAmountBoba = parseEther('0.02')
 
     const implTx = await turingFactory.deployMinimalETH(
@@ -134,7 +148,7 @@ describe('Turing Helper Factory', function () {
     const res = await implTx.wait()
     console.log('TX confirmation: ', res)
     expect(res).to.be.ok
-  })
+  })*/
 
   let newHybridComputeHelper: Contract
   let newHybridComputeHelperOtherWallet: Contract
@@ -142,13 +156,16 @@ describe('Turing Helper Factory', function () {
     // Approva Boba before
     const bobaToDeposit = ethers.utils.parseEther('0.02')
     const approveTx = await L2BOBAToken.approve(
-      turingFactory.address,
+      hcFactory.address,
       bobaToDeposit
     )
     await approveTx.wait()
-    console.log('Approved Boba tokens for funding new HybridComputeHelper.')
+    console.log('Approved Boba tokens for funding new HybridComputeHelper')
 
-    const implTx = await turingFactory.deployMinimal(
+    const implTuring = await hcFactory.turingImplementation()
+    console.log("IMPLEMENTATION: ", implTuring)
+
+    const implTx = await hcFactory.deployMinimal(
       [deployerWallet.address],
       bobaToDeposit,
       gasOverride
@@ -166,7 +183,9 @@ describe('Turing Helper Factory', function () {
     expect(preBalance).to.be.equal(bobaToDeposit) // is funded?
 
     newHybridComputeHelper =
-      Factory__HybridComputeHelper.attach(implementation).connect(deployerWallet)
+      Factory__HybridComputeHelper.attach(implementation).connect(
+        deployerWallet
+      )
     newHybridComputeHelperOtherWallet = newHybridComputeHelper.connect(otherWallet)
     const owner = await newHybridComputeHelper.owner()
     console.log('Owner: ', owner)
@@ -189,6 +208,7 @@ describe('Turing Helper Factory', function () {
   })
 
   it('should get random number', async () => {
+    await newHybridComputeHelper.estimateGas.TuringRandom(gasOverride)
     const tr = await newHybridComputeHelper.TuringRandom(gasOverride)
     const res = await tr.wait()
     expect(res).to.be.ok

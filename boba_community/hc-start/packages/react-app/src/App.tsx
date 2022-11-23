@@ -26,8 +26,8 @@ function App() {
       </Header>
       <Body style={{width: '100%', textAlign: 'center', marginRight: 'auto', marginLeft: 'auto', backgroundColor: 'black'}}>
         <>
-          <H1>Use Turing with ease</H1>
-          <P>Simply follow this guide to start using Turing in your project. Feel free to consult the docs to deploy without this DApp.</P>
+          <H1>Use HybridCompute with ease</H1>
+          <P>Simply follow this guide to start using HybridCompute in your project. Feel free to consult the docs to deploy without this DApp.</P>
           <HorizontalLinearStepper
             contractBobaToken={contractBobaToken} />
         </>

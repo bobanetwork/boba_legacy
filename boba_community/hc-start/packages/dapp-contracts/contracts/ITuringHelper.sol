@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-interface IHybridComputeHelper {
+interface ITuringHelper {
 
     /* Called from the external contract. It takes an api endponit URL
        and an abi-encoded request payload. The URL and the list of allowed

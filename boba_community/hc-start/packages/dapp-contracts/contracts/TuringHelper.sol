@@ -3,11 +3,11 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "./IHybridComputeHelper.sol";
+import "./ITuringHelper.sol";
 
-contract HybridComputeHelper is IHybridComputeHelper, OwnableUpgradeable, UUPSUpgradeable {
+contract TuringHelper is ITuringHelper, OwnableUpgradeable, UUPSUpgradeable {
 
-    HybridComputeHelper Self;
+    TuringHelper Self;
 
     // This protects your own credits for this helper contract
     mapping(address => bool) public permittedCaller;
@@ -29,7 +29,7 @@ contract HybridComputeHelper is IHybridComputeHelper, OwnableUpgradeable, UUPSUp
     function initialize() initializer external {
         __Ownable_init();
         __UUPSUpgradeable_init();
-        Self = HybridComputeHelper(address(this));
+        Self = TuringHelper(address(this));
     }
 
     /**
@@ -148,7 +148,7 @@ contract HybridComputeHelper is IHybridComputeHelper, OwnableUpgradeable, UUPSUp
     function supportsInterface(bytes4 _interfaceId) public pure returns (bool) {
         bytes4 firstSupportedInterface = bytes4(keccak256("supportsInterface(bytes4)"));
         // ERC165
-        bytes4 secondSupportedInterface = IHybridComputeHelper.TuringTx.selector;
+        bytes4 secondSupportedInterface = ITuringHelper.TuringTx.selector;
         return _interfaceId == firstSupportedInterface || _interfaceId == secondSupportedInterface;
     }
 }

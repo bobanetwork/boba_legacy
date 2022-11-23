@@ -49,9 +49,9 @@ const depositAmount = utils.parseEther("0.10"); // for TuringCredit!
 describe("Verify Twitter post for testnet funds", function() {
   before(async () => {
 
-    if (hre.network.name === "boba_rinkeby") {
-      BOBAL2Address = "0xF5B97a4860c1D81A1e915C40EcCB5E4a5E6b8309";
-      BobaTuringCreditAddress = "0x208c3CE906cd85362bd29467819d3AcbE5FC1614";
+    if (hre.network.name === "boba_goerli") {
+      BOBAL2Address = '0x4200000000000000000000000000000000000023'
+      BobaTuringCreditAddress = '0x4200000000000000000000000000000000000020'
     } else if (hre.network.name === "boba_mainnet") {
       BOBAL2Address = "0x_________________";
       BobaTuringCreditAddress = "0x___________________";

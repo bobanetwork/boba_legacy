@@ -12,7 +12,7 @@
     "deploy:factory": "hardhat run scripts/deploy-factory.ts",
     "deploy:multicall": "hardhat run scripts/deploy-multicall.ts",
     "test:local": "hardhat --network boba_local test",
-    "test:rinkeby": "hardhat --network boba_rinkeby test",
+    "test:goerli": "hardhat --network boba_goerli test",
     "test:mainnet": "hardhat --network boba_mainnet test"
   },
   "devDependencies": {

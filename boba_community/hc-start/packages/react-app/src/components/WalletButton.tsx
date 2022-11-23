@@ -86,7 +86,7 @@ export function WalletButton(props: IWalletButtonProps) {
             ? <><FontAwesomeIcon bounce={true} icon={regular("credit-card")} />&nbsp;Get</>
             : (+formatEther(bobaTokenBalance)).toFixed(2)} BOBA</Button>
         <Button title="Switch network?" target='_blank'
-                href={isTestnet ? 'https://turing.boba.network/' : 'https://turing.rinkeby.boba.network/'}
+                href={isTestnet ? 'https://hcb.boba.network/' : 'https://hcb.goerli.boba.network/'}
                 style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>{chainName}</Button>
       </ButtonGroup> : null}
     <CustomButton

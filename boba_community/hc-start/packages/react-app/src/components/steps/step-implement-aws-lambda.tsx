@@ -27,8 +27,8 @@ export const StepImplementAWSLambda = () => {
     <SmallerParagraph>
       You need to return your off-chain data in a Solidity readable format. We recommend an AWS lambda endpoint for this
       (<Link href="https://github.com/bobanetwork/boba/tree/develop/packages/boba/turing/AWS_code" target="_blank"
-             title="AWS Turing examples">examples</Link>). Example below shows how you can do an external API call with Turing (e.g.
-      <Link href='https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/AWS_code/turing_oracle.py' target='_blank' title='Oracle example - Turing'>fetching an exchange rate</Link>).
+             title="AWS HybridCompute examples">examples</Link>). Example below shows how you can do an external API call with HybridCompute (e.g.
+      <Link href='https://github.com/bobanetwork/boba/blob/develop/packages/boba/turing/AWS_code/turing_oracle.py' target='_blank' title='Oracle example - HybridCompute'>fetching an exchange rate</Link>).
     </SmallerParagraph>
 
     <Grid container spacing={2} style={{marginTop: 2}}>

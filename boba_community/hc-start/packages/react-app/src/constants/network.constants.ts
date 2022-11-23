@@ -12,23 +12,23 @@ const BobaMainnetChain: Chain = {
   getExplorerTransactionLink: (transactionHash: string) => `https://blockexplorer.boba.network/tx/${transactionHash}`,
 }
 
-const BobaRinkebyChain: Chain = {
-  chainId: 28,
-  chainName: 'Boba Rinkeby',
+const BobaGoerliChain: Chain = {
+  chainId: 2888,
+  chainName: 'Boba Goerli',
   isTestChain: true,
   isLocalChain: false,
-  multicallAddress: '0xd22c83569AD94FfD16592B08A0468b779e9d4A59',
-  multicall2Address: '0x449809032b8357608Df9f601b117b19115ea4285',
-  getExplorerAddressLink: (address: string) => `https://blockexplorer.rinkeby.boba.network/address/${address}`,
-  getExplorerTransactionLink: (transactionHash: string) => `https://blockexplorer.rinkeby.boba.network/tx/${transactionHash}`,
+  multicallAddress: '0x2D7a14384f4BeB2EDc33Ca4B43ea8028d1155E05',
+  multicall2Address: '0x3CA4f8c5730526aAE8F5e8F475af60EA2Ae6b9E0',
+  getExplorerAddressLink: (address: string) => `https://testnet.bobascan.com/address/${address}`,
+  getExplorerTransactionLink: (transactionHash: string) => `https://testnet.bobascan.com/tx/${transactionHash}`,
 }
 
 
 export const getChainConfig = () => isTestEnv()
   ? {
-    readOnlyChainId: BobaRinkebyChain.chainId,
-    readOnlyUrls: {[BobaRinkebyChain.chainId]: 'https://rinkeby.boba.network'},
-    networks: [...DEFAULT_SUPPORTED_CHAINS, BobaRinkebyChain],
+    readOnlyChainId: BobaGoerliChain.chainId,
+    readOnlyUrls: {[BobaGoerliChain.chainId]: 'https://goerli.boba.network'},
+    networks: [...DEFAULT_SUPPORTED_CHAINS, BobaGoerliChain],
   }
   : {
     readOnlyChainId: BobaMainnetChain.chainId,
