@@ -323,10 +323,15 @@ class l1BridgeMonitorService extends OptimismEnv {
         resolved = await this.watcher.toCrossChainMessage(transaction)
       } catch {
         const messages = this.watcher.getMessagesByTransaction(transaction)
-        // we pick the target address is L2StandardBridge
-        resolved = messages.filter(
-          (i) => i.target === '0x4200000000000000000000000000000000000010'
-        )
+        if (typeof messages !== 'undefined') {
+          // we pick the target address is L2StandardBridge
+          resolved = messages.filter(
+            (i) => i.target === '0x4200000000000000000000000000000000000010'
+          )
+        } else {
+          // drop the message if we can't resolve it
+          continue
+        }
       }
       const latestL2Block = await this.L2Provider.getBlockNumber()
       let CDMReceipt = null
