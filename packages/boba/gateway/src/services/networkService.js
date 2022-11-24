@@ -65,8 +65,7 @@ import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2Billing
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
 import OMGJson from '../deployment/contracts/OMG.json'
-import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
-import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
+
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
@@ -106,7 +105,7 @@ import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { APP_CHAIN, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -263,208 +262,6 @@ class NetworkService {
       console.log("Bad verifier response")
       return false
     }
-  }
-
-  async fetchAirdropStatusL1() {
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('get.l1.airdrop', {
-      address: this.account,
-      key: APP_AIRDROP
-    })
-
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
-    }
-
-  }
-
-  async fetchAirdropStatusL2() {
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('get.l2.airdrop', {
-      address: this.account,
-      key: APP_AIRDROP
-    })
-
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
-    }
-
-  }
-
-  async initiateAirdrop(callData) {
-
-    console.log("Initiating airdrop")
-    console.log("getAirdropL1(callData)",callData.merkleProof)
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL1,
-      BobaAirdropL1Json.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL1Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.initiateClaim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l1.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('initiate.l1.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L1 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L1 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
-  }
-
-  async getAirdropL1(callData) {
-
-    console.log("getAirdropL1")
-    console.log("getAirdropL1(callData)",callData.merkleProof)
-    console.log("this.account:",this.account)
-
-    //Interact with contract
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL1,
-      BobaAirdropL1Json.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL1Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.claim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l1.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.l1.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L1 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L1 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
-  }
-
-  async getAirdropL2(callData) {
-
-    console.log("getAirdropL2(callData)",callData)
-    console.log("this.account:",this.account)
-
-    //Interact with contract
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL2,
-      BobaAirdropJson.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL2Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.claim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l2.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.l2.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L2 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L2 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
   }
 
   async getBobaFeeChoice() {
@@ -769,14 +566,6 @@ class NetworkService {
       // not critical
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
       console.log("DiscretionaryExitFee:",allAddresses.DiscretionaryExitFee)
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
-      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
-      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
 
       //L2CrossDomainMessenger is a predeploy, so add by hand....
       allAddresses = {
@@ -4077,9 +3866,15 @@ class NetworkService {
     let description = ''
     let address = ['']
     let callData = ['']
-    let tokenIds = payload.tokenIds
-    // create proposal only on latest contracts.
-    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+
+    /****
+      // FIXME :Disable for veDao.
+      let tokenIds = payload.tokenIds
+      // create proposal only on latest contracts.
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+    */
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     if( payload.action === 'text-proposal' ) {
       address = ['0x000000000000000000000000000000000000dEaD']
@@ -4132,7 +3927,6 @@ class NetworkService {
           values,
           signatures,
           callData,
-          tokenIds,
           description
       )
 
@@ -4151,7 +3945,7 @@ class NetworkService {
    *
   */
 
-  async fetchProposals() {
+  async fetchProposalsVeDao() {
 
     if (!this.delegateContract) return
 
@@ -4265,7 +4059,7 @@ class NetworkService {
   }
 
   //Cast vote for proposal
-  async castProposalVote({id, userVote,tokenIds}) {
+  async castProposalVoteVeDao({id, userVote,tokenIds}) {
 
     if( !this.delegateContract ) return
 
@@ -5243,6 +5037,116 @@ class NetworkService {
       return error;
     }
   }
+
+
+  /****************************************
+   ************* STARTS HERE **************
+   ***********OLD DAO REMOVE ME ***********
+   *****************************************/
+
+  // FIXME: remove me once deprecated old dao.
+
+  async fetchProposals() {
+
+    if (!this.delegateContract) return
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+
+    try {
+
+      let proposalList = []
+
+      const proposalCounts = await delegateCheck.proposalCount()
+      const totalProposals = await proposalCounts.toNumber()
+
+      /// @notice An event emitted when a new proposal is created
+      // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
+
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+
+      for (let i = 0; i < totalProposals; i++) {
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
+
+        //this is a number such as 2
+        let proposalData = await delegateCheck.proposals(proposalID)
+
+        const proposalStates = [
+          'Pending',
+          'Active',
+          'Canceled',
+          'Defeated',
+          'Succeeded',
+          'Queued',
+          'Expired',
+          'Executed',
+        ]
+
+        let state = await delegateCheck.state(proposalID)
+
+        let againstVotes = parseInt(formatEther(proposalData.againstVotes))
+        let forVotes = parseInt(formatEther(proposalData.forVotes))
+        let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
+
+        let startTimestamp = proposalData.startTimestamp.toString()
+        let endTimestamp = proposalData.endTimestamp.toString()
+
+        let proposal = await delegateCheck.getActions(i+2)
+
+        let hasVoted = null
+
+        let description = proposalRaw.description.toString()
+
+        proposalList.push({
+           id: proposalID?.toString(),
+           proposal,
+           description,
+           totalVotes: forVotes + againstVotes,
+           forVotes,
+           againstVotes,
+           abstainVotes,
+           state: proposalStates[state],
+           startTimestamp,
+           endTimestamp,
+           hasVoted: hasVoted
+        })
+
+      }
+      return { proposalList }
+    } catch(error) {
+      console.log("NS: fetchProposals error:",error)
+      return error
+    }
+  }
+
+
+  async castProposalVote({id, userVote}) {
+
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: castProposalVote() error - called but account === null')
+      return
+    }
+    try {
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
+      return delegateCheck.castVote(id, userVote)
+    } catch(error) {
+      console.log("NS: castProposalVote error:",error)
+      return error
+    }
+  }
+
+
+  /****************************************
+   ************* END HERE *****************
+   ***********OLD DAO REMOVE ME TILL HERE *
+   *****************************************/
 
 }
 

@@ -27,19 +27,7 @@ import networkService from 'services/networkService'
 
 /**** ACTIONS and SELECTORS *****/
 import { setBaseState } from 'actions/setupAction'
-import {
-  fetchDaoBalance,
-  fetchDaoVotes,
-  fetchDaoBalanceX,
-  fetchDaoVotesX,
-  fetchDaoProposals,
-  getProposalThreshold
-} from 'actions/daoAction'
 
-import {
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2
-} from 'actions/airdropAction'
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
@@ -165,8 +153,6 @@ function Home() {
       if (initialized === 'enabled') {
         console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
-        // load DAO to speed up the process
-        dispatch(fetchDaoProposals())
         return true
       }
     }
@@ -176,20 +162,10 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchAirdropStatusL1()) // account specific
-      dispatch(fetchAirdropStatusL2()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
       dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific
-    }
-    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
-      dispatch(getProposalThreshold())
-      dispatch(fetchDaoProposals())
     }
   }, POLL_INTERVAL)
 
@@ -197,7 +173,6 @@ function Home() {
     if (maintenance) return
     // load the following functions when the home page is open
     checkVersion()
-    dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
   useEffect(() => {
