@@ -1,4 +1,4 @@
-# Turing Faucet
+# HC Faucet
 
 Goerli deployment:
 * Helper contract deployed as `0xd7CcDeCE06b271667ce4de5931e67fc90E108283`
