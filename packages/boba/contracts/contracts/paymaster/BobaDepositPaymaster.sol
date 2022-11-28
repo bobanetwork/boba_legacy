@@ -36,17 +36,11 @@ contract DepositPaymaster is BasePaymaster {
 
     //calculated cost of the postOp
     uint256 constant public COST_OF_POST = 35000;
-    // set native token base
 
-    // delete
-    address public feedRegistry;
     address public constant L2_ETH_ADDRESS = 0x4200000000000000000000000000000000000006;
     IERC20 public constant L2_ETH = IERC20(L2_ETH_ADDRESS);
 
     IBobaStraw private constant NULL_ORACLE = IBobaStraw(address(0));
-    // delete
-    mapping(IERC20 => IBobaStraw) public oracles;
-    mapping(IERC20 => address) public tokenBase;
 
     mapping(IERC20 => Oracle) public oracles;
     mapping(IERC20 => mapping(address => uint256)) public balances;
@@ -56,6 +50,7 @@ contract DepositPaymaster is BasePaymaster {
         require(ethPriceOracle != NULL_ORACLE, "Incorrect eth oracle");
         //owner account is unblocked, to allow withdraw of paid tokens;
         unlockTokenDeposit();
+        // set native token base
         oracles[L2_ETH] = Oracle(ethPriceOracle, L2_ETH_ADDRESS);
     }
 
