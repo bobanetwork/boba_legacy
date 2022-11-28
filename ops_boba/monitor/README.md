@@ -72,3 +72,4 @@ It scans the L2 and write the new block data, transaction data and receipt data 
 | `SERVICE_MONITOR_ENABLE_LOOP_TRANSFER`    | No        | false                                           | Whether enable the feature of sending the test transaction   |
 | `NUMBER_OF_BLOCKS_TO_FETCH`               | No        | 10000000                                        | block range for querying data                                |
 | `SERVICE_MONITOR_ENABLE_BALANCE_MONITOR`  | No        | false                                           | Whether monitor the balances of Liquidity pools              |
+| TELEPORTATION_BLOCK_RANGE_PER_POLLING     | No        | 2000                                            | Block range of polling the events of Teleportation           |
