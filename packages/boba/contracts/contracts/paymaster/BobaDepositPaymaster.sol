@@ -23,8 +23,10 @@ import "./IBobaStraw.sol";
  * (the standard rules ban accessing data of an external contract)
  * It can only be used if it is "whitelisted" by the bundler.
  * (technically, it can be used by an "oracle" which returns a static value, without accessing any storage)
+ * If you do not have bundler permissions, consider deploying a paymaster that accesses a stored 'ratio' value
+ * on validation and asynchronously update the ratio
  */
-contract DepositPaymaster is BasePaymaster {
+contract BobaDepositPaymaster is BasePaymaster {
 
     using UserOperationLib for UserOperation;
     using SafeERC20 for IERC20;
