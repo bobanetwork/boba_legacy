@@ -331,7 +331,7 @@ contract Boba_GasPriceOracle {
      */
     function updateSecondaryFeeTokenMinimum(uint256 _secondaryFeeTokenMinimum) public onlyOwner {
         // Users should have more than 0.002 l1 native token
-        require(_secondaryFeeTokenMinimum >= 1e15);
+        require(_secondaryFeeTokenMinimum >= 2e15);
         secondaryFeeTokenMinimum = _secondaryFeeTokenMinimum;
         emit UpdateSecondaryFeeTokenMinimum(owner(), _secondaryFeeTokenMinimum);
     }
