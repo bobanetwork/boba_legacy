@@ -15,7 +15,7 @@ const loop = async (func) => {
         stack: error.stack,
         code: error.code,
       })
-      await sleep(1000)
+      await sleep(60000)
     }
   }
 }
@@ -48,6 +48,7 @@ const main = async () => {
   const l1BridgeMonitorService = require('../services/l1BridgeMonitor')
   const messageMonitorService = require('../services/messageMonitor')
   const LayerZeroBridgeMonitor = require('../services/layerZeroBridge')
+  const TeleportationMonitorService = require('../services/teleportationMonitor')
 
   // l1 message monitor
   const messageService = new messageMonitorService()
@@ -91,6 +92,17 @@ const main = async () => {
   const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
   await layerZeroBridgeMonitor.initScan()
   await layerZeroBridgeMonitor.startMonitor()
+
+  // teleportation monitor
+  const teleporationService = new TeleportationMonitorService()
+  await teleporationService.initConnection()
+  try {
+    await teleporationService.initScan()
+  } catch (error) {
+    ;`Failed to get Teleportation env - error: ${error}`
+  }
+
+  loop(() => teleporationService.startTeleportationMonitor()).catch()
 
   // enable the tx response time report
   if (

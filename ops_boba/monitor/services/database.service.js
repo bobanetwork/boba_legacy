@@ -162,6 +162,19 @@ class DatabaseService extends OptimismEnv {
         reference VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber)
       )`)
+    await query(`CREATE TABLE IF NOT EXISTS teleportation
+      (
+        sourceChainId INT NOT NULL,
+        toChainId INT NOT NULL,
+        hash VARCHAR(255) NOT NULL,
+        blockHash VARCHAR(255) NOT NULL,
+        blockNumber INT NOT NULL,
+        txFrom VARCHAR(255),
+        txTo VARCHAR(255),
+        amount VARCHAR(255),
+        event VARCHAR(255),
+        PRIMARY KEY ( hash, blockNumber)
+      )`)
     con.end()
     this.logger.info('Initialized the database.')
   }
@@ -578,6 +591,29 @@ class DatabaseService extends OptimismEnv {
     con.end()
   }
 
+  async insertTeleportationData(teleportationData) {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    await query(`INSERT IGNORE INTO teleportation
+      SET sourceChainId='${teleportationData.sourceChainId.toString()}',
+      toChainId='${teleportationData.toChainId.toString()}',
+      hash='${teleportationData.hash.toString()}',
+      blockHash='${teleportationData.blockHash.toString()}',
+      blockNumber='${teleportationData.blockNumber.toString()}',
+      txFrom='${teleportationData.emitter.toString()}',
+      txTo='${teleportationData.emitter.toString()}',
+      amount='${teleportationData.amount.toString()}',
+      event='${teleportationData.event.toString()}'
+    `)
+    con.end()
+  }
+
   async getNewestBlockFromBlockTable() {
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
@@ -667,6 +703,22 @@ class DatabaseService extends OptimismEnv {
     `)
     con.end()
     return pendingMessages
+  }
+
+  async getNewestBlockFromTeleportationTable() {
+    const con = mysql.createConnection({
+      host: this.MySQLHostURL,
+      port: this.MySQLPort,
+      user: this.MySQLUsername,
+      password: this.MySQLPassword,
+    })
+    const query = util.promisify(con.query).bind(con)
+    await query(`USE ${this.MySQLDatabaseName}`)
+    const latestBlock = await query(
+      `SELECT MAX(blockNumber) from teleportation`
+    )
+    con.end()
+    return latestBlock
   }
 
   async getLatestTx(logger) {

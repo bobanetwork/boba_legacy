@@ -5,6 +5,7 @@ const { CrossChainMessenger } = require('@eth-optimism/sdk')
 const { Logger } = require('@eth-optimism/common-ts')
 const Mutex = require('async-mutex').Mutex
 const fetch = require('node-fetch')
+const { BobaChains } = require('@boba/teleportation')
 
 const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
 const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
@@ -12,6 +13,8 @@ const L2LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L2Li
 const L1StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
 const L2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
 const StateCommitmentChainJson = require('@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
+const TeleportationJson = require('@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json')
+const L2StandardERC20Json = require('@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json')
 
 require('dotenv').config()
 const env = process.env
@@ -87,6 +90,9 @@ const LAYER_ZERO_ENABLE_TEST =
 const LAYER_ZERO_CHAIN = env.LAYER_ZERO_CHAIN || 'Testnet'
 const LAYER_ZERO_BRIDGES = env.LAYER_ZERO_BRIDGES || 'Proxy__EthBridgeToAvalanche'
 const LAYER_ZERO_LATEST_BLOCK = Number(env.LAYER_ZERO_LATEST_BLOCK) || 0
+
+// teleportation env
+const TELEPORTATION_BLOCK_RANGE_PER_POLLING = env.TELEPORTATION_BLOCK_RANGE_PER_POLLING || 2000
 
 class OptimismEnv {
   constructor() {
@@ -175,6 +181,8 @@ class OptimismEnv {
     this.layerZeroChain = LAYER_ZERO_CHAIN
     this.layerZeroBridges = LAYER_ZERO_BRIDGES.split(',')
     this.layerZeroLatestBlock = LAYER_ZERO_LATEST_BLOCK
+
+    this.teleportationBlockRangePerPolling = TELEPORTATION_BLOCK_RANGE_PER_POLLING
   }
 
   async initOptimismEnv() {
@@ -264,6 +272,26 @@ class OptimismEnv {
       L2StandardBridgeJson.abi,
       this.L2Provider
     )
+    // Load Teleportation contract
+    const L2ChainId = (await this.L2Provider.getNetwork()).chainId
+    const teleportationContractAddress = BobaChains[L2ChainId].teleportationAddress
+    this.TeleportationContract = new ethers.Contract(
+      teleportationContractAddress,
+      TeleportationJson.abi,
+      this.L2Provider
+    )
+    this.TeleportationContractHeight = BobaChains[L2ChainId].height
+    const L2BOBAAddress = BobaChains[L2ChainId].BobaTokenAddress
+    this.L2BOBAContract = new ethers.Contract(
+      L2BOBAAddress,
+      L2StandardERC20Json.abi,
+      this.L2Provider
+    )
+    this.logger.info('Found TeleportationContract', {
+      TeleportationContract: this.TeleportationContract.address,
+      L2BOBAContract: this.L2BOBAContract.address,
+      TeleportationContractHeight: this.TeleportationContractHeight,
+    })
 
     // watcher
     const { chainId } = await this.L1Provider.getNetwork()
