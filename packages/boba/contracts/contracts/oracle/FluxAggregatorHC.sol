@@ -27,6 +27,7 @@ import "@chainlink/contracts/src/v0.6/interfaces/AggregatorValidatorInterface.so
 import "@chainlink/contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 
 import "./interfaces/BobaTokenInterface.sol";
+import "./interfaces/ITuringHelper.sol";
 
 /**
  * @title The Prepaid Aggregator contract
@@ -36,7 +37,7 @@ import "./interfaces/BobaTokenInterface.sol";
  * single answer. The latest aggregated answer is exposed as well as historical
  * answers and their updated at timestamp.
  */
-contract FluxAggregator is AggregatorV2V3Interface, Owned {
+contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   using SafeMathChainlink for uint256;
   using SafeMath128 for uint128;
   using SafeMath64 for uint64;
@@ -116,6 +117,8 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
 
   uint32 private reportingRoundId;
   uint32 internal latestRoundId;
+  uint32 public overrideStaringRoundId;
+  uint32 public chainLinkLatestRoundId;
   mapping(address => OracleStatus) private oracles;
   mapping(uint32 => Round) internal rounds;
   mapping(uint32 => RoundDetails) internal details;
@@ -125,6 +128,11 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
 
   // Allow oracles to voluntarily submit even when available funds have been depleted
   bool public voluntarySubmissionsAllowed;
+
+  // turing
+  address public turingHelperAddr;
+  ITuringHelper turingHelper;
+  string public turingURL;
 
   event AvailableFundsUpdated(
     uint256 indexed amount
@@ -166,6 +174,15 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
   event VoluntarySubmissionStatusUpdated(
     bool voluntarySubmissionStatus
   );
+  event GetChainLinkQuote(
+    string indexed turingURL,
+    uint256 indexed CLRoundId,
+    int256 CLSubmission,
+    uint256 CLLatestRoundId
+  );
+  event TuringDebug(
+    bytes response
+  );
 
   /**
    * @notice set up the aggregator with initial configuration
@@ -181,6 +198,8 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
    * submission values are accepted from an oracle
    * @param _decimals represents the number of decimals to offset the answer by
    * @param _description a short description of what is being reported
+   * @param _turingHelperAddr address of turing helper
+   * @param _turingURL url of turing endpoint
    */
   constructor(
     address _boba,
@@ -190,7 +209,9 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     int256 _minSubmissionValue,
     int256 _maxSubmissionValue,
     uint8 _decimals,
-    string memory _description
+    string memory _description,
+    address _turingHelperAddr,
+    string memory _turingURL
   ) public {
     bobaToken = BobaTokenInterface(_boba);
     updateFutureRounds(_paymentAmount, 0, 0, 0, _timeout);
@@ -200,14 +221,44 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     decimals = _decimals;
     description = _description;
     rounds[0].updatedAt = uint64(block.timestamp.sub(uint256(_timeout)));
+    turingHelperAddr = _turingHelperAddr;
+    turingHelper = ITuringHelper(_turingHelperAddr);
+    turingURL = _turingURL;
   }
 
   /**
    * @notice called by oracles when they have witnessed a need to update
    * @param _roundId is the ID of the round this submission pertains to
-   * @param _submission is the updated data that the oracle is submitting
    */
-  function submit(uint256 _roundId, int256 _submission)
+  function submit(uint256 _roundId)
+    external
+  {
+    (uint256 _CLRoundId, int256 _CLSubmission, uint32 _CLLatestRoundId) = getChainLinkQuote(_roundId);
+    require(_CLRoundId == _roundId, "ChainLink roundId not match");
+    bytes memory error = validateOracleRound(msg.sender, uint32(_roundId));
+    require(_CLSubmission >= minSubmissionValue, "value below minSubmissionValue");
+    require(_CLSubmission <= maxSubmissionValue, "value above maxSubmissionValue");
+    require(error.length == 0, string(error));
+
+    oracleInitializeNewRound(uint32(_roundId));
+    recordSubmission(_CLSubmission, uint32(_roundId));
+    (bool updated, int256 newAnswer) = updateRoundAnswer(uint32(_roundId));
+    payOracle(uint32(_roundId));
+    deleteRoundDetails(uint32(_roundId));
+    if (updated) {
+      validateAnswer(uint32(_roundId), newAnswer);
+    }
+    require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
+    chainLinkLatestRoundId = _CLLatestRoundId;
+  }
+
+  /**
+   * @notice called by owner when they have witnessed a need to update
+   * @param _roundId is the ID of the round this submission pertains to
+   * @param _submission is the updated data that the oracle is submitting
+   * @param _CLLatestRoundId is the chainlink latest round id
+   */
+  function emergencySubmit(uint256 _roundId, int256 _submission, uint32 _CLLatestRoundId)
     external
   {
     bytes memory error = validateOracleRound(msg.sender, uint32(_roundId));
@@ -223,6 +274,8 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     if (updated) {
       validateAnswer(uint32(_roundId), newAnswer);
     }
+    require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
+    chainLinkLatestRoundId = _CLLatestRoundId;
   }
 
   /**
@@ -241,6 +294,7 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     address[] calldata _removed,
     address[] calldata _added,
     address[] calldata _addedAdmins,
+    uint32[] calldata _roundId,
     uint32 _minSubmissions,
     uint32 _maxSubmissions,
     uint32 _restartDelay
@@ -256,7 +310,7 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     require(uint256(oracleCount()).add(_added.length) <= MAX_ORACLE_COUNT, "max oracles allowed");
 
     for (uint256 i = 0; i < _added.length; i++) {
-      addOracle(_added[i], _addedAdmins[i]);
+      addOracle(_added[i], _addedAdmins[i], _roundId[i]);
     }
 
     updateFutureRounds(paymentAmount, _minSubmissions, _maxSubmissions, _restartDelay, timeout);
@@ -994,7 +1048,8 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
 
   function addOracle(
     address _oracle,
-    address _admin
+    address _admin,
+    uint32 _roundId
   )
     private
   {
@@ -1003,7 +1058,16 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     require(_admin != address(0), "cannot set admin to 0");
     require(oracles[_oracle].admin == address(0) || oracles[_oracle].admin == _admin, "owner cannot overwrite admin");
 
-    oracles[_oracle].startingRound = getStartingRound(_oracle);
+    // set reportingRoundId ands tartingRound if it has not been set yet
+    uint32 _startingRound = getStartingRound(_oracle);
+    if (reportingRoundId == 0) {
+      reportingRoundId = _roundId;
+      overrideStaringRoundId = _roundId;
+      // override startingRoundId
+      _startingRound = _roundId;
+    }
+
+    oracles[_oracle].startingRound = _startingRound;
     oracles[_oracle].endingRound = ROUND_MAX;
     oracles[_oracle].index = uint16(oracleAddresses.length);
     oracleAddresses.push(_oracle);
@@ -1045,7 +1109,7 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     if (oracles[_oracle].endingRound < _roundId) return "no longer allowed oracle";
     if (oracles[_oracle].lastReportedRound >= _roundId) return "cannot report on previous rounds";
     if (_roundId != rrId && _roundId != rrId.add(1) && !previousAndCurrentUnanswered(_roundId, rrId)) return "invalid round to report";
-    if (_roundId != 1 && !supersedable(_roundId.sub(1))) return "previous round not supersedable";
+    if (_roundId != overrideStaringRoundId.add(1) && !supersedable(_roundId.sub(1))) return "previous round not supersedable";
   }
 
   function supersedable(uint32 _roundId)
@@ -1097,4 +1161,16 @@ contract FluxAggregator is AggregatorV2V3Interface, Owned {
     return _roundId <= ROUND_MAX;
   }
 
+  function getChainLinkQuote(uint256 _roundId) public onlyOwner returns (uint256 , int256, uint32) {
+    bytes memory encRequest = abi.encode(_roundId);
+    bytes memory encResponse = turingHelper.TuringTx(turingURL, encRequest);
+
+    emit TuringDebug(encResponse);
+
+    (uint256 _CLRoundId, int256 _CLSubmission, uint32 _CLLatestRoundId) = abi.decode(encResponse,(uint256,int256,uint32));
+
+    emit GetChainLinkQuote(turingURL, _CLRoundId, _CLSubmission, _CLLatestRoundId);
+
+    return (_CLRoundId, _CLSubmission, _CLLatestRoundId);
+  }
 }
