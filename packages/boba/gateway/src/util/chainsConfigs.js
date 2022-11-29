@@ -35,12 +35,6 @@ export const ChainList = [
     label: 'Goerli Ethereum <> Boba',
     key: 'Goerli'
   },
-  {
-    icon: 'ethereum',
-    chain: 'rinkeby',
-    label: 'Rinkeby Ethereum <> Boba',
-    key: 'rinkeby'
-  }
 ]
 
 export default ChainList;

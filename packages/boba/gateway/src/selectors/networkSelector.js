@@ -1,5 +1,5 @@
 
-// local, rinkeby, mainnet...
+// local, goerli, mainnet...
 export function selectNetwork () {
   return function (state) {
     return state.network['network']
