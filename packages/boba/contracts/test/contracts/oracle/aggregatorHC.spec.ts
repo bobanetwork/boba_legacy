@@ -88,14 +88,14 @@ describe('Oracle Flux Aggregator Tests', async () => {
       await FluxAggregator.connect(signer2).emergencySubmit(10002, 1010, 10002)
     })
 
-    it.only('should not allow submissions when funds depleted and voluntary submissions stopped', async () => {
+    it('should not allow submissions when funds depleted and voluntary submissions stopped', async () => {
       const signer2: Signer = (await ethers.getSigners())[1]
       await expect(
         FluxAggregator.connect(signer2).emergencySubmit(10003, 1030, 10003)
       ).to.be.revertedWith('available funds depleted')
     })
 
-    it.only('should allow submissions when funds depleted and voluntary submissions allowed', async () => {
+    it('should allow submissions when funds depleted and voluntary submissions allowed', async () => {
       const signer2: Signer = (await ethers.getSigners())[1]
       const currentStatus = await FluxAggregator.voluntarySubmissionsAllowed()
       expect(currentStatus).to.be.eq(false)
@@ -130,7 +130,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
   })
 
   describe('Aggregator available funds status', async () => {
-    it.only('should update available funds data on using method', async () => {
+    it('should update available funds data on using method', async () => {
       const depositL2ERC20Amount = utils.parseEther('100')
       const approveTx = await bobaToken.approve(
         FluxAggregator.address,
@@ -151,7 +151,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       )
     })
 
-    it.only('should be able to withdraw directly transferred funds', async () => {
+    it('should be able to withdraw directly transferred funds', async () => {
       const signer: Signer = (await ethers.getSigners())[0]
       const transferAmount = utils.parseEther('10')
       const preAvailableFunds = await FluxAggregator.availableFunds()
@@ -218,7 +218,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       await addOracleTx.wait()
     })
 
-    it.only('rounds with less than min submissions is timedOut', async () => {
+    it('rounds with less than min submissions is timedOut', async () => {
       // emergencySubmit first oracle
       const signer2: Signer = (await ethers.getSigners())[1]
       const SubmitTx = await FluxAggregator.connect(signer2).emergencySubmit(
@@ -245,7 +245,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       expect(previousRoundData.answer).to.be.eq(roundThreeData.answer)
     })
 
-    it.only('rounds with at least min submissions is not timedOut', async () => {
+    it('rounds with at least min submissions is not timedOut', async () => {
       // emergencySubmit second oracle
       const signer2: Signer = (await ethers.getSigners())[1]
       const signer3: Signer = (await ethers.getSigners())[2]
