@@ -15,16 +15,21 @@ limitations under the License. */
 
 const initialState = {
   appChain: 'mainnet',
-  network: 'mainnet'
+  network: 'mainnet',
+  networkType: 'Mainnet',
 }
 
 function networkReducer(state = initialState, action) {
   switch (action.type) {
     case 'SETUP/APPCHAIN/SET':
+      const {
+        networkType, chain
+      } = action.payload
       return {
         ...state,
-        appChain: action.payload,
-        network: action.payload
+        appChain: chain,
+        network: chain,
+        networkType: networkType,
       }
     default:
       return state
