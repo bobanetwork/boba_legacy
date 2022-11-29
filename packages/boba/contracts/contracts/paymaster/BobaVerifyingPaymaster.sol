@@ -99,7 +99,7 @@ contract BobaVerifyingPaymaster is BasePaymaster {
         address dest = abi.decode(destData, (address));
         if (dest != bobaDepositPaymaster) return false;
         bytes memory depositParam = opCallData[136:232];
-        (address token, ) = abi.decode(depositParam, (address, address, uint256));
+        (address token, , ) = abi.decode(depositParam, (address, address, uint256));
         if (funcSelector == DEPOSIT_FOR_FUNCTION_SELECTOR && token == approvedToken) return true;
         return false;
     }

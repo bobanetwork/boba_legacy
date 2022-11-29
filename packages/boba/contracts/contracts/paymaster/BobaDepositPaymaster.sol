@@ -38,6 +38,7 @@ contract BobaDepositPaymaster is BasePaymaster {
 
     //calculated cost of the postOp
     uint256 constant public COST_OF_POST = 35000;
+    address public constant QUOTE_USD = 0x0000000000000000000000000000000000000348;
 
     address public constant L2_ETH_ADDRESS = 0x4200000000000000000000000000000000000006;
     IERC20 public constant L2_ETH = IERC20(L2_ETH_ADDRESS);
@@ -127,11 +128,11 @@ contract BobaDepositPaymaster is BasePaymaster {
      * @return requiredTokens the amount of tokens required to get this amount of eth
      */
     function getTokenValueOfEth(IERC20 token, uint256 ethBought) internal view virtual returns (uint256 requiredTokens) {
-        Oracle oracleInfo = oracles[token];
+        Oracle memory oracleInfo = oracles[token];
         require(oracleInfo.feedRegistry != NULL_ORACLE, "DepositPaymaster: unsupported token");
         address base = oracleInfo.tokenBase;
-        uint256 ethPrice = oracles[L2_ETH].feedRegistry.latestAnswer(oracles[L2_ETH].tokenBase,"0x0000000000000000000000000000000000000348");
-        uint256 tokenPrice = oracleInfo.feedRegistry.latestAnswer(base,"0x0000000000000000000000000000000000000348");
+        uint256 ethPrice = uint256(oracles[L2_ETH].feedRegistry.latestAnswer(oracles[L2_ETH].tokenBase, QUOTE_USD));
+        uint256 tokenPrice = uint256(oracleInfo.feedRegistry.latestAnswer(base, QUOTE_USD));
         uint256 requiredAmount = (ethBought * ethPrice) / tokenPrice;
         return requiredAmount;
     }
