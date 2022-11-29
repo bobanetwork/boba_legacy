@@ -11,7 +11,7 @@ import { setCurrentAppChain } from 'actions/networkAction';
 import { useSelector } from 'react-redux';
 import { selectCurrentAppChain } from 'selectors/networkSelector';
 
-function ChainSwitcher({}) {
+function ChainSwitcher() {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const dispatch = useDispatch();
