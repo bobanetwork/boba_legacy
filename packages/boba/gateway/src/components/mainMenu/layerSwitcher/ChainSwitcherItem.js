@@ -11,7 +11,7 @@ function ChainSwitcherItem({
   icon,
   label,
   onChainChange,
-  currentChain
+  isActive
 }) {
 
   return <S.ChainSwitcherItem
@@ -26,7 +26,7 @@ function ChainSwitcherItem({
         {L2Icons[ icon ]}
       </Box>
       <Typography flex={1} variant="body2" sx={{ whiteSpace: 'nowrap' }} >{label} </Typography>
-      {currentChain === chain ? <CheckIcon color="#BAE21A" /> : null}
+      {isActive ? <CheckIcon color="#BAE21A" /> : null}
     </Box >
   </S.ChainSwitcherItem>
 }

@@ -11,3 +11,9 @@ export function selectCurrentAppChain() {
     return state.network['appChain']
   }
 }
+
+export function selectActiveNetworkType() {
+  return function (state) {
+    return state.network['networkType']
+  }
+}
