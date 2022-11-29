@@ -31,7 +31,8 @@ const deployFluxAggregator = async (
     8, // decimals
     'TST USD', // description
     '0x0000000000000000000000000000000000000000',
-    'https://example.com'
+    'https://example.com',
+    '0x0000000000000000000000000000000000000000'
   )
 }
 
@@ -270,6 +271,115 @@ describe('Oracle Flux Aggregator Tests', async () => {
 
       const previousRoundData = await FluxAggregator.getRoundData(10004)
       expect(previousRoundData.answeredInRound).to.be.eq(10004)
+    })
+  })
+
+  describe('Allow admin to update Turing settings', async () => {
+    beforeEach(async () => {
+      const signer: Signer = (await ethers.getSigners())[0]
+      const signer2: Signer = (await ethers.getSigners())[1]
+      const signer3: Signer = (await ethers.getSigners())[2]
+      const paymentAmount = await FluxAggregator.paymentAmount()
+      const approveTx = await bobaToken.approve(
+        FluxAggregator.address,
+        paymentAmount.mul(6)
+      )
+      await approveTx.wait()
+      const addFundsTx = await FluxAggregator.addFunds(paymentAmount.mul(6))
+      await addFundsTx.wait()
+
+      const addFirstOracleTx = await FluxAggregator.changeOracles(
+        [],
+        [await signer2.getAddress()],
+        [await signer2.getAddress()],
+        [10000],
+        1, // min submission count
+        1, // max submission count
+        0 // restart delay
+      )
+      await addFirstOracleTx.wait()
+
+      await FluxAggregator.connect(signer2).emergencySubmit(10001, 1000, 10001)
+      await FluxAggregator.connect(signer2).emergencySubmit(10002, 1010, 10002)
+      await FluxAggregator.connect(signer2).emergencySubmit(10003, 1020, 10003)
+
+      const addOracleTx = await FluxAggregator.changeOracles(
+        [],
+        [await signer3.getAddress(), await signer.getAddress()],
+        [await signer3.getAddress(), await signer.getAddress()],
+        [10003, 10003],
+        2, // min submission count
+        3, // max submission count
+        0 // restart delay
+      )
+      await addOracleTx.wait()
+    })
+
+    it('should be able to update Turing URL', async () => {
+      const newUrl = 'https://turing.new.url'
+      const updateTx = await FluxAggregator.updateTuringUrl(newUrl)
+      await updateTx.wait()
+      const turingUrl = await FluxAggregator.turingUrl()
+      expect(turingUrl).to.be.eq(newUrl)
+    })
+
+    it('should not be able to update Turing URL if not admin', async () => {
+      const newUrl = 'https://turing.new.url'
+      const signer2: Signer = (await ethers.getSigners())[1]
+      await expect(
+        FluxAggregator.connect(signer2).updateTuringUrl(newUrl)
+      ).to.be.revertedWith('Only callable by owner')
+    })
+
+    it('should be able to update TuringHelper', async () => {
+      const newHelper = '0x0000000000000000000000000000000000000001'
+      const updateTx = await FluxAggregator.updateTuringHelper(newHelper)
+      await updateTx.wait()
+      const turingHelper = await FluxAggregator.turingHelperAddr()
+      expect(turingHelper).to.be.eq(newHelper)
+    })
+
+    it('should not be able to update TuringHelper if not admin', async () => {
+      const newHelper = '0x0000000000000000000000000000000000000002'
+      const signer2: Signer = (await ethers.getSigners())[1]
+      await expect(
+        FluxAggregator.connect(signer2).updateTuringHelper(newHelper)
+      ).to.be.revertedWith('Only callable by owner')
+    })
+
+    it('should not be able to update TuringHelper if address is 0x', async () => {
+      const newHelper = ethers.constants.AddressZero
+      await expect(
+        FluxAggregator.updateTuringHelper(newHelper)
+      ).to.be.revertedWith('Cannot set turingHelper to 0x address')
+    })
+
+    it('should be able to update turingChainLinkPriceFeedAddress', async () => {
+      const newAddress = '0x0000000000000000000000000000000000000001'
+      const updateTx = await FluxAggregator.updateTuringChainLinkPriceFeedAddr(
+        newAddress
+      )
+      await updateTx.wait()
+      const turingChainLinkPriceFeedAddress =
+        await FluxAggregator.turingChainLinkPriceFeedAddr()
+      expect(turingChainLinkPriceFeedAddress).to.be.eq(newAddress)
+    })
+
+    it('should not be able to update turingChainLinkPriceFeedAddress if not admin', async () => {
+      const newAddress = '0x0000000000000000000000000000000000000002'
+      const signer2: Signer = (await ethers.getSigners())[1]
+      await expect(
+        FluxAggregator.connect(signer2).updateTuringChainLinkPriceFeedAddr(
+          newAddress
+        )
+      ).to.be.revertedWith('Only callable by owner')
+    })
+
+    it('should not be able to update turingChainLinkPriceFeedAddress if address is 0x', async () => {
+      const newAddress = ethers.constants.AddressZero
+      await expect(
+        FluxAggregator.updateTuringChainLinkPriceFeedAddr(newAddress)
+      ).to.be.revertedWith('Cannot set turingChainLinkPriceFeed to 0x address')
     })
   })
 })
