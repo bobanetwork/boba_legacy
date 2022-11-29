@@ -6,12 +6,14 @@ import BNBIcon from 'components/icons/chain/L1/BNBIcon';
 import AvalancheIcon from 'components/icons/chain/L1/AvalancheIcon';
 import FantomIcon from 'components/icons/chain/L1/FantomIcon';
 import MoonbeamIcon from 'components/icons/chain/L1/MoonbeamIcon';
+import MoonbaseIcon from 'components/icons/chain/L1/MoonbaseIcon';
 
 import BobaIcon from 'components/icons/chain/L2/BobaIcon';
 import BobaBNBIcon from 'components/icons/chain/L2/BobaBNBIcon';
 import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon';
 import BobaFantomIcon from 'components/icons/chain/L2/BobaFantomIcon';
 import BobabeamIcon from 'components/icons/chain/L2/BobabeamIcon';
+import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon';
 
 /**************
  * Env Params *
@@ -93,6 +95,7 @@ export const L1Icons = {
   avax: <AvalancheIcon />,
   fantom: <FantomIcon />,
   moonbeam: <MoonbeamIcon />,
+  moonbase: <MoonbaseIcon />,
 }
 
 export const L2Icons = {
@@ -101,4 +104,5 @@ export const L2Icons = {
   avax: <BobaAvaxIcon />,
   fantom: <BobaFantomIcon />,
   moonbeam: <BobabeamIcon />,
+  moonbase: <BobabaseIcon />,
 }
