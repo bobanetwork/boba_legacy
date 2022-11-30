@@ -174,7 +174,6 @@ function LayerSwitcher({
 
   useEffect(() => {
     if (connectETHRequest) {
-      console.log(`%cConnect TO ETH request`, 'color:yellow;font-size:20px');
       localStorage.setItem('wantChain', JSON.stringify('L1'))
       networkService.switchChain('L1')
       dispatchBootAccount()
@@ -183,7 +182,6 @@ function LayerSwitcher({
 
   useEffect(() => {
     if (connectBOBARequest) {
-      console.log(`%cConnect TO BOBA request`, 'color:green;font-size:20px');
       localStorage.setItem('wantChain', JSON.stringify('L2'))
       networkService.switchChain('L2')
       dispatchBootAccount()
@@ -192,7 +190,6 @@ function LayerSwitcher({
 
   useEffect(() => {
     if (connectRequest) {
-      console.log(`%cConnect request`, 'color:blue;font-size:20px');
       dispatchBootAccount()
     }
   }, [ connectRequest, dispatchBootAccount ])
