@@ -121,7 +121,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     expect(preL2BOBABalance).to.deep.eq(
       postL2BOBABalance.sub(depositBOBAAmount)
     )
-  })
+  }).retries(3)
 
   it('contract should be whitelisted', async () => {
     const tr2 = await TuringHelper.checkPermittedCaller(random.address)
