@@ -24,9 +24,9 @@ function NetworkListItem({
       onChainChange({chain, icon})
     }}>
     <Box display="flex" justifyContent="space-around" alignItems="center" gap={2}>
-      <Box display="flex" justifyContent="space-around" alignItems="center">
-        <L1Icon />
-        <L2Icon />
+      <Box display="flex" justifyContent="space-around" alignItems="center" gap={1}>
+        <L1Icon selected={isActive} />
+        <L2Icon selected={isActive}/>
       </Box>
       <Typography flex={1} variant="body2" sx={{ whiteSpace: 'nowrap' }} >{label} </Typography>
       {isActive ? <CheckIcon color="#BAE21A" /> : null}
