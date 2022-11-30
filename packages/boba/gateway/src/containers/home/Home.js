@@ -36,10 +36,6 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import {
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2
-} from 'actions/airdropAction'
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
@@ -72,7 +68,7 @@ import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
 import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
-import NewProposalModal from 'containers/modals/dao/NewProposalModal'
+import NewProposalModal from 'containers/modals/dao/old/NewProposalModalOldDao'
 import CastVoteModal from 'containers/modals/dao/CastVoteModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
@@ -176,8 +172,6 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchAirdropStatusL1()) // account specific
-      dispatch(fetchAirdropStatusL2()) // account specific
       dispatch(fetchDaoBalance())      // account specific
       dispatch(fetchDaoVotes())        // account specific
       dispatch(fetchDaoBalanceX())     // account specific

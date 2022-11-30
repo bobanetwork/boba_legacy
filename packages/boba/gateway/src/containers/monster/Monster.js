@@ -269,7 +269,7 @@ class Monster extends React.Component {
                   their Boba wallet. The system is powered by Turing, which does all
                   the heavy lifting in the background.
                   The new Twitter/Turing based fountain has been launched and is available
-                  to developers on Rinkeby.
+                  to developers on Goerli.
                 </Typography>
 
               </Box>
