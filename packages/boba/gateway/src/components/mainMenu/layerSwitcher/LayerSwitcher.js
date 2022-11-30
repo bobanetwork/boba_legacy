@@ -30,7 +30,7 @@ import {
   selectConnect
 } from 'selectors/setupSelector'
 
-import {selectActiveNetworkIcon, selectNetwork} from 'selectors/networkSelector'
+import {selectActiveNetwork, selectActiveNetworkIcon, selectActiveNetworkType } from 'selectors/networkSelector'
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
@@ -48,7 +48,7 @@ import {
 
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
-import { L1_ICONS, L2_ICONS } from 'util/network.util.js'
+import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
 
 function LayerSwitcher({
   visisble = true
@@ -58,10 +58,10 @@ function LayerSwitcher({
   const accountEnabled = useSelector(selectAccountEnabled())
 
   let layer = useSelector(selectLayer())
-  const network = useSelector(selectNetwork())
+  const network = useSelector(selectActiveNetwork())
+  const networkType = useSelector(selectActiveNetworkType())
 
   const networkIcon = useSelector(selectActiveNetworkIcon())
-  console.log(['networkIcon',networkIcon]);
 
   const L1Icon = L1_ICONS[ networkIcon ];
   const L2Icon = L2_ICONS[ networkIcon ];
@@ -85,9 +85,10 @@ function LayerSwitcher({
 
     async function initializeAccount() {
 
-      const initialized = await networkService.initializeAccount(network)
-
-      console.log("initialized:",initialized)
+      const initialized = await networkService.initializeAccount({
+        networkGateway: network,
+        networkType
+      })
 
       if (initialized === 'wrongnetwork') {
         dispatch(openModal('wrongNetworkModal'))
@@ -112,7 +113,7 @@ function LayerSwitcher({
       }
     }
 
-  }, [ dispatch, accountEnabled, network ])
+  }, [ dispatch, accountEnabled, network,networkType ])
 
   // this will switch chain, if needed, and then connect to Boba
   const connectToBOBA = useCallback(() => {

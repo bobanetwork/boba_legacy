@@ -88,7 +88,7 @@ import Zendesk from 'components/zendesk/Zendesk'
 import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
-import { selectNetwork } from 'selectors/networkSelector'
+import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
 
 
 function Home() {
@@ -128,7 +128,8 @@ function Home() {
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
   const castVoteModalState = useSelector(selectModalState('castVoteModal'))
 
-  const network = useSelector(selectNetwork())
+  const activeNetwork = useSelector(selectActiveNetwork())
+  const activeNetworkType = useSelector(selectActiveNetworkType())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -153,7 +154,11 @@ function Home() {
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
-      const initialized = await networkService.initializeBase( 'etheruem' ) /// FIXME: should be active network
+      const initialized = await networkService.initializeBase({
+        networkGateway: activeNetwork,
+        networkType: activeNetworkType
+      })
+
       if (!initialized) {
         dispatch(setBaseState(false))
         return false
@@ -166,7 +171,7 @@ function Home() {
       }
     }
 
-  }, [ dispatch, network, baseEnabled, maintenance ])
+  }, [ dispatch, activeNetwork, activeNetworkType, baseEnabled, maintenance ])
 
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {

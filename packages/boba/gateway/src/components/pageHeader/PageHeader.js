@@ -17,6 +17,7 @@ import Copy from 'components/copy/Copy'
 import { useSelector } from 'react-redux'
 import { selectAccountEnabled, selectMonster } from 'selectors/setupSelector'
 import NetworkSwitcher from 'components/mainMenu/networkSwitcher/NetworkSwitcher'
+import WalletSwitch from 'components/walletSwitch/WalletSwitch'
 
 const useStyles = makeStyles({
   root: {
@@ -118,8 +119,8 @@ const PageHeader = ({ maintenance }) => {
             <Logo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px' }} />
             <MenuItems setOpen={setOpen} />
             <FeeSwitcher />
+            <WalletSwitch />
             <NetworkSwitcher />
-            {/* <LayerSwitcher /> */}
             {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}
             <ThemeSwitcher />
           </S.HeaderWrapper>)

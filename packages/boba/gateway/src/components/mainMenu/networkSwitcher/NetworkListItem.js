@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 
 import CheckIcon from '@mui/icons-material/Check'
-import { L1_ICONS, L2_ICONS } from 'util/network.util';
+import { L1_ICONS, L2_ICONS } from 'util/network/network.util';
 
 import * as S from './NetworkListItem.styles'
 
