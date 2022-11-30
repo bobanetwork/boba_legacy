@@ -13,6 +13,7 @@ export const moonbaseConfig = {
       rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
       blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: ` https://etherscan.io/tx/`,
+      blockExplorerUrl: `https://etherscan.io/`
     },
     L2: {
       name: "BOBA L2",
@@ -21,6 +22,7 @@ export const moonbaseConfig = {
       rpcUrl: `https://mainnet.boba.network`,
       blockExplorer: `https://bobascan.com/`,
       transaction: `https://bobascan.com/tx/`,
+      blockExplorerUrl: `https://bobascan.com/`
     },
     payloadForL1SecurityFee: {
       from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
