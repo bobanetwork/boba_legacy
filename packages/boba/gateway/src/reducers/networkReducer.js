@@ -16,32 +16,54 @@ limitations under the License. */
 import { NETWORK, NETWORK_TYPE } from "util/network.util"
 
 /**
+ * network : etheruem, bnb, fantom, avax, moonbase, moonbeam
+ * networkType : mainnet, testnet.
+ **/
+
+/**
  * NOTE:
- * 1. selected networkType, network.
- * 2. current networkType, network.
  * 3. enable switch once selected !== current.
  * 4. on selection dispatch event.
  * 5. on switch click dispatch event. and reload.
- *
  */
 
 const initialState = {
   network: NETWORK.ETHEREUM,
-  networkType: NETWORK_TYPE.MAINNET
+  networkIcon: 'ethereum',
+  networkType: NETWORK_TYPE.MAINNET,
+  activeNetworkIcon: 'ethereum',
+  activeNetwork: NETWORK.ETHEREUM,
+  activeNetworkType: NETWORK_TYPE.MAINNET
 }
 
 function networkReducer(state = initialState, action) {
   switch (action.type) {
-    case 'SETUP/NETWORK/SET':
+    case 'NETWORK/SET': {
       const {
         network,
-        networkType
+        networkType,
+        networkIcon
       } = action.payload;
       return {
         ...state,
         network,
+        networkIcon,
         networkType
       }
+    }
+    case 'NETWORK/SET/ACTIVE':{
+      const {
+        network: activeNetwork,
+        networkType: activeNetworkType,
+        networkIcon: activeNetworkIcon
+      } = state;
+      return {
+        ...state,
+        activeNetwork,
+        activeNetworkType,
+        activeNetworkIcon
+      }
+    }
     default:
       return state
   }

@@ -30,7 +30,7 @@ import {
   selectConnect
 } from 'selectors/setupSelector'
 
-import {selectNetwork} from 'selectors/networkSelector'
+import {selectActiveNetworkIcon, selectNetwork} from 'selectors/networkSelector'
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
@@ -48,6 +48,7 @@ import {
 
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
+import { L1_ICONS, L2_ICONS } from 'util/network.util.js'
 
 function LayerSwitcher({
   visisble = true
@@ -58,6 +59,12 @@ function LayerSwitcher({
 
   let layer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
+
+  const networkIcon = useSelector(selectActiveNetworkIcon())
+  console.log(['networkIcon',networkIcon]);
+
+  const L1Icon = L1_ICONS[ networkIcon ];
+  const L2Icon = L2_ICONS[ networkIcon ];
 
   const connectETHRequest = useSelector(selectConnectETH())
   const connectBOBARequest = useSelector(selectConnectBOBA())
@@ -247,10 +254,10 @@ function LayerSwitcher({
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
-          <EthereumIcon selected={layer === 'L1'}/>
+          <L1Icon selected={layer === 'L1'}/>
         </ToggleButton>
         <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
-          <BobaIcon selected={layer === 'L2'} />
+          <L2Icon selected={layer === 'L2'} />
         </ToggleButton>
       </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>

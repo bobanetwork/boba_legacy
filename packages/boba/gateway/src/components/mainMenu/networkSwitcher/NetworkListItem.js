@@ -14,16 +14,19 @@ function NetworkListItem({
   isActive
 }) {
 
+  const L1Icon = L1_ICONS[ icon ];
+  const L2Icon = L2_ICONS[ icon ];
+
   return <S.ChainSwitcherItem
     divider
     key={chain}
     onClick={() => {
-      onChainChange({chain})
+      onChainChange({chain, icon})
     }}>
     <Box display="flex" justifyContent="space-around" alignItems="center" gap={2}>
       <Box display="flex" justifyContent="space-around" alignItems="center">
-        {L1_ICONS[ icon ]}
-        {L2_ICONS[ icon ]}
+        <L1Icon />
+        <L2Icon />
       </Box>
       <Typography flex={1} variant="body2" sx={{ whiteSpace: 'nowrap' }} >{label} </Typography>
       {isActive ? <CheckIcon color="#BAE21A" /> : null}
