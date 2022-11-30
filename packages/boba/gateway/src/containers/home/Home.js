@@ -89,6 +89,7 @@ import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
+import IconComponent from 'components/icons/chain/IconComponent'
 
 
 function Home() {
@@ -252,7 +253,6 @@ function Home() {
       </Alert>
       <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
-
       {!!maintenance &&
         <Box sx={{
           display: 'flex',
