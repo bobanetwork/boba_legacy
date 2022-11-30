@@ -151,6 +151,8 @@ function Home() {
 
     if (maintenance) return
 
+    console.log(['BASEENABLED',baseEnabled])
+
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
@@ -158,6 +160,8 @@ function Home() {
         networkGateway: activeNetwork,
         networkType: activeNetworkType
       })
+
+      console.log(`%c base initialized ${initialized}`,'color:yellow')
 
       if (!initialized) {
         dispatch(setBaseState(false))
