@@ -89,7 +89,6 @@ import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
-import IconComponent from 'components/icons/chain/IconComponent'
 
 
 function Home() {
