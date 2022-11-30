@@ -12,7 +12,8 @@ export const avaxConfig = {
       chainIdHex: '0x5',
       rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
       blockExplorer: `https://api-goerli.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
-      transaction: `https://goerli.etherscan.io/tx/`
+      transaction: `https://goerli.etherscan.io/tx/`,
+      blockExplorerUrl: `https://goerli.etherscan.io/`
     },
     L2: {
       name: "BOBA Goerli L2",
@@ -20,7 +21,8 @@ export const avaxConfig = {
       chainIdHex: '0xB48',
       rpcUrl: `https://goerli.boba.network`,
       blockExplorer: `https://testnet.bobascan.com/`,
-      transaction: `https://testnet.bobascan.com/tx/`
+      transaction: `https://testnet.bobascan.com/tx/`,
+      blockExplorerUrl: `https://testnet.bobascan.com/`
     },
     ALTL1: {
       name: "Alt L1s",
@@ -58,6 +60,7 @@ export const avaxConfig = {
       rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
       blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: ` https://etherscan.io/tx/`,
+      blockExplorerUrl: `https://etherscan.io/`
     },
     L2: {
       name: "BOBA L2",
@@ -66,6 +69,7 @@ export const avaxConfig = {
       rpcUrl: `https://mainnet.boba.network`,
       blockExplorer: `https://bobascan.com/`,
       transaction: `https://bobascan.com/tx/`,
+      blockExplorerUrl: `https://bobascan.com/`
     },
     payloadForL1SecurityFee: {
       from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',

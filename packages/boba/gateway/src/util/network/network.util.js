@@ -132,3 +132,12 @@ export const getNetworkDetail = ({
 }) => {
   return networkConfig[network][networkType]
 }
+
+
+export const getBlockExplorerUrl = ({
+  network,
+  networkType,
+  layer
+}) => {
+  return networkConfig[network][networkType][layer]?.blockExplorerUrl
+}
