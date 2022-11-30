@@ -9,10 +9,10 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher';
 import Tabs from 'components/tabs/Tabs';
 import NetworkListItem from './NetworkListItem'
 
-import NetworkList, { NETWORK_TYPE } from 'util/network.util';
+import {NetworkList, NETWORK_TYPE } from 'util/network/network.util';
 
 import * as S from './NetworkSwitcher.styles'
-import { setActiveNetwork, setNetwork } from 'actions/networkAction';
+import { setNetwork } from 'actions/networkAction';
 import { selectNetwork, selectNetworkType } from 'selectors/networkSelector';
 
 function NetworkSwitcher() {
@@ -40,7 +40,6 @@ function NetworkSwitcher() {
       networkIcon: icon,
       networkType: activeTab,
     }));
-    dispatch(setActiveNetwork());
   }
 
   return (

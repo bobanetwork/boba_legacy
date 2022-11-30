@@ -1,5 +1,3 @@
-import React from 'react';
-
 import EthereumIcon from 'components/icons/chain/L1/EthereumIcon';
 import BNBIcon from 'components/icons/chain/L1/BNBIcon';
 import AvalancheIcon from 'components/icons/chain/L1/AvalancheIcon';
@@ -13,6 +11,8 @@ import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon';
 import BobaFantomIcon from 'components/icons/chain/L2/BobaFantomIcon';
 import BobabeamIcon from 'components/icons/chain/L2/BobabeamIcon';
 import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon';
+
+import { ethereumConfig } from './config/ethereum';
 
 
 export const L1_ICONS = {
@@ -116,4 +116,19 @@ export const NetworkList = {
   ]
 }
 
-export default NetworkList;
+
+const networkConfig = {
+  [NETWORK.ETHEREUM] : ethereumConfig,
+  [NETWORK.BNB] : ethereumConfig,
+  [NETWORK.FANTOM] : ethereumConfig,
+  [NETWORK.AVAX] : ethereumConfig,
+  [NETWORK.MOONBEAM] : ethereumConfig,
+  [NETWORK.MOONBASE] : ethereumConfig,
+}
+
+export const getNetworkDetail = ({
+  network,
+  networkType
+}) => {
+  return networkConfig[network][networkType]
+}
