@@ -36,6 +36,10 @@ const optimizedComilerSettings = {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
+  typechain: {
+    outDir: 'typechain',
+    target: 'ethers-v5'
+  },
   solidity: {
     compilers: [{
       version: '0.8.15',
