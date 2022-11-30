@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 
 import { setActiveNetwork } from 'actions/networkAction';
-import { setBaseState, setConnect } from 'actions/setupAction';
+import { setBaseState } from 'actions/setupAction';
 import { selectActiveNetwork, selectActiveNetworkType, selectNetwork, selectNetworkType } from 'selectors/networkSelector';
 
 import Button from 'components/button/Button';

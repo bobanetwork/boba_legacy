@@ -19,25 +19,25 @@ const IconComponent = () => {
     <Box display="flex">
       <Box display="flex" margin="auto" p="5" gap={2}>
         <Typography>
-          Default State
+          Selected State
         </Typography>
         <Box display="flex" flexDirection="column" gap={2}>
-          <EthereumIcon selected={false} />
-          <BNBIcon selected={false} />
-          <AvalancheIcon selected={false} />
-          <FantomIcon selected={false} />
-          <MoonbeamIcon selected={false} />
+          <EthereumIcon selected={true} />
+          <BNBIcon selected={true} />
+          <AvalancheIcon selected={true} />
+          <FantomIcon selected={true} />
+          <MoonbeamIcon selected={true} />
         </Box>
         <Box display="flex" flexDirection="column" gap={2}>
-          <BobaIcon selected={false} />
-          <BobaBNBIcon selected={false} />
-          <BobaAvaxIcon selected={false} />
-          <BobaFantomIcon selected={false} />
-          <BobabeamIcon selected={false} />
+          <BobaIcon selected={true} />
+          <BobaBNBIcon selected={true} />
+          <BobaAvaxIcon selected={true} />
+          <BobaFantomIcon selected={true} />
+          <BobabeamIcon selected={true} />
         </Box>
       </Box><Box display="flex" margin="auto" p="5" gap={2}>
         <Typography>
-          Selected State
+          Default State
         </Typography>
         <Box display="flex" flexDirection="column" gap={2}>
           <EthereumIcon />
