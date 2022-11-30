@@ -255,6 +255,13 @@ export function getAllAddresses() {
 */
 export function setNetwork(payload) {
   return function (dispatch) {
-    return dispatch({ type: 'SETUP/NETWORK/SET', payload: payload })
+    return dispatch({ type: 'NETWORK/SET', payload: payload })
+  }
+}
+
+// to update the active network.
+export function setActiveNetwork(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'NETWORK/SET/ACTIVE' })
   }
 }
