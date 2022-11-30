@@ -106,6 +106,7 @@ import tokenInfo from "@boba/register/addresses/tokenInfo"
 import { bobaBridges } from 'util/bobaBridges'
 import { APP_CHAIN, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
+import { getNetworkDetail, NETWORK } from 'util/network/network.util'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -168,6 +169,7 @@ class NetworkService {
     // L1 or L2
     this.L1orL2 = null
     this.networkGateway = null
+    this.networkType = null
     this.L1ProviderBASE = null
     this.L2ProviderBASE = null
 
@@ -494,17 +496,23 @@ class NetworkService {
      return allAddresses
   }
 
-  async initializeBase( networkGateway ) {
-
-    console.log('NS: initializeBase() for', networkGateway)
+  async initializeBase({
+    networkGateway,
+    networkType
+  }) {
 
     let addresses = null
     this.networkGateway = networkGateway // e.g. mainnet | goerli | ...
+    this.networkType = networkType // e.g. mainnet | goerli | ...
 
     // defines the set of possible networks along with chainId for L1 and L2
-    const nw = getNetwork()
-    const L1rpc = nw[networkGateway]['L1']['rpcUrl']
-    const L2rpc = nw[networkGateway]['L2']['rpcUrl']
+    const networkDetail = getNetworkDetail({
+      network: networkGateway,
+      networkType
+    })
+    console.log(['networkDetail',networkDetail])
+    const L1rpc = networkDetail['L1']['rpcUrl']
+    const L2rpc = networkDetail['L2']['rpcUrl']
 
     try {
 
@@ -517,33 +525,27 @@ class NetworkService {
       //this.L1ProviderBASE.eth.handleRevert = true
       //this.L2ProviderBASE.eth.handleRevert = true
 
-      if (networkGateway === 'mainnet' || networkGateway === 'goerli') {
-        this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
-        this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
-        this.gasEstimateAccount = nw[networkGateway].gasEstimateAccount
+      if (NETWORK[networkGateway]) {
+        this.payloadForL1SecurityFee = networkDetail.payloadForL1SecurityFee
+        this.payloadForFastDepositBatchCost = networkDetail.payloadForFastDepositBatchCost
+        this.gasEstimateAccount = networkDetail.gasEstimateAccount
         console.log('gasEstimateAccount:', this.gasEstimateAccount)
       }
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[networkGateway]['L1']['rpcUrl']
+        networkDetail['L1']['rpcUrl']
       )
 
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
-        nw[networkGateway]['L2']['rpcUrl']
+        networkDetail['L2']['rpcUrl']
       )
 
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
 
-      if (networkGateway === 'goerli') {
-        addresses = addresses_Goerli
-      } else if (networkGateway === 'mainnet') {
-        addresses = addresses_Mainnet
+      if (!!NETWORK[networkGateway]) {
+        addresses = allAddresses
       }
-      // else if (networkGateway === 'local') {
-      //     //addresses = addresses_Local
-      //     console.log('Goerli Addresses:', addresses)
-      // }
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
@@ -712,7 +714,6 @@ class NetworkService {
           this.L2Provider
         )
       }
-      console.log("L2StandardBridgeContract:", this.L2StandardBridgeContract.address)
 
       this.L2_ETH_Contract = new ethers.Contract(
         allAddresses.L2_ETH_Address,
@@ -839,9 +840,7 @@ class NetworkService {
     }
   }
 
-  async initializeAccount( networkGateway ) {
-
-    console.log('NS: initializeAccounts() for', networkGateway)
+  async initializeAccount({ networkGateway, networkType }) {
 
     try {
 
@@ -854,47 +853,32 @@ class NetworkService {
       this.chainID = networkMM.chainId
       this.networkName = networkMM.name
       this.networkGateway = networkGateway
+      this.networkType = networkType
 
       console.log('NS: networkMM:', networkMM)
       console.log('NS: networkGateway:', networkGateway)
+      console.log('NS: networkType:', networkType)
       console.log('NS: this.chainID from MM:', this.chainID)
       console.log('NS: this.networkName from MM:', this.networkName)
       console.log('NS: this.account from MM:', this.account)
 
       // defines the set of possible networks along with chainId for L1 and L2
-      const nw = getNetwork()
-      const L1ChainId = nw[networkGateway]['L1']['chainId']
-      const L2ChainId = nw[networkGateway]['L2']['chainId']
+      // const nw = getNetwork()
+      const networkDetail = getNetworkDetail({
+        network: networkGateway,
+        networkType
+      })
 
-      // there are numerous possible chains we could be on
-      // either local, goerli etc
-      // also, either L1 or L2
+      const L1ChainId = networkDetail['L1']['chainId']
+      const L2ChainId = networkDetail['L2']['chainId']
 
-      // at this point, we only know whether we want to be on local or goerli etc
-      if (networkGateway === 'local' && networkMM.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //local deployment, L2
-        this.L1orL2 = 'L2'
-      } else if (networkGateway === 'local' && networkMM.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //local deployment, L1
-        this.L1orL2 = 'L1'
-      } else if (networkGateway === 'goerli' && networkMM.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //goerli, L1
-        this.L1orL2 = 'L1'
-      } else if (networkGateway === 'goerli' && networkMM.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //goerli, L2
-        this.L1orL2 = 'L2'
-      } else if (networkGateway === 'mainnet' && networkMM.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //mainnet, L2
-        this.L1orL2 = 'L1'
-      } else if (networkGateway === 'mainnet' && networkMM.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //mainnet, L2
-        this.L1orL2 = 'L2'
+      // there are numerous possible chains we could be on also, either L1 or L2
+      // at this point, we only know whether we want to be on which network etc
+
+      if (!!NETWORK[ networkGateway ] && networkMM.chainId === L2ChainId) {
+        this.L1orL2 = 'L2';
+      } else if(!!NETWORK[ networkGateway ] && networkMM.chainId === L1ChainId) {
+        this.L1orL2 = 'L1';
       } else {
         console.log("ERROR: networkGateway does not match actual network.chainId")
         this.bindProviderListeners()
@@ -945,21 +929,23 @@ class NetworkService {
 
   async switchChain( targetLayer ) {
 
-    const nw = getNetwork()
-    const network = store.getState().setup.network
+    const networkDetail = getNetworkDetail({
+      network: this.networkGateway,
+      networkType: this.networkType
+    })
 
     let blockExplorerUrls = null
 
     //local does not have a blockexplorer
-    if( network !== 'local') {
-      blockExplorerUrls = [nw[network].L2.blockExplorer.slice(0, -1)]
+    if( this.networkGateway !== 'local') {
+      blockExplorerUrls = [networkDetail.L2.blockExplorer.slice(0, -1)]
     }
 
     //the chainParams are only needed for the L2s
     const chainParam = {
-      chainId: '0x' + nw[network].L2.chainId.toString(16),
-      chainName: nw[network].L2.name,
-      rpcUrls: [nw[network].L2.rpcUrl],
+      chainId: '0x' + networkDetail.L2.chainId.toString(16),
+      chainName: networkDetail.L2.name,
+      rpcUrls: [networkDetail.L2.rpcUrl],
       nativeCurrency: {
         name: 'Ethereum',
         symbol: 'ETH',
@@ -968,7 +954,7 @@ class NetworkService {
       blockExplorerUrls
     }
 
-    const targetIDHex = nw[network][targetLayer].chainIdHex
+    const targetIDHex = networkDetail[targetLayer].chainIdHex
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
