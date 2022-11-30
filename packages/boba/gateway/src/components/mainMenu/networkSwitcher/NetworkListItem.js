@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+
 import CheckIcon from '@mui/icons-material/Check'
+import { L1_ICONS, L2_ICONS } from 'util/network.util';
 
-import { L1Icons, L2Icons } from 'util/constant';
+import * as S from './NetworkListItem.styles'
 
-import * as S from './ChainSwitcherItem.styles'
-
-function ChainSwitcherItem({
+function NetworkListItem({
   chain,
   icon,
   label,
@@ -22,8 +22,8 @@ function ChainSwitcherItem({
     }}>
     <Box display="flex" justifyContent="space-around" alignItems="center" gap={2}>
       <Box display="flex" justifyContent="space-around" alignItems="center">
-        {L1Icons[ icon ]}
-        {L2Icons[ icon ]}
+        {L1_ICONS[ icon ]}
+        {L2_ICONS[ icon ]}
       </Box>
       <Typography flex={1} variant="body2" sx={{ whiteSpace: 'nowrap' }} >{label} </Typography>
       {isActive ? <CheckIcon color="#BAE21A" /> : null}
@@ -31,4 +31,4 @@ function ChainSwitcherItem({
   </S.ChainSwitcherItem>
 }
 
-export default ChainSwitcherItem;
+export default NetworkListItem;

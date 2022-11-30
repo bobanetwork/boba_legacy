@@ -4,7 +4,7 @@ import { BrowserTracing } from '@sentry/tracing';
 import { Typography } from '@mui/material';
 import { APP_ENV, SENTRY_DSN } from 'util/constant';
 import { useSelector } from 'react-redux';
-import { selectCurrentAppChain } from 'selectors/networkSelector';
+import { selectNetwork } from 'selectors/networkSelector';
 
 
 /**
@@ -18,7 +18,7 @@ const SentryWrapper = ({
   children
 }) => {
 
-  const appChain = useSelector(selectCurrentAppChain());
+  const network = useSelector(selectNetwork());
 
   useEffect(() => {
     const dns = SENTRY_DSN;
@@ -27,7 +27,7 @@ const SentryWrapper = ({
       // Sentry initializations.
       Sentry.init({
         dsn: SENTRY_DSN,
-        environment: `${APP_ENV}-${appChain}`,
+        environment: `${APP_ENV}-${network}`,
         integrations: [
           new Sentry.Integrations.GlobalHandlers({
             onunhandledrejection: false,  /// will avoid to send unhandle browser error.
@@ -49,7 +49,7 @@ const SentryWrapper = ({
         ],
         tracesSampleRate: 1.0,
         initialScope: {
-          tags: { 'network': appChain }
+          tags: { network }
         },
         beforeSend: (event, hint) => {
           // Avoid sending the sentry events on local env.
@@ -70,7 +70,7 @@ const SentryWrapper = ({
     return () => {
       Sentry.close(2000) // to close the sentry client connection on unmounting.
     };
-  }, [appChain]);
+  }, [network]);
 
 
   return <>
