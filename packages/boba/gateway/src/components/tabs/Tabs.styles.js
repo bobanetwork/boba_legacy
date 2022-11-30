@@ -18,6 +18,7 @@ export const TabItem = styled(Box)(({ theme }) => ({
    transition: 'color 200ms ease-in-out',
    cursor: 'pointer',
    marginRight: '20px',
+   textTransform: 'capitalize',
    '&:hover': {
       opacity: 1,
    },

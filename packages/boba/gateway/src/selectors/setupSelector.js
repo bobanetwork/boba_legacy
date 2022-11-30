@@ -33,13 +33,6 @@ export function selectBaseEnabled () {
   }
 }
 
-// local, goerli, mainnet...
-export function selectNetwork () {
-  return function (state) {
-    return state.setup['network']
-  }
-}
-
 export function selectLayer () {
   return function (state) {
     return state.setup['netLayer']

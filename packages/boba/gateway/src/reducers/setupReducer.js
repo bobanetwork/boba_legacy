@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import { NETWORK, NETWORK_TYPE } from "util/network.util"
+
 let justSwitchedChain = localStorage.getItem("justSwitchedChain")
 
 if (justSwitchedChain) {
@@ -29,9 +31,7 @@ const initialState = {
   bobaFeeChoice: null,
   connectETH: false,
   connectBOBA: false,
-  connect: false,
-  appChain: 'mainnet',
-  network: 'mainnet'
+  connect: false
 }
 
 function setupReducer(state = initialState, action) {
@@ -58,11 +58,6 @@ function setupReducer(state = initialState, action) {
       return {
         ...state,
         netLayer: action.payload
-      }
-    case 'SETUP/NETWORK/SET':
-      return {
-        ...state,
-        network: action.payload
       }
     case 'SETUP/CONNECT_ETH':
       return {
