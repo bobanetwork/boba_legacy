@@ -7,8 +7,7 @@ import { pagesByChain, MENU_LIST } from './menu.config'
 
 import * as S from './MenuItems.styles'
 import { DISABLE_VE_DAO } from 'util/constant'
-import { selectNetwork } from 'selectors/networkSelector'
-
+import { selectActiveNetwork } from 'selectors/networkSelector'
 
 const MenuItems = () => {
 
@@ -17,13 +16,12 @@ const MenuItems = () => {
   const menuList = MENU_LIST;
   const monstersAdded = MENU_LIST.some(item => item.key === 'Monster')
   const [ list, setList ] = useState([]);
-  const network = useSelector(selectNetwork());
+  const network = useSelector(selectActiveNetwork());
 
   useEffect(() => {
+    const filterMenu = menuList.filter((m) => intersection([ m.key ], pagesByChain[ network.toLowerCase() ]).length)
 
-    const filterMenu = menuList.filter((m) => intersection([ m.key ], pagesByChain[ network ]).length)
     setList(filterMenu);
-
   },[network, menuList])
 
   useEffect(() => {
