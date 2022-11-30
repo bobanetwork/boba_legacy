@@ -1,9 +1,10 @@
-import chai from 'chai'
+import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
-const expect = chai.expect
 import { Contract, ContractFactory, BigNumber, utils, providers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { bobaLinkGetQuote } from '@boba/api'
+import util from 'util'
 
 /* eslint-disable */
 const fetch = require('node-fetch')
@@ -146,6 +147,13 @@ describe('BobaLink Test\n', async () => {
           if (req.url === "/fake") {
             const randomPrice = Math.floor(Math.random() * 1000)
             result = `0x${generateBytes32(32 * 3)}${generateBytes32(args[2])}${generateBytes32(randomPrice)}${generateBytes32(args[2])}`
+            let response = {
+              "jsonrpc": "2.0",
+              "id": jsonBody.id,
+              "result": result
+            }
+            res.end(JSON.stringify(response))
+            server.emit('success', body)
           }
           if (req.url === "/real") {
             const APIChainLinkContract = new Contract(
@@ -159,14 +167,26 @@ describe('BobaLink Test\n', async () => {
             const latestRound = await APIChainLinkContract.latestRound()
             const roundData = await APIChainLinkContract.getRoundData(args[2])
             result = `0x${generateBytes32(32 * 3)}${generateBytes32(roundData.roundId)}${generateBytes32(roundData.answer)}${generateBytes32(latestRound)}`
+            let response = {
+              "jsonrpc": "2.0",
+              "id": jsonBody.id,
+              "result": result
+            }
+            res.end(JSON.stringify(response))
+            server.emit('success', body)
           }
-          let response = {
-            "jsonrpc": "2.0",
-            "id": jsonBody.id,
-            "result": result
+          if (req.url === '/api') {
+            // load env
+            process.env.L1_NODE_WEB3_URL = ETHProviderUrl
+            const asyncBobaLinkGetQuote: any = util.promisify(
+              bobaLinkGetQuote
+            )
+            const response = await asyncBobaLinkGetQuote({
+              body: JSON.stringify({params: [input]}
+            )}, null)
+            res.end(JSON.stringify(response))
+            server.emit('success', body)
           }
-          res.end(JSON.stringify(response))
-          server.emit('success', body)
         });
 
       } else {
@@ -257,8 +277,9 @@ describe('BobaLink Test\n', async () => {
 
   it('should not be able to submit answer again using Turing', async () => {
     const nextRoundId = roundId.add(1)
-    await expect(FluxAggregatorHC.estimateGas.submit(nextRoundId)).to.be
-      .reverted
+    await expect(
+      FluxAggregatorHC.estimateGas.submit(nextRoundId)
+    ).to.be.revertedWith('cannot report on previous rounds')
   })
 
   it('should not be able to submit answer again using emergency submission', async () => {
@@ -271,7 +292,7 @@ describe('BobaLink Test\n', async () => {
         chainLinkRoundData.answer,
         latestRound
       )
-    ).to.be.reverted
+    ).to.be.revertedWith('cannot report on previous rounds')
   })
 
   it('should not be able to submit answer using the incorrect chainlink data', async () => {
@@ -289,6 +310,64 @@ describe('BobaLink Test\n', async () => {
         chainLinkRoundData.answer,
         latestRound.sub(1)
       )
-    ).to.be.reverted
+    ).to.be.revertedWith('ChainLink latestRoundId is invalid')
+  })
+
+  it('test of api endpoint: should return price', async () => {
+    const abi_payload = utils.defaultAbiCoder.encode(
+      ['uint256', 'address', 'uint256'],
+      [64, ETHUSDPriceFeedAddr, roundId]
+    )
+
+    const body = {
+      params: [abi_payload],
+    }
+
+    const resp = await fetch(`${URL}/api`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const res = await resp.json()
+    const result = utils.defaultAbiCoder.decode(
+      ['uint256', 'uint256', 'int256', 'uint80'],
+      res.result
+    )
+
+    const latestRound = await ChainLinkContract.latestRound()
+    expect(Number(result[0])).to.equal(32 * 3)
+    expect(result[1]).to.be.deep.equal(roundId)
+    expect(result[3]).to.be.deep.equal(latestRound)
+  })
+
+  it('should allow to submit answer using Turing api', async () => {
+    await FluxAggregatorHC.updateTuringUrl(`${URL}/api`)
+    const nextRoundId = roundId.add(3)
+    await FluxAggregatorHC.estimateGas.getChainLinkQuote(nextRoundId)
+    await FluxAggregatorHC.getChainLinkQuote(nextRoundId, gasOverride)
+    const block = await env.l2Provider.getBlockNumber()
+    const chainLinkQuoteEvents = await FluxAggregatorHC.queryFilter(
+      FluxAggregatorHC.filters.GetChainLinkQuote(),
+      block - 1,
+      block
+    )
+    const latestRound = await ChainLinkContract.latestRound()
+    expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(nextRoundId)
+    expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(latestRound)
+  })
+
+  it('should not be able to update answer if env is incorrect', async () => {
+    process.env.L1_NODE_WEB3_URL = 'http://localhost:3000'
+    const nextRoundId = roundId.add(4)
+    await expect(
+      FluxAggregatorHC.estimateGas.submit(nextRoundId)
+    ).to.be.revertedWith('invalid round to report')
+  })
+
+  it('should not be able to update answer if rpc returns error', async () => {
+    process.env.L1_NODE_WEB3_URL = ETHProviderUrl
+    await expect(FluxAggregatorHC.estimateGas.submit(1)).to.be.revertedWith(
+      'TURING: Server error'
+    )
   })
 })
