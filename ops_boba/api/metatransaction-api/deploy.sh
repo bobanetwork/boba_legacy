@@ -21,6 +21,14 @@ if [[ $STAGE == "rinkeby" ]]; then
   rm -rf .serverless
 fi
 
+if [[ $STAGE == "goerli" ]]; then
+  echo 'You set STAGE to goerli. Deploying to Goerli...'
+  cp env-goerli.yml env.yml &&
+  serverless -c serverless-goerli.yml deploy && # aws profile!
+  rm -rf env.yml &&
+  rm -rf .serverless
+fi
+
 if [[ $STAGE == "mainnet" ]]; then
   echo 'You set STAGE to mainnet. Deploying to Mainnet...'
   cp env-mainnet.yml env.yml &&
