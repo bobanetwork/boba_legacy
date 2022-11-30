@@ -12,7 +12,7 @@ import NetworkListItem from './NetworkListItem'
 import NetworkList, { NETWORK_TYPE } from 'util/network.util';
 
 import * as S from './NetworkSwitcher.styles'
-import { setNetwork } from 'actions/networkAction';
+import { setActiveNetwork, setNetwork } from 'actions/networkAction';
 import { selectNetwork, selectNetworkType } from 'selectors/networkSelector';
 
 function NetworkSwitcher() {
@@ -34,11 +34,13 @@ function NetworkSwitcher() {
     setAnchorEl(null);
   };
 
-  const onChainChange = ({ chain }) => {
+  const onChainChange = ({ icon, chain }) => {
     dispatch(setNetwork({
       network: chain,
+      networkIcon: icon,
       networkType: activeTab,
     }));
+    dispatch(setActiveNetwork());
   }
 
   return (

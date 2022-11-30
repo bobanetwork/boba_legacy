@@ -13,16 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-
-// etheruem, bnb, fantom, avax, moonbase, moonbeam
 export function selectNetwork () {
   return function (state) {
     return state.network['network']
   }
 }
-// mainnet, testnet.
+
 export function selectNetworkType() {
   return function (state) {
     return state.network['networkType']
+  }
+}
+
+export function selectActiveNetwork () {
+  return function (state) {
+    return state.network['activeNetwork']
+  }
+}
+
+export function selectActiveNetworkType() {
+  return function (state) {
+    return state.network['activeNetworkType']
+  }
+}
+
+export function selectActiveNetworkIcon() {
+  return function (state) {
+    return state.network['activeNetworkIcon']
   }
 }

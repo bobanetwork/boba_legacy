@@ -16,21 +16,21 @@ import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon';
 
 
 export const L1_ICONS = {
-  ethereum: <EthereumIcon />,
-  bnb: <BNBIcon />,
-  avax: <AvalancheIcon />,
-  fantom: <FantomIcon />,
-  moonbeam: <MoonbeamIcon />,
-  moonbase: <MoonbaseIcon />,
+  ethereum: EthereumIcon,
+  bnb: BNBIcon,
+  avax: AvalancheIcon,
+  fantom: FantomIcon,
+  moonbeam: MoonbeamIcon,
+  moonbase: MoonbaseIcon,
 }
 
 export const L2_ICONS = {
-  ethereum: <BobaIcon />,
-  bnb: <BobaBNBIcon />,
-  avax: <BobaAvaxIcon />,
-  fantom: <BobaFantomIcon />,
-  moonbeam: <BobabeamIcon />,
-  moonbase: <BobabaseIcon />,
+  ethereum: BobaIcon,
+  bnb: BobaBNBIcon,
+  avax: BobaAvaxIcon,
+  fantom: BobaFantomIcon,
+  moonbeam: BobabeamIcon,
+  moonbase: BobabaseIcon,
 }
 
 
