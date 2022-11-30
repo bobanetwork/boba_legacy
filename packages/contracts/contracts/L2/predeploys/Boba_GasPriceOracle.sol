@@ -89,7 +89,7 @@ contract Boba_GasPriceOracle {
     event UpdateDecimals(address, uint256);
     event WithdrawBOBA(address, address);
     event WithdrawSecondaryFeeToken(address, address);
-    event UpdateSecondaryFeeTokenMinimum(address, uint256);
+    event UpdateSecondaryFeeTokenMinimum(uint256, uint256);
 
     /**********************
      * Function Modifiers *
@@ -332,8 +332,8 @@ contract Boba_GasPriceOracle {
     function updateSecondaryFeeTokenMinimum(uint256 _secondaryFeeTokenMinimum) public onlyOwner {
         // Users should have more than 0.002 l1 native token
         require(_secondaryFeeTokenMinimum >= 2e15);
+        emit UpdateSecondaryFeeTokenMinimum(secondaryFeeTokenMinimum, _secondaryFeeTokenMinimum);
         secondaryFeeTokenMinimum = _secondaryFeeTokenMinimum;
-        emit UpdateSecondaryFeeTokenMinimum(owner(), _secondaryFeeTokenMinimum);
     }
 
     /**
