@@ -683,26 +683,28 @@ describe('Boba_GasPriceOracle', () => {
       ).to.not.be.reverted
     })
 
-    it('should emit event', async () => {
+    it.only('should emit event', async () => {
       const newMin = utils.parseEther('0.006')
+      const previousMin = await Boba_GasPriceOracle.secondaryFeeTokenMinimum()
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateSecondaryFeeTokenMinimum(
           newMin
         )
       )
         .to.emit(Boba_GasPriceOracle, 'UpdateSecondaryFeeTokenMinimum')
-        .withArgs(await signer1.getAddress(), newMin)
+        .withArgs(previousMin, newMin)
     })
 
-    it('should emit event if Secondary Fee Token Minimum is exactly 0.002', async () => {
+    it.only('should emit event if Secondary Fee Token Minimum is exactly 0.002', async () => {
       const newMin = utils.parseEther('0.002')
+      const previousMin = await Boba_GasPriceOracle.secondaryFeeTokenMinimum()
       await expect(
         Boba_GasPriceOracle.connect(signer1).updateSecondaryFeeTokenMinimum(
           newMin
         )
       )
         .to.emit(Boba_GasPriceOracle, 'UpdateSecondaryFeeTokenMinimum')
-        .withArgs(await signer1.getAddress(), newMin)
+        .withArgs(previousMin, newMin)
     })
   })
 })
