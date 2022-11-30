@@ -25,7 +25,7 @@ The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Rinkeby
 
 ## Example contracts ready to deploy
 
-1. [Turing Monsters](../../boba_community/turing-monsters/README.md) _NFTs with on-chain svg and using the Turing random number generator_
+1. [Turing Monsters](boba_community/hc-monsters/README.md) _NFTs with on-chain svg and using the Turing random number generator_
 
 2. [Truffle ERC20](../../boba_examples/truffle-erc20/README.md) _A basic ERC20 deployment using Truffle_
 
