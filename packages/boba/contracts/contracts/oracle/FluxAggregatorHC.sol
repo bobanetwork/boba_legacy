@@ -26,6 +26,7 @@ import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorValidatorInterface.sol";
 import "@chainlink/contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 
+import "./SafeMath80.sol";
 import "./interfaces/BobaTokenInterface.sol";
 import "./interfaces/ITuringHelper.sol";
 
@@ -40,6 +41,7 @@ import "./interfaces/ITuringHelper.sol";
 contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   using SafeMathChainlink for uint256;
   using SafeMath128 for uint128;
+  using SafeMath80 for uint80;
   using SafeMath64 for uint64;
   using SafeMath32 for uint32;
 
@@ -47,7 +49,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     int256 answer;
     uint64 startedAt;
     uint64 updatedAt;
-    uint32 answeredInRound;
+    uint80 answeredInRound;
   }
 
   struct RoundDetails {
@@ -60,10 +62,10 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
 
   struct OracleStatus {
     uint128 withdrawable;
-    uint32 startingRound;
-    uint32 endingRound;
-    uint32 lastReportedRound;
-    uint32 lastStartedRound;
+    uint80 startingRound;
+    uint80 endingRound;
+    uint80 lastReportedRound;
+    uint80 lastStartedRound;
     int256 latestSubmission;
     uint16 index;
     address admin;
@@ -73,7 +75,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   struct Requester {
     bool authorized;
     uint32 delay;
-    uint32 lastStartedRound;
+    uint80 lastStartedRound;
   }
 
   struct Funds {
@@ -109,19 +111,19 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    */
   uint256 constant private RESERVE_ROUNDS = 2;
   uint256 constant private MAX_ORACLE_COUNT = 77;
-  uint32 constant private ROUND_MAX = 2**32-1;
+  uint80 constant private ROUND_MAX = 2**80-1;
   uint256 private constant VALIDATOR_GAS_LIMIT = 100000;
   // An error specific to the Aggregator V3 Interface, to prevent possible
   // confusion around accidentally reading unset values as reported values.
   string constant private V3_NO_DATA_ERROR = "No data present";
 
-  uint32 private reportingRoundId;
-  uint32 internal latestRoundId;
-  uint32 public overrideStaringRoundId;
+  uint80 private reportingRoundId;
+  uint80 internal latestRoundId;
+  uint80 public overrideStaringRoundId;
   uint256 public chainLinkLatestRoundId;
   mapping(address => OracleStatus) private oracles;
-  mapping(uint32 => Round) internal rounds;
-  mapping(uint32 => RoundDetails) internal details;
+  mapping(uint80 => Round) internal rounds;
+  mapping(uint80 => RoundDetails) internal details;
   mapping(address => Requester) internal requesters;
   address[] private oracleAddresses;
   Funds private recordedFunds;
@@ -160,7 +162,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   );
   event SubmissionReceived(
     int256 indexed submission,
-    uint32 indexed round,
+    uint80 indexed round,
     address indexed oracle
   );
   event RequesterPermissionsSet(
@@ -251,18 +253,18 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   {
     (uint256 _CLRoundId, int256 _CLSubmission, uint256 _CLLatestRoundId) = getChainLinkQuote(_roundId);
     require(_CLRoundId == _roundId, "ChainLink roundId not match");
-    bytes memory error = validateOracleRound(msg.sender, uint32(_roundId));
+    bytes memory error = validateOracleRound(msg.sender, uint80(_roundId));
     require(_CLSubmission >= minSubmissionValue, "value below minSubmissionValue");
     require(_CLSubmission <= maxSubmissionValue, "value above maxSubmissionValue");
     require(error.length == 0, string(error));
 
-    oracleInitializeNewRound(uint32(_roundId));
-    recordSubmission(_CLSubmission, uint32(_roundId));
-    (bool updated, int256 newAnswer) = updateRoundAnswer(uint32(_roundId));
-    payOracle(uint32(_roundId));
-    deleteRoundDetails(uint32(_roundId));
+    oracleInitializeNewRound(uint80(_roundId));
+    recordSubmission(_CLSubmission, uint80(_roundId));
+    (bool updated, int256 newAnswer) = updateRoundAnswer(uint80(_roundId));
+    payOracle(uint80(_roundId));
+    deleteRoundDetails(uint80(_roundId));
     if (updated) {
-      validateAnswer(uint32(_roundId), newAnswer);
+      validateAnswer(uint80(_roundId), newAnswer);
     }
     require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
     chainLinkLatestRoundId = _CLLatestRoundId;
@@ -274,21 +276,21 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * @param _submission is the updated data that the oracle is submitting
    * @param _CLLatestRoundId is the chainlink latest round id
    */
-  function emergencySubmit(uint256 _roundId, int256 _submission, uint32 _CLLatestRoundId)
+  function emergencySubmit(uint256 _roundId, int256 _submission, uint256 _CLLatestRoundId)
     external
   {
-    bytes memory error = validateOracleRound(msg.sender, uint32(_roundId));
+    bytes memory error = validateOracleRound(msg.sender, uint80(_roundId));
     require(_submission >= minSubmissionValue, "value below minSubmissionValue");
     require(_submission <= maxSubmissionValue, "value above maxSubmissionValue");
     require(error.length == 0, string(error));
 
-    oracleInitializeNewRound(uint32(_roundId));
-    recordSubmission(_submission, uint32(_roundId));
-    (bool updated, int256 newAnswer) = updateRoundAnswer(uint32(_roundId));
-    payOracle(uint32(_roundId));
-    deleteRoundDetails(uint32(_roundId));
+    oracleInitializeNewRound(uint80(_roundId));
+    recordSubmission(_submission, uint80(_roundId));
+    (bool updated, int256 newAnswer) = updateRoundAnswer(uint80(_roundId));
+    payOracle(uint80(_roundId));
+    deleteRoundDetails(uint80(_roundId));
     if (updated) {
-      validateAnswer(uint32(_roundId), newAnswer);
+      validateAnswer(uint80(_roundId), newAnswer);
     }
     require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
     chainLinkLatestRoundId = _CLLatestRoundId;
@@ -310,7 +312,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     address[] calldata _removed,
     address[] calldata _added,
     address[] calldata _addedAdmins,
-    uint32[] calldata _roundId,
+    uint80[] calldata _roundId,
     uint32 _minSubmissions,
     uint32 _maxSubmissions,
     uint32 _restartDelay
@@ -500,7 +502,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     returns (int256)
   {
     if (validRoundId(_roundId)) {
-      return rounds[uint32(_roundId)].answer;
+      return rounds[uint80(_roundId)].answer;
     }
     return 0;
   }
@@ -522,7 +524,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     returns (uint256)
   {
     if (validRoundId(_roundId)) {
-      return rounds[uint32(_roundId)].updatedAt;
+      return rounds[uint80(_roundId)].updatedAt;
     }
     return 0;
   }
@@ -558,7 +560,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
       uint80 answeredInRound
     )
   {
-    Round memory r = rounds[uint32(_roundId)];
+    Round memory r = rounds[uint80(_roundId)];
 
     require(r.answeredInRound > 0 && validRoundId(_roundId), V3_NO_DATA_ERROR);
 
@@ -708,10 +710,10 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   {
     require(requesters[msg.sender].authorized, "not authorized requester");
 
-    uint32 current = reportingRoundId;
+    uint80 current = reportingRoundId;
     require(rounds[current].updatedAt > 0 || timedOut(current), "prev round must be supersedable");
 
-    uint32 newRoundId = current.add(1);
+    uint80 newRoundId = current.add(1);
     requesterInitializeNewRound(newRoundId);
     return newRoundId;
   }
@@ -756,12 +758,12 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * the amount of availableFunds returned might be lower than the actual value
    * @param _oracle the address to look up information for.
    */
-  function oracleRoundState(address _oracle, uint32 _queriedRoundId)
+  function oracleRoundState(address _oracle, uint80 _queriedRoundId)
     external
     view
     returns (
       bool _eligibleToSubmit,
-      uint32 _roundId,
+      uint80 _roundId,
       int256 _latestSubmission,
       uint64 _startedAt,
       uint64 _timeout,
@@ -822,7 +824,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * Private
    */
 
-  function initializeNewRound(uint32 _roundId)
+  function initializeNewRound(uint80 _roundId)
     private
   {
     updateTimedOutRoundInfo(_roundId.sub(1));
@@ -841,7 +843,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     emit NewRound(_roundId, msg.sender, rounds[_roundId].startedAt);
   }
 
-  function oracleInitializeNewRound(uint32 _roundId)
+  function oracleInitializeNewRound(uint80 _roundId)
     private
   {
     if (!newRound(_roundId)) return;
@@ -853,7 +855,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     oracles[msg.sender].lastStartedRound = _roundId;
   }
 
-  function requesterInitializeNewRound(uint32 _roundId)
+  function requesterInitializeNewRound(uint80 _roundId)
     private
   {
     if (!newRound(_roundId)) return;
@@ -865,12 +867,12 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     requesters[msg.sender].lastStartedRound = _roundId;
   }
 
-  function updateTimedOutRoundInfo(uint32 _roundId)
+  function updateTimedOutRoundInfo(uint80 _roundId)
     private
   {
     if (!timedOut(_roundId)) return;
 
-    uint32 prevId = _roundId.sub(1);
+    uint80 prevId = _roundId.sub(1);
     rounds[_roundId].answer = rounds[prevId].answer;
     rounds[_roundId].answeredInRound = rounds[prevId].answeredInRound;
     rounds[_roundId].updatedAt = uint64(block.timestamp);
@@ -878,7 +880,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     delete details[_roundId];
   }
 
-  function eligibleForSpecificRound(address _oracle, uint32 _queriedRoundId)
+  function eligibleForSpecificRound(address _oracle, uint80 _queriedRoundId)
     private
     view
     returns (bool _eligible)
@@ -895,7 +897,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     view
     returns (
       bool _eligibleToSubmit,
-      uint32 _roundId,
+      uint80 _roundId,
       int256 _latestSubmission,
       uint64 _startedAt,
       uint64 _timeout,
@@ -941,7 +943,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     );
   }
 
-  function updateRoundAnswer(uint32 _roundId)
+  function updateRoundAnswer(uint80 _roundId)
     internal
     returns (bool, int256)
   {
@@ -961,7 +963,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   }
 
   function validateAnswer(
-    uint32 _roundId,
+    uint80 _roundId,
     int256 _newAnswer
   )
     private
@@ -969,8 +971,8 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     AggregatorValidatorInterface av = validator; // cache storage reads
     if (address(av) == address(0)) return;
 
-    uint32 prevRound = _roundId.sub(1);
-    uint32 prevAnswerRoundId = rounds[prevRound].answeredInRound;
+    uint80 prevRound = _roundId.sub(1);
+    uint80 prevAnswerRoundId = rounds[prevRound].answeredInRound;
     int256 prevRoundAnswer = rounds[prevRound].answer;
     // We do not want the validator to ever prevent reporting, so we limit its
     // gas usage and catch any errors that may arise.
@@ -982,7 +984,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     ) {} catch {}
   }
 
-  function payOracle(uint32 _roundId)
+  function payOracle(uint80 _roundId)
     private
   {
     // updateAvailableFunds not added here in order to reduce gas for submissions
@@ -1003,7 +1005,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     }
   }
 
-  function recordSubmission(int256 _submission, uint32 _roundId)
+  function recordSubmission(int256 _submission, uint80 _roundId)
     private
   {
     require(acceptingSubmissions(_roundId), "round not accepting submissions");
@@ -1015,7 +1017,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     emit SubmissionReceived(_submission, _roundId, msg.sender);
   }
 
-  function deleteRoundDetails(uint32 _roundId)
+  function deleteRoundDetails(uint80 _roundId)
     private
   {
     if (details[_roundId].submissions.length < details[_roundId].maxSubmissions) return;
@@ -1023,7 +1025,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     delete details[_roundId];
   }
 
-  function timedOut(uint32 _roundId)
+  function timedOut(uint80 _roundId)
     private
     view
     returns (bool)
@@ -1037,16 +1039,16 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   function getStartingRound(address _oracle)
     private
     view
-    returns (uint32)
+    returns (uint80)
   {
-    uint32 currentRound = reportingRoundId;
+    uint80 currentRound = reportingRoundId;
     if (currentRound != 0 && currentRound == oracles[_oracle].endingRound) {
       return currentRound;
     }
     return currentRound.add(1);
   }
 
-  function previousAndCurrentUnanswered(uint32 _roundId, uint32 _rrId)
+  function previousAndCurrentUnanswered(uint80 _roundId, uint80 _rrId)
     private
     view
     returns (bool)
@@ -1065,7 +1067,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   function addOracle(
     address _oracle,
     address _admin,
-    uint32 _roundId
+    uint80 _roundId
   )
     private
   {
@@ -1075,7 +1077,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     require(oracles[_oracle].admin == address(0) || oracles[_oracle].admin == _admin, "owner cannot overwrite admin");
 
     // set reportingRoundId ands startingRound if they have not been set yet
-    uint32 _startingRound = getStartingRound(_oracle);
+    uint80 _startingRound = getStartingRound(_oracle);
     if (reportingRoundId == 0) {
       reportingRoundId = _roundId;
       overrideStaringRoundId = _roundId;
@@ -1111,14 +1113,14 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     emit OraclePermissionsUpdated(_oracle, false);
   }
 
-  function validateOracleRound(address _oracle, uint32 _roundId)
+  function validateOracleRound(address _oracle, uint80 _roundId)
     private
     view
     returns (bytes memory)
   {
     // cache storage reads
-    uint32 startingRound = oracles[_oracle].startingRound;
-    uint32 rrId = reportingRoundId;
+    uint80 startingRound = oracles[_oracle].startingRound;
+    uint80 rrId = reportingRoundId;
 
     if (startingRound == 0) return "not enabled oracle";
     if (startingRound > _roundId) return "not yet enabled oracle";
@@ -1128,7 +1130,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     if (_roundId != overrideStaringRoundId.add(1) && !supersedable(_roundId.sub(1))) return "previous round not supersedable";
   }
 
-  function supersedable(uint32 _roundId)
+  function supersedable(uint80 _roundId)
     private
     view
     returns (bool)
@@ -1144,7 +1146,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     return oracles[_oracle].endingRound == ROUND_MAX;
   }
 
-  function acceptingSubmissions(uint32 _roundId)
+  function acceptingSubmissions(uint80 _roundId)
     private
     view
     returns (bool)
@@ -1152,7 +1154,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     return details[_roundId].maxSubmissions != 0;
   }
 
-  function delayed(address _oracle, uint32 _roundId)
+  function delayed(address _oracle, uint80 _roundId)
     private
     view
     returns (bool)
@@ -1161,7 +1163,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     return _roundId > lastStarted + restartDelay || lastStarted == 0;
   }
 
-  function newRound(uint32 _roundId)
+  function newRound(uint80 _roundId)
     private
     view
     returns (bool)

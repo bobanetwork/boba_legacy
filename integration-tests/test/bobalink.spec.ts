@@ -157,9 +157,7 @@ describe('BobaLink Test\n', async () => {
               ETHProvider
             )
             const latestRound = await APIChainLinkContract.latestRound()
-            console.log({ latestRound, roundId: args[2] })
             const roundData = await APIChainLinkContract.getRoundData(args[2])
-            console.log({ latestRound, roundData })
             result = `0x${generateBytes32(32 * 3)}${generateBytes32(roundData.roundId)}${generateBytes32(roundData.answer)}${generateBytes32(latestRound)}`
           }
           let response = {
@@ -181,7 +179,7 @@ describe('BobaLink Test\n', async () => {
       /* eslint-enable */
   })
 
-  it.only('test of local compute endpoint: should return price', async () => {
+  it('test of local compute endpoint: should return price', async () => {
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
       [64, ETHUSDPriceFeedAddr, roundId]
@@ -207,7 +205,7 @@ describe('BobaLink Test\n', async () => {
     expect(result[3]).to.be.deep.equal(roundId)
   })
 
-  it.only('should get fake chainLink quote', async () => {
+  it('should get fake chainLink quote', async () => {
     await FluxAggregatorHC.updateTuringUrl(`${URL}/fake`)
     await FluxAggregatorHC.estimateGas.getChainLinkQuote(roundId)
     await FluxAggregatorHC.getChainLinkQuote(roundId, gasOverride)
@@ -221,7 +219,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(roundId)
   })
 
-  it.only('should get real chainLink quote', async () => {
+  it('should get real chainLink quote', async () => {
     await FluxAggregatorHC.updateTuringUrl(`${URL}/real`)
     await FluxAggregatorHC.estimateGas.getChainLinkQuote(roundId)
     await FluxAggregatorHC.getChainLinkQuote(roundId, gasOverride)
@@ -236,7 +234,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(latestRound)
   })
 
-  it.only('should allow to submit answer', async () => {
+  it('should allow to submit answer using Turing', async () => {
     const addOracleTx = await FluxAggregatorHC.changeOracles(
       [],
       [env.l1Wallet.address],
@@ -247,9 +245,50 @@ describe('BobaLink Test\n', async () => {
       0 // restart delay
     )
     await addOracleTx.wait()
-    await FluxAggregatorHC.estimateGas.submit(roundId.add(1))
-    await FluxAggregatorHC.submit(roundId.add(1), gasOverride)
+    const nextRoundId = roundId.add(1)
+    await FluxAggregatorHC.estimateGas.submit(nextRoundId)
+    await FluxAggregatorHC.submit(nextRoundId, gasOverride)
     const latestRound = await FluxAggregatorHC.latestRound()
-    console.log({ latestRound, roundId })
+    const latestRoundData = await FluxAggregatorHC.getRoundData(latestRound)
+    const chainLinkRoundData = await ChainLinkContract.getRoundData(nextRoundId)
+    expect(latestRound).to.eq(nextRoundId)
+    expect(latestRoundData.answer).to.be.eq(chainLinkRoundData.answer)
+  })
+
+  it('should not be able to submit answer again using Turing', async () => {
+    const nextRoundId = roundId.add(1)
+    await expect(FluxAggregatorHC.estimateGas.submit(nextRoundId)).to.be
+      .reverted
+  })
+
+  it('should not be able to submit answer again using emergency submission', async () => {
+    const nextRoundId = roundId.add(1)
+    const chainLinkRoundData = await ChainLinkContract.getRoundData(nextRoundId)
+    const latestRound = await ChainLinkContract.latestRound()
+    await expect(
+      FluxAggregatorHC.emergencySubmit(
+        nextRoundId,
+        chainLinkRoundData.answer,
+        latestRound
+      )
+    ).to.be.reverted
+  })
+
+  it('should not be able to submit answer using the incorrect chainlink data', async () => {
+    const nextRoundId = roundId.add(2)
+    const chainLinkRoundData = await ChainLinkContract.getRoundData(nextRoundId)
+    const latestRound = await ChainLinkContract.latestRound()
+    await FluxAggregatorHC.emergencySubmit(
+      nextRoundId,
+      chainLinkRoundData.answer,
+      latestRound
+    )
+    await expect(
+      FluxAggregatorHC.emergencySubmit(
+        nextRoundId.add(1),
+        chainLinkRoundData.answer,
+        latestRound.sub(1)
+      )
+    ).to.be.reverted
   })
 })

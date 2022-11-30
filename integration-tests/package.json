@@ -66,6 +66,7 @@
     "@openzeppelin/test-helpers": "^0.5.15",
     "chalk": "^4.1.2",
     "request-promise-native": "^1.0.9",
-    "ip": "^1.1.5"
+    "ip": "^1.1.5",
+    "node-fetch": "^2.6.1"
   }
 }
