@@ -37,6 +37,7 @@ import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
+import pmc from '../../images/ecosystem/pmc.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -199,6 +200,17 @@ export const projectList = [
     "type": "token",
     "image": bobaDogeLogo,
     "description": "The first dog coin on Boba."
+  },
+  {
+    "title": "Memes Wallet",
+    "canLaunch": true,
+    "link": "https://planetmemes.com/",
+    "telegram": "https://t.me/PlanetMemesOf",
+    "twitter": "https://twitter.com/PlanetMemes4",
+    "discord": "",
+    "type": "wallet",
+    "image": pmc,
+    "description": "Memes wallet is a non-custodial multichain wallet with a memeable UI dedicated with funny features for meme coins fans it gives users control over their own private keys, addresses, and funds. ",
   },
   {
     "title": "ApeBoard",
