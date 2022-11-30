@@ -55,7 +55,6 @@ import {
   selectAccountEnabled,
 } from 'selectors/setupSelector'
 
-import { selectNetwork } from 'selectors/networkSelector'
 
 import { selectAlert, selectError } from 'selectors/uiSelector'
 import { selectModalState } from 'selectors/uiSelector'
@@ -89,6 +88,7 @@ import Zendesk from 'components/zendesk/Zendesk'
 import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
+import { selectNetwork } from 'selectors/networkSelector'
 
 
 function Home() {
@@ -144,8 +144,7 @@ function Home() {
       : body.style.overflow = 'auto'
   }, [ mobileMenuOpen ])
 
-  console.log(['network',network])
-  // calls only on boot
+
   useEffect(() => {
     window.scrollTo(0, 0)
 
@@ -154,14 +153,12 @@ function Home() {
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
-      const initialized = await networkService.initializeBase( network )
+      const initialized = await networkService.initializeBase( 'etheruem' ) /// FIXME: should be active network
       if (!initialized) {
-        console.log("Failed to boot L1 and L2 base providers for", network)
         dispatch(setBaseState(false))
         return false
       }
       if (initialized === 'enabled') {
-        console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
         // load DAO to speed up the process
         dispatch(fetchDaoProposals())

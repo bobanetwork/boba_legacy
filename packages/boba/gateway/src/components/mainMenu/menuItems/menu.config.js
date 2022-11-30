@@ -1,6 +1,15 @@
 import { ROUTES_PATH } from "util/constant";
 
-export const menuItems = [
+export const pagesByChain = {
+  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO' ],
+  bnb: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  avax: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  fantom: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  moonbeam: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  moonbase: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+}
+
+export const MENU_LIST = [
   {
     key: 'Bridge',
     icon: "WalletIcon",

@@ -37,7 +37,7 @@ import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
 import veBobaReducer from './veBobaReducer';
-import networkReducer from './networkReducer';
+import networkReducer from './networkReducer'
 
 const rootReducer = combineReducers({
   loading: loadingReducer,

@@ -244,8 +244,17 @@ export function getAllAddresses() {
   return createAction('GET/ALL/ADDRESS', () => networkService.getAllAddresses())
 }
 
-export function setAppChain(chain) {
+
+/********************************/
+/******ONE GATEWAY ACTIONS *****/
+/********************************/
+/**
+ * @params
+ *  network - ethereum, bnb, fantom, avax, moonbase, moonbeam
+ *  networkType -  MAINNET, TESTNET
+*/
+export function setNetwork(payload) {
   return function (dispatch) {
-    return dispatch({ type: 'SETUP/APPCHAIN/SET', payload: chain })
+    return dispatch({ type: 'SETUP/NETWORK/SET', payload: payload })
   }
 }

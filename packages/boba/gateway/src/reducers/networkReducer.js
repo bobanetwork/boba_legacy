@@ -13,23 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import { NETWORK, NETWORK_TYPE } from "util/network.util"
+
+/**
+ * NOTE:
+ * 1. selected networkType, network.
+ * 2. current networkType, network.
+ * 3. enable switch once selected !== current.
+ * 4. on selection dispatch event.
+ * 5. on switch click dispatch event. and reload.
+ *
+ */
+
 const initialState = {
-  appChain: 'mainnet',
-  network: 'mainnet',
-  networkType: 'Mainnet',
+  network: NETWORK.ETHEREUM,
+  networkType: NETWORK_TYPE.MAINNET
 }
 
 function networkReducer(state = initialState, action) {
   switch (action.type) {
-    case 'SETUP/APPCHAIN/SET':
+    case 'SETUP/NETWORK/SET':
       const {
-        networkType, chain
-      } = action.payload
+        network,
+        networkType
+      } = action.payload;
       return {
         ...state,
-        appChain: chain,
-        network: chain,
-        networkType: networkType,
+        network,
+        networkType
       }
     default:
       return state
@@ -37,3 +48,4 @@ function networkReducer(state = initialState, action) {
 }
 
 export default networkReducer
+

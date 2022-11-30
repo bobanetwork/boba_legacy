@@ -30,12 +30,6 @@ export function setBaseState(enabled) {
   }
 }
 
-export function setNetwork(network) {
-  return function (dispatch) {
-    return dispatch({ type: 'SETUP/NETWORK/SET', payload: network })
-  }
-}
-
 export function setLayer(layer) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/LAYER/SET', payload: layer })

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import {
-  APP_CHAIN, ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
+ ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
 } from './constant'
 
 let NETWORK = {
@@ -63,7 +63,7 @@ let NETWORK = {
     },
     gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`
   },
-  mainnet: {
+  etheruem: {
     OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
     VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
     MM_Label: `Mainnet`,
