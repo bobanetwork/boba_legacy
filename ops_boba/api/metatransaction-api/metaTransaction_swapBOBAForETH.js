@@ -213,3 +213,50 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
     body: JSON.stringify({ status: 'success' }),
   })
 }
+
+// Return error message
+module.exports.goerliHandler = async (event, context, callback) => {
+  const body = JSON.parse(event.body)
+
+  const [Boba_GasPriceOracle, L2Boba] = loadContracts()
+  const isVerified = await verifyBobay(body, Boba_GasPriceOracle, L2Boba)
+  if (isVerified.isVerified === false) {
+    return callback(null, {
+      headers,
+      statusCode: 400,
+      body: JSON.stringify({
+        status: 'failure',
+        error: isVerified.errorMessage,
+      }),
+    })
+  }
+
+  const { owner, spender, value, deadline, signature } = body
+  // Get r s v from signature
+  const sig = ethers.utils.splitSignature(signature)
+  // Send transaction to node
+  try {
+    const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
+      owner,
+      spender,
+      value,
+      deadline,
+      sig.v,
+      sig.r,
+      sig.s
+    )
+    await tx.wait()
+  } catch (err) {
+    return callback(null, {
+      headers,
+      statusCode: 400,
+      body: JSON.stringify({ status: 'failure', error: err }),
+    })
+  }
+
+  return callback(null, {
+    headers,
+    statusCode: 201,
+    body: JSON.stringify({ status: 'success' }),
+  })
+}
