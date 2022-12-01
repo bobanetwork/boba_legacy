@@ -1,43 +1,58 @@
-import { ETHERSCAN_API_KEY, INFURA_ID } from "util/constant";
+import { ETHERSCAN_API_KEY } from "util/constant";
 
 export const moonbeamConfig = {
-  Mainnet: {
-    OMGX_WATCHER_URL: `https://api-watcher.mainnet.boba.network/`,
-    VERIFIER_WATCHER_URL: `https://api-verifier.mainnet.boba.network/`,
-    MM_Label: `Mainnet`,
-    addressManager: `0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089`,
+  Testnet: {
+    OMGX_WATCHER_URL: `https://api-watcher.bobabase.boba.network/`,
+    MM_Label:         `BobaBase`,
+    addressManager:   `0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B`,
     L1: {
-      name: "Mainnet",
-      chainId: 1,
-      chainIdHex: '0x1',
-      rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-      blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
-      transaction: ` https://etherscan.io/tx/`,
-      blockExplorerUrl: `https://etherscan.io/`
+      name: "MoonBase",
+      chainId: 1287,
+      chainIdHex: '0x507',
+      rpcUrl: `https://rpc.api.moonbase.moonbeam.network`,
+      blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
+      transaction: `https://moonbase.moonscan.io/tx/`,
+      blockExplorerUrl: `https://moonbase.moonscan.io`,
+      symbol: 'GLMR',
+      tokenName: 'GLMR',
     },
     L2: {
-      name: "BOBA L2",
-      chainId: 288,
-      chainIdHex: '0x120',
-      rpcUrl: `https://mainnet.boba.network`,
-      blockExplorer: `https://bobascan.com/`,
-      transaction: `https://bobascan.com/tx/`,
-      blockExplorerUrl: `https://bobascan.com/`
+      name: "BobaBase",
+      chainId: 1297,
+      chainIdHex: '0x511',
+      rpcUrl: `https://bobabase.boba.network`,
+      blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
+      transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
+      blockExplorerUrl: `https://blockexplorer.bobabase.boba.network`,
     },
-    payloadForL1SecurityFee: {
-      from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
-      to: '0x17C83E2B96ACfb5190d63F5E46d93c107eC0b514',
-      value: '0x38d7ea4c68000',
-      data:
-        '0x7ff36ab5000000000000000000000000000000000000000000000000132cc41aecbfbace00000000000000000000000000000000000000000000000000000000000000800000000000000000000000005e7a06025892d8eef0b5fa263fa0d4d2e5c3b54900000000000000000000000000000000000000000000000000000001c73d14500000000000000000000000000000000000000000000000000000000000000002000000000000000000000000deaddeaddeaddeaddeaddeaddeaddeaddead00000000000000000000000000005008f837883ea9a07271a1b5eb0658404f5a9610',
+    gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+    twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20`
+  },
+  Mainnet: {
+    OMGX_WATCHER_URL: `https://api-watcher.bobabeam.boba.network/`,
+    MM_Label:         `bobaBeam`,
+    addressManager:   `0x564c10A60af35a07f0EA8Be3106a4D81014b21a0`,
+    L1: {
+      name: "MoonBeam",
+      chainId: 1284,
+      chainIdHex: '0x504',
+      rpcUrl: `https://rpc.api.moonbeam.network`,
+      blockExplorer: `https://api-moonbeam.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
+      transaction: `https://moonscan.io/tx/`,
+      blockExplorerUrl: `https://moonscan.io/`,
+      symbol: "GLMR",
+      tokenName: "GLMR",
     },
-    payloadForFastDepositBatchCost: {
-      from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',
-      to: '0x1A26ef6575B7BBB864d984D9255C069F6c361a14',
-      value: '0x038d7ea4c68000',
-      data:
-        '0xa44c80e30000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000200000000000000000000000042bbfa2e77757c645eeaad1655e0911a7553efbc0000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000038d7ea4c68000'
+    L2: {
+      name: "BobaBeam",
+      chainId: 1294,
+      chainIdHex: '0x50E',
+      rpcUrl: `https://bobabeam.boba.network`,
+      blockExplorer: `https://blockexplorer.bobabeam.boba.network/`,
+      transaction: `https://blockexplorer.bobabeam.boba.network/tx/`,
+      blockExplorerUrl: `https://blockexplorer.bobabeam.boba.network/`,
     },
-    gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`
+    gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
+    twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabeam%20for%20Moonbeam%20`
   }
 }

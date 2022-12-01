@@ -45,7 +45,6 @@ export const NETWORK = {
   FANTOM: 'FANTOM',
   AVAX: 'AVAX',
   MOONBEAM: 'MOONBEAM',
-  MOONBASE: 'MOONBASE',
 }
 
 
@@ -80,13 +79,7 @@ export const NetworkList = {
       chain: NETWORK.MOONBEAM,
       label: 'Moonbeam <> Boba',
       key: 'moonbeam'
-    },
-    {
-      icon: 'moonbase',
-      chain: NETWORK.MOONBASE,
-      label: 'Moonbase <> Boba',
-      key: 'moonbase'
-    },
+    }
   ],
   Testnet: [
     {
@@ -112,6 +105,12 @@ export const NetworkList = {
       chain: NETWORK.FANTOM,
       label: 'Opera (Testnet) <> Boba',
       key: 'fantom'
+    },
+    {
+      icon: 'moonbase',
+      chain: NETWORK.MOONBEAM,
+      label: 'Moonbase <> Boba',
+      key: 'moonbeam'
     },
   ]
 }
