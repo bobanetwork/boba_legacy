@@ -80,7 +80,7 @@ jobs:
       - name: Rename and retag the optimism images
         working-directory: ./ops
         run: |
-          for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do
+          for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork | grep alt-l1); do
             echo "$1"
             docker push "$i"
           done
