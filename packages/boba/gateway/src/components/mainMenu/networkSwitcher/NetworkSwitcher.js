@@ -34,9 +34,10 @@ function NetworkSwitcher() {
     setAnchorEl(null);
   };
 
-  const onChainChange = ({ icon, chain }) => {
+  const onChainChange = ({ icon, chain,name }) => {
     dispatch(setNetwork({
       network: chain,
+      name: name,
       networkIcon: icon,
       networkType: activeTab,
     }));
