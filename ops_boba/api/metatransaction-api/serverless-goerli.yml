@@ -1,0 +1,54 @@
+service: sls-boba-goerli-metaTransaction # NOTE: update this with your service name
+
+plugins:
+  - serverless-better-credentials
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stackName: sls-boba-goerli-metaTransaction
+  stage: prod
+  region: us-east-1
+  role: ${file(env-goerli.yml):ROLE}
+
+package:
+  exclude:
+    - .gitignore
+    - node_modules
+  individually: true
+
+functions:
+  boba_swapBOBAForETH:
+    handler: metaTransaction_swapBOBAForETH.goerliHandler
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-goerli.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-goerli.yml):SUBNET_ID_1}
+        - ${file(env-goerli.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.swapBOBAForETH
+          method: post
+          cors: true
+    layers:
+      - ${file(env-goerli.yml):LAYERS}
+  boba_getTestnetETH:
+    handler: metaTransaction_getTestnetETH.goerliHandler
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    vpc:
+      securityGroupIds:
+        - ${file(env-goerli.yml):SECURITY_GROUPS}
+      subnetIds:
+        - ${file(env-goerli.yml):SUBNET_ID_1}
+        - ${file(env-goerli.yml):SUBNET_ID_2}
+    events:
+      - http:
+          path: send.getTestnetETH
+          method: post
+          cors: true
+    layers:
+      - ${file(env-goerli.yml):LAYERS}
