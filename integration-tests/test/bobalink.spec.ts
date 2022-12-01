@@ -6,6 +6,8 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { bobaLinkGetQuote } from '@boba/api'
 import util from 'util'
 
+import { BobaLinkService } from '@boba/bobalink'
+
 /* eslint-disable */
 const fetch = require('node-fetch')
 /* eslint-enable */
@@ -369,5 +371,49 @@ describe('BobaLink Test\n', async () => {
     await expect(FluxAggregatorHC.estimateGas.submit(1)).to.be.revertedWith(
       'TURING: Server error'
     )
+  })
+
+  it('should be able to submit data via BobaLinkService', async () => {
+    const startBOBALinkService = async () => {
+      const chainId = (await env.l2Provider.getNetwork()).chainId
+      return new BobaLinkService({
+        l1RpcProvider: ETHProvider,
+        l2RpcProvider: env.l2Provider,
+        chainId,
+        reporterWallet: env.l2Wallet,
+        bobaLinkPairs,
+        pollingInterval: 2000,
+        setGasPriceToZero: false,
+      })
+    }
+
+    const Timer = (time) => {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve('TimeOut'), time)
+      })
+    }
+
+    const bobaLinkPairs = {
+      [ETHUSDPriceFeedAddr]: {
+        pair: 'ETH / USD',
+        decimals: 8,
+        l2ContractAddress: FluxAggregatorHC.address,
+      },
+    }
+    const bobaLinkService = await startBOBALinkService()
+    await bobaLinkService.init()
+
+    await Promise.race([Timer(5000), bobaLinkService.start()])
+    const latestRoundId = await FluxAggregatorHC.latestRound()
+    const roundData = await FluxAggregatorHC.getRoundData(latestRoundId)
+    const chainLinkLatestRoundId =
+      await FluxAggregatorHC.chainLinkLatestRoundId()
+    const chainLinkRoundData = await ChainLinkContract.getRoundData(
+      latestRoundId
+    )
+    const chainLinkLatestRoundIdInCLContract =
+      await ChainLinkContract.latestRound()
+    expect(roundData.answer).to.be.eq(chainLinkRoundData.answer)
+    expect(chainLinkLatestRoundIdInCLContract).to.be.eq(chainLinkLatestRoundId)
   })
 })

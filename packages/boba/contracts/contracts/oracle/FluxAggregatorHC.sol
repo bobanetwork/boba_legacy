@@ -1076,13 +1076,15 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     require(_admin != address(0), "cannot set admin to 0");
     require(oracles[_oracle].admin == address(0) || oracles[_oracle].admin == _admin, "owner cannot overwrite admin");
 
-    // set reportingRoundId ands startingRound if they have not been set yet
+    // override the latestRoundId, startingRound and reportingRoundId
     uint80 _startingRound = getStartingRound(_oracle);
     if (reportingRoundId == 0) {
       reportingRoundId = _roundId;
       overrideStaringRoundId = _roundId;
       // override startingRoundId
       _startingRound = _roundId;
+      // override latestRoundId
+      latestRoundId = _roundId;
     }
 
     oracles[_oracle].startingRound = _startingRound;
