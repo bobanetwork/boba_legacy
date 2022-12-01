@@ -31,9 +31,11 @@ const initialState = {
   network: NETWORK.ETHEREUM,
   networkIcon: 'ethereum',
   networkType: NETWORK_TYPE.MAINNET,
+  name: {},
   activeNetworkIcon: 'ethereum',
   activeNetwork: NETWORK.ETHEREUM,
-  activeNetworkType: NETWORK_TYPE.MAINNET
+  activeNetworkType: NETWORK_TYPE.MAINNET,
+  activeNetworkName: {},
 }
 
 function networkReducer(state = initialState, action) {
@@ -42,26 +44,30 @@ function networkReducer(state = initialState, action) {
       const {
         network,
         networkType,
-        networkIcon
+        networkIcon,
+        name
       } = action.payload;
       return {
         ...state,
         network,
         networkIcon,
-        networkType
+        networkType,
+        name
       }
     }
     case 'NETWORK/SET/ACTIVE':{
       const {
         network: activeNetwork,
         networkType: activeNetworkType,
-        networkIcon: activeNetworkIcon
+        networkIcon: activeNetworkIcon,
+        name: activeNetworkName
       } = state;
       return {
         ...state,
         activeNetwork,
         activeNetworkType,
-        activeNetworkIcon
+        activeNetworkIcon,
+        activeNetworkName
       }
     }
     default:

@@ -10,6 +10,7 @@ function NetworkListItem({
   chain,
   icon,
   label,
+  name,
   onChainChange,
   isActive
 }) {
@@ -21,7 +22,7 @@ function NetworkListItem({
     divider
     key={chain}
     onClick={() => {
-      onChainChange({chain, icon})
+      onChainChange({chain, icon, name})
     }}>
     <Box display="flex" justifyContent="space-around" alignItems="center" gap={2}>
       <Box display="flex" justifyContent="space-around" alignItems="center" gap={1}>

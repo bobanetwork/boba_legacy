@@ -42,3 +42,8 @@ export function selectActiveNetworkIcon() {
     return state.network['activeNetworkIcon']
   }
 }
+export function selectActiveNetworkName() {
+  return function (state) {
+    return state.network['activeNetworkName']
+  }
+}

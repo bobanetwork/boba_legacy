@@ -13,6 +13,10 @@ import BobabeamIcon from 'components/icons/chain/L2/BobabeamIcon';
 import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon';
 
 import { ethereumConfig } from './config/ethereum';
+import { bnbConfig } from './config/bnb';
+import { fantomConfig } from './config/fantom';
+import { avaxConfig } from './config/avax';
+import { moonbeamConfig } from './config/moonbeam';
 
 
 export const L1_ICONS = {
@@ -54,31 +58,51 @@ export const NetworkList = {
       icon: 'ethereum',
       chain: NETWORK.ETHEREUM,
       label: 'Ethereum <> Boba',
-      key: 'ethereum'
+      key: 'ethereum',
+      name: {
+        l1: 'Ethereum',
+        l2: 'Boba'
+      }
     },
     {
       icon: 'bnb',
       chain: NETWORK.BNB,
       label: 'BNB <> Boba',
-      key: 'bnb'
+      key: 'bnb',
+      name: {
+        l1: 'BNB',
+        l2: 'Boba'
+      }
     },
     {
       icon: 'avax',
       chain: NETWORK.AVAX,
       label: 'Avalanche <> Boba',
-      key: 'avax'
+      key: 'avax',
+      name: {
+        l1: 'Avalanche',
+        l2: 'Boba'
+      }
     },
     {
       icon: 'fantom',
       chain: NETWORK.FANTOM,
       label: 'Fantom <> Boba',
-      key: 'fantom'
+      key: 'fantom',
+      name: {
+        l1: 'Fantom',
+        l2: 'Boba'
+      }
     },
     {
       icon: 'moonbeam',
       chain: NETWORK.MOONBEAM,
       label: 'Moonbeam <> Boba',
-      key: 'moonbeam'
+      key: 'moonbeam',
+      name: {
+        l1: 'Moonbeam',
+        l2: 'Boba'
+      }
     }
   ],
   Testnet: [
@@ -86,43 +110,61 @@ export const NetworkList = {
       icon: 'ethereum',
       chain: NETWORK.ETHEREUM,
       label: 'Ethereum (Goerli) <> Boba',
-      key: 'ethereum'
+      key: 'ethereum',
+      name: {
+        l1: 'Ethereum (Goerli)',
+        l2: 'Boba',
+      }
     },
     {
       icon: 'bnb',
       chain: NETWORK.BNB,
       label: 'BNB (Testnet) <> Boba',
-      key: 'bnb'
+      key: 'bnb',
+      name: {
+        l1: 'BNB (Testnet)',
+        l2: 'Boba',
+      }
     },
     {
       icon: 'avax',
       chain: NETWORK.AVAX,
       label: 'Fuji (Testnet) <> Boba',
-      key: 'avax'
+      key: 'avax',
+      name: {
+        l1: 'Fuji (Testnet)',
+        l2: 'Boba',
+      }
     },
     {
       icon: 'fantom',
       chain: NETWORK.FANTOM,
       label: 'Opera (Testnet) <> Boba',
-      key: 'fantom'
+      key: 'fantom',
+      name: {
+        l1: 'Opera (Testnet)',
+        l2: 'Boba',
+      }
     },
     {
       icon: 'moonbase',
       chain: NETWORK.MOONBEAM,
       label: 'Moonbase <> Boba',
-      key: 'moonbeam'
+      key: 'moonbeam',
+      name: {
+        l1: 'Moonbase',
+        l2: 'Boba',
+      }
     },
   ]
 }
 
-
 const networkConfig = {
   [NETWORK.ETHEREUM] : ethereumConfig,
-  [NETWORK.BNB] : ethereumConfig,
-  [NETWORK.FANTOM] : ethereumConfig,
-  [NETWORK.AVAX] : ethereumConfig,
-  [NETWORK.MOONBEAM] : ethereumConfig,
-  [NETWORK.MOONBASE] : ethereumConfig,
+  [NETWORK.BNB] : bnbConfig,
+  [NETWORK.FANTOM] : fantomConfig,
+  [NETWORK.AVAX] : avaxConfig,
+  [NETWORK.MOONBEAM] : moonbeamConfig
 }
 
 export const getNetworkDetail = ({
