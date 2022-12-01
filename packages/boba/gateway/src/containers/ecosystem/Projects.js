@@ -10,6 +10,7 @@ import Tooltip from 'components/tooltip/Tooltip'
 import { useParams } from 'react-router-dom'
 import * as S from './Ecosystem.styles'
 import { loadProjectByCategory, loadBobaProjectByCategory } from './project.list'
+import { SvgIcon } from '@mui/material'
 
 const Projects = ({projectType}) => {
   const [ projectByCategory, setprojectByCategory ] = useState({})
@@ -39,10 +40,10 @@ const Projects = ({projectType}) => {
         <S.ProjectContainer
         >
           <S.ImageContainer>
-            <img
+            {project.icon ? <SvgIcon component={project.icon} sx={{fontSize: 30}} selected /> : <img
               src={project.image}
               alt={project.title}
-            />
+            />}
           </S.ImageContainer>
           <S.ProjectContent
           >

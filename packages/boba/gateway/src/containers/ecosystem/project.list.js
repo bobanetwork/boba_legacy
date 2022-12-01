@@ -65,6 +65,13 @@ import BobabnbLogo from '../../images/bobaLinks/Bobabnb.svg'
 import BobabeamLogo from '../../images/bobaLinks/Bobabeam.svg'
 import BobaftmLogo from '../../images/bobaLinks/Bobaftm.svg'
 
+import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon'
+import BobaBnbIcon from 'components/icons/chain/L2/BobaBNBIcon'
+import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon'
+import BobaFantomIcon from 'components/icons/chain/L2/BobaFantomIcon'
+import BobabeamIcon from 'components/icons/chain/L2/BobabeamIcon'
+import BobaIcon from 'components/icons/chain/L2/BobaIcon'
+
 /**
  * thematical order of type.
  *
@@ -684,7 +691,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.boba.network',
     type: 'mainnet',
-    image: BobaethLogo,
+    icon: BobaIcon,
     description: 'Boba Ethereum is a bridge between Ethereum and Boba L2.',
   },
   {
@@ -692,7 +699,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.goerli.boba.network',
     type: 'testnet',
-    image: BobaethLogo,
+    icon: BobaIcon,
     description: 'Boba Ethereum is a bridge between Ethereum Goerli and Boba L2.',
   },
   {
@@ -700,7 +707,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://bobascan.com',
     type: 'mainnet',
-    image: BobaethLogo,
+    icon: BobaIcon,
     description: 'Block explorer for Boba Ethereum.',
   },
   {
@@ -708,7 +715,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://testnet.bobascan.com',
     type: 'testnet',
-    image: BobaethLogo,
+    icon: BobaIcon,
     description: 'Block explorer for Boba Ethereum Goerli.',
   },
   {
@@ -716,7 +723,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.avax.boba.network',
     type: 'mainnet',
-    image: BobaavaxLogo,
+    icon: BobaAvaxIcon,
     description: 'Boba Avalanche is a bridge between Avalanche and Boba L2.',
   },
   {
@@ -724,7 +731,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.testnet.avax.boba.network',
     type: 'testnet',
-    image: BobaavaxLogo,
+    icon: BobaAvaxIcon,
     description: 'Boba Avalanche is a bridge between Avalanche Fuji Testnet and Boba L2.',
   },
   {
@@ -732,7 +739,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.avax.boba.network',
     type: 'mainnet',
-    image: BobaavaxLogo,
+    icon: BobaAvaxIcon,
     description: 'Block explorer for Boba Avalanche.',
   },
   {
@@ -740,7 +747,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.testnet.avax.boba.network',
     type: 'testnet',
-    image: BobaavaxLogo,
+    icon: BobaAvaxIcon,
     description: 'Block explorer for Boba Avalanche Testnet.',
   },
   {
@@ -748,7 +755,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.bnb.boba.network',
     type: 'mainnet',
-    image: BobabnbLogo,
+    icon: BobaBnbIcon,
     description: 'Boba BNB is a bridge between BNB chain and Boba L2.',
   },
   {
@@ -756,7 +763,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.testnet.bnb.boba.network',
     type: 'testnet',
-    image: BobabnbLogo,
+    icon: BobaBnbIcon,
     description: 'Boba BNB is a bridge between BNB Testnet and Boba L2.',
   },
   {
@@ -764,7 +771,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.bnb.boba.network',
     type: 'mainnet',
-    image: BobabnbLogo,
+    icon: BobaBnbIcon,
     description: 'Block explorer for Boba BNB.',
   },
   {
@@ -772,7 +779,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.testnet.bnb.boba.network',
     type: 'testnet',
-    image: BobabnbLogo,
+    icon: BobaBnbIcon,
     description: 'Block explorer for Boba BNB Testnet.',
   },
   {
@@ -780,7 +787,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.bobabeam.boba.network',
     type: 'mainnet',
-    image: BobabeamLogo,
+    icon: BobabeamIcon,
     description: 'Boba Moonbeam is a bridge between Moonbeam and Boba L2.',
   },
   {
@@ -788,7 +795,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.bobabase.boba.network',
     type: 'testnet',
-    image: BobabeamLogo,
+    icon: BobabaseIcon,
     description: 'Boba Moonbase is a bridge between Moonbase and Boba L2.',
   },
   {
@@ -796,7 +803,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.bobabeam.boba.network',
     type: 'mainnet',
-    image: BobabeamLogo,
+    icon: BobabeamIcon,
     description: 'Block explorer for Bobabeam.',
   },
   {
@@ -804,7 +811,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.bobabase.boba.network',
     type: 'testnet',
-    image: BobabeamLogo,
+    icon: BobabaseIcon,
     description: 'Block explorer for Bobabase.',
   },
   {
@@ -812,7 +819,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.bobaopera.boba.network',
     type: 'mainnet',
-    image: BobaftmLogo,
+    icon: BobaFantomIcon,
     description: 'Boba Fantom is a bridge between Fantom and Boba L2.',
   },
   {
@@ -820,7 +827,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://gateway.testnet.bobaopera.boba.network',
     type: 'testnet',
-    image: BobaftmLogo,
+    icon: BobaFantomIcon,
     description: 'Boba Fantom is a bridge between Fantom Testnet and Boba L2.',
   },
   {
@@ -828,7 +835,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.bobaopera.boba.network',
     type: 'mainnet',
-    image: BobaftmLogo,
+    icon: BobaFantomIcon,
     description: 'Block explorer for Bobaopera.',
   },
   {
@@ -836,7 +843,7 @@ export const BobaProjectList = [
     canLaunch: true,
     link: 'https://blockexplorer.testnet.bobaopera.boba.network',
     type: 'testnet',
-    image: BobaftmLogo,
+    icon: BobaFantomIcon,
     description: 'Block explorer for Bobaopera Testnet.',
   },
 ]
