@@ -46,7 +46,7 @@ export class BobaLinkService extends BaseService<BobaLinkOptions> {
     gasOverride: GasPriceOverride
   } = {} as any
 
-  protected async _init(): Promise<void> {
+  async _init(): Promise<void> {
     this.logger.info('Initializing bobaLink service...', {
       options: this.options,
     })
@@ -78,7 +78,7 @@ export class BobaLinkService extends BaseService<BobaLinkOptions> {
       : { gasLimit: 10000000 }
   }
 
-  protected async _start(): Promise<void> {
+  async _start(): Promise<void> {
     while (this.running) {
       for (const [_, contracts] of Object.entries(
         this.state.bobaLinkContracts

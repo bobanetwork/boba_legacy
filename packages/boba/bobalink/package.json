@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@eth-optimism/contracts": "^0.5.11",
-    "@eth-optimism/common-ts": "0.2.2",
+    "@eth-optimism/common-ts": "^0.1.0",
     "bcfg": "^0.1.6",
     "dotenv": "^8.2.0",
     "ethers": "^5.1.0"

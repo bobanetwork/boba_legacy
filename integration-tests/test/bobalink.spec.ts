@@ -401,9 +401,9 @@ describe('BobaLink Test\n', async () => {
       },
     }
     const bobaLinkService = await startBOBALinkService()
-    await bobaLinkService.init()
+    await bobaLinkService._init()
 
-    await Promise.race([Timer(5000), bobaLinkService.start()])
+    await Promise.race([Timer(5000), bobaLinkService._start()])
     const latestRoundId = await FluxAggregatorHC.latestRound()
     const roundData = await FluxAggregatorHC.getRoundData(latestRoundId)
     const chainLinkLatestRoundId =
