@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
@@ -41,6 +41,13 @@ function NetworkSwitcher() {
       networkType: activeTab,
     }));
   }
+
+  useEffect(() => {
+    setActiveTab(networkType)
+    return () => {
+      setActiveTab(NETWORK_TYPE.MAINNET)
+    };
+  }, [networkType]);
 
   return (
     <>

@@ -42,7 +42,7 @@ const WalletSwitch = () => {
       // set reconnect to false to avoid retrigger!
       setReconnect(false);
     }
-  }, [ layer, reconnect, baseEnabled ]);
+  }, [ layer, reconnect, baseEnabled, dispatch ]);
 
   if (activeNetwork === network
     && activeNetworkType === networkType) {
