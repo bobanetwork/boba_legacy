@@ -38,6 +38,7 @@ import useInterval from "hooks/useInterval"
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
+import { selectActiveNetworkName } from "selectors/networkSelector"
 
 function Wallet() {
 
@@ -50,7 +51,7 @@ function Wallet() {
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
-
+  const networkName = useSelector(selectActiveNetworkName())
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
@@ -112,7 +113,6 @@ function Wallet() {
 
   async function emergencySwap () {
     const res = await dispatch(getETHMetaTransaction())
-    console.log("emergencySwap - res:",res)
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
 
@@ -163,7 +163,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Ethereum Wallet
+            {networkName['l1'] || 'Etheruem'} Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}
@@ -174,7 +174,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            Boba Wallet
+            {networkName['l2'] || 'Boba'} Wallet
           </Typography>
         </G.PageSwitcher>
       </S.WalletActionContainer>

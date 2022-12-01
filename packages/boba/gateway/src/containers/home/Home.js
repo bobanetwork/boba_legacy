@@ -161,8 +161,6 @@ function Home() {
         networkType: activeNetworkType
       })
 
-      console.log(`%c base initialized ${initialized}`,'color:yellow')
-
       if (!initialized) {
         dispatch(setBaseState(false))
         return false

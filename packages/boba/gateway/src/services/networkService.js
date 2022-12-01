@@ -509,7 +509,7 @@ class NetworkService {
       network: networkGateway,
       networkType
     })
-    console.log(['networkDetail',networkDetail])
+
     const L1rpc = networkDetail['L1']['rpcUrl']
     const L2rpc = networkDetail['L2']['rpcUrl']
 
