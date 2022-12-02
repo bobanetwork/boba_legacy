@@ -253,6 +253,8 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   {
     (uint256 _CLRoundId, int256 _CLSubmission, uint256 _CLLatestRoundId) = getChainLinkQuote(_roundId);
     require(_CLRoundId == _roundId, "ChainLink roundId not match");
+    require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
+
     bytes memory error = validateOracleRound(msg.sender, uint80(_roundId));
     require(_CLSubmission >= minSubmissionValue, "value below minSubmissionValue");
     require(_CLSubmission <= maxSubmissionValue, "value above maxSubmissionValue");
@@ -266,7 +268,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     if (updated) {
       validateAnswer(uint80(_roundId), newAnswer);
     }
-    require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
     chainLinkLatestRoundId = _CLLatestRoundId;
   }
 
@@ -821,6 +822,61 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   }
 
   /**
+   * @notice method to update url
+   */
+  function updateTuringUrl(string memory _turingUrl)
+    public
+    onlyOwner
+  {
+    string memory prevTuringUrl = turingUrl;
+    turingUrl = _turingUrl;
+    emit UpdateTuringUrl(prevTuringUrl, turingUrl);
+  }
+
+  /**
+   * @notice method to update turingHelper contract
+   */
+  function updateTuringHelper(address _turingHelperAddr)
+    public
+    onlyOwner
+  {
+    require(_turingHelperAddr != address(0), "Cannot set turingHelper to 0x address");
+    address prevTuringHelperAddr = turingHelperAddr;
+    turingHelperAddr = _turingHelperAddr;
+    turingHelper = ITuringHelper(_turingHelperAddr);
+    emit UpdateTuringHelper(prevTuringHelperAddr, turingHelperAddr);
+  }
+
+  /**
+   * @notice method to update ChainLink's contract address
+   */
+  function updateTuringChainLinkPriceFeedAddr(address _turingChainLinkPriceFeedAddr)
+    public
+    onlyOwner
+  {
+    require(_turingChainLinkPriceFeedAddr != address(0), "Cannot set turingChainLinkPriceFeed to 0x address");
+    address prevTuringChainLinkPriceFeedAddr = turingChainLinkPriceFeedAddr;
+    turingChainLinkPriceFeedAddr = _turingChainLinkPriceFeedAddr;
+    emit UpdateTuringChainLinkPriceFeedAddr(prevTuringChainLinkPriceFeedAddr, turingChainLinkPriceFeedAddr);
+  }
+
+  /**
+   * @notice method to get ChainLink's quote via turing
+   */
+  function getChainLinkQuote(uint256 _roundId) public onlyOwner returns (uint256 , int256, uint256) {
+    bytes memory encRequest = abi.encode(turingChainLinkPriceFeedAddr, _roundId);
+    bytes memory encResponse = turingHelper.TuringTx(turingUrl, encRequest);
+
+    emit TuringDebug(encResponse);
+
+    (uint256 _CLRoundId, int256 _CLSubmission, uint256 _CLLatestRoundId) = abi.decode(encResponse,(uint256,int256,uint256));
+
+    emit GetChainLinkQuote(turingUrl, _CLRoundId, _CLSubmission, _CLLatestRoundId);
+
+    return (_CLRoundId, _CLSubmission, _CLLatestRoundId);
+  }
+
+  /**
    * Private
    */
 
@@ -1179,48 +1235,5 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     returns (bool)
   {
     return _roundId <= ROUND_MAX;
-  }
-
-  function updateTuringUrl(string memory _turingUrl)
-    public
-    onlyOwner
-  {
-    string memory prevTuringUrl = turingUrl;
-    turingUrl = _turingUrl;
-    emit UpdateTuringUrl(prevTuringUrl, turingUrl);
-  }
-
-  function updateTuringHelper(address _turingHelperAddr)
-    public
-    onlyOwner
-  {
-    require(_turingHelperAddr != address(0), "Cannot set turingHelper to 0x address");
-    address prevTuringHelperAddr = turingHelperAddr;
-    turingHelperAddr = _turingHelperAddr;
-    turingHelper = ITuringHelper(_turingHelperAddr);
-    emit UpdateTuringHelper(prevTuringHelperAddr, turingHelperAddr);
-  }
-
-  function updateTuringChainLinkPriceFeedAddr(address _turingChainLinkPriceFeedAddr)
-    public
-    onlyOwner
-  {
-    require(_turingChainLinkPriceFeedAddr != address(0), "Cannot set turingChainLinkPriceFeed to 0x address");
-    address prevTuringChainLinkPriceFeedAddr = turingChainLinkPriceFeedAddr;
-    turingChainLinkPriceFeedAddr = _turingChainLinkPriceFeedAddr;
-    emit UpdateTuringChainLinkPriceFeedAddr(prevTuringChainLinkPriceFeedAddr, turingChainLinkPriceFeedAddr);
-  }
-
-  function getChainLinkQuote(uint256 _roundId) public onlyOwner returns (uint256 , int256, uint256) {
-    bytes memory encRequest = abi.encode(turingChainLinkPriceFeedAddr, _roundId);
-    bytes memory encResponse = turingHelper.TuringTx(turingUrl, encRequest);
-
-    emit TuringDebug(encResponse);
-
-    (uint256 _CLRoundId, int256 _CLSubmission, uint256 _CLLatestRoundId) = abi.decode(encResponse,(uint256,int256,uint256));
-
-    emit GetChainLinkQuote(turingUrl, _CLRoundId, _CLSubmission, _CLLatestRoundId);
-
-    return (_CLRoundId, _CLSubmission, _CLLatestRoundId);
   }
 }
