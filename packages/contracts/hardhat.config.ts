@@ -40,8 +40,7 @@ const config: HardhatUserConfig = {
       blockGasLimit: RUN_OVM_TEST_GAS * 2,
       live: false,
       saveDeployments: false,
-      tags: ['local'],
-      hardfork: 'istanbul',
+      tags: ['local']
     },
     optimism: {
       url: 'http://127.0.0.1:8545',
