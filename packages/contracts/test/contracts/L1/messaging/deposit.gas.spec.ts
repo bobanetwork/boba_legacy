@@ -1,11 +1,11 @@
 /* External Imports */
 import { ethers } from 'hardhat'
 import { Signer, ContractFactory, Contract } from 'ethers'
-import { smoddit } from '@eth-optimism/smock'
 import { expectApprox } from '@eth-optimism/core-utils'
 
 /* Internal Imports */
 import {
+  deploy,
   makeAddressManager,
   L2_GAS_DISCOUNT_DIVISOR,
   ENQUEUE_GAS_COST,
@@ -13,6 +13,8 @@ import {
   NON_NULL_BYTES32,
 } from '../../../helpers'
 import { expect } from '../../../setup'
+import { MockContract, smock } from '@defi-wonderland/smock'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 // Still have some duplication from CanonicalTransactionChain.spec.ts, but it's so minimal that
 // this is probably cleaner for now. Particularly since we're planning to move all of this out into
@@ -22,8 +24,8 @@ const INITIAL_TOTAL_L1_SUPPLY = 5000
 const FINALIZATION_GAS = 1_200_000
 
 describe('[GAS BENCHMARK] Depositing via the standard bridge [ @skip-on-coverage ]', () => {
-  let sequencer: Signer
-  let alice: Signer
+  let sequencer: SignerWithAddress
+  let alice: SignerWithAddress
   before(async () => {
     ;[sequencer, alice] = await ethers.getSigners()
   })
@@ -92,27 +94,19 @@ describe('[GAS BENCHMARK] Depositing via the standard bridge [ @skip-on-coverage
   })
 
   // 4 Bridge
-  let L1ERC20: Contract
+  let L1ERC20: MockContract<Contract>
   let L1StandardBridge: Contract
   before('Deploy the bridge and setup the token', async () => {
-    // Deploy the Bridge
-    L1StandardBridge = await (
-      await ethers.getContractFactory('L1StandardBridge')
-    ).deploy()
+    L1StandardBridge = await deploy('L1StandardBridge')
     await L1StandardBridge.initialize(
       L1CrossDomainMessenger.address,
       NON_ZERO_ADDRESS
     )
 
-    L1ERC20 = await (
-      await smoddit('@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20')
-    ).deploy('L1ERC20', 'ERC')
-    const aliceAddress = await alice.getAddress()
-    await L1ERC20.smodify.put({
-      _totalSupply: INITIAL_TOTAL_L1_SUPPLY,
-      _balances: {
-        [aliceAddress]: INITIAL_TOTAL_L1_SUPPLY,
-      },
+    L1ERC20 = await (await smock.mock('ERC20')).deploy('L1ERC20', 'ERC')
+    await L1ERC20.setVariable('_totalSupply', INITIAL_TOTAL_L1_SUPPLY)
+    await L1ERC20.setVariable('_balances', {
+      [alice.address]: INITIAL_TOTAL_L1_SUPPLY,
     })
   })
 

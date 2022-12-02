@@ -3,7 +3,7 @@ import { expect } from '../../../setup'
 /* External Imports */
 import hre, { ethers } from 'hardhat'
 import { Signer, ContractFactory, Contract } from 'ethers'
-import { smockit, MockContract } from '@eth-optimism/smock'
+import { smock, FakeContract, MockContract } from '@defi-wonderland/smock'
 import { applyL1ToL2Alias } from '@eth-optimism/core-utils'
 
 /* Internal Imports */
@@ -13,30 +13,29 @@ import {
   encodeXDomainCalldata,
 } from '../../../helpers'
 import { predeploys } from '../../../../src'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 describe('L2CrossDomainMessenger', () => {
-  let signer: Signer
+  let signer: SignerWithAddress
   before(async () => {
     ;[signer] = await ethers.getSigners()
   })
 
-  let Mock__TargetContract: MockContract
-  let Mock__L1CrossDomainMessenger: MockContract
-  let Mock__OVM_L2ToL1MessagePasser: MockContract
+  let Mock__TargetContract: FakeContract
+  let Mock__L1CrossDomainMessenger: FakeContract
+  let Mock__OVM_L2ToL1MessagePasser: FakeContract
   before(async () => {
-    Mock__TargetContract = await smockit(
-      await ethers.getContractFactory('Helper_SimpleProxy')
+    Mock__TargetContract = await smock.fake<Contract>('Helper_SimpleProxy')
+    Mock__L1CrossDomainMessenger = await smock.fake<Contract>(
+      'L1CrossDomainMessenger'
     )
-    Mock__L1CrossDomainMessenger = await smockit(
-      await ethers.getContractFactory('L1CrossDomainMessenger')
-    )
-    Mock__OVM_L2ToL1MessagePasser = await smockit(
-      await ethers.getContractFactory('OVM_L2ToL1MessagePasser'),
+    Mock__OVM_L2ToL1MessagePasser = await smock.fake<Contract>(
+      'OVM_L2ToL1MessagePasser',
       { address: predeploys.OVM_L2ToL1MessagePasser }
     )
   })
 
-  let impersonatedL1CrossDomainMessengerSender: Signer
+  let impersonatedL1CrossDomainMessengerSender: SignerWithAddress
   before(async () => {
     const impersonatedAddress = applyL1ToL2Alias(
       Mock__L1CrossDomainMessenger.address
@@ -75,14 +74,23 @@ describe('L2CrossDomainMessenger', () => {
 
     it('should be able to send a single message', async () => {
       await expect(
-        L2CrossDomainMessenger.sendMessage(target, message, gasLimit)
+        L2CrossDomainMessenger.connect(signer).sendMessage(
+          NON_ZERO_ADDRESS,
+          NON_NULL_BYTES32,
+          100_000
+        )
       ).to.not.be.reverted
 
       expect(
-        Mock__OVM_L2ToL1MessagePasser.smocked.passMessageToL1.calls[0]
-      ).to.deep.equal([
-        encodeXDomainCalldata(target, await signer.getAddress(), message, 0),
-      ])
+        Mock__OVM_L2ToL1MessagePasser.passMessageToL1.getCall(0).args[0]
+      ).to.deep.equal(
+        encodeXDomainCalldata(
+          NON_ZERO_ADDRESS,
+          signer.address,
+          NON_NULL_BYTES32,
+          0
+        )
+      )
     })
 
     it('should be able to send the same message twice', async () => {
@@ -118,13 +126,16 @@ describe('L2CrossDomainMessenger', () => {
     })
 
     it('should send a call to the target contract', async () => {
-      await L2CrossDomainMessenger.connect(
-        impersonatedL1CrossDomainMessengerSender
-      ).relayMessage(target, sender, message, 0)
+      await L2CrossDomainMessenger.relayMessage(
+        target,
+        signer.address,
+        message,
+        0
+      )
 
-      expect(Mock__TargetContract.smocked.setTarget.calls[0]).to.deep.equal([
-        NON_ZERO_ADDRESS,
-      ])
+      expect(Mock__TargetContract.mint.getCall(0).args[0]).to.deep.equal(
+        NON_ZERO_ADDRESS
+      )
     })
 
     it('the xDomainMessageSender is reset to the original value', async () => {

@@ -44,12 +44,12 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-standard": "^5.0.0",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.2",
+    "ethers": "^5.5.4",
     "hardhat": "^2.6.6",
     "solhint": "^3.3.7",
     "ts-generator": "^0.1.1",
     "ts-mocha": "^10.0.0",
-    "ts-node": "10.1.0",
+    "ts-node": "10.9.1",
     "typechain": "^8.1.0"
   },
   "dependencies": {
@@ -57,7 +57,7 @@
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^4.2.0",
     "@thehubbleproject/bls": "^0.5.1",
-    "@typechain/hardhat": "^3.0.0",
+    "@typechain/hardhat": "^6.1.2",
     "@types/mocha": "^9.0.0",
     "ethereumjs-util": "^7.1.0",
     "ethereumjs-wallet": "^1.0.1",

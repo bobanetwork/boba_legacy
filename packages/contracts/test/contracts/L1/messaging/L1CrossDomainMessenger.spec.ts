@@ -3,7 +3,7 @@ import { expect } from '../../../setup'
 /* External Imports */
 import { ethers } from 'hardhat'
 import { Signer, ContractFactory, Contract, BigNumber } from 'ethers'
-import { smockit, MockContract } from '@eth-optimism/smock'
+import { smock, FakeContract } from '@defi-wonderland/smock'
 import {
   remove0x,
   toHexString,
@@ -57,9 +57,9 @@ describe('L1CrossDomainMessenger', () => {
     AddressManager = await makeAddressManager()
   })
 
-  let Mock__TargetContract: MockContract
-  let Mock__L2CrossDomainMessenger: MockContract
-  let Mock__StateCommitmentChain: MockContract
+  let Mock__TargetContract: FakeContract
+  let Mock__L2CrossDomainMessenger: FakeContract
+  let Mock__StateCommitmentChain: FakeContract
 
   let Factory__CanonicalTransactionChain: ContractFactory
   let Factory__ChainStorageContainer: ContractFactory
@@ -67,16 +67,14 @@ describe('L1CrossDomainMessenger', () => {
 
   let CanonicalTransactionChain: Contract
   before(async () => {
-    Mock__TargetContract = await smockit(
-      await ethers.getContractFactory('Helper_SimpleProxy')
-    )
-    Mock__L2CrossDomainMessenger = await smockit(
+    Mock__TargetContract = await smock.fake<Contract>('Helper_SimpleProxy')
+    Mock__L2CrossDomainMessenger = await smock.fake<Contract>(
       await ethers.getContractFactory('L2CrossDomainMessenger'),
       {
         address: predeploys.L2CrossDomainMessenger,
       }
     )
-    Mock__StateCommitmentChain = await smockit(
+    Mock__StateCommitmentChain = await smock.fake<Contract>(
       await ethers.getContractFactory('StateCommitmentChain')
     )
 
@@ -459,18 +457,12 @@ describe('L1CrossDomainMessenger', () => {
     })
 
     beforeEach(async () => {
-      Mock__StateCommitmentChain.smocked.verifyStateCommitment.will.return.with(
-        true
-      )
-      Mock__StateCommitmentChain.smocked.insideFraudProofWindow.will.return.with(
-        false
-      )
+      Mock__StateCommitmentChain.verifyStateCommitment.returns(true)
+      Mock__StateCommitmentChain.insideFraudProofWindow.returns(false)
     })
 
     it('should revert if still inside the fraud proof window', async () => {
-      Mock__StateCommitmentChain.smocked.insideFraudProofWindow.will.return.with(
-        true
-      )
+      Mock__StateCommitmentChain.insideFraudProofWindow.returns(true)
 
       const proof1 = {
         stateRoot: ethers.constants.HashZero,
@@ -506,9 +498,7 @@ describe('L1CrossDomainMessenger', () => {
     })
 
     it('should revert if provided an invalid state root proof', async () => {
-      Mock__StateCommitmentChain.smocked.verifyStateCommitment.will.return.with(
-        false
-      )
+      Mock__StateCommitmentChain.verifyStateCommitment.returns(false)
 
       const proof1 = {
         stateRoot: ethers.constants.HashZero,
