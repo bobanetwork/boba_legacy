@@ -32,6 +32,7 @@
     "preprocess": "yarn lerna-clear && yarn hardhat-compile && yarn lerna-tsc"
   },
   "dependencies": {
+    "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "depcheck": "^1.4.3",
