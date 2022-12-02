@@ -88,7 +88,7 @@
     "prettier": "^2.3.1",
     "prom-client": "^13.1.0",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.0.0",
+    "ts-node": "10.1.0",
     "typescript": "^4.3.5"
   }
 }

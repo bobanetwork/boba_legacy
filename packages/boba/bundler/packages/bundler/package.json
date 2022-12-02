@@ -59,7 +59,7 @@
     "sinon": "^14.0.0",
     "solidity-coverage": "^0.7.21",
     "solidity-string-utils": "^0.0.8-0",
-    "ts-node": ">=8.0.0",
+    "ts-node": "10.1.0",
     "typechain": "^8.1.0"
   }
 }

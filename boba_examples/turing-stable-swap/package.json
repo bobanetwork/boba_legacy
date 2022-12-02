@@ -32,7 +32,7 @@
     "keythereum": "^1.2.0",
     "mocha": "^8.3.1",
     "request-promise-native": "^1.0.9",
-    "ts-node": "^10.8.0",
+    "ts-node": "10.1.0",
     "typescript": "^4.7.2"
   },
   "dependencies": {
