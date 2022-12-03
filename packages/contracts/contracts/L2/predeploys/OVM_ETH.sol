@@ -40,21 +40,17 @@ contract OVM_ETH is L2StandardERC20 {
         revert("OVM_ETH: transferFrom is disabled pending further community discussion.");
     }
 
-    function increaseAllowance(address spender, uint256 addedValue)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function increaseAllowance(
+        address spender,
+        uint256 addedValue
+    ) public virtual override returns (bool) {
         revert("OVM_ETH: increaseAllowance is disabled pending further community discussion.");
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function decreaseAllowance(
+        address spender,
+        uint256 subtractedValue
+    ) public virtual override returns (bool) {
         revert("OVM_ETH: decreaseAllowance is disabled pending further community discussion.");
     }
 }

@@ -77,11 +77,9 @@ library Lib_OVMCodec {
      * @param _transaction OVM transaction to encode.
      * @return Encoded transaction bytes.
      */
-    function encodeTransaction(Transaction memory _transaction)
-        internal
-        pure
-        returns (bytes memory)
-    {
+    function encodeTransaction(
+        Transaction memory _transaction
+    ) internal pure returns (bytes memory) {
         return
             abi.encodePacked(
                 _transaction.timestamp,
@@ -125,11 +123,9 @@ library Lib_OVMCodec {
      * @param _batchHeader Header to hash.
      * @return Hash of the header.
      */
-    function hashBatchHeader(Lib_OVMCodec.ChainBatchHeader memory _batchHeader)
-        internal
-        pure
-        returns (bytes32)
-    {
+    function hashBatchHeader(
+        Lib_OVMCodec.ChainBatchHeader memory _batchHeader
+    ) internal pure returns (bytes32) {
         return
             keccak256(
                 abi.encode(

@@ -131,9 +131,7 @@ describe('StateCommitmentChain', () => {
 
       describe('when not submitting more elements than present in the CanonicalTransactionChain', () => {
         before(() => {
-          Mock__CanonicalTransactionChain.getTotalElements.returns(
-            batch.length
-          )
+          Mock__CanonicalTransactionChain.getTotalElements.returns(batch.length)
         })
 
         it('should append the state batch', async () => {
@@ -195,9 +193,7 @@ describe('StateCommitmentChain', () => {
     }
 
     beforeEach(async () => {
-      Mock__CanonicalTransactionChain.getTotalElements.returns(
-        batch.length
-      )
+      Mock__CanonicalTransactionChain.getTotalElements.returns(batch.length)
       await StateCommitmentChain.appendStateBatch(batch, 0)
       batchHeader.extraData = ethers.utils.defaultAbiCoder.encode(
         ['uint256', 'address'],
@@ -273,9 +269,7 @@ describe('StateCommitmentChain', () => {
     describe('when one batch element has been inserted', () => {
       beforeEach(async () => {
         const batch = [NON_NULL_BYTES32]
-        Mock__CanonicalTransactionChain.getTotalElements.returns(
-          batch.length
-        )
+        Mock__CanonicalTransactionChain.getTotalElements.returns(batch.length)
         await StateCommitmentChain.appendStateBatch(batch, 0)
       })
 
@@ -287,9 +281,7 @@ describe('StateCommitmentChain', () => {
     describe('when 64 batch elements have been inserted in one batch', () => {
       beforeEach(async () => {
         const batch = Array(64).fill(NON_NULL_BYTES32)
-        Mock__CanonicalTransactionChain.getTotalElements.returns(
-          batch.length
-        )
+        Mock__CanonicalTransactionChain.getTotalElements.returns(batch.length)
         await StateCommitmentChain.appendStateBatch(batch, 0)
       })
 
@@ -324,9 +316,7 @@ describe('StateCommitmentChain', () => {
     describe('when one batch has been inserted', () => {
       beforeEach(async () => {
         const batch = [NON_NULL_BYTES32]
-        Mock__CanonicalTransactionChain.getTotalElements.returns(
-          batch.length
-        )
+        Mock__CanonicalTransactionChain.getTotalElements.returns(batch.length)
         await StateCommitmentChain.appendStateBatch(batch, 0)
       })
 

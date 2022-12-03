@@ -43,9 +43,10 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
      * @param _libAddressManager Address of the Address Manager.
      * @param _owner Name of the contract that owns this container (will be resolved later).
      */
-    constructor(address _libAddressManager, string memory _owner)
-        Lib_AddressResolver(_libAddressManager)
-    {
+    constructor(
+        address _libAddressManager,
+        string memory _owner
+    ) Lib_AddressResolver(_libAddressManager) {
         owner = _owner;
     }
 
@@ -117,10 +118,10 @@ contract ChainStorageContainer is IChainStorageContainer, Lib_AddressResolver {
     /**
      * @inheritdoc IChainStorageContainer
      */
-    function deleteElementsAfterInclusive(uint256 _index, bytes27 _globalMetadata)
-        public
-        onlyOwner
-    {
+    function deleteElementsAfterInclusive(
+        uint256 _index,
+        bytes27 _globalMetadata
+    ) public onlyOwner {
         buffer.deleteElementsAfterInclusive(uint40(_index), _globalMetadata);
     }
 }

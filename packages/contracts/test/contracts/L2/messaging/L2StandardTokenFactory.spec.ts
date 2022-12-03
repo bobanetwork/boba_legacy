@@ -6,7 +6,11 @@ import { Signer, ContractFactory, Contract } from 'ethers'
 
 /* Internal Imports */
 import { predeploys, getContractInterface } from '../../../../src'
-import { MockContract, MockContractFactory, smock } from '@defi-wonderland/smock'
+import {
+  MockContract,
+  MockContractFactory,
+  smock,
+} from '@defi-wonderland/smock'
 
 describe('L2StandardTokenFactory', () => {
   let signer: Signer

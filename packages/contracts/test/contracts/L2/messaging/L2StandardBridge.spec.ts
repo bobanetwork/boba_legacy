@@ -177,7 +177,7 @@ describe('L2StandardBridge', () => {
       bobsBalance.should.equal(depositAmount)
     })
   })
-describe('withdrawals', () => {
+  describe('withdrawals', () => {
     const withdrawAmount = 1_000
 
     let Fake__OVM_ETH: FakeContract<Contract>
@@ -303,26 +303,25 @@ describe('withdrawals', () => {
     })
   })
 
-
   describe('standard erc20', () => {
-      it('should not allow anyone but the L2 bridge to mint and burn', async () => {
-        expect(
-          L2ERC20.connect(alice).mint(alice.address, 100)
-        ).to.be.revertedWith('Only L2 Bridge can mint and burn')
+    it('should not allow anyone but the L2 bridge to mint and burn', async () => {
+      expect(
+        L2ERC20.connect(alice).mint(alice.address, 100)
+      ).to.be.revertedWith('Only L2 Bridge can mint and burn')
 
-        expect(
-          L2ERC20.connect(alice).burn(alice.address, 100)
-        ).to.be.revertedWith('Only L2 Bridge can mint and burn')
-      })
+      expect(
+        L2ERC20.connect(alice).burn(alice.address, 100)
+      ).to.be.revertedWith('Only L2 Bridge can mint and burn')
+    })
 
-      it('should return the correct interface support', async () => {
-        // ERC165
-        expect(await L2ERC20.supportsInterface(0x01ffc9a7)).to.be.true
+    it('should return the correct interface support', async () => {
+      // ERC165
+      expect(await L2ERC20.supportsInterface(0x01ffc9a7)).to.be.true
 
-        // L2StandardERC20
-        expect(await L2ERC20.supportsInterface(0x1d1d8b63)).to.be.true
+      // L2StandardERC20
+      expect(await L2ERC20.supportsInterface(0x1d1d8b63)).to.be.true
 
-        expect(await L2ERC20.supportsInterface(0xffffffff)).to.be.false
-      })
+      expect(await L2ERC20.supportsInterface(0xffffffff)).to.be.false
     })
   })
+})

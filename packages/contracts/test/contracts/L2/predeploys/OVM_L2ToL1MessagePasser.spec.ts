@@ -56,9 +56,7 @@ describe.skip('OVM_L2ToL1MessagePasser', () => {
 
   describe('passMessageToL1', () => {
     before(async () => {
-      Mock__OVM_ExecutionManager.ovmCALLER.returns(
-        NON_ZERO_ADDRESS
-      )
+      Mock__OVM_ExecutionManager.ovmCALLER.returns(NON_ZERO_ADDRESS)
     })
 
     for (const size of ELEMENT_TEST_SIZES) {
