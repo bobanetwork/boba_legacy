@@ -15,7 +15,7 @@ describe('test Create2Factory', () => {
     expect(await factory._isFactoryDeployed()).to.equal(false, 'factory exists before test deploy')
     await factory.deployFactory()
     expect(await factory._isFactoryDeployed()).to.equal(true, 'factory failed to deploy')
-  })
+  }).timeout(100000)
 
   it('should deploy to known address', async () => {
     const initCode = TestToken__factory.bytecode
