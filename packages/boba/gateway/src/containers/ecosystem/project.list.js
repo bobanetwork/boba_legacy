@@ -39,13 +39,6 @@ import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
 
-// Boba gateways and block explorers
-import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
-import BobaavaxLogo from '../../images/bobaLinks/Bobaavax.svg'
-import BobabnbLogo from '../../images/bobaLinks/Bobabnb.svg'
-import BobabeamLogo from '../../images/bobaLinks/Bobabeam.svg'
-import BobaftmLogo from '../../images/bobaLinks/Bobaftm.svg'
-
 import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon'
 import BobaBnbIcon from 'components/icons/chain/L2/BobaBNBIcon'
 import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon'

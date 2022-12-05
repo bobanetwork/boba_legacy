@@ -1,4 +1,4 @@
-import { ETHERSCAN_API_KEY, INFURA_ID } from "util/constant";
+import { ETHERSCAN_API_KEY } from "util/constant";
 
 export const fantomConfig = {
   Testnet: {

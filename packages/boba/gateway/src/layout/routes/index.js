@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { DISABLE_VE_DAO, PAGES_BY_NETWORK, ROUTES_PATH } from 'util/constant'
+import { useEffect, useState } from 'react';
+import { PAGES_BY_NETWORK } from 'util/constant'
 import { COMMON_ROUTES, ROUTE_LIST } from './routeList'
 import { useSelector } from 'react-redux';
 import { selectActiveNetwork } from 'selectors/networkSelector';
@@ -32,7 +32,6 @@ export const Router = () => {
     };
   }, [ network, routeList ]);
 
-  console.log([ 'routes', routes[ 0 ] ])
   return useRoutes(routes);
 }
 

@@ -147,7 +147,7 @@ class Save extends React.Component {
 
       if (netLayer === 'L2') {
         let cost_BN = await networkService.savingEstimate()
-        console.log([ `cost_BN`, cost_BN ])
+
         if (bobaFeeChoice) {
           // we are staking BOBA and paying in BOBA
           // so need to subtract the BOBA fee
@@ -296,7 +296,7 @@ class Save extends React.Component {
                 disabled={netLayer !== 'L2'}
                 variant="standard"
               />
-              
+
               {netLayer === 'L2' && bobaFeeChoice && fee &&
                 <Typography variant="body2" sx={{ mt: 2 }}>
                   Fee: {fee} BOBA
