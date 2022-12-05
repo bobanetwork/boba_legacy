@@ -15,34 +15,18 @@ limitations under the License. */
 
 import React, { Suspense, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { BrowserRouter } from "react-router-dom"
 
 import { Box, useMediaQuery } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
 import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles'
 
 import { setTheme } from 'actions/uiAction'
-
-import Home from 'containers/home/Home'
-import Notification from 'containers/notification/Notification'
-
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 
-import Transactions from 'containers/history/History'
-import BobaScope from 'containers/bobaScope/BobaScope'
-import Help from 'containers/help/Help'
-import Ecosystem from 'containers/ecosystem/Ecosystem'
-import Wallet from 'containers/wallet/Wallet'
-import Bridge from 'containers/bridge/Bridge'
-import MonsterWrapper from 'containers/monster/MonsterWrapper'
-import Lock from 'containers/veboba/Lock'
-import FarmWrapper from 'containers/farm/FarmWrapper'
-import SaveWrapper from 'containers/save/SaveWrapper'
-import Projects from 'containers/ecosystem/Projects'
-import { DISABLE_VE_DAO, ROUTES_PATH } from 'util/constant'
-import VoteAndDao from 'containers/VoteAndDao'
-import OldDao from 'containers/dao/OldDao'
-import DevTools from 'containers/devtools/DevTools'
+import Notification from 'containers/notification/Notification'
+
+import Router from './routes'
 
 function App() {
 
@@ -289,32 +273,7 @@ function App() {
           >
             <Notification />
             <Suspense fallback={<>Loading...</>}>
-              <Routes>
-                <Route exact path="/" element={<Home />} >
-                  <Route index element={<Bridge />} />
-                  <Route path={ROUTES_PATH.BRIDGE} element={<Bridge />} />
-                  <Route path={ROUTES_PATH.ECOSYSTEM} element={<Ecosystem />} >
-                    <Route path=":category" element={<Projects />} />
-                  </Route>
-                  <Route path={ROUTES_PATH.WALLET} element={<Wallet />} />
-                  <Route path={ROUTES_PATH.HISTORY} element={<Transactions />} />
-                  <Route path={ROUTES_PATH.EARN} element={<FarmWrapper />} />
-                  <Route path={ROUTES_PATH.STAKE} element={<SaveWrapper />} />
-
-                  <Route path={ROUTES_PATH.BOBASCOPE} element={<BobaScope />} />
-                  <Route path={ROUTES_PATH.HELP} element={<Help />} />
-                  <Route path={ROUTES_PATH.MONSTER} element={<MonsterWrapper />} />
-                  <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
-                    <Route path=":category" element={<Projects projectType='BOBA' />} />
-                  </Route>
-                  <Route path={ROUTES_PATH.DEV_TOOLS} element={<DevTools />} />
-                  {/* FIXME: On setting flag below to 1 below routes will not be available to user. */}
-                  {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.LOCK} element={<Lock />} />}
-                  {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />}
-                  <Route path={ROUTES_PATH.DAO} element={<OldDao />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Route>
-              </Routes>
+              <Router />
             </Suspense>
           </div>
         </Box>

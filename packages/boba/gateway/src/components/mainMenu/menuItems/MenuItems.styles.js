@@ -10,7 +10,7 @@ export const Nav = styled('nav')(({ theme }) => ({
   alignItems: 'center',
   gap: '10px',
   flexWrap: 'wrap',
-  [theme.breakpoints.down('md')]: {
+  [ theme.breakpoints.down('md') ]: {
     width: '100%',
     gap: '20px',
     height: '250px',
@@ -22,7 +22,7 @@ export const Nav = styled('nav')(({ theme }) => ({
   }
 }))
 
-export const MenuItem = styled(NavLink)(({ selected, theme }) => ({
+export const MenuListItem = styled(NavLink)(({ theme }) => ({
   fontSize: '0.8em',
   fontWeight: 'normal',
   cursor: 'pointer',
@@ -33,8 +33,11 @@ export const MenuItem = styled(NavLink)(({ selected, theme }) => ({
     fontWeight: '400',
     marginLeft: '20px'
   },
+  color: 'inherit',
   '&:hover': {
     color: `${theme.palette.secondary.main}`,
   },
-
+  '&.active': {
+    color: `${theme.palette.secondary.main}`,
+  },
 }))
