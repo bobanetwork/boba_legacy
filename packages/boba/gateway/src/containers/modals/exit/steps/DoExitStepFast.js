@@ -65,7 +65,6 @@ import {
 } from 'selectors/setupSelector'
 
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
-  console.log([`DO EXIT STEP FAST`, token])
 
   const dispatch = useDispatch()
 

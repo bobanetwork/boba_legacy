@@ -43,7 +43,6 @@ function BridgeTransfer() {
   const dispatch = useDispatch()
 
   const onReset = () => {
-    console.log([`RESET TOKEN onReset`])
     dispatch(resetToken())
   }
 
