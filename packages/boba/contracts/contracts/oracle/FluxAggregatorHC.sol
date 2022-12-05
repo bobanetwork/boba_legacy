@@ -201,11 +201,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
 
   /**
    * @notice set up the aggregator with initial configuration
-   * @param _boba The address of the BOBA token
-   * @param _paymentAmount The amount paid of BOBA paid to each oracle per submission, in wei (units of 10⁻¹⁸ BOBA)
-   * @param _timeout is the number of seconds after the previous round that are
-   * allowed to lapse before allowing an oracle to skip an unfinished round
-   * external validation of answers
    * @param _minSubmissionValue is an immutable check for a lower bound of what
    * submission values are accepted from an oracle
    * @param _maxSubmissionValue is an immutable check for an upper bound of what
@@ -217,9 +212,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * @param _turingChainLinkPriceFeedAddr address of chainlink price feed
    */
   constructor(
-    address _boba,
-    uint128 _paymentAmount,
-    uint32 _timeout,
     int256 _minSubmissionValue,
     int256 _maxSubmissionValue,
     uint8 _decimals,
@@ -228,13 +220,16 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     string memory _turingUrl,
     address _turingChainLinkPriceFeedAddr
   ) public {
-    bobaToken = BobaTokenInterface(_boba);
-    updateFutureRounds(_paymentAmount, 0, 0);
+    // hardcode
+    minSubmissionCount = 1;
+    maxSubmissionCount = 1;
+    timeout = 180;
+
     minSubmissionValue = _minSubmissionValue;
     maxSubmissionValue = _maxSubmissionValue;
     decimals = _decimals;
     description = _description;
-    rounds[0].updatedAt = uint64(block.timestamp.sub(uint256(_timeout)));
+    rounds[0].updatedAt = uint64(block.timestamp.sub(timeout));
     turingHelperAddr = _turingHelperAddr;
     turingHelper = ITuringHelper(_turingHelperAddr);
     turingUrl = _turingUrl;
@@ -293,23 +288,17 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * @param _added is the list of addresses for the new Oracles being added
    * @param _addedAdmins is the admin addresses for the new respective _added
    * list. Only this address is allowed to access the respective oracle's funds
-   * @param _minSubmissions is the new minimum submission count for each round
-   * @param _maxSubmissions is the new maximum submission count for each round
    * they can initiate a round
    */
   function changeOracles(
     address[] calldata _removed,
     address[] calldata _added,
     address[] calldata _addedAdmins,
-    uint80[] calldata _roundId,
-    uint32 _minSubmissions,
-    uint32 _maxSubmissions
+    uint80[] calldata _roundId
   )
     external
     onlyOwner()
   {
-    uint32 _restartDelay = 0;
-
     for (uint256 i = 0; i < _removed.length; i++) {
       removeOracle(_removed[i]);
     }
@@ -320,48 +309,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     for (uint256 i = 0; i < _added.length; i++) {
       addOracle(_added[i], _addedAdmins[i], _roundId[i]);
     }
-
-    updateFutureRounds(paymentAmount, _minSubmissions, _maxSubmissions);
-  }
-
-  /**
-   * @notice update the round and payment related parameters for subsequent
-   * rounds
-   * @param _paymentAmount is the payment amount for subsequent rounds
-   * @param _minSubmissions is the new minimum submission count for each round
-   * @param _maxSubmissions is the new maximum submission count for each round
-   * they can initiate a round
-   */
-  function updateFutureRounds(
-    uint128 _paymentAmount,
-    uint32 _minSubmissions,
-    uint32 _maxSubmissions
-  )
-    public
-    onlyOwner()
-  {
-    uint32 _restartDelay = 0;
-    uint32 oracleNum = oracleCount(); // Save on storage reads
-    require(_maxSubmissions >= _minSubmissions, "max must equal/exceed min");
-    require(oracleNum >= _maxSubmissions, "max cannot exceed total");
-    require(oracleNum == 0 || oracleNum > _restartDelay, "delay cannot exceed total");
-    if (oracleCount() > 0) {
-      require(_minSubmissions > 0, "min must be greater than 0");
-    }
-
-    paymentAmount = _paymentAmount;
-    minSubmissionCount = _minSubmissions;
-    maxSubmissionCount = _maxSubmissions;
-    restartDelay = _restartDelay;
-    timeout = 60;
-
-    emit RoundDetailsUpdated(
-      paymentAmount,
-      _minSubmissions,
-      _maxSubmissions,
-      _restartDelay,
-      60
-    );
   }
 
   /**
@@ -753,7 +700,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   {
     if (!newRound(_roundId)) return;
     uint256 lastStarted = oracles[msg.sender].lastStartedRound; // cache storage reads
-    if (_roundId <= lastStarted + restartDelay && lastStarted != 0) return;
+    if (_roundId <= lastStarted && lastStarted != 0) return;
 
     initializeNewRound(_roundId);
 
@@ -779,7 +726,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     returns (bool _eligible)
   {
     if (rounds[_queriedRoundId].startedAt > 0) {
-      return acceptingSubmissions(_queriedRoundId) && validateOracleRound(_oracle, _queriedRoundId).length == 0;
+      return validateOracleRound(_oracle, _queriedRoundId).length == 0;
     } else {
       return delayed(_oracle, _queriedRoundId) && validateOracleRound(_oracle, _queriedRoundId).length == 0;
     }
@@ -802,7 +749,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     Round storage round = rounds[0];
     OracleStatus storage oracle = oracles[_oracle];
 
-    bool shouldSupersede = oracle.lastReportedRound == reportingRoundId || !acceptingSubmissions(reportingRoundId);
+    bool shouldSupersede = oracle.lastReportedRound == reportingRoundId;
     // Instead of nudging oracles to submit to the next round, the inclusion of
     // the shouldSupersede bool in the if condition pushes them towards
     // submitting in a currently open round.
@@ -817,7 +764,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
       round = rounds[_roundId];
 
       _paymentAmount = details[_roundId].paymentAmount;
-      _eligibleToSubmit = acceptingSubmissions(_roundId);
+      _eligibleToSubmit = true;
     }
 
     if (validateOracleRound(_oracle, _roundId).length != 0) {
@@ -858,8 +805,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   function recordSubmission(int256 _submission, uint80 _roundId)
     private
   {
-    require(acceptingSubmissions(_roundId), "round not accepting submissions");
-
     details[_roundId].submissions.push(_submission);
     oracles[msg.sender].lastReportedRound = _roundId;
     oracles[msg.sender].latestSubmission = _submission;
@@ -990,21 +935,13 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     return oracles[_oracle].endingRound == ROUND_MAX;
   }
 
-  function acceptingSubmissions(uint80 _roundId)
-    private
-    view
-    returns (bool)
-  {
-    return details[_roundId].maxSubmissions != 0;
-  }
-
   function delayed(address _oracle, uint80 _roundId)
     private
     view
     returns (bool)
   {
     uint256 lastStarted = oracles[_oracle].lastStartedRound;
-    return _roundId > lastStarted + restartDelay || lastStarted == 0;
+    return _roundId > lastStarted || lastStarted == 0;
   }
 
   function newRound(uint80 _roundId)
