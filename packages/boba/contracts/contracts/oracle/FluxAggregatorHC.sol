@@ -205,7 +205,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * @param _paymentAmount The amount paid of BOBA paid to each oracle per submission, in wei (units of 10⁻¹⁸ BOBA)
    * @param _timeout is the number of seconds after the previous round that are
    * allowed to lapse before allowing an oracle to skip an unfinished round
-   * @param _validator is an optional contract address for validating
    * external validation of answers
    * @param _minSubmissionValue is an immutable check for a lower bound of what
    * submission values are accepted from an oracle
@@ -221,7 +220,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     address _boba,
     uint128 _paymentAmount,
     uint32 _timeout,
-    address _validator,
     int256 _minSubmissionValue,
     int256 _maxSubmissionValue,
     uint8 _decimals,
@@ -231,8 +229,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     address _turingChainLinkPriceFeedAddr
   ) public {
     bobaToken = BobaTokenInterface(_boba);
-    updateFutureRounds(_paymentAmount, 0, 0, 0, _timeout);
-    setValidator(_validator);
+    updateFutureRounds(_paymentAmount, 0, 0);
     minSubmissionValue = _minSubmissionValue;
     maxSubmissionValue = _maxSubmissionValue;
     decimals = _decimals;
@@ -263,11 +260,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     oracleInitializeNewRound(uint80(_roundId));
     recordSubmission(_CLSubmission, uint80(_roundId));
     (bool updated, int256 newAnswer) = updateRoundAnswer(uint80(_roundId));
-    payOracle(uint80(_roundId));
     deleteRoundDetails(uint80(_roundId));
-    if (updated) {
-      validateAnswer(uint80(_roundId), newAnswer);
-    }
     chainLinkLatestRoundId = _CLLatestRoundId;
   }
 
@@ -288,11 +281,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     oracleInitializeNewRound(uint80(_roundId));
     recordSubmission(_submission, uint80(_roundId));
     (bool updated, int256 newAnswer) = updateRoundAnswer(uint80(_roundId));
-    payOracle(uint80(_roundId));
     deleteRoundDetails(uint80(_roundId));
-    if (updated) {
-      validateAnswer(uint80(_roundId), newAnswer);
-    }
     require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
     chainLinkLatestRoundId = _CLLatestRoundId;
   }
@@ -306,7 +295,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * list. Only this address is allowed to access the respective oracle's funds
    * @param _minSubmissions is the new minimum submission count for each round
    * @param _maxSubmissions is the new maximum submission count for each round
-   * @param _restartDelay is the number of rounds an Oracle has to wait before
    * they can initiate a round
    */
   function changeOracles(
@@ -315,12 +303,13 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     address[] calldata _addedAdmins,
     uint80[] calldata _roundId,
     uint32 _minSubmissions,
-    uint32 _maxSubmissions,
-    uint32 _restartDelay
+    uint32 _maxSubmissions
   )
     external
     onlyOwner()
   {
+    uint32 _restartDelay = 0;
+
     for (uint256 i = 0; i < _removed.length; i++) {
       removeOracle(_removed[i]);
     }
@@ -332,7 +321,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
       addOracle(_added[i], _addedAdmins[i], _roundId[i]);
     }
 
-    updateFutureRounds(paymentAmount, _minSubmissions, _maxSubmissions, _restartDelay, timeout);
+    updateFutureRounds(paymentAmount, _minSubmissions, _maxSubmissions);
   }
 
   /**
@@ -341,25 +330,21 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
    * @param _paymentAmount is the payment amount for subsequent rounds
    * @param _minSubmissions is the new minimum submission count for each round
    * @param _maxSubmissions is the new maximum submission count for each round
-   * @param _restartDelay is the number of rounds an Oracle has to wait before
    * they can initiate a round
    */
   function updateFutureRounds(
     uint128 _paymentAmount,
     uint32 _minSubmissions,
-    uint32 _maxSubmissions,
-    uint32 _restartDelay,
-    uint32 _timeout
+    uint32 _maxSubmissions
   )
     public
     onlyOwner()
   {
-    updateAvailableFunds();
+    uint32 _restartDelay = 0;
     uint32 oracleNum = oracleCount(); // Save on storage reads
     require(_maxSubmissions >= _minSubmissions, "max must equal/exceed min");
     require(oracleNum >= _maxSubmissions, "max cannot exceed total");
     require(oracleNum == 0 || oracleNum > _restartDelay, "delay cannot exceed total");
-    require(recordedFunds.available >= requiredReserve(_paymentAmount), "insufficient funds for payment");
     if (oracleCount() > 0) {
       require(_minSubmissions > 0, "min must be greater than 0");
     }
@@ -368,54 +353,15 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     minSubmissionCount = _minSubmissions;
     maxSubmissionCount = _maxSubmissions;
     restartDelay = _restartDelay;
-    timeout = _timeout;
+    timeout = 60;
 
     emit RoundDetailsUpdated(
       paymentAmount,
       _minSubmissions,
       _maxSubmissions,
       _restartDelay,
-      _timeout
+      60
     );
-  }
-
-  /**
-   * @notice the amount of payment yet to be withdrawn by oracles
-   */
-  function allocatedFunds()
-    external
-    view
-    returns (uint128)
-  {
-    return recordedFunds.allocated;
-  }
-
-  /**
-   * @notice the amount of future funding available to oracles
-   * the amount returned might be lower than the actual value
-   */
-  function availableFunds()
-    external
-    view
-    returns (uint128)
-  {
-    return recordedFunds.available;
-  }
-
-  /**
-   * @notice recalculate the amount of BOBA available for payouts
-   */
-  function updateAvailableFunds()
-    public
-  {
-    Funds memory funds = recordedFunds;
-
-    uint256 nowAvailable = bobaToken.balanceOf(address(this)).sub(funds.allocated);
-
-    if (funds.available != nowAvailable) {
-      recordedFunds.available = uint128(nowAvailable);
-      emit AvailableFundsUpdated(nowAvailable);
-    }
   }
 
   /**
@@ -611,57 +557,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     return getRoundData(latestRoundId);
   }
 
-
-  /**
-   * @notice query the available amount of BOBA for an oracle to withdraw
-   */
-  function withdrawablePayment(address _oracle)
-    external
-    view
-    returns (uint256)
-  {
-    return oracles[_oracle].withdrawable;
-  }
-
-  /**
-   * @notice transfers the oracle's BOBA to another address. Can only be called
-   * by the oracle's admin.
-   * @param _oracle is the oracle whose BOBA is transferred
-   * @param _recipient is the address to send the BOBA to
-   * @param _amount is the amount of BOBA to send
-   */
-  function withdrawPayment(address _oracle, address _recipient, uint256 _amount)
-    external
-  {
-    require(oracles[_oracle].admin == msg.sender, "only callable by admin");
-
-    // Safe to downcast _amount because the total amount of BOBA is less than 2^128.
-    uint128 amount = uint128(_amount);
-    uint128 available = oracles[_oracle].withdrawable;
-    require(available >= amount, "insufficient withdrawable funds");
-
-    oracles[_oracle].withdrawable = available.sub(amount);
-    recordedFunds.allocated = recordedFunds.allocated.sub(amount);
-
-    require(bobaToken.transfer(_recipient, uint256(amount)));
-  }
-
-  /**
-   * @notice transfers the owner's BOBA to another address
-   * @param _recipient is the address to send the BOBA to
-   * @param _amount is the amount of BOBA to send
-   */
-  function withdrawFunds(address _recipient, uint256 _amount)
-    external
-    onlyOwner()
-  {
-    updateAvailableFunds();
-    uint256 available = uint256(recordedFunds.available);
-    require(available.sub(requiredReserve(paymentAmount)) >= _amount, "insufficient reserve funds");
-    require(bobaToken.transfer(_recipient, _amount), "token transfer failed");
-    updateAvailableFunds();
-  }
-
   /**
    * @notice get the admin address of an oracle
    * @param _oracle is the address of the oracle whose admin is being queried
@@ -703,23 +598,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
   }
 
   /**
-   * @notice allows non-oracles to request a new round
-   */
-  function requestNewRound()
-    external
-    returns (uint80)
-  {
-    require(requesters[msg.sender].authorized, "not authorized requester");
-
-    uint80 current = reportingRoundId;
-    require(rounds[current].updatedAt > 0 || timedOut(current), "prev round must be supersedable");
-
-    uint80 newRoundId = current.add(1);
-    requesterInitializeNewRound(newRoundId);
-    return newRoundId;
-  }
-
-  /**
    * @notice allows the owner to specify new non-oracles to start new rounds
    * @param _requester is the address to set permissions for
    * @param _authorized is a boolean specifying whether they can start new rounds or not
@@ -739,18 +617,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     }
 
     emit RequesterPermissionsSet(_requester, _authorized, _delay);
-  }
-
-  /**
-   * @notice recommended call to add funds to aggregator for oracle payments(if enabled)
-   * if funds transferred directly instead, call the updateAvailableFunds method manually after transfer
-   * @param amount the amount to transfer to aggregator
-   */
-  function addFunds(uint256 amount)
-    public
-  {
-    require(bobaToken.transferFrom(msg.sender, address(this), amount), "token transfer failed");
-    updateAvailableFunds();
   }
 
   /**
@@ -790,23 +656,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
       );
     } else {
       return oracleRoundStateSuggestRound(_oracle);
-    }
-  }
-
-  /**
-   * @notice method to update the address which does external data validation.
-   * @param _newValidator designates the address of the new validation contract.
-   */
-  function setValidator(address _newValidator)
-    public
-    onlyOwner()
-  {
-    address previous = address(validator);
-
-    if (previous != _newValidator) {
-      validator = AggregatorValidatorInterface(_newValidator);
-
-      emit ValidatorUpdated(previous, _newValidator);
     }
   }
 
@@ -911,18 +760,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     oracles[msg.sender].lastStartedRound = _roundId;
   }
 
-  function requesterInitializeNewRound(uint80 _roundId)
-    private
-  {
-    if (!newRound(_roundId)) return;
-    uint256 lastStarted = requesters[msg.sender].lastStartedRound; // cache storage reads
-    require(_roundId > lastStarted + requesters[msg.sender].delay || lastStarted == 0, "must delay requests");
-
-    initializeNewRound(_roundId);
-
-    requesters[msg.sender].lastStartedRound = _roundId;
-  }
-
   function updateTimedOutRoundInfo(uint80 _roundId)
     private
   {
@@ -1018,49 +855,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     return (true, newAnswer);
   }
 
-  function validateAnswer(
-    uint80 _roundId,
-    int256 _newAnswer
-  )
-    private
-  {
-    AggregatorValidatorInterface av = validator; // cache storage reads
-    if (address(av) == address(0)) return;
-
-    uint80 prevRound = _roundId.sub(1);
-    uint80 prevAnswerRoundId = rounds[prevRound].answeredInRound;
-    int256 prevRoundAnswer = rounds[prevRound].answer;
-    // We do not want the validator to ever prevent reporting, so we limit its
-    // gas usage and catch any errors that may arise.
-    try av.validate{gas: VALIDATOR_GAS_LIMIT}(
-      prevAnswerRoundId,
-      prevRoundAnswer,
-      _roundId,
-      _newAnswer
-    ) {} catch {}
-  }
-
-  function payOracle(uint80 _roundId)
-    private
-  {
-    // updateAvailableFunds not added here in order to reduce gas for submissions
-    // if voluntarySubmissionsAllowed is set to true, lack of payments wouldnt stop submissions
-    uint128 payment = details[_roundId].paymentAmount;
-    Funds memory funds = recordedFunds;
-
-    // allow voluntary submissions even when available funds have been depleted
-    if (funds.available >= payment) {
-      funds.available = funds.available.sub(payment);
-      funds.allocated = funds.allocated.add(payment);
-      recordedFunds = funds;
-      oracles[msg.sender].withdrawable = oracles[msg.sender].withdrawable.add(payment);
-
-      emit AvailableFundsUpdated(funds.available);
-    } else {
-      require(voluntarySubmissionsAllowed, "available funds depleted");
-    }
-  }
-
   function recordSubmission(int256 _submission, uint80 _roundId)
     private
   {
@@ -1110,14 +904,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface, Owned {
     returns (bool)
   {
     return _roundId.add(1) == _rrId && rounds[_rrId].updatedAt == 0;
-  }
-
-  function requiredReserve(uint256 payment)
-    private
-    view
-    returns (uint256)
-  {
-    return payment.mul(oracleCount()).mul(RESERVE_ROUNDS);
   }
 
   function addOracle(
