@@ -1,61 +1,54 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { useTheme } from '@mui/material'
 import { intersection } from 'lodash'
 import { selectMonster } from 'selectors/setupSelector'
-import { pagesByChain, MENU_LIST } from './menu.config'
+import { MENU_LIST } from './menu.config'
 
 import * as S from './MenuItems.styles'
-import { DISABLE_VE_DAO } from 'util/constant'
+import { PAGES_BY_NETWORK } from 'util/constant'
 import { selectActiveNetwork } from 'selectors/networkSelector'
 
 const MenuItems = () => {
 
-  const theme = useTheme()
-  const monsterNumber = useSelector(selectMonster())
   const menuList = MENU_LIST;
-  const monstersAdded = MENU_LIST.some(item => item.key === 'Monster')
-  const [ list, setList ] = useState([]);
+
+  const monsterNumber = useSelector(selectMonster())
   const network = useSelector(selectActiveNetwork());
 
-  useEffect(() => {
-    const filterMenu = menuList.filter((m) => intersection([ m.key ], pagesByChain[ network.toLowerCase() ]).length)
-
-    setList(filterMenu);
-  },[network, menuList])
+  const [ list, setList ] = useState([]);
 
   useEffect(() => {
-    if (monsterNumber > 0 && !monstersAdded) {
-      setList([
-        ...list,
+    let _menuList = menuList
+
+    if (monsterNumber > 0) {
+      _menuList = [
+        ...menuList,
         {
           key: 'Monster',
           icon: "MonsterIcon",
           title: "MonsterVerse",
           url: "/monster"
         }
-      ])
+      ]
     }
-  }, [ monsterNumber, monstersAdded, list ]);
+
+    let fMenu = _menuList.filter((m) => intersection([ m.key ], PAGES_BY_NETWORK[ network.toLowerCase() ]).length)
+      .filter((m) => !m.disable)
+
+    setList(fMenu);
+  }, [ network, menuList, monsterNumber ])
 
   return (
     <S.Nav>
       {list.map((item) => {
-        if (!!Number(DISABLE_VE_DAO) && (['Lock','Vote&Dao'].includes(item.key))) {
-          return null;
-        }
         return (
-          <S.MenuItem
-            style={({ isActive }) => {
-              return {
-                color: isActive ? theme.palette.secondary.main : 'inherit'
-              }
-            }}
+          <S.MenuListItem
             key={item.key}
             to={item.url}
+            activeclassname="active"
           >
             {item.title}
-          </S.MenuItem>
+          </S.MenuListItem>
         )
       })}
     </S.Nav>

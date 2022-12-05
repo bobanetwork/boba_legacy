@@ -72,3 +72,13 @@ export const ROUTES_PATH = {
   DAO: '/DAO',
 }
 export const PER_PAGE = 8
+
+
+export const PAGES_BY_NETWORK = {
+  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO', 'Monster'],
+  bnb: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  avax: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  fantom: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  moonbeam: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+  moonbase: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
+}
