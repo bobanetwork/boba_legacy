@@ -1,13 +1,4 @@
-import { ROUTES_PATH } from "util/constant";
-
-export const pagesByChain = {
-  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO' ],
-  bnb: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
-  avax: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
-  fantom: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
-  moonbeam: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
-  moonbase: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
-}
+import { DISABLE_VE_DAO, ROUTES_PATH } from "util/constant";
 
 export const MENU_LIST = [
   {
@@ -51,12 +42,14 @@ export const MENU_LIST = [
     icon: "LockIcon",
     title: "Lock",
     url: ROUTES_PATH.LOCK,
+    disable: !!Number(DISABLE_VE_DAO)
   },
   {
     key: 'Vote&Dao',
     icon: "VoteIcon",
     title: "Vote&Dao",
-    url: ROUTES_PATH.VOTE_DAO
+    url: ROUTES_PATH.VOTE_DAO,
+    disable: !!Number(DISABLE_VE_DAO)
   },
   {
     key: 'DAO',
