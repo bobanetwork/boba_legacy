@@ -86,11 +86,8 @@ describe('BobaLink Test\n', async () => {
       env.l2Wallet
     )
 
-    FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy(
-      env.addressesBOBA.TOKENS.BOBA.L2, // boba L2 token
-      0, // starting payment amount
-      180, // timeout, 3 mins
-      '0x0000000000000000000000000000000000000000', // validator
+    FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy()
+    await FluxAggregatorHC.initialize(
       minSubmissionValue, // min submission value
       maxSubmissionValue, // max submission value
       8, // decimals
@@ -178,8 +175,6 @@ describe('BobaLink Test\n', async () => {
             server.emit('success', body)
           }
           if (req.url === '/api') {
-            // load env
-            process.env.L1_NODE_WEB3_URL = ETHProviderUrl
             const asyncBobaLinkGetQuote: any = util.promisify(
               bobaLinkGetQuote
             )
@@ -188,6 +183,10 @@ describe('BobaLink Test\n', async () => {
             )}, null)
             res.end(JSON.stringify(response))
             server.emit('success', body)
+          }
+          if (req.url === '/invalidapi') {
+            res.writeHead(400, { 'Content-Type': 'text/plain' })
+            res.end('Expected content-type: application/json')
           }
         });
 
@@ -256,15 +255,11 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(latestRound)
   })
 
-  it('should allow to submit answer using Turing', async () => {
-    const addOracleTx = await FluxAggregatorHC.changeOracles(
-      [],
-      [env.l1Wallet.address],
-      [env.l1Wallet.address],
-      [roundId],
-      1, // min submission count
-      1, // max submission count
-      0 // restart delay
+  it('should submit answer using Turing', async () => {
+    const addOracleTx = await FluxAggregatorHC.setOracle(
+      env.l1Wallet.address,
+      env.l1Wallet.address,
+      roundId
     )
     await addOracleTx.wait()
     const nextRoundId = roundId.add(1)
@@ -281,7 +276,7 @@ describe('BobaLink Test\n', async () => {
     const nextRoundId = roundId.add(1)
     await expect(
       FluxAggregatorHC.estimateGas.submit(nextRoundId)
-    ).to.be.revertedWith('cannot report on previous rounds')
+    ).to.be.revertedWith('invalid roundId to initialize')
   })
 
   it('should not be able to submit answer again using emergency submission', async () => {
@@ -294,7 +289,7 @@ describe('BobaLink Test\n', async () => {
         chainLinkRoundData.answer,
         latestRound
       )
-    ).to.be.revertedWith('cannot report on previous rounds')
+    ).to.be.revertedWith('invalid roundId to initialize')
   })
 
   it('should not be able to submit answer using the incorrect chainlink data', async () => {
@@ -316,6 +311,7 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('test of api endpoint: should return price', async () => {
+    process.env.L1_NODE_WEB3_URL = ETHProviderUrl
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
       [64, ETHUSDPriceFeedAddr, roundId]
@@ -360,17 +356,20 @@ describe('BobaLink Test\n', async () => {
 
   it('should not be able to update answer if env is incorrect', async () => {
     process.env.L1_NODE_WEB3_URL = 'http://localhost:3000'
-    const nextRoundId = roundId.add(4)
+    const nextRoundId = roundId.add(3)
     await expect(
       FluxAggregatorHC.estimateGas.submit(nextRoundId)
-    ).to.be.revertedWith('invalid round to report')
+    ).to.be.revertedWith('TURING: Server error')
   })
 
   it('should not be able to update answer if rpc returns error', async () => {
     process.env.L1_NODE_WEB3_URL = ETHProviderUrl
-    await expect(FluxAggregatorHC.estimateGas.submit(1)).to.be.revertedWith(
-      'TURING: Server error'
-    )
+    const nextRoundId = roundId.add(3)
+    await FluxAggregatorHC.updateTuringUrl(`${URL}/invalidapi`)
+    await expect(
+      FluxAggregatorHC.estimateGas.submit(nextRoundId)
+    ).to.be.rejectedWith('TURING: Server error')
+    await FluxAggregatorHC.updateTuringUrl(`${URL}/api`)
   })
 
   it('should be able to submit data via BobaLinkService', async () => {
@@ -401,9 +400,10 @@ describe('BobaLink Test\n', async () => {
       },
     }
     const bobaLinkService = await startBOBALinkService()
-    await bobaLinkService._init()
+    await bobaLinkService.init()
 
-    await Promise.race([Timer(5000), bobaLinkService._start()])
+    const prevRoundId = await FluxAggregatorHC.latestRound()
+    await Promise.race([Timer(5000), bobaLinkService.start()])
     const latestRoundId = await FluxAggregatorHC.latestRound()
     const roundData = await FluxAggregatorHC.getRoundData(latestRoundId)
     const chainLinkLatestRoundId =
@@ -413,6 +413,7 @@ describe('BobaLink Test\n', async () => {
     )
     const chainLinkLatestRoundIdInCLContract =
       await ChainLinkContract.latestRound()
+    expect(latestRoundId).to.be.gt(prevRoundId)
     expect(roundData.answer).to.be.eq(chainLinkRoundData.answer)
     expect(chainLinkLatestRoundIdInCLContract).to.be.eq(chainLinkLatestRoundId)
   })
