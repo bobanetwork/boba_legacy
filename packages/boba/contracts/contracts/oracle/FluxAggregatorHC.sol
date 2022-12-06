@@ -34,17 +34,12 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     uint80 answeredInRound;
   }
 
-  // owner env
   address public owner;
 
-  // Round related params
-  uint32 public maxSubmissionCount;
-  uint32 public minSubmissionCount;
   uint8 public override decimals;
   string public override description;
-
-  int256 immutable public minSubmissionValue;
-  int256 immutable public maxSubmissionValue;
+  int256 public minSubmissionValue;
+  int256 public maxSubmissionValue;
 
   uint256 constant public override version = 1;
 
@@ -52,22 +47,19 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   // confusion around accidentally reading unset values as reported values.
   string constant private V3_NO_DATA_ERROR = "No data present";
 
-  // round id related params
   uint80 internal latestRoundId;
   uint80 public staringRoundId;
   uint256 public chainLinkLatestRoundId;
 
-  // oracle related params
   address private oracleAddress;
   address private oracleAdmin;
 
-  mapping(uint80 => Round) internal rounds;
-
-  // turing
   address public turingHelperAddr;
   ITuringHelper turingHelper;
   string public turingUrl;
   address public turingChainLinkPriceFeedAddr;
+
+  mapping(uint80 => Round) internal rounds;
 
   event OracleAdminUpdated(
     address indexed prevAdmin,
@@ -110,6 +102,16 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     _;
   }
 
+  modifier onlyNotInitialized() {
+    require(address(owner) == address(0), "Contract has been initialized");
+    _;
+  }
+
+  modifier onlyInitialized() {
+    require(address(owner) != address(0), "Contract has not yet been initialized");
+    _;
+  }
+
   /**
    * @notice set up the aggregator with initial configuration
    * @param _minSubmissionValue is an immutable check for a lower bound of what
@@ -122,19 +124,18 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    * @param _turingUrl url of turing endpoint
    * @param _turingChainLinkPriceFeedAddr address of chainlink price feed
    */
-  constructor(
+  function initialize(
     int256 _minSubmissionValue,
     int256 _maxSubmissionValue,
     uint8 _decimals,
-    string memory _description,
+    string calldata _description,
     address _turingHelperAddr,
-    string memory _turingUrl,
+    string calldata _turingUrl,
     address _turingChainLinkPriceFeedAddr
-  ) public {
-    // hardcode
-    minSubmissionCount = 1;
-    maxSubmissionCount = 1;
-
+  )
+    external
+    onlyNotInitialized
+  {
     minSubmissionValue = _minSubmissionValue;
     maxSubmissionValue = _maxSubmissionValue;
     decimals = _decimals;
@@ -152,6 +153,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    */
   function submit(uint256 _roundId)
     external
+    onlyInitialized
   {
     require(_roundId == latestRoundId.add(1), "invalid roundId to initialize");
 
@@ -174,6 +176,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    */
   function emergencySubmit(uint256 _roundId, int256 _submission, uint256 _CLLatestRoundId)
     external
+    onlyInitialized
   {
     require(_roundId == latestRoundId.add(1), "invalid roundId to initialize");
     require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
@@ -199,7 +202,8 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     uint80 _roundId
   )
     external
-    onlyOwner()
+    onlyOwner
+    onlyInitialized
   {
     require(oracleAddress == address(0), "oracleAddress already set");
     // override the latestRoundId, startingRound
@@ -457,7 +461,11 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   /**
    * @notice method to get ChainLink's quote via turing
    */
-  function getChainLinkQuote(uint256 _roundId) public onlyOwner returns (uint256 , int256, uint256) {
+  function getChainLinkQuote(uint256 _roundId)
+    public
+    onlyOwner
+    returns (uint256 , int256, uint256)
+  {
     bytes memory encRequest = abi.encode(turingChainLinkPriceFeedAddr, _roundId);
     bytes memory encResponse = turingHelper.TuringTx(turingUrl, encRequest);
 
@@ -471,10 +479,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   }
 
   /**
-   * Ownership
-   */
-
-  /**
    * @notice transfer ownership
    *
    * @param _newOwner new admin owner of this contract
@@ -483,7 +487,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     address _newOwner
   )
     external
-    onlyOwner()
+    onlyOwner
   {
     require(_newOwner != address(0), 'New owner cannot be the zero address');
     address prevOwner = owner;
