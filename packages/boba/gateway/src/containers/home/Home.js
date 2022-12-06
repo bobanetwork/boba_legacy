@@ -89,6 +89,7 @@ import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
+import useNetwork from 'hooks/useNetwork'
 
 
 function Home() {
@@ -151,8 +152,6 @@ function Home() {
 
     if (maintenance) return
 
-    console.log(['BASEENABLED',baseEnabled])
-
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
@@ -210,6 +209,8 @@ function Home() {
 
   // Invoking GA analysis page view hooks
   useGoogleAnalytics();
+
+  useNetwork()
 
   return (
     <>
