@@ -102,6 +102,11 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     _;
   }
 
+  modifier onlyOracleAdmin {
+    require(msg.sender == oracleOwner, 'Caller is not the oracle owner');
+    _;
+  }
+
   modifier onlyNotInitialized() {
     require(address(owner) == address(0), "Contract has been initialized");
     _;
@@ -153,7 +158,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    */
   function submit(uint256 _roundId)
     external
-    onlyInitialized
+    onlyOracleAdmin
   {
     require(_roundId == latestRoundId.add(1), "invalid roundId to initialize");
 
@@ -176,7 +181,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    */
   function emergencySubmit(uint256 _roundId, int256 _submission, uint256 _CLLatestRoundId)
     external
-    onlyInitialized
+    onlyOracleAdmin
   {
     require(_roundId == latestRoundId.add(1), "invalid roundId to initialize");
     require(_CLLatestRoundId >= _roundId && _CLLatestRoundId >= chainLinkLatestRoundId, "ChainLink latestRoundId is invalid");
@@ -203,7 +208,6 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   )
     external
     onlyOwner
-    onlyInitialized
   {
     require(oracleAddress == address(0), "oracleAddress already set");
     // override the latestRoundId, startingRound
@@ -217,8 +221,10 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   /**
    * @notice returns the oracle address
    */
-  function getOracle() external view returns (address) {
-    return oracleAddress;
+  function getOracles() external view returns (address[] memory) {
+    address[] memory oracleAddresses;
+    oracleAddresses[0] = oracleAddress;
+    return oracleAddresses;
   }
 
   /**
@@ -411,8 +417,8 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    */
   function transferOracleAdmin(address _oracleAdmin)
     external
+    onlyOracleAdmin
   {
-    require(_oracleAdmin == msg.sender, "only callable by oracle admin");
     address prevOracleAdmin = oracleAdmin;
     oracleAdmin = msg.sender;
 
