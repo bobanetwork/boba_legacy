@@ -52,6 +52,49 @@ export const NETWORK = {
 }
 
 
+export const CHAIN_ID_LIST = {
+  5: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.ETHEREUM,
+    layer: 'L1'
+  },
+  2888: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.ETHEREUM,
+    layer: 'L2'
+  },
+  1: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.ETHEREUM,
+    layer: 'L1'
+  },
+  288: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.ETHEREUM,
+    layer: 'L2'
+  },
+  43113: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.AVAX,
+    layer: 'L1'
+  },
+  4328: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.AVAX,
+    layer: 'L2'
+  },
+  43114: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.AVAX,
+    layer: 'L1'
+  },
+  43288: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.AVAX,
+    layer: 'L2'
+  },
+}
+
 export const NetworkList = {
   Mainnet: [
     {
