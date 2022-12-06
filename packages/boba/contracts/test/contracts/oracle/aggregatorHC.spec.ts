@@ -2,30 +2,15 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
-import { Contract, Signer, BigNumber, utils } from 'ethers'
+import { Contract, Signer, utils } from 'ethers'
 
-let bobaToken: Contract
-let FluxAggregator: Contract
-const BOBA_SUPPLY = ethers.utils.parseEther('10000')
-const BOBA_DECIMALS = 18
+let FluxAggregatorHC: Contract
 
-const deployBoba = async (): Promise<Contract> => {
-  return (await ethers.getContractFactory('L1ERC20')).deploy(
-    BOBA_SUPPLY,
-    'BOBA',
-    'BOBA',
-    BOBA_DECIMALS
-  )
-}
-
-const deployFluxAggregator = async (
-  bobaTokenAddress: string
-): Promise<Contract> => {
-  return (await ethers.getContractFactory('FluxAggregatorHC')).deploy(
-    bobaTokenAddress, // L2 token address
-    0, // starting payment amount
-    180, // timeout, 3 mins
-    '0x0000000000000000000000000000000000000000', // validator
+const deployFluxAggregatorHC = async (): Promise<Contract> => {
+  FluxAggregatorHC = await (
+    await ethers.getContractFactory('FluxAggregatorHC')
+  ).deploy()
+  await FluxAggregatorHC.initialize(
     0, // min submission value
     utils.parseUnits('50000', 8), // max submission value
     8, // decimals
@@ -34,352 +19,247 @@ const deployFluxAggregator = async (
     'https://example.com',
     '0x0000000000000000000000000000000000000000'
   )
-}
-
-const moveTimeForward = async (time = 0) => {
-  await ethers.provider.send('evm_increaseTime', [time])
-  await ethers.provider.send('evm_mine', [])
+  return FluxAggregatorHC
 }
 
 describe('Oracle Flux Aggregator Tests', async () => {
   beforeEach(async () => {
-    bobaToken = await deployBoba()
-    FluxAggregator = await deployFluxAggregator(bobaToken.address)
+    FluxAggregatorHC = await deployFluxAggregatorHC()
   })
 
-  describe('Optional payments for oracle submission', async () => {
-    beforeEach(async () => {
-      const signer2: Signer = (await ethers.getSigners())[1]
-      // add oracles
-      const addOracleTx = await FluxAggregator.changeOracles(
-        [],
-        [await signer2.getAddress()],
-        [await signer2.getAddress()],
-        [10000],
-        1, // min submission count
-        1, // max submission count
-        0 // restart delay
-      )
-      await addOracleTx.wait()
-      // send funds to aggregator
-      const reserveRounds = 2
-      const paymentAmount = utils.parseEther('1')
-      const requiredBalance = paymentAmount.mul(reserveRounds)
-
-      const approveTx = await bobaToken.approve(
-        FluxAggregator.address,
-        requiredBalance
-      )
-      await approveTx.wait()
-      const addFundsTx = await FluxAggregator.addFunds(requiredBalance)
-      await addFundsTx.wait()
-
-      // update payment for round
-      const updateFutureRoundsTx = await FluxAggregator.updateFutureRounds(
-        paymentAmount, // payment amount
-        1, // same min submission count
-        1, // same max submission count
-        0, // same restart delay
-        180 // same timeout
-      )
-      await updateFutureRoundsTx.wait()
-
-      // deplete funds with dummy submissions two rounds
-      await FluxAggregator.connect(signer2).emergencySubmit(10001, 1000, 10001)
-      await FluxAggregator.connect(signer2).emergencySubmit(10002, 1010, 10002)
-    })
-
-    it('should not allow submissions when funds depleted and voluntary submissions stopped', async () => {
-      const signer2: Signer = (await ethers.getSigners())[1]
+  describe('owner tests', async () => {
+    it('should not intialize again', async () => {
       await expect(
-        FluxAggregator.connect(signer2).emergencySubmit(10003, 1030, 10003)
-      ).to.be.revertedWith('available funds depleted')
-    })
-
-    it('should allow submissions when funds depleted and voluntary submissions allowed', async () => {
-      const signer2: Signer = (await ethers.getSigners())[1]
-      const currentStatus = await FluxAggregator.voluntarySubmissionsAllowed()
-      expect(currentStatus).to.be.eq(false)
-
-      await expect(
-        FluxAggregator.connect(signer2).flipVoluntarySubmissionsAllowed()
-      ).to.be.revertedWith('Only callable by owner')
-
-      await FluxAggregator.flipVoluntarySubmissionsAllowed()
-      const updatedStatus = await FluxAggregator.voluntarySubmissionsAllowed()
-      expect(updatedStatus).to.be.eq(true)
-
-      const preWithdrawablePayment = await FluxAggregator.withdrawablePayment(
-        await signer2.getAddress()
-      )
-
-      const SubmitTx = await FluxAggregator.connect(signer2).emergencySubmit(
-        10003,
-        1030,
-        10003
-      )
-      await SubmitTx.wait()
-
-      const latestRound = await FluxAggregator.latestRound()
-      expect(latestRound).to.be.eq(10003)
-
-      const postWithdrawablePayment = await FluxAggregator.withdrawablePayment(
-        await signer2.getAddress()
-      )
-      expect(postWithdrawablePayment).to.be.eq(preWithdrawablePayment)
-    })
-  })
-
-  describe('Aggregator available funds status', async () => {
-    it('should update available funds data on using method', async () => {
-      const depositL2ERC20Amount = utils.parseEther('100')
-      const approveTx = await bobaToken.approve(
-        FluxAggregator.address,
-        depositL2ERC20Amount
-      )
-      await approveTx.wait()
-
-      const preAvailableFunds = await FluxAggregator.availableFunds()
-      const preAllocatedFunds = await FluxAggregator.allocatedFunds()
-      const addFundsTx = await FluxAggregator.addFunds(depositL2ERC20Amount)
-      await addFundsTx.wait()
-      const postAvailableFunds = await FluxAggregator.availableFunds()
-      const postAllocatedFunds = await FluxAggregator.allocatedFunds()
-
-      expect(postAllocatedFunds).to.eq(preAllocatedFunds)
-      expect(postAvailableFunds).to.eq(
-        preAvailableFunds.add(depositL2ERC20Amount)
-      )
-    })
-
-    it('should be able to withdraw directly transferred funds', async () => {
-      const signer: Signer = (await ethers.getSigners())[0]
-      const transferAmount = utils.parseEther('10')
-      const preAvailableFunds = await FluxAggregator.availableFunds()
-
-      const reserveRounds = 2
-      const paymentAmount = await FluxAggregator.paymentAmount()
-      const requiredBalance = paymentAmount.mul(reserveRounds)
-      // directly transfer funds
-      const transferTx = await bobaToken.transfer(
-        FluxAggregator.address,
-        transferAmount
-      )
-      await transferTx.wait()
-
-      const withdrawTx = await FluxAggregator.withdrawFunds(
-        await signer.getAddress(),
-        transferAmount.add(preAvailableFunds).sub(requiredBalance)
-      )
-      await withdrawTx.wait()
-
-      const postAvailableFunds = await FluxAggregator.availableFunds()
-      expect(postAvailableFunds).to.eq(requiredBalance)
-    })
-  })
-
-  describe('Allow rounds between min-max submissions', async () => {
-    beforeEach(async () => {
-      const signer: Signer = (await ethers.getSigners())[0]
-      const signer2: Signer = (await ethers.getSigners())[1]
-      const signer3: Signer = (await ethers.getSigners())[2]
-      const paymentAmount = await FluxAggregator.paymentAmount()
-      const approveTx = await bobaToken.approve(
-        FluxAggregator.address,
-        paymentAmount.mul(6)
-      )
-      await approveTx.wait()
-      const addFundsTx = await FluxAggregator.addFunds(paymentAmount.mul(6))
-      await addFundsTx.wait()
-
-      const addFirstOracleTx = await FluxAggregator.changeOracles(
-        [],
-        [await signer2.getAddress()],
-        [await signer2.getAddress()],
-        [10000],
-        1, // min submission count
-        1, // max submission count
-        0 // restart delay
-      )
-      await addFirstOracleTx.wait()
-
-      await FluxAggregator.connect(signer2).emergencySubmit(10001, 1000, 10001)
-      await FluxAggregator.connect(signer2).emergencySubmit(10002, 1010, 10002)
-      await FluxAggregator.connect(signer2).emergencySubmit(10003, 1020, 10003)
-
-      const addOracleTx = await FluxAggregator.changeOracles(
-        [],
-        [await signer3.getAddress(), await signer.getAddress()],
-        [await signer3.getAddress(), await signer.getAddress()],
-        [10003, 10003],
-        2, // min submission count
-        3, // max submission count
-        0 // restart delay
-      )
-      await addOracleTx.wait()
-    })
-
-    it('rounds with less than min submissions is timedOut', async () => {
-      // emergencySubmit first oracle
-      const signer2: Signer = (await ethers.getSigners())[1]
-      const SubmitTx = await FluxAggregator.connect(signer2).emergencySubmit(
-        10004,
-        1040,
-        10004
-      )
-      await SubmitTx.wait()
-
-      // move time forward until timeout
-      const timeout = await FluxAggregator.timeout()
-      await moveTimeForward(timeout)
-
-      // start new round and check last round data
-      const SubmitSecondRoundTx = await FluxAggregator.connect(
-        signer2
-      ).emergencySubmit(10005, 1050, 10005)
-      await SubmitSecondRoundTx.wait()
-
-      const previousRoundData = await FluxAggregator.getRoundData(10004)
-      const roundThreeData = await FluxAggregator.getRoundData(10003)
-
-      expect(previousRoundData.answeredInRound).to.be.eq(10003)
-      expect(previousRoundData.answer).to.be.eq(roundThreeData.answer)
-    })
-
-    it('rounds with at least min submissions is not timedOut', async () => {
-      // emergencySubmit second oracle
-      const signer2: Signer = (await ethers.getSigners())[1]
-      const signer3: Signer = (await ethers.getSigners())[2]
-      const SubmitTxFirstOracle = await FluxAggregator.connect(
-        signer2
-      ).emergencySubmit(10004, 1040, 10004)
-      await SubmitTxFirstOracle.wait()
-      const SubmitTxSecondOracle = await FluxAggregator.connect(
-        signer3
-      ).emergencySubmit(10004, 1050, 10004)
-      await SubmitTxSecondOracle.wait()
-
-      // move time forward until timeout
-      const timeout = await FluxAggregator.timeout()
-      await moveTimeForward(timeout)
-
-      // start new round and check last round data
-      const SubmitSecondRoundTx = await FluxAggregator.connect(
-        signer2
-      ).emergencySubmit(10005, 1060, 10005)
-      await SubmitSecondRoundTx.wait()
-
-      const previousRoundData = await FluxAggregator.getRoundData(10004)
-      expect(previousRoundData.answeredInRound).to.be.eq(10004)
-    })
-  })
-
-  describe('Allow admin to update Turing settings', async () => {
-    beforeEach(async () => {
-      const signer: Signer = (await ethers.getSigners())[0]
-      const signer2: Signer = (await ethers.getSigners())[1]
-      const signer3: Signer = (await ethers.getSigners())[2]
-      const paymentAmount = await FluxAggregator.paymentAmount()
-      const approveTx = await bobaToken.approve(
-        FluxAggregator.address,
-        paymentAmount.mul(6)
-      )
-      await approveTx.wait()
-      const addFundsTx = await FluxAggregator.addFunds(paymentAmount.mul(6))
-      await addFundsTx.wait()
-
-      const addFirstOracleTx = await FluxAggregator.changeOracles(
-        [],
-        [await signer2.getAddress()],
-        [await signer2.getAddress()],
-        [10000],
-        1, // min submission count
-        1, // max submission count
-        0 // restart delay
-      )
-      await addFirstOracleTx.wait()
-
-      await FluxAggregator.connect(signer2).emergencySubmit(10001, 1000, 10001)
-      await FluxAggregator.connect(signer2).emergencySubmit(10002, 1010, 10002)
-      await FluxAggregator.connect(signer2).emergencySubmit(10003, 1020, 10003)
-
-      const addOracleTx = await FluxAggregator.changeOracles(
-        [],
-        [await signer3.getAddress(), await signer.getAddress()],
-        [await signer3.getAddress(), await signer.getAddress()],
-        [10003, 10003],
-        2, // min submission count
-        3, // max submission count
-        0 // restart delay
-      )
-      await addOracleTx.wait()
-    })
-
-    it('should be able to update Turing URL', async () => {
-      const newUrl = 'https://turing.new.url'
-      const updateTx = await FluxAggregator.updateTuringUrl(newUrl)
-      await updateTx.wait()
-      const turingUrl = await FluxAggregator.turingUrl()
-      expect(turingUrl).to.be.eq(newUrl)
-    })
-
-    it('should not be able to update Turing URL if not admin', async () => {
-      const newUrl = 'https://turing.new.url'
-      const signer2: Signer = (await ethers.getSigners())[1]
-      await expect(
-        FluxAggregator.connect(signer2).updateTuringUrl(newUrl)
-      ).to.be.revertedWith('Only callable by owner')
-    })
-
-    it('should be able to update TuringHelper', async () => {
-      const newHelper = '0x0000000000000000000000000000000000000001'
-      const updateTx = await FluxAggregator.updateTuringHelper(newHelper)
-      await updateTx.wait()
-      const turingHelper = await FluxAggregator.turingHelperAddr()
-      expect(turingHelper).to.be.eq(newHelper)
-    })
-
-    it('should not be able to update TuringHelper if not admin', async () => {
-      const newHelper = '0x0000000000000000000000000000000000000002'
-      const signer2: Signer = (await ethers.getSigners())[1]
-      await expect(
-        FluxAggregator.connect(signer2).updateTuringHelper(newHelper)
-      ).to.be.revertedWith('Only callable by owner')
-    })
-
-    it('should not be able to update TuringHelper if address is 0x', async () => {
-      const newHelper = ethers.constants.AddressZero
-      await expect(
-        FluxAggregator.updateTuringHelper(newHelper)
-      ).to.be.revertedWith('Cannot set turingHelper to 0x address')
-    })
-
-    it('should be able to update turingChainLinkPriceFeedAddress', async () => {
-      const newAddress = '0x0000000000000000000000000000000000000001'
-      const updateTx = await FluxAggregator.updateTuringChainLinkPriceFeedAddr(
-        newAddress
-      )
-      await updateTx.wait()
-      const turingChainLinkPriceFeedAddress =
-        await FluxAggregator.turingChainLinkPriceFeedAddr()
-      expect(turingChainLinkPriceFeedAddress).to.be.eq(newAddress)
-    })
-
-    it('should not be able to update turingChainLinkPriceFeedAddress if not admin', async () => {
-      const newAddress = '0x0000000000000000000000000000000000000002'
-      const signer2: Signer = (await ethers.getSigners())[1]
-      await expect(
-        FluxAggregator.connect(signer2).updateTuringChainLinkPriceFeedAddr(
-          newAddress
+        FluxAggregatorHC.initialize(
+          0, // min submission value
+          utils.parseUnits('50000', 8), // max submission value
+          8, // decimals
+          'TST USD', // description
+          '0x0000000000000000000000000000000000000000',
+          'https://example.com',
+          '0x0000000000000000000000000000000000000000'
         )
-      ).to.be.revertedWith('Only callable by owner')
+      ).to.be.revertedWith('Contract has been initialized')
     })
 
-    it('should not be able to update turingChainLinkPriceFeedAddress if address is 0x', async () => {
-      const newAddress = ethers.constants.AddressZero
+    it('should be able to transfer ownership', async () => {
+      const signer1: Signer = (await ethers.getSigners())[0]
+      const address1 = await signer1.getAddress()
+      expect(await FluxAggregatorHC.owner()).to.be.eq(address1)
+      const signer2: Signer = (await ethers.getSigners())[1]
+      await FluxAggregatorHC.transferOwnership(await signer2.getAddress())
+      const owner = await FluxAggregatorHC.owner()
+      expect(owner).to.be.eq(await signer2.getAddress())
+    })
+
+    it('should not be able to transfer ownership if not owner', async () => {
+      const signer1: Signer = (await ethers.getSigners())[0]
+      const signer2: Signer = (await ethers.getSigners())[1]
+      await FluxAggregatorHC.transferOwnership(await signer2.getAddress())
       await expect(
-        FluxAggregator.updateTuringChainLinkPriceFeedAddr(newAddress)
-      ).to.be.revertedWith('Cannot set turingChainLinkPriceFeed to 0x address')
+        FluxAggregatorHC.transferOwnership(await signer1.getAddress())
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it('should update turing url', async () => {
+      const url = 'https://example2.com'
+      await FluxAggregatorHC.updateTuringUrl(url)
+      const turingUrl = await FluxAggregatorHC.turingUrl()
+      expect(turingUrl).to.be.eq(url)
+    })
+
+    it('should not update turing url if not owner', async () => {
+      const signer2: Signer = (await ethers.getSigners())[1]
+      const url = 'https://example2.com'
+      await expect(
+        FluxAggregatorHC.connect(signer2).updateTuringUrl(url)
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it('should update turing address', async () => {
+      const signer2: Signer = (await ethers.getSigners())[1]
+      const address = await signer2.getAddress()
+      await FluxAggregatorHC.updateTuringHelper(address)
+      const turingHelperAddr = await FluxAggregatorHC.turingHelperAddr()
+      expect(turingHelperAddr).to.be.eq(address)
+    })
+
+    it('should not update turing address if not owner', async () => {
+      const signer: Signer = (await ethers.getSigners())[1]
+      const address = await signer.getAddress()
+      await expect(
+        FluxAggregatorHC.connect(signer).updateTuringHelper(address)
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it("should update ChainLink's contract address", async () => {
+      const signer: Signer = (await ethers.getSigners())[1]
+      const address = await signer.getAddress()
+      await FluxAggregatorHC.updateTuringChainLinkPriceFeedAddr(address)
+      const turingChainLinkPriceFeedAddr =
+        await FluxAggregatorHC.turingChainLinkPriceFeedAddr()
+      expect(turingChainLinkPriceFeedAddr).to.be.eq(address)
+    })
+
+    it("should not update ChainLink's contract address if not owner", async () => {
+      const signer: Signer = (await ethers.getSigners())[1]
+      const address = await signer.getAddress()
+      await expect(
+        FluxAggregatorHC.connect(signer).updateTuringChainLinkPriceFeedAddr(
+          address
+        )
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+  })
+
+  describe('Oracle admin tests', async () => {
+    const staringRoundId = 1000
+
+    it('should add an oracle', async () => {
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      const oracleAdmin = await FluxAggregatorHC.getAdmin()
+      expect(oracleAdmin).to.be.eq(signerAddr)
+    })
+
+    it('should not add an oracle again', async () => {
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await expect(
+        FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      ).to.be.revertedWith('oracleAddress already set')
+    })
+
+    it('should transfer oracle admin', async () => {
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      const signer2Addr = await (await ethers.getSigners())[1].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.transferOracleAdmin(signer2Addr)
+      const oracleAdmin = await FluxAggregatorHC.getAdmin()
+      expect(oracleAdmin).to.be.eq(signer2Addr)
+    })
+
+    it('should not transfer oracle admin if not admin', async () => {
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      const signer2Addr = await (await ethers.getSigners())[1].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.transferOracleAdmin(signer2Addr)
+      await expect(
+        FluxAggregatorHC.transferOracleAdmin(signer2Addr)
+      ).to.be.revertedWith('Caller is not the oracle owner')
+    })
+  })
+
+  describe('Data submission tests', async () => {
+    const staringRoundId = 1000
+
+    it('should submit data for round 1001', async () => {
+      const nextRoundId = 1001
+      const submissionAnswer = 1000
+
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.emergencySubmit(
+        nextRoundId,
+        submissionAnswer,
+        nextRoundId
+      )
+      const latestRound = await FluxAggregatorHC.latestRound()
+      const answer = await FluxAggregatorHC.getAnswer(nextRoundId)
+      const latestTimestamp = await FluxAggregatorHC.latestTimestamp()
+      const timestamp = await FluxAggregatorHC.getTimestamp(nextRoundId)
+      const roundData = await FluxAggregatorHC.getRoundData(nextRoundId)
+      expect(latestRound).to.be.eq(nextRoundId)
+      expect(answer).to.be.eq(submissionAnswer)
+      expect(latestTimestamp).to.be.eq(timestamp)
+      expect(timestamp).not.be.eq(0)
+      expect(roundData.answer).to.be.eq(submissionAnswer)
+      expect(roundData.updatedAt).to.be.eq(timestamp)
+      expect(roundData.answeredInRound).to.be.eq(nextRoundId)
+      expect(roundData.startedAt).to.be.eq(timestamp)
+    })
+
+    it('should not submit data twice for the same round id', async () => {
+      const nextRoundId = 1001
+      const submissionAnswer = 1000
+
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.emergencySubmit(
+        nextRoundId,
+        submissionAnswer,
+        nextRoundId
+      )
+      await expect(
+        FluxAggregatorHC.emergencySubmit(
+          nextRoundId,
+          submissionAnswer,
+          nextRoundId
+        )
+      ).to.be.revertedWith('invalid roundId to initialize')
+    })
+
+    it('should not submit data for wrong chainLinkLatestRoundId', async () => {
+      const nextRoundId = 1001
+      const submissionAnswer = 1000
+      const chainLinkLatestRoundId = 10000
+
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await expect(
+        FluxAggregatorHC.emergencySubmit(
+          nextRoundId,
+          submissionAnswer,
+          nextRoundId - 1
+        )
+      ).to.be.revertedWith('ChainLink latestRoundId is invalid')
+      await FluxAggregatorHC.emergencySubmit(
+        nextRoundId,
+        submissionAnswer,
+        chainLinkLatestRoundId
+      )
+      await expect(
+        FluxAggregatorHC.emergencySubmit(
+          nextRoundId + 1,
+          submissionAnswer,
+          chainLinkLatestRoundId - 1
+        )
+      ).to.be.revertedWith('ChainLink latestRoundId is invalid')
+    })
+
+    it('should continously submit data', async () => {
+      let nextRoundId = 1001
+      const submissionAnswer = 1000
+      const nextSubmissionAnswer = 2000
+      const chainLinkLatestRoundId = 10000
+
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.emergencySubmit(
+        nextRoundId,
+        submissionAnswer,
+        chainLinkLatestRoundId
+      )
+      await FluxAggregatorHC.emergencySubmit(
+        nextRoundId + 1,
+        nextSubmissionAnswer,
+        chainLinkLatestRoundId
+      )
+
+      nextRoundId = nextRoundId + 1
+      const latestRound = await FluxAggregatorHC.latestRound()
+      const answer = await FluxAggregatorHC.getAnswer(nextRoundId)
+      const latestTimestamp = await FluxAggregatorHC.latestTimestamp()
+      const timestamp = await FluxAggregatorHC.getTimestamp(nextRoundId)
+      const roundData = await FluxAggregatorHC.getRoundData(nextRoundId)
+      expect(latestRound).to.be.eq(nextRoundId)
+      expect(answer).to.be.eq(nextSubmissionAnswer)
+      expect(latestTimestamp).to.be.eq(timestamp)
+      expect(timestamp).not.be.eq(0)
+      expect(roundData.answer).to.be.eq(nextSubmissionAnswer)
+      expect(roundData.updatedAt).to.be.eq(timestamp)
+      expect(roundData.answeredInRound).to.be.eq(nextRoundId)
+      expect(roundData.startedAt).to.be.eq(timestamp)
     })
   })
 })

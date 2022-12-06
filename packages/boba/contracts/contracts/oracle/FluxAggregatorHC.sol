@@ -103,7 +103,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   }
 
   modifier onlyOracleAdmin {
-    require(msg.sender == oracleOwner, 'Caller is not the oracle owner');
+    require(msg.sender == oracleAdmin, 'Caller is not the oracle owner');
     _;
   }
 
@@ -210,7 +210,8 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     onlyOwner
   {
     require(oracleAddress == address(0), "oracleAddress already set");
-    // override the latestRoundId, startingRound
+    oracleAddress = _added;
+    oracleAdmin = _addedAdmin;
     staringRoundId = _roundId;
     latestRoundId = _roundId;
 
@@ -420,9 +421,9 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     onlyOracleAdmin
   {
     address prevOracleAdmin = oracleAdmin;
-    oracleAdmin = msg.sender;
+    oracleAdmin = _oracleAdmin;
 
-    emit OracleAdminUpdated(prevOracleAdmin, msg.sender);
+    emit OracleAdminUpdated(prevOracleAdmin, _oracleAdmin);
   }
 
   /**

@@ -55,11 +55,9 @@ describe('bobalink', () => {
       FluxAggregatorHCJson.bytecode,
       wallet
     )
-    FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy(
-      bobaTokenAddr, // L2 token address
-      0, // starting payment amount
-      180, // timeout, 3 mins
-      '0x0000000000000000000000000000000000000000', // validator
+    FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy()
+    await FluxAggregatorHC.deployTransaction.wait()
+    await FluxAggregatorHC.initialize(
       0, // min submission value
       utils.parseUnits('50000', 8), // max submission value
       8, // decimals
@@ -68,7 +66,6 @@ describe('bobalink', () => {
       'https://example.com',
       '0x0000000000000000000000000000000000000000'
     )
-    await FluxAggregatorHC.deployTransaction.wait()
 
     return [FluxAggregator, FluxAggregatorHC]
   }
@@ -159,14 +156,10 @@ describe('bobalink', () => {
         )
       }
       // start the l2 simulated contract
-      const addOracleTxHC = await FluxAggregatorHC.changeOracles(
-        [],
-        [walletAddr],
-        [walletAddr],
-        [3], // starting round id
-        1, // min submission count
-        1, // max submission count
-        0 // restart delay
+      const addOracleTxHC = await FluxAggregatorHC.setOracle(
+        walletAddr,
+        walletAddr,
+        3
       )
       await addOracleTxHC.wait()
       for (const [_, contracts] of Object.entries(
@@ -275,14 +268,10 @@ describe('bobalink', () => {
             .submit(j, Math.round(Math.random() * 10000))
         }
         // start the l2 simulated contract
-        const addOracleTxHC = await FluxAggregatorHCList[i].changeOracles(
-          [],
-          [walletAddr],
-          [walletAddr],
-          [3], // starting round id
-          1, // min submission count
-          1, // max submission count
-          0 // restart delay
+        const addOracleTxHC = await FluxAggregatorHCList[i].setOracle(
+          walletAddr,
+          walletAddr,
+          3
         )
         await addOracleTxHC.wait()
       }

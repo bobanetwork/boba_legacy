@@ -4,7 +4,11 @@ import { Contract, ContractFactory, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
+import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
 import FluxAggregatorHCJson from '../artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
+
+let Factory__Proxy__FluxAggregatorHC: ContractFactory
+let Proxy__FluxAggregatorHC: Contract
 
 let Factory__FluxAggregatorHC: ContractFactory
 let FluxAggregatorHC: Contract
@@ -48,6 +52,12 @@ const deployFn: DeployFunction = async (hre) => {
   ]
 
   const quotes = [{ name: 'USD', address: address(840) }]
+
+  Factory__Proxy__FluxAggregatorHC = new ContractFactory(
+    ProxyJson.abi,
+    ProxyJson.bytecode,
+    (hre as any).deployConfig.deployer_l2
+  )
 
   Factory__FluxAggregatorHC = new ContractFactory(
     FluxAggregatorHCJson.abi,
@@ -99,19 +109,39 @@ const deployFn: DeployFunction = async (hre) => {
         `${token.name}${quote.name}_AggregatorHC deployed to: ${FluxAggregatorHC.address}`
       )
 
+      Proxy__FluxAggregatorHC = await Factory__Proxy__FluxAggregatorHC.deploy(
+        FluxAggregatorHC.address
+      )
+      await Proxy__FluxAggregatorHC.deployTransaction.wait()
+      const Proxy__FluxAggregatorHCDeploymentSubmission: DeploymentSubmission =
+        {
+          ...Proxy__FluxAggregatorHC,
+          receipt: Proxy__FluxAggregatorHC.receipt,
+          address: Proxy__FluxAggregatorHC.address,
+          abi: FluxAggregatorHCJson.abi,
+        }
+      await hre.deployments.save(
+        'Proxy__' + token.name + quote.name + '_AggregatorHC',
+        Proxy__FluxAggregatorHCDeploymentSubmission
+      )
+
+      console.log(
+        `Proxy__${token.name}${quote.name}_AggregatorHC deployed to: ${Proxy__FluxAggregatorHC.address}`
+      )
+
       // add feed to FeedRegistry
       console.log('Adding Feed to Regsitry..')
       const proposeFeedTx = await FeedRegistry.proposeFeed(
         token.address,
         quote.address,
-        FluxAggregatorHC.address
+        Proxy__FluxAggregatorHC.address
       )
       await proposeFeedTx.wait()
 
       const confirmFeedTx = await FeedRegistry.confirmFeed(
         token.address,
         quote.address,
-        FluxAggregatorHC.address
+        Proxy__FluxAggregatorHC.address
       )
       await confirmFeedTx.wait()
 
@@ -120,9 +150,9 @@ const deployFn: DeployFunction = async (hre) => {
         quote.address
       )
 
-      if (currentAggregator === FluxAggregatorHC.address) {
+      if (currentAggregator === Proxy__FluxAggregatorHC.address) {
         console.log(
-          `${token.name}${quote.name} feed added to FeedRegistry: ${confirmFeedTx.hash}`
+          `Proxy__${token.name}${quote.name} feed added to FeedRegistry: ${confirmFeedTx.hash}`
         )
       } else {
         throw new Error('Failed to register feed correctly')
@@ -131,6 +161,11 @@ const deployFn: DeployFunction = async (hre) => {
       await registerBobaAddress(
         addressManager,
         `BobaLink_${token.name}${quote.name}`,
+        FluxAggregatorHC.address
+      )
+      await registerBobaAddress(
+        addressManager,
+        `Proxy__BobaLink_${token.name}${quote.name}`,
         FluxAggregatorHC.address
       )
     }
