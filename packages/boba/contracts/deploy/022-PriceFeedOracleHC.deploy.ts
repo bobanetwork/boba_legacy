@@ -80,19 +80,7 @@ const deployFn: DeployFunction = async (hre) => {
   // deploy FluxAggregatorHC for each pair and register on FeedRegistry
   for (const token of tokens) {
     for (const quote of quotes) {
-      FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy(
-        BobaL2.address, // boba L2 token
-        0, // starting payment amount
-        180, // timeout, 3 mins
-        '0x0000000000000000000000000000000000000000', // validator
-        token.minSubmissionValue, // min submission value
-        token.maxSubmissionValue, // max submission value
-        8, // decimals
-        `${token.name} ${quote.name}`, // description
-        '0x0000000000000000000000000000000000000000',
-        'https://example.com',
-        '0x0000000000000000000000000000000000000000'
-      )
+      FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy()
       await FluxAggregatorHC.deployTransaction.wait()
       const FluxAggregatorHCDeploymentSubmission: DeploymentSubmission = {
         ...FluxAggregatorHC,
@@ -113,6 +101,25 @@ const deployFn: DeployFunction = async (hre) => {
         FluxAggregatorHC.address
       )
       await Proxy__FluxAggregatorHC.deployTransaction.wait()
+
+      Proxy__FluxAggregatorHC = new Contract(
+        Proxy__FluxAggregatorHC.address,
+        FluxAggregatorHCJson.abi,
+        (hre as any).deployConfig.deployer_l2
+      )
+      const initializeTx = await Proxy__FluxAggregatorHC.initialize(
+        token.minSubmissionValue, // min submission value
+        token.maxSubmissionValue, // max submission value
+        8, // decimals
+        `${token.name} ${quote.name}`, // description
+        '0x0000000000000000000000000000000000000000',
+        'https://example.com',
+        '0x0000000000000000000000000000000000000000'
+      )
+      console.log(
+        `Initialized Proxy__${token.name}${quote.name}_AggregatorHC - ${initializeTx.hash}}`
+      )
+
       const Proxy__FluxAggregatorHCDeploymentSubmission: DeploymentSubmission =
         {
           ...Proxy__FluxAggregatorHC,
