@@ -6,7 +6,7 @@ import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
-import { ROUTES_PATH } from 'util/constant'
+import { LAYER, ROUTES_PATH } from 'util/constant'
 import { useSelector } from 'react-redux'
 import { selectLayer } from 'selectors/setupSelector'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
@@ -86,7 +86,7 @@ const PageFooter = ({maintenance}) => {
               href={getBlockExplorerUrl({
                 network,
                 networkType,
-                layer: layer || 'L1'
+                layer: layer || LAYER.L1
               })}
             component="a"
             target="_blank"
