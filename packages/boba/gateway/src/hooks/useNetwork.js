@@ -27,11 +27,10 @@ const useNetwork = () => {
     const queryParams = Object.fromEntries([ ...searchParams ])
     const {
       chain,
-      networkType,
-      layer
+      networkType
     } = CHAIN_ID_LIST[ queryParams.chainId || 1 ]
 
-    const [{name, icon,...rest}] = NetworkList[ networkType ].filter((n) => n.chain === chain);
+    const { name, icon } = NetworkList[ networkType ].filter((n) => n.chain === chain)[ 0 ];
 
     dispatch(setNetwork({
       networkType,
