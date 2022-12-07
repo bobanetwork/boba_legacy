@@ -63,41 +63,41 @@ describe('Oracle Flux Aggregator Tests', async () => {
 
     it('should update turing url', async () => {
       const url = 'https://example2.com'
-      await FluxAggregatorHC.updateTuringUrl(url)
-      const turingUrl = await FluxAggregatorHC.turingUrl()
-      expect(turingUrl).to.be.eq(url)
+      await FluxAggregatorHC.updateHCUrl(url)
+      const HCUrl = await FluxAggregatorHC.HCUrl()
+      expect(HCUrl).to.be.eq(url)
     })
 
     it('should not update turing url if not owner', async () => {
       const signer2: Signer = (await ethers.getSigners())[1]
       const url = 'https://example2.com'
       await expect(
-        FluxAggregatorHC.connect(signer2).updateTuringUrl(url)
+        FluxAggregatorHC.connect(signer2).updateHCUrl(url)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
     it('should update turing address', async () => {
       const signer2: Signer = (await ethers.getSigners())[1]
       const address = await signer2.getAddress()
-      await FluxAggregatorHC.updateTuringHelper(address)
-      const turingHelperAddr = await FluxAggregatorHC.turingHelperAddr()
-      expect(turingHelperAddr).to.be.eq(address)
+      await FluxAggregatorHC.updateHCHelper(address)
+      const HCHelperAddr = await FluxAggregatorHC.HCHelperAddr()
+      expect(HCHelperAddr).to.be.eq(address)
     })
 
     it('should not update turing address if not owner', async () => {
       const signer: Signer = (await ethers.getSigners())[1]
       const address = await signer.getAddress()
       await expect(
-        FluxAggregatorHC.connect(signer).updateTuringHelper(address)
+        FluxAggregatorHC.connect(signer).updateHCHelper(address)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
     it("should update ChainLink's contract address", async () => {
       const signer: Signer = (await ethers.getSigners())[1]
       const address = await signer.getAddress()
-      await FluxAggregatorHC.updateTuringChainLinkPriceFeedAddr(address)
+      await FluxAggregatorHC.updateHCChainLinkPriceFeedAddr(address)
       const turingChainLinkPriceFeedAddr =
-        await FluxAggregatorHC.turingChainLinkPriceFeedAddr()
+        await FluxAggregatorHC.HCChainLinkPriceFeedAddr()
       expect(turingChainLinkPriceFeedAddr).to.be.eq(address)
     })
 
@@ -105,9 +105,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       const signer: Signer = (await ethers.getSigners())[1]
       const address = await signer.getAddress()
       await expect(
-        FluxAggregatorHC.connect(signer).updateTuringChainLinkPriceFeedAddr(
-          address
-        )
+        FluxAggregatorHC.connect(signer).updateHCChainLinkPriceFeedAddr(address)
       ).to.be.revertedWith('Caller is not the owner')
     })
   })

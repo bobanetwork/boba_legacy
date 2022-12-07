@@ -5,17 +5,14 @@ original contract - https://github.com/smartcontractkit/chainlink/blob/master/co
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.6;
 
-import "@chainlink/contracts/src/v0.6/Median.sol";
-import "@chainlink/contracts/src/v0.6/Owned.sol";
 import "@chainlink/contracts/src/v0.6/SafeMath128.sol";
 import "@chainlink/contracts/src/v0.6/SafeMath32.sol";
 import "@chainlink/contracts/src/v0.6/SafeMath64.sol";
 import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
-import "@chainlink/contracts/src/v0.6/interfaces/AggregatorValidatorInterface.sol";
 import "@chainlink/contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 
 import "./SafeMath80.sol";
-import "./interfaces/ITuringHelper.sol";
+import "./interfaces/IHybirdComputeHelper.sol";
 
 /**
  * @title The HC Aggregator contract
@@ -54,10 +51,10 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   address private oracleAddress;
   address private oracleAdmin;
 
-  address public turingHelperAddr;
-  ITuringHelper turingHelper;
-  string public turingUrl;
-  address public turingChainLinkPriceFeedAddr;
+  address public HCHelperAddr;
+  IHybirdComputeHelper HCHelper;
+  string public HCUrl;
+  address public HCChainLinkPriceFeedAddr;
 
   mapping(uint80 => Round) internal rounds;
 
@@ -70,26 +67,26 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     address admin,
     uint80 startingRound
   );
-  event GetChainLinkQuote(
-    string indexed turingUrl,
+  event ChainLinkQuoteGot(
+    string indexed HCUrl,
     uint256 indexed CLRoundId,
     int256 CLSubmission,
     uint256 CLLatestRoundId
   );
-  event TuringDebug(
+  event HCDebug(
     bytes response
   );
-  event UpdateTuringUrl(
-    string prevTuringUrl,
-    string newTuringUrl
+  event HCUrlUpdated(
+    string prevHCUrl,
+    string newHCUrl
   );
-  event UpdateTuringHelper(
-    address prevTuringHelperAddr,
-    address newTuringHelperAddr
+  event HCHelperUpdated(
+    address prevHCHelperAddr,
+    address newHCHelperAddr
   );
-  event UpdateTuringChainLinkPriceFeedAddr(
-    address prevTuringChainLinkPriceFeedAddr,
-    address newTuringChainLinkPriceFeedAddr
+  event HCChainLinkPriceFeedAddrUpdated(
+    address prevHCChainLinkPriceFeedAddr,
+    address newHCChainLinkPriceFeedAddr
   );
   event OwnershipTransferred(
     address indexed previousOwner,
@@ -125,18 +122,18 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    * submission values are accepted from an oracle
    * @param _decimals represents the number of decimals to offset the answer by
    * @param _description a short description of what is being reported
-   * @param _turingHelperAddr address of turing helper
-   * @param _turingUrl url of turing endpoint
-   * @param _turingChainLinkPriceFeedAddr address of chainlink price feed
+   * @param _HCHelperAddr address of hybird compute helper
+   * @param _HCUrl url of hybird compute endpoint
+   * @param _HCChainLinkPriceFeedAddr address of chainlink price feed
    */
   function initialize(
     int256 _minSubmissionValue,
     int256 _maxSubmissionValue,
     uint8 _decimals,
     string calldata _description,
-    address _turingHelperAddr,
-    string calldata _turingUrl,
-    address _turingChainLinkPriceFeedAddr
+    address _HCHelperAddr,
+    string calldata _HCUrl,
+    address _HCChainLinkPriceFeedAddr
   )
     external
     onlyNotInitialized
@@ -145,10 +142,10 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     maxSubmissionValue = _maxSubmissionValue;
     decimals = _decimals;
     description = _description;
-    turingHelperAddr = _turingHelperAddr;
-    turingHelper = ITuringHelper(_turingHelperAddr);
-    turingUrl = _turingUrl;
-    turingChainLinkPriceFeedAddr = _turingChainLinkPriceFeedAddr;
+    HCHelperAddr = _HCHelperAddr;
+    HCHelper = IHybirdComputeHelper(_HCHelperAddr);
+    HCUrl = _HCUrl;
+    HCChainLinkPriceFeedAddr = _HCChainLinkPriceFeedAddr;
     owner = msg.sender;
   }
 
@@ -194,12 +191,11 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
 
   /**
    * @notice called by the owner to set a new oracle as well as
-   * update the round related parameters that pertain to total oracle count
-   * @param _added is the list of addresses for the new Oracles being added
-   * @param _addedAdmin is the admin addresses for the new respective _added
+   * Set the admin address for the new oracle
+   * @param _added is the address of the new Oracle being added
+   * @param _addedAdmin is the admin address for the new respective _added
    * @param _roundId that we use to override the starting round id
-   * list. Only this address is allowed to access the respective oracle's funds
-   * they can initiate a round
+   * list.
    */
   function setOracle(
     address _added,
@@ -210,6 +206,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     onlyOwner
   {
     require(oracleAddress == address(0), "oracleAddress already set");
+    require(_added != address(0), "oracleAddress cannot be zero address");
     oracleAddress = _added;
     oracleAdmin = _addedAdmin;
     staringRoundId = _roundId;
@@ -420,6 +417,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     external
     onlyOracleAdmin
   {
+    require(_oracleAdmin != address(0), "Cannot transfer oracle admin to 0x address");
     address prevOracleAdmin = oracleAdmin;
     oracleAdmin = _oracleAdmin;
 
@@ -429,58 +427,58 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   /**
    * @notice method to update url
    */
-  function updateTuringUrl(string memory _turingUrl)
+  function updateHCUrl(string memory _HCUrl)
     public
     onlyOwner
   {
-    string memory prevTuringUrl = turingUrl;
-    turingUrl = _turingUrl;
-    emit UpdateTuringUrl(prevTuringUrl, turingUrl);
+    string memory prevHCUrl = HCUrl;
+    HCUrl = _HCUrl;
+    emit HCUrlUpdated(prevHCUrl, HCUrl);
   }
 
   /**
-   * @notice method to update turingHelper contract
+   * @notice method to update HCHelper contract
    */
-  function updateTuringHelper(address _turingHelperAddr)
+  function updateHCHelper(address _HCHelperAddr)
     public
     onlyOwner
   {
-    require(_turingHelperAddr != address(0), "Cannot set turingHelper to 0x address");
-    address prevTuringHelperAddr = turingHelperAddr;
-    turingHelperAddr = _turingHelperAddr;
-    turingHelper = ITuringHelper(_turingHelperAddr);
-    emit UpdateTuringHelper(prevTuringHelperAddr, turingHelperAddr);
+    require(_HCHelperAddr != address(0), "Cannot set HCHelper to 0x address");
+    address prevHCHelperAddr = HCHelperAddr;
+    HCHelperAddr = _HCHelperAddr;
+    HCHelper = IHybirdComputeHelper(_HCHelperAddr);
+    emit HCHelperUpdated(prevHCHelperAddr, HCHelperAddr);
   }
 
   /**
    * @notice method to update ChainLink's contract address
    */
-  function updateTuringChainLinkPriceFeedAddr(address _turingChainLinkPriceFeedAddr)
+  function updateHCChainLinkPriceFeedAddr(address _HCChainLinkPriceFeedAddr)
     public
     onlyOwner
   {
-    require(_turingChainLinkPriceFeedAddr != address(0), "Cannot set turingChainLinkPriceFeed to 0x address");
-    address prevTuringChainLinkPriceFeedAddr = turingChainLinkPriceFeedAddr;
-    turingChainLinkPriceFeedAddr = _turingChainLinkPriceFeedAddr;
-    emit UpdateTuringChainLinkPriceFeedAddr(prevTuringChainLinkPriceFeedAddr, turingChainLinkPriceFeedAddr);
+    require(_HCChainLinkPriceFeedAddr != address(0), "Cannot set HCChainLinkPriceFeed to 0x address");
+    address prevHCChainLinkPriceFeedAddr = HCChainLinkPriceFeedAddr;
+    HCChainLinkPriceFeedAddr = _HCChainLinkPriceFeedAddr;
+    emit HCChainLinkPriceFeedAddrUpdated(prevHCChainLinkPriceFeedAddr, HCChainLinkPriceFeedAddr);
   }
 
   /**
-   * @notice method to get ChainLink's quote via turing
+   * @notice method to get ChainLink's quote via HC
    */
   function getChainLinkQuote(uint256 _roundId)
     public
     onlyOwner
     returns (uint256 , int256, uint256)
   {
-    bytes memory encRequest = abi.encode(turingChainLinkPriceFeedAddr, _roundId);
-    bytes memory encResponse = turingHelper.TuringTx(turingUrl, encRequest);
+    bytes memory encRequest = abi.encode(HCChainLinkPriceFeedAddr, _roundId);
+    bytes memory encResponse = HCHelper.TuringTx(HCUrl, encRequest);
 
-    emit TuringDebug(encResponse);
+    emit HCDebug(encResponse);
 
     (uint256 _CLRoundId, int256 _CLSubmission, uint256 _CLLatestRoundId) = abi.decode(encResponse,(uint256,int256,uint256));
 
-    emit GetChainLinkQuote(turingUrl, _CLRoundId, _CLSubmission, _CLLatestRoundId);
+    emit ChainLinkQuoteGot(HCUrl, _CLRoundId, _CLSubmission, _CLLatestRoundId);
 
     return (_CLRoundId, _CLSubmission, _CLLatestRoundId);
   }

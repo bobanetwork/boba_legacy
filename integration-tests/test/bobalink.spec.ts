@@ -227,12 +227,12 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('should get fake chainLink quote', async () => {
-    await FluxAggregatorHC.updateTuringUrl(`${URL}/fake`)
+    await FluxAggregatorHC.updateHCUrl(`${URL}/fake`)
     await FluxAggregatorHC.estimateGas.getChainLinkQuote(roundId)
     await FluxAggregatorHC.getChainLinkQuote(roundId, gasOverride)
     const block = await env.l2Provider.getBlockNumber()
     const chainLinkQuoteEvents = await FluxAggregatorHC.queryFilter(
-      FluxAggregatorHC.filters.GetChainLinkQuote(),
+      FluxAggregatorHC.filters.ChainLinkQuoteGot(),
       block - 1,
       block
     )
@@ -241,12 +241,12 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('should get real chainLink quote', async () => {
-    await FluxAggregatorHC.updateTuringUrl(`${URL}/real`)
+    await FluxAggregatorHC.updateHCUrl(`${URL}/real`)
     await FluxAggregatorHC.estimateGas.getChainLinkQuote(roundId)
     await FluxAggregatorHC.getChainLinkQuote(roundId, gasOverride)
     const block = await env.l2Provider.getBlockNumber()
     const chainLinkQuoteEvents = await FluxAggregatorHC.queryFilter(
-      FluxAggregatorHC.filters.GetChainLinkQuote(),
+      FluxAggregatorHC.filters.ChainLinkQuoteGot(),
       block - 1,
       block
     )
@@ -255,7 +255,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(latestRound)
   })
 
-  it('should submit answer using Turing', async () => {
+  it('should submit answer using Hybird Compute', async () => {
     const addOracleTx = await FluxAggregatorHC.setOracle(
       env.l1Wallet.address,
       env.l1Wallet.address,
@@ -272,7 +272,7 @@ describe('BobaLink Test\n', async () => {
     expect(latestRoundData.answer).to.be.eq(chainLinkRoundData.answer)
   })
 
-  it('should not be able to submit answer again using Turing', async () => {
+  it('should not be able to submit answer again using Hybird Compute', async () => {
     const nextRoundId = roundId.add(1)
     await expect(
       FluxAggregatorHC.estimateGas.submit(nextRoundId)
@@ -338,14 +338,14 @@ describe('BobaLink Test\n', async () => {
     expect(result[3]).to.be.deep.equal(latestRound)
   })
 
-  it('should allow to submit answer using Turing api', async () => {
-    await FluxAggregatorHC.updateTuringUrl(`${URL}/api`)
+  it('should allow to submit answer using Hybird Compute api', async () => {
+    await FluxAggregatorHC.updateHCUrl(`${URL}/api`)
     const nextRoundId = roundId.add(3)
     await FluxAggregatorHC.estimateGas.getChainLinkQuote(nextRoundId)
     await FluxAggregatorHC.getChainLinkQuote(nextRoundId, gasOverride)
     const block = await env.l2Provider.getBlockNumber()
     const chainLinkQuoteEvents = await FluxAggregatorHC.queryFilter(
-      FluxAggregatorHC.filters.GetChainLinkQuote(),
+      FluxAggregatorHC.filters.ChainLinkQuoteGot(),
       block - 1,
       block
     )
@@ -365,11 +365,11 @@ describe('BobaLink Test\n', async () => {
   it('should not be able to update answer if rpc returns error', async () => {
     process.env.L1_NODE_WEB3_URL = ETHProviderUrl
     const nextRoundId = roundId.add(3)
-    await FluxAggregatorHC.updateTuringUrl(`${URL}/invalidapi`)
+    await FluxAggregatorHC.updateHCUrl(`${URL}/invalidapi`)
     await expect(
       FluxAggregatorHC.estimateGas.submit(nextRoundId)
     ).to.be.rejectedWith('TURING: Server error')
-    await FluxAggregatorHC.updateTuringUrl(`${URL}/api`)
+    await FluxAggregatorHC.updateHCUrl(`${URL}/api`)
   })
 
   it('should be able to submit data via BobaLinkService', async () => {
