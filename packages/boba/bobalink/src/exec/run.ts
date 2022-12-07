@@ -29,7 +29,7 @@ const main = async () => {
   // Optional
   const POLLING_INTERVAL = config.uint(
     'polling-interval',
-    parseInt(env.POLLING_INTERVAL, 10) || 1000 * 15
+    parseInt(env.POLLING_INTERVAL, 10) || 1000 * 12
   )
   const SET_GAS_PRICE_TO_ZERO = config.bool(
     'set-gas-price-to-zero',

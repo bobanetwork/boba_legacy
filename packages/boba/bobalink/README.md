@@ -11,7 +11,7 @@ All configuration is done via environment variables. See all variables at [.env.
 | L1_NODE_WEB3_URL      | The endpoint of Layer 1                 |         |
 | L2_NODE_WEB3_URL      | The endpoint of Layer 2                 |         |
 | BOBALINK_REPORTER_KEY | the private key for submitting the data |         |
-| POLLING_INTERVAL      | The polling interval of fetching data   | 15000   |
+| POLLING_INTERVAL      | The polling interval of fetching data   | 12000   |
 | SET_GAS_PRICE_TO_ZERO | Whether set the gas price to 0          | 0       |
 
 ## Building & Running
