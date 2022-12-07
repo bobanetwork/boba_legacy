@@ -93,6 +93,66 @@ export const CHAIN_ID_LIST = {
     chain: NETWORK.AVAX,
     layer: 'L2'
   },
+  97: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.BNB,
+    layer: 'L1'
+  },
+  9728: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.BNB,
+    layer: 'L2'
+  },
+  56: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.BNB,
+    layer: 'L1'
+  },
+  56288: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.BNB,
+    layer: 'L2'
+  },
+  4002: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.FANTOM,
+    layer: 'L1'
+  },
+  4051: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.FANTOM,
+    layer: 'L2'
+  },
+  250: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.FANTOM,
+    layer: 'L1'
+  },
+  301: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.FANTOM,
+    layer: 'L2'
+  },
+  1287: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.MOONBEAM,
+    layer: 'L1'
+  },
+  1297: {
+    networkType: NETWORK_TYPE.TESTNET,
+    chain: NETWORK.MOONBEAM,
+    layer: 'L2'
+  },
+  1284: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.MOONBEAM,
+    layer: 'L1'
+  },
+  1294: {
+    networkType: NETWORK_TYPE.MAINNET,
+    chain: NETWORK.MOONBEAM,
+    layer: 'L2'
+  },
 }
 
 export const NetworkList = {
