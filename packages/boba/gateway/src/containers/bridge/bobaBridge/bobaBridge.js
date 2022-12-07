@@ -37,6 +37,7 @@ import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 
 import * as S from './bobaBridge.styles'
 import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
+import { DEFAULT_NETWORK, LAYER } from 'util/constant'
 
 function BobaBridge() {
 
@@ -67,7 +68,7 @@ function BobaBridge() {
 
   async function switchDirection() {
     if (accountEnabled) {
-      if (layer === 'L1')
+      if (layer === LAYER.L1)
         dispatch(setConnectBOBA(true))
       else
         dispatch(setConnectETH(true))
@@ -87,7 +88,7 @@ function BobaBridge() {
           <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
             <Box width="100%">
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> From {networkName[ 'l1' ] || 'Ethereum'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L1Icon selected /> From {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
               </S.ChainInput>
             </Box>
             <S.IconSwitcher onClick={() => { switchDirection() }}>
@@ -97,12 +98,12 @@ function BobaBridge() {
             </S.IconSwitcher>
             <Box width="100%">
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> To {networkName[ 'l2' ] || 'Boba'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L2Icon selected /> To {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
-            <Button sx={{ marginTop: '13px' }} onClick={() => { connectToETH() }} color='primary' variant='outlined'>Connect to {networkName[ 'l1' ] || 'Ethereum'}</Button>
+            <Button sx={{ marginTop: '13px' }} onClick={() => { connectToETH() }} color='primary' variant='outlined'>Connect to {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</Button>
           </Box>
         </S.BobaContent>
       </S.BobaBridgeWrapper>
@@ -118,7 +119,7 @@ function BobaBridge() {
           <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
             <Box width="100%">
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> From {networkName[ 'l2' ] || 'Boba'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L2Icon selected /> From {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
               </S.ChainInput>
             </Box>
             <S.IconSwitcher onClick={() => { switchDirection() }}>
@@ -128,12 +129,12 @@ function BobaBridge() {
             </S.IconSwitcher>
             <Box width="100%">
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> To {networkName[ 'l1' ] || 'Ethereum'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L1Icon selected /> To {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
-            <Button sx={{ marginTop: '13px' }} onClick={() => { connectToBOBA() }} color='primary' variant='outlined'>Connect to {networkName[ 'l2' ] || 'Boba'}</Button>
+            <Button sx={{ marginTop: '13px' }} onClick={() => { connectToBOBA() }} color='primary' variant='outlined'>Connect to {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</Button>
           </Box>
         </S.BobaContent>
       </S.BobaBridgeWrapper>
@@ -148,9 +149,9 @@ function BobaBridge() {
             <S.ChainInput
             >
               {layer === 'L1' ?
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> From {networkName[ 'l1' ] || 'Ethereum'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L1Icon selected /> From {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
                 :
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> From {networkName[ 'l2' ] || 'Boba'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L2Icon selected /> From {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
               }
             </S.ChainInput>
           </Box>
@@ -164,9 +165,9 @@ function BobaBridge() {
           <Box width="100%">
             <S.ChainInput>
               {layer === 'L2' ?
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> To {networkName[ 'l1' ] || 'Ethereum'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L1Icon selected /> To {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
                 :
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> To {networkName[ 'l2' ] || 'Boba'}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body"><L2Icon selected /> To {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
               }
             </S.ChainInput>
           </Box>

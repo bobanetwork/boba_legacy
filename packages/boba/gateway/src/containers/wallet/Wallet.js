@@ -33,7 +33,7 @@ import { selectlayer2Balance } from 'selectors/balanceSelector'
 import PageTitle from 'components/pageTitle/PageTitle'
 import { isEqual } from 'lodash'
 
-import { POLL_INTERVAL } from "util/constant"
+import { DEFAULT_NETWORK, POLL_INTERVAL } from "util/constant"
 import useInterval from "hooks/useInterval"
 
 import BN from 'bignumber.js'
@@ -163,7 +163,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            {networkName['l1'] || 'Etheruem'} Wallet
+            {networkName['l1'] || DEFAULT_NETWORK.NAME.L1} Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}
@@ -174,7 +174,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            {networkName['l2'] || 'Boba'} Wallet
+            {networkName['l2'] || DEFAULT_NETWORK.NAME.L2} Wallet
           </Typography>
         </G.PageSwitcher>
       </S.WalletActionContainer>

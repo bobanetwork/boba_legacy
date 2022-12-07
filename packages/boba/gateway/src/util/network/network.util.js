@@ -17,7 +17,7 @@ import { bnbConfig } from './config/bnb';
 import { fantomConfig } from './config/fantom';
 import { avaxConfig } from './config/avax';
 import { moonbeamConfig } from './config/moonbeam';
-
+import { LAYER } from 'util/constant';
 
 export const L1_ICONS = {
   ethereum: EthereumIcon,
@@ -56,102 +56,102 @@ export const CHAIN_ID_LIST = {
   5: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.ETHEREUM,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   2888: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.ETHEREUM,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   1: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.ETHEREUM,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   288: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.ETHEREUM,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   43113: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.AVAX,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   4328: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.AVAX,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   43114: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.AVAX,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   43288: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.AVAX,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   97: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.BNB,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   9728: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.BNB,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   56: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.BNB,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   56288: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.BNB,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   4002: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.FANTOM,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   4051: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.FANTOM,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   250: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.FANTOM,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   301: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.FANTOM,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   1287: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.MOONBEAM,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   1297: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.MOONBEAM,
-    layer: 'L2'
+    layer: LAYER.L2
   },
   1284: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.MOONBEAM,
-    layer: 'L1'
+    layer: LAYER.L1
   },
   1294: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.MOONBEAM,
-    layer: 'L2'
+    layer: LAYER.L2
   },
 }
 

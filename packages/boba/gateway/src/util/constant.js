@@ -82,3 +82,20 @@ export const PAGES_BY_NETWORK = {
   moonbeam: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
   moonbase: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'LinksToBobaChains' ],
 }
+
+export const LAYER = {
+  L1: 'L1',
+  L2: 'L2',
+}
+
+
+export const DEFAULT_NETWORK = {
+  NAME: {
+    L1: 'Etheruem',
+    L2: 'Boba'
+  },
+  ICON: {
+    L1: 'etheruem',
+    L2: 'boba'
+  }
+}
