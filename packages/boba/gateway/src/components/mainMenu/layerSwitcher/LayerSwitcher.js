@@ -49,6 +49,7 @@ import {
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
+import { LAYER } from 'util/constant.js'
 
 function LayerSwitcher({
   visisble = true
@@ -99,7 +100,7 @@ function LayerSwitcher({
         dispatch(setEnableAccount(false))
         return false
       }
-      else if (initialized === 'L1' || initialized === 'L2') {
+      else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
         console.log("WP: Account IS enabled for", initialized)
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
@@ -208,7 +209,7 @@ function LayerSwitcher({
       </IconButton>
       <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >{title} </Typography>
-        <S.Label >{(layer === 'L1' || layer === 'L2')? wAddress : 'Not Connected' }</S.Label>
+        <S.Label >{(layer === LAYER.L1 || layer === LAYER.L2)? wAddress : 'Not Connected' }</S.Label>
       </S.LayerContent>
       {!layer ?
         <Button
@@ -235,12 +236,12 @@ function LayerSwitcher({
       <S.LayerSwitcherWrapperMobile>
         <MobileLayer title="Ethereum" layer={layer} icon={<EthereumIcon />}
           onConnect={() => connectToETH()}
-          isConnected={layer === 'L1'}
+          isConnected={layer === LAYER.L1}
         />
         <S.LayerDivider />
         <MobileLayer title="Boba Network" layer={layer} icon={<BobaIcon />}
           onConnect={() => connectToBOBA()}
-          isConnected={layer === 'L2'}
+          isConnected={layer === LAYER.L2}
         />
       </S.LayerSwitcherWrapperMobile>
     )
@@ -255,10 +256,10 @@ function LayerSwitcher({
         aria-label="text alignment"
       >
         <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
-          <L1Icon selected={layer === 'L1'}/>
+          <L1Icon selected={layer === LAYER.L1}/>
         </ToggleButton>
         <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
-          <L2Icon selected={layer === 'L2'} />
+          <L2Icon selected={layer === LAYER.L2} />
         </ToggleButton>
       </ToggleButtonGroup>
       {layer === 'L1' ? <S.LayerContent>

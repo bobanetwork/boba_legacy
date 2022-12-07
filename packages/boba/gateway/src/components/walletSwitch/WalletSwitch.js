@@ -8,6 +8,7 @@ import { selectActiveNetwork, selectActiveNetworkType, selectNetwork, selectNetw
 import Button from 'components/button/Button';
 import { FiberManualRecord } from '@mui/icons-material';
 import { selectBaseEnabled, selectLayer } from 'selectors/setupSelector';
+import { LAYER } from 'util/constant';
 
 const WalletSwitch = () => {
 
@@ -32,9 +33,9 @@ const WalletSwitch = () => {
   useEffect(() => {
     if (!!reconnect && !!baseEnabled) {
 
-      if (layer === 'L1') {
+      if (layer === LAYER.L1) {
         dispatch(setConnectETH(true));
-      } else if (layer === 'L2') {
+      } else if (layer === LAYER.L2) {
         dispatch(setConnectBOBA(true));
       } else {
         dispatch(setConnect(true));
