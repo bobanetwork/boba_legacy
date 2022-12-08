@@ -59,3 +59,13 @@ services:
       dockerfile: ./ops/docker/Dockerfile.teleportation
     deploy:
       replicas: 0
+
+  bobalink:
+    depends_on:
+     - l2geth
+    image: bobanetwork/bobalink:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.bobalink
+    deploy:
+      replicas: 0
