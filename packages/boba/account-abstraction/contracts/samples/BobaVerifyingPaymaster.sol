@@ -2,7 +2,9 @@
 pragma solidity ^0.8.12;
 
 /* solhint-disable reason-string */
-import "./VerifyingPaymaster.sol";
+
+import "../core/BasePaymaster.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 /**
  * A sample paymaster that uses external service to decide whether to pay for the UserOp.
@@ -13,16 +15,45 @@ import "./VerifyingPaymaster.sol";
  * - the paymaster signs to agree to PAY for GAS.
  * - the wallet signs to prove identity and wallet ownership.
  */
-contract BobaVerifyingPaymaster is VerifyingPaymaster {
+contract BobaVerifyingPaymaster is BasePaymaster {
+
+    using ECDSA for bytes32;
+    using UserOperationLib for UserOperation;
+
+    address public immutable verifyingSigner;
     address public bobaDepositPaymaster;
     address public approvedToken;
 
     bytes4 public constant APPROVE_FUNCTION_SELECTOR = bytes4(keccak256("approve(address,uint256)"));
     bytes4 public constant DEPOSIT_FOR_FUNCTION_SELECTOR = bytes4(keccak256("addDepositFor(address,address,uint256)"));
 
-    constructor(IEntryPoint _entryPoint, address _verifyingSigner, address _bobaDepositPaymaster, address _approvedToken) VerifyingPaymaster(_entryPoint, _verifyingSigner) {
+    constructor(IEntryPoint _entryPoint, address _verifyingSigner, address _bobaDepositPaymaster, address _approvedToken) BasePaymaster(_entryPoint) {
+        verifyingSigner = _verifyingSigner;
         bobaDepositPaymaster = _bobaDepositPaymaster;
         approvedToken = _approvedToken;
+    }
+
+    /**
+     * return the hash we're going to sign off-chain (and validate on-chain)
+     * this method is called by the off-chain service, to sign the request.
+     * it is called on-chain from the validatePaymasterUserOp, to validate the signature.
+     * note that this signature covers all fields of the UserOperation, except the "paymasterAndData",
+     * which will carry the signature itself.
+     */
+    function getHash(UserOperation calldata userOp)
+    public pure returns (bytes32) {
+        //can't use userOp.hash(), since it contains also the paymasterAndData itself.
+        return keccak256(abi.encode(
+                userOp.getSender(),
+                userOp.nonce,
+                keccak256(userOp.initCode),
+                keccak256(userOp.callData),
+                userOp.callGasLimit,
+                userOp.verificationGasLimit,
+                userOp.preVerificationGas,
+                userOp.maxFeePerGas,
+                userOp.maxPriorityFeePerGas
+            ));
     }
 
     /**
@@ -72,4 +103,5 @@ contract BobaVerifyingPaymaster is VerifyingPaymaster {
         if (funcSelector == DEPOSIT_FOR_FUNCTION_SELECTOR && token == approvedToken) return true;
         return false;
     }
+
 }

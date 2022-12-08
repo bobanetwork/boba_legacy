@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../core/BasePaymaster.sol";
-import "./IBobaStraw.sol";
+import "./IOracle.sol";
 
 /**
  * A token-based paymaster that accepts token deposit
@@ -23,49 +23,42 @@ import "./IBobaStraw.sol";
  * (the standard rules ban accessing data of an external contract)
  * It can only be used if it is "whitelisted" by the bundler.
  * (technically, it can be used by an "oracle" which returns a static value, without accessing any storage)
- * If you do not have bundler permissions, consider deploying a paymaster that accesses a stored 'ratio' value
- * on validation and asynchronously update the ratio
  */
-contract BobaDepositPaymaster is BasePaymaster {
+contract AsyncDepositPaymaster is BasePaymaster {
 
     using UserOperationLib for UserOperation;
     using SafeERC20 for IERC20;
 
-    struct Oracle {
-        IBobaStraw feedRegistry;
-        address tokenBase;
+    struct SupportedTokenInfo {
+        IERC20 token;
         uint8 tokenDecimals;
+        uint256 priceRatio; // ratio = token : native
+        uint256 priceRatioDecimals;
+        uint256 minRatio;
+        uint256 maxRatio;
     }
 
     //calculated cost of the postOp
     uint256 constant public COST_OF_POST = 35000;
-    address public constant QUOTE_USD = 0x0000000000000000000000000000000000000348;
 
-    // for alt-l1, treat this as the native token
-    address public constant L2_ETH_ADDRESS = 0x4200000000000000000000000000000000000006;
-    IERC20 public constant L2_ETH = IERC20(L2_ETH_ADDRESS);
-
-    IBobaStraw private constant NULL_ORACLE = IBobaStraw(address(0));
-
-    mapping(IERC20 => Oracle) public oracles;
+    mapping(IERC20 => SupportedTokenInfo) public priceRatioInfo;
     mapping(IERC20 => mapping(address => uint256)) public balances;
     mapping(address => uint256) public unlockBlock;
 
-    constructor(IEntryPoint _entryPoint, IBobaStraw ethPriceOracle) BasePaymaster(_entryPoint) {
-        require(ethPriceOracle != NULL_ORACLE, "Incorrect eth oracle");
+    constructor(IEntryPoint _entryPoint) BasePaymaster(_entryPoint) {
         //owner account is unblocked, to allow withdraw of paid tokens;
         unlockTokenDeposit();
-        // set native token base
-        oracles[L2_ETH] = Oracle(ethPriceOracle, L2_ETH_ADDRESS, 18);
     }
 
     /**
      * owner of the paymaster should add supported tokens
      */
-    function addToken(IERC20 token, IBobaStraw tokenPriceOracle, address base, uint8 tokenDecimals) external onlyOwner {
-        require(tokenPriceOracle != NULL_ORACLE, "Incorrect token oracle");
-        require(oracles[token].feedRegistry == NULL_ORACLE);
-        oracles[token] = Oracle(tokenPriceOracle, base, tokenDecimals);
+    function addToken(IERC20 token, uint8 tokenDecimals, uint256 priceRatio, uint256 priceRatioDecimals, uint256 minRatio, uint256 maxRatio) external onlyOwner {
+        require(priceRatioInfo[token].token == IERC20(address(0)));
+        require(priceRatio != 0, "price ratio cannot be zero");
+        require(minRatio != 0, "min ratio cannot be zero");
+        require(token != IERC20(address(0)), "DepositPaymaster: Invalid token");
+        priceRatioInfo[token] = SupportedTokenInfo(token, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio);
     }
 
     /**
@@ -80,9 +73,8 @@ contract BobaDepositPaymaster is BasePaymaster {
      */
     function addDepositFor(IERC20 token, address account, uint256 amount) external {
         //(sender must have approval for the paymaster)
-        // native tokens will fail here
         token.safeTransferFrom(msg.sender, address(this), amount);
-        require(oracles[token].feedRegistry != NULL_ORACLE, "unsupported token");
+        require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
         balances[token][account] += amount;
         if (msg.sender == account) {
             lockTokenDeposit();
@@ -130,15 +122,24 @@ contract BobaDepositPaymaster is BasePaymaster {
      * @return requiredTokens the amount of tokens required to get this amount of eth
      */
     function getTokenValueOfEth(IERC20 token, uint256 ethBought) internal view virtual returns (uint256 requiredTokens) {
-        Oracle memory oracleInfo = oracles[token];
-        require(oracleInfo.feedRegistry != NULL_ORACLE, "DepositPaymaster: unsupported token");
-        address base = oracleInfo.tokenBase;
-        uint256 ethPrice = uint256(oracles[L2_ETH].feedRegistry.latestAnswer(oracles[L2_ETH].tokenBase, QUOTE_USD));
-        uint256 tokenPrice = uint256(oracleInfo.feedRegistry.latestAnswer(base, QUOTE_USD));
-        uint256 ethPriceDecimals = uint256(oracles[L2_ETH].feedRegistry.decimals(oracles[L2_ETH].tokenBase, QUOTE_USD));
-        uint256 tokenPriceDecimals = uint256(oracleInfo.feedRegistry.decimals(base, QUOTE_USD));
-        uint256 requiredAmount = (ethBought * ethPrice * (10**tokenPriceDecimals)) / (tokenPrice * (10**ethPriceDecimals));
-        return ((requiredAmount * (10**oracleInfo.tokenDecimals)) / (10**oracles[L2_ETH].tokenDecimals));
+        require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
+        uint256 requiredAmount = (ethBought * (10**priceRatioInfo[token].priceRatioDecimals)) / priceRatioInfo[token].priceRatio;
+        return (requiredAmount / (10**(18 - priceRatioInfo[token].tokenDecimals)));
+    }
+
+    // update token params
+    function updateTokenParams(IERC20 token, uint256 priceRatioDecimals, uint256 minRatio, uint256 maxRatio) external onlyOwner {
+        require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
+        require(minRatio != 0, "min ratio cannot be zero");
+        priceRatioInfo[token].priceRatioDecimals = priceRatioDecimals;
+        priceRatioInfo[token].minRatio = minRatio;
+        priceRatioInfo[token].maxRatio = maxRatio;
+    }
+
+    function updatePriceRatio(IERC20 token, uint256 priceRatio) external onlyOwner {
+        require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
+        require(priceRatio >= priceRatioInfo[token].minRatio && priceRatio <= priceRatioInfo[token].maxRatio, "DepositPaymaster: Invalid price ratio");
+        priceRatioInfo[token].priceRatio = priceRatio;
     }
 
     /**

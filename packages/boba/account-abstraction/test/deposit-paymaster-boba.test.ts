@@ -40,7 +40,7 @@ describe('BobaDepositPaymaster', () => {
 
     token = await new TestToken__factory(ethersSigner).deploy()
     // add boba token
-    await paymaster.addToken(token.address, ethOracle.address, token.address)
+    await paymaster.addToken(token.address, ethOracle.address, token.address, 18)
 
     await token.mint(await ethersSigner.getAddress(), FIVE_ETH)
     await token.approve(paymaster.address, ethers.constants.MaxUint256)
@@ -60,7 +60,7 @@ describe('BobaDepositPaymaster', () => {
 
   describe('addToken', () => {
     it('should not allow incorrect token oracle', async () => {
-      await expect(paymaster.addToken(token.address, ethers.constants.AddressZero, token.address)).to.be.revertedWith('Incorrect token oracle')
+      await expect(paymaster.addToken(token.address, ethers.constants.AddressZero, token.address, 18)).to.be.revertedWith('Incorrect token oracle')
     })
   })
 

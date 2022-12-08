@@ -53,4 +53,14 @@ interface IBobaStraw {
     returns (
       uint256 timestamp
     );
+
+  function decimals(
+    address base,
+    address quote
+  )
+    external
+    view
+    returns (
+      uint8
+    );
 }

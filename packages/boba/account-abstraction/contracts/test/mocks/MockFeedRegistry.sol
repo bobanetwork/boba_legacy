@@ -63,4 +63,16 @@ contract MockFeedRegistry is IBobaStraw {
     ) {
       return 0;
     }
+
+  function decimals(
+    address base,
+    address quote
+  )
+    external
+    view
+    returns (
+      uint8
+    ) {
+      return 18;
+    }
 }
