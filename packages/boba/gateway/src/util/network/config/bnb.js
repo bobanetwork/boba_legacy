@@ -41,6 +41,7 @@ export const bnbConfig = {
       transaction: `https://bscscan.com/tx/`,
       blockExplorerUrl: `https://bscscan.com/`,
       symbol: "BNB",
+      tokenName: "BNB",
     },
     L2: {
       name: "Boba BNB Mainnet",
