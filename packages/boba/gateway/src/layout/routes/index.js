@@ -16,7 +16,12 @@ export const Router = () => {
   useEffect(() => {
     const childRoutes = routeList[ 0 ].children;
     const fRoutes = childRoutes.filter((m) => intersection([ m.key ], PAGES_BY_NETWORK[ network.toLowerCase() ]).length);
+    const {path, ...indexRoute} = fRoutes[ 0 ];
     const _routes = [
+      {
+        ...indexRoute,
+        index:true
+      },
       ...fRoutes,
       ...COMMON_ROUTES
     ].filter((r) => !r.disable)
