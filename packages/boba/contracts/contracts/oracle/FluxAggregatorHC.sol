@@ -12,7 +12,7 @@ import "@chainlink/contracts/src/v0.6/interfaces/AggregatorV2V3Interface.sol";
 import "@chainlink/contracts/src/v0.6/vendor/SafeMathChainlink.sol";
 
 import "./SafeMath80.sol";
-import "./interfaces/IHybirdComputeHelper.sol";
+import "./interfaces/IHybridComputeHelper.sol";
 
 /**
  * @title The HC Aggregator contract
@@ -52,7 +52,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   address private oracleAdmin;
 
   address public HCHelperAddr;
-  IHybirdComputeHelper HCHelper;
+  IHybridComputeHelper HCHelper;
   string public HCUrl;
   address public HCChainLinkPriceFeedAddr;
 
@@ -143,7 +143,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     decimals = _decimals;
     description = _description;
     HCHelperAddr = _HCHelperAddr;
-    HCHelper = IHybirdComputeHelper(_HCHelperAddr);
+    HCHelper = IHybridComputeHelper(_HCHelperAddr);
     HCUrl = _HCUrl;
     HCChainLinkPriceFeedAddr = _HCChainLinkPriceFeedAddr;
     owner = msg.sender;
@@ -446,7 +446,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     require(_HCHelperAddr != address(0), "Cannot set HCHelper to 0x address");
     address prevHCHelperAddr = HCHelperAddr;
     HCHelperAddr = _HCHelperAddr;
-    HCHelper = IHybirdComputeHelper(_HCHelperAddr);
+    HCHelper = IHybridComputeHelper(_HCHelperAddr);
     emit HCHelperUpdated(prevHCHelperAddr, HCHelperAddr);
   }
 
