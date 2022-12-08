@@ -42,11 +42,6 @@ export const ROUTE_LIST = [
     element: <Home />,
     children: [
       {
-        index: true,
-        element: <Bridge />,
-        key: 'Bridge',
-      },
-      {
         path: ROUTES_PATH.BRIDGE,
         element: <Bridge />,
         key: 'Bridge',
