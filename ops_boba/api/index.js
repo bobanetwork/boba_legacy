@@ -7,4 +7,14 @@ import {
   mainnetGetTestnetETH,
 } from './metatransaction-api'
 
-export { rinkebySwapBOBAForETH, goerliSwapBOBAForETH, mainnetSwapBOBAForETH, rinkebyGetTestnetETH, goerliGetTestnetETH, mainnetGetTestnetETH }
+import { bobaLinkGetQuote } from './bobalink-api'
+
+export {
+  rinkebySwapBOBAForETH,
+  goerliSwapBOBAForETH,
+  mainnetSwapBOBAForETH,
+  rinkebyGetTestnetETH,
+  goerliGetTestnetETH,
+  mainnetGetTestnetETH,
+  bobaLinkGetQuote,
+}

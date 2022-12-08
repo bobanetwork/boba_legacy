@@ -15,7 +15,7 @@ import { ChainInfo } from '../utils/types'
 dotenv.config()
 
 const main = async () => {
-  const config: Bcfg = new Config('gas-price-oracle')
+  const config: Bcfg = new Config('teleportation')
   config.load({
     env: true,
     argv: true,

@@ -19,6 +19,7 @@
     "@boba/api": "0.0.1",
     "@boba/contracts": "0.0.1",
     "@boba/ve-boba": "0.0.1",
+    "@boba/bobalink": "1.0.0",
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "@eth-optimism/sdk": "1.0.1",
@@ -65,6 +66,8 @@
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.15",
     "chalk": "^4.1.2",
-    "request-promise-native": "^1.0.9"
+    "request-promise-native": "^1.0.9",
+    "ip": "^1.1.5",
+    "node-fetch": "^2.6.1"
   }
 }
