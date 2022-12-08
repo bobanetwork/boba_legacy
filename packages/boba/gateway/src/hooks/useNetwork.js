@@ -25,20 +25,21 @@ const useNetwork = () => {
 
   useEffect(() => {
     const queryParams = Object.fromEntries([ ...searchParams ])
-    const {
-      chain,
-      networkType
-    } = CHAIN_ID_LIST[ queryParams.chainId || 1 ]
+    if (queryParams.chainId) {
+      const {
+        chain,
+        networkType
+      } = CHAIN_ID_LIST[ queryParams.chainId || 1 ]
 
-    const { name, icon } = NetworkList[ networkType ].filter((n) => n.chain === chain)[ 0 ];
+      const { name, icon } = NetworkList[ networkType ].filter((n) => n.chain === chain)[ 0 ];
 
-    dispatch(setNetwork({
-      networkType,
-      name,
-      network: chain,
-      networkIcon: icon,
-    }));
-
+      dispatch(setNetwork({
+        networkType,
+        name,
+        network: chain,
+        networkIcon: icon,
+      }));
+    }
   }, [ searchParams, dispatch ]);
 
 }
