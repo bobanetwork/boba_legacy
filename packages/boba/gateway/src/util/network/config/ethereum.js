@@ -13,7 +13,9 @@ export const ethereumConfig = {
       rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
       blockExplorer: `https://api-goerli.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://goerli.etherscan.io/tx/`,
-      blockExplorerUrl: `https://goerli.etherscan.io/`
+      blockExplorerUrl: `https://goerli.etherscan.io/`,
+      symbol: 'ETH',
+      tokenName: 'ETH',
     },
     L2: {
       name: "BOBA Goerli L2",
@@ -60,7 +62,9 @@ export const ethereumConfig = {
       rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
       blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: ` https://etherscan.io/tx/`,
-      blockExplorerUrl: `https://etherscan.io/`
+      blockExplorerUrl: `https://etherscan.io/`,
+      symbol: 'ETH',
+      tokenName: 'ETH',
     },
     L2: {
       name: "BOBA L2",
