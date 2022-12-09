@@ -683,7 +683,7 @@ describe('Boba_GasPriceOracle', () => {
       ).to.not.be.reverted
     })
 
-    it.only('should emit event', async () => {
+    it('should emit event', async () => {
       const newMin = utils.parseEther('0.006')
       const previousMin = await Boba_GasPriceOracle.secondaryFeeTokenMinimum()
       await expect(
@@ -695,7 +695,7 @@ describe('Boba_GasPriceOracle', () => {
         .withArgs(previousMin, newMin)
     })
 
-    it.only('should emit event if Secondary Fee Token Minimum is exactly 0.002', async () => {
+    it('should emit event if Secondary Fee Token Minimum is exactly 0.002', async () => {
       const newMin = utils.parseEther('0.002')
       const previousMin = await Boba_GasPriceOracle.secondaryFeeTokenMinimum()
       await expect(

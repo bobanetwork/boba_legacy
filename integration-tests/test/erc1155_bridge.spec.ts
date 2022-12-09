@@ -1138,7 +1138,7 @@ describe('ERC1155 Bridge Test', async () => {
         preOwnerL1Balance.sub(DUMMY_TOKEN_AMOUNT_1)
       )
       expect(postL2Balance).to.deep.eq(preL2Balance.add(DUMMY_TOKEN_AMOUNT_1))
-    })
+    }).retries(3)
 
     it('should withdraw a batch of tokens from L2 to L1', async () => {
       const mintType1Tx = await L2ERC1155.mint(

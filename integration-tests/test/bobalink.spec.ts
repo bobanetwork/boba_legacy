@@ -28,7 +28,6 @@ describe('BobaLink Test\n', async () => {
   let TuringHelper: Contract
 
   let BobaTuringCredit: Contract
-  let L2BOBAToken: Contract
 
   let ChainLinkContract: Contract
 
@@ -54,12 +53,6 @@ describe('BobaLink Test\n', async () => {
       'BobaTuringCredit',
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
-
-    L2BOBAToken = new Contract(
-      env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
-      env.l2Wallet
-    )
 
     ChainLinkContract = new Contract(
       ETHUSDPriceFeedAddr,
@@ -104,18 +97,13 @@ describe('BobaLink Test\n', async () => {
 
     // add boba as credit
     const depositBOBAAmount = utils.parseEther('1')
-    const bobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+    const bobaBalance = await env.l2Provider.getBalance(env.l2Wallet.address)
     console.log('BOBA Balance in your account', bobaBalance.toString())
-
-    const approveTx = await L2BOBAToken.approve(
-      BobaTuringCredit.address,
-      depositBOBAAmount
-    )
-    await approveTx.wait()
 
     const depositTx = await BobaTuringCredit.addBalanceTo(
       depositBOBAAmount,
-      TuringHelper.address
+      TuringHelper.address,
+      { value: depositBOBAAmount }
     )
     await depositTx.wait()
 

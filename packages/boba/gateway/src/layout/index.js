@@ -314,8 +314,8 @@ function App() {
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
                   {/* FIXME: On setting flag below to 1 below routes will not be available to user. */}
-                  {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.LOCK} element={<Lock />} />}
-                  {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />}
+                  {/* {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.LOCK} element={<Lock />} />} */}
+                  {/* {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />} */}
                   <Route path={ROUTES_PATH.DAO} element={<OldDao />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Route>
