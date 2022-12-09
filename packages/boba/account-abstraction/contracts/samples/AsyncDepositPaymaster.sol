@@ -128,7 +128,9 @@ contract AsyncDepositPaymaster is BasePaymaster {
         return (requiredAmount / (10**(18 - priceRatioInfo[token].tokenDecimals)));
     }
 
-    // update token params
+    /**
+     * allows the owner to update the token params
+     */
     function updateTokenParams(IERC20 token, uint256 priceRatioDecimals, uint256 minRatio, uint256 maxRatio) external onlyOwner {
         require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
         require(minRatio != 0, "min ratio cannot be zero");
@@ -137,6 +139,10 @@ contract AsyncDepositPaymaster is BasePaymaster {
         priceRatioInfo[token].maxRatio = maxRatio;
     }
 
+    /**
+     * allows the owner to update the price Ratio of a token
+     * can be called as per precision desired by owner
+     */
     function updatePriceRatio(IERC20 token, uint256 priceRatio) external onlyOwner {
         require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
         require(priceRatio >= priceRatioInfo[token].minRatio && priceRatio <= priceRatioInfo[token].maxRatio, "DepositPaymaster: Invalid price ratio");

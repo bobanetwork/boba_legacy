@@ -12,7 +12,9 @@ import {
   TestToken,
   TestToken__factory,
   MockFeedRegistry__factory,
-  MockFeedRegistry
+  MockFeedRegistry,
+  TestTokenValueBobaDepositPaymaster__factory,
+  TestTokenValueBobaDepositPaymaster
 } from '../typechain'
 import {
   AddressZero, createAddress,
@@ -222,6 +224,20 @@ describe('BobaDepositPaymaster', () => {
 
       const targetLogs = await counter.queryFilter(counter.filters.CalledFrom())
       expect(targetLogs.length).to.eq(1)
+    })
+  })
+  describe('getTokenValueOfEth', () => {
+    let bobaDepositPaymaster: TestTokenValueBobaDepositPaymaster
+    before(async () => {
+      bobaDepositPaymaster = await new TestTokenValueBobaDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, ethOracle.address)
+      // add boba token
+      await bobaDepositPaymaster.addToken(token.address, ethOracle.address, token.address, 18)
+    })
+    it('should return correct conversion', async () => {
+      const ethBoughtAmount = ethers.utils.parseEther('1')
+      const requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      // oracle returns 1:1 conversion
+      expect(requiredTokens).to.be.eq(ethBoughtAmount)
     })
   })
 })

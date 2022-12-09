@@ -7,11 +7,12 @@ import {
   EntryPoint,
   AsyncDepositPaymaster,
   AsyncDepositPaymaster__factory,
-  TestOracle__factory,
   TestCounter,
   TestCounter__factory,
   TestToken,
-  TestToken__factory
+  TestToken__factory,
+  TestTokenValueAsyncDepositPaymaster__factory,
+  TestTokenValueAsyncDepositPaymaster
 } from '../typechain'
 import {
   AddressZero, createAddress,
@@ -253,6 +254,20 @@ describe('AsyncDepositPaymaster', () => {
       expect(priceRatio).to.be.eq(60)
       expect(minRatio).to.be.eq(10)
       expect(maxRatio).to.be.eq(1000)
+    })
+  })
+  describe('getTokenValueOfEth', () => {
+    let asyncDepositPaymaster: TestTokenValueAsyncDepositPaymaster
+    before(async () => {
+      asyncDepositPaymaster = await new TestTokenValueAsyncDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
+      // add boba token
+      await asyncDepositPaymaster.addToken(token.address, await token.decimals(), priceRatio, priceRatioDecimals, minRatio, maxRatio)
+    })
+    it('should return correct conversion', async () => {
+      const ethBoughtAmount = ethers.utils.parseEther('1')
+      const requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      // oracle returns 1:1 conversion
+      expect(requiredTokens).to.be.eq(ethBoughtAmount.mul(10 ** priceRatioDecimals / priceRatio))
     })
   })
 })
