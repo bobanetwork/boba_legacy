@@ -2,7 +2,7 @@ import {
   rinkebyHandler,
   goerliHandler,
   mainnetHandler,
-} from './metaTransaction_swapNativeTokenForBOBA'
+} from './metaTransaction_swapBOBAForETH'
 
 import {
   rinkebyHandler as rinkebyHandlerFaucet,
@@ -11,8 +11,9 @@ import {
 } from './metaTransaction_getTestnetETH'
 
 export {
-  rinkebyHandler as rinkebySwapL2SecondaryFeeTokenForBOBA,
-  mainnetHandler as mainnetSwapL2SecondaryFeeTokenForBOBA,
+  rinkebyHandler as rinkebySwapBOBAForETH,
+  goerliHandler as goerliSwapBOBAForETH,
+  mainnetHandler as mainnetSwapBOBAForETH,
   rinkebyHandlerFaucet as rinkebyGetTestnetETH,
   goerliHandlerFaucet as goerliGetTestnetETH,
   mainnetHandlerFaucet as mainnetGetTestnetETH,
