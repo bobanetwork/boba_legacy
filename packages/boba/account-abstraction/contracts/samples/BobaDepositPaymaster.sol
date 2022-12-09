@@ -52,7 +52,7 @@ contract BobaDepositPaymaster is BasePaymaster {
     mapping(address => uint256) public unlockBlock;
 
     constructor(IEntryPoint _entryPoint, IBobaStraw ethPriceOracle) BasePaymaster(_entryPoint) {
-        require(ethPriceOracle != NULL_ORACLE, "Incorrect eth oracle");
+        require(ethPriceOracle != NULL_ORACLE, "DepositPaymaster: Incorrect eth oracle");
         //owner account is unblocked, to allow withdraw of paid tokens;
         unlockTokenDeposit();
         // set native token base
@@ -63,7 +63,7 @@ contract BobaDepositPaymaster is BasePaymaster {
      * owner of the paymaster should add supported tokens
      */
     function addToken(IERC20 token, IBobaStraw tokenPriceOracle, address base, uint8 tokenDecimals) external onlyOwner {
-        require(tokenPriceOracle != NULL_ORACLE, "Incorrect token oracle");
+        require(tokenPriceOracle != NULL_ORACLE, "DepositPaymaster: Incorrect token oracle");
         require(oracles[token].feedRegistry == NULL_ORACLE);
         oracles[token] = Oracle(tokenPriceOracle, base, tokenDecimals);
     }
@@ -82,7 +82,7 @@ contract BobaDepositPaymaster is BasePaymaster {
         //(sender must have approval for the paymaster)
         // native tokens will fail here
         token.safeTransferFrom(msg.sender, address(this), amount);
-        require(oracles[token].feedRegistry != NULL_ORACLE, "unsupported token");
+        require(oracles[token].feedRegistry != NULL_ORACLE, "DepositPaymaster: unsupported token");
         balances[token][account] += amount;
         if (msg.sender == account) {
             lockTokenDeposit();

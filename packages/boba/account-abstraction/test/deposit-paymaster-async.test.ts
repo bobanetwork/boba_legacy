@@ -5,14 +5,13 @@ import {
   SimpleWallet,
   SimpleWallet__factory,
   EntryPoint,
-  BobaDepositPaymaster,
-  BobaDepositPaymaster__factory,
+  AsyncDepositPaymaster,
+  AsyncDepositPaymaster__factory,
+  TestOracle__factory,
   TestCounter,
   TestCounter__factory,
   TestToken,
-  TestToken__factory,
-  MockFeedRegistry__factory,
-  MockFeedRegistry
+  TestToken__factory
 } from '../typechain'
 import {
   AddressZero, createAddress,
@@ -22,45 +21,43 @@ import {
 import { fillAndSign } from './UserOp'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 
-describe('BobaDepositPaymaster', () => {
+describe('AsyncDepositPaymaster', () => {
   let entryPoint: EntryPoint
   const ethersSigner = ethers.provider.getSigner()
   let token: TestToken
-  let ethOracle: MockFeedRegistry
-  let paymaster: BobaDepositPaymaster
+  let paymaster: AsyncDepositPaymaster
+  const priceRatio = 50
+  const priceRatioDecimals = 2
+  const minRatio = 1
+  const maxRatio = 500
   before(async function () {
     entryPoint = await deployEntryPoint()
 
-    // deploy ethOracle
-    ethOracle = await new MockFeedRegistry__factory(ethersSigner).deploy()
-
-    paymaster = await new BobaDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, ethOracle.address)
+    paymaster = await new AsyncDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
     await paymaster.addStake(1, { value: parseEther('2') })
     await entryPoint.depositTo(paymaster.address, { value: parseEther('1') })
 
     token = await new TestToken__factory(ethersSigner).deploy()
-    // add boba token
-    await paymaster.addToken(token.address, ethOracle.address, token.address, 18)
+    const tokenDecimals = await token.decimals()
+    await paymaster.addToken(token.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
 
     await token.mint(await ethersSigner.getAddress(), FIVE_ETH)
     await token.approve(paymaster.address, ethers.constants.MaxUint256)
   })
 
-  describe('ethOracle', () => {
-    it('should set native token oracle and base', async () => {
-      const nativeTokenAddress = await paymaster.L2_ETH_ADDRESS()
-      const nativeTokenOracle = await paymaster.oracles(nativeTokenAddress)
-      expect(nativeTokenOracle.feedRegistry).to.eq(ethOracle.address)
-      expect(nativeTokenOracle.tokenBase).to.eq(nativeTokenAddress)
-    })
-    it('should not allow incorrect native token oracle', async () => {
-      await expect(new BobaDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, ethers.constants.AddressZero)).to.be.revertedWith('DepositPaymaster: Incorrect eth oracle')
-    })
-  })
-
   describe('addToken', () => {
-    it('should not allow incorrect token oracle', async () => {
-      await expect(paymaster.addToken(token.address, ethers.constants.AddressZero, token.address, 18)).to.be.revertedWith('DepositPaymaster: Incorrect token oracle')
+    it('should not allow adding invalid token', async () => {
+      await expect(paymaster.addToken(ethers.constants.AddressZero, await token.decimals(), priceRatio, priceRatioDecimals, minRatio, maxRatio)).to.be.revertedWith('DepositPaymaster: Invalid token')
+    })
+    it('should not allow zero priceRatio', async () => {
+      const tokenSample = await new TestToken__factory(ethersSigner).deploy()
+      await expect(paymaster.addToken(tokenSample.address, await token.decimals(), 0, priceRatioDecimals, minRatio, maxRatio)).to.be.revertedWith('DepositPaymaster: price ratio cannot be zero')
+    })
+    it('should not allow incorrect priceRatio ranges', async () => {
+      const tokenSample = await new TestToken__factory(ethersSigner).deploy()
+      await expect(paymaster.addToken(tokenSample.address, await token.decimals(), priceRatio, priceRatioDecimals, minRatio, 0)).to.be.revertedWith('DepositPaymaster: Invalid price ratio')
+      await expect(paymaster.addToken(tokenSample.address, await token.decimals(), priceRatio, priceRatioDecimals, 0, maxRatio)).to.be.revertedWith('DepositPaymaster: min ratio cannot be zero')
+      await expect(paymaster.addToken(tokenSample.address, await token.decimals(), 100, priceRatioDecimals, 400, 500)).to.be.revertedWith('DepositPaymaster: Invalid price ratio')
     })
   })
 
@@ -74,9 +71,11 @@ describe('BobaDepositPaymaster', () => {
       await paymaster.addDepositFor(token.address, wallet.address, 100)
       expect(await paymaster.depositInfo(token.address, wallet.address)).to.eql({ amount: 100 })
     })
-    it('should fail to deposit native token', async () => {
-      const nativeTokenAddress = await paymaster.L2_ETH_ADDRESS()
-      await expect(paymaster.addDepositFor(nativeTokenAddress, wallet.address, 100)).to.be.reverted
+    it('should fail to deposit unsupported token', async () => {
+      const tokenSample = await new TestToken__factory(ethersSigner).deploy()
+      await tokenSample.mint(await ethersSigner.getAddress(), FIVE_ETH)
+      await tokenSample.approve(paymaster.address, ethers.constants.MaxUint256)
+      await expect(paymaster.addDepositFor(tokenSample.address, wallet.address, 100)).to.be.revertedWith('DepositPaymaster: unsupported token');
     })
     it('should fail to withdraw without unlock', async () => {
       const paymasterWithdraw = await paymaster.populateTransaction.withdrawTokensTo(token.address, AddressZero, 1).then(tx => tx.data!)
@@ -162,7 +161,6 @@ describe('BobaDepositPaymaster', () => {
       await entryPoint.callStatic.simulateValidation(userOp).catch(simulationResultCatch)
     })
   })
-
   describe('#handleOps', () => {
     let wallet: SimpleWallet
     const walletOwner = createWalletOwner()
@@ -222,6 +220,39 @@ describe('BobaDepositPaymaster', () => {
 
       const targetLogs = await counter.queryFilter(counter.filters.CalledFrom())
       expect(targetLogs.length).to.eq(1)
+    })
+  })
+  describe('token params', () => {
+    let wallet: SimpleWallet
+
+    before(async () => {
+      wallet = await new SimpleWallet__factory(ethersSigner).deploy(entryPoint.address, await ethersSigner.getAddress())
+    })
+    it('should not allow non owner to update priceRatio', async () => {
+      const updatePriceRatio = await paymaster.populateTransaction.updatePriceRatio(token.address, 60).then(tx => tx.data!)
+
+      await expect(
+        wallet.exec(paymaster.address, 0, updatePriceRatio)
+      ).to.revertedWith('Ownable: caller is not the owner')
+    })
+    it('should not allow non owner to update token params', async () => {
+      const updateParams = await paymaster.populateTransaction.updateTokenParams(token.address, priceRatioDecimals, 10, 1000).then(tx => tx.data!)
+
+      await expect(
+        wallet.exec(paymaster.address, 0, updateParams)
+      ).to.revertedWith('Ownable: caller is not the owner')
+    })
+    it('should allow only the owner to update token params and priceRatio', async () => {
+      await paymaster.updateTokenParams(token.address, priceRatioDecimals, 10, 1000)
+      await paymaster.updatePriceRatio(token.address, 60)
+
+      const priceRatio = (await paymaster.priceRatioInfo(token.address)).priceRatio
+      const minRatio = (await paymaster.priceRatioInfo(token.address)).minRatio
+      const maxRatio = (await paymaster.priceRatioInfo(token.address)).maxRatio
+
+      expect(priceRatio).to.be.eq(60)
+      expect(minRatio).to.be.eq(10)
+      expect(maxRatio).to.be.eq(1000)
     })
   })
 })

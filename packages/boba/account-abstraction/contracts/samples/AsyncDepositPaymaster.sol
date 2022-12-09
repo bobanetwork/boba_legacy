@@ -55,8 +55,9 @@ contract AsyncDepositPaymaster is BasePaymaster {
      */
     function addToken(IERC20 token, uint8 tokenDecimals, uint256 priceRatio, uint256 priceRatioDecimals, uint256 minRatio, uint256 maxRatio) external onlyOwner {
         require(priceRatioInfo[token].token == IERC20(address(0)));
-        require(priceRatio != 0, "price ratio cannot be zero");
-        require(minRatio != 0, "min ratio cannot be zero");
+        require(priceRatio != 0, "DepositPaymaster: price ratio cannot be zero");
+        require(minRatio != 0, "DepositPaymaster: min ratio cannot be zero");
+        require(priceRatio >= minRatio && priceRatio <= maxRatio, "DepositPaymaster: Invalid price ratio");
         require(token != IERC20(address(0)), "DepositPaymaster: Invalid token");
         priceRatioInfo[token] = SupportedTokenInfo(token, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio);
     }
