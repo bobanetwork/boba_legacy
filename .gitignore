@@ -17,6 +17,7 @@ dist
 artifacts
 cache
 __pycache__
+.openzeppelin/
 
 l2geth/build/bin
 packages/contracts/deployments/custom
@@ -67,4 +68,5 @@ subgraph.yaml
 # api
 env-mainnet.yml
 env-rinkeby.yml
+env-goerli.yml
 ops_boba/api/metatransaction-api/yarn.lock
