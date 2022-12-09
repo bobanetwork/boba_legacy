@@ -4,8 +4,8 @@ import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
-import L1NFTBridgeJson from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
-import L2NFTBridgeJson from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L1NFTBridgeJson from '../artifacts/contracts/ERC721Bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridgeJson from '../artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json'
 
 let Factory__L1NFTBridge: ContractFactory
 let Factory__L2NFTBridge: ContractFactory

@@ -657,4 +657,54 @@ describe('Boba_GasPriceOracle', () => {
       })
     }
   })
+
+  describe('updateSecondaryFeeTokenMinimum', () => {
+    it('should revert if called by someone other than the owner', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer2).updateSecondaryFeeTokenMinimum(
+          utils.parseEther('0.003')
+        )
+      ).to.be.reverted
+    })
+
+    it('should revert if the new Secondary Fee Token Minimum is smaller than 0.002', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateSecondaryFeeTokenMinimum(
+          utils.parseEther('0.001')
+        )
+      ).to.be.reverted
+    })
+
+    it('should succeed if called by the owner', async () => {
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateSecondaryFeeTokenMinimum(
+          utils.parseEther('0.003')
+        )
+      ).to.not.be.reverted
+    })
+
+    it.only('should emit event', async () => {
+      const newMin = utils.parseEther('0.006')
+      const previousMin = await Boba_GasPriceOracle.secondaryFeeTokenMinimum()
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateSecondaryFeeTokenMinimum(
+          newMin
+        )
+      )
+        .to.emit(Boba_GasPriceOracle, 'UpdateSecondaryFeeTokenMinimum')
+        .withArgs(previousMin, newMin)
+    })
+
+    it.only('should emit event if Secondary Fee Token Minimum is exactly 0.002', async () => {
+      const newMin = utils.parseEther('0.002')
+      const previousMin = await Boba_GasPriceOracle.secondaryFeeTokenMinimum()
+      await expect(
+        Boba_GasPriceOracle.connect(signer1).updateSecondaryFeeTokenMinimum(
+          newMin
+        )
+      )
+        .to.emit(Boba_GasPriceOracle, 'UpdateSecondaryFeeTokenMinimum')
+        .withArgs(previousMin, newMin)
+    })
+  })
 })

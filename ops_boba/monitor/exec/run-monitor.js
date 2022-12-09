@@ -87,11 +87,6 @@ const main = async () => {
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 
-  // monitor layerZero bridge:
-  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
-  await layerZeroBridgeMonitor.initScan()
-  await layerZeroBridgeMonitor.startMonitor()
-
   // enable the tx response time report
   if (
     process.env.SERVICE_MONITOR_ENABLE_TX_RESPONSE_TIME?.toLowerCase() ===
@@ -139,6 +134,11 @@ const main = async () => {
   ) {
     loop(() => loopTransferTx()).catch()
   }
+
+  // monitor layerZero bridge:
+  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
+  await layerZeroBridgeMonitor.initScan()
+  loop(() => layerZeroBridgeMonitor.startMonitor()).catch()
 }
 
 ;(async () => {

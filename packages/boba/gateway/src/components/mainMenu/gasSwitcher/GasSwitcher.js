@@ -1,18 +1,37 @@
 
 import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { useSelector } from 'react-redux'
 import * as S from './GasSwitcher.styles.js'
 
 import { selectGas } from 'selectors/balanceSelector'
 import { selectVerifierStatus } from 'selectors/verifierSelector'
+import { selectBaseEnabled } from 'selectors/setupSelector.js'
+
+import { fetchGas } from 'actions/networkAction.js'
+import { fetchVerifierStatus } from 'actions/verifierAction.js'
 
 import networkService from 'services/networkService.js'
 
-function GasSwitcher({ isMobile }) {
+import useInterval from 'hooks/useInterval.js'
 
+import { GAS_POLL_INTERVAL } from 'util/constant.js'
+
+function GasSwitcher() {
+  const dispatch = useDispatch()
+
+  const baseEnabled = useSelector(selectBaseEnabled())
   const gas = useSelector(selectGas)
+  const verifierStatus = useSelector(selectVerifierStatus)
+
   const [ savings, setSavings ] = useState(0)
+
+  useInterval(() => {
+    if (baseEnabled) {
+      dispatch(fetchGas())
+      dispatch(fetchVerifierStatus())
+    }
+  }, GAS_POLL_INTERVAL)
 
   useEffect(() => {
     async function getGasSavings() {
@@ -31,7 +50,6 @@ function GasSwitcher({ isMobile }) {
     getGasSavings()
   }, [ gas ])
 
-  const verifierStatus = useSelector(selectVerifierStatus)
 
   return (
     <S.Menu>
@@ -45,10 +63,10 @@ function GasSwitcher({ isMobile }) {
         <S.Label component="p" variant="body2">Boba</S.Label>
         <S.Value component="p" variant="body2">{gas.gasL2} Gwei</S.Value>
       </S.MenuItem>
-      <S.MenuItem>
+      {/* <S.MenuItem>
         <S.Label component="p" variant="body2">Savings</S.Label>
         <S.Value component="p" variant="body2">{savings.toFixed(0)}x</S.Value>
-      </S.MenuItem>
+      </S.MenuItem> */}
       <S.MenuItem>
         <S.Label component="p" variant="body2">L1</S.Label>
         <S.Value component="p" variant="body2">{gas.blockL1}</S.Value>

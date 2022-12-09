@@ -9,7 +9,8 @@ import Button from 'components/button/Button';
 
 import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg';
 
-import * as S from './ManageLockModal.styles';
+import * as G from 'containers/Global.styles';
+
 import moment from 'moment';
 
 function WithdrawLock({
@@ -36,9 +37,9 @@ function WithdrawLock({
 
   return <Box p={2} display="flex" gap={4} flexDirection="column">
     <Box display="flex" justifyContent="flex-start" gap={2}>
-      <S.ThumbnailContainer px={2} py={1}>
+      <G.ThumbnailContainer px={2} py={1}>
         <img src={BobaNFTGlass} alt="glass" />
-      </S.ThumbnailContainer>
+      </G.ThumbnailContainer>
       <Box display="flex" flexDirection="column" justifyContent="space-around">
         <Typography variant="body3" sx={{ opacity: 0.7 }}>
           NFT ID:

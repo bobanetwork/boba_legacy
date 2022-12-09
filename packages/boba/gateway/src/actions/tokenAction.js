@@ -158,11 +158,26 @@ export async function addToken ( tokenContractAddressL1 ) {
       )
     }
 
-    const [ _symbolL1, _decimals, _name ] = await Promise.all([
-      tokenContract.symbol(),
-      tokenContract.decimals(),
-      tokenContract.name()
-    ]).catch(e => [ null, null, null ])
+    let _symbolL1
+    let _decimals
+    let _name
+
+    if (ethers.utils.isAddress(_tokenContractAddressL1)) {
+      const tokenInfo = networkService.tokenInfo.L1[ethers.utils.getAddress(_tokenContractAddressL1)]
+      if (tokenInfo) {
+        _symbolL1 = tokenInfo.symbol
+        _decimals = tokenInfo.decimals
+        _name = tokenInfo.name
+      }
+    }
+
+    if (!_symbolL1 || !_decimals || !_name) {
+      [ _symbolL1, _decimals, _name ] = await Promise.all([
+        tokenContract.symbol(),
+        tokenContract.decimals(),
+        tokenContract.name()
+      ]).catch(e => [ null, null, null ])
+    }
 
     const decimals = _decimals ? Number(_decimals.toString()) : 'NOT ON ETHEREUM'
     const symbolL1 = _symbolL1 || 'NOT ON ETHEREUM'
@@ -204,9 +219,9 @@ export async function addToken ( tokenContractAddressL1 ) {
 
     store.dispatch({
       type: 'TOKEN/GET/FAILURE',
-      payload: {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'},
+      payload: {currency: _tokenContractAddressL1, addressL1: _tokenContractAddressL1, addressL2: '', symbol: 'Not found', error: 'Not found'},
     })
 
-    return {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'};
+    return {currency: _tokenContractAddressL1, addressL1: _tokenContractAddressL1, addressL2: '', symbol: 'Not found', error: 'Not found'};
   }
 }

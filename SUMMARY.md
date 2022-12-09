@@ -44,7 +44,7 @@
 
 * [Other](packages/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
-  * [Boba NFT Bridges](packages/boba/contracts/contracts/bridges/README.md)
+  * [Boba NFT Bridges](packages/boba/contracts/contracts/ERC721Bridges/README.md)
   * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
   * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
   * [Contracts Registration](packages/boba/register/README.md)

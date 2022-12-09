@@ -43,6 +43,7 @@ import FarmWrapper from 'containers/farm/FarmWrapper'
 // import SaveWrapper from 'containers/save/SaveWrapper'
 import Projects from 'containers/ecosystem/Projects'
 import { ROUTES_PATH } from 'util/constant'
+import VoteAndDao from 'containers/VoteAndDao'
 
 function App() {
 
@@ -311,6 +312,7 @@ function App() {
                   <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
+                  <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Route>
               </Routes>

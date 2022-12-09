@@ -168,10 +168,6 @@ function BobaBridge() {
         </S.BobaContentWrapper>
       </S.BobaBridgeWrapper>
 
-      {tokens.length === 1 &&
-        <AvailableBridges token={tokens[0]}/>
-      }
-
       <S.BobaBridgeWrapper>
 
       {layer === 'L1' && !multibridgeMode && tokens.length < 1 &&
@@ -212,6 +208,12 @@ function BobaBridge() {
       <BridgeTransfer />
 
       </S.BobaBridgeWrapper>
+
+
+      {tokens.length === 1 &&
+        <AvailableBridges token={tokens[0]}/>
+      }
+
 
       <S.HistoryLink
         onClick={() => {
