@@ -108,7 +108,7 @@ const config: HardhatUserConfig = {
       mainnet: process.env.ETHERSCAN_KEY,
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
       goerli: process.env.ETHERSCAN_GOERLI_KEY,
-      'boba-goerli': process.env.ETHERSCAN_GOERLI_KEY,
+      'boba-goerli': process.env.BOBA_MAINNET_KEY,
     },
     customChains: [
       {
