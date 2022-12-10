@@ -54,7 +54,19 @@ export const getCoinImage = (symbol) => {
     case "USDC":
       logo = usdcLogo;
       break;
+    case "USDC.mc":
+      logo = usdcLogo;
+      break;
+    case "USDC.wh":
+      logo = usdcLogo;
+      break;
     case "WBTC":
+      logo = wbtcLogo;
+      break;
+    case "WBTC.wh":
+      logo = wbtcLogo;
+      break;
+    case "WBTC.mc":
       logo = wbtcLogo;
       break;
     case "REP":

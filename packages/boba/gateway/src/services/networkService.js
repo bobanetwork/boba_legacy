@@ -207,7 +207,7 @@ const L1ChainAssets = {
     l1NameShort: 'Moonbeam',
     l2Name: 'Bobabeam',
     icon: (bool) => <MoonbeamIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, "ETH.mc", "ETH.wh", "WBTC.mc", "WBTC.wh", "USDC.mc", "USDC.wh"],
     supportedTokenAddresses: {},
     foundation: false,
   },
