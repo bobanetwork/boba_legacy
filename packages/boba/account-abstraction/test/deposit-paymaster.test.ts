@@ -194,6 +194,6 @@ describe('DepositPaymaster', () => {
 
       const targetLogs = await counter.queryFilter(counter.filters.CalledFrom())
       expect(targetLogs.length).to.eq(1)
-    })
+    }).timeout(100000).retries(3)
   })
 })

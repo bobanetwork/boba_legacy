@@ -204,7 +204,7 @@ describe('EntryPoint with paymaster', function () {
           // (first account pays more, for warming up..)
           expect(paid).to.be.closeTo(totalPaid / 4, paid * 0.15)
         }
-      })
+      }).timeout(100000).retries(3)
 
       // wallets attempt to grief paymaster: both wallets pass validatePaymasterUserOp (since they have enough balance)
       // but the execution of wallet1 drains wallet2.
