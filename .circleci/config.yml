@@ -2,6 +2,57 @@
 version: 2.1
 
 jobs:
+  go-lint-test-build:
+    parameters:
+      binary_name:
+        description: Binary name to build
+        type: string
+      working_directory:
+        description: Working directory
+        type: string
+      build:
+        description: Whether or not to build the binary
+        type: boolean
+        default: true
+      dependencies:
+        description: Regex matching dependent packages
+        type: string
+        default: this-package-does-not-exist
+    docker:
+      - image: ethereumoptimism/ci-builder:latest
+      - image: cimg/postgres:14.1
+    steps:
+      - checkout
+      - run:
+          name: Check if we should run
+          command: |
+            shopt -s inherit_errexit
+            CHANGED=$(check-changed "(<<parameters.working_directory>>|<<parameters.dependencies>>)" || echo "TRUE")
+            echo $CHANGED
+            if [[ "$CHANGED" = "FALSE" ]]; then
+              circleci step halt
+            fi
+      - run:
+          name: Lint
+          command: golangci-lint run -E goimports,sqlclosecheck,bodyclose,asciicheck,misspell,errorlint -e "errors.As" -e "errors.Is" ./...
+          working_directory: <<parameters.working_directory>>
+      - store_test_results:
+          path: /test-results
+      - run:
+          name: Test
+          command: |
+            mkdir -p /test-results
+            DB_USER=postgres gotestsum --junitfile /test-results/tests.xml
+          working_directory: <<parameters.working_directory>>
+      - when:
+          condition:
+            equal: [ true, <<parameters.build>> ]
+          steps:
+            - run:
+                name: Build
+                command: make <<parameters.binary_name>>
+                working_directory: <<parameters.working_directory>>
+
   integration-tests:
     machine:
       image: ubuntu-2004:202111-02
@@ -49,3 +100,7 @@ workflows:
   main:
     jobs:
       - integration-tests
+      - go-lint-test-build:
+          name: proxyd-tests
+          binary_name: proxyd
+          working_directory: go/proxyd
