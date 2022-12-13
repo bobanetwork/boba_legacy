@@ -1,10 +1,13 @@
 package main
 
 import (
-	"github.com/BurntSushi/toml"
-	"github.com/ethereum-optimism/optimism/go/proxyd"
-	"github.com/ethereum/go-ethereum/log"
 	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/BurntSushi/toml"
+	"github.com/ethereum-optimism/optimism/proxyd"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 var (
@@ -19,7 +22,7 @@ func main() {
 	log.Root().SetHandler(
 		log.LvlFilterHandler(
 			log.LvlInfo,
-			log.StreamHandler(os.Stdout, log.TerminalFormat(true)),
+			log.StreamHandler(os.Stdout, log.JSONFormat()),
 		),
 	)
 
@@ -34,7 +37,29 @@ func main() {
 		log.Crit("error reading config file", "err", err)
 	}
 
-	if err := proxyd.Start(config); err != nil {
+	// update log level from config
+	logLevel, err := log.LvlFromString(config.Server.LogLevel)
+	if err != nil {
+		logLevel = log.LvlInfo
+		if config.Server.LogLevel != "" {
+			log.Warn("invalid server.log_level set: " + config.Server.LogLevel)
+		}
+	}
+	log.Root().SetHandler(
+		log.LvlFilterHandler(
+			logLevel,
+			log.StreamHandler(os.Stdout, log.JSONFormat()),
+		),
+	)
+
+	shutdown, err := proxyd.Start(config)
+	if err != nil {
 		log.Crit("error starting proxyd", "err", err)
 	}
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	recvSig := <-sig
+	log.Info("caught signal, shutting down", "signal", recvSig)
+	shutdown()
 }

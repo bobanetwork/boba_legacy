@@ -2,10 +2,11 @@ package proxyd
 
 import (
 	"context"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"strconv"
 	"strings"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 const (
@@ -19,6 +20,9 @@ const (
 	SourceBackend = "backend"
 	MethodUnknown = "unknown"
 )
+
+var PayloadSizeBuckets = []float64{10, 50, 100, 500, 1000, 5000, 10000, 100000, 1000000}
+var MillisecondDurationBuckets = []float64{1, 10, 50, 100, 500, 1000, 5000, 10000, 100000}
 
 var (
 	rpcRequestsTotal = promauto.NewCounter(prometheus.CounterOpts{
@@ -36,6 +40,18 @@ var (
 		"backend_name",
 		"method_name",
 		"source",
+	})
+
+	rpcBackendHTTPResponseCodesTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "rpc_backend_http_response_codes_total",
+		Help:      "Count of total backend responses by HTTP status code.",
+	}, []string{
+		"auth",
+		"backend_name",
+		"method_name",
+		"status_code",
+		"batched",
 	})
 
 	rpcErrorsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
@@ -68,6 +84,7 @@ var (
 	}, []string{
 		"backend_name",
 		"method_name",
+		"batched",
 	})
 
 	activeClientWsConnsGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
@@ -95,10 +112,12 @@ var (
 		"request_source",
 	})
 
-	httpRequestsTotal = promauto.NewCounter(prometheus.CounterOpts{
+	httpResponseCodesTotal = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: MetricsNamespace,
-		Name:      "http_requests_total",
-		Help:      "Count of total HTTP requests.",
+		Name:      "http_response_codes_total",
+		Help:      "Count of total HTTP response codes.",
+	}, []string{
+		"status_code",
 	})
 
 	httpRequestDurationSumm = promauto.NewSummary(prometheus.SummaryOpts{
@@ -126,12 +145,103 @@ var (
 		"source",
 	})
 
+	requestPayloadSizesGauge = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: MetricsNamespace,
+		Name:      "request_payload_sizes",
+		Help:      "Histogram of client request payload sizes.",
+		Buckets:   PayloadSizeBuckets,
+	}, []string{
+		"auth",
+	})
+
+	responsePayloadSizesGauge = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: MetricsNamespace,
+		Name:      "response_payload_sizes",
+		Help:      "Histogram of client response payload sizes.",
+		Buckets:   PayloadSizeBuckets,
+	}, []string{
+		"auth",
+	})
+
+	cacheHitsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "cache_hits_total",
+		Help:      "Number of cache hits.",
+	}, []string{
+		"method",
+	})
+
+	cacheMissesTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "cache_misses_total",
+		Help:      "Number of cache misses.",
+	}, []string{
+		"method",
+	})
+
+	lvcErrorsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "lvc_errors_total",
+		Help:      "Count of lvc errors.",
+	}, []string{
+		"key",
+	})
+
+	lvcPollTimeGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: MetricsNamespace,
+		Name:      "lvc_poll_time_gauge",
+		Help:      "Gauge of lvc poll time.",
+	}, []string{
+		"key",
+	})
+
+	batchRPCShortCircuitsTotal = promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "batch_rpc_short_circuits_total",
+		Help:      "Count of total batch RPC short-circuits.",
+	})
+
 	rpcSpecialErrors = []string{
 		"nonce too low",
 		"gas price too high",
 		"gas price too low",
 		"invalid parameters",
 	}
+
+	redisCacheDurationSumm = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace: MetricsNamespace,
+		Name:      "redis_cache_duration_milliseconds",
+		Help:      "Histogram of Redis command durations, in milliseconds.",
+		Buckets:   MillisecondDurationBuckets,
+	}, []string{"command"})
+
+	tooManyRequestErrorsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "too_many_request_errors_total",
+		Help:      "Count of request timeouts due to too many concurrent RPCs.",
+	}, []string{
+		"backend_name",
+	})
+
+	batchSizeHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Namespace: MetricsNamespace,
+		Name:      "batch_size_summary",
+		Help:      "Summary of batch sizes",
+		Buckets: []float64{
+			1,
+			5,
+			10,
+			25,
+			50,
+			100,
+		},
+	})
+
+	frontendRateLimitTakeErrors = promauto.NewCounter(prometheus.CounterOpts{
+		Namespace: MetricsNamespace,
+		Name:      "rate_limit_take_errors",
+		Help:      "Count of errors taking frontend rate limits",
+	})
 )
 
 func RecordRedisError(source string) {
@@ -171,4 +281,24 @@ func MaybeRecordSpecialRPCError(ctx context.Context, backendName, method string,
 			return
 		}
 	}
+}
+
+func RecordRequestPayloadSize(ctx context.Context, payloadSize int) {
+	requestPayloadSizesGauge.WithLabelValues(GetAuthCtx(ctx)).Observe(float64(payloadSize))
+}
+
+func RecordResponsePayloadSize(ctx context.Context, payloadSize int) {
+	responsePayloadSizesGauge.WithLabelValues(GetAuthCtx(ctx)).Observe(float64(payloadSize))
+}
+
+func RecordCacheHit(method string) {
+	cacheHitsTotal.WithLabelValues(method).Inc()
+}
+
+func RecordCacheMiss(method string) {
+	cacheMissesTotal.WithLabelValues(method).Inc()
+}
+
+func RecordBatchSize(size int) {
+	batchSizeHistogram.Observe(float64(size))
 }
