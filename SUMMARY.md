@@ -6,9 +6,9 @@
 
 * User Docs
   * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
-  * [Fraud Detection](boba\_community/fraud-detector/README.md)
+  * [Fraud Detection](https://github.com/bobanetwork/boba/blob/develop/boba_community/fraud-detector/README.md)
   * [NFTs](boba\_documentation/user/003\_nfts.md)
-  * [Running a Boba node](boba\_community/boba-node/README.md)
+  * [Running a Boba node](https://github.com/bobanetwork/boba/blob/develop/boba_community/boba-node/README.md)
 
 * [Welcome to Turing](boba\_documentation/developer/turing.md)
   * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
