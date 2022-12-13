@@ -5,6 +5,10 @@ pragma experimental ABIEncoderV2;
 import "../../samples/IBobaStraw.sol";
 
 contract MockFeedRegistry is IBobaStraw {
+
+  int256 public fixedReturnValue = 45;
+  uint8 public decimalsOverride = 8;
+
   function latestRoundData(
     address base,
     address quote
@@ -49,7 +53,7 @@ contract MockFeedRegistry is IBobaStraw {
     returns (
       int256 answer
     ) {
-        return 45;
+        return fixedReturnValue;
     }
 
   function latestTimestamp(
@@ -73,6 +77,22 @@ contract MockFeedRegistry is IBobaStraw {
     returns (
       uint8
     ) {
-      return 18;
+      return decimalsOverride;
+    }
+
+    function updateFixedRetunValue(
+      int256 newValue
+    )
+     external
+    {
+        fixedReturnValue = newValue;
+    }
+
+    function updateDecimals(
+      uint8 newDecimals
+    )
+     external
+    {
+        decimalsOverride = newDecimals;
     }
 }

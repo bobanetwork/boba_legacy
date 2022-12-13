@@ -258,6 +258,7 @@ describe('AsyncDepositPaymaster', () => {
   })
   describe('getTokenValueOfEth', () => {
     let asyncDepositPaymaster: TestTokenValueAsyncDepositPaymaster
+    let tokenAlt: TestToken
     before(async () => {
       asyncDepositPaymaster = await new TestTokenValueAsyncDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
       // add boba token
@@ -268,6 +269,90 @@ describe('AsyncDepositPaymaster', () => {
       const requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
       // oracle returns 1:1 conversion
       expect(requiredTokens).to.be.eq(ethBoughtAmount.mul(10 ** priceRatioDecimals / priceRatio))
+    })
+    it('should return correct conversion on different priceRatio values', async () => {
+      tokenAlt = await new TestToken__factory(ethersSigner).deploy()
+      const tokenDecimals = await tokenAlt.decimals()
+      // set price ratio, example boba
+      const priceRatio = 17224478
+      const priceRatioDecimals = 11
+      const minRatio = 11000000
+      const maxRatio = 25000000
+      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 5805.69 as per the exchange value
+      expect(requiredTokens).to.be.eq('5805691179726897964629')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 2.90 as per the exchange value
+      expect(requiredTokens).to.be.eq('2902845589863448982')
+    })
+    it('should return correct conversion on different priceRatio decimals', async () => {
+      tokenAlt = await new TestToken__factory(ethersSigner).deploy()
+      const tokenDecimals = await tokenAlt.decimals()
+      // set new price ratio decimals, example boba
+      const priceRatio = 17224478000
+      const priceRatioDecimals = 14
+      const minRatio = 11000000000
+      const maxRatio = 25000000000
+      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 5805.69 as per the exchange value
+      expect(requiredTokens).to.be.eq('5805691179726897964629')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 2.90 as per the exchange value
+      expect(requiredTokens).to.be.eq('2902845589863448982')
+    })
+    it('should return correct conversion on different token decimals', async () => {
+      tokenAlt = await new TestToken__factory(ethersSigner).deploy()
+      // set price ratio, example usdc
+      // adjust decimals
+      await tokenAlt.setDecimals(6)
+      const tokenDecimals = await tokenAlt.decimals()
+      const priceRatio = 79696833
+      const priceRatioDecimals = 11
+      const minRatio = 11000000
+      const maxRatio = 250000000
+      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 1254.75 as per the exchange value
+      expect(requiredTokens).to.be.eq('1254755003')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 0.62 as per the exchange value
+      expect(requiredTokens).to.be.eq('627377')
+    })
+    it('should return correct conversion on different priceRatio and token decimals', async () => {
+      tokenAlt = await new TestToken__factory(ethersSigner).deploy()
+      // set price ratio, example usdc
+      // adjust decimals
+      await tokenAlt.setDecimals(6)
+      const tokenDecimals = await tokenAlt.decimals()
+      const priceRatio = 79696833000
+      const priceRatioDecimals = 14
+      const minRatio = 11000000000
+      const maxRatio = 250000000000
+      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 1254.75 as per the exchange value
+      expect(requiredTokens).to.be.eq('1254755003')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 0.62 as per the exchange value
+      expect(requiredTokens).to.be.eq('627377')
     })
   })
 })

@@ -228,16 +228,102 @@ describe('BobaDepositPaymaster', () => {
   })
   describe('getTokenValueOfEth', () => {
     let bobaDepositPaymaster: TestTokenValueBobaDepositPaymaster
+    let testEthOracle: MockFeedRegistry
+    let testTokenOracle: MockFeedRegistry
+    let tokenAlt: TestToken
     before(async () => {
-      bobaDepositPaymaster = await new TestTokenValueBobaDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, ethOracle.address)
+      testEthOracle = await new MockFeedRegistry__factory(ethersSigner).deploy()
+      testTokenOracle = await new MockFeedRegistry__factory(ethersSigner).deploy()
+
+      bobaDepositPaymaster = await new TestTokenValueBobaDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, testEthOracle.address)
       // add boba token
-      await bobaDepositPaymaster.addToken(token.address, ethOracle.address, token.address, 18)
+      await bobaDepositPaymaster.addToken(token.address, testTokenOracle.address, token.address, 18)
     })
     it('should return correct conversion', async () => {
       const ethBoughtAmount = ethers.utils.parseEther('1')
       const requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
       // oracle returns 1:1 conversion
       expect(requiredTokens).to.be.eq(ethBoughtAmount)
+    })
+    it('should return correct conversion on different values', async () => {
+      // set eth price
+      await testEthOracle.updateFixedRetunValue(125475500000)
+      // set token price
+      // example boba
+      await testTokenOracle.updateFixedRetunValue(21612500)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      // required Tokens should be approx. 5805.69 as per the exchange value
+      expect(requiredTokens).to.be.eq('5805691150954308849045')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      // required Tokens should be approx. 2.90 as per the exchange value
+      expect(requiredTokens).to.be.eq('2902845575477154424')
+    })
+    it('should return correct conversion on different token decimals', async () => {
+      tokenAlt = await new TestToken__factory(ethersSigner).deploy()
+      await tokenAlt.setDecimals(6)
+
+      await bobaDepositPaymaster.addToken(tokenAlt.address, testTokenOracle.address, tokenAlt.address, 6)
+      // set eth price
+      await testEthOracle.updateFixedRetunValue(125475500000)
+      // set token price
+      // example usdc, adjust decimals
+      await testTokenOracle.updateFixedRetunValue(100000000)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 1254.75 as per the exchange value
+      expect(requiredTokens).to.be.eq('1254755000')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 0.62 as per the exchange value
+      expect(requiredTokens).to.be.eq('627377')
+    })
+    it('should return correct conversion on different price oracle decimals', async () => {
+      // set eth price
+      await testEthOracle.updateFixedRetunValue(125475500000)
+      // set token price
+      // example boba
+      await testTokenOracle.updateDecimals(6)
+      // decimal 6
+      await testTokenOracle.updateFixedRetunValue(216125)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      // required Tokens should be approx. 5805.69 as per the exchange value
+      expect(requiredTokens).to.be.eq('5805691150954308849045')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      // required Tokens should be approx. 2.90 as per the exchange value
+      expect(requiredTokens).to.be.eq('2902845575477154424')
+
+      await testTokenOracle.updateDecimals(8)
+    })
+    it('should return correct conversion on different token and price oracle decimals', async () => {
+      tokenAlt = await new TestToken__factory(ethersSigner).deploy()
+      await tokenAlt.setDecimals(6)
+      await testTokenOracle.updateDecimals(6)
+      await bobaDepositPaymaster.addToken(tokenAlt.address, testTokenOracle.address, tokenAlt.address, 6)
+      // set eth price
+      await testEthOracle.updateFixedRetunValue(125475500000)
+      // set token price
+      // example usdc, adjust priceOracle decimals to 6
+      await testTokenOracle.updateFixedRetunValue(1000000)
+
+      let ethBoughtAmount = ethers.utils.parseEther('1')
+      let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 1254.75 as per the exchange value
+      expect(requiredTokens).to.be.eq('1254755000')
+
+      ethBoughtAmount = ethers.utils.parseEther('0.0005')
+      requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      // required Tokens should be approx. 0.62 as per the exchange value
+      expect(requiredTokens).to.be.eq('627377')
     })
   })
 })
