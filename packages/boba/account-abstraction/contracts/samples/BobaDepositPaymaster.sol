@@ -138,6 +138,7 @@ contract BobaDepositPaymaster is BasePaymaster {
         uint256 ethPriceDecimals = uint256(oracles[L2_ETH].feedRegistry.decimals(oracles[L2_ETH].tokenBase, QUOTE_USD));
         uint256 tokenPriceDecimals = uint256(oracleInfo.feedRegistry.decimals(base, QUOTE_USD));
         uint256 requiredAmount = (ethBought * ethPrice * (10**tokenPriceDecimals)) / (tokenPrice * (10**ethPriceDecimals));
+        // there is no requiredAmount = 0 check, priceRatio from oracle shouldnt exceed ethBought
         return ((requiredAmount * (10**oracleInfo.tokenDecimals)) / (10**oracles[L2_ETH].tokenDecimals));
     }
 

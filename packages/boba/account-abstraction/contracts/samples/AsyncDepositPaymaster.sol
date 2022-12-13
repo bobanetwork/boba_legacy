@@ -125,6 +125,7 @@ contract AsyncDepositPaymaster is BasePaymaster {
     function getTokenValueOfEth(IERC20 token, uint256 ethBought) internal view virtual returns (uint256 requiredTokens) {
         require(priceRatioInfo[token].token != IERC20(address(0)), "DepositPaymaster: unsupported token");
         uint256 requiredAmount = (ethBought * (10**priceRatioInfo[token].priceRatioDecimals)) / priceRatioInfo[token].priceRatio;
+        // there is no requiredAmount = 0 check, priceRatio set by owner and shouldn't exceed ethBought
         return (requiredAmount / (10**(18 - priceRatioInfo[token].tokenDecimals)));
     }
 
