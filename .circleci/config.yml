@@ -144,6 +144,7 @@ jobs:
           command: yarn depcheck
           working_directory: ./packages/boba/bundler
   integration-tests:
+    resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
