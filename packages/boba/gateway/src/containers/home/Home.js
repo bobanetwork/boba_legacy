@@ -144,22 +144,18 @@ function Home() {
 
   // calls only on boot
   useEffect(() => {
-    window.scrollTo(0, 0)
 
     if (maintenance) return
 
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
-      console.log("Calling initializeBase for", network)
       const initialized = await networkService.initializeBase( network )
       if (!initialized) {
-        console.log("Failed to boot L1 and L2 base providers for", network)
         dispatch(setBaseState(false))
         return false
       }
       if (initialized === 'enabled') {
-        console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
         // load DAO to speed up the process
         dispatch(fetchDaoProposals())
