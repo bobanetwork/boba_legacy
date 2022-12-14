@@ -1,6 +1,15 @@
 # Gateway
 gateway.boba.betwork.
 
+## To Run the app in dev mode.
+`yarn start`
+
+## To run the unit tests
+`yarn test`
+
+## To prepare the snapshots
+`yarn snapshots`
+
 # Environment variables listed to below to get the app running
 
 | Environment Vars             | Required | Default Valu | Description                                                     |
