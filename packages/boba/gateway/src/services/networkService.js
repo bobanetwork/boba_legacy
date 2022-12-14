@@ -93,7 +93,7 @@ import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import { sortRawTokens } from 'util/common'
-import GraphQLService from "./graphQLService"
+import GraphQLService from "./graphQL.Service"
 
 import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
@@ -107,6 +107,7 @@ import { bobaBridges } from 'util/bobaBridges'
 import { APP_CHAIN, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { getNetworkDetail, NETWORK } from 'util/network/network.util'
+import appService from './app.service'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -170,8 +171,7 @@ class NetworkService {
     this.L1orL2 = null
     this.networkGateway = null
     this.networkType = null
-    this.L1ProviderBASE = null
-    this.L2ProviderBASE = null
+
 
     // Watcher
     this.watcher = null
@@ -511,19 +511,7 @@ class NetworkService {
       networkType
     })
 
-    const L1rpc = networkDetail['L1']['rpcUrl']
-    const L2rpc = networkDetail['L2']['rpcUrl']
-
     try {
-
-      //fire up the base providers
-      const Web3 = require("web3")
-
-      this.L1ProviderBASE = new Web3(new Web3.providers.HttpProvider(L1rpc))
-      this.L2ProviderBASE = new Web3(new Web3.providers.HttpProvider(L2rpc))
-
-      //this.L1ProviderBASE.eth.handleRevert = true
-      //this.L2ProviderBASE.eth.handleRevert = true
 
       if (NETWORK[networkGateway]) {
         this.payloadForL1SecurityFee = networkDetail.payloadForL1SecurityFee
@@ -540,11 +528,15 @@ class NetworkService {
         networkDetail['L2']['rpcUrl']
       )
 
+      // get the tokens based on l1ChainId
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
 
-      if (!!NETWORK[networkGateway]) {
-        addresses = allAddresses
+      if (!!NETWORK[ networkGateway ]) {
+        addresses = appService.fetchAddresses({
+          network: networkGateway,
+          networkType
+        });
       }
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
@@ -562,41 +554,9 @@ class NetworkService {
       if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
-      //if (!(await this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee'))) return
 
       // not critical
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
-      console.log("DiscretionaryExitFee:",allAddresses.DiscretionaryExitFee)
-
-      //L2CrossDomainMessenger is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2MessengerAddress': L2MessengerAddress,
-      }
-
-      //L2StandardBridgeAddress is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2StandardBridgeAddress': L2StandardBridgeAddress,
-      }
-
-      //L2MessengerAddress is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2MessengerAddress': L2MessengerAddress
-      }
-
-      //L2_ETH_Address is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L2_ETH_Address': L2_ETH_Address
-      }
-
-      //L1_ETH_Address is a predeploy, so add by hand....
-      allAddresses = {
-        ...allAddresses,
-        'L1_ETH_Address': L1_ETH_Address
-      }
 
       this.L1StandardBridgeContract = new ethers.Contract(
         allAddresses.L1StandardBridgeAddress,
