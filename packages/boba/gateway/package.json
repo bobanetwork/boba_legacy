@@ -3,17 +3,20 @@
   "version": "0.0.3",
   "private": true,
   "scripts": {
+    "audit-check": "audit-ci --moderate",
+    "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_ENV=dev react-scripts build",
+    "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build",
     "buildenv-dev": "react-env",
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
+    "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://boba-gateway-goerli --recursive && aws s3 sync build s3://boba-gateway-goerli && aws s3 cp s3://boba-gateway-goerli/index.html s3://boba-gateway-goerli/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
+    "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
+    "postinstall": "patch-package",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
     "start": "npm run buildenv-dev && react-scripts start",
-    "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build",
-    "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_ENV=dev react-scripts build",
-    "audit-check": "audit-ci --moderate",
-    "postinstall": "patch-package",
-    "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
-    "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://boba-gateway-goerli --recursive && aws s3 sync build s3://boba-gateway-goerli && aws s3 cp s3://boba-gateway-goerli/index.html s3://boba-gateway-goerli/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
+    "test": "node_modules/.bin/jest",
+    "test:watch": "node_modules/.bin/jest --watchAll",
+    "snapshots": "node_modules/.bin/jest -u"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -26,8 +29,8 @@
     "@mui/icons-material": "^5.3.1",
     "@mui/material": "^5.4.0",
     "@mui/styles": "^5.3.0",
-    "@sentry/react": "^7.12.1",
-    "@sentry/tracing": "^7.12.1",
+    "@sentry/react": "^7.26.0",
+    "@sentry/tracing": "^7.26.0",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "axios": "^0.21.1",
@@ -80,7 +83,19 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.20.5",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
     "@beam-australia/react-env": "2.1.2",
-    "audit-ci": "^3.1.1"
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "12.1.5",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.4.3",
+    "audit-ci": "^3.1.1",
+    "babel-jest": "^29.3.1",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.3.1",
+    "jest-environment-jsdom": "^29.3.1",
+    "redux-mock-store": "^1.5.4"
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import * as S from './PageHeader.styles'
-import { ReactComponent as BobaLogo } from '../../images/boba2/logo-boba2.svg'
-import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
+import BobaLogo from 'components/icons/BobaLogo';
+import BobaLogoM from 'components/icons/BobaLogoM';
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
