@@ -54,6 +54,7 @@ ops_boba/api/watcher-api/.serverless
 
 # gateway
 packages/boba/gateway/build
+packages/boba/gateway/coverage
 packages/boba/gateway/public/env.js
 
 # subgraph
