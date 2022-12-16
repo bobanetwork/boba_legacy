@@ -8,6 +8,7 @@
     "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build",
     "buildenv-dev": "react-env",
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
+    "clean": "rm -rf ./build ./coverage",
     "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://boba-gateway-goerli --recursive && aws s3 sync build s3://boba-gateway-goerli && aws s3 cp s3://boba-gateway-goerli/index.html s3://boba-gateway-goerli/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
