@@ -224,6 +224,7 @@ class NetworkService {
 
     // support token
     this.supportedTokens = []
+    this.supportedTokenAddresses = {}
 
     // support alt l1 tokens
     this.supportedAltL1Chains = supportedAltL1Chains
@@ -497,27 +498,26 @@ class NetworkService {
   }
 
   async initializeBase({
-    networkGateway,
+    networkGateway: network,
     networkType
   }) {
 
     let addresses = null
-    this.networkGateway = networkGateway // e.g. mainnet | goerli | ...
+    this.networkGateway = network // e.g. mainnet | goerli | ...
     this.networkType = networkType // e.g. mainnet | goerli | ...
 
     // defines the set of possible networks along with chainId for L1 and L2
     const networkDetail = getNetworkDetail({
-      network: networkGateway,
+      network,
       networkType
     })
 
     try {
 
-      if (NETWORK[networkGateway]) {
+      if (NETWORK[network]) {
         this.payloadForL1SecurityFee = networkDetail.payloadForL1SecurityFee
         this.payloadForFastDepositBatchCost = networkDetail.payloadForFastDepositBatchCost
         this.gasEstimateAccount = networkDetail.gasEstimateAccount
-        console.log('gasEstimateAccount:', this.gasEstimateAccount)
       }
 
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
@@ -532,9 +532,9 @@ class NetworkService {
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
 
-      if (!!NETWORK[ networkGateway ]) {
+      if (!!NETWORK[ network ]) {
         addresses = appService.fetchAddresses({
-          network: networkGateway,
+          network,
           networkType
         });
       }
@@ -549,11 +549,12 @@ class NetworkService {
       // )
       // //console.log("AddressManager Contract:",this.AddressManager)
 
+
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
+      // if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
 
       // not critical
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
@@ -564,103 +565,48 @@ class NetworkService {
         this.L1Provider
       )
 
-      this.supportedTokens = [ 'USDT',   'DAI', 'USDC',  'WBTC',
-                               'REP',    'BAT',  'ZRX', 'SUSHI',
-                               'LINK',   'UNI', 'BOBA', 'xBOBA',
-                               'OMG',   'FRAX',  'FXS',  'DODO',
-                               'UST',   'BUSD',  'BNB',   'FTM',
-                               'MATIC',  'UMA',  'DOM',   'OLO',
-                               'WAGMIv0',
-                               'WAGMIv1',
-                               'WAGMIv2', 'WAGMIv2-Oolong',
-                               'WAGMIv3', 'WAGMIv3-Oolong',
-                               'CGT'
-                              ]
+      // fech suported assets eg. tokens and address.
+      const tokenAsset = appService.fetchSupportedAssets({
+        network,
+        networkType
+      })
 
-      //not all tokens are on Goerli
-      if ( networkGateway === 'goerli') {
-        this.supportedTokens = [ 'BOBA', 'USDC', 'OMG', 'xBOBA' ]
-      }
+      this.supportedTokens = tokenAsset.tokens;
+      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
+      const tokenList = {}
 
-      await Promise.all(this.supportedTokens.map(async (key) => {
+      this.supportedTokens.forEach((key) => {
+        const L1a = addresses[ 'TK_L1' + key ]
+        const L2a = addresses[ 'TK_L2' + key ]
 
-        const L2a = addresses['TK_L2'+key]
-
-        if(key === 'xBOBA') {
+        if (key === 'xBOBA') {
           if (L2a === ERROR_ADDRESS) {
-            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
             return false
           } else {
-            allTokens[key] = {
+            tokenList[ key ] = {
               'L1': 'xBOBA',
               'L2': L2a
             }
           }
         }
-        else if(key === 'WAGMIv0') {
-          allTokens[key] = {
-            'L1': 'WAGMIv0',
-            'L2': '0x8493C4d9Cd1a79be0523791E3331c78Abb3f9672'
-          }
-        }
-        else if(key === 'WAGMIv1') {
-          allTokens[key] = {
-            'L1': 'WAGMIv1',
-            'L2': '0xCe055Ea4f29fFB8bf35E852522B96aB67Cbe8197'
-          }
-        }
-        else if(key === 'WAGMIv2') {
-          allTokens[key] = {
-            'L1': 'WAGMIv2',
-            'L2': '0x76B5908ecd0ae3DB23011ae96b7C1f803D63136c'
-          }
-        }
-        else if(key === 'WAGMIv2-Oolong') {
-          allTokens[key] = {
-            'L1': 'WAGMIv2-Oolong',
-            'L2': '0x49a3e4a1284829160f95eE785a1A5FfE2DD5Eb1D'
-          }
-        }
-        else if(key === 'WAGMIv3') {
-          allTokens[key] = {
-            'L1': 'WAGMIv3',
-            'L2': '0xC6158B1989f89977bcc3150fC1F2eB2260F6cabE'
-          }
-        }
-        else if(key === 'WAGMIv3-Oolong') {
-          allTokens[key] = {
-            'L1': 'WAGMIv3-Oolong',
-            'L2': '0x70bf3c5B5d80C4Fece8Bde0fCe7ef38B688463d4'
-          }
-        }
-        else if(key === 'OLO') {
-          allTokens[key] = {
-            'L1': 'OLO',
-            'L2': '0x5008F837883EA9a07271a1b5eB0658404F5a9610'
-          }
-        }
-        else if(key === 'CGT') {
-          allTokens[key] = {
-            'L1': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a',
-            'L2': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a'
-          }
-        }
-        else {
-          const L1a = addresses['TK_L1'+key]
-          if (L1a === ERROR_ADDRESS || L2a === ERROR_ADDRESS) {
-            console.log(key + ' ERROR: TOKEN NOT IN ADDRESSMANAGER')
-            return false
-          } else {
-            allTokens[key] = {
-              'L1': L1a,
-              'L2': L2a
-            }
-          }
-        }
 
-      }))
+        // NOTE: if not in address manager then refer it from token assets config.
+        if (typeof L1a === 'undefined' || typeof L2a === 'undefined') {
+          console.log(`ERROR: ${key} not addressmanager`)
+          if (typeof this.supportedTokenAddresses[key] !== 'undefined') {
+            tokenList[key] = this.supportedTokenAddresses[key]
+          }
+          return false
+        } else {
+          tokenList[key] = {
+            'L1': L1a,
+            'L2': L2a
+          }
+        }
+      })
 
-      this.tokenAddresses = allTokens
+      this.tokenAddresses = tokenList
+      allTokens = tokenList;
 
       if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
 
@@ -721,34 +667,20 @@ class NetworkService {
         this.L2Provider
       )
 
-      if(networkGateway === 'mainnet') {
+      if (NETWORK[ network ]) {
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 1,
+          chainId,
           fastRelayer: false,
         })
         this.fastWatcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 1,
+          chainId,
           fastRelayer: true,
         })
-      } else if (networkGateway === 'goerli') {
-        this.watcher = new CrossChainMessenger({
-          l1SignerOrProvider: this.L1Provider,
-          l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 5,
-          fastRelayer: false,
-        })
-        this.fastWatcher = new CrossChainMessenger({
-          l1SignerOrProvider: this.L1Provider,
-          l2SignerOrProvider: this.L2Provider,
-          l1ChainId: 5,
-          fastRelayer: true,
-        })
-      }
-      else {
+      } else {
         this.watcher = null
         this.fastWatcher = null
       }
@@ -815,12 +747,16 @@ class NetworkService {
       this.networkGateway = networkGateway
       this.networkType = networkType
 
-      console.log('NS: networkMM:', networkMM)
-      console.log('NS: networkGateway:', networkGateway)
-      console.log('NS: networkType:', networkType)
-      console.log('NS: this.chainID from MM:', this.chainID)
-      console.log('NS: this.networkName from MM:', this.networkName)
-      console.log('NS: this.account from MM:', this.account)
+      console.table({
+        type: 'MM',
+        network: networkMM,
+        networkGateway,
+        networkType,
+        chainID: this.chainID,
+        account: this.account,
+        networkName: this.networkName,
+      })
+
 
       // defines the set of possible networks along with chainId for L1 and L2
       // const nw = getNetwork()
