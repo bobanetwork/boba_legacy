@@ -91,11 +91,7 @@ contract L1StandardBridge is IL1StandardBridge, CrossDomainEnabled {
     /**
      * @inheritdoc IL1StandardBridge
      */
-    function depositETHTo(
-        address _to,
-        uint32 _l2Gas,
-        bytes calldata _data
-    ) external payable {
+    function depositETHTo(address _to, uint32 _l2Gas, bytes calldata _data) external payable {
         _initiateETHDeposit(msg.sender, _to, _l2Gas, _data);
     }
 

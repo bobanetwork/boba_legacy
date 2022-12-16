@@ -173,14 +173,14 @@ describe('xBOBA Test', async () => {
     )
   })
 
-  it('{tag:boba} Should pause the xBoba', async () => {
+  it('Should pause the xBoba', async () => {
     const payload = await xBoba.populateTransaction.pause()
     const pauseTx = await xBobaHelper.connect(env.l2Wallet).call(payload.data)
     await pauseTx.wait()
 
     const pauseStatus = await xBoba.paused()
     expect(pauseStatus).to.equal(true)
-  })
+  }).retries(3)
 
   it('{tag:boba} Should delete the controller', async () => {
     const deleteTx = await xBoba.deleteController(xBobaHelper.address)

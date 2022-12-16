@@ -36,7 +36,7 @@
     "eslint-config-react-app": "^7.0.0",
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-util": "^7.0.5",
-    "ethers": "^5.0.32",
+    "ethers": "^5.5.4",
     "html-react-parser": "^1.4.0",
     "human-standard-token-abi": "^2.0.0",
     "json5": "^2.1.2",

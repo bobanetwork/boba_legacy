@@ -165,11 +165,7 @@ contract L1CrossDomainMessengerFast is
      * @param _message Message to send to the target.
      * @param _gasLimit Gas limit for the provided message.
      */
-    function sendMessage(
-        address _target,
-        bytes memory _message,
-        uint32 _gasLimit
-    ) public override {
+    function sendMessage(address _target, bytes memory _message, uint32 _gasLimit) public override {
         revert("sendMessage via L1CrossDomainMessengerFast is disabled");
     }
 
@@ -289,11 +285,9 @@ contract L1CrossDomainMessengerFast is
      * @param _proof Message inclusion proof.
      * @return Whether or not the provided proof is valid.
      */
-    function _verifyStateRootProof(L2MessageInclusionProof memory _proof)
-        internal
-        view
-        returns (bool)
-    {
+    function _verifyStateRootProof(
+        L2MessageInclusionProof memory _proof
+    ) internal view returns (bool) {
         IStateCommitmentChain ovmStateCommitmentChain = IStateCommitmentChain(
             resolve("StateCommitmentChain")
         );
@@ -353,9 +347,10 @@ contract L1CrossDomainMessengerFast is
             );
     }
 
-    function _verifyDepositHashes(bytes32 _standardBridgeDepositHash, bytes32 _lpDepositHash)
-        internal
-    {
+    function _verifyDepositHashes(
+        bytes32 _standardBridgeDepositHash,
+        bytes32 _lpDepositHash
+    ) internal {
         // fetch address of standard bridge and LP1
         address standardBridge = resolve("Proxy__L1StandardBridge");
         address L1LP = resolve("Proxy__L1LiquidityPool");
