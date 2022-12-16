@@ -33,12 +33,14 @@ import { selectlayer2Balance } from 'selectors/balanceSelector'
 import PageTitle from 'components/pageTitle/PageTitle'
 import { isEqual } from 'lodash'
 
-import { DEFAULT_NETWORK, POLL_INTERVAL } from "util/constant"
+import { DEFAULT_NETWORK, LAYER, POLL_INTERVAL } from "util/constant"
 import useInterval from "hooks/useInterval"
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
-import { selectActiveNetworkName } from "selectors/networkSelector"
+import { selectActiveNetwork, selectActiveNetworkName } from "selectors/networkSelector"
+import networkService from "services/networkService"
+import { NETWORK } from "util/network/network.util"
 
 function Wallet() {
 
@@ -48,38 +50,40 @@ function Wallet() {
   const [ tooSmallBOBA, setTooSmallBOBA ] = useState(false)
 
   const dispatch = useDispatch()
-
+  const network = useSelector(selectActiveNetwork())
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const networkName = useSelector(selectActiveNetworkName())
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  useEffect(()=>{
+  useEffect(() => {
     if (accountEnabled)
       dispatch(fetchTransactions())
-  },[ dispatch, accountEnabled ])
+  }, [ dispatch, accountEnabled ])
 
-  useEffect(()=>{
-    if (accountEnabled && l2Balances.length > 0)  {
+  useEffect(() => {
+    if (accountEnabled && l2Balances.length > 0) {
 
-      const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
+      const l2BalanceETH = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
 
       if (l2BalanceETH && l2BalanceETH.balance) {
+        // FOR ETH MIN BALANCE 0.003ETH
         setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
       } else {
         // in case of zero ETH balance we are setting tooSmallETH
         setTooSmallETH(true)
       }
       if (l2BalanceBOBA && l2BalanceBOBA.balance) {
+        // FOR BOBA 1
         setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
       } else {
         // in case of zero BOBA balance we are setting tooSmallBOBA
         setTooSmallBOBA(true)
       }
     }
-  },[ l2Balances, accountEnabled ])
+  }, [ l2Balances, accountEnabled ])
 
   useEffect(() => {
     if (layer === 'L2') {
@@ -87,7 +91,7 @@ function Wallet() {
         dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
       }
     }
-  },[tooSmallETH, tooSmallBOBA, layer, dispatch])
+  }, [ tooSmallETH, tooSmallBOBA, layer, dispatch ])
 
   useInterval(() => {
     if (accountEnabled) {
@@ -96,9 +100,9 @@ function Wallet() {
   }, POLL_INTERVAL)
 
   useEffect(() => {
-    if (layer === 'L2') {
+    if (layer === LAYER.L2) {
       setChain('Boba Wallet')
-    } else if (layer === 'L1') {
+    } else if (layer === LAYER.L1) {
       setChain('Ethereum Wallet')
     }
   }, [ layer ])
@@ -111,7 +115,7 @@ function Wallet() {
     }
   }
 
-  async function emergencySwap () {
+  async function emergencySwap() {
     const res = await dispatch(getETHMetaTransaction())
     if (res) dispatch(openAlert('Emergency Swap submitted'))
   }
@@ -127,9 +131,9 @@ function Wallet() {
       />
 
       {layer === 'L2' && tooSmallETH &&
-        <G.LayerAlert style={{padding: '20px'}}>
+        <G.LayerAlert style={{ padding: '20px' }}>
           <G.AlertInfo>
-            <Icon as={Info} sx={{color:"#BAE21A"}}/>
+            <Icon as={Info} sx={{ color: "#BAE21A" }} />
             <Typography
               flex={4}
               variant="body2"
@@ -143,7 +147,7 @@ function Wallet() {
             </Typography>
           </G.AlertInfo>
           <Button
-            onClick={()=>{emergencySwap()}}
+            onClick={() => { emergencySwap() }}
             color='primary'
             variant='outlined'
           >
@@ -163,7 +167,7 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            {networkName['l1'] || DEFAULT_NETWORK.NAME.L1} Wallet
+            {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1} Wallet
           </Typography>
           <Typography
             className={chain === 'Boba Wallet' ? 'active' : ''}
@@ -174,20 +178,26 @@ function Wallet() {
             }}
             variant="body2"
             component="span">
-            {networkName['l2'] || DEFAULT_NETWORK.NAME.L2} Wallet
+            {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2} Wallet
           </Typography>
         </G.PageSwitcher>
       </S.WalletActionContainer>
 
-      <Box sx={{ mt: 2 }}>
-        <Tabs
-          activeTab={page}
-          onClick={(t) => handleSwitch(t)}
-          aria-label="Page Tab"
-          tabs={[ "Token", "NFT" ]}
-        />
-      </Box>
-      {page === 'Token' ? <Token /> : <Nft />}
+      {
+        network === NETWORK.ETHEREUM ?
+          <>
+            <Box sx={{ mt: 2 }}>
+              <Tabs
+                activeTab={page}
+                onClick={(t) => handleSwitch(t)}
+                aria-label="Page Tab"
+                tabs={[ "Token", "NFT" ]}
+              />
+            </Box>
+            {page === 'Token' ? <Token /> : <Nft />}
+          </>
+          : <Token />
+      }
     </S.PageContainer>
   )
 }

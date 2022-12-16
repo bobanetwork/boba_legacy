@@ -528,6 +528,9 @@ class NetworkService {
         networkDetail['L2']['rpcUrl']
       )
 
+      this.L1NativeTokenSymbol = networkDetail['L1']['symbol']
+      this.L1NativeTokenName = networkDetail['L1']['tokenName'] || this.L1NativeTokenSymbol
+
       // get the tokens based on l1ChainId
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
@@ -549,12 +552,18 @@ class NetworkService {
       // )
       // //console.log("AddressManager Contract:",this.AddressManager)
 
+      if (network === NETWORK.ETHEREUM) {
+        // check only if selected network is ETHEREUM
+        if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
+        if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
+        if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
+        if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+      }
 
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
       if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
-      // if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
 
       // not critical
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
@@ -608,21 +617,16 @@ class NetworkService {
       this.tokenAddresses = tokenList
       allTokens = tokenList;
 
-      if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
-
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
-
-      if(allAddresses.L2StandardBridgeAddress !== null) {
+      if(addresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
-          allAddresses.L2StandardBridgeAddress,
+          addresses.L2StandardBridgeAddress,
           L2StandardBridgeJson.abi,
           this.L2Provider
         )
       }
 
       this.L2_ETH_Contract = new ethers.Contract(
-        allAddresses.L2_ETH_Address,
+        addresses.L2_ETH_Address,
         L2ERC20Json.abi,
         this.L2Provider
       )
@@ -645,29 +649,30 @@ class NetworkService {
 
       /*The OMG token*/
       //We need this seperately because OMG is not ERC20 compliant
-      this.L1_OMG_Contract = new ethers.Contract(
+      /* this.L1_OMG_Contract = new ethers.Contract(
         allTokens.OMG.L1,
         OMGJson,
         this.L1Provider
-      )
+      ) */
       //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
-      console.log('Setting up contract for L1LP at:',allAddresses.L1LPAddress)
+      console.log('Setting up contract for L1LP at:',addresses.L1LPAddress)
       this.L1LPContract = new ethers.Contract(
-        allAddresses.L1LPAddress,
+        addresses.L1LPAddress,
         L1LPJson.abi,
         this.L1Provider
       )
 
-      console.log('Setting up contract for L2LP at:',allAddresses.L2LPAddress)
+      console.log('Setting up contract for L2LP at:',addresses.L2LPAddress)
       this.L2LPContract = new ethers.Contract(
-        allAddresses.L2LPAddress,
+        addresses.L2LPAddress,
         L2LPJson.abi,
         this.L2Provider
       )
 
-      if (NETWORK[ network ]) {
+      /* if (NETWORK[ network ]) {
+        console.log(['chainId',chainId])
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
@@ -683,7 +688,7 @@ class NetworkService {
       } else {
         this.watcher = null
         this.fastWatcher = null
-      }
+      } */
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
@@ -691,32 +696,34 @@ class NetworkService {
         this.L2Provider
       )
 
-      this.xBobaContract = new ethers.Contract(
-        allTokens.xBOBA.L2,
-        Boba.abi,
-        this.L2Provider
-      )
+      if (NETWORK.ETHEREUM === network) {
+        this.xBobaContract = new ethers.Contract(
+          allTokens.xBOBA.L2,
+          Boba.abi,
+          this.L2Provider
+        )
 
-      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-      if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
 
-      this.delegateContract = new ethers.Contract(
-        allAddresses.GovernorBravoDelegate,
-        GovernorBravoDelegate.abi,
-        this.L2Provider
-      )
+        this.delegateContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegate,
+          GovernorBravoDelegate.abi,
+          this.L2Provider
+        )
 
-      this.delegatorContract = new ethers.Contract(
-        allAddresses.GovernorBravoDelegator,
-        GovernorBravoDelegator.abi,
-        this.L2Provider
-      )
+        this.delegatorContract = new ethers.Contract(
+          allAddresses.GovernorBravoDelegator,
+          GovernorBravoDelegator.abi,
+          this.L2Provider
+        )
 
-      this.delegatorContractV2 = new ethers.Contract(
-        allAddresses.GovernorBravoDelegatorV2,
-        GovernorBravoDelegator.abi,
-        this.L2Provider
-      )
+        this.delegatorContractV2 = new ethers.Contract(
+          allAddresses.GovernorBravoDelegatorV2,
+          GovernorBravoDelegator.abi,
+          this.L2Provider
+        )
+      }
 
       this.gasOracleContract = new ethers.Contract(
         L2GasOracle,
@@ -1259,9 +1266,9 @@ class NetworkService {
     const layer1Balances = [
       {
         address: allAddresses.L1_ETH_Address,
-        addressL2: allAddresses.L2_ETH_Address,
+        addressL2: allAddresses["TK_L2" + networkService.L1NativeTokenSymbol],
         currency: allAddresses.L1_ETH_Address,
-        symbol: 'ETH',
+        symbol: networkService.L1NativeTokenSymbol,
         decimals: 18,
         balance: new BN(0),
       },
@@ -1270,9 +1277,9 @@ class NetworkService {
     const layer2Balances = [
       {
         address: allAddresses.L2_ETH_Address,
-        addressL1: allAddresses.L1_ETH_Address,
+        addressL1: allAddresses.TK_L1BOBA,
         addressL2: allAddresses.L2_ETH_Address,
-        currency: allAddresses.L1_ETH_Address,
+        currency: allAddresses.TK_L1BOBA,
         symbol: 'ETH',
         decimals: 18,
         balance: new BN(0),
