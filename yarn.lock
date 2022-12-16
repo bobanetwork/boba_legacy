@@ -5156,7 +5156,7 @@
     lru_map "^0.3.3"
     tslib "^1.9.3"
 
-"@sentry/react@^7.27.0":
+"@sentry/react@^7.12.1":
   version "7.27.0"
   resolved "https://registry.yarnpkg.com/@sentry/react/-/react-7.27.0.tgz#6a0708344164b33aa84e9df23cee31b5d60b7656"
   integrity sha512-KApZkkfMAC49L6j3mI7e+ZGig/Alo6lwGZWrAOIGXhdj77+msKWueL58YJDdpffm/EqIblc/8ZY9KG4b6Mkcgg==
@@ -5198,7 +5198,7 @@
     "@sentry/utils" "6.19.7"
     tslib "^1.9.3"
 
-"@sentry/tracing@^7.27.0":
+"@sentry/tracing@^7.12.1":
   version "7.27.0"
   resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-7.27.0.tgz#455a032c6ccf9bc8e27905dc8e624e6e2f45737b"
   integrity sha512-lxAiGAajbZgZkaViwYuxavbu/c8JUp56XOYzSAi7Km9jGnTFLNF4JCoyG0INy7lXipFJiWSd0Xq3aej0Lb+Cvg==
