@@ -82,6 +82,7 @@ const TxBuilder = () => {
       setContractABI('')
       return
     }
+    setContractMethods([])
     for (const [key, value] of Object.entries(contract.interface.functions)) {
       if (value.type === 'function') {
         setContractMethods(prevState => [...prevState, {key, value}])
