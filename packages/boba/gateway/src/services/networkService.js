@@ -93,7 +93,7 @@ import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import { sortRawTokens } from 'util/common'
-import GraphQLService from "./graphQL.Service"
+import GraphQLService from "./graphQL.service"
 
 import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
@@ -232,7 +232,10 @@ class NetworkService {
     // token info
     this.tokenInfo = {}
 
+    // newly added properties to network services.
     this.addresses = {}
+    this.network = null;
+    this.networkConfig = null
   }
 
   bindProviderListeners() {
@@ -505,6 +508,7 @@ class NetworkService {
   }) {
 
     let addresses = null;
+    this.network = network; //// refer this in other services and clean up iteratively.
     this.networkGateway = network // e.g. mainnet | goerli | ...
     this.networkType = networkType // e.g. mainnet | goerli | ...
 
@@ -513,6 +517,8 @@ class NetworkService {
       network,
       networkType
     })
+
+    this.networkConfig = networkDetail;
 
     try {
 
