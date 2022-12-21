@@ -231,6 +231,8 @@ class NetworkService {
 
     // token info
     this.tokenInfo = {}
+
+    this.addresses = {}
   }
 
   bindProviderListeners() {
@@ -502,7 +504,7 @@ class NetworkService {
     networkType
   }) {
 
-    let addresses = null
+    let addresses = null;
     this.networkGateway = network // e.g. mainnet | goerli | ...
     this.networkType = networkType // e.g. mainnet | goerli | ...
 
@@ -531,6 +533,11 @@ class NetworkService {
       this.L1NativeTokenSymbol = networkDetail['L1']['symbol']
       this.L1NativeTokenName = networkDetail['L1']['tokenName'] || this.L1NativeTokenSymbol
 
+      appService.setupInitState({
+        l1Token: this.L1NativeTokenSymbol,
+        l1TokenName: this.L1NativeTokenName
+      })
+
       // get the tokens based on l1ChainId
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
@@ -541,6 +548,8 @@ class NetworkService {
           networkType
         });
       }
+
+      this.addresses = addresses
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
@@ -672,7 +681,6 @@ class NetworkService {
       )
 
       /* if (NETWORK[ network ]) {
-        console.log(['chainId',chainId])
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
@@ -819,6 +827,7 @@ class NetworkService {
 
     // connect to the wallet
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
+    console.log([ 'Switch Chain addL2Network', chainParam ]);
     let res = await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
 
     if( res === null ){
@@ -837,24 +846,17 @@ class NetworkService {
       networkType: this.networkType
     })
 
-    let blockExplorerUrls = null
-
-    //local does not have a blockexplorer
-    if( this.networkGateway !== 'local') {
-      blockExplorerUrls = [networkDetail.L2.blockExplorer.slice(0, -1)]
-    }
-
     //the chainParams are only needed for the L2s
     const chainParam = {
-      chainId: '0x' + networkDetail.L2.chainId.toString(16),
-      chainName: networkDetail.L2.name,
-      rpcUrls: [networkDetail.L2.rpcUrl],
+      chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
+      chainName: networkDetail[targetLayer].name,
+      rpcUrls: [networkDetail[targetLayer].rpcUrl],
       nativeCurrency: {
-        name: 'Ethereum',
-        symbol: 'ETH',
+        name: 'BOBA TOKEN',
+        symbol: 'BOBA',
         decimals: 18,
       },
-      blockExplorerUrls
+      blockExplorerUrls: [networkDetail[targetLayer].blockExplorer.slice(0, -1)]
     }
 
     const targetIDHex = networkDetail[targetLayer].chainIdHex
@@ -862,15 +864,17 @@ class NetworkService {
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
     try {
-      await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
 
+      await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
       window.ethereum.on('chainChanged', handleChangeChainOnce)
+
       return true
     } catch (error) {
       // 4902 = the chain has not been added to MetaMask.
       // So, lets add it
       if (error.code === 4902) {
         try {
+          console.log([ 'Switch Chain 123', chainParam, targetIDHex ]);
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
           window.ethereum.on('chainChanged', handleChangeChainOnce)
           return true
@@ -1265,9 +1269,9 @@ class NetworkService {
 
     const layer1Balances = [
       {
-        address: allAddresses.L1_ETH_Address,
-        addressL2: allAddresses["TK_L2" + networkService.L1NativeTokenSymbol],
-        currency: allAddresses.L1_ETH_Address,
+        address: this.addresses.L1_ETH_Address,
+        addressL2: this.addresses["TK_L2" + networkService.L1NativeTokenSymbol],
+        currency: this.addresses.L1_ETH_Address,
         symbol: networkService.L1NativeTokenSymbol,
         decimals: 18,
         balance: new BN(0),
@@ -1276,11 +1280,11 @@ class NetworkService {
 
     const layer2Balances = [
       {
-        address: allAddresses.L2_ETH_Address,
-        addressL1: allAddresses.TK_L1BOBA,
-        addressL2: allAddresses.L2_ETH_Address,
-        currency: allAddresses.TK_L1BOBA,
-        symbol: 'ETH',
+        address: this.addresses.L2_ETH_Address,
+        addressL1: this.addresses.TK_L1BOBA,
+        addressL2: this.addresses.L2_ETH_Address,
+        currency: this.addresses.TK_L1BOBA,
+        symbol: 'BOBA',
         decimals: 18,
         balance: new BN(0),
       },
@@ -1296,10 +1300,11 @@ class NetworkService {
       layer2Balances[0].balance = new BN(layer2Balance.toString())
 
       const state = store.getState()
-      const tA = Object.values(state.tokenList)
+      const tA = Object.values(state.tokenList);
+      console.log(['state.tokenList',state.tokenList, tA])
 
       const tokenC = new ethers.Contract(
-        allAddresses.L1_ETH_Address,
+        this.addresses.L1_ETH_Address,
         L1ERC20Json.abi,
         this.L1Provider
       )
@@ -1318,41 +1323,27 @@ class NetworkService {
       const getBalancePromise = []
 
       tA.forEach((token) => {
-        if (token.addressL1 === allAddresses.L1_ETH_Address) return
-        if (token.addressL2 === allAddresses.L2_ETH_Address) return
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
 
-        if (token.symbolL1 === 'xBOBA') {
-          //there is no L1 xBOBA
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        if (token.addressL1 === this.addresses.L1_ETH_Address) {
+          return getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
-        else if (token.symbolL1 === 'WAGMIv0') {
-          //there is no L1 WAGMIv0
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+        if (token.addressL2 === this.addresses.L2_ETH_Address) {
+          return getBalancePromise.push(getERC20Balance(token, token.addressL2, "L1", this.L2Provider))
         }
-        else if (token.symbolL1 === 'WAGMIv1') {
-          //there is no L1 WAGMIv1
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        }
-        else if (token.symbolL1 === 'WAGMIv2') {
-          //there is no L2 WAGMIv2
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        }
-        else if (token.symbolL1 === 'WAGMIv2-Oolong') {
-          //there is no L2 WAGMIv2OLO
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        }
-        else if (token.symbolL1 === 'WAGMIv3') {
-          //there is no L2 WAGMIv3
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        }
-        else if (token.symbolL1 === 'WAGMIv3-Oolong') {
-          //there is no L2 WAGMIv3OLO
-          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        }
-        else if (token.symbolL1 === 'OLO') {
-          //there is no L1 OLO
+
+        if ([
+          'xBOBA',
+          'WAGMIv0',
+          'WAGMIv1',
+          'WAGMIv2',
+          'WAGMIv2-Oolong',
+          'WAGMIv3',
+          'WAGMIv3-Oolong',
+          'OLO'
+        ].includes(token.symbolL1)) {
+          //there is no L1 xBOBA, WAGMIv0, WAGMIv1, WAGMIv2, WAGMIv2OLO, WAGMIv3, WAGMIv3OLO, OLO
           getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else {

@@ -16,6 +16,7 @@ import addresses_BobaOpera from "@boba/register/addresses/addressBobaOpera_0x4e7
 // layerzero addresses.
 import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
 import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
+import store from "store";
 
 // predeployed contracts.
 
@@ -25,8 +26,7 @@ const L2_BOBA_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
-const L2_SecondaryFeeToken_Address = '0x4200000000000000000000000000000000000023'
-
+const L2_SECONDARYFEETOKEN_ADDRESS = '0x4200000000000000000000000000000000000023'
 
 const ADDRESS_CONFIG = {
   [ NETWORK_TYPE.MAINNET ]: {
@@ -223,6 +223,33 @@ class AppService {
     network
   }) {
     return SUPPORTED_ASSETS[ networkType ][ network ] || {};
+  }
+
+
+  /**
+   * @setupInitState
+   *   setup initial state of token reducer
+   *
+  */
+
+  setupInitState({
+    l1Token,
+    l1TokenName
+  }) {
+
+    store.dispatch({
+      type: 'TOKEN/GET/SUCCESS',
+      payload: {
+        currency: L1_ETH_Address,
+        addressL1: L1_ETH_Address,
+        addressL2: L2_SECONDARYFEETOKEN_ADDRESS,
+        symbolL1: l1Token,
+        symbolL2: l1Token,
+        decimals: 18,
+        name: l1TokenName,
+        redalert: false,
+      }
+    });
   }
 
 };

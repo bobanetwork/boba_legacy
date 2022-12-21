@@ -13,8 +13,8 @@ export const moonbeamConfig = {
       blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://moonbase.moonscan.io/tx/`,
       blockExplorerUrl: `https://moonbase.moonscan.io`,
-      symbol: 'GLMR',
-      tokenName: 'GLMR',
+      symbol: 'DEV',
+      tokenName: 'DEV',
     },
     L2: {
       name: "BobaBase",
