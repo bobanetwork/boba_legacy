@@ -1,9 +1,9 @@
-service: sls-bobaopera-tn-watcher # NOTE: update this with your service name
+service: sls-bobabase-watcher # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: python3.7
-  stackName: sls-bobaopera-tn-watcher
+  stackName: sls-bobabase-watcher
   stage: prod
   region: us-east-1
 
@@ -48,7 +48,7 @@ functions:
     layers:
       - ${file(env.yml):LAYERS}
   watcher_getL2CrossDomainMessage:
-    handler: watcher_getL2CrossDomainMessage.watcher_getL2CrossDomainMessage
+    handler: watcher_getL2CrossDomainMessage.watcher_getCrossL2DomainMessage
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
     vpc:

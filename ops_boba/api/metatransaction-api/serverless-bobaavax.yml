@@ -6,7 +6,6 @@ provider:
   stackName: sls-bobaavax-metaTransaction
   stage: prod
   region: us-east-1
-  role: ${file(env-bobaavax.yml):ROLE}
 
 package:
   exclude:
@@ -19,17 +18,11 @@ functions:
     handler: metaTransaction_swapNativeTokenForBOBA.mainnetHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
-    vpc:
-      securityGroupIds:
-        - ${file(env-bobaavax.yml):SECURITY_GROUPS}
-      subnetIds:
-        - ${file(env-bobaavax.yml):SUBNET_ID_1}
-        - ${file(env-bobaavax.yml):SUBNET_ID_2}
     events:
       - http:
           path: send.swapSecondaryFeeToken
           method: post
           cors: true
     layers:
-      - ${file(env-bobaavax.yml):LAYERS}
+      - ${file(env.yml):LAYERS}
 
