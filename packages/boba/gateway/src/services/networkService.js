@@ -499,7 +499,7 @@ class NetworkService {
   }
 
   getAllAddresses() {
-     return allAddresses
+    return this.addresses;
   }
 
   async initializeBase({
@@ -2436,7 +2436,7 @@ class NetworkService {
     const poolInfo = {}
     const userInfo = {}
 
-    let tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
+    let tokenAddressList = Object.keys(this.tokenAddresses).reduce((acc, cur) => {
       if(cur !== 'xBOBA' &&
         cur !== 'OLO' &&
         cur !== 'WAGMIv0' &&
@@ -2445,13 +2445,13 @@ class NetworkService {
         cur !== 'WAGMIv2-Oolong' &&
         cur !== 'WAGMIv3' &&
         cur !== 'WAGMIv3-Oolong') {
-        acc.push(allTokens[cur].L1.toLowerCase())
+        acc.push(this.tokenAddresses[cur].L1.toLowerCase())
       }
       return acc
-    }, [allAddresses.L1_ETH_Address])
+    }, [this.addresses.L1_ETH_Address])
 
     const L1LPContract = new ethers.Contract(
-      allAddresses.L1LPAddress,
+      this.addresses.L1LPAddress,
       L1LPJson.abi,
       this.L1Provider
     )
@@ -2465,17 +2465,15 @@ class NetworkService {
       let tokenName
       let decimals
 
-      if (tokenAddress === allAddresses.L1_ETH_Address) {
-        //console.log("Getting eth balance:", tokenAddress)
+      if (tokenAddress === this.addresses.L1_ETH_Address) {
         //getting eth balance
-        tokenBalance = await this.L1Provider.getBalance(allAddresses.L1LPAddress)
-        tokenSymbol = 'ETH'
-        tokenName = 'Ethereum'
+        tokenBalance = await this.L1Provider.getBalance(this.addresses.L1LPAddress)
+        tokenSymbol = this.L1NativeTokenSymbol
+        tokenName = this.L1NativeTokenName
         decimals = 18
       } else {
         //getting eth balance
-        //console.log("Getting balance for:", tokenAddress)
-        tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(allAddresses.L1LPAddress)
+        tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(this.addresses.L1LPAddress)
         const tokenInfoFiltered = this.tokenInfo.L1[utils.getAddress(tokenAddress)]
         if (tokenInfo) {
           tokenSymbol = tokenInfoFiltered.symbol
@@ -2527,12 +2525,13 @@ class NetworkService {
         rewardDebt: Object.keys(token.userTokenInfo).length? token.userTokenInfo.rewardDebt.toString(): 0
       }
     })
+
     return { poolInfo, userInfo }
   }
 
   async getL2LPInfo() {
 
-    const tokenAddressList = Object.keys(allTokens).reduce((acc, cur) => {
+    const tokenAddressList = Object.keys(this.tokenAddresses).reduce((acc, cur) => {
       if(cur !== 'xBOBA' &&
          cur !== 'OLO' &&
          cur !== 'WAGMIv0' &&
@@ -2543,18 +2542,18 @@ class NetworkService {
          cur !== 'WAGMIv3-Oolong'
         ) {
         acc.push({
-          L1: allTokens[cur].L1.toLowerCase(),
-          L2: allTokens[cur].L2.toLowerCase()
+          L1: this.tokenAddresses[cur].L1.toLowerCase(),
+          L2: this.tokenAddresses[cur].L2.toLowerCase()
         })
       }
       return acc
     }, [{
-      L1: allAddresses.L1_ETH_Address,
-      L2: allAddresses.L2_ETH_Address
+      L1: this.addresses.L1_ETH_Address,
+      L2: this.addresses.L2_ETH_Address
     }])
 
     const L2LPContract = new ethers.Contract(
-      allAddresses.L2LPAddress,
+      this.addresses.L2LPAddress,
       L2LPJson.abi,
       this.L2Provider
     )
@@ -2571,13 +2570,13 @@ class NetworkService {
       let tokenName
       let decimals
 
-      if (tokenAddress === allAddresses.L2_ETH_Address) {
-        tokenBalance = await this.L2Provider.getBalance(allAddresses.L2LPAddress)
-        tokenSymbol = 'ETH'
-        tokenName = 'Ethereum'
+      if (tokenAddress === this.addresses.L2_ETH_Address) {
+        tokenBalance = await this.L2Provider.getBalance(this.addresses.L2LPAddress)
+        tokenSymbol = 'BOBA'
+        tokenName = 'BOBA Token'
         decimals = 18
       } else {
-        tokenBalance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(allAddresses.L2LPAddress)
+        tokenBalance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(this.addresses.L2LPAddress)
         const tokenInfoFiltered = this.tokenInfo.L2[utils.getAddress(tokenAddress)]
         if (tokenInfo) {
           tokenSymbol = tokenInfoFiltered.symbol

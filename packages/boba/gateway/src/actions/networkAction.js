@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import networkService from 'services/networkService'
-import { transctionService } from 'services/transaction.service'
+import transctionService from 'services/transaction.service'
 import { createAction } from './createAction'
 
 export function fetchBalances() {
