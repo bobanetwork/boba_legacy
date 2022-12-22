@@ -17,12 +17,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
-
 import { orderBy } from 'lodash'
-// import { selectNetwork } from 'selectors/setupSelector'
-
-// import { getNetwork } from 'util/masterConfig'
-
 import moment from 'moment'
 
 import { selectLoading } from 'selectors/loadingSelector'
@@ -169,7 +164,6 @@ function TX_Pending({ searchHistory, transactions }) {
     //     return '';
     // }
 
-    console.log("PendingToShow:", paginatedTransactions)
 
   return (
       <S.HistoryContainer>

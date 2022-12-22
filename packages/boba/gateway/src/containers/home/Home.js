@@ -42,8 +42,7 @@ import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
 import {
   fetchBalances,
-  addTokenList,
-  fetchExits
+  addTokenList
 } from 'actions/networkAction'
 import {
   getMonsterInfo
@@ -181,7 +180,6 @@ function Home() {
       dispatch(fetchDaoVotes())        // account specific
       dispatch(fetchDaoBalanceX())     // account specific
       dispatch(fetchDaoVotesX())       // account specific
-      dispatch(fetchExits())           // account specific
       dispatch(getFS_Saves())          // account specific
       dispatch(getFS_Info())           // account specific
       dispatch(getMonsterInfo())       // account specific

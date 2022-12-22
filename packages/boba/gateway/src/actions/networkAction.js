@@ -48,10 +48,6 @@ export function fetchFastExits() {
   )
 }
 
-export function fetchExits() {
-  return createAction('EXIT/GETALL', () => networkService.getExits())
-}
-
 export function exitBOBA(token, value) {
   return createAction('EXIT/CREATE', () =>
     networkService.exitBOBA(token, value)
