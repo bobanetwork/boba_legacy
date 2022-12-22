@@ -14,3 +14,13 @@ The Verifying Paymaster sponsors calls to the following methods: i) approve() fo
 
 **Async Deposit Paymaster** (alternate) - The Boba Deposit Paymaster uses an oracle to find out the conversion ratio between the erc20 and the native token. The bundler, while simulating the userOp validation would however fail if `paymaster.validatePaymasterUserOp` accesses the state of any other contract than itself, by default. And in which case, the paymaster would require whitelisting by the bundler.
 For those without bundler access, Async Deposit Paymaster provides the same functionality as the Boba Deposit Paymaster, but does not requiring whitelisting at the bundler level. It does not access an oracle during the userOp validaiton, but uses a priceRatio (between the erc20 and the native token) that is asynchronously updated by the paymaster operator in the frequency as per their required precision.
+
+
+### Sequence Flows
+#### Boba Deposit Paymaster
+
+![](https://github.com/bobanetwork/boba/blob/develop/packages/boba/account-abstraction/BobaDepositPaymaster.png)
+
+#### Boba Verifying Paymaster
+
+![](https://github.com/bobanetwork/boba/blob/develop/packages/boba/account-abstraction/VerifyingPaymaster.png)
