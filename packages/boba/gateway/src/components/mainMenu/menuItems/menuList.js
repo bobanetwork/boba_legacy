@@ -56,12 +56,6 @@ export const menuItems = [
     url: ROUTES_PATH.DAO
   },
   {
-    key: 'Dev Tools',
-    icon: "DevToolsIcon",
-    title: "Dev Tools",
-    url: ROUTES_PATH.DEV_TOOLS
-  },
-  {
     key: 'LinksToBobaChains',
     icon: "LinksToBobaChainsIcon",
     title: "BOBA Chains",

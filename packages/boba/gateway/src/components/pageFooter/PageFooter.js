@@ -67,6 +67,10 @@ const PageFooter = ({maintenance}) => {
             to={ROUTES_PATH.HELP}
           >FAQs</S.FooterLink>
           <S.FooterLink
+            to={ROUTES_PATH.DEV_TOOLS}
+            sx={{ whiteSpace: 'nowrap'}}
+          >Dev Tools</S.FooterLink>
+          <S.FooterLink
             to={ROUTES_PATH.BOBASCOPE}
           >BobaScope</S.FooterLink>
           <S.FooterLinkExt
