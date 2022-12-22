@@ -101,8 +101,8 @@ export class BobaLinkService extends BaseService<BobaLinkOptions> {
           })
         }
       }
+      await sleep(this.options.pollingInterval)
     }
-    await sleep(this.options.pollingInterval)
   }
 
   protected async _getReportedRound(

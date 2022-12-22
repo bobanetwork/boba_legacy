@@ -38,6 +38,7 @@ import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
+import cookbookLogo from '../../images/ecosystem/cookbook.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -168,6 +169,17 @@ export const projectList = [
     "type": "bridge",
     "image": layerSwapLogo,
     "description": "Bridge Crypto from CEX to Layer2 faster and cheaper."
+  },
+  {
+    "title": "Cookbook",
+    "canLaunch": true,
+    "link": "https://cookbook.dev/",
+    "telegram": "https://t.me/cookbook_dev",
+    "twitter": "https://twitter.com/cookbook_dev",
+    "discord": "http://discord.gg/DAgJVfvxPC",
+    "type": "tool",
+    "image": cookbookLogo,
+    "description": "An open-source global registry for smart contracts"
   },
   {
     "title": "Witnet Oracle",

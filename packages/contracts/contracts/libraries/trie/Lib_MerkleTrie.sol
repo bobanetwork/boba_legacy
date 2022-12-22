@@ -142,11 +142,10 @@ library Lib_MerkleTrie {
      * @param _value Value for the single node.
      * @return _updatedRoot Hash of the trie.
      */
-    function getSingleNodeRootHash(bytes memory _key, bytes memory _value)
-        internal
-        pure
-        returns (bytes32 _updatedRoot)
-    {
+    function getSingleNodeRootHash(
+        bytes memory _key,
+        bytes memory _value
+    ) internal pure returns (bytes32 _updatedRoot) {
         return keccak256(_makeLeafNode(Lib_BytesUtils.toNibbles(_key), _value).encoded);
     }
 
@@ -167,15 +166,7 @@ library Lib_MerkleTrie {
         TrieNode[] memory _proof,
         bytes memory _key,
         bytes32 _root
-    )
-        private
-        pure
-        returns (
-            uint256 _pathLength,
-            bytes memory _keyRemainder,
-            bool _isFinalNode
-        )
-    {
+    ) private pure returns (uint256 _pathLength, bytes memory _keyRemainder, bool _isFinalNode) {
         uint256 pathLength = 0;
         bytes memory key = Lib_BytesUtils.toNibbles(_key);
 
@@ -450,11 +441,10 @@ library Lib_MerkleTrie {
      * @param _key Key for the k/v pair.
      * @return _updatedRoot Root hash for the updated trie.
      */
-    function _getUpdatedTrieRoot(TrieNode[] memory _nodes, bytes memory _key)
-        private
-        pure
-        returns (bytes32 _updatedRoot)
-    {
+    function _getUpdatedTrieRoot(
+        TrieNode[] memory _nodes,
+        bytes memory _key
+    ) private pure returns (bytes32 _updatedRoot) {
         bytes memory key = Lib_BytesUtils.toNibbles(_key);
 
         // Some variables to keep track of during iteration.
@@ -613,11 +603,10 @@ library Lib_MerkleTrie {
      * @param _b Second nibble array.
      * @return _shared Number of shared nibbles.
      */
-    function _getSharedNibbleLength(bytes memory _a, bytes memory _b)
-        private
-        pure
-        returns (uint256 _shared)
-    {
+    function _getSharedNibbleLength(
+        bytes memory _a,
+        bytes memory _b
+    ) private pure returns (uint256 _shared) {
         uint256 i = 0;
         while (_a.length > i && _b.length > i && _a[i] == _b[i]) {
             i++;
@@ -641,11 +630,9 @@ library Lib_MerkleTrie {
      * @param _items RLP-decoded node to convert.
      * @return _node Node as a TrieNode struct.
      */
-    function _makeNode(Lib_RLPReader.RLPItem[] memory _items)
-        private
-        pure
-        returns (TrieNode memory _node)
-    {
+    function _makeNode(
+        Lib_RLPReader.RLPItem[] memory _items
+    ) private pure returns (TrieNode memory _node) {
         bytes[] memory raw = new bytes[](_items.length);
         for (uint256 i = 0; i < _items.length; i++) {
             raw[i] = Lib_RLPReader.readRawBytes(_items[i]);
@@ -659,11 +646,10 @@ library Lib_MerkleTrie {
      * @param _value Value for the extension node.
      * @return _node New extension node with the given k/v pair.
      */
-    function _makeExtensionNode(bytes memory _key, bytes memory _value)
-        private
-        pure
-        returns (TrieNode memory _node)
-    {
+    function _makeExtensionNode(
+        bytes memory _key,
+        bytes memory _value
+    ) private pure returns (TrieNode memory _node) {
         bytes[] memory raw = new bytes[](2);
         bytes memory key = _addHexPrefix(_key, false);
         raw[0] = Lib_RLPWriter.writeBytes(Lib_BytesUtils.fromNibbles(key));
@@ -677,11 +663,10 @@ library Lib_MerkleTrie {
      * @param _value New value for the extension node.
      * @return New node with the same key and different value.
      */
-    function _editExtensionNodeValue(TrieNode memory _node, bytes memory _value)
-        private
-        pure
-        returns (TrieNode memory)
-    {
+    function _editExtensionNodeValue(
+        TrieNode memory _node,
+        bytes memory _value
+    ) private pure returns (TrieNode memory) {
         bytes[] memory raw = new bytes[](2);
         bytes memory key = _addHexPrefix(_getNodeKey(_node), false);
         raw[0] = Lib_RLPWriter.writeBytes(Lib_BytesUtils.fromNibbles(key));
@@ -702,11 +687,10 @@ library Lib_MerkleTrie {
      * @param _value Value for the leaf node.
      * @return _node New leaf node with the given k/v pair.
      */
-    function _makeLeafNode(bytes memory _key, bytes memory _value)
-        private
-        pure
-        returns (TrieNode memory _node)
-    {
+    function _makeLeafNode(
+        bytes memory _key,
+        bytes memory _value
+    ) private pure returns (TrieNode memory _node) {
         bytes[] memory raw = new bytes[](2);
         bytes memory key = _addHexPrefix(_key, true);
         raw[0] = Lib_RLPWriter.writeBytes(Lib_BytesUtils.fromNibbles(key));
@@ -732,11 +716,10 @@ library Lib_MerkleTrie {
      * @param _value Value to insert into the branch.
      * @return _updatedNode Modified branch node.
      */
-    function _editBranchValue(TrieNode memory _branch, bytes memory _value)
-        private
-        pure
-        returns (TrieNode memory _updatedNode)
-    {
+    function _editBranchValue(
+        TrieNode memory _branch,
+        bytes memory _value
+    ) private pure returns (TrieNode memory _updatedNode) {
         bytes memory encoded = Lib_RLPWriter.writeBytes(_value);
         _branch.decoded[_branch.decoded.length - 1] = Lib_RLPReader.toRLPItem(encoded);
         return _makeNode(_branch.decoded);
@@ -765,11 +748,10 @@ library Lib_MerkleTrie {
      * @param _isLeaf Whether or not the key belongs to a leaf.
      * @return _prefixedKey Prefixed key.
      */
-    function _addHexPrefix(bytes memory _key, bool _isLeaf)
-        private
-        pure
-        returns (bytes memory _prefixedKey)
-    {
+    function _addHexPrefix(
+        bytes memory _key,
+        bool _isLeaf
+    ) private pure returns (bytes memory _prefixedKey) {
         uint8 prefix = _isLeaf ? uint8(0x02) : uint8(0x00);
         uint8 offset = uint8(_key.length % 2);
         bytes memory prefixed = new bytes(2 - offset);
@@ -782,11 +764,9 @@ library Lib_MerkleTrie {
      * @param _path Path to remove the prefix from.
      * @return _unprefixedKey Unprefixed key.
      */
-    function _removeHexPrefix(bytes memory _path)
-        private
-        pure
-        returns (bytes memory _unprefixedKey)
-    {
+    function _removeHexPrefix(
+        bytes memory _path
+    ) private pure returns (bytes memory _unprefixedKey) {
         if (uint8(_path[0]) % 2 == 0) {
             return Lib_BytesUtils.slice(_path, 2);
         } else {
