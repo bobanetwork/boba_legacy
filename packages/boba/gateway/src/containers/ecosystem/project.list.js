@@ -39,6 +39,8 @@ import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
 import cookbookLogo from '../../images/ecosystem/cookbook.png'
+import changenowLogo from '../../images/ecosystem/changenow.svg'
+import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -464,6 +466,27 @@ export const projectList = [
     "type": "wallet",
     "image": rabbyLogo,
     "description": "The game-changing wallet for Ethereum and all EVM chains."
+  },
+  {
+    "title": "NOW Wallet",
+    "canLaunch": true,
+    "link": "https://walletnow.app",
+    "telegram": "https://t.me/NOWWallet_channel",
+    "twitter": "https://twitter.com/NOW_Wallet",
+    "type": "wallet",
+    "image": nowwalletLogo,
+    "description": "NOW Wallet is a fast, secure and non-custodial crypto wallet developed by the team of ChangeNOW Crypto Exchange service"
+  },
+  {
+    "title": "ChangeNOW",
+    "canLaunch": true,
+    "link": "https://changenow.io/?utm_source=boba+network&utm_medium=direct&utm_campaign=boba+website+traffic",
+    "telegram": "https://t.me/changeNOW_chat",
+    "twitter": "https://twitter.com/ChangeNOW_io",
+    "discord": "https://discord.gg/ETMPprbgDT",
+    "type": "tool",
+    "image": changenowLogo,
+    "description": "Non-custodial service created for simple and fast cryptocurrency exchanges: buy and swap BOBA."
   },
 ]
 
