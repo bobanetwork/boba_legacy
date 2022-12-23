@@ -24,7 +24,7 @@ import "./IOracle.sol";
  * It can only be used if it is "whitelisted" by the bundler.
  * (technically, it can be used by an "oracle" which returns a static value, without accessing any storage)
  */
-contract AsyncDepositPaymaster is BasePaymaster {
+contract ManualDepositPaymaster is BasePaymaster {
 
     using UserOperationLib for UserOperation;
     using SafeERC20 for IERC20;

@@ -5,14 +5,14 @@ import {
   SimpleWallet,
   SimpleWallet__factory,
   EntryPoint,
-  AsyncDepositPaymaster,
-  AsyncDepositPaymaster__factory,
+  ManualDepositPaymaster,
+  ManualDepositPaymaster__factory,
   TestCounter,
   TestCounter__factory,
   TestToken,
   TestToken__factory,
-  TestTokenValueAsyncDepositPaymaster__factory,
-  TestTokenValueAsyncDepositPaymaster
+  TestTokenValueManualDepositPaymaster__factory,
+  TestTokenValueManualDepositPaymaster
 } from '../typechain'
 import {
   AddressZero, createAddress,
@@ -22,11 +22,11 @@ import {
 import { fillAndSign } from './UserOp'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 
-describe('AsyncDepositPaymaster', () => {
+describe('ManualDepositPaymaster', () => {
   let entryPoint: EntryPoint
   const ethersSigner = ethers.provider.getSigner()
   let token: TestToken
-  let paymaster: AsyncDepositPaymaster
+  let paymaster: ManualDepositPaymaster
   const priceRatio = 50
   const priceRatioDecimals = 2
   const minRatio = 1
@@ -34,7 +34,7 @@ describe('AsyncDepositPaymaster', () => {
   before(async function () {
     entryPoint = await deployEntryPoint()
 
-    paymaster = await new AsyncDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
+    paymaster = await new ManualDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
     await paymaster.addStake(1, { value: parseEther('2') })
     await entryPoint.depositTo(paymaster.address, { value: parseEther('1') })
 
@@ -257,16 +257,16 @@ describe('AsyncDepositPaymaster', () => {
     })
   })
   describe('getTokenValueOfEth', () => {
-    let asyncDepositPaymaster: TestTokenValueAsyncDepositPaymaster
+    let manualDepositPaymaster: TestTokenValueManualDepositPaymaster
     let tokenAlt: TestToken
     before(async () => {
-      asyncDepositPaymaster = await new TestTokenValueAsyncDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
+      manualDepositPaymaster = await new TestTokenValueManualDepositPaymaster__factory(ethersSigner).deploy(entryPoint.address)
       // add boba token
-      await asyncDepositPaymaster.addToken(token.address, await token.decimals(), priceRatio, priceRatioDecimals, minRatio, maxRatio)
+      await manualDepositPaymaster.addToken(token.address, await token.decimals(), priceRatio, priceRatioDecimals, minRatio, maxRatio)
     })
     it('should return correct conversion', async () => {
       const ethBoughtAmount = ethers.utils.parseEther('1')
-      const requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
+      const requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
       // oracle returns 1:1 conversion
       expect(requiredTokens).to.be.eq(ethBoughtAmount.mul(10 ** priceRatioDecimals / priceRatio))
     })
@@ -278,15 +278,15 @@ describe('AsyncDepositPaymaster', () => {
       const priceRatioDecimals = 11
       const minRatio = 11000000
       const maxRatio = 25000000
-      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+      await manualDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
-      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      let requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 5805.69 as per the exchange value
       expect(requiredTokens).to.be.eq('5805691179726897964629')
 
       ethBoughtAmount = ethers.utils.parseEther('0.0005')
-      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 2.90 as per the exchange value
       expect(requiredTokens).to.be.eq('2902845589863448982')
     })
@@ -298,15 +298,15 @@ describe('AsyncDepositPaymaster', () => {
       const priceRatioDecimals = 14
       const minRatio = 11000000000
       const maxRatio = 25000000000
-      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+      await manualDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
-      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      let requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 5805.69 as per the exchange value
       expect(requiredTokens).to.be.eq('5805691179726897964629')
 
       ethBoughtAmount = ethers.utils.parseEther('0.0005')
-      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 2.90 as per the exchange value
       expect(requiredTokens).to.be.eq('2902845589863448982')
     })
@@ -320,15 +320,15 @@ describe('AsyncDepositPaymaster', () => {
       const priceRatioDecimals = 11
       const minRatio = 11000000
       const maxRatio = 250000000
-      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+      await manualDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
-      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      let requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 1254.75 as per the exchange value
       expect(requiredTokens).to.be.eq('1254755003')
 
       ethBoughtAmount = ethers.utils.parseEther('0.0005')
-      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 0.62 as per the exchange value
       expect(requiredTokens).to.be.eq('627377')
     })
@@ -342,15 +342,15 @@ describe('AsyncDepositPaymaster', () => {
       const priceRatioDecimals = 14
       const minRatio = 11000000000
       const maxRatio = 250000000000
-      await asyncDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
+      await manualDepositPaymaster.addToken(tokenAlt.address, tokenDecimals, priceRatio, priceRatioDecimals, minRatio, maxRatio)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
-      let requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      let requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 1254.75 as per the exchange value
       expect(requiredTokens).to.be.eq('1254755003')
 
       ethBoughtAmount = ethers.utils.parseEther('0.0005')
-      requiredTokens = await asyncDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
+      requiredTokens = await manualDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
       // required Tokens should be approx. 0.62 as per the exchange value
       expect(requiredTokens).to.be.eq('627377')
     })

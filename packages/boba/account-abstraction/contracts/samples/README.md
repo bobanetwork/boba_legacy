@@ -12,15 +12,15 @@ The functioanlity of the Deposit Paymaster can be extended to first time users, 
 The Verifying Paymaster sponsors calls to the following methods: i) approve() for a specific token ii) deposit() on the Deposit Paymaster.
 
 
-**Async Deposit Paymaster** (alternate) - The Boba Deposit Paymaster uses an oracle to find out the conversion ratio between the erc20 and the native token. The bundler, while simulating the userOp validation would however fail if `paymaster.validatePaymasterUserOp` accesses the state of any other contract than itself, by default. And in which case, the paymaster would require whitelisting by the bundler.
-For those without bundler access, Async Deposit Paymaster provides the same functionality as the Boba Deposit Paymaster, but does not requiring whitelisting at the bundler level. It does not access an oracle during the userOp validaiton, but uses a priceRatio (between the erc20 and the native token) that is asynchronously updated by the paymaster operator in the frequency as per their required precision.
+**Manual Deposit Paymaster** (alternate) - The Boba Deposit Paymaster uses an oracle to find out the conversion ratio between the erc20 and the native token. The bundler, while simulating the userOp validation would however fail if `paymaster.validatePaymasterUserOp` accesses the state of any other contract than itself, by default. And in which case, the paymaster would require whitelisting by the bundler.
+For those without bundler access, Manual Deposit Paymaster provides the same functionality as the Boba Deposit Paymaster, but does not requiring whitelisting at the bundler level. It does not access an oracle during the userOp validaiton, but uses a priceRatio (between the erc20 and the native token) that is asynchronously updated by the paymaster operator in the frequency as per their required precision.
 
 **GPODepositPaymaster** (alternate) - The GPO Deposit Paymaster is primarily suited for alt-L1 deployments of Boba, and it uses the gas price oracle to find out the price ratio between boba and the alt-l1 native token. The functionality again, is the same as that of the Boba Deposit Paymaster, and requires whitlisting at the bundler level.
 
 
 ### Sequence Flows
 #### Boba Deposit Paymaster
-Here, Paymaster can be used for 'Boba Deposit Paymaster','Async Deposit Paymaster' and 'GPO Deposit Paymaster' interchangeably.
+Here, Paymaster can be used for 'Boba Deposit Paymaster','Manual Deposit Paymaster' and 'GPO Deposit Paymaster' interchangeably.
 The sole distinction between them is the manner in which their priceRatio is adjusted.
 
 ![](../../BobaDepositPaymaster.png)
