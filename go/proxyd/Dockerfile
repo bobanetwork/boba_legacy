@@ -1,22 +1,30 @@
-FROM golang:1.17.2-alpine3.13 AS builder
+FROM golang:1.18.0-alpine3.15 as builder
 
 ARG GITCOMMIT=docker
 ARG GITDATE=docker
 ARG GITVERSION=docker
 
-RUN apk add make jq git
+RUN apk add make jq git gcc musl-dev linux-headers
+
+COPY ./proxyd /app
 
 WORKDIR /app
-COPY ./go/proxyd /app
 
 RUN make proxyd
 
-FROM alpine:3.14.2
+FROM alpine:3.15
+
+COPY ./proxyd/entrypoint.sh /bin/entrypoint.sh
+
+RUN apk update && \
+    apk add ca-certificates && \
+    chmod +x /bin/entrypoint.sh
 
 EXPOSE 8080
 
 VOLUME /etc/proxyd
-COPY proxyd.toml /etc/proxyd/proxyd.toml
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+
+COPY --from=builder /app/bin/proxyd /bin/proxyd
+
+ENTRYPOINT ["/bin/entrypoint.sh"]
+CMD ["/bin/proxyd", "/etc/proxyd/proxyd.toml"]

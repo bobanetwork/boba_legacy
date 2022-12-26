@@ -38,6 +38,8 @@ import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
 import foxtrotCommand from '../../images/ecosystem/foxtrotCommand.webp'
+import pmc from '../../images/ecosystem/pmc.png'
+import cookbookLogo from '../../images/ecosystem/cookbook.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -151,7 +153,7 @@ export const projectList = [
   {
     "title": "Unidex",
     "canLaunch": true,
-    "link": "https://unidexbeta.app/trading",
+    "link": "https://app.unidex.exchange/trading",
     "telegram": "https://t.me/unidexfinance",
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",
@@ -168,6 +170,17 @@ export const projectList = [
     "type": "bridge",
     "image": layerSwapLogo,
     "description": "Bridge Crypto from CEX to Layer2 faster and cheaper."
+  },
+  {
+    "title": "Cookbook",
+    "canLaunch": true,
+    "link": "https://cookbook.dev/",
+    "telegram": "https://t.me/cookbook_dev",
+    "twitter": "https://twitter.com/cookbook_dev",
+    "discord": "http://discord.gg/DAgJVfvxPC",
+    "type": "tool",
+    "image": cookbookLogo,
+    "description": "An open-source global registry for smart contracts"
   },
   {
     "title": "Witnet Oracle",
@@ -200,6 +213,17 @@ export const projectList = [
     "type": "token",
     "image": bobaDogeLogo,
     "description": "The first dog coin on Boba."
+  },
+  {
+    "title": "Memes Wallet",
+    "canLaunch": true,
+    "link": "https://planetmemes.com/",
+    "telegram": "https://t.me/PlanetMemesOf",
+    "twitter": "https://twitter.com/PlanetMemes4",
+    "discord": "",
+    "type": "wallet",
+    "image": pmc,
+    "description": "Memes wallet is a non-custodial multichain wallet with a memeable UI dedicated with funny features for meme coins fans it gives users control over their own private keys, addresses, and funds. ",
   },
   {
     "title": "ApeBoard",
@@ -478,10 +502,10 @@ export const BobaProjectList = [
   {
     title: 'Boba Ethereum Testnet Gateway',
     canLaunch: true,
-    link: 'https://gateway.rinkeby.boba.network',
+    link: 'https://gateway.goerli.boba.network',
     type: 'testnet',
     image: BobaethLogo,
-    description: 'Boba Ethereum is a bridge between Ethereum Rinkeby and Boba L2.',
+    description: 'Boba Ethereum is a bridge between Ethereum Goerli and Boba L2.',
   },
   {
     title: 'Boba Ethereum Block Explorer',
@@ -497,7 +521,7 @@ export const BobaProjectList = [
     link: 'https://testnet.bobascan.com',
     type: 'testnet',
     image: BobaethLogo,
-    description: 'Block explorer for Boba Ethereum Rinkeby.',
+    description: 'Block explorer for Boba Ethereum Goerli.',
   },
   {
     title: 'Boba Avalanche Gateway',

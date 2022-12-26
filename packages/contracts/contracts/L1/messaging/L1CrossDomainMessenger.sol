@@ -140,11 +140,7 @@ contract L1CrossDomainMessenger is
      * @param _message Message to send to the target.
      * @param _gasLimit Gas limit for the provided message.
      */
-    function sendMessage(
-        address _target,
-        bytes memory _message,
-        uint32 _gasLimit
-    ) public {
+    function sendMessage(address _target, bytes memory _message, uint32 _gasLimit) public {
         address ovmCanonicalTransactionChain = resolve("CanonicalTransactionChain");
         // Use the CTC queue length as nonce
         uint40 nonce = ICanonicalTransactionChain(ovmCanonicalTransactionChain).getQueueLength();
@@ -289,11 +285,9 @@ contract L1CrossDomainMessenger is
      * @param _proof Message inclusion proof.
      * @return Whether or not the provided proof is valid.
      */
-    function _verifyStateRootProof(L2MessageInclusionProof memory _proof)
-        internal
-        view
-        returns (bool)
-    {
+    function _verifyStateRootProof(
+        L2MessageInclusionProof memory _proof
+    ) internal view returns (bool) {
         IStateCommitmentChain ovmStateCommitmentChain = IStateCommitmentChain(
             resolve("StateCommitmentChain")
         );

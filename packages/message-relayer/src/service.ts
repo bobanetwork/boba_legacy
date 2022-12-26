@@ -536,6 +536,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           const relayerFilterSelect = [
             filter.Proxy__L1StandardBridge,
             filter.Proxy__L1NFTBridge,
+            filter.Proxy__L1ERC1155Bridge,
           ]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()
