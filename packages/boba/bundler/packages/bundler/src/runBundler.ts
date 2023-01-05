@@ -86,7 +86,7 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .option('--gasFactor <number>', '', '1')
     .option('--minBalance <number>', 'below this signer balance, keep fee for itself, ignoring "beneficiary" address ')
     .option('--network <string>', 'network name or url')
-    .option('--mnemonic <string>', 'mnemonic/private-key file of signer account')
+    .option('--mnemonic <string or file>', 'mnemonic/private-key file of signer account')
     .option('--helper <string>', 'address of the BundlerHelper contract')
     .option('--entryPoint <string>', 'address of the supported EntryPoint contract')
     .option('--port <number>', 'server listening port', '3000')
@@ -115,9 +115,15 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     // eslint-disable-next-line
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
       ethers.getDefaultProvider(config.network)
+  let mnemonic: string
   let wallet: Wallet
   try {
-    wallet = new Wallet(config.mnemonic).connect(provider)
+    if (fs.existsSync(config.mnemonic)) {
+      mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
+      wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
+    } else {
+      wallet = new Wallet(config.mnemonic).connect(provider)
+    }
   } catch (e: any) {
     throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)
   }
