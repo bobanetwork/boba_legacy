@@ -1,0 +1,18 @@
+FROM node:14-alpine AS compile-image
+
+ENV PYTHONUNBUFFERED=1
+RUN apk add --update --no-cache python3 git curl bash jq make gcc g++ && ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip
+RUN pip3 install --no-cache --upgrade pip setuptools
+
+COPY packages/boba/bundler/ ./
+RUN echo $(ls -altr)
+RUN echo $(pwd)
+RUN yarn create-all-deps
+RUN yarn
+RUN yarn preprocess
+RUN cd dockers/bundler && npx webpack
+
+FROM node:14-alpine AS runtime-image
+COPY --from=compile-image ./dockers/bundler/dist/bundler.js .
+CMD node --no-deprecation bundler.js --minBalance $MIN_BALANCE --mnemonic $MNEMONIC_OR_PK --network $NETWORK --helper $HELPER --entryPoint $ENTRYPOINT --beneficiary $BENEFICIARY

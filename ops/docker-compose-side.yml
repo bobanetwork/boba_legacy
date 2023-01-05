@@ -92,3 +92,32 @@ services:
       dockerfile: ./proxyd/Dockerfile
     deploy:
       replicas: 0
+
+  bundler:
+    image: bobanetwork/bundler:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.bundler
+    deploy:
+      replicas: 1
+    ports: [ '3000:3000' ]
+    restart: on-failure
+    environment:
+      url: https://${HOST}/
+      LETSENCRYPT_HOST: $HOST
+      LETSENCRYPT_PORT: 3000
+      VIRTUAL_HOST: $HOST
+      VIRTUAL_PATH: /
+      VIRTUAL_DEST: /
+      MIN_BALANCE: 0
+      MNEMONIC_OR_PK: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+      NETWORK: "http://l2geth:8545"
+      ENTRYPOINT: "0x"
+      BENEFICIARY: "0x"
+      HELPER: "0x"
+    mem_limit: 300M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "10"
