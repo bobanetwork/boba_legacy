@@ -1,0 +1,37 @@
+FROM bobanetwork/builder AS builder
+FROM node:14-alpine
+
+RUN apk add --no-cache git curl bash jq
+WORKDIR /opt/optimism/
+
+COPY --from=builder /optimism/*.json /optimism/yarn.lock ./
+COPY --from=builder /optimism/node_modules ./node_modules
+
+WORKDIR /opt/optimism/packages/contracts
+COPY --from=builder /optimism/packages/contracts/dist ./dist
+COPY --from=builder /optimism/packages/contracts/*.json ./
+COPY --from=builder /optimism/packages/contracts/node_modules ./node_modules
+COPY --from=builder /optimism/packages/contracts/artifacts ./artifacts
+
+# get the built artifacts
+WORKDIR /opt/optimism/packages/boba/account-abstraction
+COPY --from=builder /optimism/packages/boba/account-abstraction/tsconfig.json ./tsconfig.json
+COPY --from=builder /optimism/packages/boba/account-abstraction/package.json ./package.json
+COPY --from=builder /optimism/packages/boba/account-abstraction/node_modules ./node_modules
+COPY --from=builder /optimism/packages/boba/account-abstraction/artifacts ./artifacts
+
+# Copy solc compilers
+
+# get static artifacts from the host
+# COPY packages/boba/account-abstraction/bin ./bin
+COPY packages/boba/account-abstraction/contracts ./contracts
+COPY packages/boba/account-abstraction/hardhat.config.ts ./
+COPY packages/boba/account-abstraction/deploy ./deploy
+COPY packages/boba/account-abstraction/scripts ./scripts
+COPY packages/boba/account-abstraction/tasks ./tasks
+
+
+RUN chmod +x ./scripts/wait-for-l1-and-l2.sh
+RUN chmod +x ./scripts/deployer.sh
+
+ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]

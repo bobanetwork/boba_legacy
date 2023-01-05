@@ -441,6 +441,32 @@ services:
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
 
+  # deploys account abstraction contracts and serves contract addresses
+  aa_deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - boba_deployer
+    image: bobanetwork/aa_deployer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.aa_deployer
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      URL: http://dtl:8081/addresses.json
+      # DO NOT use in production
+      << : *deployer_pk
+      << : *relayer_pk
+      << : *fast-relayer_pk
+      RETRIES: 200
+      DTL_REGISTRY_URL: http://dtl:8081/aa-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+
   #in no way should this be running in production
   kms:
     image: bobanetwork/local-kms:latest

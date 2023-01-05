@@ -1,38 +1,35 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
-import { Create2Factory } from '../src/Create2Factory'
 import { ethers } from 'hardhat'
 
-const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const provider = ethers.provider
-  const from = await provider.getSigner().getAddress()
-  await new Create2Factory(ethers.provider).deployFactory()
+// const UNSTAKE_DELAY_SEC = 100
+// const PAYMASTER_STAKE = ethers.utils.parseEther('1')
 
-  const ret = await hre.deployments.deploy(
+// deploy entrypoint - but only on debug network..
+const deployEP: DeployFunction = async (hre) => {
+  // first verify if already deployed:
+  try {
+    await hre.deployments.deploy(
+      'EntryPoint', {
+        from: ethers.constants.AddressZero,
+        args: [],
+        deterministicDeployment: true,
+        log: true
+      })
+
+    // already deployed. do nothing.
+    return
+  } catch (e) {
+  }
+
+  await hre.deployments.deploy(
     'EntryPoint', {
-      from,
+      from: (hre as any).deployConfig.deployer_l2.address,
       args: [],
-      gasLimit: 6e6,
-      deterministicDeployment: true
+      gasLimit: 4e6,
+      deterministicDeployment: true,
+      log: true
     })
-  console.log('==entrypoint addr=', ret.address)
-  const entryPointAddress = ret.address
-
-  const w = await hre.deployments.deploy(
-    'SimpleWallet', {
-      from,
-      args: [entryPointAddress, from],
-      gasLimit: 2e6,
-      deterministicDeployment: true
-    })
-
-  console.log('== wallet=', w.address)
-
-  const t = await hre.deployments.deploy('TestCounter', {
-    from,
-    deterministicDeployment: true
-  })
-  console.log('==testCounter=', t.address)
 }
 
-export default deployEntryPoint
+export default deployEP
