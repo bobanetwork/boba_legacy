@@ -708,6 +708,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       return tokenPriceX.toNumber() / 100
       /* eslint-enable */
     }
+    return tokenPrice.toNumber() / 10 ** decimals
   }
 
   private _formatBigNumberToEther(
