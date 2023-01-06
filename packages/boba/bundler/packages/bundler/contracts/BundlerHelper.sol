@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.17;
 
 import "@account-abstraction/contracts/core/EntryPoint.sol";
 import "solidity-string-utils/StringUtils.sol";

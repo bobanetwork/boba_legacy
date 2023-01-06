@@ -6,11 +6,7 @@ RUN python3 -m ensurepip
 RUN pip3 install --no-cache --upgrade pip setuptools
 
 COPY packages/boba/bundler/ ./
-RUN echo $(ls -altr)
-RUN echo $(pwd)
-RUN yarn create-all-deps
-RUN yarn
-RUN yarn preprocess
+RUN yarn create-all-deps && yarn && yarn preprocess
 RUN cd dockers/bundler && npx webpack
 
 FROM node:14-alpine AS runtime-image
