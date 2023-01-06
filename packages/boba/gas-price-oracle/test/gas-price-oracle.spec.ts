@@ -177,7 +177,6 @@ describe('gas-price-oracle', () => {
       minL1BaseFee: 0,
       maxL1BaseFee: 1,
       bobaFeeRatio100X: 800,
-      bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31338,
     })
 
@@ -521,7 +520,6 @@ describe('gas-price-oracle', () => {
       minL1BaseFee: 1_000_000_000,
       maxL1BaseFee: 2_000_000_000,
       bobaFeeRatio100X: 800,
-      bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
     })
 
@@ -627,7 +625,6 @@ describe('gas-price-oracle', () => {
       minL1BaseFee: 50_000_000_000,
       maxL1BaseFee: 100_000_000_000,
       bobaFeeRatio100X: 100,
-      bobaFeeRatioMinPercentChange: 10,
       bobaLocalTestnetChainId: 31337,
     })
 
