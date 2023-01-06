@@ -12,7 +12,7 @@ import { Signer, Wallet } from 'ethers'
 import { runBundler } from '../src/runBundler'
 import { BundlerServer } from '../src/BundlerServer'
 import fs from 'fs'
-
+import { getContractFactory } from '@eth-optimism/contracts'
 const { expect } = chai.use(chaiAsPromised)
 
 export async function startBundler (options: BundlerConfig): Promise<BundlerServer> {
@@ -37,6 +37,9 @@ describe('Flow', function () {
   before(async function () {
     signer = await hre.ethers.provider.getSigner()
     const beneficiary = await signer.getAddress()
+
+    const addressManagerFactory = await getContractFactory('Lib_AddressManager', signer)
+    const addressManager = await addressManagerFactory.deploy()
 
     const sampleRecipientFactory = await ethers.getContractFactory('SampleRecipient')
     const sampleRecipient = await sampleRecipientFactory.deploy()
@@ -64,7 +67,8 @@ describe('Flow', function () {
       minBalance: '0',
       mnemonic: mnemonicFile,
       network: 'http://localhost:8545/',
-      port: '5555'
+      port: '5555',
+      addressManager: addressManager.address
     })
   })
 
