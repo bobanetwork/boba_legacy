@@ -12,6 +12,7 @@ COPY --from=builder /optimism/packages/contracts/dist ./dist
 COPY --from=builder /optimism/packages/contracts/*.json ./
 COPY --from=builder /optimism/packages/contracts/node_modules ./node_modules
 COPY --from=builder /optimism/packages/contracts/artifacts ./artifacts
+COPY --from=builder /optimism/packages/contracts/deployments ./deployments
 
 # get the built artifacts
 WORKDIR /opt/optimism/packages/boba/account-abstraction
@@ -23,7 +24,7 @@ COPY --from=builder /optimism/packages/boba/account-abstraction/artifacts ./arti
 # Copy solc compilers
 
 # get static artifacts from the host
-# COPY packages/boba/account-abstraction/bin ./bin
+COPY packages/boba/account-abstraction/bin ./bin
 COPY packages/boba/account-abstraction/contracts ./contracts
 COPY packages/boba/account-abstraction/hardhat.config.ts ./
 COPY packages/boba/account-abstraction/deploy ./deploy

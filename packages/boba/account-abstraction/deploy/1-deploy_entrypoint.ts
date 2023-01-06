@@ -6,7 +6,7 @@ import { ethers } from 'hardhat'
 // const PAYMASTER_STAKE = ethers.utils.parseEther('1')
 
 // deploy entrypoint - but only on debug network..
-const deployEP: DeployFunction = async (hre) => {
+const deployFn: DeployFunction = async (hre) => {
   // first verify if already deployed:
   try {
     await hre.deployments.deploy(
@@ -32,4 +32,4 @@ const deployEP: DeployFunction = async (hre) => {
     })
 }
 
-export default deployEP
+export default deployFn
