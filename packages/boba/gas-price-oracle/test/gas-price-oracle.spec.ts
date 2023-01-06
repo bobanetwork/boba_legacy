@@ -78,10 +78,6 @@ describe('gas-price-oracle', () => {
   let Factory__L2BOBA: ContractFactory
   let L2BOBA: Contract
 
-  let Factory__ChainStorageContainer: ContractFactory
-  let batches: Contract
-  let queue: Contract
-
   before(async () => {
     Factory__Lib_AddressManager = getContractFactory(
       'Lib_AddressManager',
@@ -570,7 +566,6 @@ describe('gas-price-oracle', () => {
       minL1BaseFee: 50_000_000_000,
       maxL1BaseFee: 100_000_000_000,
       bobaFeeRatio100X: 800,
-      bobaFeeRatioMinPercentChange: 3000,
       bobaLocalTestnetChainId: 31337,
     })
 

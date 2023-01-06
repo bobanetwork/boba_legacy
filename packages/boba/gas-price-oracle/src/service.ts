@@ -290,49 +290,20 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this.logger.warn('Loading L2 cost history...')
       const historyJsonRaw = await fsPromise.readFile(dumpsPath)
       const historyJSON = JSON.parse(historyJsonRaw.toString())
-      // Load ETH
-      if (historyJSON.L2ETHCollectFee) {
-        this.state.L2ETHCollectFee = BigNumber.from(historyJSON.L2ETHCollectFee)
-      } else {
-        this.logger.warn('Invalid L2 ETH cost history!')
-        this.state.L2ETHCollectFee = ETHVaultBalance
-      }
-      // Load Boba
-      if (historyJSON.L2BOBACollectFee) {
-        this.state.L2BOBACollectFee = BigNumber.from(
-          historyJSON.L2BOBACollectFee
-        )
-      } else {
-        this.logger.warn('Invalid L2 BOBA cost history!')
-        this.state.L2BOBACollectFee = BOBAVaultBalance
-      }
-      // Load Boba billing
-      if (historyJSON.L2BOBABillingCollectFee) {
-        this.state.L2BOBABillingCollectFee = BigNumber.from(
-          historyJSON.L2BOBABillingCollectFee
-        )
-      } else {
-        this.logger.warn('Invalid L2 BOBA billing history!')
-        this.state.L2BOBABillingCollectFee = BOBABillingBalance
-      }
+      /* eslint-disable */
+      this._readL2FeeCost(historyJSON, ETHVaultBalance, 'L2ETHCollectFee')
+      this._readL2FeeCost(historyJSON, BOBAVaultBalance, 'L2BOBACollectFee')
+      this._readL2FeeCost(historyJSON, BOBABillingBalance, 'L2BOBABillingCollectFee')
     } else {
       this.logger.warn('No L2 cost history Found!')
       this.state.L2ETHCollectFee = ETHVaultBalance
       this.state.L2BOBACollectFee = BOBAVaultBalance
       this.state.L2BOBABillingCollectFee = BOBABillingBalance
     }
-    // adjust the L2ETHCollectFee if it is not correct
-    if (this.state.L2ETHCollectFee.lt(ETHVaultBalance)) {
-      this.state.L2ETHCollectFee = ETHVaultBalance
-    }
-    // adjust the L2BOBACollectFee if it is not correct
-    if (this.state.L2BOBACollectFee.lt(BOBAVaultBalance)) {
-      this.state.L2BOBACollectFee = BOBAVaultBalance
-    }
-    // adjust the L2BOBABillingCollectFee if it is not correct
-    if (this.state.L2BOBABillingCollectFee.lt(BOBABillingBalance)) {
-      this.state.L2BOBABillingCollectFee = BOBABillingBalance
-    }
+    this._adjustL2FeeCost(ETHVaultBalance, this.state.L2ETHCollectFee, 'L2ETHCollectFee')
+    this._adjustL2FeeCost(BOBAVaultBalance, this.state.L2BOBACollectFee, 'L2BOBACollectFee')
+    this._adjustL2FeeCost(BOBABillingBalance, this.state.L2BOBABillingCollectFee, 'L2BOBABillingCollectFee')
+    /* eslint-enable */
     this.state.L2ETHVaultBalance = ETHVaultBalance
     this.state.L2BOBAVaultBalance = BOBAVaultBalance
     this.logger.info('Loaded L2 Cost Data', {
@@ -416,14 +387,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       this._updateL1CostFee(
         L1ETHBalanceLatest,
         this.state.L1ETHBalance,
-        this.state.L1ETHCostFee,
         L2ETHVaultBalance,
         'L1ETH'
       )
       this._updateL1CostFee(
         L1RelayerETHBalanceLatest,
         this.state.L1RelayerBalance,
-        this.state.L1RelayerCostFee,
         BigNumber.from('0'),
         'L1Relayer'
       )
@@ -660,16 +629,44 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
     }
   }
 
+  private _readL2FeeCost(
+    historyJSON: {
+      L2ETHCollectFee: string
+      L2BOBACollectFee: string
+      L2BOBABillingCollectFee: string
+    },
+    latestBalance: BigNumber,
+    balanceName: string
+  ) {
+    if (historyJSON[balanceName]) {
+      this.state[balanceName] = BigNumber.from(historyJSON[balanceName])
+    } else {
+      this.logger.warn(`Invalid ${balanceName}`)
+      this.state[balanceName] = latestBalance
+    }
+  }
+
+  private _adjustL2FeeCost(
+    latestBalance: BigNumber,
+    balanceHistory: BigNumber,
+    balanceName: string
+  ) {
+    if (balanceHistory.lt(latestBalance)) {
+      this.state[balanceName] = latestBalance
+    }
+  }
+
   private _updateL1CostFee(
     latestBalance: BigNumber,
     balanceHistory: BigNumber,
-    costFeeHistory: BigNumber,
     defaultValue: BigNumber,
     prefix: string
   ) {
     if (!balanceHistory.eq(BigNumber.from('0'))) {
       if (balanceHistory.gt(latestBalance)) {
-        this.state[`${prefix}CostFee`] = this.state[`${prefix}CostFee`].add(balanceHistory.sub(latestBalance))
+        this.state[`${prefix}CostFee`] = this.state[`${prefix}CostFee`].add(
+          balanceHistory.sub(latestBalance)
+        )
       }
     } else {
       this.state[`${prefix}CostFee`] = defaultValue
