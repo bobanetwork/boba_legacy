@@ -86,10 +86,8 @@ import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMoc
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
-import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
-import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import { sortRawTokens } from 'util/common'
@@ -257,19 +255,6 @@ class NetworkService {
     })
   }
 
-  async fetchVerifierStatus() {
-    const response = await verifierWatcherAxiosInstance(
-      this.networkGateway
-    ).post('/', { jsonrpc: "2.0", method: "status", id: 1 })
-
-    if (response.status === 200) {
-      const status = response.data.result
-      return status
-    } else {
-      console.log("Bad verifier response")
-      return false
-    }
-  }
 
   async getBobaFeeChoice() {
     const bobaFeeContract = new ethers.Contract(
@@ -672,37 +657,35 @@ class NetworkService {
       //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
-      console.log('Setting up contract for L1LP at:',addresses.L1LPAddress)
+      console.log('Setting up contract for L2LP at:',addresses.L2LPAddress)
+
       this.L1LPContract = new ethers.Contract(
         addresses.L1LPAddress,
         L1LPJson.abi,
         this.L1Provider
       )
 
-      console.log('Setting up contract for L2LP at:',addresses.L2LPAddress)
+      console.log('Setting up contract for L1LP at:',addresses.L1LPAddress)
       this.L2LPContract = new ethers.Contract(
         addresses.L2LPAddress,
         L2LPJson.abi,
         this.L2Provider
       )
 
-      /* if (NETWORK[ network ]) {
-        this.watcher = new CrossChainMessenger({
-          l1SignerOrProvider: this.L1Provider,
-          l2SignerOrProvider: this.L2Provider,
-          chainId,
-          fastRelayer: false,
-        })
-        this.fastWatcher = new CrossChainMessenger({
-          l1SignerOrProvider: this.L1Provider,
-          l2SignerOrProvider: this.L2Provider,
-          chainId,
-          fastRelayer: true,
-        })
-      } else {
-        this.watcher = null
-        this.fastWatcher = null
-      } */
+      console.log('Setting up watcher CrossChainMessenger')
+      this.watcher = new CrossChainMessenger({
+        l1SignerOrProvider: this.L1Provider,
+        l2SignerOrProvider: this.L2Provider,
+        chainId,
+        fastRelayer: false,
+      })
+      this.fastWatcher = new CrossChainMessenger({
+        l1SignerOrProvider: this.L1Provider,
+        l2SignerOrProvider: this.L2Provider,
+        chainId,
+        fastRelayer: true,
+      })
+
 
       this.BobaContract = new ethers.Contract(
         allTokens.BOBA.L2,
@@ -1137,35 +1120,6 @@ class NetworkService {
     }
   }
 
-  async getGas() {
-
-    try {
-      const gasPrice2 = await this.L2Provider.getGasPrice()
-      //console.log("L2 gas", gasPrice2.toString())
-
-      const block2 = await this.L2Provider.getBlockNumber()
-
-      const gasPrice1 = await this.L1Provider.getGasPrice()
-      //console.log("L1 gas", gasPrice1.toString())
-
-      const block1 = await this.L1Provider.getBlockNumber()
-
-      const gasData = {
-        gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
-        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0),
-        blockL1: Number(block1),
-        blockL2: Number(block2),
-      }
-
-      //console.log(gasData)
-
-      return gasData
-    } catch (error) {
-      console.log("NS: getGas error:",error)
-      return error
-    }
-
-  }
 
   async getBalances() {
 

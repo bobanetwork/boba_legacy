@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import gasService from 'services/gas.service'
 import networkService from 'services/networkService'
 import transctionService from 'services/transaction.service'
 import { createAction } from './createAction'
@@ -22,11 +23,10 @@ export function fetchBalances() {
 }
 
 export function fetchGas() {
-  return createAction('GAS/GET', () => networkService.getGas())
+  return createAction('GAS/GET', () => gasService.getGas())
 }
 
 export function addTokenList() {
-  console.log("addTokenList")
   return createAction('TOKENLIST/GET', () => networkService.addTokenList())
 }
 

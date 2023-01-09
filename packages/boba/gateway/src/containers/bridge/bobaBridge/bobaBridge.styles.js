@@ -19,7 +19,9 @@ export const BobaContent = styled(Box)(({ theme }) => ({
   gap: '10px'
 }))
 
-export const BobaContentWrapper = styled(Box)(({ theme, flexDirection }) => ({
+export const BobaContentWrapper = styled(Box, {
+  shouldForwardProp: (props) => props !== 'fullWidth'
+})(({ theme, flexDirection }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: flexDirection || 'column',
