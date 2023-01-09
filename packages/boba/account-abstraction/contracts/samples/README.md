@@ -20,7 +20,7 @@ For those without bundler access, Manual Deposit Paymaster provides the same fun
 
 ### Sequence Flows
 #### Boba Deposit Paymaster
-Here, Paymaster can be used for 'Boba Deposit Paymaster','Manual Deposit Paymaster' and 'GPO Deposit Paymaster' interchangeably.
+Here, 'Paymaster' can be substituted for 'Boba Deposit Paymaster','Manual Deposit Paymaster' or 'GPO Deposit Paymaster'.
 The sole distinction between them is the manner in which their priceRatio is adjusted.
 
 ![](../../BobaDepositPaymaster.png)
