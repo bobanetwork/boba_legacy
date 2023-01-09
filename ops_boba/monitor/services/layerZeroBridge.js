@@ -2,10 +2,9 @@
 
 const ethers = require('ethers')
 const DatabaseService = require('./database.service')
-const OptimismEnv = require('./utilities/optimismEnv')
+const GlobalEnv = require('./utils/globalEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
-const { Logger } = require('@eth-optimism/common-ts')
 
 const EthBridgeJson = require('@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
 const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
@@ -13,17 +12,15 @@ const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/A
 const layerZeroMainnetAddresses = require('@boba/register/addresses/layerZeroMainnet.json')
 const layerZeroTestnetAddresses = require('@boba/register/addresses/layerZeroTestnet.json')
 
-const prefix = '[layer_zero_bridge]'
-class LayerZeroBridgeMonitor extends OptimismEnv {
+class LayerZeroBridgeMonitor extends GlobalEnv {
   constructor() {
     super(...arguments)
 
     this.databaseService = new DatabaseService()
 
-
     const layerZeroAddresses = this.layerZeroEnableTest
       ? layerZeroTestnetAddresses
-      : layerZeroMainnetAddresses;
+      : layerZeroMainnetAddresses
 
     this.layerZeroURL = this.layerZeroEnableTest
       ? 'https://api-testnet.layerzero-scan.com/tx/'
@@ -49,10 +46,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
         layerZeroAddresses.Layer_Zero_Protocol[this.layerZeroChain]
           .Layer_Zero_ChainId,
     }
-    console.log(
-      prefix,
-      `monitoring ${this.layerZeroChain} with ${JSON.stringify(this.chainInfo)}`
-    )
+    this.logger.info(`LZ monitoring ${this.layerZeroChain} with ${JSON.stringify(this.chainInfo)}`)
     this.latestBlock = 0
     this.currentBlock = this.chainInfo.latestBlock
     this.chainID = this.chainInfo.chainID
@@ -72,7 +66,6 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async initScan() {
-    console.log(prefix, `init MySQL`)
     // Create tables
     await this.databaseService.initMySQL()
 
@@ -80,17 +73,13 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     for (let i = 0; i < this.bridgeContracts.length; i++) {
       const destChainID = await this.bridgeContracts[i].dstChainId()
       this.bridgeDstChainIDs.push(destChainID)
-      console.log(
-        prefix,
-        `monitor bridge ${this.bridgeContracts[i].address} with dstChainID ${destChainID}`
-      )
+      this.logger.info(`LZ monitors bridge ${this.bridgeContracts[i].address} with dstChainID ${destChainID}`)
     }
 
     const maxBlockFromDB = await this.databaseService.getNewestBlockFromLayerZeroTx(this.chainID)
     this.currentBlock = this.currentBlock > maxBlockFromDB ? this.currentBlock : maxBlockFromDB
 
     this.latestBlock = await this.L1Provider.getBlockNumber()
-    console.log(prefix, `latestBlock ${this.latestBlock}`)
 
     if (this.currentBlock < this.latestBlock) {
       await this.scanBlockRange(this.currentBlock, this.latestBlock)
@@ -98,12 +87,12 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
   }
 
   async startMonitor() {
-    console.log(prefix, `start monitor`)
     this.latestBlock = await this.L1Provider.getBlockNumber()
 
     if (this.currentBlock < this.latestBlock) {
       await this.scanBlockRange(this.currentBlock, this.latestBlock)
     }
+    await sleep(60000)
   }
 
   async scanBlockRange(startBlock, endBlock) {
@@ -161,7 +150,7 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
     }
 
     if (logs.length !== 0) {
-      console.log(prefix, `found events from ${startBlock} to ${endBlock}`)
+      this.logger.info(`LZ found events from ${startBlock} to ${endBlock}`)
     }
 
     for (const l of logs) {
@@ -224,19 +213,6 @@ class LayerZeroBridgeMonitor extends OptimismEnv {
 
       await this.databaseService.insertLayerZeroTx(eventData)
     }
-  }
-
-  errorCatcher(func, param) {
-    return (async () => {
-      for (let i = 0; i < 2; i++) {
-        try {
-          return await func(param)
-        } catch (error) {
-          console.log(`${func}returned an error!`, error)
-          await sleep(1000)
-        }
-      }
-    })()
   }
 }
 
