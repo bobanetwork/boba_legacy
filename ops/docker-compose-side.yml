@@ -115,6 +115,7 @@ services:
       ENTRYPOINT: "0x"
       BENEFICIARY: "0x"
       HELPER: "0x"
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
     mem_limit: 300M
     logging:
       driver: "json-file"
