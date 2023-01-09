@@ -416,5 +416,6 @@ describe('BobaLink Test\n', async () => {
     expect(latestRoundId).to.be.gt(prevRoundId)
     expect(roundData.answer).to.be.eq(chainLinkRoundData.answer)
     expect(chainLinkLatestRoundIdInCLContract).to.be.eq(chainLinkLatestRoundId)
+    await bobaLinkService.stop()
   })
 })
