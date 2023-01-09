@@ -44,10 +44,26 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@eth-optimism/common-ts": "0.2.2",
+=======
+    "@eth-optimism/common-ts": "^0.1.0",
+    "@types/babel__core": "^7.1.20",
+>>>>>>> f9469dd5 (split the building stack steps)
     "bcfg": "^0.1.6",
     "dotenv": "^8.2.0",
     "ethers": "^5.5.4",
+<<<<<<< HEAD
     "lodash": "^4.17.21"
+=======
+    "ganache-core": "^2.13.2",
+    "glob": "^7.1.6",
+    "google-spreadsheet": "^3.1.15",
+    "lodash": "^4.17.21",
+    "merkletreejs": "^0.2.18",
+    "node-fetch": "^2.6.1",
+    "patch-package": "^6.4.7",
+    "rlp": "^2.2.6"
+>>>>>>> f9469dd5 (split the building stack steps)
   }
 }
