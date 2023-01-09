@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-export default function omgxWatcherAxiosInstance(watcherUrl) {
+export default function omgxWatcherAxiosInstance(networkConfig) {
+  const watcherUrl = networkConfig[ 'OMGX_WATCHER_URL' ]
 
   let axiosInstance = axios.create({
     baseURL: watcherUrl,

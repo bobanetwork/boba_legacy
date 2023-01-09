@@ -35,9 +35,7 @@ class TransactionService {
   async fetchL2Tx() {
     let L2Txs = [];
     try {
-      const omgxWatcherUrl = networkService.networkConfig[ 'OMGX_WATCHER_URL' ]
-
-      const responseL2 = await omgxWatcherAxiosInstance(omgxWatcherUrl)
+      const responseL2 = await omgxWatcherAxiosInstance(networkService.networkConfig)
         .post('get.l2.transactions', {
           address: networkService.account,
           fromRange: 0,
@@ -58,8 +56,7 @@ class TransactionService {
   async fetchL0Tx() {
     let L0Txs = [];
     try {
-      const omgxWatcherUrl = networkService.networkConfig[ 'OMGX_WATCHER_URL' ]
-      const responseL0 = await omgxWatcherAxiosInstance(omgxWatcherUrl)
+      const responseL0 = await omgxWatcherAxiosInstance(networkService.networkConfig)
         .post('get.layerzero.transactions', {
           address: networkService.account,
           fromRange: 0,
@@ -87,9 +84,7 @@ class TransactionService {
   async fetchL1PendingTx() {
     let txL1pending = [];
     try {
-      const omgxWatcherUrl = networkService.networkConfig[ 'OMGX_WATCHER_URL' ]
-
-      const responseL1pending = await omgxWatcherAxiosInstance(omgxWatcherUrl)
+      const responseL1pending = await omgxWatcherAxiosInstance(networkService.networkConfig)
         .post('get.l1.transactions', {
           address: networkService.account,
           fromRange: 0,

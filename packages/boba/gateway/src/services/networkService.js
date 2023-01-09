@@ -903,7 +903,7 @@ class NetworkService {
     if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
+      this.networkConfig
     ).get('get.l2.pendingexits')
 
     if (response.status === 201) {
@@ -926,7 +926,7 @@ class NetworkService {
     if (this.networkGateway === 'local') return
 
     const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
+      this.networkConfig
     ).get('get.l2.pendingexits')
 
     if (response.status === 201) {
@@ -1374,7 +1374,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -2177,7 +2177,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -2823,7 +2823,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -2900,7 +2900,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -2919,7 +2919,7 @@ class NetworkService {
   async L1LPPending(tokenAddress) {
 
     const L1pending = await omgxWatcherAxiosInstance(
-      this.networkGateway
+      this.networkConfig
     ).get('get.l2.pendingexits', {})
 
     const pendingFast = L1pending.data.filter(i => {
@@ -3361,7 +3361,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)
@@ -3478,7 +3478,7 @@ class NetworkService {
       console.log("Speed checker data payload:", data)
 
       const speed = await omgxWatcherAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('send.crossdomainmessage', data)
 
       console.log("Speed checker:", speed)

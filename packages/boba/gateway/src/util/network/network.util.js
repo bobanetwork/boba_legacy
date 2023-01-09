@@ -173,8 +173,8 @@ export const NetworkList = {
       label: 'BNB <> Boba',
       key: 'bnb',
       name: {
-        l1: 'BNB',
-        l2: 'Boba'
+        l1: 'Binance Smart Chain Mainnet',
+        l2: 'Boba BNB Mainnet'
       }
     },
     {
@@ -183,8 +183,8 @@ export const NetworkList = {
       label: 'Avalanche <> Boba',
       key: 'avax',
       name: {
-        l1: 'Avalanche',
-        l2: 'Boba'
+        l1: 'Avalanche Mainnet C-Chain',
+        l2: 'Boba Avalance Mainnet'
       }
     },
     {
@@ -193,8 +193,8 @@ export const NetworkList = {
       label: 'Fantom <> Boba',
       key: 'fantom',
       name: {
-        l1: 'Fantom',
-        l2: 'Boba'
+        l1: 'Fantom Mainnet',
+        l2: 'Bobaopera Mainnet'
       }
     },
     {
@@ -204,7 +204,7 @@ export const NetworkList = {
       key: 'moonbeam',
       name: {
         l1: 'Moonbeam',
-        l2: 'Boba'
+        l2: 'Bobabeam'
       }
     }
   ],
@@ -225,8 +225,8 @@ export const NetworkList = {
       label: 'BNB (Testnet) <> Boba',
       key: 'bnb',
       name: {
-        l1: 'BNB (Testnet)',
-        l2: 'Boba',
+        l1: 'BNB Testnet',
+        l2: 'Boba BNB Testnet',
       }
     },
     {
@@ -235,8 +235,8 @@ export const NetworkList = {
       label: 'Fuji (Testnet) <> Boba',
       key: 'avax',
       name: {
-        l1: 'Fuji (Testnet)',
-        l2: 'Boba',
+        l1: 'Fuji Testnet',
+        l2: 'Boba Fuji Testnet',
       }
     },
     {
@@ -245,8 +245,8 @@ export const NetworkList = {
       label: 'Opera (Testnet) <> Boba',
       key: 'fantom',
       name: {
-        l1: 'Opera (Testnet)',
-        l2: 'Boba',
+        l1: 'Fantom Testnet',
+        l2: 'Bobaopera Testnet',
       }
     },
     {
@@ -256,7 +256,7 @@ export const NetworkList = {
       key: 'moonbeam',
       name: {
         l1: 'Moonbase',
-        l2: 'Boba',
+        l2: 'Bobabase',
       }
     },
   ]
