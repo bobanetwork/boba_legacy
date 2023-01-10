@@ -37,6 +37,7 @@ import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
 import veBobaReducer from './veBobaReducer';
+import devToolsReducer from './devToolsReducer';
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
@@ -61,6 +62,7 @@ const rootReducer = combineReducers({
   verifier: verifierReducer,
   bridge: bridgeReducer,
   veboba: veBobaReducer,
+  devTools: devToolsReducer,
 })
 
 export default rootReducer
