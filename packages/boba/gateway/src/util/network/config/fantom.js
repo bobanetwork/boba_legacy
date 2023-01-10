@@ -3,6 +3,7 @@ import { ETHERSCAN_API_KEY } from "util/constant";
 export const fantomConfig = {
   Testnet: {
     OMGX_WATCHER_URL: `https://api-watcher.testnet.bobaopera.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.testnet.bobaopera.boba.network/`,
     MM_Label:         `bobaOperaTestnet`,
     addressManager:   `0x12ad9f501149D3FDd703cC10c567F416B7F0af8b`,
     L1: {
@@ -30,6 +31,7 @@ export const fantomConfig = {
   },
   Mainnet: {
     OMGX_WATCHER_URL: `https://api-watcher.bobaopera.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.bobaopera.boba.network/`,
     MM_Label:         `Bobaopera`,
     addressManager:   `0x4e7325bcf09e091Bb8119258B885D4ef687B7386`,
     L1: {

@@ -106,6 +106,7 @@ import { APP_CHAIN, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { getNetworkDetail, NETWORK } from 'util/network/network.util'
 import appService from './app.service'
+import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -113,6 +114,8 @@ const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
 const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
+const L2_SECONDARYFEETOKEN_ADDRESS = '0x4200000000000000000000000000000000000023'
+
 let supportedAltL1Chains = []
 
 let allAddresses = {}
@@ -258,24 +261,26 @@ class NetworkService {
 
   async getBobaFeeChoice() {
     const bobaFeeContract = new ethers.Contract(
-      allAddresses.Boba_GasPriceOracle,
-      Boba_GasPriceOracleJson.abi,
+      this.addresses.Proxy__Boba_GasPriceOracle,
+      BobaGasPriceOracleABI,
       this.L2Provider
     )
 
     try {
-
       let priceRatio = await bobaFeeContract.priceRatio()
 
-      let feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
+      let feeChoice;
+      if (this.networkGateway === NETWORK.ETHEREUM) {
+        feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
+      } else {
+        feeChoice = await bobaFeeContract.secondaryFeeTokenUsers(this.account)
+      }
 
       const bobaFee = {
         priceRatio: priceRatio.toString(),
         feeChoice
       }
-
       await addBobaFee( bobaFee )
-
       return bobaFee
 
     } catch (error) {
@@ -283,7 +288,6 @@ class NetworkService {
       console.log(error)
       return error
     }
-
   }
 
   async switchFee( targetFee ) {
@@ -291,8 +295,8 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     const bobaFeeContract = new ethers.Contract(
-      allAddresses.Boba_GasPriceOracle,
-      Boba_GasPriceOracleJson.abi,
+      this.addresses.Proxy__Boba_GasPriceOracle,
+      BobaGasPriceOracleABI,
       this.provider.getSigner()
     )
 
@@ -306,6 +310,9 @@ class NetworkService {
 
       } else if (targetFee === 'ETH') {
         tx = await bobaFeeContract.useETHAsFeeToken()
+        await tx.wait()
+      } else if (targetFee === this.L1NativeTokenSymbol) {
+        tx = await bobaFeeContract.useSecondaryFeeTokenAsFeeToken()
         await tx.wait()
       }
 
@@ -335,15 +342,23 @@ class NetworkService {
     ]
 
     const owner = this.account
-    const spender = allAddresses.Boba_GasPriceOracle
+    const spender = this.addresses.Proxy__Boba_GasPriceOracle
 
     const Boba_GasPriceOracle = new ethers.Contract(
-      allAddresses.Boba_GasPriceOracle,
-      Boba_GasPriceOracleJson.abi,
+      this.addresses.Proxy__Boba_GasPriceOracle,
+      BobaGasPriceOracleABI,
       this.provider.getSigner()
     )
 
-    let value = (await Boba_GasPriceOracle.getBOBAForSwap()).toString()
+    let rawValue;
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      rawValue = await Boba_GasPriceOracle.getBOBAForSwap();
+    } else {
+      rawValue = await Boba_GasPriceOracle.getSecondaryFeeTokenForSwap();
+    }
+
+    let value = (rawValue).toString()
+
     const nonce = (await this.BobaContract.nonces(this.account)).toNumber()
     const deadline = Math.floor(Date.now() / 1000) + 300
     const verifyingContract = this.BobaContract.address
@@ -362,26 +377,24 @@ class NetworkService {
     let signature
 
     try {
-      signature = await this.provider.send('eth_signTypedData_v4', [this.account, JSON.stringify(data)])
+      signature = await this.provider.send('eth_signTypedData_v4', [ this.account, JSON.stringify(data) ])
     } catch (error) {
-      console.log(error)
       return error
     }
 
     try {
+      // change url if network is etheruem
+      const swapUrl = this.networkGateway === NETWORK.ETHEREUM ? '/send.swapBOBAForETH' : '/send.swapSecondaryFeeToken'
       const response = await metaTransactionAxiosInstance(
-        this.networkGateway
-      ).post('/send.swapBOBAForETH', { owner, spender, value, deadline, signature, data })
-      console.log("response",response)
+        this.networkConfig
+      ).post(swapUrl, { owner, spender, value, deadline, signature, data })
+      console.log(['meta tx fee res', response])
       await this.getBobaFeeChoice()
     } catch (error) {
-      console.log(error)
-      // sigh
       let errorData = error.response.data.error
       if(errorData.hasOwnProperty('error')) {
         errorData = errorData.error.error.body
       }
-      console.log("returning:",error)
       return errorData
     }
   }
@@ -412,7 +425,7 @@ class NetworkService {
 
     try {
       const response = await metaTransactionAxiosInstance(
-        this.networkGateway
+        this.networkConfig
       ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
       console.log("response",response)
     } catch (error) {
@@ -672,6 +685,7 @@ class NetworkService {
         this.L2Provider
       )
 
+      /*
       console.log('Setting up watcher CrossChainMessenger')
       this.watcher = new CrossChainMessenger({
         l1SignerOrProvider: this.L1Provider,
@@ -685,10 +699,10 @@ class NetworkService {
         chainId,
         fastRelayer: true,
       })
-
+ */
 
       this.BobaContract = new ethers.Contract(
-        allTokens.BOBA.L2,
+        L2_SECONDARYFEETOKEN_ADDRESS,
         Boba.abi,
         this.L2Provider
       )
@@ -750,17 +764,6 @@ class NetworkService {
       this.networkName = networkMM.name
       this.networkGateway = networkGateway
       this.networkType = networkType
-
-      console.table({
-        type: 'MM',
-        network: networkMM,
-        networkGateway,
-        networkType,
-        chainID: this.chainID,
-        account: this.account,
-        networkName: this.networkName,
-      })
-
 
       // defines the set of possible networks along with chainId for L1 and L2
       // const nw = getNetwork()
@@ -954,9 +957,9 @@ class NetworkService {
   }
 
   async claimAuthenticatedTestnetTokens(tweetId) {
-    // Only Goerli
+    // Only Testnet
     const contract = new ethers.Contract(
-      addresses_Goerli.AuthenticatedFaucet,
+      this.addresses.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
     ).connect()

@@ -3,6 +3,7 @@ import { ETHERSCAN_API_KEY } from "util/constant";
 export const bnbConfig = {
   Testnet: {
     OMGX_WATCHER_URL: `https://api-watcher.testnet.bnb.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.testnet.bnb.boba.network/`,
     MM_Label:         `bobaBnbTestnet`,
     addressManager:   `0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa`,
     L1: {
@@ -30,6 +31,7 @@ export const bnbConfig = {
   },
   Mainnet: {
     OMGX_WATCHER_URL: `https://api-watcher.bnb.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.bnb.boba.network/`,
     MM_Label:         `bobaBnb`,
     addressManager:   `0xeb989B25597259cfa51Bd396cE1d4B085EC4c753`,
     L1: {

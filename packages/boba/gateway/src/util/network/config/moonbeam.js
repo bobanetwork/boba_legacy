@@ -3,6 +3,7 @@ import { ETHERSCAN_API_KEY } from "util/constant";
 export const moonbeamConfig = {
   Testnet: {
     OMGX_WATCHER_URL: `https://api-watcher.bobabase.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.bobabase.boba.network/`,
     MM_Label:         `BobaBase`,
     addressManager:   `0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B`,
     L1: {
@@ -30,6 +31,7 @@ export const moonbeamConfig = {
   },
   Mainnet: {
     OMGX_WATCHER_URL: `https://api-watcher.bobabeam.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.bobabeam.boba.network/`,
     MM_Label:         `bobaBeam`,
     addressManager:   `0x564c10A60af35a07f0EA8Be3106a4D81014b21a0`,
     L1: {

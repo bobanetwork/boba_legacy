@@ -71,13 +71,13 @@ function Wallet() {
   useEffect(() => {
     if (accountEnabled && l2Balances.length > 0) {
 
-      const l2BalanceETH = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
+      const l2BalanceSec = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
       const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
 
-      if (l2BalanceETH && l2BalanceETH.balance) {
+      if (l2BalanceSec && l2BalanceSec.balance) {
         // FOR ETH MIN BALANCE 0.003ETH for other sec tokens 1
-        const minEth = network === NETWORK.ETHEREUM ? 0.003 : 1;
-        setTooSmallSec(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(minEth)))
+        const minBalance = network === NETWORK.ETHEREUM ? 0.003 : 1;
+        setTooSmallSec(new BN(logAmount(l2BalanceSec.balance, 18)).lt(new BN(minBalance)))
       } else {
         // in case of zero ETH balance we are setting tooSmallSec
         setTooSmallSec(true)
@@ -103,7 +103,9 @@ function Wallet() {
 
   async function emergencySwap() {
     const res = await dispatch(getETHMetaTransaction())
-    if (res) dispatch(openAlert('Emergency Swap submitted'))
+    if (res) {
+      dispatch(openAlert('Emergency Swap submitted'))
+    }
   }
 
   return (
@@ -117,6 +119,7 @@ function Wallet() {
       />
 
       {layer === 'L2' &&
+        tooSmallSec &&
         <G.LayerAlert style={{ padding: '20px' }}>
           <G.AlertInfo>
             <Icon as={Info} sx={{ color: "#BAE21A" }} />

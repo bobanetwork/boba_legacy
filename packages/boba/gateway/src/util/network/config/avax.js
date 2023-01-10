@@ -3,6 +3,7 @@ import { ETHERSCAN_API_KEY } from "util/constant";
 export const avaxConfig = {
   Testnet: {
     OMGX_WATCHER_URL: `https://api-watcher.testnet.avax.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.testnet.avax.boba.network/`,
     MM_Label:         `Boba Avalanche Testnet`,
     addressManager:   `0xcE78de95b85212BC348452e91e0e74c17cf37c79`,
     L1: {
@@ -30,6 +31,7 @@ export const avaxConfig = {
   },
   Mainnet: {
     OMGX_WATCHER_URL: `https://api-watcher.avax.boba.network/`,
+    META_TRANSACTION: `https://api-meta-transaction.avax.boba.network/`,
     MM_Label:         `Boba Avalanche Mainnet`,
     addressManager:   `0x00220f8ce1c4be8436574e575fE38558d85e2E6b`,
     L1: {
