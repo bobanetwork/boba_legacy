@@ -69,3 +69,4 @@ services:
       dockerfile: ./ops/docker/Dockerfile.bobalink
     deploy:
       replicas: 0
+

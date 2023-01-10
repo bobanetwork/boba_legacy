@@ -154,9 +154,27 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Bring up the stack
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build the builder
+          command: docker-compose build builder
+          working_directory: ops
+      - run:
+          name: Build the stack
           command: |
             ./scripts/build-ci.sh
+          working_directory: ops
+      - run:
+          name: Build the side stack
+          command: |
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
+          working_directory: ops
+      - run:
+          name: Bring up the stack
+          command: |
+            docker images
             BUILD=2 DAEMON=1 ./up_local.sh
           working_directory: ops
       - run:
