@@ -45,8 +45,7 @@ import { NETWORK } from "util/network/network.util"
 function Wallet() {
 
   const [ page, setPage ] = useState('Token')
-  const [ chain, setChain ] = useState('')
-  const [ tooSmallETH, setTooSmallETH ] = useState(false)
+  const [ tooSmallSec, setTooSmallSec ] = useState(false)
   const [ tooSmallBOBA, setTooSmallBOBA ] = useState(false)
 
   const dispatch = useDispatch()
@@ -57,41 +56,11 @@ function Wallet() {
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
+  // fetching transactions
   useEffect(() => {
     if (accountEnabled)
       dispatch(fetchTransactions())
   }, [ dispatch, accountEnabled ])
-
-  useEffect(() => {
-    if (accountEnabled && l2Balances.length > 0) {
-
-      const l2BalanceETH = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
-      const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
-
-      if (l2BalanceETH && l2BalanceETH.balance) {
-        // FOR ETH MIN BALANCE 0.003ETH
-        setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
-      } else {
-        // in case of zero ETH balance we are setting tooSmallETH
-        setTooSmallETH(true)
-      }
-      if (l2BalanceBOBA && l2BalanceBOBA.balance) {
-        // FOR BOBA 1
-        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
-      } else {
-        // in case of zero BOBA balance we are setting tooSmallBOBA
-        setTooSmallBOBA(true)
-      }
-    }
-  }, [ l2Balances, accountEnabled ])
-
-  useEffect(() => {
-    if (layer === 'L2') {
-      if (tooSmallBOBA && tooSmallETH) {
-        dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
-      }
-    }
-  }, [ tooSmallETH, tooSmallBOBA, layer, dispatch ])
 
   useInterval(() => {
     if (accountEnabled) {
@@ -100,20 +69,37 @@ function Wallet() {
   }, POLL_INTERVAL)
 
   useEffect(() => {
-    if (layer === LAYER.L2) {
-      setChain('Boba Wallet')
-    } else if (layer === LAYER.L1) {
-      setChain('Ethereum Wallet')
-    }
-  }, [ layer ])
+    if (accountEnabled && l2Balances.length > 0) {
 
-  const handleSwitch = (l) => {
-    if (l === 'Token') {
-      setPage('Token')
-    } else if (l === 'NFT') {
-      setPage('NFT')
+      const l2BalanceETH = l2Balances.find((i) => i.symbol === networkService.L1NativeTokenSymbol)
+      const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
+
+      if (l2BalanceETH && l2BalanceETH.balance) {
+        // FOR ETH MIN BALANCE 0.003ETH for other sec tokens 1
+        const minEth = network === NETWORK.ETHEREUM ? 0.003 : 1;
+        setTooSmallSec(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(minEth)))
+      } else {
+        // in case of zero ETH balance we are setting tooSmallSec
+        setTooSmallSec(true)
+      }
+      if (l2BalanceBOBA && l2BalanceBOBA.balance) {
+        // FOR BOBA MIN BALANCE of 1
+        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(1)))
+      } else {
+        // in case of zero BOBA balance we are setting tooSmallBOBA
+        setTooSmallBOBA(true)
+      }
     }
-  }
+  }, [ l2Balances, accountEnabled, network ])
+
+  useEffect(() => {
+    if (layer === 'L2') {
+      if (tooSmallBOBA && tooSmallSec) {
+        dispatch(openError(`Wallet empty - please bridge in ${networkService.L1NativeTokenSymbol} or BOBA from L1`))
+      }
+    }
+  }, [ tooSmallSec, tooSmallBOBA, layer, dispatch ])
+
 
   async function emergencySwap() {
     const res = await dispatch(getETHMetaTransaction())
@@ -130,7 +116,7 @@ function Wallet() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && tooSmallETH &&
+      {layer === 'L2' &&
         <G.LayerAlert style={{ padding: '20px' }}>
           <G.AlertInfo>
             <Icon as={Info} sx={{ color: "#BAE21A" }} />
@@ -141,9 +127,9 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
-              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use
-              EMERGENCY SWAP to swap BOBA for 0.005 ETH at market rates.
+              Using {networkService.L1NativeTokenSymbol} requires a minimum BOBA balance (of 1 BOBA) regardless of your fee setting,
+              otherwise MetaMask may incorrectly reject transactions. If you ran out of BOBA, use
+              EMERGENCY SWAP to swap {networkService.L1NativeTokenSymbol} for 1 BOBA at market rates.
             </Typography>
           </G.AlertInfo>
           <Button
@@ -159,7 +145,7 @@ function Wallet() {
       <S.WalletActionContainer>
         <G.PageSwitcher>
           <Typography
-            className={chain === 'Ethereum Wallet' ? 'active' : ''}
+            className={layer === LAYER.L1 ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectETH(true))
@@ -170,7 +156,7 @@ function Wallet() {
             {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1} Wallet
           </Typography>
           <Typography
-            className={chain === 'Boba Wallet' ? 'active' : ''}
+            className={layer === LAYER.L2 ? 'active' : ''}
             onClick={() => {
               if (!!accountEnabled) {
                 dispatch(setConnectBOBA(true))
@@ -189,7 +175,7 @@ function Wallet() {
             <Box sx={{ mt: 2 }}>
               <Tabs
                 activeTab={page}
-                onClick={(t) => handleSwitch(t)}
+                onClick={(t) => setPage(t)}
                 aria-label="Page Tab"
                 tabs={[ "Token", "NFT" ]}
               />
