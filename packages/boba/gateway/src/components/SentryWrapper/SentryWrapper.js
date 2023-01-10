@@ -4,7 +4,7 @@ import { BrowserTracing } from '@sentry/tracing';
 import { Typography } from '@mui/material';
 import { APP_ENV, SENTRY_DSN } from 'util/constant';
 import { useSelector } from 'react-redux';
-import { selectNetwork } from 'selectors/networkSelector';
+import { selectActiveNetwork } from 'selectors/networkSelector';
 
 
 /**
@@ -18,7 +18,7 @@ const SentryWrapper = ({
   children
 }) => {
 
-  const network = useSelector(selectNetwork());
+  const network = useSelector(selectActiveNetwork());
 
   useEffect(() => {
     const dns = SENTRY_DSN;
@@ -33,7 +33,7 @@ const SentryWrapper = ({
             onunhandledrejection: false,  /// will avoid to send unhandle browser error.
             onerror: false,
           }),
-          new BrowserTracing()
+          // new BrowserTracing()
         ],
         ignoreErrors: [
           'top.GLOBALS', //stop sentry to report the random plugin / extensions errors.
