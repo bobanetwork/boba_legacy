@@ -12,8 +12,8 @@
   "scripts": {
     "start:service": "node ./exec/run-gas-price-oracle.js",
     "start": "yarn start:service",
-    "build": "tsc -p ./tsconfig.build.json",
-    "clean": "rimraf  dist/ ./tsconfig.build.tsbuildinfo",
+    "build": "tsc -p ./tsconfig.json",
+    "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
     "lint": "yarn lint:fix && yarn lint:check",
     "lint:fix": "prettier --config .prettierrc.json --write \"{src,exec,test}/**/*.ts\"",
     "lint:check": "tslint --format stylish --project .",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "devDependencies": {
     "@boba/contracts": "0.0.1",
-    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/contracts": "0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "@ethersproject/providers": "^5.5.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -50,7 +50,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@eth-optimism/common-ts": "^0.1.0",
+    "@eth-optimism/common-ts": "0.2.2",
     "bcfg": "^0.1.6",
     "chalk": "^4.1.1",
     "dotenv": "^8.2.0",

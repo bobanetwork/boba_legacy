@@ -9,8 +9,8 @@
   ],
   "scripts": {
     "start": "node ./exec/run-message-relayer.js",
-    "build": "tsc -p ./tsconfig.build.json",
-    "clean": "rimraf  dist/ ./tsconfig.build.tsbuildinfo",
+    "build": "tsc -p ./tsconfig.json",
+    "clean": "rimraf  dist/ ./tsconfig.tsbuildinfo",
     "lint": "yarn lint:fix && yarn lint:check",
     "pre-commit": "lint-staged",
     "lint:fix": "yarn lint:check --fix",

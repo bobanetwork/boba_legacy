@@ -1,4 +1,3 @@
 ignores: [
-  "@types/pino-std-serializers",
   "pino-pretty"
 ]

@@ -9,7 +9,7 @@
     "dist/index"
   ],
   "scripts": {
-    "clean": "rimraf ./dist ./tsconfig.build.tsbuildinfo",
+    "clean": "rimraf ./dist ./tsconfig.tsbuildinfo",
     "clean:db": "rimraf ./db",
     "lint": "yarn run lint:fix && yarn run lint:check",
     "lint:fix": "yarn lint:check --fix",
@@ -18,7 +18,7 @@
     "start:local": "ts-node ./src/services/run.ts | pino-pretty",
     "test": "hardhat --config test/config/hardhat.config.ts test",
     "test:coverage": "nyc hardhat --config test/config/hardhat.config.ts test && nyc merge .nyc_output coverage.json",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.json",
     "pre-commit": "lint-staged"
   },
   "keywords": [

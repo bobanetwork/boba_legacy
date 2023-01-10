@@ -11,7 +11,7 @@
     "deploy": "ts-node \"./bin/deploy.ts\""
   },
   "dependencies": {
-    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/contracts": "0.5.11",
     "@eth-optimism/core-utils": "^0.8.1",
     "@ethersproject/abstract-provider": "^5.5.0",
     "@ethersproject/abstract-signer": "^5.5.0",
