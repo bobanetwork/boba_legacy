@@ -399,77 +399,10 @@ class NetworkService {
     }
   }
 
-  /** @dev Only works on testnet, but can be freely called on production app */
-  async getTestnetETHAuthenticatedMetaTransaction(tweetId) {
-
-    console.log("triggering getTestnetETH")
-
-    const Boba_AuthenticatedFaucet = new ethers.Contract(
-      addresses_Goerli.AuthenticatedFaucet,
-      AuthenticatedFaucetJson.abi,
-      this.L2Provider,
-    )
-
-    const nonce = parseInt(
-      await Boba_AuthenticatedFaucet.getNonce(this.account),
-      10
-    )
-
-    const signer = this.provider.getSigner(this.account)
-    const hashedMsg = ethers.utils.solidityKeccak256(
-      ['address', 'uint'],
-      [this.account, nonce]
-    )
-    const messageHashBin = ethers.utils.arrayify(hashedMsg)
-    const signature = await signer.signMessage(messageHashBin)
-
-    try {
-      const response = await metaTransactionAxiosInstance(
-        this.networkConfig
-      ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: this.account })
-      console.log("response",response)
-    } catch (error) {
-      let errorMsg = error?.response?.data?.error?.error?.body
-      if (errorMsg) {
-        errorMsg = JSON.stringify(errorMsg)?.match(/execution reverted:\s(.+)\\"/)
-        errorMsg = errorMsg ? errorMsg[1]?.trim() : null;
-      }
-      console.log(`MetaTx error for getTestnetETH: ${errorMsg}`)
-      if (errorMsg?.includes('Invalid request')) {
-        errorMsg = errorMsg.match(/Invalid request:(.+)/)
-        if (errorMsg) {
-          const errorMap = [
-            'Twitter API error - Probably limits hit.',
-            'Twitter account needs to exist at least 48 hours.',
-            'Invalid Tweet, be sure to tweet the Boba Bubble provided above.',
-            'Your Twitter account needs more than 5 followers.',
-            'You need to have tweeted more than 2 times.',
-          ]
-          try {
-            errorMsg = errorMap[parseInt(errorMsg[1]) - 1]
-          } catch(err) {
-            console.error(err)
-            errorMsg = 'Unexpected Twitter error.'
-          }
-        } else {
-          errorMsg = 'Not expected Turing error.'
-        }
-      } else {
-        const errorMap = {
-          'Cooldown': 'Cooldown: You need to wait 24h to claim again with this Twitter account.',
-          'No testnet funds': 'Faucet drained: Please reach out to us.',
-          'Rate limit reached': 'Throttling: Too many requests. Throttling to not hit Twitter rate limits.',
-        }
-        errorMsg = errorMap[errorMsg];
-      }
-      return errorMsg ?? 'Limits reached or Twitter constraints not met.'
-    }
-  }
-
   async getAddress(contractName, varToSet) {
     const address = await this.AddressManager.getAddress(contractName)
     if (address === ERROR_ADDRESS) {
-      console.log(contractName + ' ERROR: NOT IN ADDRESSMANAGER')
+      // console.log(contractName + ' ERROR: NOT IN ADDRESSMANAGER')
       return false
     } else {
       allAddresses = {
@@ -484,14 +417,12 @@ class NetworkService {
   async getAddressCached(cache, contractName, varToSet) {
     const address = cache[contractName]
     if (typeof(address) === 'undefined') {
-      console.log(contractName + ' ERROR: NOT IN CACHE')
       return false
     } else {
-      allAddresses = {
-        ...allAddresses,
+      this.addresses = {
+        ...this.addresses,
         [varToSet]: address
       }
-      console.log(contractName +' pulled from address cache and set to:', address)
       return true
     }
   }
@@ -582,7 +513,7 @@ class NetworkService {
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
 
       this.L1StandardBridgeContract = new ethers.Contract(
-        allAddresses.L1StandardBridgeAddress,
+        this.addresses.L1StandardBridgeAddress,
         L1StandardBridgeJson.abi,
         this.L1Provider
       )
@@ -643,7 +574,6 @@ class NetworkService {
         L2ERC20Json.abi,
         this.L2Provider
       )
-      //console.log("L2_ETH_Contract:", this.L2_ETH_Contract.address)
 
       /*The test token*/
       this.L1_TEST_Contract = new ethers.Contract(
@@ -651,14 +581,12 @@ class NetworkService {
         L1ERC20Json.abi,
         this.L1Provider
       )
-      //console.log('L1_TEST_Contract:', this.L1_TEST_Contract)
 
       this.L2_TEST_Contract = new ethers.Contract(
         allTokens.BOBA.L2, //this will get changed anyway when the contract is used
         L2ERC20Json.abi,
         this.L2Provider
       )
-      //console.log('L2_TEST_Contract:', this.L2_TEST_Contract)
 
       /*The OMG token*/
       //We need this seperately because OMG is not ERC20 compliant
@@ -670,15 +598,12 @@ class NetworkService {
       //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
 
       // Liquidity pools
-      console.log('Setting up contract for L2LP at:',addresses.L2LPAddress)
 
       this.L1LPContract = new ethers.Contract(
         addresses.L1LPAddress,
         L1LPJson.abi,
         this.L1Provider
       )
-
-      console.log('Setting up contract for L1LP at:',addresses.L1LPAddress)
       this.L2LPContract = new ethers.Contract(
         addresses.L2LPAddress,
         L2LPJson.abi,
@@ -701,6 +626,7 @@ class NetworkService {
       })
  */
 
+
       this.BobaContract = new ethers.Contract(
         L2_SECONDARYFEETOKEN_ADDRESS,
         Boba.abi,
@@ -718,19 +644,19 @@ class NetworkService {
         if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
 
         this.delegateContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegate,
+          this.addresses.GovernorBravoDelegate,
           GovernorBravoDelegate.abi,
           this.L2Provider
         )
 
         this.delegatorContract = new ethers.Contract(
-          allAddresses.GovernorBravoDelegator,
+          this.addresses.GovernorBravoDelegator,
           GovernorBravoDelegator.abi,
           this.L2Provider
         )
 
         this.delegatorContractV2 = new ethers.Contract(
-          allAddresses.GovernorBravoDelegatorV2,
+          this.addresses.GovernorBravoDelegatorV2,
           GovernorBravoDelegator.abi,
           this.L2Provider
         )

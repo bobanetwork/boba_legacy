@@ -38,7 +38,7 @@ function GasSwitcher() {
       dispatch(fetchGas())
       dispatch(fetchVerifierStatus())
     }
-  }, [ networkName, baseEnabled ])
+  }, [ networkName, baseEnabled , dispatch])
 
   useInterval(() => {
     if (baseEnabled) {

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
 import { Typography } from '@mui/material';
 import { APP_ENV, SENTRY_DSN } from 'util/constant';
 import { useSelector } from 'react-redux';
