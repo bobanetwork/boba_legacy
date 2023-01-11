@@ -163,8 +163,7 @@ jobs:
           working_directory: ops
       - run:
           name: Build the stack
-          command: |
-            ./scripts/build-ci.sh
+          command: docker-compose build
           working_directory: ops
       - run:
           name: Build the side stack

@@ -71,4 +71,4 @@ env-goerli.yml
 ops_boba/api/metatransaction-api/yarn.lock
 
 #
-../packages/boba/contracts/coverage/
+packages/boba/contracts/coverage/
