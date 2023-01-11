@@ -89,6 +89,7 @@ import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
 import useNetwork from 'hooks/useNetwork'
+import { NETWORK } from 'util/network/network.util'
 
 
 function Home() {
@@ -166,7 +167,9 @@ function Home() {
       if (initialized === 'enabled') {
         dispatch(setBaseState(true))
         // load DAO to speed up the process
-        dispatch(fetchDaoProposals())
+        if (activeNetwork === NETWORK.ETHEREUM) {
+          dispatch(fetchDaoProposals())
+        }
         return true
       }
     }
@@ -176,15 +179,20 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
-      dispatch(getFS_Saves())          // account specific
-      dispatch(getFS_Info())           // account specific
-      dispatch(getMonsterInfo())       // account specific
+
+      //specific to ETH network
+      if (activeNetwork === NETWORK.ETHEREUM) {
+        dispatch(fetchDaoBalance())      // account specific
+        dispatch(fetchDaoVotes())        // account specific
+        dispatch(fetchDaoBalanceX())     // account specific
+        dispatch(fetchDaoVotesX())       // account specific
+        dispatch(getFS_Info())   // account specific
+        dispatch(getFS_Saves()) // account specific
+        dispatch(getMonsterInfo()) // account specific
+      }
     }
-    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
+    /*== we only have have Base L1 and L2 providers*/
+    if (baseEnabled && activeNetwork === NETWORK.ETHEREUM) {
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
     }
@@ -201,9 +209,12 @@ function Home() {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
-      dispatch(getMonsterInfo())
+      // monster only availble for ETH
+      if (activeNetwork === NETWORK.ETHEREUM) {
+        dispatch(getMonsterInfo())
+      }
     }
-  }, [ dispatch, accountEnabled, maintenance ])
+  }, [ dispatch, accountEnabled, maintenance, activeNetwork ])
 
   // Invoking GA analysis page view hooks
   useGoogleAnalytics();

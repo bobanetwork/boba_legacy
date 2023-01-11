@@ -262,7 +262,7 @@ class NetworkService {
   async getBobaFeeChoice() {
 
     const bobaFeeContract = new ethers.Contract(
-      this.addresses.Proxy__Boba_GasPriceOracle,
+      this.addresses.Boba_GasPriceOracle,
       BobaGasPriceOracleABI,
       this.L2Provider
     )
@@ -296,7 +296,7 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     const bobaFeeContract = new ethers.Contract(
-      this.addresses.Proxy__Boba_GasPriceOracle,
+      this.addresses.Boba_GasPriceOracle,
       BobaGasPriceOracleABI,
       this.provider.getSigner()
     )
@@ -544,7 +544,6 @@ class NetworkService {
 
         // NOTE: if not in address manager then refer it from token assets config.
         if (typeof L1a === 'undefined' || typeof L2a === 'undefined') {
-          console.log(`ERROR: ${key} not addressmanager`)
           if (typeof this.supportedTokenAddresses[key] !== 'undefined') {
             tokenList[key] = this.supportedTokenAddresses[key]
           }
@@ -1085,7 +1084,6 @@ class NetworkService {
 
       const state = store.getState()
       const tA = Object.values(state.tokenList);
-      console.log(['state.tokenList',state.tokenList, tA])
 
       const tokenC = new ethers.Contract(
         this.addresses.L1_ETH_Address,
