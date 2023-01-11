@@ -51,6 +51,23 @@ if [ ! -z "$URL" ]; then
       fi
     done
     echo "Rollup contracts are deployed"
+
+    if [ ! -z "$BOBA_URL" ]; then
+        RETRIES=${RETRIES:-50}
+        until $(curl --fail \
+            --output /dev/null \
+            "$BOBA_URL"); do
+          sleep 10
+          echo "Will wait $((RETRIES--)) more times for $BOBA_URL to be up..."
+
+          if [ "$RETRIES" -lt 0 ]; then
+            echo "Timeout waiting for boba deployment"
+            exit 1
+          fi
+        done
+        echo "Boba contracts are deployed"
+    fi
+
     ADDRESS_MANAGER_ADDRESS=$(curl --silent $URL | jq -r .AddressManager)
     exec env \
         ADDRESS_MANAGER_ADDRESS=$ADDRESS_MANAGER_ADDRESS \

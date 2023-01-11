@@ -17,15 +17,6 @@ const main = async () => {
   const deployer_l1 = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, l1Provider)
   const deployer_l2 = new Wallet(process.env.DEPLOYER_PRIVATE_KEY, l2Provider)
 
-  const relayer = new Wallet(process.env.RELAYER_PRIVATE_KEY, l1Provider)
-  const relayerAddress = relayer.address
-
-  const fastRelayer = new Wallet(
-    process.env.FAST_RELAYER_PRIVATE_KEY,
-    l1Provider
-  )
-  const fastRelayerAddress = fastRelayer.address
-
   const getAddressManager = (provider: any, addressManagerAddress: any) => {
     return getContractFactory('Lib_AddressManager')
       .connect(provider)
@@ -67,8 +58,6 @@ const main = async () => {
     deployer_l2,
     addressManager,
     network,
-    relayerAddress,
-    fastRelayerAddress,
     noCompile: process.env.NO_COMPILE ? true : false,
   })
 }
