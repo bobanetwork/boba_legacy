@@ -110,5 +110,5 @@ CMD ["npm", "run", "start"]
 
 FROM base as boba_message-relayer-fast
 WORKDIR /opt/optimism/packages/message-relayer
-COPY ./ops/scripts/relayer.sh .
+COPY ./ops/scripts/relayer-fast.sh .
 CMD ["npm", "run", "start"]
