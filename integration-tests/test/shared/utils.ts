@@ -8,11 +8,7 @@ import {
   utils,
   constants,
 } from 'ethers'
-import {
-  getContractFactory,
-  getContractInterface,
-  predeploys,
-} from '@eth-optimism/contracts'
+import { getContractInterface,predeploys } from '@eth-optimism/contracts'
 import { remove0x } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,

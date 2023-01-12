@@ -1,7 +1,7 @@
 {
-  "name": "accountabstraction",
+  "name": "@boba/accountabstraction",
   "version": "1.0.0",
-  "description": "",
+  "description": "BOBA Account Abstraction",
   "scripts": {
     "build": "yarn install && yarn compile",
     "clean": "rm -rf cache artifacts typechain typechain-types",
@@ -24,8 +24,6 @@
     "runop-goerli": "AA_URL=https://account-abstraction-goerli.nethermind.io yarn runop --network goerli",
     "runop3": "hardhat run src/runop3.ts "
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

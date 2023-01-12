@@ -1,17 +1,8 @@
 {
-  "private": true,
   "name": "aa-bundler",
   "version": "0.2.0",
   "author": "Dror Tirosh",
   "license": "MIT",
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "**eslint**"
-    ]
-  },
   "scripts": {
     "bundler": "lerna run --no-prefix --stream bundler --",
     "runop": "lerna run --no-prefix --stream runop --",
@@ -35,7 +26,6 @@
     "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
-    "@eth-optimism/contracts": "^0.5.11",
     "depcheck": "^1.4.3",
     "eslint": "^8.21.0",
     "eslint-config-standard-with-typescript": "^22.0.0",
