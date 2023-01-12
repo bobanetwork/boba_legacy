@@ -10,14 +10,14 @@
   * [NFTs](boba\_documentation/user/003\_nfts.md)
   * [Running a Boba node](https://github.com/bobanetwork/boba/blob/develop/boba_community/boba-node/README.md)
 
-* [Welcome to Turing](boba\_documentation/developer/turing.md)
-  * [Turing BOBA Faucet](boba\_community/turing-captcha-faucet/README.md)
-  * [Turing KYC](boba\_community/turing-kyc/README.md)
-  * [Turing Monster Minting](boba\_community/turing-monsters/README.md)
+* [Welcome to Hybrid Compute](boba\_documentation/developer/hybrid_compute.md)
   * [Hybrid Compute 101](https://github.com/bobanetwork/HybridCompute_Tutorial/blob/non-local-starter/README.md)
-  * [Turing Wizard](boba\_community/turing-start/README.md)
-  * [Turing API Endpoints](packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
-  * [Turing Implementation](packages/boba/turing/README.md)
+  * [Implementation](boba\_documentation/hc/implementation.md)
+  * [BOBA Faucet](boba\_documentation/hc/hc-captcha-faucet.md)
+  * [KYC](boba\_documentation/hc/kyc.md)
+  * [Monster Minting](boba\_documentation/hc/monsters.md)
+  * [Wizard](boba\_documentation/hc/start.md)
+  * [API Endpoints](boba\_documentation/hc/AWS_lambda_setup.md)
 
 * For Developers
   * [Testnet faucets for developers](boba\_documentation/developer/faucets.md)
