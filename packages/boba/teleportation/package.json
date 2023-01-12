@@ -2,10 +2,9 @@
   "name": "@boba/teleportation",
   "version": "1.0.0",
   "description": "The teleportation between L2s",
-  "main": "dist/index",
-  "types": "dist/index",
+  "main": "dist/src/index",
   "files": [
-    "dist/index",
+    "dist/src/index",
     "test/**/*.ts"
   ],
   "scripts": {

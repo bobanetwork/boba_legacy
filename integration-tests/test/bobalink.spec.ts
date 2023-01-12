@@ -6,7 +6,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { bobaLinkGetQuote } from '@boba/api'
 import util from 'util'
 
-import { BobaLinkService } from '@boba/bobalink'
+import { BobaLinkService } from '@boba/bobalink/src/service'
 
 /* eslint-disable */
 const fetch = require('node-fetch')
