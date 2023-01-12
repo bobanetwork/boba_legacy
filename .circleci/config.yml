@@ -159,16 +159,9 @@ jobs:
           working_directory: ./
       - run:
           name: Build the builder
-          command: docker-compose build builder
-          working_directory: ops
-      - run:
-          name: Build the stack
-          command: docker-compose build
-          working_directory: ops
-      - run:
-          name: Build the side stack
           command: |
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
+            docker-compose build --progress=plain
+            docker-compose up -d --scale replica_healthcheck=1
           working_directory: ops
       - run:
           name: Bring up the stack

@@ -33,7 +33,7 @@
     "@eth-optimism/core-utils": "^0.8.1",
     "@eth-optimism/ynatm": "^0.2.2",
     "@eth-optimism/sdk": "1.0.1",
-    "@sentry/node": "^6.3.1",
+    "@sentry/node": "^7.30.0",
     "bcfg": "^0.1.6",
     "dotenv": "^10.0.0",
     "ethers": "^5.5.4",

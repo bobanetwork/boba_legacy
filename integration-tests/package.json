@@ -16,6 +16,7 @@
     "clean": "rimraf cache artifacts"
   },
   "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.15",
     "@boba/api": "0.0.1",
     "@boba/contracts": "0.0.1",
     "@boba/ve-boba": "0.0.1",
@@ -62,12 +63,5 @@
     "mocha-multi-reporters": "^1.5.1",
     "prom-client": "^14.0.1",
     "rimraf": "^3.0.2"
-  },
-  "dependencies": {
-    "@openzeppelin/test-helpers": "^0.5.15",
-    "chalk": "^4.1.2",
-    "request-promise-native": "^1.0.9",
-    "ip": "^1.1.5",
-    "node-fetch": "^2.6.1"
   }
 }
