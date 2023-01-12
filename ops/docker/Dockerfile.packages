@@ -67,6 +67,7 @@ COPY ./patches ./patches
 RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY ./packages ./packages
+COPY ./ops_boba ./ops_boba
 COPY ./integration-tests ./integration-tests
 
 # copy over solc to save time building (35+ seconds vs not doing this step)

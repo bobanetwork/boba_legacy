@@ -158,7 +158,7 @@ jobs:
           command: yarn && yarn build
           working_directory: ./
       - run:
-          name: Build the builder
+          name: Build everything
           command: |
             docker-compose build --progress=plain
             docker-compose up -d --scale replica_healthcheck=1
