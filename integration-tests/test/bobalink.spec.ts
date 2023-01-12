@@ -39,7 +39,7 @@ describe('BobaLink Test\n', async () => {
   let URL: string
   const ETHProviderUrl = 'https://rpc.ankr.com/eth'
   const ETHProvider = new providers.JsonRpcProvider(ETHProviderUrl)
-  const roundId = BigNumber.from('92233720368547795404')
+  let roundId = BigNumber.from('0')
 
   const gasOverride = {
     gasLimit: 1000000,
@@ -69,6 +69,8 @@ describe('BobaLink Test\n', async () => {
       ],
       ETHProvider
     )
+
+    roundId = (await ChainLinkContract.latestRound()).sub(BigNumber.from('10'))
 
     Factory__TuringHelper = new ContractFactory(
       TuringHelperJson.abi,
@@ -400,10 +402,10 @@ describe('BobaLink Test\n', async () => {
       },
     }
     const bobaLinkService = await startBOBALinkService()
-    await bobaLinkService.init()
+    await bobaLinkService._init()
 
     const prevRoundId = await FluxAggregatorHC.latestRound()
-    await Promise.race([Timer(5000), bobaLinkService.start()])
+    await Promise.race([Timer(5000), bobaLinkService._start()])
     const latestRoundId = await FluxAggregatorHC.latestRound()
     const roundData = await FluxAggregatorHC.getRoundData(latestRoundId)
     const chainLinkLatestRoundId =
