@@ -161,7 +161,6 @@ jobs:
           name: Build everything
           command: |
             docker-compose build --progress=plain
-            docker-compose up -d --scale replica_healthcheck=1
           working_directory: ops
       - run:
           name: Bring up the stack

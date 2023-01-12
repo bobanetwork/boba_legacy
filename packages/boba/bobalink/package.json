@@ -2,8 +2,7 @@
   "name": "@boba/bobalink",
   "version": "1.0.0",
   "description": "BOBA Link Service",
-  "main": "dist/index",
-  "types": "dist/index",
+  "main": "dist/exec/run.js",
   "files": [
     "dist/index",
     "test/**/*.ts"
