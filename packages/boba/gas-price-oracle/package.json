@@ -37,7 +37,7 @@
     "directory-tree": "^2.2.7",
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.5.4",
-    "hardhat": "^2.9.2",
+    "hardhat": "^2.12.5",
     "mocha": "^8.3.1",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",

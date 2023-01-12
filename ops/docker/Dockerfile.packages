@@ -1,0 +1,113 @@
+# This Dockerfile builds all the dependencies needed by the monorepo, and should
+# be used to build any of the follow-on services
+#
+# Pre-download the compilers so that they do not need to be downloaded inside
+# the image when building
+FROM alpine as downloader
+ARG SOLC_LIST_PREFIX=https://binaries.soliditylang.org/linux-amd64/
+ARG SOLC_PREFIX=https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/
+
+ADD ${SOLC_LIST_PREFIX}list.json list.json
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.4.11+commit.68ef5810 ./solc-v0.4.11+commit.68ef5810
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.5.17+commit.d19bba13 ./solc-v0.5.17+commit.d19bba13
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.6.6+commit.6c089d02  ./solc-v0.6.6+commit.6c089d02
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.9+commit.e5eed63a  ./solc-v0.8.9+commit.e5eed63a
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.11+commit.d7f03943  ./solc-v0.8.11+commit.d7f03943
+
+# ### BASE: Install deps
+FROM bobanetwork/foundry:latest as foundry
+# FROM node:16-alpine3.14 as base
+FROM node:16-buster-slim as base
+
+ARG BUILDPLATFORM
+RUN echo "Build Platform: $BUILDPLATFORM"
+
+RUN  if echo $BUILDPLATFORM | grep -i "amd64" ; then \
+          echo "Building for x86_64" ; \
+          apt-get update -y && apt-get install -y git curl bash jq ; \
+     elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
+          echo "Building for Mac ($BUILDPLATFORM)" ; \
+          apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config libc6-amd64-cross ; \
+     elif echo "\"`uname -a`\"" | grep -q -E -i "aarch" ; then \
+          apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
+          echo "Building for aarch64 GNU/Linux" ; \
+     else \
+         echo "Building for something else" ; \
+         apt-get update -y && apt-get install -y git curl bash jq ; \
+     fi
+
+RUN ln -s /usr/x86_64-linux-gnu/lib64/ /lib64
+ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/lib64:/usr/x86_64-linux-gnu/lib"
+
+# copy over the needed configs to run the dep installation
+# note: this approach can be a bit unhandy to maintain, but it allows
+# us to cache the installation steps
+WORKDIR /opt/optimism
+COPY *.json yarn.lock ./
+COPY packages/sdk/package.json ./packages/sdk/package.json
+COPY packages/core-utils/package.json ./packages/core-utils/package.json
+COPY packages/common-ts/package.json ./packages/common-ts/package.json
+COPY packages/contracts/package.json ./packages/contracts/package.json
+COPY packages/data-transport-layer/package.json ./packages/data-transport-layer/package.json
+COPY packages/message-relayer/package.json ./packages/message-relayer/package.json
+COPY packages/replica-healthcheck/package.json ./packages/replica-healthcheck/package.json
+COPY integration-tests/package.json ./integration-tests/package.json
+COPY ops_boba/api/package.json ./ops_boba/api/package.json
+
+COPY packages/boba/contracts/package.json ./packages/boba/contracts/package.json
+COPY packages/boba/gas-price-oracle/package.json ./packages/boba/gas-price-oracle/package.json
+COPY packages/boba/turing/package.json ./packages/boba/turing/package.json
+COPY packages/boba/ve-boba/package.json ./packages/boba/ve-boba/package.json
+COPY packages/boba/bobalink/package.json ./packages/boba/bobalink/package.json
+
+# copy over the patches, if any...
+# needs to happen before `yarn` otherwise patch-packages does not apply the patches
+COPY ./patches ./patches
+
+RUN yarn install --frozen-lockfile && yarn cache clean
+
+COPY ./packages ./packages
+COPY ./integration-tests ./integration-tests
+
+# copy over solc to save time building (35+ seconds vs not doing this step)
+COPY --from=downloader list.json /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/list.json
+COPY --from=downloader solc-v0.4.11+commit.68ef5810 /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810
+COPY --from=downloader solc-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13
+COPY --from=downloader solc-v0.6.6+commit.6c089d02  /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02
+COPY --from=downloader solc-v0.8.9+commit.e5eed63a  /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a
+COPY --from=downloader solc-v0.8.11+commit.d7f03943 /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943
+
+RUN chmod +x /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
+
+# build it!
+RUN yarn build
+
+FROM base as deployer
+WORKDIR /opt/optimism/packages/contracts
+COPY ./ops/scripts/deployer.sh .
+CMD ["yarn", "run", "deploy"]
+
+FROM base as boba_deployer
+WORKDIR /opt/optimism/packages/boba/contracts
+ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
+
+FROM base as data-transport-layer
+WORKDIR /opt/optimism/packages/data-transport-layer
+RUN mkdir ./state-dumps
+COPY ./ops/scripts/dtl.sh .
+CMD ["node", "dist/src/services/run.js"]
+
+FROM base as integration-tests
+WORKDIR /opt/optimism/integration-tests
+COPY ./ops/scripts/integration-tests.sh ./
+CMD ["yarn", "test:integration"]
+
+FROM base as message-relayer
+WORKDIR /opt/optimism/packages/message-relayer
+COPY ./ops/scripts/relayer.sh .
+CMD ["npm", "run", "start"]
+
+FROM base as boba_message-relayer-fast
+WORKDIR /opt/optimism/packages/message-relayer
+COPY ./ops/scripts/relayer.sh .
+CMD ["npm", "run", "start"]

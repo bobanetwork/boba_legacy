@@ -301,13 +301,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
          try {
            this.logger.info("addressRegistry PUT request for state-dump file")
 
-           req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json_TMP"))
-
-           await fs.rename(
-             "./state-dumps/state-dump.latest.json_TMP",
-             "./state-dumps/state-dump.latest.json",
-             (err) => { if (err) { throw err; } }
-           )
+           req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json"))
 
            this.logger.info("Saved new state-dump.latest.json")
            return res.sendStatus(201).end()
