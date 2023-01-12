@@ -41,10 +41,20 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.7.0",
     "hardhat": "^2.12.5",
-    "hardhat-deploy": "^0.11.4",
     "nyc": "^15.1.0",
     "typedoc": "^0.22.13",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "chai": "^4.3.4",
+    "@babel/eslint-parser": "^7.18.2",
+    "@typescript-eslint/eslint-plugin": "^5.45.1",
+    "@typescript-eslint/parser": "^5.45.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jsdoc": "^35.1.2",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-unicorn": "^32.0.1"
   },
   "dependencies": {
     "@eth-optimism/contracts": "0.5.11",

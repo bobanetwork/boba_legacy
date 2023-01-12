@@ -154,7 +154,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build images
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build everything
           command: |
             docker-compose build --progress=plain
           working_directory: ops

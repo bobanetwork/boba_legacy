@@ -3,6 +3,14 @@
   "version": "0.2.0",
   "author": "Dror Tirosh",
   "license": "MIT",
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**eslint**"
+    ]
+  },
   "scripts": {
     "bundler": "lerna run --no-prefix --stream bundler --",
     "runop": "lerna run --no-prefix --stream runop --",
