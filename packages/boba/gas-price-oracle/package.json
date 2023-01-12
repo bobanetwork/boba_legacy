@@ -10,8 +10,7 @@
     "test/**/*.ts"
   ],
   "scripts": {
-    "start:service": "node ./exec/run-gas-price-oracle.js",
-    "start": "yarn start:service",
+    "start": "ts-node ./src/exec/run.ts",
     "build": "tsc -p ./tsconfig.json",
     "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
     "lint": "yarn lint:fix && yarn lint:check",

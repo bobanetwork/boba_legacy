@@ -112,3 +112,15 @@ FROM base as boba_message-relayer-fast
 WORKDIR /opt/optimism/packages/message-relayer
 COPY ./ops/scripts/relayer-fast.sh .
 CMD ["npm", "run", "start"]
+
+FROM base as gas_oracle
+WORKDIR /opt/optimism/packages/boba/gas-price-oracle
+CMD ["npm", "run", "start"]
+
+FROM base as bobalink
+WORKDIR /opt/optimism/packages/boba/bobalink
+CMD ["npm", "run", "start"]
+
+FROM base as teleportation
+WORKDIR /opt/optimism/packages/boba/teleportation
+CMD ["npm", "run", "start"]

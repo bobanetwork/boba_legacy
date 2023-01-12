@@ -68,7 +68,7 @@ jobs:
         working-directory: ./ops
         run: |
            ./scripts/build-ci.sh
-           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
+           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle teleportation bobalink
 
       - name: Build Proxyd
         working-directory: ./
