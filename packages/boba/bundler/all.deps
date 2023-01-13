@@ -1,6 +1,7 @@
   "@account-abstraction/contracts": "^0.2.0",
   "@account-abstraction/sdk": "^0.2.3",
   "@account-abstraction/utils": "^0.2.3",
+  "@ethersproject/abi": "^5.5.0",
   "@ethersproject/abstract-provider": "^5.5.0",
   "@ethersproject/abstract-signer": "^5.5.0",
   "@ethersproject/networks": "^5.5.0",
