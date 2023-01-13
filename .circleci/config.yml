@@ -172,7 +172,7 @@ jobs:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml run bobalink
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink
           working_directory: ops
       - run:
           name: Start background logging
