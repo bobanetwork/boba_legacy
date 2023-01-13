@@ -18,8 +18,7 @@
     "test": "yarn test:contracts",
     "test:contracts": "hardhat test --show-stack-traces",
     "test:coverage": "NODE_OPTIONS=--max_old_space_size=8192 hardhat coverage",
-    "test:slither": "slither .",
-    "depcheck": "depcheck --ignores @openzeppelin/*,@chainlink/*"
+    "test:slither": "slither ."
   },
   "dependencies": {
     "@boba/turing-hybrid-compute": "0.2.0",

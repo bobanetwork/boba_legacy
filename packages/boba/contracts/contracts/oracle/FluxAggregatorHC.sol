@@ -468,7 +468,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    */
   function getChainLinkQuote(uint256 _roundId)
     public
-    onlyOwner
+    onlyOracleAdmin
     returns (uint256 , int256, uint256)
   {
     bytes memory encRequest = abi.encode(HCChainLinkPriceFeedAddr, _roundId);

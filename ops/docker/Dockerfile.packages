@@ -106,12 +106,14 @@ CMD ["yarn", "test:integration"]
 FROM base as message-relayer
 WORKDIR /opt/optimism/packages/message-relayer
 COPY ./ops/scripts/relayer.sh .
-CMD ["npm", "run", "start"]
+RUN chmod +x ./relayer.sh
+ENTRYPOINT ["./relayer.sh"]
 
 FROM base as boba_message-relayer-fast
 WORKDIR /opt/optimism/packages/message-relayer
 COPY ./ops/scripts/relayer-fast.sh .
-CMD ["npm", "run", "start"]
+RUN chmod +x ./relayer-fast.sh
+ENTRYPOINT ["./relayer-fast.sh"]
 
 FROM base as gas_oracle
 WORKDIR /opt/optimism/packages/boba/gas-price-oracle
@@ -119,7 +121,9 @@ CMD ["npm", "run", "start"]
 
 FROM base as bobalink
 WORKDIR /opt/optimism/packages/boba/bobalink
-CMD ["npm", "run", "start"]
+COPY ./ops/scripts/bobalink.sh .
+RUN chmod +x ./bobalink.sh
+ENTRYPOINT ["./bobalink.sh"]
 
 FROM base as teleportation
 WORKDIR /opt/optimism/packages/boba/teleportation

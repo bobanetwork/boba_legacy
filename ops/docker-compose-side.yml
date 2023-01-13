@@ -1,5 +1,9 @@
 version: "3"
 
+# Account #14 - bobalink test
+x-bobalink_pk: &bobalink_pk
+  BOBALINK_REPORTER_KEY: '0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa'
+
 # Account #19
 x-gas-price-oracle_pk: &gas-price-oracle_pk
   GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
@@ -39,6 +43,8 @@ services:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 200
+    deploy:
+      replicas: 0
 
   monitor:
     depends_on:
@@ -70,6 +76,11 @@ services:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.packages
       target: bobalink
-    deploy:
-      replicas: 0
-
+    environment:
+      L1_NODE_WEB3_URL: http://l2geth:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      << : *bobalink_pk #same as the deployer
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      POLLING_INTERVAL: 1000

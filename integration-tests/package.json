@@ -20,7 +20,6 @@
     "@boba/api": "0.0.1",
     "@boba/contracts": "0.0.1",
     "@boba/ve-boba": "0.0.1",
-    "@boba/bobalink": "1.0.0",
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "@eth-optimism/sdk": "1.0.1",
