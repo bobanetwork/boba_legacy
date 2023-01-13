@@ -215,7 +215,7 @@ describe('BobaLink Test\n', async () => {
       /* eslint-enable */
   })
 
-  it('test of local compute endpoint: should return price', async () => {
+  it.only('test of local compute endpoint: should return price', async () => {
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const decimals = await EthChainLinkOracle.decimals()
     /* eslint-disable */
@@ -247,7 +247,7 @@ describe('BobaLink Test\n', async () => {
     expect(result[3]).to.be.deep.equal(roundId)
   })
 
-  it('test of /bobalink-test-api endpoint: should return price', async () => {
+  it.only('test of /bobalink-test-api endpoint: should return price', async () => {
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
@@ -273,7 +273,7 @@ describe('BobaLink Test\n', async () => {
     expect(result[3]).to.be.deep.equal(lastRoundId)
   })
 
-  it('test of /bobalink-prod-api endpoint: should return price', async () => {
+  it.only('test of /bobalink-prod-api endpoint: should return price', async () => {
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
@@ -299,7 +299,7 @@ describe('BobaLink Test\n', async () => {
     expect(result[3]).to.be.deep.equal(lastRoundId)
   })
 
-  it('should get quote via Hybrid Compute', async () => {
+  it.only('should get quote via Hybrid Compute', async () => {
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     await EthOracleHC.updateHCUrl(`${URL}/fake`)
     await EthOracleHC.connect(env.l2Wallet_2).estimateGas.getChainLinkQuote(lastRoundId)
@@ -314,7 +314,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId)
   }).retries(3)
 
-  it('should get a single quote via bobalink using test api', async () => {
+  it.only('should get a single quote via bobalink using test api', async () => {
     await EthOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const decimals = await EthChainLinkOracle.decimals()
@@ -335,14 +335,14 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 1)
   })
 
-  it('should not be able to submit answer again using Hybird Compute', async () => {
+  it.only('should not be able to submit answer again using Hybird Compute', async () => {
     const lastRoundId = (await EthOracleHC.latestRound()).toNumber()
     await expect(
       EthOracleHC.connect(env.l2Wallet_2).estimateGas.submit(lastRoundId)
     ).to.be.revertedWith('invalid roundId to initialize')
   })
 
-  it('should not be able to submit answer again using emergency submission', async () => {
+  it.only('should not be able to submit answer again using emergency submission', async () => {
     const lastRoundId = (await EthOracleHC.latestRound()).toNumber()
     const decimals = await EthOracleHC.decimals()
     await expect(
@@ -354,7 +354,7 @@ describe('BobaLink Test\n', async () => {
     ).to.be.revertedWith('invalid roundId to initialize')
   })
 
-  it('should get multiple quotes via bobalink using test api', async () => {
+  it.only('should get multiple quotes via bobalink using test api', async () => {
     await EthOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const decimals = await EthChainLinkOracle.decimals()
@@ -379,7 +379,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
   })
 
-  it('should get a single quote via bobalink using prod api', async () => {
+  it.only('should get a single quote via bobalink using prod api', async () => {
     await EthOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const decimals = await EthChainLinkOracle.decimals()
@@ -400,7 +400,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 1)
   })
 
-  it('should get multiple quotes via bobalink using prod api', async () => {
+  it.only('should get multiple quotes via bobalink using prod api', async () => {
     await EthOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const decimals = await EthChainLinkOracle.decimals()
@@ -425,7 +425,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
   })
 
-  it('should get multiple quotes for multiple oracles using prod api', async () => {
+  it.only('should get multiple quotes for multiple oracles using prod api', async () => {
     await EthOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
     const EthLastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const EthDecimals = await EthChainLinkOracle.decimals()

@@ -70,6 +70,7 @@ services:
 
   bobalink:
     depends_on:
+     - dtl
      - l2geth
     image: bobanetwork/bobalink:latest
     build:
