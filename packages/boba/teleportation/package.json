@@ -14,7 +14,8 @@
     "lint": "yarn lint:fix && yarn lint:check",
     "lint:fix": "prettier --config .prettierrc.json --write \"{src,exec,test}/**/*.ts\"",
     "lint:check": "tslint --format stylish --project .",
-    "test": "hardhat test --show-stack-traces"
+    "test": "hardhat test --show-stack-traces",
+    "test:coverage": "nyc hardhat test && nyc merge .nyc_output coverage.json"
   },
   "license": "MIT",
   "devDependencies": {
