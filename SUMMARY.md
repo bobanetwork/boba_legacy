@@ -41,6 +41,7 @@
   * [Exchange Integration](boba\_documentation/developer/exchange-integration.md)
   * [JSON-RPC API](boba\_documentation/developer/json-rpc-api.md)
   * [Price Oracles](boba\_documentation/developer/price-feeds.md)
+  * [Account Abstraction Paymasters](boba\_documentation/developer/aa-paymasters.md)
   * [NFT Bridging](boba\_documentation/developer/nft-bridge.md)
   * [Token Bridging](boba\_documentation/developer/bridge-l1-and-l2/bridge-basics.md)
     * [Using the Standard Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/standard-bridge.md)
