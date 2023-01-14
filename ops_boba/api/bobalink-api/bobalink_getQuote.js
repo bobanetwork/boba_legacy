@@ -25,6 +25,8 @@ const loadContract = (contractAddr) => {
   }
   const L1_NODE_WEB3_URL = env.L1_NODE_WEB3_URL
 
+  console.log({ L1_NODE_WEB3_URL })
+
   // load contract
   const provider = new ethers.providers.JsonRpcProvider(L1_NODE_WEB3_URL)
   const chainLinkContract = new ethers.Contract(

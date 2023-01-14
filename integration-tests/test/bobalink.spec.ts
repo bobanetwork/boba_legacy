@@ -274,7 +274,7 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('test of /bobalink-prod-api endpoint: should return price', async () => {
-    process.env.L1_NODE_WEB3_URL = 'http://localhost:8545'
+    process.env.L1_NODE_WEB3_URL = env.l2Provider.connection.url
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
