@@ -34,11 +34,10 @@ contract TestLib_MerkleTrie {
         return Lib_MerkleTrie.get(_key, _proof, _root);
     }
 
-    function getSingleNodeRootHash(bytes memory _key, bytes memory _value)
-        public
-        pure
-        returns (bytes32)
-    {
+    function getSingleNodeRootHash(
+        bytes memory _key,
+        bytes memory _value
+    ) public pure returns (bytes32) {
         return Lib_MerkleTrie.getSingleNodeRootHash(_key, _value);
     }
 }

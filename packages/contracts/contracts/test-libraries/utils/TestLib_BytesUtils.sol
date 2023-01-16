@@ -9,11 +9,10 @@ import { TestERC20 } from "../../test-helpers/TestERC20.sol";
  * @title TestLib_BytesUtils
  */
 contract TestLib_BytesUtils {
-    function concat(bytes memory _preBytes, bytes memory _postBytes)
-        public
-        pure
-        returns (bytes memory)
-    {
+    function concat(
+        bytes memory _preBytes,
+        bytes memory _postBytes
+    ) public pure returns (bytes memory) {
         return abi.encodePacked(_preBytes, _postBytes);
     }
 

@@ -46,7 +46,7 @@
     "prom-client": "^13.1.0"
   },
   "devDependencies": {
-    "@ethersproject/abstract-provider": "^5.5.1",
+    "@ethersproject/abstract-provider": "^5.5.0",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@types/chai": "^4.2.18",
     "@types/express": "^4.17.12",
