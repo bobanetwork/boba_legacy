@@ -892,8 +892,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		
 		//methodID for GetRandomV2 is a886988e -> [168, 134, 152, 142]
 		isGetRand2 = bytes.Equal(input[:4], []byte{168, 134, 152, 142})
+		log.Debug("MMDBG isTuring", "method", hexutil.Bytes(input[:4]))
 	}
-	log.Debug("MMDBG isTuring", "method", hexutil.Bytes(input[:4]))
 
 	// TuringCall takes the original calldata, figures out what needs
 	// to be done, and then synthesizes a 'updated_input' calldata
