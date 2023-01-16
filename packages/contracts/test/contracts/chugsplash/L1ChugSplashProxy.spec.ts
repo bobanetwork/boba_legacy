@@ -3,10 +3,10 @@ import { expect } from '../../setup'
 /* Imports: External */
 import hre from 'hardhat'
 import { Contract, Signer } from 'ethers'
-import { smockit } from '@eth-optimism/smock'
 
 /* Imports: Internal */
 import { getContractInterface } from '../../../src'
+import { smock } from '@defi-wonderland/smock'
 
 describe('L1ChugSplashProxy', () => {
   let signer1: Signer
@@ -171,11 +171,13 @@ describe('L1ChugSplashProxy', () => {
     })
 
     it('should throw an error if the owner has signalled an upgrade', async () => {
-      const owner = await smockit(getContractInterface('iL1ChugSplashDeployer'))
+      const owner = await smock.fake<Contract>(
+        getContractInterface('iL1ChugSplashDeployer')
+      )
       const factory = await hre.ethers.getContractFactory('L1ChugSplashProxy')
       const proxy = await factory.deploy(owner.address)
 
-      owner.smocked.isUpgrading.will.return.with(true)
+      owner.isUpgrading.returns(true)
 
       await expect(
         owner.wallet.sendTransaction({

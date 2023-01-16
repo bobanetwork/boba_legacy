@@ -2,7 +2,149 @@
 version: 2.1
 
 jobs:
+  go-lint-test-build:
+    parameters:
+      binary_name:
+        description: Binary name to build
+        type: string
+      working_directory:
+        description: Working directory
+        type: string
+      build:
+        description: Whether or not to build the binary
+        type: boolean
+        default: true
+      dependencies:
+        description: Regex matching dependent packages
+        type: string
+        default: this-package-does-not-exist
+    docker:
+      - image: ethereumoptimism/ci-builder:latest
+      - image: cimg/postgres:14.1
+    steps:
+      - checkout
+      - run:
+          name: Check if we should run
+          command: |
+            shopt -s inherit_errexit
+            CHANGED=$(check-changed "(<<parameters.working_directory>>|<<parameters.dependencies>>)" || echo "TRUE")
+            echo $CHANGED
+            if [[ "$CHANGED" = "FALSE" ]]; then
+              circleci step halt
+            fi
+      - run:
+          name: Lint
+          command: golangci-lint run -E goimports,sqlclosecheck,bodyclose,asciicheck,misspell,errorlint -e "errors.As" -e "errors.Is" ./...
+          working_directory: <<parameters.working_directory>>
+      - store_test_results:
+          path: /test-results
+      - run:
+          name: Test
+          command: |
+            mkdir -p /test-results
+            DB_USER=postgres gotestsum --junitfile /test-results/tests.xml
+          working_directory: <<parameters.working_directory>>
+      - when:
+          condition:
+            equal: [ true, <<parameters.build>> ]
+          steps:
+            - run:
+                name: Build
+                command: make <<parameters.binary_name>>
+                working_directory: <<parameters.working_directory>>
+
+  build_bundler: # runs not using Workflows must have a `build` job as entry point
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
+
+      - run:
+          name: package-json-all-deps
+          command: yarn create-all-deps
+          working_directory: ./packages/boba/bundler
+
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}
+
+      - run:
+          name: yarn-install-if-no-cache
+          command:  test -d node_modules/truffle || yarn
+          working_directory: ./packages/boba/bundler
+
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}
+          paths:
+            - ./packages/boba/bundler/node_modules
+            - ./packages/boba/bundler/packages/node_modules
+            # - ./packages/boba/bundler/packages/client/node_modules
+            # - ./packages/boba/bundler/packages/common/node_modules
+            # - ./packages/boba/bundler/packages/contracts/node_modules
+
+      - run:
+          name: yarn-preprocess
+          command: yarn preprocess
+          working_directory: ./packages/boba/bundler
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./packages/boba/bundler
+
+  test_bundler:
+    working_directory: ~/aa # directory where steps will run
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: test
+          command: yarn lerna-test | tee /tmp/test-dev-results.log
+          working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-dev-results.log
+  test_flow_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run hardhat-node as standalone process fork
+          name: hardhat-node-process
+          command: yarn hardhat-node
+          background: true
+          working_directory: ./packages/boba/bundler
+      - run: # run tests
+          name: test
+          command: yarn lerna-test-flows | tee /tmp/test-flows-results.log
+          working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-flow-results.log
+
+  lint_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: lint
+          command: yarn lerna-lint
+          working_directory: ./packages/boba/bundler
+  depcheck_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: depcheck
+          command: yarn depcheck
+          working_directory: ./packages/boba/bundler
   integration-tests:
+    resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
@@ -49,3 +191,21 @@ workflows:
   main:
     jobs:
       - integration-tests
+      - go-lint-test-build:
+          name: proxyd-tests
+          binary_name: proxyd
+          working_directory: go/proxyd
+      - build_bundler
+      - test_bundler:
+          requires:
+            - build_bundler
+      - test_flow_bundler:
+          requires:
+            - build_bundler
+      - lint_bundler:
+          requires:
+            - build_bundler
+      - depcheck_bundler:
+          requires:
+            - build_bundler
+

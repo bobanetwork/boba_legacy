@@ -95,10 +95,10 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
      * Allows the Burn Admin to update the parameters which determine the amount of gas to burn.
      * The value of enqueueL2GasPrepaid is immediately updated as well.
      */
-    function setGasParams(uint256 _l2GasDiscountDivisor, uint256 _enqueueGasCost)
-        external
-        onlyBurnAdmin
-    {
+    function setGasParams(
+        uint256 _l2GasDiscountDivisor,
+        uint256 _enqueueGasCost
+    ) external onlyBurnAdmin {
         enqueueGasCost = _enqueueGasCost;
         l2GasDiscountDivisor = _l2GasDiscountDivisor;
         // See the comment in enqueue() for the rationale behind this formula.
@@ -175,11 +175,9 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
      * @param _index Index of the queue element to access.
      * @return _element Queue element at the given index.
      */
-    function getQueueElement(uint256 _index)
-        public
-        view
-        returns (Lib_OVMCodec.QueueElement memory _element)
-    {
+    function getQueueElement(
+        uint256 _index
+    ) public view returns (Lib_OVMCodec.QueueElement memory _element) {
         return queueElements[_index];
     }
 
@@ -206,11 +204,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
      * @param _gasLimit Gas limit for the enqueued L2 transaction.
      * @param _data Transaction data.
      */
-    function enqueue(
-        address _target,
-        uint256 _gasLimit,
-        bytes memory _data
-    ) external {
+    function enqueue(address _target, uint256 _gasLimit, bytes memory _data) external {
         require(
             _data.length <= MAX_ROLLUP_TX_SIZE,
             "Transaction data size exceeds maximum for rollup transaction."
@@ -412,16 +406,7 @@ contract CanonicalTransactionChain is ICanonicalTransactionChain, Lib_AddressRes
      * @return Total number of elements submitted.
      * @return Index of the next queue element.
      */
-    function _getBatchExtraData()
-        internal
-        view
-        returns (
-            uint40,
-            uint40,
-            uint40,
-            uint40
-        )
-    {
+    function _getBatchExtraData() internal view returns (uint40, uint40, uint40, uint40) {
         bytes27 extraData = batches().getGlobalMetadata();
 
         uint40 totalElements;

@@ -55,11 +55,7 @@ contract L2CrossDomainMessenger is IL2CrossDomainMessenger {
      * @param _message Message to send to the target.
      * @param _gasLimit Gas limit for the provided message.
      */
-    function sendMessage(
-        address _target,
-        bytes memory _message,
-        uint32 _gasLimit
-    ) public {
+    function sendMessage(address _target, bytes memory _message, uint32 _gasLimit) public {
         bytes memory xDomainCalldata = Lib_CrossDomainUtils.encodeXDomainCalldata(
             _target,
             msg.sender,
