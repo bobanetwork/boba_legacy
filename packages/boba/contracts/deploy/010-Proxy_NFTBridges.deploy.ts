@@ -5,8 +5,8 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from './000-Messenger.deploy'
 
 import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
-import L1NFTBridgeJson from '../artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
-import L2NFTBridgeJson from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L1NFTBridgeJson from '../artifacts/contracts/ERC721Bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridgeJson from '../artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json'
 
 let Factory__Proxy__L1NFTBridge: ContractFactory
 let Factory__Proxy__L2NFTBridge: ContractFactory

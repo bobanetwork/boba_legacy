@@ -19,7 +19,7 @@
     "axios": "0.26.0",
     "async-mutex": "^0.3.1",
     "dotenv": "^9.0.0",
-    "ethers": "^5.1.4",
+    "ethers": "^5.5.4",
     "lodash": "4.17.21",
     "mysql": "^2.18.1",
     "node-fetch": "2.6.0",

@@ -1,0 +1,1099 @@
+{
+  "address": "0x602aB3881Ff3Fa8dA60a8F44Cf633e91bA1FdB69",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_create2factory",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_paymasterStake",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint32",
+          "name": "_unstakeDelaySec",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "opIndex",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "paymaster",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "reason",
+          "type": "string"
+        }
+      ],
+      "name": "FailedOp",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "totalDeposit",
+          "type": "uint256"
+        }
+      ],
+      "name": "Deposited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "totalStaked",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "withdrawTime",
+          "type": "uint256"
+        }
+      ],
+      "name": "StakeLocked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "withdrawTime",
+          "type": "uint256"
+        }
+      ],
+      "name": "StakeUnlocked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "withdrawAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "StakeWithdrawn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "requestId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "paymaster",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "nonce",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "actualGasCost",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "actualGasPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "success",
+          "type": "bool"
+        }
+      ],
+      "name": "UserOperationEvent",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "requestId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "nonce",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "revertReason",
+          "type": "bytes"
+        }
+      ],
+      "name": "UserOperationRevertReason",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "withdrawAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Withdrawn",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_unstakeDelaySec",
+          "type": "uint32"
+        }
+      ],
+      "name": "addStake",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "create2factory",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "depositTo",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "deposits",
+      "outputs": [
+        {
+          "internalType": "uint112",
+          "name": "deposit",
+          "type": "uint112"
+        },
+        {
+          "internalType": "bool",
+          "name": "staked",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint112",
+          "name": "stake",
+          "type": "uint112"
+        },
+        {
+          "internalType": "uint32",
+          "name": "unstakeDelaySec",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint64",
+          "name": "withdrawTime",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "getDepositInfo",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint112",
+              "name": "deposit",
+              "type": "uint112"
+            },
+            {
+              "internalType": "bool",
+              "name": "staked",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint112",
+              "name": "stake",
+              "type": "uint112"
+            },
+            {
+              "internalType": "uint32",
+              "name": "unstakeDelaySec",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "withdrawTime",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct StakeManager.DepositInfo",
+          "name": "info",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "verificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxPriorityFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "paymaster",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct UserOperation",
+          "name": "userOp",
+          "type": "tuple"
+        }
+      ],
+      "name": "getRequestId",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "initCode",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "salt",
+          "type": "uint256"
+        }
+      ],
+      "name": "getSenderAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "getSenderStorage",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "senderStorageCells",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "verificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxPriorityFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "paymaster",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct UserOperation[]",
+          "name": "ops",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "address payable",
+          "name": "beneficiary",
+          "type": "address"
+        }
+      ],
+      "name": "handleOps",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "verificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxPriorityFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "paymaster",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct UserOperation",
+          "name": "op",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "requestId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "prefund",
+              "type": "uint256"
+            },
+            {
+              "internalType": "enum EntryPoint.PaymentMode",
+              "name": "paymentMode",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "contextOffset",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preOpGas",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct EntryPoint.UserOpInfo",
+          "name": "opInfo",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes",
+          "name": "context",
+          "type": "bytes"
+        }
+      ],
+      "name": "innerHandleOp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "actualGasCost",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paymasterStake",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "verificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxPriorityFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "paymaster",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct UserOperation",
+          "name": "userOp",
+          "type": "tuple"
+        }
+      ],
+      "name": "simulateValidation",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "preOpGas",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "prefund",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unlockStake",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unstakeDelaySec",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "withdrawAddress",
+          "type": "address"
+        }
+      ],
+      "name": "withdrawStake",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "withdrawAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "withdrawAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdrawTo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "args": [
+    "0xce0042B868300000d44A59004Da54A005ffdcf9f",
+    "1000000000000000000",
+    100
+  ],
+  "solcInputHash": "e483154fa64ffd3f4176544534164472",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.12+commit.f00d7308\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_create2factory\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_paymasterStake\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"_unstakeDelaySec\",\"type\":\"uint32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"opIndex\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"reason\",\"type\":\"string\"}],\"name\":\"FailedOp\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalDeposit\",\"type\":\"uint256\"}],\"name\":\"Deposited\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"totalStaked\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawTime\",\"type\":\"uint256\"}],\"name\":\"StakeLocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"withdrawTime\",\"type\":\"uint256\"}],\"name\":\"StakeUnlocked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"StakeWithdrawn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"actualGasCost\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"actualGasPrice\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"}],\"name\":\"UserOperationEvent\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"revertReason\",\"type\":\"bytes\"}],\"name\":\"UserOperationRevertReason\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Withdrawn\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"_unstakeDelaySec\",\"type\":\"uint32\"}],\"name\":\"addStake\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"create2factory\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"depositTo\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"deposits\",\"outputs\":[{\"internalType\":\"uint112\",\"name\":\"deposit\",\"type\":\"uint112\"},{\"internalType\":\"bool\",\"name\":\"staked\",\"type\":\"bool\"},{\"internalType\":\"uint112\",\"name\":\"stake\",\"type\":\"uint112\"},{\"internalType\":\"uint32\",\"name\":\"unstakeDelaySec\",\"type\":\"uint32\"},{\"internalType\":\"uint64\",\"name\":\"withdrawTime\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"getDepositInfo\",\"outputs\":[{\"components\":[{\"internalType\":\"uint112\",\"name\":\"deposit\",\"type\":\"uint112\"},{\"internalType\":\"bool\",\"name\":\"staked\",\"type\":\"bool\"},{\"internalType\":\"uint112\",\"name\":\"stake\",\"type\":\"uint112\"},{\"internalType\":\"uint32\",\"name\":\"unstakeDelaySec\",\"type\":\"uint32\"},{\"internalType\":\"uint64\",\"name\":\"withdrawTime\",\"type\":\"uint64\"}],\"internalType\":\"struct StakeManager.DepositInfo\",\"name\":\"info\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"paymasterData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"}],\"name\":\"getRequestId\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"salt\",\"type\":\"uint256\"}],\"name\":\"getSenderAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"getSenderStorage\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"senderStorageCells\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"paymasterData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation[]\",\"name\":\"ops\",\"type\":\"tuple[]\"},{\"internalType\":\"address payable\",\"name\":\"beneficiary\",\"type\":\"address\"}],\"name\":\"handleOps\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"paymasterData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"op\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"internalType\":\"uint256\",\"name\":\"prefund\",\"type\":\"uint256\"},{\"internalType\":\"enum EntryPoint.PaymentMode\",\"name\":\"paymentMode\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"contextOffset\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preOpGas\",\"type\":\"uint256\"}],\"internalType\":\"struct EntryPoint.UserOpInfo\",\"name\":\"opInfo\",\"type\":\"tuple\"},{\"internalType\":\"bytes\",\"name\":\"context\",\"type\":\"bytes\"}],\"name\":\"innerHandleOp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"actualGasCost\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paymasterStake\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"paymaster\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"paymasterData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"}],\"name\":\"simulateValidation\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"preOpGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"prefund\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unlockStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unstakeDelaySec\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"withdrawAddress\",\"type\":\"address\"}],\"name\":\"withdrawStake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"withdrawAmount\",\"type\":\"uint256\"}],\"name\":\"withdrawTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"errors\":{\"FailedOp(uint256,address,string)\":[{\"params\":{\"opIndex\":\"- index into the array of ops to the failed one (in simulateValidation, this is always zero)\",\"paymaster\":\"- if paymaster.validatePaymasterUserOp fails, this will be the paymaster's address. if validateUserOp failed,       this value will be zero (since it failed before accessing the paymaster)\",\"reason\":\"- revert reason   Should be caught in off-chain handleOps simulation and not happen on-chain.   Useful for mitigating DoS attempts against batchers or for troubleshooting of wallet/paymaster reverts.\"}}]},\"events\":{\"UserOperationRevertReason(bytes32,address,uint256,bytes)\":{\"params\":{\"nonce\":\"the nonce used in the request\",\"requestId\":\"the request unique identifier.\",\"revertReason\":\"- the return bytes from the (reverted) call to \\\"callData\\\".\",\"sender\":\"the sender of this request\"}}},\"kind\":\"dev\",\"methods\":{\"addStake(uint32)\":{\"params\":{\"_unstakeDelaySec\":\"the new lock duration before the deposit can be withdrawn.\"}},\"constructor\":{\"params\":{\"_create2factory\":\"- contract to \\\"create2\\\" wallets (not the EntryPoint itself, so that the EntryPoint can be upgraded)\",\"_paymasterStake\":\"- minimum required locked stake for a paymaster\",\"_unstakeDelaySec\":\"- minimum time (in seconds) a paymaster stake must be locked\"}},\"getSenderAddress(bytes,uint256)\":{\"params\":{\"initCode\":\"the constructor code to be passed into the UserOperation.\",\"salt\":\"the salt parameter, to be passed as \\\"nonce\\\" in the UserOperation.\"}},\"handleOps((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes)[],address)\":{\"params\":{\"beneficiary\":\"the address to receive the fees\",\"ops\":\"the operations to execute\"}},\"simulateValidation((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))\":{\"details\":\"The node must also verify it doesn't use banned opcodes, and that it doesn't reference storage outside the wallet's data.      In order to split the running opcodes of the wallet (validateUserOp) from the paymaster's validatePaymasterUserOp,      it should look for the NUMBER opcode at depth=1 (which itself is a banned opcode)\",\"returns\":{\"preOpGas\":\"total gas used by validation (including contract creation)\",\"prefund\":\"the amount the wallet had to prefund (zero in case a paymaster pays)\"}},\"withdrawStake(address)\":{\"params\":{\"withdrawAddress\":\"the address to send withdrawn value.\"}},\"withdrawTo(address,uint256)\":{\"params\":{\"withdrawAddress\":\"the address to send withdrawn value.\",\"withdrawAmount\":\"the amount to withdraw.\"}}},\"version\":1},\"userdoc\":{\"errors\":{\"FailedOp(uint256,address,string)\":[{\"notice\":\"a custom revert error of handleOps, to identify the offending op.  NOTE: if simulateValidation passes successfully, there should be no reason for handleOps to fail on it.\"}]},\"events\":{\"StakeLocked(address,uint256,uint256)\":{\"notice\":\"Emitted once a stake is scheduled for withdrawal\"},\"StakeUnlocked(address,uint256)\":{\"notice\":\"Emitted once a stake is scheduled for withdrawal\"},\"UserOperationRevertReason(bytes32,address,uint256,bytes)\":{\"notice\":\"An event emitted if the UserOperation \\\"callData\\\" reverted with non-zero length\"}},\"kind\":\"user\",\"methods\":{\"addStake(uint32)\":{\"notice\":\"add to the account's stake - amount and delay any pending unstake is first cancelled.\"},\"balanceOf(address)\":{\"notice\":\"return the deposit (for gas payment) of the account\"},\"depositTo(address)\":{\"notice\":\"add to the deposit of the given account\"},\"deposits(address)\":{\"notice\":\"maps paymaster to their deposits and stakes\"},\"getRequestId((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))\":{\"notice\":\"generate a request Id - unique identifier for this request. the request ID is a hash over the content of the userOp (except the signature), the entrypoint and the chainid.\"},\"getSenderAddress(bytes,uint256)\":{\"notice\":\"Get counterfactual sender address.  Calculate the sender contract address that will be generated by the initCode and salt in the UserOperation.\"},\"getSenderStorage(address)\":{\"notice\":\"return the storage cells used internally by the EntryPoint for this sender address. During `simulateValidation`, allow these storage cells to be accessed  (that is, a wallet/paymaster are allowed to access their own deposit balance on the  EntryPoint's storage, but no other account)\"},\"handleOps((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes)[],address)\":{\"notice\":\"Execute a batch of UserOperation.\"},\"innerHandleOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes),(bytes32,uint256,uint8,uint256,uint256),bytes)\":{\"notice\":\"inner function to handle a UserOperation. Must be declared \\\"external\\\" to open a call context, but it can only be called by handleOps.\"},\"paymasterStake()\":{\"notice\":\"minimum value required to stake for a paymaster\"},\"simulateValidation((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))\":{\"notice\":\"Simulate a call to wallet.validateUserOp and paymaster.validatePaymasterUserOp. Validation succeeds if the call doesn't revert.\"},\"unlockStake()\":{\"notice\":\"attempt to unlock the stake. the value can be withdrawn (using withdrawStake) after the unstake delay.\"},\"unstakeDelaySec()\":{\"notice\":\"minimum time (in seconds) required to lock a paymaster stake before it can be withdraw.\"},\"withdrawStake(address)\":{\"notice\":\"withdraw from the (unlocked) stake. must first call unlockStake and wait for the unstakeDelay to pass\"},\"withdrawTo(address,uint256)\":{\"notice\":\"withdraw from the deposit.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/EntryPoint.sol\":\"EntryPoint\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/EntryPoint.sol\":{\"content\":\"/**\\n ** Account-Abstraction (EIP-4337) singleton EntryPoint implementation.\\n ** Only one instance required on each chain.\\n **/\\n// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\nimport \\\"./StakeManager.sol\\\";\\nimport \\\"./UserOperation.sol\\\";\\nimport \\\"./IWallet.sol\\\";\\nimport \\\"./IPaymaster.sol\\\";\\n\\nimport \\\"./ICreate2Deployer.sol\\\";\\n\\ncontract EntryPoint is StakeManager {\\n\\n    using UserOperationLib for UserOperation;\\n\\n    enum PaymentMode {\\n        paymasterDeposit, // if paymaster is set, use paymaster's deposit to pay.\\n        walletDeposit // pay with wallet deposit.\\n    }\\n\\n    address public immutable create2factory;\\n\\n    /***\\n     * An event emitted after each successful request\\n     * @param requestId - unique identifier for the request (hash its entire content, except signature).\\n     * @param sender - the account that generates this request.\\n     * @param paymaster - if non-null, the paymaster that pays for this request.\\n     * @param nonce - the nonce value from the request\\n     * @param actualGasCost - the total cost (in gas) of this request.\\n     * @param actualGasPrice - the actual gas price the sender agreed to pay.\\n     * @param success - true if the sender transaction succeeded, false if reverted.\\n     */\\n    event UserOperationEvent(bytes32 indexed requestId, address indexed sender, address indexed paymaster, uint256 nonce, uint256 actualGasCost, uint256 actualGasPrice, bool success);\\n\\n    /**\\n     * An event emitted if the UserOperation \\\"callData\\\" reverted with non-zero length\\n     * @param requestId the request unique identifier.\\n     * @param sender the sender of this request\\n     * @param nonce the nonce used in the request\\n     * @param revertReason - the return bytes from the (reverted) call to \\\"callData\\\".\\n     */\\n    event UserOperationRevertReason(bytes32 indexed requestId, address indexed sender, uint256 nonce, bytes revertReason);\\n\\n    /**\\n     * a custom revert error of handleOps, to identify the offending op.\\n     *  NOTE: if simulateValidation passes successfully, there should be no reason for handleOps to fail on it.\\n     *  @param opIndex - index into the array of ops to the failed one (in simulateValidation, this is always zero)\\n     *  @param paymaster - if paymaster.validatePaymasterUserOp fails, this will be the paymaster's address. if validateUserOp failed,\\n     *       this value will be zero (since it failed before accessing the paymaster)\\n     *  @param reason - revert reason\\n     *   Should be caught in off-chain handleOps simulation and not happen on-chain.\\n     *   Useful for mitigating DoS attempts against batchers or for troubleshooting of wallet/paymaster reverts.\\n     */\\n    error FailedOp(uint256 opIndex, address paymaster, string reason);\\n\\n    /**\\n     * @param _create2factory - contract to \\\"create2\\\" wallets (not the EntryPoint itself, so that the EntryPoint can be upgraded)\\n     * @param _paymasterStake - minimum required locked stake for a paymaster\\n     * @param _unstakeDelaySec - minimum time (in seconds) a paymaster stake must be locked\\n     */\\n    constructor(address _create2factory, uint256 _paymasterStake, uint32 _unstakeDelaySec) StakeManager(_paymasterStake, _unstakeDelaySec) {\\n        require(_create2factory != address(0), \\\"invalid create2factory\\\");\\n        require(_unstakeDelaySec > 0, \\\"invalid unstakeDelay\\\");\\n        require(_paymasterStake > 0, \\\"invalid paymasterStake\\\");\\n        create2factory = _create2factory;\\n    }\\n\\n    /**\\n     * compensate the caller's beneficiary address with the collected fees of all UserOperations.\\n     * @param beneficiary the address to receive the fees\\n     * @param amount amount to transfer.\\n     */\\n    function _compensate(address payable beneficiary, uint256 amount) internal {\\n        require(beneficiary != address(0), \\\"invalid beneficiary\\\");\\n        (bool success,) = beneficiary.call{value : amount}(\\\"\\\");\\n        require(success);\\n    }\\n\\n    /**\\n     * Execute a batch of UserOperation.\\n     * @param ops the operations to execute\\n     * @param beneficiary the address to receive the fees\\n     */\\n    function handleOps(UserOperation[] calldata ops, address payable beneficiary) public {\\n\\n        uint256 opslen = ops.length;\\n        UserOpInfo[] memory opInfos = new UserOpInfo[](opslen);\\n\\n    unchecked {\\n        for (uint256 i = 0; i < opslen; i++) {\\n            uint256 preGas = gasleft();\\n            UserOperation calldata op = ops[i];\\n\\n            bytes memory context;\\n            uint256 contextOffset;\\n            bytes32 requestId = getRequestId(op);\\n            uint256 prefund;\\n            PaymentMode paymentMode;\\n            (prefund, paymentMode, context) = _validatePrepayment(i, op, requestId);\\n            assembly {contextOffset := context}\\n            opInfos[i] = UserOpInfo(\\n                requestId,\\n                prefund,\\n                paymentMode,\\n                contextOffset,\\n                preGas - gasleft() + op.preVerificationGas\\n            );\\n        }\\n\\n        uint256 collected = 0;\\n\\n        for (uint256 i = 0; i < ops.length; i++) {\\n            uint256 preGas = gasleft();\\n            UserOperation calldata op = ops[i];\\n            UserOpInfo memory opInfo = opInfos[i];\\n            uint256 contextOffset = opInfo.contextOffset;\\n            bytes memory context;\\n            assembly {context := contextOffset}\\n\\n            try this.innerHandleOp(op, opInfo, context) returns (uint256 _actualGasCost) {\\n                collected += _actualGasCost;\\n            } catch {\\n                uint256 actualGas = preGas - gasleft() + opInfo.preOpGas;\\n                collected += _handlePostOp(i, IPaymaster.PostOpMode.postOpReverted, op, opInfo, context, actualGas);\\n            }\\n        }\\n\\n        _compensate(beneficiary, collected);\\n    } //unchecked\\n    }\\n\\n    struct UserOpInfo {\\n        bytes32 requestId;\\n        uint256 prefund;\\n        PaymentMode paymentMode;\\n        uint256 contextOffset;\\n        uint256 preOpGas;\\n    }\\n\\n    /**\\n     * inner function to handle a UserOperation.\\n     * Must be declared \\\"external\\\" to open a call context, but it can only be called by handleOps.\\n     */\\n    function innerHandleOp(UserOperation calldata op, UserOpInfo calldata opInfo, bytes calldata context) external returns (uint256 actualGasCost) {\\n        uint256 preGas = gasleft();\\n        require(msg.sender == address(this));\\n\\n        IPaymaster.PostOpMode mode = IPaymaster.PostOpMode.opSucceeded;\\n        if (op.callData.length > 0) {\\n\\n            (bool success,bytes memory result) = address(op.getSender()).call{gas : op.callGas}(op.callData);\\n            if (!success) {\\n                if (result.length > 0) {\\n                    emit UserOperationRevertReason(opInfo.requestId, op.getSender(), op.nonce, result);\\n                }\\n                mode = IPaymaster.PostOpMode.opReverted;\\n            }\\n        }\\n\\n    unchecked {\\n        uint256 actualGas = preGas - gasleft() + opInfo.preOpGas;\\n        //note: opIndex is ignored (relevant only if mode==postOpReverted, which is only possible outside of innerHandleOp)\\n        return _handlePostOp(0, mode, op, opInfo, context, actualGas);\\n    }\\n    }\\n\\n    /**\\n     * generate a request Id - unique identifier for this request.\\n     * the request ID is a hash over the content of the userOp (except the signature), the entrypoint and the chainid.\\n     */\\n    function getRequestId(UserOperation calldata userOp) public view returns (bytes32) {\\n        return keccak256(abi.encode(userOp.hash(), address(this), block.chainid));\\n    }\\n\\n    /**\\n    * Simulate a call to wallet.validateUserOp and paymaster.validatePaymasterUserOp.\\n    * Validation succeeds if the call doesn't revert.\\n    * @dev The node must also verify it doesn't use banned opcodes, and that it doesn't reference storage outside the wallet's data.\\n     *      In order to split the running opcodes of the wallet (validateUserOp) from the paymaster's validatePaymasterUserOp,\\n     *      it should look for the NUMBER opcode at depth=1 (which itself is a banned opcode)\\n     * @return preOpGas total gas used by validation (including contract creation)\\n     * @return prefund the amount the wallet had to prefund (zero in case a paymaster pays)\\n     */\\n    function simulateValidation(UserOperation calldata userOp) external returns (uint256 preOpGas, uint256 prefund) {\\n        uint256 preGas = gasleft();\\n\\n        bytes32 requestId = getRequestId(userOp);\\n        (prefund,,) = _validatePrepayment(0, userOp, requestId);\\n        preOpGas = preGas - gasleft() + userOp.preVerificationGas;\\n\\n        require(msg.sender == address(0), \\\"must be called off-chain with from=zero-addr\\\");\\n    }\\n\\n    function _getPaymentInfo(UserOperation calldata userOp) internal view returns (uint256 requiredPrefund, PaymentMode paymentMode) {\\n        requiredPrefund = userOp.requiredPreFund();\\n        if (userOp.hasPaymaster()) {\\n            paymentMode = PaymentMode.paymasterDeposit;\\n        } else {\\n            paymentMode = PaymentMode.walletDeposit;\\n        }\\n    }\\n\\n    // create the sender's contract if needed.\\n    function _createSenderIfNeeded(UserOperation calldata op) internal {\\n        if (op.initCode.length != 0) {\\n            // note that we're still under the gas limit of validate, so probably\\n            // this create2 creates a proxy account.\\n            // @dev initCode must be unique (e.g. contains the signer address), to make sure\\n            //   it can only be executed from the entryPoint, and called with its initialization code (callData)\\n            address sender1 = ICreate2Deployer(create2factory).deploy(op.initCode, bytes32(op.nonce));\\n            require(sender1 != address(0), \\\"create2 failed\\\");\\n            require(sender1 == op.getSender(), \\\"sender doesn't match create2 address\\\");\\n        }\\n    }\\n\\n    /**\\n     * Get counterfactual sender address.\\n     *  Calculate the sender contract address that will be generated by the initCode and salt in the UserOperation.\\n     * @param initCode the constructor code to be passed into the UserOperation.\\n     * @param salt the salt parameter, to be passed as \\\"nonce\\\" in the UserOperation.\\n     */\\n    function getSenderAddress(bytes memory initCode, uint256 salt) public view returns (address) {\\n        bytes32 hash = keccak256(\\n            abi.encodePacked(\\n                bytes1(0xff),\\n                address(create2factory),\\n                salt,\\n                keccak256(initCode)\\n            )\\n        );\\n\\n        // NOTE: cast last 20 bytes of hash to address\\n        return address(uint160(uint256(hash)));\\n    }\\n\\n    /**\\n     * call wallet.validateUserOp.\\n     * revert (with FailedOp) in case validateUserOp reverts, or wallet didn't send required prefund.\\n     * decrement wallet's deposit if needed\\n     */\\n    function _validateWalletPrepayment(uint256 opIndex, UserOperation calldata op, bytes32 requestId, uint256 requiredPrefund, PaymentMode paymentMode) internal returns (uint256 gasUsedByValidateWalletPrepayment) {\\n    unchecked {\\n        uint256 preGas = gasleft();\\n        _createSenderIfNeeded(op);\\n        uint256 missingWalletFunds = 0;\\n        address sender = op.getSender();\\n        if (paymentMode != PaymentMode.paymasterDeposit) {\\n            uint256 bal = balanceOf(sender);\\n            missingWalletFunds = bal > requiredPrefund ? 0 : requiredPrefund - bal;\\n        }\\n        try IWallet(sender).validateUserOp{gas : op.verificationGas}(op, requestId, missingWalletFunds) {\\n        } catch Error(string memory revertReason) {\\n            revert FailedOp(opIndex, address(0), revertReason);\\n        } catch {\\n            revert FailedOp(opIndex, address(0), \\\"\\\");\\n        }\\n        if (paymentMode != PaymentMode.paymasterDeposit) {\\n            DepositInfo storage senderInfo = deposits[sender];\\n            uint deposit = senderInfo.deposit;\\n            if (requiredPrefund > deposit) {\\n                revert FailedOp(opIndex, address(0), \\\"wallet didn't pay prefund\\\");\\n            }\\n            senderInfo.deposit = uint112(deposit - requiredPrefund);\\n        }\\n        gasUsedByValidateWalletPrepayment = preGas - gasleft();\\n    }\\n    }\\n\\n    /**\\n     * in case the request has a paymaster:\\n     * validate paymaster is staked and has enough deposit.\\n     * call paymaster.validatePaymasterUserOp.\\n     * revert with proper FailedOp in case paymaster reverts.\\n     * decrement paymaster's deposit\\n     */\\n    function _validatePaymasterPrepayment(uint256 opIndex, UserOperation calldata op, bytes32 requestId, uint256 requiredPreFund, uint256 gasUsedByValidateWalletPrepayment) internal returns (bytes memory context) {\\n    unchecked {\\n        address paymaster = op.paymaster;\\n        DepositInfo storage paymasterInfo = deposits[paymaster];\\n        uint deposit = paymasterInfo.deposit;\\n        bool staked = paymasterInfo.staked;\\n        if (!staked) {\\n            revert FailedOp(opIndex, paymaster, \\\"not staked\\\");\\n        }\\n        if (deposit < requiredPreFund) {\\n            revert FailedOp(opIndex, paymaster, \\\"paymaster deposit too low\\\");\\n        }\\n        paymasterInfo.deposit = uint112(deposit - requiredPreFund);\\n        uint256 gas = op.verificationGas - gasUsedByValidateWalletPrepayment;\\n        try IPaymaster(paymaster).validatePaymasterUserOp{gas : gas}(op, requestId, requiredPreFund) returns (bytes memory _context){\\n            context = _context;\\n        } catch Error(string memory revertReason) {\\n            revert FailedOp(opIndex, paymaster, revertReason);\\n        } catch {\\n            revert FailedOp(opIndex, paymaster, \\\"\\\");\\n        }\\n    }\\n    }\\n\\n    /**\\n     * validate wallet and paymaster (if defined).\\n     * also make sure total validation doesn't exceed verificationGas\\n     * this method is called off-chain (simulateValidation()) and on-chain (from handleOps)\\n     */\\n    function _validatePrepayment(uint256 opIndex, UserOperation calldata userOp, bytes32 requestId) private returns (uint256 requiredPreFund, PaymentMode paymentMode, bytes memory context){\\n\\n        uint256 preGas = gasleft();\\n        uint256 maxGasValues = userOp.preVerificationGas | userOp.verificationGas |\\n        userOp.callGas | userOp.maxFeePerGas | userOp.maxPriorityFeePerGas;\\n        require(maxGasValues <= type(uint120).max, \\\"gas values overflow\\\");\\n        uint256 gasUsedByValidateWalletPrepayment;\\n        (requiredPreFund, paymentMode) = _getPaymentInfo(userOp);\\n\\n        (gasUsedByValidateWalletPrepayment) = _validateWalletPrepayment(opIndex, userOp, requestId, requiredPreFund, paymentMode);\\n\\n        //a \\\"marker\\\" where wallet opcode validation is done and paymaster opcode validation is about to start\\n        // (used only by off-chain simulateValidation)\\n        uint256 marker = block.number;\\n        (marker);\\n\\n        if (paymentMode == PaymentMode.paymasterDeposit) {\\n            (context) = _validatePaymasterPrepayment(opIndex, userOp, requestId, requiredPreFund, gasUsedByValidateWalletPrepayment);\\n        } else {\\n            context = \\\"\\\";\\n        }\\n    unchecked {\\n        uint256 gasUsed = preGas - gasleft();\\n\\n        if (userOp.verificationGas < gasUsed) {\\n            revert FailedOp(opIndex, userOp.paymaster, \\\"Used more than verificationGas\\\");\\n        }\\n    }\\n    }\\n\\n    /**\\n     * process post-operation.\\n     * called just after the callData is executed.\\n     * if a paymaster is defined and its validation returned a non-empty context, its postOp is called.\\n     * the excess amount is refunded to the wallet (or paymaster - if it is was used in the request)\\n     * @param opIndex index in the batch\\n     * @param mode - whether is called from innerHandleOp, or outside (postOpReverted)\\n     * @param op the user operation\\n     * @param opInfo info collected during validation\\n     * @param context the context returned in validatePaymasterUserOp\\n     * @param actualGas the gas used so far by this user operation\\n     */\\n    function _handlePostOp(uint256 opIndex, IPaymaster.PostOpMode mode, UserOperation calldata op, UserOpInfo memory opInfo, bytes memory context, uint256 actualGas) private returns (uint256 actualGasCost) {\\n        uint256 preGas = gasleft();\\n        uint256 gasPrice = UserOperationLib.gasPrice(op);\\n    unchecked {\\n        address refundAddress;\\n\\n        address paymaster = op.paymaster;\\n        if (paymaster == address(0)) {\\n            refundAddress = op.getSender();\\n        } else {\\n            refundAddress = paymaster;\\n            if (context.length > 0) {\\n                actualGasCost = actualGas * gasPrice;\\n                if (mode != IPaymaster.PostOpMode.postOpReverted) {\\n                    IPaymaster(paymaster).postOp{gas : op.verificationGas}(mode, context, actualGasCost);\\n                } else {\\n                    try IPaymaster(paymaster).postOp{gas : op.verificationGas}(mode, context, actualGasCost) {}\\n                    catch Error(string memory reason) {\\n                        revert FailedOp(opIndex, paymaster, reason);\\n                    }\\n                    catch {\\n                        revert FailedOp(opIndex, paymaster, \\\"postOp revert\\\");\\n                    }\\n                }\\n            }\\n        }\\n        actualGas += preGas - gasleft();\\n        actualGasCost = actualGas * gasPrice;\\n        if (opInfo.prefund < actualGasCost) {\\n            revert FailedOp(opIndex, paymaster, \\\"prefund below actualGasCost\\\");\\n        }\\n        uint refund = opInfo.prefund - actualGasCost;\\n        internalIncrementDeposit(refundAddress, refund);\\n        bool success = mode == IPaymaster.PostOpMode.opSucceeded;\\n        emit UserOperationEvent(opInfo.requestId, op.getSender(), op.paymaster, op.nonce, actualGasCost, gasPrice, success);\\n    } // unchecked\\n    }\\n\\n    /**\\n     * return the storage cells used internally by the EntryPoint for this sender address.\\n     * During `simulateValidation`, allow these storage cells to be accessed\\n     *  (that is, a wallet/paymaster are allowed to access their own deposit balance on the\\n     *  EntryPoint's storage, but no other account)\\n     */\\n    function getSenderStorage(address sender) external view returns (uint256[] memory senderStorageCells) {\\n        uint256 cell;\\n        DepositInfo storage info = deposits[sender];\\n\\n        assembly {\\n            cell := info.slot\\n        }\\n        senderStorageCells = new uint256[](1);\\n        senderStorageCells[0] = cell;\\n    }\\n}\\n\\n\",\"keccak256\":\"0x02984183ea732a05ba39b30b3b5b489992b2a0c33c2733f18718830ce0a38cf7\",\"license\":\"GPL-3.0\"},\"contracts/ICreate2Deployer.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n/**\\n * create2-based deployer (eip-2470)\\n */\\ninterface ICreate2Deployer {\\n    function deploy(bytes memory initCode, bytes32 salt) external returns (address);\\n}\\n\\n\",\"keccak256\":\"0xba7f42ff30bf38773251115e580ef245937cdedfc3f2bc21b3acc3610a67527b\",\"license\":\"GPL-3.0\"},\"contracts/IPaymaster.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\nimport \\\"./UserOperation.sol\\\";\\n\\n/**\\n * the interface exposed by a paymaster contract, who agrees to pay the gas for user's operations.\\n * a paymaster must hold a stake to cover the required entrypoint stake and also the gas for the transaction.\\n */\\ninterface IPaymaster {\\n\\n    /**\\n     * payment validation: check if paymaster agree to pay (using its stake)\\n     * revert to reject this request.\\n     * actual payment is done after postOp is called, by deducting actual call cost form the paymaster's stake.\\n     * @param userOp the user operation\\n     * @param requestId hash of the user's request data.\\n     * @param maxCost the maximum cost of this transaction (based on maximum gas and gas price from userOp)\\n     * @return context value to send to a postOp\\n     *  zero length to signify postOp is not required.\\n     */\\n    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 requestId, uint256 maxCost) external view returns (bytes memory context);\\n\\n    /**\\n     * post-operation handler.\\n     * Must verify sender is the entryPoint\\n     * @param mode enum with the following options:\\n     *      opSucceeded - user operation succeeded.\\n     *      opReverted  - user op reverted. still has to pay for gas.\\n     *      postOpReverted - user op succeeded, but caused postOp (in mode=opSucceeded) to revert.\\n     *                       Now this is the 2nd call, after user's op was deliberately reverted.\\n     * @param context - the context value returned by validatePaymasterUserOp\\n     * @param actualGasCost - actual gas used so far (without this postOp call).\\n     */\\n    function postOp(PostOpMode mode, bytes calldata context, uint256 actualGasCost) external;\\n\\n    enum PostOpMode {\\n        opSucceeded, // user op succeeded\\n        opReverted, // user op reverted. still has to pay for gas.\\n        postOpReverted //user op succeeded, but caused postOp to revert. Now its a 2nd call, after user's op was deliberately reverted.\\n    }\\n}\\n\",\"keccak256\":\"0x6b26c3accee30544f5c8beeebf492d2a77ef19363b5feefc4bee3fc44c08ad5e\",\"license\":\"GPL-3.0\"},\"contracts/IWallet.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\nimport \\\"./UserOperation.sol\\\";\\n\\ninterface IWallet {\\n\\n    /**\\n     * Validate user's signature and nonce\\n     * the entryPoint will make the call to the recipient only if this validation call returns successfully.\\n     *\\n     * @dev Must validate caller is the entryPoint.\\n     *      Must validate the signature and nonce\\n     * @param userOp the operation that is about to be executed.\\n     * @param requestId hash of the user's request data. can be used as the basis for signature.\\n     * @param missingWalletFunds missing funds on the wallet's deposit in the entrypoint.\\n     *      This is the minimum amount to transfer to the sender(entryPoint) to be able to make the call.\\n     *      The excess is left as a deposit in the entrypoint, for future calls.\\n     *      can be withdrawn anytime using \\\"entryPoint.withdrawTo()\\\"\\n     *      In case there is a paymaster in the request (or the current deposit is high enough), this value will be zero.\\n     */\\n    function validateUserOp(UserOperation calldata userOp, bytes32 requestId, uint256 missingWalletFunds) external;\\n}\\n\",\"keccak256\":\"0x0208088e484bbd582818bd27165cf5b1c132d6b50974b29efe3f8afe1514e35e\",\"license\":\"GPL-3.0\"},\"contracts/StakeManager.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0-only\\npragma solidity ^0.8.12;\\n\\n/**\\n * manage deposits and stakes.\\n * deposit is just a balance used to pay for UserOperations (either by a paymaster or a wallet)\\n * stake is value locked for at least \\\"unstakeDelay\\\" by a paymaster.\\n */\\nabstract contract StakeManager {\\n\\n    /**\\n     * minimum time (in seconds) required to lock a paymaster stake before it can be withdraw.\\n     */\\n    uint32 immutable public unstakeDelaySec;\\n\\n    /**\\n     * minimum value required to stake for a paymaster\\n     */\\n    uint256 immutable public paymasterStake;\\n\\n    constructor(uint256 _paymasterStake, uint32 _unstakeDelaySec) {\\n        unstakeDelaySec = _unstakeDelaySec;\\n        paymasterStake = _paymasterStake;\\n    }\\n\\n    event Deposited(\\n        address indexed account,\\n        uint256 totalDeposit\\n    );\\n\\n    event Withdrawn(\\n        address indexed account,\\n        address withdrawAddress,\\n        uint256 amount\\n    );\\n\\n    /// Emitted once a stake is scheduled for withdrawal\\n    event StakeLocked(\\n        address indexed account,\\n        uint256 totalStaked,\\n        uint256 withdrawTime\\n    );\\n\\n    /// Emitted once a stake is scheduled for withdrawal\\n    event StakeUnlocked(\\n        address indexed account,\\n        uint256 withdrawTime\\n    );\\n\\n    event StakeWithdrawn(\\n        address indexed account,\\n        address withdrawAddress,\\n        uint256 amount\\n    );\\n\\n    /**\\n     * @param deposit the account's deposit\\n     * @param staked true if this account is staked as a paymaster\\n     * @param stake actual amount of ether staked for this paymaster. must be above paymasterStake\\n     * @param unstakeDelaySec minimum delay to withdraw the stake. must be above the global unstakeDelaySec\\n     * @param withdrawTime - first block timestamp where 'withdrawStake' will be callable, or zero if already locked\\n     * @dev sizes were chosen so that (deposit,staked) fit into one cell (used during handleOps)\\n     *    and the rest fit into a 2nd cell.\\n     *    112 bit allows for 2^15 eth\\n     *    64 bit for full timestamp\\n     *    32 bit allow 150 years for unstake delay\\n     */\\n    struct DepositInfo {\\n        uint112 deposit;\\n        bool staked;\\n        uint112 stake;\\n        uint32 unstakeDelaySec;\\n        uint64 withdrawTime;\\n    }\\n\\n    /// maps paymaster to their deposits and stakes\\n    mapping(address => DepositInfo) public deposits;\\n\\n    function getDepositInfo(address account) public view returns (DepositInfo memory info) {\\n        return deposits[account];\\n    }\\n\\n    /// return the deposit (for gas payment) of the account\\n    function balanceOf(address account) public view returns (uint256) {\\n        return deposits[account].deposit;\\n    }\\n\\n    receive() external payable {\\n        depositTo(msg.sender);\\n    }\\n\\n    function internalIncrementDeposit(address account, uint256 amount) internal {\\n        DepositInfo storage info = deposits[account];\\n        uint256 newAmount = info.deposit + amount;\\n        require(newAmount <= type(uint112).max, 'deposit overflow');\\n        info.deposit = uint112(newAmount);\\n    }\\n\\n    /**\\n     * add to the deposit of the given account\\n     */\\n    function depositTo(address account) public payable {\\n        internalIncrementDeposit(account, msg.value);\\n        DepositInfo storage info = deposits[account];\\n        emit Deposited(account, info.deposit);\\n    }\\n\\n    /**\\n     * add to the account's stake - amount and delay\\n     * any pending unstake is first cancelled.\\n     * @param _unstakeDelaySec the new lock duration before the deposit can be withdrawn.\\n     */\\n    function addStake(uint32 _unstakeDelaySec) public payable {\\n        DepositInfo storage info = deposits[msg.sender];\\n        require(_unstakeDelaySec >= unstakeDelaySec, \\\"unstake delay too low\\\");\\n        require(_unstakeDelaySec >= info.unstakeDelaySec, \\\"cannot decrease unstake time\\\");\\n        uint256 stake = info.stake + msg.value;\\n        require(stake >= paymasterStake, \\\"stake value too low\\\");\\n        require(stake < type(uint112).max, \\\"stake overflow\\\");\\n        deposits[msg.sender] = DepositInfo(\\n            info.deposit,\\n            true,\\n            uint112(stake),\\n            _unstakeDelaySec,\\n            0\\n        );\\n        emit StakeLocked(msg.sender, stake, _unstakeDelaySec);\\n    }\\n\\n    /**\\n     * attempt to unlock the stake.\\n     * the value can be withdrawn (using withdrawStake) after the unstake delay.\\n     */\\n    function unlockStake() external {\\n        DepositInfo storage info = deposits[msg.sender];\\n        require(info.unstakeDelaySec != 0, \\\"not staked\\\");\\n        require(info.staked, \\\"already unstaking\\\");\\n        uint64 withdrawTime = uint64(block.timestamp) + info.unstakeDelaySec;\\n        info.withdrawTime = withdrawTime;\\n        info.staked = false;\\n        emit StakeUnlocked(msg.sender, withdrawTime);\\n    }\\n\\n\\n    /**\\n     * withdraw from the (unlocked) stake.\\n     * must first call unlockStake and wait for the unstakeDelay to pass\\n     * @param withdrawAddress the address to send withdrawn value.\\n     */\\n    function withdrawStake(address payable withdrawAddress) external {\\n        DepositInfo storage info = deposits[msg.sender];\\n        uint256 stake = info.stake;\\n        require(stake > 0, \\\"No stake to withdraw\\\");\\n        require(info.withdrawTime > 0, \\\"must call unlockStake() first\\\");\\n        require(info.withdrawTime <= block.timestamp, \\\"Stake withdrawal is not due\\\");\\n        info.unstakeDelaySec = 0;\\n        info.withdrawTime = 0;\\n        info.stake = 0;\\n        emit StakeWithdrawn(msg.sender, withdrawAddress, stake);\\n        (bool success,) = withdrawAddress.call{value : stake}(\\\"\\\");\\n        require(success, \\\"failed to withdraw stake\\\");\\n    }\\n\\n    /**\\n     * withdraw from the deposit.\\n     * @param withdrawAddress the address to send withdrawn value.\\n     * @param withdrawAmount the amount to withdraw.\\n     */\\n    function withdrawTo(address payable withdrawAddress, uint256 withdrawAmount) external {\\n        DepositInfo memory info = deposits[msg.sender];\\n        require(withdrawAmount <= info.deposit, \\\"Withdraw amount too large\\\");\\n        info.deposit = uint112(info.deposit - withdrawAmount);\\n        emit Withdrawn(msg.sender, withdrawAddress, withdrawAmount);\\n        (bool success,) = withdrawAddress.call{value : withdrawAmount}(\\\"\\\");\\n        require(success, \\\"failed to withdraw\\\");\\n    }\\n}\\n\",\"keccak256\":\"0xde76f2fdf7287b39effddfbfa3b4f1bc0c4976f16980545635cbabef9d681c24\",\"license\":\"GPL-3.0-only\"},\"contracts/UserOperation.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n    /**\\n     * User Operation struct\\n     * @param sender the sender account of this request\\n     * @param nonce unique value the sender uses to verify it is not a replay.\\n     * @param initCode if set, the account contract will be created by this constructor\\n     * @param callData the method call to execute on this account.\\n     * @param verificationGas gas used for validateUserOp and validatePaymasterUserOp\\n     * @param preVerificationGas gas not calculated by the handleOps method, but added to the gas paid. Covers batch overhead.\\n     * @param maxFeePerGas same as EIP-1559 gas parameter\\n     * @param maxPriorityFeePerGas same as EIP-1559 gas parameter\\n     * @param paymaster if set, the paymaster will pay for the transaction instead of the sender\\n     * @param paymasterData extra data used by the paymaster for validation\\n     * @param signature sender-verified signature over the entire request, the EntryPoint address and the chain ID.\\n     */\\n    struct UserOperation {\\n\\n        address sender;\\n        uint256 nonce;\\n        bytes initCode;\\n        bytes callData;\\n        uint256 callGas;\\n        uint256 verificationGas;\\n        uint256 preVerificationGas;\\n        uint256 maxFeePerGas;\\n        uint256 maxPriorityFeePerGas;\\n        address paymaster;\\n        bytes paymasterData;\\n        bytes signature;\\n    }\\n\\nlibrary UserOperationLib {\\n\\n    function getSender(UserOperation calldata userOp) internal pure returns (address) {\\n        address data;\\n        //read sender from userOp, which is first userOp member (saves 800 gas...)\\n        assembly {data := calldataload(userOp)}\\n        return address(uint160(data));\\n    }\\n\\n    //relayer/miner might submit the TX with higher priorityFee, but the user should not\\n    // pay above what he signed for.\\n    function gasPrice(UserOperation calldata userOp) internal view returns (uint256) {\\n    unchecked {\\n        uint256 maxFeePerGas = userOp.maxFeePerGas;\\n        uint256 maxPriorityFeePerGas = userOp.maxPriorityFeePerGas;\\n        if (maxFeePerGas == maxPriorityFeePerGas) {\\n            //legacy mode (for networks that don't support basefee opcode)\\n            return maxFeePerGas;\\n        }\\n        return min(maxFeePerGas, maxPriorityFeePerGas + block.basefee);\\n    }\\n    }\\n\\n    function requiredGas(UserOperation calldata userOp) internal pure returns (uint256) {\\n    unchecked {\\n        //when using a Paymaster, the verificationGas is used also to cover the postOp call.\\n        // our security model might call postOp eventually twice\\n        uint256 mul = hasPaymaster(userOp) ? 3 : 1;\\n        return userOp.callGas + userOp.verificationGas * mul + userOp.preVerificationGas;\\n    }\\n    }\\n\\n    function requiredPreFund(UserOperation calldata userOp) internal view returns (uint256 prefund) {\\n    unchecked {\\n        return requiredGas(userOp) * gasPrice(userOp);\\n    }\\n    }\\n\\n    function hasPaymaster(UserOperation calldata userOp) internal pure returns (bool) {\\n        return userOp.paymaster != address(0);\\n    }\\n\\n    function pack(UserOperation calldata userOp) internal pure returns (bytes memory ret) {\\n        //lighter signature scheme. must match UserOp.ts#packUserOp\\n        bytes calldata sig = userOp.signature;\\n        // copy directly the userOp from calldata up to (but not including) the signature.\\n        // this encoding depends on the ABI encoding of calldata, but is much lighter to copy\\n        // than referencing each field separately.\\n        assembly {\\n            let ofs := userOp\\n            let len := sub(sub(sig.offset, ofs), 32)\\n            ret := mload(0x40)\\n            mstore(0x40, add(ret, add(len, 32)))\\n            mstore(ret, len)\\n            calldatacopy(add(ret, 32), ofs, len)\\n        }\\n    }\\n\\n    function hash(UserOperation calldata userOp) internal pure returns (bytes32) {\\n        return keccak256(pack(userOp));\\n    }\\n\\n    function min(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a < b ? a : b;\\n    }\\n}\\n\",\"keccak256\":\"0x95d587a97499a00a24322ad95d360e07bbb8dbf7e80415ec3d792843df8dee0d\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x60e06040523480156200001157600080fd5b5060405162002bad38038062002bad83398101604081905262000034916200015d565b63ffffffff811660805260a08290526001600160a01b0383166200009f5760405162461bcd60e51b815260206004820152601660248201527f696e76616c69642063726561746532666163746f72790000000000000000000060448201526064015b60405180910390fd5b60008163ffffffff1611620000f75760405162461bcd60e51b815260206004820152601460248201527f696e76616c696420756e7374616b6544656c6179000000000000000000000000604482015260640162000096565b60008211620001495760405162461bcd60e51b815260206004820152601660248201527f696e76616c6964207061796d61737465725374616b6500000000000000000000604482015260640162000096565b50506001600160a01b031660c052620001b8565b6000806000606084860312156200017357600080fd5b83516001600160a01b03811681146200018b57600080fd5b60208501516040860151919450925063ffffffff81168114620001ad57600080fd5b809150509250925092565b60805160a05160c0516129a9620002046000396000818161013c015281816104960152611e1201526000818161018d0152610743015260008181610244015261065201526129a96000f3fe6080604052600436106101025760003560e01c80635287ce1211610095578063bb9fe6bf11610064578063bb9fe6bf1461042b578063c23a5cea14610440578063c31e435414610460578063ec8b5dbf146104f2578063fc7e286d1461051f57600080fd5b80635287ce121461029b57806370a08231146103b957806388799426146103f8578063b760faf91461041857600080fd5b8063205c2878116100d1578063205c2878146101f25780632815c17b14610212578063390b9978146102325780634baeaf8a1461027b57600080fd5b80630396cb60146101175780630bfb68471461012a57806317c6a9871461017b5780631a1c1141146101bd57600080fd5b3661011257610110336105d5565b005b600080fd5b610110610125366004611fbd565b61063c565b34801561013657600080fd5b5061015e7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b0390911681526020015b60405180910390f35b34801561018757600080fd5b506101af7f000000000000000000000000000000000000000000000000000000000000000081565b604051908152602001610172565b3480156101c957600080fd5b506101dd6101d8366004611ffc565b610906565b60408051928352602083019190915201610172565b3480156101fe57600080fd5b5061011061020d366004612045565b6109b2565b34801561021e57600080fd5b5061011061022d366004612071565b610b75565b34801561023e57600080fd5b506102667f000000000000000000000000000000000000000000000000000000000000000081565b60405163ffffffff9091168152602001610172565b34801561028757600080fd5b506101af610296366004611ffc565b610de1565b3480156102a757600080fd5b506103606102b6366004612106565b6040805160a081018252600080825260208201819052918101829052606081018290526080810191909152506001600160a01b031660009081526020818152604091829020825160a08101845281546001600160701b038082168352600160701b820460ff16151594830194909452600160781b90049092169282019290925260019091015463ffffffff81166060830152600160201b90046001600160401b0316608082015290565b6040805182516001600160701b03908116825260208085015115159083015283830151169181019190915260608083015163ffffffff16908201526080918201516001600160401b03169181019190915260a001610172565b3480156103c557600080fd5b506101af6103d4366004612106565b6001600160a01b03166000908152602081905260409020546001600160701b031690565b34801561040457600080fd5b506101af610413366004612123565b610e23565b610110610426366004612106565b6105d5565b34801561043757600080fd5b50610110610f92565b34801561044c57600080fd5b5061011061045b366004612106565b61109a565b34801561046c57600080fd5b5061015e61047b36600461223a565b8151602092830120604080516001600160f81b0319818601527f000000000000000000000000000000000000000000000000000000000000000060601b6001600160601b03191660218201526035810193909352605580840192909252805180840390920182526075909201909152805191012090565b3480156104fe57600080fd5b5061051261050d366004612106565b6112cf565b60405161017291906122c3565b34801561052b57600080fd5b5061058e61053a366004612106565b600060208190529081526040902080546001909101546001600160701b0380831692600160701b810460ff1692600160781b9091049091169063ffffffff811690600160201b90046001600160401b031685565b604080516001600160701b0396871681529415156020860152929094169183019190915263ffffffff1660608201526001600160401b03909116608082015260a001610172565b6105df8134611335565b6001600160a01b03811660008181526020818152604091829020805492516001600160701b03909316835292917f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec19055ce277ca2f39ba42c491015b60405180910390a25050565b33600090815260208190526040902063ffffffff7f0000000000000000000000000000000000000000000000000000000000000000811690831610156106c15760405162461bcd60e51b8152602060048201526015602482015274756e7374616b652064656c617920746f6f206c6f7760581b60448201526064015b60405180910390fd5b600181015463ffffffff908116908316101561071f5760405162461bcd60e51b815260206004820152601c60248201527f63616e6e6f7420646563726561736520756e7374616b652074696d650000000060448201526064016106b8565b805460009061073f903490600160781b90046001600160701b031661231d565b90507f00000000000000000000000000000000000000000000000000000000000000008110156107a75760405162461bcd60e51b81526020600482015260136024820152727374616b652076616c756520746f6f206c6f7760681b60448201526064016106b8565b6001600160701b0381106107ee5760405162461bcd60e51b815260206004820152600e60248201526d7374616b65206f766572666c6f7760901b60448201526064016106b8565b6040805160a08101825283546001600160701b0390811682526001602080840182815286841685870190815263ffffffff808b16606088019081526000608089018181523380835296829052908a902098518954955194518916600160781b02600160781b600160e81b0319951515600160701b026effffffffffffffffffffffffffffff19909716919099161794909417929092169590951786555194909201805492516001600160401b0316600160201b026001600160601b0319909316949093169390931717905590517fa5ae833d0bb1dcd632d98a8b70973e8516812898e19bf27b70071ebc8dc52c01906108f9908490879091825263ffffffff16602082015260400190565b60405180910390a2505050565b60008060005a9050600061091985610de1565b9050610927600086836113d1565b509093505060c08501355a61093c9084612335565b610946919061231d565b935033156109ab5760405162461bcd60e51b815260206004820152602c60248201527f6d7573742062652063616c6c6564206f66662d636861696e207769746820667260448201526b37b69ebd32b93796b0b2323960a11b60648201526084016106b8565b5050915091565b3360009081526020818152604091829020825160a08101845281546001600160701b03808216808452600160701b830460ff16151595840195909552600160781b90910416938101939093526001015463ffffffff81166060840152600160201b90046001600160401b03166080830152821115610a725760405162461bcd60e51b815260206004820152601960248201527f576974686472617720616d6f756e7420746f6f206c617267650000000000000060448201526064016106b8565b8051610a889083906001600160701b0316612335565b6001600160701b03168152604080516001600160a01b03851681526020810184905233917fd1c19fbcd4551a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb910160405180910390a26000836001600160a01b03168360405160006040518083038185875af1925050503d8060008114610b24576040519150601f19603f3d011682016040523d82523d6000602084013e610b29565b606091505b5050905080610b6f5760405162461bcd60e51b81526020600482015260126024820152716661696c656420746f20776974686472617760701b60448201526064016106b8565b50505050565b816000816001600160401b03811115610b9057610b906121d1565b604051908082528060200260200182016040528015610bf357816020015b610be06040805160a0810182526000808252602082018190529091820190815260200160008152602001600081525090565b815260200190600190039081610bae5790505b50905060005b82811015610cc85760005a905036878784818110610c1957610c1961234c565b9050602002810190610c2b9190612362565b90506060600080610c3b84610de1565b9050600080610c4b8887856113d1565b6040805160a08101825287815260208101859052919850889750929450909250908101826001811115610c8057610c80612383565b81526020018581526020018760c001355a8a0301815250898981518110610ca957610ca961234c565b6020026020010181905250505050505050508080600101915050610bf9565b506000805b85811015610dce5760005a905036888884818110610ced57610ced61234c565b9050602002810190610cff9190612362565b90506000858481518110610d1557610d1561234c565b6020908102919091010151606081015160405163443cca1360e11b81529192509081903090638879942690610d5290879087908690600401612578565b6020604051808303816000875af1925050508015610d8d575060408051601f3d908101601f19168201909252610d8a918101906125e8565b60015b610db757600083608001515a8703019050610dad87600287878686611541565b8801975050610dbd565b96909601955b505060019093019250610ccd915050565b50610dd9848261184b565b505050505050565b6000610dec826118fc565b6040805160208101929092523090820152466060820152608001604051602081830303815290604052805190602001209050919050565b6000805a9050333014610e3557600080fd5b600080610e456060890189612601565b90501115610f255760008088356001600160a01b031660808a0135610e6d60608c018c612601565b604051610e7b929190612647565b60006040518083038160008787f1925050503d8060008114610eb9576040519150601f19603f3d011682016040523d82523d6000602084013e610ebe565b606091505b509150915081610f2257805115610f1d5788356001600160a01b031688600001357f1c4fada7374c0a9ee8841fc38afe82932dc0f8e69012e927f061a8bae611a2018b6020013584604051610f14929190612657565b60405180910390a35b600192505b50505b600086608001355a8403019050610f866000838a610f48368c90038c018c612670565b8a8a8080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250899250611541915050565b98975050505050505050565b336000908152602081905260409020600181015463ffffffff16610fc85760405162461bcd60e51b81526004016106b8906126eb565b8054600160701b900460ff166110145760405162461bcd60e51b8152602060048201526011602482015270616c726561647920756e7374616b696e6760781b60448201526064016106b8565b600181015460009061102c9063ffffffff164261271b565b6001830180546bffffffffffffffff000000001916600160201b6001600160401b03841690810291909117909155835460ff60701b1916845560405190815290915033907ffa9b3c14cc825c412c9ed81b3ba365a5b459439403f18829e572ed53a4180f0a90602001610630565b3360009081526020819052604090208054600160781b90046001600160701b0316806110ff5760405162461bcd60e51b81526020600482015260146024820152734e6f207374616b6520746f20776974686472617760601b60448201526064016106b8565b6001820154600160201b90046001600160401b03166111605760405162461bcd60e51b815260206004820152601d60248201527f6d7573742063616c6c20756e6c6f636b5374616b65282920666972737400000060448201526064016106b8565b600182015442600160201b9091046001600160401b031611156111c55760405162461bcd60e51b815260206004820152601b60248201527f5374616b65207769746864726177616c206973206e6f7420647565000000000060448201526064016106b8565b6001820180546001600160601b03191690558154600160781b600160e81b0319168255604080516001600160a01b03851681526020810183905233917fb7c918e0e249f999e965cafeb6c664271b3f4317d296461500e71da39f0cbda3910160405180910390a26000836001600160a01b03168260405160006040518083038185875af1925050503d8060008114611279576040519150601f19603f3d011682016040523d82523d6000602084013e61127e565b606091505b5050905080610b6f5760405162461bcd60e51b815260206004820152601860248201527f6661696c656420746f207769746864726177207374616b65000000000000000060448201526064016106b8565b6001600160a01b038116600090815260208190526040908190208151600180825281840190935260609282919081602001602082028036833701905050925081836000815181106113225761132261234c565b6020026020010181815250505050919050565b6001600160a01b038216600090815260208190526040812080549091906113669084906001600160701b031661231d565b90506001600160701b038111156113b25760405162461bcd60e51b815260206004820152601060248201526f6465706f736974206f766572666c6f7760801b60448201526064016106b8565b81546001600160701b0319166001600160701b03919091161790555050565b600080606060005a905060c086013560a08701351760808701351760e087013517610100870135176effffffffffffffffffffffffffffff81111561144e5760405162461bcd60e51b81526020600482015260136024820152726761732076616c756573206f766572666c6f7760681b60448201526064016106b8565b600061145988611915565b909650945061146b8989898989611941565b905043600086600181111561148257611482612383565b141561149c576114958a8a8a8a86611b4a565b94506114af565b6040518060200160405280600081525094505b60005a85039050808a60a001351015611533578a6114d56101408c016101208d01612106565b60405162fa072b60e01b815260048101929092526001600160a01b0316602482015260606044820152601e60648201527f55736564206d6f7265207468616e20766572696669636174696f6e4761730000608482015260a4016106b8565b505050505093509350939050565b6000805a9050600061155287611d42565b90506000806115696101408a016101208b01612106565b90506001600160a01b0381166115825788359150611717565b80915060008751111561171757858302945060028a60028111156115a8576115a8612383565b1461161b5760405163a9a2340960e01b81526001600160a01b0382169063a9a234099060a08c0135906115e3908e908c908b90600401612746565b600060405180830381600088803b1580156115fd57600080fd5b5087f1158015611611573d6000803e3d6000fd5b5050505050611717565b60405163a9a2340960e01b81526001600160a01b0382169063a9a234099060a08c013590611651908e908c908b90600401612746565b600060405180830381600088803b15801561166b57600080fd5b5087f19350505050801561167d575060015b6117175761168961277f565b806308c379a014156116c7575061169e61279b565b806116a957506116c9565b8b828260405162fa072b60e01b81526004016106b893929190612824565b505b60405162fa072b60e01b8152600481018c90526001600160a01b038216602482015260606044820152600d60648201526c1c1bdcdd13dc081c995d995c9d609a1b608482015260a4016106b8565b5a8403860195508286029450848860200151101561178d5760405162fa072b60e01b8152600481018c90526001600160a01b038216602482015260606044820152601b60648201527f70726566756e642062656c6f772061637475616c476173436f73740000000000608482015260a4016106b8565b602088015185900361179f8382611335565b6000808c60028111156117b4576117b4612383565b1490506117c96101408c016101208d01612106565b6001600160a01b03168b356001600160a01b03168b600001517f33fd4d1f25a5461bea901784a6571de6debc16cd0831932c22c6969cd73ba9948e602001358b8a876040516118339493929190938452602084019290925260408301521515606082015260800190565b60405180910390a45050505050509695505050505050565b6001600160a01b0382166118975760405162461bcd60e51b8152602060048201526013602482015272696e76616c69642062656e656669636961727960681b60448201526064016106b8565b6000826001600160a01b03168260405160006040518083038185875af1925050503d80600081146118e4576040519150601f19603f3d011682016040523d82523d6000602084013e6118e9565b606091505b50509050806118f757600080fd5b505050565b600061190782611d72565b805190602001209050919050565b60008061192183611db1565b915061192c83611dcc565b1561193957506000915091565b506001915091565b6000805a905061195086611df2565b600086358185600181111561196757611967612383565b146119a4576001600160a01b0381166000908152602081905260409020546001600160701b031686811161199d578087036119a0565b60005b9250505b604051633f2eb07d60e21b81526001600160a01b0382169063fcbac1f49060a08b0135906119da908c908c908890600401612857565b600060405180830381600088803b1580156119f457600080fd5b5087f193505050508015611a06575060015b611a8357611a1261277f565b806308c379a01415611a515750611a2761279b565b80611a325750611a53565b8960008260405162fa072b60e01b81526004016106b893929190612824565b505b60405162fa072b60e01b8152600481018a90526000602482018190526060604483015260648201526084016106b8565b6000856001811115611a9757611a97612383565b14611b3a576001600160a01b038116600090815260208190526040902080546001600160701b031680881115611b1d5760405162fa072b60e01b8152600481018c90526000602482015260606044820152601960648201527f77616c6c6574206469646e2774207061792070726566756e6400000000000000608482015260a4016106b8565b81546001600160701b031916908890036001600160701b03161790555b5a90920398975050505050505050565b60606000611b6061014087016101208801612106565b6001600160a01b03811660009081526020819052604090208054919250906001600160701b03811690600160701b900460ff1680611bb457898460405162fa072b60e01b81526004016106b892919061287c565b86821015611c1a5760405162fa072b60e01b8152600481018b90526001600160a01b038516602482015260606044820152601960648201527f7061796d6173746572206465706f73697420746f6f206c6f7700000000000000608482015260a4016106b8565b82546001600160701b0319168783036001600160701b0316178355604051637bfd084560e01b815260a08a0135879003906001600160a01b03861690637bfd0845908390611c70908e908e908e90600401612857565b6000604051808303818786fa93505050508015611caf57506040513d6000823e601f3d908101601f19168201604052611cac91908101906128bb565b60015b611d3357611cbb61277f565b806308c379a01415611cf95750611cd061279b565b80611cdb5750611cfb565b8b868260405162fa072b60e01b81526004016106b893929190612824565b505b60405162fa072b60e01b8152600481018c90526001600160a01b038616602482015260606044820152600060648201526084016106b8565b9b9a5050505050505050505050565b600060e082013561010083013580821415611d5e575092915050565b611d6a82488301611f6b565b949350505050565b6060366000611d85610160850185612601565b915091508360208184030360405194506020810185016040528085528082602087013750505050919050565b6000611dbc82611d42565b611dc583611f83565b0292915050565b600080611de161014084016101208501612106565b6001600160a01b0316141592915050565b611dff6040820182612601565b159050611f685760006001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016634af63f02611e446040850185612601565b6040516001600160e01b031960e085901b168152611e6c929190602088013590600401612932565b6020604051808303816000875af1158015611e8b573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611eaf9190612956565b90506001600160a01b038116611ef85760405162461bcd60e51b815260206004820152600e60248201526d18dc99585d194c8819985a5b195960921b60448201526064016106b8565b81356001600160a01b0316816001600160a01b031614611f665760405162461bcd60e51b8152602060048201526024808201527f73656e64657220646f65736e2774206d617463682063726561746532206164646044820152637265737360e01b60648201526084016106b8565b505b50565b6000818310611f7a5781611f7c565b825b9392505050565b600080611f8f83611dcc565b611f9a576001611f9d565b60035b60ff1690508260c00135818460a001350284608001350101915050919050565b600060208284031215611fcf57600080fd5b813563ffffffff81168114611f7c57600080fd5b60006101808284031215611ff657600080fd5b50919050565b60006020828403121561200e57600080fd5b81356001600160401b0381111561202457600080fd5b611d6a84828501611fe3565b6001600160a01b0381168114611f6857600080fd5b6000806040838503121561205857600080fd5b823561206381612030565b946020939093013593505050565b60008060006040848603121561208657600080fd5b83356001600160401b038082111561209d57600080fd5b818601915086601f8301126120b157600080fd5b8135818111156120c057600080fd5b8760208260051b85010111156120d557600080fd5b602092830195509350508401356120eb81612030565b809150509250925092565b803561210181612030565b919050565b60006020828403121561211857600080fd5b8135611f7c81612030565b60008060008084860360e081121561213a57600080fd5b85356001600160401b038082111561215157600080fd5b61215d89838a01611fe3565b965060a0601f198401121561217157600080fd5b60208801955060c088013592508083111561218b57600080fd5b828801925088601f84011261219f57600080fd5b82359150808211156121b057600080fd5b508760208284010111156121c357600080fd5b949793965060200194505050565b634e487b7160e01b600052604160045260246000fd5b601f8201601f191681016001600160401b038111828210171561220c5761220c6121d1565b6040525050565b60006001600160401b0382111561222c5761222c6121d1565b50601f01601f191660200190565b6000806040838503121561224d57600080fd5b82356001600160401b0381111561226357600080fd5b8301601f8101851361227457600080fd5b803561227f81612213565b60405161228c82826121e7565b8281528760208486010111156122a157600080fd5b8260208501602083013760006020938201840152979590910135955050505050565b6020808252825182820181905260009190848201906040850190845b818110156122fb578351835292840192918401916001016122df565b50909695505050505050565b634e487b7160e01b600052601160045260246000fd5b6000821982111561233057612330612307565b500190565b60008282101561234757612347612307565b500390565b634e487b7160e01b600052603260045260246000fd5b6000823561017e1983360301811261237957600080fd5b9190910192915050565b634e487b7160e01b600052602160045260246000fd5b6000808335601e198436030181126123b057600080fd5b83016020810192503590506001600160401b038111156123cf57600080fd5b8036038313156123de57600080fd5b9250929050565b81835281816020850137506000828201602090810191909152601f909101601f19169091010190565b600061018061242d84612420856120f6565b6001600160a01b03169052565b602083013560208501526124446040840184612399565b82604087015261245783870182846123e5565b925050506124686060840184612399565b858303606087015261247b8382846123e5565b925050506080830135608085015260a083013560a085015260c083013560c085015260e083013560e08501526101008084013581860152506101206124c18185016120f6565b6001600160a01b0316908501526101406124dd84820185612399565b868403838801526124ef8482846123e5565b935050505061016061250381850185612399565b868403838801526125158482846123e5565b979650505050505050565b60005b8381101561253b578181015183820152602001612523565b83811115610b6f5750506000910152565b60008151808452612564816020860160208601612520565b601f01601f19169290920160200192915050565b60e08152600061258b60e083018661240e565b84516020840152602085015160408401526040850151600281106125b1576125b1612383565b8060608501525060608501516080840152608085015160a084015282810360c08401526125de818561254c565b9695505050505050565b6000602082840312156125fa57600080fd5b5051919050565b6000808335601e1984360301811261261857600080fd5b8301803591506001600160401b0382111561263257600080fd5b6020019150368190038213156123de57600080fd5b8183823760009101908152919050565b828152604060208201526000611d6a604083018461254c565b600060a0828403121561268257600080fd5b60405160a081018181106001600160401b03821117156126a4576126a46121d1565b806040525082358152602083013560208201526040830135600281106126c957600080fd5b6040820152606083810135908201526080928301359281019290925250919050565b60208152600061271560208301600a8152691b9bdd081cdd185ad95960b21b602082015260400190565b92915050565b60006001600160401b0380831681851680830382111561273d5761273d612307565b01949350505050565b60006003851061275857612758612383565b8482526060602083015261276f606083018561254c565b9050826040830152949350505050565b600060033d11156127985760046000803e5060005160e01c5b90565b600060443d10156127a95790565b6040516003193d81016004833e81513d6001600160401b0381602484011181841117156127d857505050505090565b82850191508151818111156127f05750505050505090565b843d870101602082850101111561280a5750505050505090565b612819602082860101876121e7565b509095945050505050565b8381526001600160a01b038316602082015260606040820181905260009061284e9083018461254c565b95945050505050565b60608152600061286a606083018661240e565b60208301949094525060400152919050565b8281526001600160a01b0382166020820152606060408201819052600a90820152691b9bdd081cdd185ad95960b21b6080820152600060a08201611d6a565b6000602082840312156128cd57600080fd5b81516001600160401b038111156128e357600080fd5b8201601f810184136128f457600080fd5b80516128ff81612213565b60405161290c82826121e7565b82815286602084860101111561292157600080fd5b6125de836020830160208701612520565b6040815260006129466040830185876123e5565b9050826020830152949350505050565b60006020828403121561296857600080fd5b8151611f7c8161203056fea26469706673582212200d36d032456a421cc8bd7f35c4a818ee75cff9b110a5c29230f4d689e3b857c364736f6c634300080c0033",
+  "deployedBytecode": "0x6080604052600436106101025760003560e01c80635287ce1211610095578063bb9fe6bf11610064578063bb9fe6bf1461042b578063c23a5cea14610440578063c31e435414610460578063ec8b5dbf146104f2578063fc7e286d1461051f57600080fd5b80635287ce121461029b57806370a08231146103b957806388799426146103f8578063b760faf91461041857600080fd5b8063205c2878116100d1578063205c2878146101f25780632815c17b14610212578063390b9978146102325780634baeaf8a1461027b57600080fd5b80630396cb60146101175780630bfb68471461012a57806317c6a9871461017b5780631a1c1141146101bd57600080fd5b3661011257610110336105d5565b005b600080fd5b610110610125366004611fbd565b61063c565b34801561013657600080fd5b5061015e7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b0390911681526020015b60405180910390f35b34801561018757600080fd5b506101af7f000000000000000000000000000000000000000000000000000000000000000081565b604051908152602001610172565b3480156101c957600080fd5b506101dd6101d8366004611ffc565b610906565b60408051928352602083019190915201610172565b3480156101fe57600080fd5b5061011061020d366004612045565b6109b2565b34801561021e57600080fd5b5061011061022d366004612071565b610b75565b34801561023e57600080fd5b506102667f000000000000000000000000000000000000000000000000000000000000000081565b60405163ffffffff9091168152602001610172565b34801561028757600080fd5b506101af610296366004611ffc565b610de1565b3480156102a757600080fd5b506103606102b6366004612106565b6040805160a081018252600080825260208201819052918101829052606081018290526080810191909152506001600160a01b031660009081526020818152604091829020825160a08101845281546001600160701b038082168352600160701b820460ff16151594830194909452600160781b90049092169282019290925260019091015463ffffffff81166060830152600160201b90046001600160401b0316608082015290565b6040805182516001600160701b03908116825260208085015115159083015283830151169181019190915260608083015163ffffffff16908201526080918201516001600160401b03169181019190915260a001610172565b3480156103c557600080fd5b506101af6103d4366004612106565b6001600160a01b03166000908152602081905260409020546001600160701b031690565b34801561040457600080fd5b506101af610413366004612123565b610e23565b610110610426366004612106565b6105d5565b34801561043757600080fd5b50610110610f92565b34801561044c57600080fd5b5061011061045b366004612106565b61109a565b34801561046c57600080fd5b5061015e61047b36600461223a565b8151602092830120604080516001600160f81b0319818601527f000000000000000000000000000000000000000000000000000000000000000060601b6001600160601b03191660218201526035810193909352605580840192909252805180840390920182526075909201909152805191012090565b3480156104fe57600080fd5b5061051261050d366004612106565b6112cf565b60405161017291906122c3565b34801561052b57600080fd5b5061058e61053a366004612106565b600060208190529081526040902080546001909101546001600160701b0380831692600160701b810460ff1692600160781b9091049091169063ffffffff811690600160201b90046001600160401b031685565b604080516001600160701b0396871681529415156020860152929094169183019190915263ffffffff1660608201526001600160401b03909116608082015260a001610172565b6105df8134611335565b6001600160a01b03811660008181526020818152604091829020805492516001600160701b03909316835292917f2da466a7b24304f47e87fa2e1e5a81b9831ce54fec19055ce277ca2f39ba42c491015b60405180910390a25050565b33600090815260208190526040902063ffffffff7f0000000000000000000000000000000000000000000000000000000000000000811690831610156106c15760405162461bcd60e51b8152602060048201526015602482015274756e7374616b652064656c617920746f6f206c6f7760581b60448201526064015b60405180910390fd5b600181015463ffffffff908116908316101561071f5760405162461bcd60e51b815260206004820152601c60248201527f63616e6e6f7420646563726561736520756e7374616b652074696d650000000060448201526064016106b8565b805460009061073f903490600160781b90046001600160701b031661231d565b90507f00000000000000000000000000000000000000000000000000000000000000008110156107a75760405162461bcd60e51b81526020600482015260136024820152727374616b652076616c756520746f6f206c6f7760681b60448201526064016106b8565b6001600160701b0381106107ee5760405162461bcd60e51b815260206004820152600e60248201526d7374616b65206f766572666c6f7760901b60448201526064016106b8565b6040805160a08101825283546001600160701b0390811682526001602080840182815286841685870190815263ffffffff808b16606088019081526000608089018181523380835296829052908a902098518954955194518916600160781b02600160781b600160e81b0319951515600160701b026effffffffffffffffffffffffffffff19909716919099161794909417929092169590951786555194909201805492516001600160401b0316600160201b026001600160601b0319909316949093169390931717905590517fa5ae833d0bb1dcd632d98a8b70973e8516812898e19bf27b70071ebc8dc52c01906108f9908490879091825263ffffffff16602082015260400190565b60405180910390a2505050565b60008060005a9050600061091985610de1565b9050610927600086836113d1565b509093505060c08501355a61093c9084612335565b610946919061231d565b935033156109ab5760405162461bcd60e51b815260206004820152602c60248201527f6d7573742062652063616c6c6564206f66662d636861696e207769746820667260448201526b37b69ebd32b93796b0b2323960a11b60648201526084016106b8565b5050915091565b3360009081526020818152604091829020825160a08101845281546001600160701b03808216808452600160701b830460ff16151595840195909552600160781b90910416938101939093526001015463ffffffff81166060840152600160201b90046001600160401b03166080830152821115610a725760405162461bcd60e51b815260206004820152601960248201527f576974686472617720616d6f756e7420746f6f206c617267650000000000000060448201526064016106b8565b8051610a889083906001600160701b0316612335565b6001600160701b03168152604080516001600160a01b03851681526020810184905233917fd1c19fbcd4551a5edfb66d43d2e337c04837afda3482b42bdf569a8fccdae5fb910160405180910390a26000836001600160a01b03168360405160006040518083038185875af1925050503d8060008114610b24576040519150601f19603f3d011682016040523d82523d6000602084013e610b29565b606091505b5050905080610b6f5760405162461bcd60e51b81526020600482015260126024820152716661696c656420746f20776974686472617760701b60448201526064016106b8565b50505050565b816000816001600160401b03811115610b9057610b906121d1565b604051908082528060200260200182016040528015610bf357816020015b610be06040805160a0810182526000808252602082018190529091820190815260200160008152602001600081525090565b815260200190600190039081610bae5790505b50905060005b82811015610cc85760005a905036878784818110610c1957610c1961234c565b9050602002810190610c2b9190612362565b90506060600080610c3b84610de1565b9050600080610c4b8887856113d1565b6040805160a08101825287815260208101859052919850889750929450909250908101826001811115610c8057610c80612383565b81526020018581526020018760c001355a8a0301815250898981518110610ca957610ca961234c565b6020026020010181905250505050505050508080600101915050610bf9565b506000805b85811015610dce5760005a905036888884818110610ced57610ced61234c565b9050602002810190610cff9190612362565b90506000858481518110610d1557610d1561234c565b6020908102919091010151606081015160405163443cca1360e11b81529192509081903090638879942690610d5290879087908690600401612578565b6020604051808303816000875af1925050508015610d8d575060408051601f3d908101601f19168201909252610d8a918101906125e8565b60015b610db757600083608001515a8703019050610dad87600287878686611541565b8801975050610dbd565b96909601955b505060019093019250610ccd915050565b50610dd9848261184b565b505050505050565b6000610dec826118fc565b6040805160208101929092523090820152466060820152608001604051602081830303815290604052805190602001209050919050565b6000805a9050333014610e3557600080fd5b600080610e456060890189612601565b90501115610f255760008088356001600160a01b031660808a0135610e6d60608c018c612601565b604051610e7b929190612647565b60006040518083038160008787f1925050503d8060008114610eb9576040519150601f19603f3d011682016040523d82523d6000602084013e610ebe565b606091505b509150915081610f2257805115610f1d5788356001600160a01b031688600001357f1c4fada7374c0a9ee8841fc38afe82932dc0f8e69012e927f061a8bae611a2018b6020013584604051610f14929190612657565b60405180910390a35b600192505b50505b600086608001355a8403019050610f866000838a610f48368c90038c018c612670565b8a8a8080601f016020809104026020016040519081016040528093929190818152602001838380828437600092019190915250899250611541915050565b98975050505050505050565b336000908152602081905260409020600181015463ffffffff16610fc85760405162461bcd60e51b81526004016106b8906126eb565b8054600160701b900460ff166110145760405162461bcd60e51b8152602060048201526011602482015270616c726561647920756e7374616b696e6760781b60448201526064016106b8565b600181015460009061102c9063ffffffff164261271b565b6001830180546bffffffffffffffff000000001916600160201b6001600160401b03841690810291909117909155835460ff60701b1916845560405190815290915033907ffa9b3c14cc825c412c9ed81b3ba365a5b459439403f18829e572ed53a4180f0a90602001610630565b3360009081526020819052604090208054600160781b90046001600160701b0316806110ff5760405162461bcd60e51b81526020600482015260146024820152734e6f207374616b6520746f20776974686472617760601b60448201526064016106b8565b6001820154600160201b90046001600160401b03166111605760405162461bcd60e51b815260206004820152601d60248201527f6d7573742063616c6c20756e6c6f636b5374616b65282920666972737400000060448201526064016106b8565b600182015442600160201b9091046001600160401b031611156111c55760405162461bcd60e51b815260206004820152601b60248201527f5374616b65207769746864726177616c206973206e6f7420647565000000000060448201526064016106b8565b6001820180546001600160601b03191690558154600160781b600160e81b0319168255604080516001600160a01b03851681526020810183905233917fb7c918e0e249f999e965cafeb6c664271b3f4317d296461500e71da39f0cbda3910160405180910390a26000836001600160a01b03168260405160006040518083038185875af1925050503d8060008114611279576040519150601f19603f3d011682016040523d82523d6000602084013e61127e565b606091505b5050905080610b6f5760405162461bcd60e51b815260206004820152601860248201527f6661696c656420746f207769746864726177207374616b65000000000000000060448201526064016106b8565b6001600160a01b038116600090815260208190526040908190208151600180825281840190935260609282919081602001602082028036833701905050925081836000815181106113225761132261234c565b6020026020010181815250505050919050565b6001600160a01b038216600090815260208190526040812080549091906113669084906001600160701b031661231d565b90506001600160701b038111156113b25760405162461bcd60e51b815260206004820152601060248201526f6465706f736974206f766572666c6f7760801b60448201526064016106b8565b81546001600160701b0319166001600160701b03919091161790555050565b600080606060005a905060c086013560a08701351760808701351760e087013517610100870135176effffffffffffffffffffffffffffff81111561144e5760405162461bcd60e51b81526020600482015260136024820152726761732076616c756573206f766572666c6f7760681b60448201526064016106b8565b600061145988611915565b909650945061146b8989898989611941565b905043600086600181111561148257611482612383565b141561149c576114958a8a8a8a86611b4a565b94506114af565b6040518060200160405280600081525094505b60005a85039050808a60a001351015611533578a6114d56101408c016101208d01612106565b60405162fa072b60e01b815260048101929092526001600160a01b0316602482015260606044820152601e60648201527f55736564206d6f7265207468616e20766572696669636174696f6e4761730000608482015260a4016106b8565b505050505093509350939050565b6000805a9050600061155287611d42565b90506000806115696101408a016101208b01612106565b90506001600160a01b0381166115825788359150611717565b80915060008751111561171757858302945060028a60028111156115a8576115a8612383565b1461161b5760405163a9a2340960e01b81526001600160a01b0382169063a9a234099060a08c0135906115e3908e908c908b90600401612746565b600060405180830381600088803b1580156115fd57600080fd5b5087f1158015611611573d6000803e3d6000fd5b5050505050611717565b60405163a9a2340960e01b81526001600160a01b0382169063a9a234099060a08c013590611651908e908c908b90600401612746565b600060405180830381600088803b15801561166b57600080fd5b5087f19350505050801561167d575060015b6117175761168961277f565b806308c379a014156116c7575061169e61279b565b806116a957506116c9565b8b828260405162fa072b60e01b81526004016106b893929190612824565b505b60405162fa072b60e01b8152600481018c90526001600160a01b038216602482015260606044820152600d60648201526c1c1bdcdd13dc081c995d995c9d609a1b608482015260a4016106b8565b5a8403860195508286029450848860200151101561178d5760405162fa072b60e01b8152600481018c90526001600160a01b038216602482015260606044820152601b60648201527f70726566756e642062656c6f772061637475616c476173436f73740000000000608482015260a4016106b8565b602088015185900361179f8382611335565b6000808c60028111156117b4576117b4612383565b1490506117c96101408c016101208d01612106565b6001600160a01b03168b356001600160a01b03168b600001517f33fd4d1f25a5461bea901784a6571de6debc16cd0831932c22c6969cd73ba9948e602001358b8a876040516118339493929190938452602084019290925260408301521515606082015260800190565b60405180910390a45050505050509695505050505050565b6001600160a01b0382166118975760405162461bcd60e51b8152602060048201526013602482015272696e76616c69642062656e656669636961727960681b60448201526064016106b8565b6000826001600160a01b03168260405160006040518083038185875af1925050503d80600081146118e4576040519150601f19603f3d011682016040523d82523d6000602084013e6118e9565b606091505b50509050806118f757600080fd5b505050565b600061190782611d72565b805190602001209050919050565b60008061192183611db1565b915061192c83611dcc565b1561193957506000915091565b506001915091565b6000805a905061195086611df2565b600086358185600181111561196757611967612383565b146119a4576001600160a01b0381166000908152602081905260409020546001600160701b031686811161199d578087036119a0565b60005b9250505b604051633f2eb07d60e21b81526001600160a01b0382169063fcbac1f49060a08b0135906119da908c908c908890600401612857565b600060405180830381600088803b1580156119f457600080fd5b5087f193505050508015611a06575060015b611a8357611a1261277f565b806308c379a01415611a515750611a2761279b565b80611a325750611a53565b8960008260405162fa072b60e01b81526004016106b893929190612824565b505b60405162fa072b60e01b8152600481018a90526000602482018190526060604483015260648201526084016106b8565b6000856001811115611a9757611a97612383565b14611b3a576001600160a01b038116600090815260208190526040902080546001600160701b031680881115611b1d5760405162fa072b60e01b8152600481018c90526000602482015260606044820152601960648201527f77616c6c6574206469646e2774207061792070726566756e6400000000000000608482015260a4016106b8565b81546001600160701b031916908890036001600160701b03161790555b5a90920398975050505050505050565b60606000611b6061014087016101208801612106565b6001600160a01b03811660009081526020819052604090208054919250906001600160701b03811690600160701b900460ff1680611bb457898460405162fa072b60e01b81526004016106b892919061287c565b86821015611c1a5760405162fa072b60e01b8152600481018b90526001600160a01b038516602482015260606044820152601960648201527f7061796d6173746572206465706f73697420746f6f206c6f7700000000000000608482015260a4016106b8565b82546001600160701b0319168783036001600160701b0316178355604051637bfd084560e01b815260a08a0135879003906001600160a01b03861690637bfd0845908390611c70908e908e908e90600401612857565b6000604051808303818786fa93505050508015611caf57506040513d6000823e601f3d908101601f19168201604052611cac91908101906128bb565b60015b611d3357611cbb61277f565b806308c379a01415611cf95750611cd061279b565b80611cdb5750611cfb565b8b868260405162fa072b60e01b81526004016106b893929190612824565b505b60405162fa072b60e01b8152600481018c90526001600160a01b038616602482015260606044820152600060648201526084016106b8565b9b9a5050505050505050505050565b600060e082013561010083013580821415611d5e575092915050565b611d6a82488301611f6b565b949350505050565b6060366000611d85610160850185612601565b915091508360208184030360405194506020810185016040528085528082602087013750505050919050565b6000611dbc82611d42565b611dc583611f83565b0292915050565b600080611de161014084016101208501612106565b6001600160a01b0316141592915050565b611dff6040820182612601565b159050611f685760006001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016634af63f02611e446040850185612601565b6040516001600160e01b031960e085901b168152611e6c929190602088013590600401612932565b6020604051808303816000875af1158015611e8b573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611eaf9190612956565b90506001600160a01b038116611ef85760405162461bcd60e51b815260206004820152600e60248201526d18dc99585d194c8819985a5b195960921b60448201526064016106b8565b81356001600160a01b0316816001600160a01b031614611f665760405162461bcd60e51b8152602060048201526024808201527f73656e64657220646f65736e2774206d617463682063726561746532206164646044820152637265737360e01b60648201526084016106b8565b505b50565b6000818310611f7a5781611f7c565b825b9392505050565b600080611f8f83611dcc565b611f9a576001611f9d565b60035b60ff1690508260c00135818460a001350284608001350101915050919050565b600060208284031215611fcf57600080fd5b813563ffffffff81168114611f7c57600080fd5b60006101808284031215611ff657600080fd5b50919050565b60006020828403121561200e57600080fd5b81356001600160401b0381111561202457600080fd5b611d6a84828501611fe3565b6001600160a01b0381168114611f6857600080fd5b6000806040838503121561205857600080fd5b823561206381612030565b946020939093013593505050565b60008060006040848603121561208657600080fd5b83356001600160401b038082111561209d57600080fd5b818601915086601f8301126120b157600080fd5b8135818111156120c057600080fd5b8760208260051b85010111156120d557600080fd5b602092830195509350508401356120eb81612030565b809150509250925092565b803561210181612030565b919050565b60006020828403121561211857600080fd5b8135611f7c81612030565b60008060008084860360e081121561213a57600080fd5b85356001600160401b038082111561215157600080fd5b61215d89838a01611fe3565b965060a0601f198401121561217157600080fd5b60208801955060c088013592508083111561218b57600080fd5b828801925088601f84011261219f57600080fd5b82359150808211156121b057600080fd5b508760208284010111156121c357600080fd5b949793965060200194505050565b634e487b7160e01b600052604160045260246000fd5b601f8201601f191681016001600160401b038111828210171561220c5761220c6121d1565b6040525050565b60006001600160401b0382111561222c5761222c6121d1565b50601f01601f191660200190565b6000806040838503121561224d57600080fd5b82356001600160401b0381111561226357600080fd5b8301601f8101851361227457600080fd5b803561227f81612213565b60405161228c82826121e7565b8281528760208486010111156122a157600080fd5b8260208501602083013760006020938201840152979590910135955050505050565b6020808252825182820181905260009190848201906040850190845b818110156122fb578351835292840192918401916001016122df565b50909695505050505050565b634e487b7160e01b600052601160045260246000fd5b6000821982111561233057612330612307565b500190565b60008282101561234757612347612307565b500390565b634e487b7160e01b600052603260045260246000fd5b6000823561017e1983360301811261237957600080fd5b9190910192915050565b634e487b7160e01b600052602160045260246000fd5b6000808335601e198436030181126123b057600080fd5b83016020810192503590506001600160401b038111156123cf57600080fd5b8036038313156123de57600080fd5b9250929050565b81835281816020850137506000828201602090810191909152601f909101601f19169091010190565b600061018061242d84612420856120f6565b6001600160a01b03169052565b602083013560208501526124446040840184612399565b82604087015261245783870182846123e5565b925050506124686060840184612399565b858303606087015261247b8382846123e5565b925050506080830135608085015260a083013560a085015260c083013560c085015260e083013560e08501526101008084013581860152506101206124c18185016120f6565b6001600160a01b0316908501526101406124dd84820185612399565b868403838801526124ef8482846123e5565b935050505061016061250381850185612399565b868403838801526125158482846123e5565b979650505050505050565b60005b8381101561253b578181015183820152602001612523565b83811115610b6f5750506000910152565b60008151808452612564816020860160208601612520565b601f01601f19169290920160200192915050565b60e08152600061258b60e083018661240e565b84516020840152602085015160408401526040850151600281106125b1576125b1612383565b8060608501525060608501516080840152608085015160a084015282810360c08401526125de818561254c565b9695505050505050565b6000602082840312156125fa57600080fd5b5051919050565b6000808335601e1984360301811261261857600080fd5b8301803591506001600160401b0382111561263257600080fd5b6020019150368190038213156123de57600080fd5b8183823760009101908152919050565b828152604060208201526000611d6a604083018461254c565b600060a0828403121561268257600080fd5b60405160a081018181106001600160401b03821117156126a4576126a46121d1565b806040525082358152602083013560208201526040830135600281106126c957600080fd5b6040820152606083810135908201526080928301359281019290925250919050565b60208152600061271560208301600a8152691b9bdd081cdd185ad95960b21b602082015260400190565b92915050565b60006001600160401b0380831681851680830382111561273d5761273d612307565b01949350505050565b60006003851061275857612758612383565b8482526060602083015261276f606083018561254c565b9050826040830152949350505050565b600060033d11156127985760046000803e5060005160e01c5b90565b600060443d10156127a95790565b6040516003193d81016004833e81513d6001600160401b0381602484011181841117156127d857505050505090565b82850191508151818111156127f05750505050505090565b843d870101602082850101111561280a5750505050505090565b612819602082860101876121e7565b509095945050505050565b8381526001600160a01b038316602082015260606040820181905260009061284e9083018461254c565b95945050505050565b60608152600061286a606083018661240e565b60208301949094525060400152919050565b8281526001600160a01b0382166020820152606060408201819052600a90820152691b9bdd081cdd185ad95960b21b6080820152600060a08201611d6a565b6000602082840312156128cd57600080fd5b81516001600160401b038111156128e357600080fd5b8201601f810184136128f457600080fd5b80516128ff81612213565b60405161290c82826121e7565b82815286602084860101111561292157600080fd5b6125de836020830160208701612520565b6040815260006129466040830185876123e5565b9050826020830152949350505050565b60006020828403121561296857600080fd5b8151611f7c8161203056fea26469706673582212200d36d032456a421cc8bd7f35c4a818ee75cff9b110a5c29230f4d689e3b857c364736f6c634300080c0033",
+  "devdoc": {
+    "errors": {
+      "FailedOp(uint256,address,string)": [
+        {
+          "params": {
+            "opIndex": "- index into the array of ops to the failed one (in simulateValidation, this is always zero)",
+            "paymaster": "- if paymaster.validatePaymasterUserOp fails, this will be the paymaster's address. if validateUserOp failed,       this value will be zero (since it failed before accessing the paymaster)",
+            "reason": "- revert reason   Should be caught in off-chain handleOps simulation and not happen on-chain.   Useful for mitigating DoS attempts against batchers or for troubleshooting of wallet/paymaster reverts."
+          }
+        }
+      ]
+    },
+    "events": {
+      "UserOperationRevertReason(bytes32,address,uint256,bytes)": {
+        "params": {
+          "nonce": "the nonce used in the request",
+          "requestId": "the request unique identifier.",
+          "revertReason": "- the return bytes from the (reverted) call to \"callData\".",
+          "sender": "the sender of this request"
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "addStake(uint32)": {
+        "params": {
+          "_unstakeDelaySec": "the new lock duration before the deposit can be withdrawn."
+        }
+      },
+      "constructor": {
+        "params": {
+          "_create2factory": "- contract to \"create2\" wallets (not the EntryPoint itself, so that the EntryPoint can be upgraded)",
+          "_paymasterStake": "- minimum required locked stake for a paymaster",
+          "_unstakeDelaySec": "- minimum time (in seconds) a paymaster stake must be locked"
+        }
+      },
+      "getSenderAddress(bytes,uint256)": {
+        "params": {
+          "initCode": "the constructor code to be passed into the UserOperation.",
+          "salt": "the salt parameter, to be passed as \"nonce\" in the UserOperation."
+        }
+      },
+      "handleOps((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes)[],address)": {
+        "params": {
+          "beneficiary": "the address to receive the fees",
+          "ops": "the operations to execute"
+        }
+      },
+      "simulateValidation((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))": {
+        "details": "The node must also verify it doesn't use banned opcodes, and that it doesn't reference storage outside the wallet's data.      In order to split the running opcodes of the wallet (validateUserOp) from the paymaster's validatePaymasterUserOp,      it should look for the NUMBER opcode at depth=1 (which itself is a banned opcode)",
+        "returns": {
+          "preOpGas": "total gas used by validation (including contract creation)",
+          "prefund": "the amount the wallet had to prefund (zero in case a paymaster pays)"
+        }
+      },
+      "withdrawStake(address)": {
+        "params": {
+          "withdrawAddress": "the address to send withdrawn value."
+        }
+      },
+      "withdrawTo(address,uint256)": {
+        "params": {
+          "withdrawAddress": "the address to send withdrawn value.",
+          "withdrawAmount": "the amount to withdraw."
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "errors": {
+      "FailedOp(uint256,address,string)": [
+        {
+          "notice": "a custom revert error of handleOps, to identify the offending op.  NOTE: if simulateValidation passes successfully, there should be no reason for handleOps to fail on it."
+        }
+      ]
+    },
+    "events": {
+      "StakeLocked(address,uint256,uint256)": {
+        "notice": "Emitted once a stake is scheduled for withdrawal"
+      },
+      "StakeUnlocked(address,uint256)": {
+        "notice": "Emitted once a stake is scheduled for withdrawal"
+      },
+      "UserOperationRevertReason(bytes32,address,uint256,bytes)": {
+        "notice": "An event emitted if the UserOperation \"callData\" reverted with non-zero length"
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "addStake(uint32)": {
+        "notice": "add to the account's stake - amount and delay any pending unstake is first cancelled."
+      },
+      "balanceOf(address)": {
+        "notice": "return the deposit (for gas payment) of the account"
+      },
+      "depositTo(address)": {
+        "notice": "add to the deposit of the given account"
+      },
+      "deposits(address)": {
+        "notice": "maps paymaster to their deposits and stakes"
+      },
+      "getRequestId((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))": {
+        "notice": "generate a request Id - unique identifier for this request. the request ID is a hash over the content of the userOp (except the signature), the entrypoint and the chainid."
+      },
+      "getSenderAddress(bytes,uint256)": {
+        "notice": "Get counterfactual sender address.  Calculate the sender contract address that will be generated by the initCode and salt in the UserOperation."
+      },
+      "getSenderStorage(address)": {
+        "notice": "return the storage cells used internally by the EntryPoint for this sender address. During `simulateValidation`, allow these storage cells to be accessed  (that is, a wallet/paymaster are allowed to access their own deposit balance on the  EntryPoint's storage, but no other account)"
+      },
+      "handleOps((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes)[],address)": {
+        "notice": "Execute a batch of UserOperation."
+      },
+      "innerHandleOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes),(bytes32,uint256,uint8,uint256,uint256),bytes)": {
+        "notice": "inner function to handle a UserOperation. Must be declared \"external\" to open a call context, but it can only be called by handleOps."
+      },
+      "paymasterStake()": {
+        "notice": "minimum value required to stake for a paymaster"
+      },
+      "simulateValidation((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,address,bytes,bytes))": {
+        "notice": "Simulate a call to wallet.validateUserOp and paymaster.validatePaymasterUserOp. Validation succeeds if the call doesn't revert."
+      },
+      "unlockStake()": {
+        "notice": "attempt to unlock the stake. the value can be withdrawn (using withdrawStake) after the unstake delay."
+      },
+      "unstakeDelaySec()": {
+        "notice": "minimum time (in seconds) required to lock a paymaster stake before it can be withdraw."
+      },
+      "withdrawStake(address)": {
+        "notice": "withdraw from the (unlocked) stake. must first call unlockStake and wait for the unstakeDelay to pass"
+      },
+      "withdrawTo(address,uint256)": {
+        "notice": "withdraw from the deposit."
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 3447,
+        "contract": "contracts/EntryPoint.sol:EntryPoint",
+        "label": "deposits",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_struct(DepositInfo)3441_storage)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_struct(DepositInfo)3441_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct StakeManager.DepositInfo)",
+        "numberOfBytes": "32",
+        "value": "t_struct(DepositInfo)3441_storage"
+      },
+      "t_struct(DepositInfo)3441_storage": {
+        "encoding": "inplace",
+        "label": "struct StakeManager.DepositInfo",
+        "members": [
+          {
+            "astId": 3432,
+            "contract": "contracts/EntryPoint.sol:EntryPoint",
+            "label": "deposit",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint112"
+          },
+          {
+            "astId": 3434,
+            "contract": "contracts/EntryPoint.sol:EntryPoint",
+            "label": "staked",
+            "offset": 14,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 3436,
+            "contract": "contracts/EntryPoint.sol:EntryPoint",
+            "label": "stake",
+            "offset": 15,
+            "slot": "0",
+            "type": "t_uint112"
+          },
+          {
+            "astId": 3438,
+            "contract": "contracts/EntryPoint.sol:EntryPoint",
+            "label": "unstakeDelaySec",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint32"
+          },
+          {
+            "astId": 3440,
+            "contract": "contracts/EntryPoint.sol:EntryPoint",
+            "label": "withdrawTime",
+            "offset": 4,
+            "slot": "1",
+            "type": "t_uint64"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint112": {
+        "encoding": "inplace",
+        "label": "uint112",
+        "numberOfBytes": "14"
+      },
+      "t_uint32": {
+        "encoding": "inplace",
+        "label": "uint32",
+        "numberOfBytes": "4"
+      },
+      "t_uint64": {
+        "encoding": "inplace",
+        "label": "uint64",
+        "numberOfBytes": "8"
+      }
+    }
+  }
+}

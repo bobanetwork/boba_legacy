@@ -1,0 +1,13 @@
+{
+  "extends": "../../../tsconfig.build.json",
+
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "resolveJsonModule": true
+  },
+
+  "include": [
+    "src/**/*", "contracts/**/*", "src/abi/*.json"
+  ]
+}

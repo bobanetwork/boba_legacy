@@ -86,17 +86,17 @@ export function fastExitAll(token) {
 }
 
 //CLASSIC DEPOSIT ETH
-export function depositETHL2(value) {
+export function depositETHL2(payload) {
   return createAction('DEPOSIT/CREATE', () => {
-    return networkService.depositETHL2(value)
+    return networkService.depositETHL2(payload)
   }
   )
 }
 
 //DEPOSIT ERC20
-export function depositErc20(value, currency, currencyL2) {
+export function depositErc20(payload) {
   return createAction('DEPOSIT/CREATE', () =>
-    networkService.depositErc20(value, currency, currencyL2)
+    networkService.depositErc20(payload)
   )
 }
 

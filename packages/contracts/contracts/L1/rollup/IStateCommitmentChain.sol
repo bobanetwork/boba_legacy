@@ -74,8 +74,7 @@ interface IStateCommitmentChain {
      * @param _batchHeader Header of the batch to check.
      * @return _inside Whether or not the batch is inside the fraud proof window.
      */
-    function insideFraudProofWindow(Lib_OVMCodec.ChainBatchHeader memory _batchHeader)
-        external
-        view
-        returns (bool _inside);
+    function insideFraudProofWindow(
+        Lib_OVMCodec.ChainBatchHeader memory _batchHeader
+    ) external view returns (bool _inside);
 }

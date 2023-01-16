@@ -51,6 +51,12 @@ jobs:
         run: |
           ./scripts/build-ci.sh
           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
+
+      - name: Build Proxyd
+        working-directory: ./
+        run: |
+          docker build ./go/ --file ./go/proxyd/Dockerfile --tag bobanetwork/proxyd:${{ steps.tag.outputs.VERSION }}
+
       - name: Rename and retag the Optimism images
         working-directory: ./ops
         run: |
@@ -58,7 +64,6 @@ jobs:
             docker image tag "$i" bobanetwork/$(echo $i | awk -F'/' '{print $2}' | awk -F':' '{print $1}'):${{ steps.tag.outputs.VERSION }}
           done
           docker images
-          docker images | grep ${{ steps.tag.outputs.VERSION }}
 
       - name: Rename and retag the optimism images
         working-directory: ./ops

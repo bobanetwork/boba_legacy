@@ -203,7 +203,15 @@ function TokenPage() {
         <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
           <Typography variant="body2">
             <span style={{opacity: '0.9'}}>Need ETH or BOBA</span>{'? '}
-            <span style={{opacity: '0.6'}}>You can swap one for the other at</span>
+            <span style={{opacity: '0.6'}}>You can swap one for the other at </span>
+            <G.footerLink
+              target='_blank'
+              href={'https://www.sushi.com/swap'}
+              aria-label="link"
+              style={{fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px'}}
+            >Sushiswap<Link />
+            </G.footerLink>
+            <span style={{opacity: '0.6'}}>and </span>
             <G.footerLink
               target='_blank'
               href={'https://oolongswap.com/'}
@@ -224,7 +232,7 @@ function TokenPage() {
         </Box>
       }
 
-      {layer === 'L2' && network === 'rinkeby' &&
+      {layer === 'L2' && network === 'goerli' &&
           <G.LayerAlert style={{padding: '20px'}}>
           <Box>
 

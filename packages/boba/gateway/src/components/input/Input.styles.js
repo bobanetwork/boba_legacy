@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles'
-import { Box, TextField } from '@mui/material'
+import { Box, TextField, TextareaAutosize } from '@mui/material'
 
 export const Wrapper = styled(Box)`
   display: flex;
@@ -63,3 +63,28 @@ export const ActionsWrapper = styled(Box)`
   flex: 3;
   margin-left: 10px;
 `;
+
+export const TextareaAutosizeWrapper = styled(TextareaAutosize)(({ theme }) => ({
+  width: '100%',
+  backgroundColor: 'transparent',
+  font: 'inherit !important',
+  fontSize: '0.9em !important',
+  padding: '17.5px 15px',
+  borderRadius: '4px',
+  borderColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255,255,255,0.23)',
+  color: theme.palette.mode === 'light' ? 'black' : 'white',
+  '&::placeholder': {
+    color: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255,255,255,0.45)',
+  },
+  '&:hover': {
+    backgroundColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255,255,255,0.05)',
+    borderColor: theme.palette.mode === 'light' ? 'black' : 'white',
+  },
+  '&:focus': {
+    padding: '16.5px 14px',
+    borderColor: '#478ddf',
+    borderWidth: '2px',
+    outline: '0px !important',
+    outlineOffset: '0px !important',
+  },
+}));

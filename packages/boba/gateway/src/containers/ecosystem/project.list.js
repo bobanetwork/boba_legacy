@@ -36,6 +36,11 @@ import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
 import beamerbridge from '../../images/ecosystem/beamerbridge.png'
+import sushicom from '../../images/ecosystem/sushicom.png'
+import pmc from '../../images/ecosystem/pmc.png'
+import cookbookLogo from '../../images/ecosystem/cookbook.png'
+import changenowLogo from '../../images/ecosystem/changenow.svg'
+import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -52,6 +57,17 @@ import BobaftmLogo from '../../images/bobaLinks/Bobaftm.svg'
  */
 
 export const projectList = [
+  {
+    "title": "Sushi",
+    "canLaunch": true,
+    "link": "https://sushi.com/",
+    "telegram": "",
+    "twitter": "https://twitter.com/SushiSwap",
+    "discord": "https://discord.gg/2D7G3bsnFa",
+    "type": "defi",
+    "image": sushicom,
+    "description": "Decentralized Exchange Made For Everybody. Swap, earn, stack yields, lend, borrow, leverage all on one decentralized, community driven platform. Welcome home to DeFi."
+  },
   {
     "title": "OolongSwap",
     "canLaunch": true,
@@ -138,7 +154,7 @@ export const projectList = [
   {
     "title": "Unidex",
     "canLaunch": true,
-    "link": "https://unidexbeta.app/trading",
+    "link": "https://app.unidex.exchange/trading",
     "telegram": "https://t.me/unidexfinance",
     "twitter": "https://twitter.com/UniDexFinance",
     "discord": "https://discord.com/invite/WzJPSjGj4h",
@@ -155,6 +171,17 @@ export const projectList = [
     "type": "bridge",
     "image": layerSwapLogo,
     "description": "Bridge Crypto from CEX to Layer2 faster and cheaper."
+  },
+  {
+    "title": "Cookbook",
+    "canLaunch": true,
+    "link": "https://cookbook.dev/",
+    "telegram": "https://t.me/cookbook_dev",
+    "twitter": "https://twitter.com/cookbook_dev",
+    "discord": "http://discord.gg/DAgJVfvxPC",
+    "type": "tool",
+    "image": cookbookLogo,
+    "description": "An open-source global registry for smart contracts"
   },
   {
     "title": "Witnet Oracle",
@@ -187,6 +214,17 @@ export const projectList = [
     "type": "token",
     "image": bobaDogeLogo,
     "description": "The first dog coin on Boba."
+  },
+  {
+    "title": "Memes Wallet",
+    "canLaunch": true,
+    "link": "https://planetmemes.com/",
+    "telegram": "https://t.me/PlanetMemesOf",
+    "twitter": "https://twitter.com/PlanetMemes4",
+    "discord": "",
+    "type": "wallet",
+    "image": pmc,
+    "description": "Memes wallet is a non-custodial multichain wallet with a memeable UI dedicated with funny features for meme coins fans it gives users control over their own private keys, addresses, and funds. ",
   },
   {
     "title": "ApeBoard",
@@ -429,6 +467,27 @@ export const projectList = [
     "image": rabbyLogo,
     "description": "The game-changing wallet for Ethereum and all EVM chains."
   },
+  {
+    "title": "NOW Wallet",
+    "canLaunch": true,
+    "link": "https://walletnow.app",
+    "telegram": "https://t.me/NOWWallet_channel",
+    "twitter": "https://twitter.com/NOW_Wallet",
+    "type": "wallet",
+    "image": nowwalletLogo,
+    "description": "NOW Wallet is a fast, secure and non-custodial crypto wallet developed by the team of ChangeNOW Crypto Exchange service"
+  },
+  {
+    "title": "ChangeNOW",
+    "canLaunch": true,
+    "link": "https://changenow.io/?utm_source=boba+network&utm_medium=direct&utm_campaign=boba+website+traffic",
+    "telegram": "https://t.me/changeNOW_chat",
+    "twitter": "https://twitter.com/ChangeNOW_io",
+    "discord": "https://discord.gg/ETMPprbgDT",
+    "type": "tool",
+    "image": changenowLogo,
+    "description": "Non-custodial service created for simple and fast cryptocurrency exchanges: buy and swap BOBA."
+  },
 ]
 
 export const loadProjectByCategory = () => {
@@ -454,10 +513,10 @@ export const BobaProjectList = [
   {
     title: 'Boba Ethereum Testnet Gateway',
     canLaunch: true,
-    link: 'https://gateway.rinkeby.boba.network',
+    link: 'https://gateway.goerli.boba.network',
     type: 'testnet',
     image: BobaethLogo,
-    description: 'Boba Ethereum is a bridge between Ethereum Rinkeby and Boba L2.',
+    description: 'Boba Ethereum is a bridge between Ethereum Goerli and Boba L2.',
   },
   {
     title: 'Boba Ethereum Block Explorer',
@@ -473,7 +532,7 @@ export const BobaProjectList = [
     link: 'https://testnet.bobascan.com',
     type: 'testnet',
     image: BobaethLogo,
-    description: 'Block explorer for Boba Ethereum Rinkeby.',
+    description: 'Block explorer for Boba Ethereum Goerli.',
   },
   {
     title: 'Boba Avalanche Gateway',
