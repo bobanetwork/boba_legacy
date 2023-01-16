@@ -352,7 +352,6 @@ func (cache *randomCache) Put(key common.Hash, secret *big.Int, blockNum *big.In
 
 func (cache *randomCache) Get(key common.Hash) (bool, *big.Int, *big.Int) {
 	var ent cacher = cache.GetEnt(key)
-
 	if ent == nil {
 		return false, nil, nil
 	} else {
@@ -362,8 +361,7 @@ func (cache *randomCache) Get(key common.Hash) (bool, *big.Int, *big.Int) {
 }
 
 func (cache *turingCache) Get(key common.Hash) (bool, []byte) {
-	var ent cacher
-	ent = cache.GetEnt(key)
+	var ent = cache.GetEnt(key)
 	if ent == nil {
 		return false, nil
 	} else {
