@@ -223,7 +223,7 @@ type commonCacheEntry struct {
 
 type turingCacheEntry struct {
 	commonCacheEntry
-	value   []byte
+	value []byte
 }
 
 type cacher interface {
@@ -251,14 +251,14 @@ func (ent *randomCacheEntry) GetRandom() (*big.Int, *big.Int) {
 	return ent.secret, ent.blockNum
 }
 
-func (ent *turingCacheEntry) GetTuring() ([]byte) {
+func (ent *turingCacheEntry) GetTuring() []byte {
 	return ent.value
 }
 
 type commonCache struct {
 	lock      sync.RWMutex
 	nextClean time.Time
-	entries map[common.Hash] cacher
+	entries   map[common.Hash]cacher
 }
 
 func (cc *commonCacheEntry) IsExpired(t time.Time) bool {
@@ -281,7 +281,7 @@ type randomCache struct {
 
 func (cache *commonCache) Init() {
 	log.Debug("TURING Cache init")
-	cache.entries = make(map[common.Hash] cacher)
+	cache.entries = make(map[common.Hash]cacher)
 	cache.nextClean = time.Now().Add(turingCacheClean)
 }
 
@@ -293,7 +293,7 @@ func (cache *commonCache) GetEnt(key common.Hash) cacher {
 		cache.Init()
 	}
 	if ent, hit := cache.entries[key]; hit {
-		if !ent.IsExpired(time.Now()) {  //.Before(ent.(commonCacheEntry).expires) {
+		if !ent.IsExpired(time.Now()) { //.Before(ent.(commonCacheEntry).expires) {
 			log.Debug("TURING Cache hit", "key", key, "expires", ent.GetExpires())
 			ret = ent
 		} else {
@@ -351,9 +351,8 @@ func (cache *randomCache) Put(key common.Hash, secret *big.Int, blockNum *big.In
 }
 
 func (cache *randomCache) Get(key common.Hash) (bool, *big.Int, *big.Int) {
-	var ent cacher
-	ent = cache.GetEnt(key)
-	
+	var ent cacher = cache.GetEnt(key)
+
 	if ent == nil {
 		return false, nil, nil
 	} else {
@@ -362,7 +361,7 @@ func (cache *randomCache) Get(key common.Hash) (bool, *big.Int, *big.Int) {
 	}
 }
 
-func (cache *turingCache) Get(key common.Hash)(bool, []byte) {
+func (cache *turingCache) Get(key common.Hash) (bool, []byte) {
 	var ent cacher
 	ent = cache.GetEnt(key)
 	if ent == nil {
@@ -675,8 +674,8 @@ func bobaBigRandom() (*big.Int, error) {
 	// Max random value 2^256 - 1
 	max = max.Exp(two, big.NewInt(int64(256)), nil).Sub(max, one)
 	n, err := rand.Int(rand.Reader, max)
-	
-	return n,err
+
+	return n, err
 }
 
 // Helper function to convert a big.Int into a zero-padded uint256 representation which
@@ -684,7 +683,7 @@ func bobaBigRandom() (*big.Int, error) {
 func U256(val *big.Int) []byte {
 	var ret []byte
 	x := len(val.Bytes())
-	ret = make([]byte, 32 - x)
+	ret = make([]byte, 32-x)
 	ret = append(ret, val.Bytes()...)
 	return ret
 }
@@ -702,9 +701,7 @@ func (evm *EVM) bobaTuringRandomV2(input []byte, caller common.Address, mayBlock
 	// "require" in the contract.
 	retError := make([]byte, len(inputHexUtil))
 	copy(retError, inputHexUtil)
-	
-	ret = retError
-	
+
 	log.Debug("MMDBG bobaTuringRandomV2", "caller", caller, "mayBlock", mayBlock, "BN", blockNum, "rest", hexutil.Bytes(rest))
 
 	rType := int(rest[31])
@@ -726,19 +723,19 @@ func (evm *EVM) bobaTuringRandomV2(input []byte, caller common.Address, mayBlock
 		retError[35] = 11 // Calldata too short
 		return retError
 	}
-	
+
 	sKey := rest[32:64]
 	cNum := new(big.Int).SetBytes(rest[64:96])
 	cNext := new(common.Hash)
 	cNext.SetBytes(rest[96:128])
-	
+
 	log.Debug("MMDBG params", "sKey", hexutil.Bytes(sKey), "cNum", cNum, "cNext", cNext)
-	
+
 	sNum := new(big.Int)
 	sNext := new(common.Hash)
 	sRand := new(big.Int)
 	sBN := new(big.Int)
-	
+
 	var err error
 	var found bool
 	var zeroHash common.Hash
@@ -751,7 +748,7 @@ func (evm *EVM) bobaTuringRandomV2(input []byte, caller common.Address, mayBlock
 		hasher.Write(cNext.Bytes())
 		key := common.BytesToHash(hasher.Sum(nil))
 
-		found, sRand, sBN = rCache.Get(key)		
+		found, sRand, sBN = rCache.Get(key)
 		if !found {
 			sRand, err = bobaBigRandom()
 			if err != nil {
@@ -814,8 +811,6 @@ func (evm *EVM) bobaTuringRandomV2(input []byte, caller common.Address, mayBlock
 		"newValue", ret)
 	return ret
 }
-
-
 
 // Call executes the contract associated with the addr with the given input as
 // parameters. It also handles any necessary value transfer required and takes
@@ -889,7 +884,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 
 		//methodID for GetRandom is 493d57d6 -> [73 61 87 214]
 		isGetRand = bytes.Equal(input[:4], []byte{73, 61, 87, 214})
-		
+
 		//methodID for GetRandomV2 is a886988e -> [168, 134, 152, 142]
 		isGetRand2 = bytes.Equal(input[:4], []byte{168, 134, 152, 142})
 		log.Debug("MMDBG isTuring", "method", hexutil.Bytes(input[:4]))
@@ -956,8 +951,8 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			log.Debug("TURING NEW CALL", "updated_input", updated_input, "ret", hexutil.Bytes(ret), "err", err)
 			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
-			evm.Context.TuringDepth += 2 	// FIXME - This is initialized differently in Sequencer or Replica mode.
-							// Workaround is to incr. by 2 to avoid calling twice in Sequencer mode.
+			evm.Context.TuringDepth += 2 // FIXME - This is initialized differently in Sequencer or Replica mode.
+			// Workaround is to incr. by 2 to avoid calling twice in Sequencer mode.
 		} else {
 			// We are in Verifier/Replica mode
 			// Turing for this Transaction has already been run elsewhere - replay using
