@@ -1,8 +1,8 @@
 version: "3"
 
-# Account #14 - bobalink test
+# Account #6 - bobalink test
 x-bobalink_pk: &bobalink_pk
-  BOBALINK_REPORTER_KEY: '0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa'
+  BOBALINK_REPORTER_KEY: '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
 
 # Account #19
 x-gas-price-oracle_pk: &gas-price-oracle_pk
@@ -80,7 +80,7 @@ services:
       L1_NODE_WEB3_URL: http://l2geth:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : *bobalink_pk #same as the deployer
+      << : *bobalink_pk
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       POLLING_INTERVAL: 1000

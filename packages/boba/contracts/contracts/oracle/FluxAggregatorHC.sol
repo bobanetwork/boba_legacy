@@ -220,7 +220,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
    * @notice returns the oracle address
    */
   function getOracles() external view returns (address[] memory) {
-    address[] memory oracleAddresses;
+    address[] memory oracleAddresses = new address[](1);
     oracleAddresses[0] = oracleAddress;
     return oracleAddresses;
   }

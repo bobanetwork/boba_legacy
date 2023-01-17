@@ -83,6 +83,10 @@ x-integration_2_pk: &integration_2_pk
 x-integration_3_pk: &integration_3_pk
   PRIVATE_KEY_3: '0x8166f546bab6da521a8369cab06c5d2b9e46670292d85c875ee9ec20e84ffb61'
 
+# Account #6 - allows the bobalink test
+x-bobalink_pk: &bobalink_pk
+  BOBALINK_PRIVATE_KEY: '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
+
 version: "3"
 
 services:
@@ -332,6 +336,7 @@ services:
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
+      << : *bobalink_pk
     volumes:
       - ~/result:/opt/optimism/integration-tests/result
 
