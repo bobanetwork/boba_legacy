@@ -41,7 +41,7 @@ describe('BobaLink Test\n', async () => {
 
   const addOracle = async (contract: Contract, oracleAddr: string, adminAddr: string, roundId = 0) => {
     const admin = await contract.getAdmin()
-    if (admin == '0x0000000000000000000000000000000000000000') {
+    if (admin === '0x0000000000000000000000000000000000000000') {
       await contract.setOracle(
         oracleAddr,
         adminAddr,

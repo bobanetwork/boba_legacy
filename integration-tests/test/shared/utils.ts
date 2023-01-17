@@ -9,7 +9,7 @@ import {
   constants,
 } from 'ethers'
 import { getContractInterface,predeploys } from '@eth-optimism/contracts'
-import { remove0x } from '@eth-optimism/core-utils'
+import { remove0x, sleep } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,
   NumberLike,
@@ -18,7 +18,6 @@ import {
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
-import { sleep } from '@eth-optimism/core-utils'
 dotenv.config()
 
 /* Imports: Internal */
