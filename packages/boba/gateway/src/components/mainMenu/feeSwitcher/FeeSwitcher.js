@@ -114,7 +114,7 @@ function FeeSwitcher() {
       dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
     }
 
-  }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
+  }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA, network ])
 
   if (!accountEnabled && layer !== 'L2') {
     return <S.FeeSwitcherWrapper>
@@ -135,7 +135,7 @@ function FeeSwitcher() {
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
         }}
-        value={!feeUseBoba ? 'BOBA': networkService.L1NativeTokenSymbol }
+        value={!feeUseBoba ? networkService.L1NativeTokenSymbol: 'BOBA' }
         options={[
           {
             value: 'BOBA',

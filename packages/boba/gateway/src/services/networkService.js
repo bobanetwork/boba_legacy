@@ -274,9 +274,16 @@ class NetworkService {
       if (this.networkGateway === NETWORK.ETHEREUM) {
         feeChoice = await bobaFeeContract.bobaFeeTokenUsers(this.account)
       } else {
+        // this returns weather the secondary token getting use as tokenfee
         feeChoice = await bobaFeeContract.secondaryFeeTokenUsers(this.account)
+        // if it's false which means boba is getting used as tokenfee which is default value.
+        feeChoice = !feeChoice;
+
       }
 
+      console.log(
+        'Fee used as boba', feeChoice
+      )
       const bobaFee = {
         priceRatio: priceRatio.toString(),
         feeChoice
