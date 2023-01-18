@@ -42,6 +42,7 @@ import cookbookLogo from '../../images/ecosystem/cookbook.png'
 import babylons from '../../images/ecosystem/babylons.png'
 import changenowLogo from '../../images/ecosystem/changenow.svg'
 import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
+import foxtrotCommand from '../../images/ecosystem/foxtrotCommand.webp'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -499,6 +500,17 @@ export const projectList = [
     "type": "nft",
     "image": babylons,
     "description": "Babylons NFT Marketplace and web3.0 Infrastructure Services. Babylons is an ecosystem governed by a unique DAO model serving as a community-governed NFT Platform, a premiere blockchain gaming aggregator, a cutting-edge launchpad and web3.0 technology solutions provider trusted by over 200 partners."
+  },
+  {
+    "title": "Foxtrot Command",
+    "canLaunch": true,
+    "link": "https://foxtrotcommand.com",
+    "telegram": "https://t.me/FoxtrotCommand",
+    "twitter": "https://twitter.com/foxtrotcommand",
+    "discord": "http://discord.gg/Pp3CZ6UUX3",
+    "type": "gamefi",
+    "image": foxtrotCommand,
+    "description": "Foxtrot Command is a fast and extremely competitive trading card game with new mechanics and the innovative double lane system. Compete against other players and upgrade your deck to reach the top of the leaderboard"
   }
 ]
 
