@@ -39,6 +39,7 @@ import beamerbridge from '../../images/ecosystem/beamerbridge.png'
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
 import cookbookLogo from '../../images/ecosystem/cookbook.png'
+import babylons from '../../images/ecosystem/babylons.png'
 import changenowLogo from '../../images/ecosystem/changenow.svg'
 import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
 
@@ -488,6 +489,17 @@ export const projectList = [
     "image": changenowLogo,
     "description": "Non-custodial service created for simple and fast cryptocurrency exchanges: buy and swap BOBA."
   },
+  {
+    "title": "Babylons",
+    "canLaunch": true,
+    "link": "https://babylons.io/",
+    "telegram": "https://t.me/babylonsnft",
+    "twitter": "https://twitter.com/BabylonsNFT",
+    "discord": "https://discord.com/invite/babylonsnft",
+    "type": "nft",
+    "image": babylons,
+    "description": "Babylons NFT Marketplace and web3.0 Infrastructure Services. Babylons is an ecosystem governed by a unique DAO model serving as a community-governed NFT Platform, a premiere blockchain gaming aggregator, a cutting-edge launchpad and web3.0 technology solutions provider trusted by over 200 partners."
+  }
 ]
 
 export const loadProjectByCategory = () => {
