@@ -93,7 +93,6 @@ COPY --from=builder /opt/optimism/packages/contracts/dist ./packages/contracts/d
 COPY --from=builder /opt/optimism/packages/data-transport-layer/dist ./packages/data-transport-layer/dist
 COPY --from=builder /opt/optimism/packages/message-relayer/dist ./packages/message-relayer/dist
 
-COPY --from=builder /opt/optimism/packages/boba/contracts/dist ./packages/boba/contracts/dist
 COPY --from=builder /opt/optimism/packages/boba/gas-price-oracle/dist ./packages/boba/gas-price-oracle/dist
 COPY --from=builder /opt/optimism/packages/boba/bobalink/dist ./packages/boba/bobalink/dist
 COPY --from=builder /opt/optimism/packages/boba/teleportation/dist ./packages/boba/teleportation/dist
