@@ -54,58 +54,10 @@ jobs:
 
       - uses: codecov/codecov-action@v1
         with:
-          files: ./packages/contracts/coverage.json
+          files: ./packages/*/coverage.json, ./packages/boba/*/coverage.json
           fail_ci_if_error: true
           verbose: true
-          flags: contracts
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/core-utils/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: core-utils
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/data-transport-layer/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: data-transport-layer
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/message-relayer/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: message-relayer
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/boba/contracts/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: boba-contracts
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/sdk/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: sdk
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/boba/bobalink/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: bobalink
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/boba/teleportation/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: teleportation
-      - uses: codecov/codecov-action@v1
-        with:
-          files: ./packages/boba/gas-price-oracle/coverage.json
-          fail_ci_if_error: false
-          verbose: true
-          flags: gas-price-oracle
+          flags: coverage
 
   depcheck:
     name: Check for unused dependencies
