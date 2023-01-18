@@ -557,7 +557,7 @@ export const projectList = [
      "discord": "http://discord.gg/PGHnWapB8u",
      "type": "bridge",
      "image": bridgeNetworkLogo,
-     "description": "Move or integrate fungible and non\-fungible across 10\+ blockchains via a trustless network."
+     "description": "Move or integrate fungible and non-fungible across 10+ blockchains via a trustless network."
    },
   {
     "title": "Futuructa",
