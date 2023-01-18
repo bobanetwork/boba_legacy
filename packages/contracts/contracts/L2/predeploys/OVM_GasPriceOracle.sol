@@ -111,7 +111,7 @@ contract OVM_GasPriceOracle is Ownable {
     function getL1Fee(bytes memory _data) public view returns (uint256) {
         uint256 l1GasUsed = getL1GasUsed(_data);
         uint256 l1Fee = l1GasUsed * l1BaseFee;
-        uint256 divisor = 10**decimals;
+        uint256 divisor = 10 ** decimals;
         uint256 unscaled = l1Fee * scalar;
         uint256 scaled = unscaled / divisor;
         return scaled;

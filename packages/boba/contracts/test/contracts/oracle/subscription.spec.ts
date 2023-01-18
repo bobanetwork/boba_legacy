@@ -299,7 +299,9 @@ describe('Oracle Subscription Tests', () => {
       )
 
       // move time but not until expiry
-      await ethers.provider.send('evm_increaseTime', [subscriptionPeriod / 2])
+      await ethers.provider.send('evm_increaseTime', [
+        Math.round(subscriptionPeriod / 2),
+      ])
       await ethers.provider.send('evm_mine', [])
 
       // subscribe for one more subscriptionPeriod from the current time
@@ -563,10 +565,12 @@ describe('Oracle Subscription Tests', () => {
       )
 
       // move time but not until expiry
-      await ethers.provider.send('evm_increaseTime', [subscriptionPeriod / 2])
+      await ethers.provider.send('evm_increaseTime', [
+        Math.round(subscriptionPeriod / 2),
+      ])
       await ethers.provider.send('evm_mine', [])
 
-      // subscribe for one more subscriptionPeriod from the current time
+      // // subscribe for one more subscriptionPeriod from the current time
       await bobaToken.approve(Subscription.address, requiredToken)
 
       await Subscription.subscribeGlobalAccess(
@@ -606,7 +610,9 @@ describe('Oracle Subscription Tests', () => {
       )
 
       // move time until after expiry
-      await ethers.provider.send('evm_increaseTime', [subscriptionPeriod * 2])
+      await ethers.provider.send('evm_increaseTime', [
+        Math.round(subscriptionPeriod * 2),
+      ])
       await ethers.provider.send('evm_mine', [])
 
       // subscribe for one subscriptionPeriod from the current time

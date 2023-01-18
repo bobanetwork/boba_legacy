@@ -67,8 +67,13 @@ jobs:
       - name: Build the services
         working-directory: ./ops
         run: |
-           ./scripts/build-ci.sh
-           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
+           docker-compose -f docker-compose.yml -f docker-compose-side.yml build
+
+      - name: Build Proxyd
+        working-directory: ./
+        run: |
+          docker build ./go/ --file ./go/proxyd/Dockerfile --tag bobanetwork/proxyd:latest
+
       - name: Rename and retag the optimism images
         working-directory: ./ops
         run: |

@@ -26,10 +26,6 @@ function GasSwitcher() {
 
   const [ savings, setSavings ] = useState(0)
 
-  useEffect(() => {
-    dispatch(fetchGas())
-  })
-
   useInterval(() => {
     if (baseEnabled) {
       dispatch(fetchGas())

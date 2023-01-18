@@ -1,5 +1,9 @@
 version: "3"
 
+# Account #6 - bobalink test
+x-bobalink_pk: &bobalink_pk
+  BOBALINK_REPORTER_KEY: '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
+
 # Account #19
 x-gas-price-oracle_pk: &gas-price-oracle_pk
   GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
@@ -21,7 +25,8 @@ services:
     image: bobanetwork/boba_gas-price-oracle:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_gas-price-oracle
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: gas_oracle
     environment:
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       L1_NODE_WEB3_URL: http://l1_chain:8545
@@ -38,6 +43,8 @@ services:
       GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
       POLLING_INTERVAL:
       RETRIES: 200
+    deploy:
+      replicas: 0
 
   monitor:
     depends_on:
@@ -49,3 +56,31 @@ services:
       dockerfile: ./ops/docker/Dockerfile.monitor
     deploy:
       replicas: 0
+
+  teleportation:
+    depends_on:
+     - l2geth
+    image: bobanetwork/teleportation:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: teleportation
+    deploy:
+      replicas: 0
+
+  bobalink:
+    depends_on:
+     - l2geth
+    image: bobanetwork/bobalink:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: bobalink
+    environment:
+      L1_NODE_WEB3_URL: http://l2geth:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      << : *bobalink_pk
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      POLLING_INTERVAL: 1000
