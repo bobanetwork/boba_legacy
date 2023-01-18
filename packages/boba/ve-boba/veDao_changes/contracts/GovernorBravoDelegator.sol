@@ -4,13 +4,13 @@ pragma experimental ABIEncoderV2;
 import "./GovernorBravoInterfaces.sol";
 
 contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoEvents {
-	constructor(
-			address timelock_,
+    constructor(
+            address timelock_,
             address ve_,
-			address admin_,
-	        address implementation_,
-	        uint votingPeriod_,
-	        uint votingDelay_,
+            address admin_,
+            address implementation_,
+            uint votingPeriod_,
+            uint votingDelay_,
             uint proposalThreshold_) public {
 
         // Admin set to msg.sender for initialization
@@ -25,11 +25,11 @@ contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoE
 
         _setImplementation(implementation_);
 
-		admin = admin_;
-	}
+        admin = admin_;
+    }
 
 
-	/**
+    /**
      * @notice Called by the admin to update the implementation of the delegator
      * @param implementation_ The address of the new implementation for delegation
      */
@@ -58,7 +58,7 @@ contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoE
         }
     }
 
-	/**
+    /**
      * @dev Delegates execution to an implementation contract.
      * It returns to the external caller whatever the implementation returns
      * or forwards reverts.
