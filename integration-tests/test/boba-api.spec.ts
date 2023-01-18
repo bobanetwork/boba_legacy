@@ -7,11 +7,12 @@ import { ethers, BigNumber, Contract, Wallet } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 import ethSigUtil from 'eth-sig-util'
 import util from 'util'
+import { mainnetSwapBOBAForETH } from '@boba/api'
 
 /* Imports: Internal */
+
 import { OptimismEnv } from './shared/env'
 import { gasPriceOracleWallet } from './shared/utils'
-import { mainnetSwapBOBAForETH } from '@boba/api'
 
 describe('Boba API Tests', async () => {
   let env: OptimismEnv

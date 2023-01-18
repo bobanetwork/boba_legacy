@@ -13,7 +13,7 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import { BobaLinkPairs } from '../src/utils/types'
 
 /* Imports: Core */
-import { BobaLinkService } from '../dist/service'
+import { BobaLinkService } from '../dist/src/service'
 
 describe('bobalink', () => {
   let signer: Signer

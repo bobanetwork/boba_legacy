@@ -1,47 +1,51 @@
-/* Imports: External */
+import { Server } from 'net'
+
 import Config from 'bcfg'
 import * as dotenv from 'dotenv'
 import { Command, Option } from 'commander'
-import { ValidatorSpec, Spec, cleanEnv } from 'envalid'
-import { sleep } from '@eth-optimism/core-utils'
+import { cleanEnv } from 'envalid'
 import snakeCase from 'lodash/snakeCase'
+import express from 'express'
+import prometheus, { Registry } from 'prom-client'
+import promBundle from 'express-prom-bundle'
+import bodyParser from 'body-parser'
+import morgan from 'morgan'
 
-/* Imports: Internal */
+import { ExpressRouter } from './router'
 import { Logger } from '../common/logger'
-import { Metric } from './metrics'
-
-export type Options = {
-  [key: string]: any
-}
-
-export type OptionsSpec<TOptions extends Options> = {
-  [P in keyof Required<TOptions>]: {
-    validator: (spec?: Spec<TOptions[P]>) => ValidatorSpec<TOptions[P]>
-    desc: string
-    default?: TOptions[P]
-  }
-}
-
-export type MetricsV2 = {
-  [key: string]: Metric
-}
-
-export type MetricsSpec<TMetrics extends MetricsV2> = {
-  [P in keyof Required<TMetrics>]: {
-    type: new (configuration: any) => TMetrics[P]
-    desc: string
-    labels?: string[]
-  }
-}
+import {
+  Metrics,
+  MetricsSpec,
+  StandardMetrics,
+  makeStdMetricsSpec,
+} from './metrics'
+import {
+  Options,
+  OptionsSpec,
+  StandardOptions,
+  stdOptionsSpec,
+  getPublicOptions,
+} from './options'
 
 /**
  * BaseServiceV2 is an advanced but simple base class for long-running TypeScript services.
  */
 export abstract class BaseServiceV2<
   TOptions extends Options,
-  TMetrics extends MetricsV2,
+  TMetrics extends Metrics,
   TServiceState
 > {
+  /**
+   * The timeout that controls the polling interval
+   * If clearTimeout(this.pollingTimeout) is called the timeout will stop
+   */
+  private pollingTimeout: NodeJS.Timeout
+
+  /**
+   * The promise representing this.main
+   */
+  private mainPromise: ReturnType<typeof this.main>
+
   /**
    * Whether or not the service will loop.
    */
@@ -58,9 +62,9 @@ export abstract class BaseServiceV2<
   protected running: boolean
 
   /**
-   * Whether or not the service has run to completion.
+   * Whether or not the service is currently healthy.
    */
-  protected done: boolean
+  protected healthy: boolean
 
   /**
    * Logger class for this service.
@@ -75,37 +79,67 @@ export abstract class BaseServiceV2<
   /**
    * Service options.
    */
-  protected readonly options: TOptions
+  protected readonly options: TOptions & StandardOptions
 
   /**
    * Metrics.
    */
-  protected readonly metrics: TMetrics
+  protected readonly metrics: TMetrics & StandardMetrics
+
+  /**
+   * Registry for prometheus metrics.
+   */
+  protected readonly metricsRegistry: Registry
+
+  /**
+   * App server.
+   */
+  protected server: Server
+
+  /**
+   * Port for the app server.
+   */
+  protected readonly port: number
+
+  /**
+   * Hostname for the app server.
+   */
+  protected readonly hostname: string
 
   /**
    * @param params Options for the construction of the service.
-   * @param params.name Name for the service. This name will determine the prefix used for logging,
-   * metrics, and loading environment variables.
-   * @param params.optionsSpec Settings for input options. You must specify at least a
-   * description for each option.
-   * @param params.metricsSpec Settings that define which metrics are collected. All metrics that
-   * you plan to collect must be defined within this object.
+   * @param params.name Name for the service.
+   * @param params.optionsSpec Settings for input options.
+   * @param params.metricsSpec Settings that define which metrics are collected.
    * @param params.options Options to pass to the service.
    * @param params.loops Whether or not the service should loop. Defaults to true.
-   * @param params.loopIntervalMs Loop interval in milliseconds. Defaults to zero.
+   * @param params.useEnv Whether or not to load options from the environment. Defaults to true.
+   * @param params.useArgv Whether or not to load options from the command line. Defaults to true.
    */
-  constructor(params: {
-    name: string
-    optionsSpec: OptionsSpec<TOptions>
-    metricsSpec: MetricsSpec<TMetrics>
-    options?: Partial<TOptions>
-    loop?: boolean
-    loopIntervalMs?: number
-  }) {
+  constructor(
+    private readonly params: {
+      name: string
+      version: string
+      optionsSpec: OptionsSpec<TOptions>
+      metricsSpec: MetricsSpec<TMetrics>
+      options?: Partial<TOptions & StandardOptions>
+      loop?: boolean
+    }
+  ) {
     this.loop = params.loop !== undefined ? params.loop : true
-    this.loopIntervalMs =
-      params.loopIntervalMs !== undefined ? params.loopIntervalMs : 0
     this.state = {} as TServiceState
+
+    // Add standard options spec to user options spec.
+    ;(params.optionsSpec as any) = {
+      ...params.optionsSpec,
+      ...stdOptionsSpec,
+    }
+
+    // Add default metrics to metrics spec.
+    ;(params.metricsSpec as any) = {
+      ...params.metricsSpec,
+      ...makeStdMetricsSpec(params.optionsSpec),
+    }
 
     /**
      * Special snake_case function which accounts for the common strings "L1" and "L2" which would
@@ -124,6 +158,11 @@ export abstract class BaseServiceV2<
     // commander for anything besides the ability to run `ts-node ./service.ts --help`.
     const program = new Command()
     for (const [optionName, optionSpec] of Object.entries(params.optionsSpec)) {
+      // Skip options that are not meant to be used by the user.
+      if (['useEnv', 'useArgv'].includes(optionName)) {
+        continue
+      }
+
       program.addOption(
         new Option(`--${optionName.toLowerCase()}`, `${optionSpec.desc}`).env(
           `${opSnakeCase(
@@ -163,8 +202,8 @@ export abstract class BaseServiceV2<
     dotenv.config()
     const config = new Config(params.name)
     config.load({
-      env: true,
-      argv: true,
+      env: params.options?.useEnv ?? true,
+      argv: params.options?.useEnv ?? true,
     })
 
     // Clean configuration values using the options spec.
@@ -172,16 +211,12 @@ export abstract class BaseServiceV2<
     // names into lower case for the validation step. We'll turn the names back into their original
     // names when we're done.
     const cleaned = cleanEnv<TOptions>(
-      { ...config.env, ...config.args },
+      { ...config.env, ...config.args, ...(params.options || {}) },
       Object.entries(params.optionsSpec || {}).reduce((acc, [key, val]) => {
         acc[key.toLowerCase()] = val.validator({
           desc: val.desc,
           default: val.default,
         })
-        return acc
-      }, {}) as any,
-      Object.entries(params.options || {}).reduce((acc, [key, val]) => {
-        acc[key.toLowerCase()] = val
         return acc
       }, {}) as any
     )
@@ -192,6 +227,16 @@ export abstract class BaseServiceV2<
       return acc
     }, {}) as TOptions
 
+    // Make sure all options are defined.
+    for (const [optionName, optionSpec] of Object.entries(params.optionsSpec)) {
+      if (
+        optionSpec.default === undefined &&
+        this.options[optionName] === undefined
+      ) {
+        throw new Error(`missing required option: ${optionName}`)
+      }
+    }
+
     // Create the metrics objects.
     this.metrics = Object.keys(params.metricsSpec || {}).reduce((acc, key) => {
       const spec = params.metricsSpec[key]
@@ -201,18 +246,67 @@ export abstract class BaseServiceV2<
         labelNames: spec.labels || [],
       })
       return acc
-    }, {}) as TMetrics
+    }, {}) as TMetrics & StandardMetrics
 
-    this.logger = new Logger({ name: params.name })
+    // Create the metrics server.
+    this.metricsRegistry = prometheus.register
+    this.port = this.options.port
+    this.hostname = this.options.hostname
+
+    // Set up everything else.
+    this.healthy = true
+    this.loopIntervalMs = this.options.loopIntervalMs
+    this.logger = new Logger({
+      name: params.name,
+      level: this.options.logLevel,
+    })
 
     // Gracefully handle stop signals.
+    const maxSignalCount = 3
+    let currSignalCount = 0
     const stop = async (signal: string) => {
-      this.logger.info(`stopping service with signal`, { signal })
-      await this.stop()
-      process.exit(0)
+      // Allow exiting fast if more signals are received.
+      currSignalCount++
+      if (currSignalCount === 1) {
+        this.logger.info(`stopping service with signal`, { signal })
+        await this.stop()
+        process.exit(0)
+      } else if (currSignalCount >= maxSignalCount) {
+        this.logger.info(`performing hard stop`)
+        process.exit(0)
+      } else {
+        this.logger.info(
+          `send ${maxSignalCount - currSignalCount} more signal(s) to hard stop`
+        )
+      }
     }
+
+    // Handle stop signals.
     process.on('SIGTERM', stop)
     process.on('SIGINT', stop)
+
+    // Set metadata synthetic metric.
+    this.metrics.metadata.set(
+      {
+        name: params.name,
+        version: params.version,
+        ...getPublicOptions(params.optionsSpec).reduce((acc, key) => {
+          if (key in stdOptionsSpec) {
+            acc[key] = this.options[key].toString()
+          } else {
+            acc[key] = config.str(key)
+          }
+          return acc
+        }, {}),
+      },
+      1
+    )
+
+    // Collect default node metrics.
+    prometheus.collectDefaultMetrics({
+      register: this.metricsRegistry,
+      labels: { name: params.name, version: params.version },
+    })
   }
 
   /**
@@ -220,7 +314,86 @@ export abstract class BaseServiceV2<
    * main function. Will also catch unhandled errors.
    */
   public async run(): Promise<void> {
-    this.done = false
+    // Start the app server if not yet running.
+    if (!this.server) {
+      this.logger.info('starting app server')
+
+      // Start building the app.
+      const app = express()
+
+      // Body parsing.
+      app.use(bodyParser.urlencoded({ extended: true }))
+
+      // Keep the raw body around in case the application needs it.
+      app.use(
+        bodyParser.json({
+          verify: (req, res, buf, encoding) => {
+            ;(req as any).rawBody = buf?.toString(encoding || 'utf8') || ''
+          },
+        })
+      )
+
+      // Logging.
+      app.use(
+        morgan('short', {
+          stream: {
+            write: (str: string) => {
+              this.logger.info(`server log`, {
+                log: str,
+              })
+            },
+          },
+        })
+      )
+
+      // Health status.
+      app.get('/healthz', async (req, res) => {
+        return res.json({
+          ok: this.healthy,
+          version: this.params.version,
+        })
+      })
+
+      // Register user routes.
+      const router = express.Router()
+      if (this.routes) {
+        this.routes(router)
+      }
+
+      // Metrics.
+      // Will expose a /metrics endpoint by default.
+      app.use(
+        promBundle({
+          promRegistry: this.metricsRegistry,
+          includeMethod: true,
+          includePath: true,
+          includeStatusCode: true,
+          normalizePath: (req) => {
+            for (const layer of router.stack) {
+              if (layer.route && req.path.match(layer.regexp)) {
+                return layer.route.path
+              }
+            }
+
+            return '/invalid_path_not_a_real_route'
+          },
+        })
+      )
+
+      app.use('/api', router)
+
+      // Wait for server to come up.
+      await new Promise((resolve) => {
+        this.server = app.listen(this.port, this.hostname, () => {
+          resolve(null)
+        })
+      })
+
+      this.logger.info(`app server started`, {
+        port: this.port,
+        hostname: this.hostname,
+      })
+    }
 
     if (this.init) {
       this.logger.info('initializing service')
@@ -231,10 +404,13 @@ export abstract class BaseServiceV2<
     if (this.loop) {
       this.logger.info('starting main loop')
       this.running = true
-      while (this.running) {
+
+      const doLoop = async () => {
         try {
-          await this.main()
+          this.mainPromise = this.main()
+          await this.mainPromise
         } catch (err) {
+          this.metrics.unhandledErrors.inc()
           this.logger.error('caught an unhandled exception', {
             message: err.message,
             stack: err.stack,
@@ -244,15 +420,14 @@ export abstract class BaseServiceV2<
 
         // Sleep between loops if we're still running (service not stopped).
         if (this.running) {
-          await sleep(this.loopIntervalMs)
+          this.pollingTimeout = setTimeout(doLoop, this.loopIntervalMs)
         }
       }
+      doLoop()
     } else {
       this.logger.info('running main function')
       await this.main()
     }
-
-    this.done = true
   }
 
   /**
@@ -260,20 +435,38 @@ export abstract class BaseServiceV2<
    * iteration is finished and will then stop looping.
    */
   public async stop(): Promise<void> {
+    this.logger.info('stopping main loop...')
     this.running = false
+    clearTimeout(this.pollingTimeout)
+    this.logger.info('waiting for main to complete')
+    // if main is in the middle of running wait for it to complete
+    await this.mainPromise
+    this.logger.info('main loop stoped.')
 
-    // Wait until the main loop has finished.
-    this.logger.info('stopping service, waiting for main loop to finish')
-    while (!this.done) {
-      await sleep(1000)
+    // Shut down the metrics server if it's running.
+    if (this.server) {
+      this.logger.info('stopping metrics server')
+      await new Promise((resolve) => {
+        this.server.close(() => {
+          resolve(null)
+        })
+      })
+      this.logger.info('metrics server stopped')
+      this.server = undefined
     }
-    this.logger.info('main loop finished, goodbye!')
   }
 
   /**
    * Initialization function. Runs once before the main function.
    */
   protected init?(): Promise<void>
+
+  /**
+   * Initialization function for router.
+   *
+   * @param router Express router.
+   */
+  protected routes?(router: ExpressRouter): Promise<void>
 
   /**
    * Main function. Runs repeatedly when run() is called.
