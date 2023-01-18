@@ -5,5 +5,5 @@
     "resolveJsonModule": true
   },
   "include": ["./hardhat.config.ts", "./scripts", "./bin", "./deploy", "./test"],
-   "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts"]
 }

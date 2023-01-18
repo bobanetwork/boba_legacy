@@ -7,12 +7,6 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { GasPriceOracleService } from '../dist/service'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
-import {
-  AppendSequencerBatchParams,
-  encodeAppendSequencerBatch,
-} from '@eth-optimism/core-utils'
-import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { keccak256 } from 'ethers/lib/utils'
 
 describe('gas-price-oracle', () => {
   let signer1: Signer

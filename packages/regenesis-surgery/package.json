@@ -5,7 +5,7 @@
   "author": "Optimism PBC",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf ./dist ./tsconfig.build.tsbuildinfo",
+    "clean": "rimraf ./dist ./tsconfig.tsbuildinfo",
     "lint": "yarn run lint:fix && yarn run lint:check",
     "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint . --ext js,jsx,ts,tsx",
@@ -23,7 +23,7 @@
   "dependencies": {
     "@boba/register": "0.0.1",
     "@discoveryjs/json-ext": "^0.5.3",
-    "@eth-optimism/contracts": "^0.5.11",
+    "@eth-optimism/contracts": "0.5.11",
     "@uniswap/v3-core-optimism": "^1.0.0-rc.0",
     "chalk": "^4.1.2",
     "dotenv": "^10.0.0",

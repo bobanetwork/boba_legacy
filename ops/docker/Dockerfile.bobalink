@@ -31,8 +31,5 @@ WORKDIR /opt/optimism/packages/boba/bobalink
 # For development, comment out the next COPY and uncomment the ADD. This will
 # build the image from the current tree instead of the old builder files.
 COPY --from=builder /optimism/packages/boba/bobalink/dist ./dist
-COPY --from=builder /optimism/packages/boba/bobalink/exec ./exec
-
-RUN chmod +x ./exec/run-bobalink.js
 
 ENTRYPOINT ["node", "./exec/run-bobalink.js"]
