@@ -175,4 +175,8 @@ const main = async () => {
   await service.start()
 }
 
+if (require.main === module) {
+  main()
+}
+
 export default main

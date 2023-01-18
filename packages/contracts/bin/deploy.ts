@@ -9,8 +9,8 @@ dotenv.config()
 // hardhat import because importing will load the config (which relies on these vars). Necessary
 // because CI currently uses different var names than the ones we've chosen here.
 // TODO: Update CI so that we don't have to do this anymore.
-process.env.HARDHAT_NETWORK = 'goerli' // "custom" here is an arbitrary name. only used for CI.
-process.env.CONTRACTS_TARGET_NETWORK = 'goerli'
+process.env.HARDHAT_NETWORK = 'local' // "custom" here is an arbitrary name. only used for CI.
+process.env.CONTRACTS_TARGET_NETWORK = 'local'
 process.env.CONTRACTS_DEPLOYER_KEY = process.env.DEPLOYER_PRIVATE_KEY
 process.env.CONTRACTS_RPC_URL =
   process.env.L1_NODE_WEB3_URL || 'http://127.0.0.1:8545'
@@ -71,7 +71,7 @@ const main = async () => {
   }
 
   const contracts: any = dirtree(
-    path.resolve(__dirname, `../deployments/goerli`)
+    path.resolve(__dirname, `../deployments/local`)
   )
     .children.filter((child) => {
       return child.name.endsWith('.json')
@@ -81,7 +81,7 @@ const main = async () => {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const artifact = require(path.resolve(
         __dirname,
-        `../deployments/goerli/${child.name}`
+        `../deployments/local/${child.name}`
       ))
       contractsAccumulator[nicknames[contractName] || contractName] =
         artifact.address

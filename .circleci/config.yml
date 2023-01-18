@@ -154,16 +154,31 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build everything
+          command: |
+            docker-compose build --progress=plain
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml build bobalink
+          working_directory: ops
+      - run:
           name: Bring up the stack
           command: |
-            ./scripts/build-ci.sh
+            docker images
             BUILD=2 DAEMON=1 ./up_local.sh
+          working_directory: ops
+      - run:
+          name: Bring up services
+          command: |
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f docker-compose.yml logs --follow
+          command: docker-compose -f docker-compose.yml -f docker-compose-side.yml logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh

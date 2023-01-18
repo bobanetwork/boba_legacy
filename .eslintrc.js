@@ -4,13 +4,14 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  ignorePatterns: ['dist', 'packages/contracts/hardhat'],
+  ignorePatterns: ['dist', 'coverage', 'packages/contracts/hardhat'],
   extends: ['plugin:prettier/recommended'],
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
     es6: true,
     ecmaVersion: 6,
     sourceType: 'module',
+    requireConfigFile: false,
   },
   plugins: [
     'eslint-plugin-import',
@@ -25,8 +26,9 @@ module.exports = {
       files: ['**/*.ts'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
-        project: 'tsconfig.json',
+        project: './packages/**/tsconfig.json',
         sourceType: 'module',
+        allowAutomaticSingleRunInference: true,
       },
       rules: {
         '@typescript-eslint/adjacent-overload-signatures': 'error',
@@ -152,7 +154,7 @@ module.exports = {
         allowSingleLineBlocks: true,
       },
     ],
-    'prefer-arrow/prefer-arrow-functions': 'warn',
+    'prefer-arrow/prefer-arrow-functions': 'error',
     'prefer-const': 'error',
     'prefer-object-spread': 'error',
     'quote-props': 'off',
