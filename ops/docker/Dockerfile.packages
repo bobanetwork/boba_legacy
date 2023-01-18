@@ -14,8 +14,6 @@ ADD ${SOLC_PREFIX}solc-linux-amd64-v0.6.6+commit.6c089d02  ./solc-v0.6.6+commit.
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.9+commit.e5eed63a  ./solc-v0.8.9+commit.e5eed63a
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.11+commit.d7f03943  ./solc-v0.8.11+commit.d7f03943
 
-# ### BASE: Install deps
-FROM bobanetwork/foundry:latest as foundry
 # FROM node:16-alpine3.14 as base
 FROM node:16-buster-slim as base
 
