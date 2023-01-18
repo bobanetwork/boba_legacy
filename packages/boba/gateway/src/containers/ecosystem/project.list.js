@@ -43,6 +43,7 @@ import babylons from '../../images/ecosystem/babylons.png'
 import changenowLogo from '../../images/ecosystem/changenow.svg'
 import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
 import foxtrotCommand from '../../images/ecosystem/foxtrotCommand.webp'
+import foxwalletLogo from '../../images/ecosystem/foxwalletLogo.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -511,6 +512,18 @@ export const projectList = [
     "type": "gamefi",
     "image": foxtrotCommand,
     "description": "Foxtrot Command is a fast and extremely competitive trading card game with new mechanics and the innovative double lane system. Compete against other players and upgrade your deck to reach the top of the leaderboard"
+  },
+  {
+    "title": "FoxWallet",
+    "canLaunch": true,
+    "link": "https://foxwallet.com/",
+    "twitter": "https://twitter.com/FoxWallet",
+    "telegram": "https://t.me/FoxWallet_EN",
+    "youtube": "https://www.youtube.com/channel/UCt9O4HUkuNutXvFoN6NZh-w",
+    "discord": "https://discord.com/invite/JVjVbe3Zth",
+    "type": "wallet",
+    "image": foxwalletLogo,
+    "description": "Multi-chain decentralized mobile wallet, dedicated to creating an entrance and connection to the Web3 world."
   }
 ]
 
