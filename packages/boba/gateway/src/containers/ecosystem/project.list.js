@@ -44,6 +44,8 @@ import changenowLogo from '../../images/ecosystem/changenow.svg'
 import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
 import foxtrotCommand from '../../images/ecosystem/foxtrotCommand.webp'
 import foxwalletLogo from '../../images/ecosystem/foxwalletLogo.png'
+import ghostncolorsLogo from '../../images/ecosystem/ghostncolorsLogo.png'
+import webthreenamesLogo from '../../images/ecosystem/webthreenamesLogo.png'
 
 // Boba gateways and block explorers
 import BobaethLogo from '../../images/bobaLinks/Bobaeth.svg'
@@ -524,7 +526,27 @@ export const projectList = [
     "type": "wallet",
     "image": foxwalletLogo,
     "description": "Multi-chain decentralized mobile wallet, dedicated to creating an entrance and connection to the Web3 world."
-  }
+  },
+  {
+    "title": "GhostNColors",
+    "canLaunch": true,
+    "link": "https://ghostncolors-crypto.ipns.dweb.link/",
+    "telegram": "https://t.me/+WRDqqtNg2FQ4OTgx",
+    "twitter": "https://twitter.com/GhostNColors",
+    "type": "nft",
+    "image": ghostncolorsLogo,
+    "description": "Mint your Ghost."
+  },
+  {
+    "title": "Boba Name Service",
+    "canLaunch": true,
+    "link": "https://boba.webthreenames.com/",
+    "telegram": "https://t.me/webthreenames",
+    "twitter": "https://twitter.com/webthreenames",
+    "type": "nft",
+    "image": webthreenamesLogo,
+    "description": "Mint your .boba domains as NFT assets that will bind the domain to your wallet address. You can also set records for your website, email, twitter, description and even your own avatar."
+  },
 ]
 
 export const loadProjectByCategory = () => {
