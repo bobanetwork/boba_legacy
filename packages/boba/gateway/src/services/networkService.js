@@ -91,7 +91,7 @@ import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import { sortRawTokens } from 'util/common'
-import GraphQLService from "./graphQL.service"
+import GraphQLService from "./graphql.service"
 
 import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
