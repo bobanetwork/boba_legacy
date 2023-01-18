@@ -99,6 +99,7 @@ COPY --from=builder /opt/optimism/packages/boba/teleportation/dist ./packages/bo
 
 # some packages need to access the bytecode of the contracts and deployment files
 COPY --from=builder /opt/optimism/packages/contracts ./packages/contracts
+COPY --from=builder /opt/optimism/packages/boba/contracts ./packages/boba/contracts
 COPY --from=builder /opt/optimism/packages/boba/turing ./packages/boba/turing
 
 FROM packages as deployer
@@ -107,8 +108,6 @@ COPY ./ops/scripts/deployer.sh .
 CMD ["yarn", "run", "deploy"]
 
 FROM packages as boba_deployer
-WORKDIR /opt/optimism/packages/boba
-COPY --from=builder /opt/optimism/packages/boba/contracts ./contracts
 WORKDIR /opt/optimism/packages/boba/contracts
 ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
 
