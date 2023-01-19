@@ -1,6 +1,5 @@
 require('@nomiclabs/hardhat-ethers')
 require('@nomiclabs/hardhat-waffle')
-require('hardhat-deploy')
 
 const config = {
   mocha: {
