@@ -158,12 +158,12 @@ jobs:
           command: |
             mkdir -p /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
             cd /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
-            curl https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
-            curl https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
-            curl https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
-            curl https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
-            curl https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
-            curl https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
+            curl -L https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
+            curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
+            curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
+            curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
+            curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
+            curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
             chmod +x /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
           working_directory: /
       - run:
