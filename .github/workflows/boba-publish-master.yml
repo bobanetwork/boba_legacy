@@ -74,6 +74,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Cache compilers
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/buidler-nodejs/
+            ~/.cache/hardhat-nodejs/
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
       - name: Get the version
         id: tag
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
