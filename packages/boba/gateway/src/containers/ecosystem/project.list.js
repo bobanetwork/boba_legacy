@@ -470,7 +470,7 @@ export const projectList = [
     "canLaunch": true,
     "link": "https://thetanuts.finance/vaults",
     "twitter": "https://twitter.com/thetanuts",
-    "discord": "https://discord.gg/XnSYqutaB3",
+    "discord": "https://discord.gg/fzWKJSy9v9",
     "type": "defi",
     "image": thetanutsLogo,
     "description": "Sustainable yield through automated yield generating vault strategies implemented on cross-chain structured products."
