@@ -44,7 +44,7 @@ import WitNetLogo from '../../images/ecosystem/WitNetLogo.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
-import beamerbridge from '../../images/ecosystem/beamerbridge.png'
+
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
 import cookbookLogo from '../../images/ecosystem/cookbook.png'
@@ -527,16 +527,6 @@ export const projectList = [
      "type": "defi",
      "image": symbiosisLogo,
      "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
-   },
-  {
-     "title": "Beamer",
-     "canLaunch": true,
-     "link": "https://app.beamerbridge.com/",
-     "twitter": "https://twitter.com/BeamerBridge",
-     "discord": "https://discord.com/invite/uvTYkzsBdA",
-     "type": "bridge",
-     "image": beamerbridge,
-     "description": "Beam your ERC20 assets between EVM compatible rollups with certainty, speed and security"
    },
   {
      "title": "Via Protocol",
