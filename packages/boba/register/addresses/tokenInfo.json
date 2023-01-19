@@ -629,6 +629,11 @@
         "name": "Tether USD",
         "symbol": "USDT",
         "decimals": 18
+      },
+      "0x986cdF0fd180b40c4D6aEAA01Ab740B996D8b782": {
+        "name": "SushiToken",
+        "symbol": "SUSHI",
+        "decimals": 18
       }
     },
     "L2": {
@@ -655,6 +660,11 @@
       "0x4200000000000000000000000000000000000023": {
         "name": "BNB",
         "symbol": "BNB",
+        "decimals": 18
+      },
+      "0xa84D7c48602C898EC84C4cCA78651107B3625943": {
+        "name": "SushiToken",
+        "symbol": "SUSHI",
         "decimals": 18
       }
     }
