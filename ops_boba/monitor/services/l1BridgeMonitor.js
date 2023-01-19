@@ -2,10 +2,10 @@
 
 const ethers = require('ethers')
 const DatabaseService = require('./database.service')
-const OptimismEnv = require('./utilities/optimismEnv')
+const GlobalEnv = require('./utils/globalEnv')
 const { sleep } = require('@eth-optimism/core-utils')
 
-class l1BridgeMonitorService extends OptimismEnv {
+class l1BridgeMonitorService extends GlobalEnv {
   constructor() {
     super(...arguments)
 
@@ -58,7 +58,7 @@ class l1BridgeMonitorService extends OptimismEnv {
       }
     }
 
-    await this.initOptimismEnv()
+    await this.initGlobalEnv()
     await this.databaseService.initMySQL()
 
     // fetch the last end block
@@ -292,15 +292,8 @@ class l1BridgeMonitorService extends OptimismEnv {
           }
 
           await this.databaseService.insertL1BridgeData(payload)
-          // this.logger.info(
-          //   `Found standard bridge logs found from block ${this.startBlock} to ${endBlock}`
-          // )
         }
       }
-    // } else {
-    //   this.logger.info(
-    //     `No L1 standard bridge logs found from block ${this.startBlock} to ${endBlock}`
-    //   )
     }
 
     this.startBlock = endBlock
@@ -324,9 +317,15 @@ class l1BridgeMonitorService extends OptimismEnv {
       } catch {
         const messages = this.watcher.getMessagesByTransaction(transaction)
         // we pick the target address is L2StandardBridge
-        resolved = messages.filter(
-          (i) => i.target === '0x4200000000000000000000000000000000000010'
-        )
+        if (typeof messages !== 'undefined') {
+          // we pick the target address is L2StandardBridge
+          resolved = messages.filter(
+            (i) => i.target === '0x4200000000000000000000000000000000000010'
+          )
+        } else {
+          // drop the message if we can't resolve it
+          continue
+        }
       }
       const latestL2Block = await this.L2Provider.getBlockNumber()
       let CDMReceipt = null

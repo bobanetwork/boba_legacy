@@ -2,12 +2,12 @@
 
 const ethers = require('ethers')
 const DatabaseService = require('./database.service')
-const OptimismEnv = require('./utilities/optimismEnv')
+const GlobalEnv = require('./utils/globalEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
 const { orderBy } = require('lodash')
 
-class BlockMonitorService extends OptimismEnv {
+class BlockMonitorService extends GlobalEnv {
   constructor() {
     super(...arguments)
 
@@ -15,8 +15,6 @@ class BlockMonitorService extends OptimismEnv {
 
     this.latestBlock = null
     this.scannedLastBlock = null
-    this.lastCheckWhitelist = (new Date().getTime() / 1000).toFixed(0)
-    this.lastCheckNonWhitelist = (new Date().getTime() / 1000).toFixed(0)
 
     this.whitelist = []
   }
@@ -61,7 +59,7 @@ class BlockMonitorService extends OptimismEnv {
       }
     }
 
-    await this.initOptimismEnv()
+    await this.initGlobalEnv()
   }
 
   async initScan() {
@@ -91,7 +89,6 @@ class BlockMonitorService extends OptimismEnv {
     const latestBlock = await this.L2Provider.getBlockNumber()
 
     if (latestBlock > this.latestBlock) {
-      // this.logger.info('Finding new blocks...')
       this.latestBlock = latestBlock
 
       await this.storeBlockAndReceipt(
@@ -104,52 +101,24 @@ class BlockMonitorService extends OptimismEnv {
   }
 
   async startCrossDomainMessageMonitor() {
-    // this.logger.info('Searching cross domain messages...')
     const crossDomainData = await this.databaseService.getL2CrossDomainData()
 
-    // counts the number of server request
-    let promiseCount = 0
-
-    let checkWhitelist = this.checkTime(this.whitelistString)
-    if (checkWhitelist) {
-      await this.getWhitelist()
-    }
-    let checkNonWhitelist = this.checkTime(this.nonWhitelistString)
-
     if (crossDomainData.length) {
-      // this.logger.info('Found cross domain message.')
-
       for (let receiptData of crossDomainData) {
-        if (promiseCount % this.L2sleepThresh === 0) {
-          await sleep(2000)
-        }
         // if its time check cross domain message finalization
-        if (receiptData.fastRelay) {
+        const timestamp = new Date().getTime() / 1000
+        const isPassedEstimateFinalizedTime = timestamp > Number(receiptData.crossDomainMessageEstimateFinalizedTime)
+        if (isPassedEstimateFinalizedTime && receiptData.fastRelay) {
           receiptData = await this.getCrossDomainMessageStatusL1(receiptData)
-        } else if (checkNonWhitelist && !receiptData.fastRelay) {
+        } else if (isPassedEstimateFinalizedTime && !receiptData.fastRelay) {
           receiptData = await this.getCrossDomainMessageStatusL1(receiptData)
         }
-        promiseCount = promiseCount + 1
 
         if (receiptData.crossDomainMessageFinalize) {
           await this.databaseService.updateCrossDomainData(receiptData)
         }
       }
-      promiseCount = 0
-      // } else {
-      // this.logger.info('No waiting cross domain message found.')
     }
-
-    if (checkWhitelist) {
-      checkWhitelist = false
-    }
-    if (checkNonWhitelist) {
-      checkNonWhitelist = false
-    }
-
-    // this.logger.info(
-    //   `End searching cross domain messages. Sleeping ${this.crossDomainMessageMonitorInterval} ms...`
-    // )
 
     await sleep(this.crossDomainMessageMonitorInterval)
   }
@@ -214,12 +183,6 @@ class BlockMonitorService extends OptimismEnv {
       crossDomainMessage = true
       // Get message hashes from L2 TX
       for (const logData of filteredLogData) {
-        const [sender, message, messageNonce] =
-          ethers.utils.defaultAbiCoder.decode(
-            ['address', 'bytes', 'uint256'],
-            logData.data
-          )
-
         const [target] = ethers.utils.defaultAbiCoder.decode(
           ['address'],
           logData.topics[1]
@@ -322,36 +285,20 @@ class BlockMonitorService extends OptimismEnv {
         acc.push(this.L1LiquidityPoolInterface.parseLog(cur).args.sender)
         return acc
       }, [])
+      /* eslint-disable */
       if (tokenReceivers.includes(receiptData.from)) {
-        this.logger.info('Found successful L2 exit', {
-          status: 'succeeded',
-          blockNumber: receiptData.blockNumber,
-        })
-        await this.databaseService.updateExitData({
-          status: 'succeeded',
-          blockNumber: receiptData.blockNumber,
-        })
+        this.logger.info('Found successful L2 exit', { status: 'succeeded', blockNumber: receiptData.blockNumber })
+        await this.databaseService.updateExitData({ status: 'succeeded', blockNumber: receiptData.blockNumber })
       } else {
         if (receiptData.fastRelay) {
-          this.logger.info('Found failure L2 exit', {
-            status: 'reverted',
-            blockNumber: receiptData.blockNumber,
-          })
-          await this.databaseService.updateExitData({
-            status: 'reverted',
-            blockNumber: receiptData.blockNumber,
-          })
+          this.logger.info('Found failure L2 exit', { status: 'reverted', blockNumber: receiptData.blockNumber })
+          await this.databaseService.updateExitData({ status: 'reverted', blockNumber: receiptData.blockNumber })
         } else {
-          this.logger.info('Found successful L2 exit', {
-            status: 'succeeded',
-            blockNumber: receiptData.blockNumber,
-          })
-          await this.databaseService.updateExitData({
-            status: 'succeeded',
-            blockNumber: receiptData.blockNumber,
-          })
+          this.logger.info('Found successful L2 exit', { status: 'succeeded', blockNumber: receiptData.blockNumber })
+          await this.databaseService.updateExitData({ status: 'succeeded', blockNumber: receiptData.blockNumber })
         }
       }
+      /* eslint-enable */
     }
 
     receiptData.crossDomainMessageFinalize = crossDomainMessageFinalize
@@ -467,36 +414,6 @@ class BlockMonitorService extends OptimismEnv {
         `CRITICAL ERROR: Failed to fetch the Filter - error: ${error}`
       )
     }
-  }
-
-  // checks to see if its time to look for L1 finalization
-  checkTime(list) {
-    const currentTime = (new Date().getTime() / 1000).toFixed(0)
-    if (list === this.whitelistString) {
-      if (currentTime - this.lastCheckWhitelist >= this.whitelistSleep) {
-        this.lastCheckWhitelist = currentTime
-        return true
-      }
-    } else if (list === this.nonWhitelistString) {
-      if (currentTime - this.lastCheckNonWhitelist >= this.nonWhitelistSleep) {
-        this.lastCheckNonWhitelist = currentTime
-        return true
-      }
-    }
-    return false
-  }
-
-  errorCatcher(func, param) {
-    return (async () => {
-      for (let i = 0; i < 2; i++) {
-        try {
-          return await func(param)
-        } catch (error) {
-          console.log(`${func}returned an error!`, error)
-          await sleep(1000)
-        }
-      }
-    })()
   }
 }
 

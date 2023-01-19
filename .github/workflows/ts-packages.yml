@@ -55,7 +55,7 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           files: ./packages/*/coverage.json, ./packages/boba/*/coverage.json
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           verbose: true
           flags: coverage
 
@@ -129,6 +129,10 @@ jobs:
 
       - name: Check integration-tests
         working-directory: ./integration-tests
+        run: npx depcheck
+
+      - name: Check monitor
+        working-directory: ./ops_boba/monitor
         run: npx depcheck
 
   lint:
