@@ -492,7 +492,6 @@ export const projectList = [
     "link": "https://shibuinft.com",
     "telegram": "https://docs.shibuidao.com/telegram",
     "twitter": "https://docs.shibuidao.com/twitter",
-    "discord": "https://docs.shibuidao.com/discord",
     "type": "nft",
     "image": shibuiDAOLogo,
     "description": "An NFT marketplace on Boba."
