@@ -53,7 +53,9 @@ function Input({
   selectValue,
   style,
   isBridge,
-  openTokenPicker
+  openTokenPicker,
+  textarea = false,
+  maxRows = 10,
 }) {
 
   async function handlePaste() {
@@ -88,6 +90,38 @@ function Input({
     acc.push({ value: cur, label: tokenImageElement(cur) })
     return acc
   }, []): null
+
+  if (textarea) {
+    return (
+      <div style={{width: '100%'}}>
+        <S.Wrapper newstyle={newStyle ? 1 : 0} style={style}>
+          <S.TextareaAutosizeWrapper
+            maxRows={maxRows}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+          />
+
+          {paste && (
+            <Box
+              onClick={handlePaste}
+              sx={{
+                color: theme.palette.secondary.main,
+                opacity: 0.9,
+                cursor: 'pointer',
+                position: 'absolute',
+                right: '70px',
+                fontSize: '14px',
+                zIndex: '100'
+              }}
+            >
+              PASTE
+            </Box>
+          )}
+        </S.Wrapper>
+      </div>
+    )
+  }
 
   return (
     <div style={{width: '100%'}}>

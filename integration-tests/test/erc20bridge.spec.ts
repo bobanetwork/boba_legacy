@@ -4,7 +4,6 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 import { Contract, ContractFactory, utils, Wallet } from 'ethers'
-import chalk from 'chalk'
 import { getContractFactory } from '@eth-optimism/contracts'
 
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
