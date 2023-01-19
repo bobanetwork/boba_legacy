@@ -388,7 +388,7 @@ export const projectList = [
   {
     "title": "Boba Apes",
     "canLaunch": true,
-    "link": "https://bobaapes.com/",
+    "link": "https://www.bobaapes.art/",
     "twitter": "https://twitter.com/bobaapes",
     "type": "nft",
     "image": bobaApesLogo,
