@@ -121,7 +121,7 @@ export const projectList = [
     "link": "https://oportal.boringdao.com/twoway",
     "telegram": "https://t.me/Satis_Channel",
     "twitter": "https://twitter.com/TheBoringDAO",
-    "discord": "https://discord.gg/4CezfPe7",
+    "discord": "https://discord.gg/zCQ2ddp",
     "type": "bridge",
     "image": boringDaoLogo,
     "description": "Safely move your Bitcoin & other crypto assets between Ethereum and different blockchains to maximize utilization rate of crypto assets in DeFi world."
