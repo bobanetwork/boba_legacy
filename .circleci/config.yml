@@ -66,7 +66,7 @@ jobs:
           working_directory: ./packages/boba/bundler
 
       - restore_cache: # special step to restore the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}-{{ .Environment.CACHE_VERSION }}
 
       - run:
           name: yarn-install-if-no-cache
@@ -74,7 +74,7 @@ jobs:
           working_directory: ./packages/boba/bundler
 
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}-{{ .Environment.CACHE_VERSION }}
           paths:
             - ./packages/boba/bundler/node_modules
             - ./packages/boba/bundler/packages/node_modules
@@ -161,7 +161,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - solc-compilers-{{ checksum "/tmp/checksum.txt" }}
+            - solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
 
       - run:
           name: Cache compliers
@@ -181,7 +181,7 @@ jobs:
           working_directory: /
 
       - save_cache:
-          key: solc-compilers-{{ checksum "/tmp/checksum.txt" }}
+          key: solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
           paths:
             - /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
 
