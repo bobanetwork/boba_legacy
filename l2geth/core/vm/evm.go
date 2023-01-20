@@ -617,6 +617,11 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 	// Sanity and depth checks
 	if isTuring2 || isGetRand2 {
 		log.Debug("TURING REQUEST START", "input", input, "len(evm.Context.Turing)", len(evm.Context.Turing))
+		// Check 0. the payload must be at least 36 bytes long
+		if len(input) < 36 {
+			log.Error("TURING ERROR: INPUT TOO SHORT", "input", input)
+			return nil, gas, ErrTuringInputTooShort
+		}
 		// Check 1. can only run Turing once anywhere in the call stack
 		if evm.Context.TuringDepth > 1 {
 			log.Error("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
