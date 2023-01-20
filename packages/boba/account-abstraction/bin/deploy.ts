@@ -7,7 +7,7 @@ require('dotenv').config()
 import hre from 'hardhat'
 
 const main = async () => {
-  console.log('Starting BOBA core contracts deployment...')
+  console.log('Starting BOBA AA contracts deployment...')
 
   const network = process.env.NETWORK || 'local'
 
