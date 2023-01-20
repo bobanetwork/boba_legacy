@@ -1,11 +1,11 @@
-service: sls-boba-mainnet-watcher # NOTE: update this with your service name
+service: sls-boba-goerli-watcher # NOTE: update this with your service name
 
 provider:
   name: aws
   runtime: python3.7
-  stackName: sls-boba-mainnet-watcher
+  stackName: sls-boba-goerli-watcher
   stage: prod
-  region: us-east-1
+  region: us-east-2
 
 package:
   exclude:
@@ -19,10 +19,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: get.l2.transactions
@@ -36,10 +36,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: get.l2.deployments
@@ -53,10 +53,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: get.l2.crossdomainmessage
@@ -70,10 +70,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: get.l1.transactions
@@ -87,10 +87,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: send.crossdomainmessage
@@ -104,10 +104,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: get.l2.pendingexits
@@ -121,10 +121,10 @@ functions:
     timeout: 60 # optional, in seconds, default is 6
     vpc:
       securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
+        - !ImportValue ${file(env.yml):NETWORK}-monitor-ecs-security-group
       subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-a
+        - !ImportValue ${file(env.yml):NETWORK}-vpc-private-b
     events:
       - http:
           path: get.layerzero.transactions
