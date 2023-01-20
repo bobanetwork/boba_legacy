@@ -44,7 +44,7 @@ import WitNetLogo from '../../images/ecosystem/WitNetLogo.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
-import beamerbridge from '../../images/ecosystem/beamerbridge.png'
+
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
 import cookbookLogo from '../../images/ecosystem/cookbook.png'
@@ -121,7 +121,7 @@ export const projectList = [
     "link": "https://oportal.boringdao.com/twoway",
     "telegram": "https://t.me/Satis_Channel",
     "twitter": "https://twitter.com/TheBoringDAO",
-    "discord": "https://discord.gg/4CezfPe7",
+    "discord": "https://discord.gg/zCQ2ddp",
     "type": "bridge",
     "image": boringDaoLogo,
     "description": "Safely move your Bitcoin & other crypto assets between Ethereum and different blockchains to maximize utilization rate of crypto assets in DeFi world."
@@ -388,7 +388,7 @@ export const projectList = [
   {
     "title": "Boba Apes",
     "canLaunch": true,
-    "link": "https://bobaapes.com/",
+    "link": "https://www.bobaapes.art/",
     "twitter": "https://twitter.com/bobaapes",
     "type": "nft",
     "image": bobaApesLogo,
@@ -470,7 +470,7 @@ export const projectList = [
     "canLaunch": true,
     "link": "https://thetanuts.finance/vaults",
     "twitter": "https://twitter.com/thetanuts",
-    "discord": "https://discord.gg/XnSYqutaB3",
+    "discord": "https://discord.gg/fzWKJSy9v9",
     "type": "defi",
     "image": thetanutsLogo,
     "description": "Sustainable yield through automated yield generating vault strategies implemented on cross-chain structured products."
@@ -492,7 +492,6 @@ export const projectList = [
     "link": "https://shibuinft.com",
     "telegram": "https://docs.shibuidao.com/telegram",
     "twitter": "https://docs.shibuidao.com/twitter",
-    "discord": "https://docs.shibuidao.com/discord",
     "type": "nft",
     "image": shibuiDAOLogo,
     "description": "An NFT marketplace on Boba."
@@ -527,16 +526,6 @@ export const projectList = [
      "type": "defi",
      "image": symbiosisLogo,
      "description": "Symbiosis aggregates decentralized exchange liquidity across any EVM and non-EVM networks. Swap any token and transfer liquidity. Yes, any."
-   },
-  {
-     "title": "Beamer",
-     "canLaunch": true,
-     "link": "https://app.beamerbridge.com/",
-     "twitter": "https://twitter.com/BeamerBridge",
-     "discord": "https://discord.com/invite/uvTYkzsBdA",
-     "type": "bridge",
-     "image": beamerbridge,
-     "description": "Beam your ERC20 assets between EVM compatible rollups with certainty, speed and security"
    },
   {
      "title": "Via Protocol",
