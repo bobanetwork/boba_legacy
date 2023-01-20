@@ -31,4 +31,5 @@ var (
 	ErrTuringEmpty              = errors.New("turing replay data not found")
 	ErrTuringTooLong            = errors.New("turing calldata too long for gas")
 	ErrGasUintOverflow          = errors.New("gas uint64 overflow")
+	ErrTuringInputTooShort      = errors.New("turing input too short")
 )
