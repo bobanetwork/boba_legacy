@@ -438,7 +438,8 @@ services:
     image: bobanetwork/aa_deployer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.aa_deployer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: aa_deployer
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
