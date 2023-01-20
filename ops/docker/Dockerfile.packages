@@ -13,6 +13,8 @@ ADD ${SOLC_PREFIX}solc-linux-amd64-v0.5.17+commit.d19bba13 ./solc-v0.5.17+commit
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.6.6+commit.6c089d02  ./solc-v0.6.6+commit.6c089d02
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.9+commit.e5eed63a  ./solc-v0.8.9+commit.e5eed63a
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.11+commit.d7f03943  ./solc-v0.8.11+commit.d7f03943
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.15+commit.e14f2714  ./solc-v0.8.15+commit.e14f2714
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.17+commit.8df45f5f  ./solc-v0.8.17+commit.8df45f5f
 
 FROM node:16-buster-slim as base
 
