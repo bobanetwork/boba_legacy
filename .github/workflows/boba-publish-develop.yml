@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN_SECRET }}
 
       - uses: actions/checkout@v2
-
+      - uses: chrisdickinson/setup-yq@latest
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -64,16 +64,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Build the services
-        working-directory: ./ops
-        run: |
-           ./scripts/build-ci.sh
-           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
-
-      - name: Build Proxyd
+      - name: Build the services locally
         working-directory: ./
-        run: |
-          docker build ./go/ --file ./go/proxyd/Dockerfile --tag bobanetwork/proxyd:latest
+        run: yarn && yarn build
+
+      - name: Build the core services
+        working-directory: ./ops
+        run: docker-compose build
+
+      - name: Build the side services
+        working-directory: ./ops
+        run: docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+
+      - name: Print images
+        working-directory: ./
+        run: docker images
 
       - name: Rename and retag the optimism images
         working-directory: ./ops

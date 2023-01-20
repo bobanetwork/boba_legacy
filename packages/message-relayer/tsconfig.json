@@ -1,6 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "resolveJsonModule": true
-  }
+    "outDir": "./dist",
+    "types": ["node"]
+  },
+  "include": [
+    "package.json",
+    "src/**/*"
+  ]
 }
