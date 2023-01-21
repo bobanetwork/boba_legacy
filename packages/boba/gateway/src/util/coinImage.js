@@ -104,6 +104,9 @@ export const getCoinImage = (symbol) => {
     case "BNB":
       logo = bnbLogo;
       break;
+    case "tBNB":
+      logo = bnbLogo;
+      break;
     case "FTM":
       logo = ftmLogo;
       break;
