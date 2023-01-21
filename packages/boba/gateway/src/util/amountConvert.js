@@ -69,6 +69,8 @@ export function amountToUsd(amount, lookupPrice, token) {
     return amount * lookupPrice['usd-coin'].usd
   } else if (token.symbol === 'AVAX' && !!lookupPrice[ 'avalanche-2' ]) {
     return amount * lookupPrice['avalanche-2'].usd
+  } else if (token.symbol === 'FTM' && !!lookupPrice[ 'fantom' ]) {
+    return amount * lookupPrice['fantom'].usd
   } else if (['BNB', 'tBNB'].includes(token.symbol) && !!lookupPrice[ 'binancecoin' ]) {
     return amount * lookupPrice['binancecoin'].usd
   } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
