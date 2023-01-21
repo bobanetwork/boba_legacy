@@ -18,6 +18,7 @@ import { SimpleWalletAPI } from '@account-abstraction/sdk'
 import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
 import { Wallet } from 'ethers'
 import { postExecutionDump } from '@account-abstraction/utils/dist/src/postExecCheck'
+import { getContractFactory } from '@eth-optimism/contracts'
 
 describe('UserOpMethodHandler', function () {
   const helloWorld = 'hello world'
@@ -35,6 +36,8 @@ describe('UserOpMethodHandler', function () {
     provider = ethers.provider
     signer = ethers.provider.getSigner()
 
+    const addressManagerFactory = await getContractFactory('Lib_AddressManager', signer)
+    const addressManager = await addressManagerFactory.deploy()
     const EntryPointFactory = await ethers.getContractFactory('EntryPoint')
     entryPoint = await EntryPointFactory.deploy(1, 1)
 
@@ -52,7 +55,8 @@ describe('UserOpMethodHandler', function () {
       minBalance: '0',
       mnemonic: '',
       network: '',
-      port: '3000'
+      port: '3000',
+      addressManager: addressManager.address
     }
 
     methodHandler = new UserOpMethodHandler(
