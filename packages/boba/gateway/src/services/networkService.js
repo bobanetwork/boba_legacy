@@ -1026,30 +1026,58 @@ class NetworkService {
 
   async getBalances() {
 
-    const layer1Balances = [
-      {
-        address: this.addresses.L1_ETH_Address,
-        addressL2: this.addresses["TK_L2" + networkService.L1NativeTokenSymbol],
-        currency: this.addresses.L1_ETH_Address,
-        symbol: networkService.L1NativeTokenSymbol,
-        decimals: 18,
-        balance: new BN(0),
-      },
-    ]
-
-    const layer2Balances = [
-      {
-        address: this.addresses.L2_ETH_Address,
-        addressL1: this.addresses.TK_L1BOBA,
-        addressL2: this.addresses.L2_ETH_Address,
-        currency: this.addresses.TK_L1BOBA,
-        symbol: 'BOBA',
-        decimals: 18,
-        balance: new BN(0),
-      },
-    ]
-
     try {
+
+      let layer1Balances, layer2Balances;
+
+      if (this.network === NETWORK.ETHEREUM) {
+        layer1Balances = [
+          {
+            address: this.addresses.L1_ETH_Address,
+            addressL2: this.addresses.L2_ETH_Address,
+            currency: this.addresses.L1_ETH_Address,
+            symbol: 'ETH',
+            decimals: 18,
+            balance: new BN(0),
+          },
+        ]
+
+        layer2Balances = [
+          {
+            address: this.addresses.L2_ETH_Address,
+            addressL1: this.addresses.L1_ETH_Address,
+            addressL2: this.addresses.L2_ETH_Address,
+            currency: this.addresses.L1_ETH_Address,
+            symbol: 'ETH',
+            decimals: 18,
+            balance: new BN(0),
+          },
+        ]
+      } else {
+        layer1Balances = [
+          {
+            address: this.addresses.L1_ETH_Address,
+            addressL2: this.addresses["TK_L2" + networkService.L1NativeTokenSymbol],
+            currency: this.addresses.L1_ETH_Address,
+            symbol: networkService.L1NativeTokenSymbol,
+            decimals: 18,
+            balance: new BN(0),
+          },
+        ]
+
+        layer2Balances = [
+          {
+            address: this.addresses.L2_ETH_Address,
+            addressL1: this.addresses.TK_L1BOBA,
+            addressL2: this.addresses.L2_ETH_Address,
+            currency: this.addresses.TK_L1BOBA,
+            symbol: 'BOBA',
+            decimals: 18,
+            balance: new BN(0),
+          },
+        ]
+
+      }
 
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
@@ -1079,17 +1107,21 @@ class NetworkService {
       }
 
       const getBalancePromise = []
-      console.log(['tokenList', tA]);
 
       tA.forEach((token) => {
         if (token.addressL1 === null) return
         if (token.addressL2 === null) return
+        if (this.network === NETWORK.ETHEREUM) {
+          if(token.addressL1 === this.addresses.L1_ETH_Address) return
+          if(token.addressL2 === this.addresses.L2_ETH_Address) return
+        } else {
+          if (token.addressL1 === this.addresses.L1_ETH_Address) {
+            return getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
 
-        if (token.addressL1 === this.addresses.L1_ETH_Address) {
-          return getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
-        }
-        if (token.addressL2 === this.addresses.L2_ETH_Address) {
-          return getBalancePromise.push(getERC20Balance(token, token.addressL2, "L1", this.L2Provider))
+          }
+          if (token.addressL2 === this.addresses.L2_BOBA_Address) {
+            return getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
+          }
         }
 
         if ([
@@ -1103,8 +1135,7 @@ class NetworkService {
           'OLO'
         ].includes(token.symbolL1)) {
           //there is no L1 xBOBA, WAGMIv0, WAGMIv1, WAGMIv2, WAGMIv2OLO, WAGMIv3, WAGMIv3OLO, OLO
-          // console.log('C', token)
-          // getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
+          getBalancePromise.push(getERC20Balance(token, token.addressL2, "L2", this.L2Provider))
         }
         else {
           getBalancePromise.push(getERC20Balance(token, token.addressL1, "L1", this.L1Provider))
@@ -1132,9 +1163,6 @@ class NetworkService {
           layer2Balances.push(token)
         }
       })
-
-      console.log([ 'layer1balances', layer1Balances ]);
-      console.log([ 'layer2Balances', layer2Balances ]);
 
       return {
         layer1: orderBy(layer1Balances, (i) => i.currency),

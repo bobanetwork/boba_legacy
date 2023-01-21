@@ -37,9 +37,10 @@ function TokenPage() {
   const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
   const tokenList = useSelector(selectTokens)
-  const networkLayer = useSelector(selectLayer())
-  const childBalance = useSelector(selectlayer2Balance, isEqual)
-  const rootBalance = useSelector(selectlayer1Balance, isEqual)
+
+  const l2Balance = useSelector(selectlayer2Balance, isEqual)
+  const l1Balance = useSelector(selectlayer1Balance, isEqual)
+
   const layer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
 
@@ -102,7 +103,8 @@ function TokenPage() {
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
     // only run once all the tokens have been added to the tokenList
-    if (Object.keys(tokenList).length < 27) return
+    if (Object.keys(tokenList).length < networkService.tokenAddresses.length) return;
+
     const symbolList = Object.values(tokenList).map((i) => {
       if (i.symbolL1 === 'ETH') {
         return 'ethereum'
@@ -114,6 +116,14 @@ function TokenPage() {
         return 'oolongswap'
       } else if (i.symbolL1 === 'USDC') {
         return 'usd-coin'
+      } else if (i.symbolL1 === 'AVAX') {
+        return 'avalanche-2'
+      } else if (i.symbolL1 === 'FTM') {
+        return 'fantom'
+      } else if (['BNB', 'tBNB'].includes(i.symbolL1)) {
+        return 'binancecoin'
+      } else if (['DEV', 'GLMR'].includes(i.symbolL1)) {
+        return 'moonbeam'
       } else {
         return i.symbolL1.toLowerCase()
       }
@@ -226,13 +236,13 @@ function TokenPage() {
                 )
               })}
             </S.TableHeading>
-            {networkLayer === 'L2' ? !balanceLoading || !!childBalance.length ? childBalance.map((i, index) => {
+            {layer === 'L2' ? !balanceLoading || !!l2Balance.length ? l2Balance.map((i) => {
               return (
                 <ListToken
                   key={i.currency}
                   token={i}
                   chain={'L2'}
-                  networkLayer={networkLayer}
+                  networkLayer={layer}
                   disabled={disabled}
                 />
               )
@@ -240,13 +250,13 @@ function TokenPage() {
               <S.LoaderContainer>
                 <CircularProgress color="secondary" />
               </S.LoaderContainer> : null}
-            {networkLayer === 'L1' ? !balanceLoading || !!rootBalance.length ? rootBalance.map((i, index) => {
+            {layer === 'L1' ? !balanceLoading || !!l1Balance.length ? l1Balance.map((i) => {
               return (
                 <ListToken
                   key={i.currency}
                   token={i}
                   chain={'L1'}
-                  networkLayer={networkLayer}
+                  networkLayer={layer}
                   disabled={disabled}
                 />
               )

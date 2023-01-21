@@ -14,8 +14,8 @@ export const bnbConfig = {
       blockExplorer: `https://api-testnet.bscscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://testnet.bscscan.com/tx/`,
       blockExplorerUrl: `https://testnet.bscscan.com/`,
-      symbol: "BNB",
-      tokenName: "BNB",
+      symbol: "tBNB",
+      tokenName: "tBNB",
     },
     L2: {
       name: "Boba BNB Testnet",

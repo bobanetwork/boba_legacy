@@ -31,6 +31,7 @@ import wagmiv2OLOLogo from 'images/wagmiv2olo.png'
 import oloLogo from 'images/olo.svg'
 import CGTLogo from 'images/CGT.svg'
 import avaxLog from 'images/avax.svg'
+import moonbase from 'images/moonbase.png'
 import glmrLog from 'images/glmr.svg'
 
 export const getCoinImage = (symbol) => {
@@ -104,6 +105,9 @@ export const getCoinImage = (symbol) => {
     case "BNB":
       logo = bnbLogo;
       break;
+    case "tBNB":
+      logo = bnbLogo;
+      break;
     case "FTM":
       logo = ftmLogo;
       break;
@@ -145,6 +149,9 @@ export const getCoinImage = (symbol) => {
       break;
     case "GLMR":
       logo = glmrLog;
+      break;
+    case "DEV":
+      logo = moonbase;
       break;
     default:
       logo = ethLogo;
