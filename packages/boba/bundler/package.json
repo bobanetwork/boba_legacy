@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "aa-bundler",
+  "name": "@boba/aa-bundler",
   "version": "0.2.0",
   "author": "Dror Tirosh",
   "license": "MIT",
@@ -13,6 +13,8 @@
     ]
   },
   "scripts": {
+    "build": "yarn create-all-deps && yarn && yarn preprocess",
+    "clean": "rm -rf cache artifacts node_modules",
     "bundler": "lerna run --no-prefix --stream bundler --",
     "runop": "lerna run --no-prefix --stream runop --",
     "runop-goerli": "yarn runop --network goerli --entryPoint \"0x1b98F08dB8F12392EAE339674e568fe29929bC47\"",
@@ -36,13 +38,16 @@
     "@typescript-eslint/parser": "^5.33.0",
     "depcheck": "^1.4.3",
     "eslint": "^8.21.0",
-    "eslint-plugin-node": "^11.1.0",
     "eslint-config-standard-with-typescript": "^22.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.4",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "lerna": "^5.4.0",
     "typescript": "^4.3.5",
     "webpack": "^5.74.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^5.0.1"
   }
 }

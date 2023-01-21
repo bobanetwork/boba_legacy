@@ -10,7 +10,7 @@ import { BundlerConfig, bundlerConfigDefault, BundlerConfigShape } from './Bundl
 import { BundlerServer } from './BundlerServer'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import { EntryPoint, EntryPoint__factory } from '@account-abstraction/contracts'
-
+import { getContractFactory } from '@eth-optimism/contracts'
 import { BundlerHelper, BundlerHelper__factory } from './types'
 
 // this is done so that console.log outputs BigNumber as hex string instead of unreadable object
@@ -48,6 +48,20 @@ function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
   return params as BundlerConfig
 }
 
+export async function connectContractsViaAddressManager (
+  wallet: Wallet,
+  addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
+  const addressManager = getAddressManager(wallet.provider, addressManagerAddress)
+  const bundlerHelperAddress = await addressManager.getAddress('Boba_BundlerHelper')
+  const entryPointAddress = await addressManager.getAddress('Boba_EntryPoint')
+  const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
+  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, wallet)
+  return {
+    entryPoint,
+    bundlerHelper
+  }
+}
+
 export async function connectContracts (
   wallet: Wallet,
   entryPointAddress: string,
@@ -58,6 +72,10 @@ export async function connectContracts (
     entryPoint,
     bundlerHelper
   }
+}
+
+function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
+  return getContractFactory('Lib_AddressManager').connect(provider).attach(addressManagerAddress)
 }
 
 /**
@@ -86,13 +104,14 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .option('--gasFactor <number>', '', '1')
     .option('--minBalance <number>', 'below this signer balance, keep fee for itself, ignoring "beneficiary" address ')
     .option('--network <string>', 'network name or url')
-    .option('--mnemonic <file>', 'mnemonic/private-key file of signer account')
+    .option('--mnemonic <string or file>', 'mnemonic/private-key file of signer account')
     .option('--helper <string>', 'address of the BundlerHelper contract')
     .option('--entryPoint <string>', 'address of the supported EntryPoint contract')
     .option('--port <number>', 'server listening port', '3000')
     .option('--config <string>', 'path to config file)', CONFIG_FILE_NAME)
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
+    .option('--addressManager <string>', 'address of the Address Manager', '')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
@@ -118,23 +137,23 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
   let mnemonic: string
   let wallet: Wallet
   try {
-    mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
-    wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
+    if (fs.existsSync(config.mnemonic)) {
+      mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
+      wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
+    } else {
+      wallet = new Wallet(config.mnemonic).connect(provider)
+    }
   } catch (e: any) {
     throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)
   }
-
-  const {
-    entryPoint
-    // bundlerHelper
-  } = await connectContracts(wallet, config.entryPoint, config.helper)
-
-  const methodHandler = new UserOpMethodHandler(
-    provider,
-    wallet,
-    config,
-    entryPoint
-  )
+  let methodHandler: UserOpMethodHandler
+  if (config.addressManager.length > 0) {
+    const { entryPoint } = await connectContractsViaAddressManager(wallet, config.addressManager)
+    methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
+  } else {
+    const { entryPoint } = await connectContracts(wallet, config.entryPoint, config.helper)
+    methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
+  }
 
   const bundlerServer = new BundlerServer(
     methodHandler,
