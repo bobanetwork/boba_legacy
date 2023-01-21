@@ -21,10 +21,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import * as S from "./ListFarm.styles"
 
 import { useTheme } from '@emotion/react'
-import { selectNetwork } from 'selectors/networkSelector'
-import { useSelector } from 'react-redux'
-import { getNetwork } from 'util/masterConfig'
+
 import truncate from 'truncate-middle'
+import networkService from 'services/networkService'
 
 function Transaction({
   link,
@@ -53,12 +52,9 @@ function Transaction({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const currentNetwork = useSelector(selectNetwork())
-  const nw = getNetwork()
-
   const chainLink = ({chain,hash}) => {
-    let network = nw[currentNetwork]
-    if (!!network && !!network[chain]) {
+    const network = networkService.networkConfig;
+    if (!!network && !!network[ chain ]) {
       return `${network[chain].transaction}${hash}`;
     }
     return ''
