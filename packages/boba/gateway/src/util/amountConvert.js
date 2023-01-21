@@ -67,6 +67,8 @@ export function amountToUsd(amount, lookupPrice, token) {
     return amount * lookupPrice['omisego'].usd
   } else if (token.symbol === 'USDC' && !!lookupPrice[ 'usd-coin' ]) {
     return amount * lookupPrice['usd-coin'].usd
+  } else if (token.symbol === 'AVAX' && !!lookupPrice[ 'avalanche-2' ]) {
+    return amount * lookupPrice['avalanche-2'].usd
   } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
     return amount * lookupPrice[token.symbol.toLowerCase()].usd
   } else {
