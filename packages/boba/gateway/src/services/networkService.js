@@ -64,10 +64,8 @@ import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2Billing
 
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
-import OMGJson from '../deployment/contracts/OMG.json'
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
-import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
 //WAGMI ABIs
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
@@ -93,12 +91,6 @@ import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 import { sortRawTokens } from 'util/common'
 import GraphQLService from "./graphql.service"
 
-import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
-import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
-
-import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
-import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
-
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
@@ -111,39 +103,16 @@ import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
 const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
-const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
-const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
+// const L2MessengerAddress = '0x4200000000000000000000000000000000000007'
+// const L2StandardBridgeAddress = '0x4200000000000000000000000000000000000010'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 const L2_SECONDARYFEETOKEN_ADDRESS = '0x4200000000000000000000000000000000000023'
 
 let supportedAltL1Chains = []
 
-let allAddresses = {}
-let l0AllProtocols = {}
-// preload allAddresses
 if (APP_CHAIN === 'goerli') {
-  const bobaBridges = layerZeroTestnet.BOBA_Bridges.Testnet;
-  const l0Protocols = layerZeroTestnet.Layer_Zero_Protocol.Testnet;
-  l0AllProtocols = layerZeroTestnet.Layer_Zero_Protocol;
-  allAddresses = {
-    ...addresses_Goerli,
-    L1LPAddress: addresses_Goerli.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Goerli.Proxy__L2LiquidityPool,
-    ...bobaBridges,
-    ...l0Protocols
-  }
   supportedAltL1Chains = ['BNB', 'Fantom', 'Avalanche']
 } else if (APP_CHAIN === 'mainnet') {
-  const bobaBridges = layerZeroMainnet.BOBA_Bridges.Mainnet;
-  const l0Protocols = layerZeroMainnet.Layer_Zero_Protocol.Mainnet;
-  l0AllProtocols = layerZeroMainnet.Layer_Zero_Protocol;
-  allAddresses = {
-    ...addresses_Mainnet,
-    L1LPAddress: addresses_Mainnet.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Mainnet.Proxy__L2LiquidityPool,
-    ...bobaBridges,
-    ...l0Protocols
-  }
   supportedAltL1Chains = ['Moonbeam','BNB', 'Fantom', 'Avalanche']
 }
 let allTokens = {}
@@ -1110,6 +1079,7 @@ class NetworkService {
       }
 
       const getBalancePromise = []
+      console.log(['tokenList', tA]);
 
       tA.forEach((token) => {
         if (token.addressL1 === null) return
@@ -1162,6 +1132,9 @@ class NetworkService {
           layer2Balances.push(token)
         }
       })
+
+      console.log([ 'layer1balances', layer1Balances ]);
+      console.log([ 'layer2Balances', layer2Balances ]);
 
       return {
         layer1: orderBy(layer1Balances, (i) => i.currency),
@@ -4468,9 +4441,9 @@ class NetworkService {
       const pResponse = supportedAltL1Chains.map(async (type) => {
         let L0_ETH_ENDPOINT = this.addresses.Layer_Zero_Endpoint;
         let ETH_L1_BOBA_ADDRESS = this.addresses.TK_L1BOBA;
-        let L0_TARGET_CHAIN_ID = l0AllProtocols[type].Layer_Zero_ChainId;
-        let ALT_L1_BOBA_ADDRESS = allAddresses[`Proxy__EthBridgeTo${type}`];
-        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`${type}_TK_BOBA`];
+        let L0_TARGET_CHAIN_ID = this.addresses.layerZeroTargetChainID;
+        let ALT_L1_BOBA_ADDRESS = this.addresses[`Proxy__EthBridgeTo${type}`];
+        let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = this.addresses[`${type}_TK_BOBA`];
 
         // Layer zero doesn't support moonbase
         // return 0 for those bridges that haven't been implemented yet
@@ -4541,10 +4514,10 @@ class NetworkService {
     }
     try {
       let L0_ETH_ENDPOINT = this.addresses.Layer_Zero_Endpoint;
-      let L0_TARGET_CHAIN_ID = l0AllProtocols[type].Layer_Zero_ChainId;
+      let L0_TARGET_CHAIN_ID = this.addresses.layerZeroTargetChainID;
       let ETH_L1_BOBA_ADDRESS = this.addresses.TK_L1BOBA;
-      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = allAddresses[`Proxy__EthBridgeTo${type}`];
-      let ALT_L1_BOBA_ADDRESS = allAddresses[`${type}_TK_BOBA`];
+      let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = this.addresses[`Proxy__EthBridgeTo${type}`];
+      let ALT_L1_BOBA_ADDRESS = this.addresses[`${type}_TK_BOBA`];
       /* proxy eth bridge contract */
       const Proxy__EthBridge = new ethers.Contract(
         PROXY_ETH_L1_BRIDGE_ADDRESS_TO,
