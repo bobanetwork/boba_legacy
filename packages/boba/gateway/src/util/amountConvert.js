@@ -16,17 +16,17 @@ limitations under the License. */
 // we use BigNumber here for decimal support
 import BigNumber from 'bignumber.js';
 
-export function logAmount (amount, power, truncate = 0) {
+export function logAmount(amount, power, truncate = 0) {
 
   const x = new BigNumber(amount);
   const exp = new BigNumber(10).pow(power);
 
   const calculated = x.div(exp);
 
-  if(truncate > 0)
-  	return calculated.toFixed(truncate);
+  if (truncate > 0)
+    return calculated.toFixed(truncate);
   else
-  	return calculated.toFixed();
+    return calculated.toFixed();
 }
 
 /*Takes a value such as 3.92 and converts it into
@@ -37,7 +37,7 @@ Duplicates
 ethers.utils.parseUnits( valueString , decimalsOrUnitName )   =>   BigNumber
 */
 
-export function powAmount (amount, decimals) {
+export function powAmount(amount, decimals) {
 
   const x = new BigNumber(amount)
   const exp = new BigNumber(10).pow(decimals)
@@ -57,24 +57,29 @@ export function toWei_String(amount, decimals) {
 }
 
 export function amountToUsd(amount, lookupPrice, token) {
-  if (token.symbol === 'ETH' && !!lookupPrice['ethereum']) {
-    return amount * lookupPrice['ethereum'].usd
+  console.log([
+    'token',token
+  ])
+  if (token.symbol === 'ETH' && !!lookupPrice[ 'ethereum' ]) {
+    return amount * lookupPrice[ 'ethereum' ].usd
   } else if (token.symbol === 'BOBA' && !!lookupPrice[ 'boba-network' ]) {
-    return amount * lookupPrice['boba-network'].usd
+    return amount * lookupPrice[ 'boba-network' ].usd
   } else if (token.symbol === 'OLO' && !!lookupPrice[ 'oolongswap' ]) {
-    return amount * lookupPrice['oolongswap'].usd
+    return amount * lookupPrice[ 'oolongswap' ].usd
   } else if (token.symbol === 'OMG' && !!lookupPrice[ 'omisego' ]) {
-    return amount * lookupPrice['omisego'].usd
+    return amount * lookupPrice[ 'omisego' ].usd
   } else if (token.symbol === 'USDC' && !!lookupPrice[ 'usd-coin' ]) {
-    return amount * lookupPrice['usd-coin'].usd
+    return amount * lookupPrice[ 'usd-coin' ].usd
   } else if (token.symbol === 'AVAX' && !!lookupPrice[ 'avalanche-2' ]) {
-    return amount * lookupPrice['avalanche-2'].usd
+    return amount * lookupPrice[ 'avalanche-2' ].usd
   } else if (token.symbol === 'FTM' && !!lookupPrice[ 'fantom' ]) {
-    return amount * lookupPrice['fantom'].usd
-  } else if (['BNB', 'tBNB'].includes(token.symbol) && !!lookupPrice[ 'binancecoin' ]) {
-    return amount * lookupPrice['binancecoin'].usd
+    return amount * lookupPrice[ 'fantom' ].usd
+  } else if ([ 'BNB', 'tBNB' ].includes(token.symbol) && !!lookupPrice[ 'binancecoin' ]) {
+    return amount * lookupPrice[ 'binancecoin' ].usd
+  } else if ([ 'DEV', 'GLMR' ].includes(token.symbol) && !!lookupPrice[ 'moonbeam' ]) {
+    return amount * lookupPrice[ 'moonbeam' ].usd
   } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
-    return amount * lookupPrice[token.symbol.toLowerCase()].usd
+    return amount * lookupPrice[ token.symbol.toLowerCase() ].usd
   } else {
     return 0
   }

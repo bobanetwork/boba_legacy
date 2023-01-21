@@ -120,8 +120,10 @@ function TokenPage() {
         return 'avalanche-2'
       } else if (i.symbolL1 === 'FTM') {
         return 'fantom'
-      } else if (['BNB', 'tBNB'].includes(i.symbol)) {
+      } else if (['BNB', 'tBNB'].includes(i.symbolL1)) {
         return 'binancecoin'
+      } else if (['DEV', 'GLMR'].includes(i.symbolL1)) {
+        return 'moonbeam'
       } else {
         return i.symbolL1.toLowerCase()
       }
