@@ -103,7 +103,7 @@ jobs:
           find . -name solc-linux-amd64-v0.8.9+commit.e5eed63a | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
           find . -name solc-linux-amd64-v0.8.11+commit.d7f03943 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
           find . -name solc-linux-amd64-v0.8.15+commit.e14f2714 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714 -o ./solc-linux-amd64-v0.8.15+commit.e14f2714
-          find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.11+commit.8df45f5f
+          find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.17+commit.8df45f5f
           chmod +x /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
 
       - name: Build the services locally
