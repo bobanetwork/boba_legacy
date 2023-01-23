@@ -62,6 +62,10 @@ describe('Boba API Tests', async () => {
         value: ethers.utils.parseEther('10'),
       })
 
+      await L2Boba.transfer(
+        env.l2Wallet_2.address, ethers.utils.parseEther('10')
+      )
+
       // Load env
       process.env.L2_NODE_WEB3_URL = env.l2Provider.connection.url
       process.env.PRIVATE_KEY = env.l2Wallet.privateKey
