@@ -62,10 +62,6 @@ describe('Boba API Tests', async () => {
         value: ethers.utils.parseEther('10'),
       })
 
-      await L2Boba.transfer(
-        env.l2Wallet_2.address, ethers.utils.parseEther('10')
-      )
-
       // Load env
       process.env.L2_NODE_WEB3_URL = env.l2Provider.connection.url
       process.env.PRIVATE_KEY = env.l2Wallet.privateKey
@@ -82,6 +78,8 @@ describe('Boba API Tests', async () => {
         const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
         const verifyingContract = L2Boba.address
+
+        await L2Boba.transfer(env.l2Wallet_2.address, value)
 
         const data: any = {
           primaryType: 'Permit',
@@ -106,13 +104,6 @@ describe('Boba API Tests', async () => {
           Boba_GasPriceOracle.address
         )
 
-        console.log({
-          BobaBalanceBefore: BobaBalanceBefore.toString(),
-          ETHBalanceBefore: ETHBalanceBefore.toString(),
-          GPO_ETHBalanceBefore: GPO_ETHBalanceBefore.toString(),
-          receivedETHAmount: receivedETHAmount.toString(),
-          value: value.toString(),
-        })
         const response = await asyncMainnetSwapBOBAForETH(
           { body: JSON.stringify(payload) },
           null
