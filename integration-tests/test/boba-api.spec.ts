@@ -106,6 +106,13 @@ describe('Boba API Tests', async () => {
           Boba_GasPriceOracle.address
         )
 
+        console.log({
+          BobaBalanceBefore: BobaBalanceBefore.toString(),
+          ETHBalanceBefore: ETHBalanceBefore.toString(),
+          GPO_ETHBalanceBefore: GPO_ETHBalanceBefore.toString(),
+          receivedETHAmount: receivedETHAmount.toString(),
+          value: value.toString(),
+        })
         const response = await asyncMainnetSwapBOBAForETH(
           { body: JSON.stringify(payload) },
           null

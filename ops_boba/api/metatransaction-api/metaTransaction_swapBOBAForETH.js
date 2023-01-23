@@ -108,6 +108,9 @@ const verifyBobay = async (body, Boba_GasPriceOracle, L2Boba) => {
       errorMessage: 'Invalid value',
     }
   }
+  console.log('bigNumberValue: ', bigNumberValue.toString())
+  console.log('L2BobaBalance: ', L2BobaBalance.toString())
+  console.log('owner: ', owner)
   if (bigNumberValue.gt(L2BobaBalance)) {
     return {
       isVerified: false,
