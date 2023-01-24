@@ -9,6 +9,7 @@ import '../test/aa.init'
 import { parseEther } from 'ethers/lib/utils'
 import { providers } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/abstract-provider/src.ts/index';
+import { Create2Factory } from './Create2Factory'
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
@@ -17,7 +18,20 @@ import { TransactionReceipt } from '@ethersproject/abstract-provider/src.ts/inde
 
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   if (aa_url == null && !process.env.FORCE_DEPLOY) {
-    await hre.run('deploy')
+    // await hre.run('deploy')
+    const from = await ethers.provider.getSigner().getAddress()
+    await new Create2Factory(ethers.provider).deployFactory()
+    const ret = await hre.deployments.deploy(
+      'EntryPoint', {
+        from,
+        args: [],
+        gasLimit: 6e6,
+        deterministicDeployment: true
+      })
+    const t = await hre.deployments.deploy('TestCounter', {
+      from,
+      deterministicDeployment: true
+    })
     const chainId = await hre.getChainId()
     if (chainId.match(/1337/) == null) {
       console.log('chainid=', chainId)

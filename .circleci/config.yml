@@ -193,7 +193,7 @@ jobs:
           name: Build everything
           command: |
             docker-compose build --progress=plain
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml build bobalink
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml build bobalink aa_deployer
           working_directory: ops
       - run:
           name: Bring up the stack
@@ -204,7 +204,7 @@ jobs:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging
