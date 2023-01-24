@@ -3,31 +3,22 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
-
+import './tasks/deploy'
 import 'solidity-coverage'
 
-import * as fs from 'fs'
+import * as dotenv from 'dotenv'
 
-const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
-let mnemonic = 'test '.repeat(11) + 'junk'
-if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
+// Load environment variables from .env
+dotenv.config()
 
-function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
-  return {
-    url,
-    accounts: { mnemonic }
-  }
-}
-
-function getNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
-  return getNetwork1(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
-  // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
+if (!process.env.L1_NODE_WEB3_URL) {
+  process.env.L1_NODE_WEB3_URL = 'http://localhost:9545'
 }
 
 const optimizedComilerSettings = {
   version: '0.8.17',
   settings: {
-    optimizer: { enabled: true, runs: 1000000 },
+    optimizer: { enabled: true, runs: 10_000 },
     viaIR: true
   }
 }
@@ -44,7 +35,7 @@ const config: HardhatUserConfig = {
     compilers: [{
       version: '0.8.15',
       settings: {
-        optimizer: { enabled: true, runs: 1000000 }
+        optimizer: { enabled: true, runs: 10_000 }
       }
     }],
     overrides: {
@@ -53,25 +44,40 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
-    dev: { url: 'http://localhost:8545' },
-    // github action starts localgeth service, for gas calculations
-    localgeth: { url: 'http://localgeth:8545' },
-    goerli: getNetwork('goerli'),
-    proxy: getNetwork1('http://localhost:8545'),
-    //testnets
-    bobagoerli: getNetwork('bobagoerli'),
-    bobabase: getNetwork('bobabase'),
-    bobafantom: getNetwork('bobafantom'),
-    bobafuji: getNetwork('bobafuji'),
-    bobabnb: getNetwork('bobabnb')
+    boba: {
+      url: 'http://localhost:8545',
+      saveDeployments: false,
+    },
+    localhost: {
+      url: 'http://localhost:9545',
+      allowUnlimitedContractSize: true,
+      timeout: 1800000,
+      accounts: [
+        '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+      ],
+    },
+    mainnet: {
+      url: process.env.L1_NODE_WEB3_URL,
+    },
+    'boba-mainnet': {
+      url: 'https://mainnet.boba.network',
+    },
+    goerli: {
+      url: process.env.L1_NODE_WEB3_URL || '',
+    },
   },
   mocha: {
-    timeout: 10000
+    timeout: 300000
   },
 
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+  },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
-  }
+    apiKey: process.env.ETHERSCAN_KEY,
+  },
 
 }
 
