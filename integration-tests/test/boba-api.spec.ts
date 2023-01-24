@@ -7,11 +7,12 @@ import { ethers, BigNumber, Contract, Wallet } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 import ethSigUtil from 'eth-sig-util'
 import util from 'util'
+import { mainnetSwapBOBAForETH } from '@boba/api'
 
 /* Imports: Internal */
+
 import { OptimismEnv } from './shared/env'
 import { gasPriceOracleWallet } from './shared/utils'
-import { mainnetSwapBOBAForETH } from '@boba/api'
 
 describe('Boba API Tests', async () => {
   let env: OptimismEnv
@@ -77,6 +78,8 @@ describe('Boba API Tests', async () => {
         const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
         const verifyingContract = L2Boba.address
+
+        await L2Boba.transfer(env.l2Wallet_2.address, value)
 
         const data: any = {
           primaryType: 'Permit',
@@ -235,7 +238,7 @@ describe('Boba API Tests', async () => {
         expect(BobaBalanceAfter).to.be.deep.eq(BobaBalanceBefore)
         expect(ETHBalanceAfter).to.be.deep.eq(ETHBalanceBefore)
         expect(GPO_ETHBalanceAfter).to.be.deep.eq(GPO_ETHBalanceBefore)
-      }).retries(3)
+      })
 
       it('should return reverted reason from API if Boba_GasPriceOracle has insufficient ETH', async () => {
         // withdraw ETH first
@@ -252,6 +255,8 @@ describe('Boba API Tests', async () => {
         const nonce = (await L2Boba.nonces(env.l2Wallet_2.address)).toNumber()
         const deadline = Math.floor(Date.now() / 1000) + 90
         const verifyingContract = L2Boba.address
+
+        await L2Boba.transfer(env.l2Wallet_2.address, value)
 
         const data: any = {
           primaryType: 'Permit',
@@ -302,7 +307,7 @@ describe('Boba API Tests', async () => {
           to: Boba_GasPriceOracle.address,
           value: ethers.utils.parseEther('10'),
         })
-      }).retries(3)
+      })
     })
   })
 })

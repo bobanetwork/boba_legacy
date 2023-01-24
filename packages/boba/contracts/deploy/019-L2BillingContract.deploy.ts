@@ -8,7 +8,7 @@ import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProx
 import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2BillingContractJson from '../artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
 import DiscretionaryExitFeeJson from '../artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
-import L2NFTBridgeJson from '../artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L2NFTBridgeJson from '../artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json'
 
 let Factory__Proxy__L2BillingContract: ContractFactory
 let Factory__L2BillingContract: ContractFactory

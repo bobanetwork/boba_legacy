@@ -156,11 +156,9 @@ contract StateCommitmentChain is IStateCommitmentChain, Lib_AddressResolver {
     /**
      * @inheritdoc IStateCommitmentChain
      */
-    function insideFraudProofWindow(Lib_OVMCodec.ChainBatchHeader memory _batchHeader)
-        public
-        view
-        returns (bool _inside)
-    {
+    function insideFraudProofWindow(
+        Lib_OVMCodec.ChainBatchHeader memory _batchHeader
+    ) public view returns (bool _inside) {
         (uint256 timestamp, ) = abi.decode(_batchHeader.extraData, (uint256, address));
 
         require(timestamp != 0, "Batch header timestamp cannot be zero");
@@ -204,11 +202,10 @@ contract StateCommitmentChain is IStateCommitmentChain, Lib_AddressResolver {
      * @param _lastSequencerTimestamp Timestamp of the last batch submitted by the sequencer.
      * @return Encoded batch context.
      */
-    function _makeBatchExtraData(uint40 _totalElements, uint40 _lastSequencerTimestamp)
-        internal
-        pure
-        returns (bytes27)
-    {
+    function _makeBatchExtraData(
+        uint40 _totalElements,
+        uint40 _lastSequencerTimestamp
+    ) internal pure returns (bytes27) {
         bytes27 extraData;
         assembly {
             extraData := _totalElements
@@ -291,11 +288,9 @@ contract StateCommitmentChain is IStateCommitmentChain, Lib_AddressResolver {
      * @param _batchHeader Batch header to validate.
      * @return Whether or not the header matches the stored one.
      */
-    function _isValidBatchHeader(Lib_OVMCodec.ChainBatchHeader memory _batchHeader)
-        internal
-        view
-        returns (bool)
-    {
+    function _isValidBatchHeader(
+        Lib_OVMCodec.ChainBatchHeader memory _batchHeader
+    ) internal view returns (bool) {
         return Lib_OVMCodec.hashBatchHeader(_batchHeader) == batches().get(_batchHeader.batchIndex);
     }
 }

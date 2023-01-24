@@ -53,7 +53,7 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L2 => L1', () => {
-    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', async function () {
+    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', async () => {
       const value = `0x${'77'.repeat(32)}`
 
       // Send L2 -> L1 message.

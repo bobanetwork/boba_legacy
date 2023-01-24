@@ -2,7 +2,7 @@
 import { Wallet, utils, constants, BigNumber } from 'ethers'
 import { Address, sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
-import { Logger, BaseService, Metrics } from '@eth-optimism/common-ts'
+import { Logger, BaseService, LegacyMetrics } from '@eth-optimism/common-ts'
 import * as ynatm from '@eth-optimism/ynatm'
 import {
   CrossChainMessenger,
@@ -60,7 +60,7 @@ interface MessageRelayerOptions {
   /**
    * Metrics object to use. Defaults to no metrics.
    */
-  metrics?: Metrics
+  metrics?: LegacyMetrics
 
   // filter
   filterEndpoint?: string
@@ -536,6 +536,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           const relayerFilterSelect = [
             filter.Proxy__L1StandardBridge,
             filter.Proxy__L1NFTBridge,
+            filter.Proxy__L1ERC1155Bridge,
           ]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()

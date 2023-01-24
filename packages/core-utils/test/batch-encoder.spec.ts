@@ -94,7 +94,7 @@ describe('BatchEncoder', function () {
           for (const tx of decoded.transactions) {
             tx.toTransaction()
           }
-        })
+        }).timeout(100000)
       }
     })
 

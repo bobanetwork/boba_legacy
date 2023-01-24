@@ -374,7 +374,6 @@ enum QueueOrigin {
   SEQUENCER_QUEUE,
   L1TOL2_QUEUE
 }
-
 ```
 
 ### Structs
@@ -391,7 +390,6 @@ struct Transaction {
   uint256 gasLimit;
   bytes data;
 }
-
 ```
 
 #### EnqueuedTransaction
@@ -407,7 +405,6 @@ struct EnqueuedTransaction {
   bytes data;
   uint256 queueIndex;
 }
-
 ```
 
 ### Events

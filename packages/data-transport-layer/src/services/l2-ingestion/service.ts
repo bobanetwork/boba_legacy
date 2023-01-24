@@ -1,5 +1,5 @@
 /* Imports: External */
-import { BaseService, Metrics } from '@eth-optimism/common-ts'
+import { BaseService, LegacyMetrics } from '@eth-optimism/common-ts'
 import { StaticJsonRpcProvider } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
 import { LevelUp } from 'levelup'
@@ -20,7 +20,7 @@ interface L2IngestionMetrics {
 const registerMetrics = ({
   client,
   registry,
-}: Metrics): L2IngestionMetrics => ({
+}: LegacyMetrics): L2IngestionMetrics => ({
   highestSyncedL2Block: new client.Gauge({
     name: 'data_transport_layer_highest_synced_l2_block',
     help: 'Highest Synced L2 Block Number',

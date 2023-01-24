@@ -6,8 +6,8 @@ require('dotenv').config()
 
 const SampleERC721Json = require('../quickStart-Rinkeby/SampleERC721.json')
 const L1StandardERC721Json = require('@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json')
-const L1NFTBridgeJson = require('@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json')
-const L2NFTBridgeJson = require('@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json')
+const L1NFTBridgeJson = require('@boba/contracts/artifacts/contracts/ERC721Bridges/L1NFTBridge.sol/L1NFTBridge.json')
+const L2NFTBridgeJson = require('@boba/contracts/artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json')
 
 const { bridgeToL1 } = require('./bridgeToL1')
 const { bridgeBackToL2 } = require('./bridgeBackToL2')

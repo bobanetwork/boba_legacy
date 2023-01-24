@@ -50,7 +50,7 @@ const loadContracts = () => {
   return Boba_AuthenticatedFaucet
 }
 
-const handle = async(event, callback) => {
+const handle = async (event, callback) => {
   const body = JSON.parse(event.body)
 
   const { hashedMsg, signature, tweetId, walletAddress } = body
@@ -59,14 +59,7 @@ const handle = async(event, callback) => {
 
   // Send transaction to node
   try {
-    console.log(
-      'SendFundsMeta: ',
-      walletAddress,
-      tweetId,
-      hashedMsg,
-      signature,
-      L2_NODE_WEB3_URL
-    )
+    console.log('SendFundsMeta: ', walletAddress, tweetId, hashedMsg, signature)
 
     await Boba_AuthenticatedFaucet.estimateGas.sendFundsMeta(
       walletAddress,
@@ -105,5 +98,10 @@ module.exports.mainnetHandler = async (event, context, callback) => {
 
 // Return error message
 module.exports.rinkebyHandler = async (event, context, callback) => {
+  return handle(event, callback)
+}
+
+// Return error message
+module.exports.goerliHandler = async (event, context, callback) => {
   return handle(event, callback)
 }

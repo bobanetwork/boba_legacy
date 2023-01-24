@@ -1,0 +1,27 @@
+{
+  "name": "@hc/monorepo",
+  "version": "1.0.0",
+  "keywords": [
+    "ethereum",
+    "react",
+    "workspaces",
+    "yarn"
+  ],
+  "private": true,
+  "scripts": {
+    "subgraph:auth": "yarn workspace @hc/subgraph auth",
+    "subgraph:codegen": "yarn workspace @hc/subgraph codegen",
+    "subgraph:build": "yarn workspace @hc/subgraph build",
+    "subgraph:deploy": "yarn workspace @hc/subgraph deploy",
+    "react-app:build": "yarn workspace @hc/react-app build",
+    "react-app:eject": "yarn workspace @hc/react-app eject",
+    "react-app:ipfs": "yarn workspace @hc/react-app ipfs",
+    "react-app:start": "yarn workspace @hc/react-app start",
+    "react-app:test": "yarn workspace @hc/react-app test"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  }
+}

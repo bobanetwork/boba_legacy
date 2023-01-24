@@ -5,8 +5,8 @@ import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 
 import { getFilteredLogIndex } from './shared/utils'
 
-import L1NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L1NFTBridge.sol/L1NFTBridge.json'
-import L2NFTBridge from '@boba/contracts/artifacts/contracts/bridges/L2NFTBridge.sol/L2NFTBridge.json'
+import L1NFTBridge from '@boba/contracts/artifacts/contracts/ERC721Bridges/L1NFTBridge.sol/L1NFTBridge.json'
+import L2NFTBridge from '@boba/contracts/artifacts/contracts/ERC721Bridges/L2NFTBridge.sol/L2NFTBridge.json'
 import L1ERC721Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC721.sol/L1StandardERC721.json'
 import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
 import ERC721Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC721.sol/L1ERC721.json'
@@ -40,7 +40,6 @@ describe('NFT Bridge Test', async () => {
   let env: OptimismEnv
 
   const DUMMY_TOKEN_ID = 1234
-  const DUMMY_TOKEN_ID_2 = 5678
   const DUMMY_URI_1 = 'first-unique-uri'
 
   before(async () => {
@@ -2322,7 +2321,7 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('{tag:boba} should try deposit NFT to L2', async () => {
+    it('should try deposit NFT to L2', async () => {
       // mint nft
       const mintTx = await L1ERC721.mint(env.l1Wallet.address, DUMMY_TOKEN_ID)
       await mintTx.wait()
@@ -2360,8 +2359,10 @@ describe('NFT Bridge Test', async () => {
       expect(log.args._tokenId).to.deep.eq(DUMMY_TOKEN_ID)
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
+      //https://github.com/OpenZeppelin/openzeppelin-contracts/pull/3438/files
+      //simplified revert reason
       await expect(L2ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
-        'ERC721: owner query for nonexistent token'
+        'ERC721: invalid token ID'
       )
 
       expect(ownerL1).to.deep.eq(env.l1Wallet.address)
@@ -2413,7 +2414,7 @@ describe('NFT Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('{tag:boba} should try exit NFT from L2', async () => {
+    it('should try exit NFT from L2', async () => {
       // mint nft
       const mintTx = await L2ERC721.mint(env.l2Wallet.address, DUMMY_TOKEN_ID)
       await mintTx.wait()
@@ -2434,7 +2435,7 @@ describe('NFT Bridge Test', async () => {
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
-        'ERC721: owner query for nonexistent token'
+        'ERC721: invalid token ID'
       )
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
 

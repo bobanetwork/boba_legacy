@@ -74,6 +74,7 @@ func NewEVMContext(msg Message, header *types.Header, chain ChainContext, author
 			L1BlockNumber: msg.L1BlockNumber(),
 			Turing:        msg.L1Turing(),
 			TuringDepth:   turingDepth,
+			TuringGasMul:  0.0,
 			Sequencer:     sequencer,
 		}
 	} else {

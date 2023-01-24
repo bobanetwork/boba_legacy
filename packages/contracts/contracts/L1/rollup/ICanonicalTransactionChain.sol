@@ -110,10 +110,9 @@ interface ICanonicalTransactionChain {
      * @param _index Index of the queue element to access.
      * @return _element Queue element at the given index.
      */
-    function getQueueElement(uint256 _index)
-        external
-        view
-        returns (Lib_OVMCodec.QueueElement memory _element);
+    function getQueueElement(
+        uint256 _index
+    ) external view returns (Lib_OVMCodec.QueueElement memory _element);
 
     /**
      * Returns the timestamp of the last transaction.
@@ -146,11 +145,7 @@ interface ICanonicalTransactionChain {
      * @param _gasLimit Gas limit for the given transaction.
      * @param _data Transaction data.
      */
-    function enqueue(
-        address _target,
-        uint256 _gasLimit,
-        bytes memory _data
-    ) external;
+    function enqueue(address _target, uint256 _gasLimit, bytes memory _data) external;
 
     /**
      * Allows the sequencer to append a batch of transactions.

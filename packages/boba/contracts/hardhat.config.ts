@@ -40,6 +40,12 @@ const config: HardhatUserConfig = {
     'boba-mainnet': {
       url: 'https://mainnet.boba.network',
     },
+    goerli: {
+      url: process.env.L1_NODE_WEB3_URL || '',
+    },
+    'boba-goerli': {
+      url: 'https://goerli.boba.network',
+    },
   },
   solidity: {
     compilers: [
@@ -101,6 +107,8 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: process.env.ETHERSCAN_KEY,
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
+      goerli: process.env.ETHERSCAN_GOERLI_KEY,
+      'boba-goerli': process.env.BOBA_MAINNET_KEY,
     },
     customChains: [
       {
@@ -109,6 +117,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api.bobascan.com/api',
           browserURL: 'https://bobascan.com',
+        },
+      },
+      {
+        network: 'boba-goerli',
+        chainId: 2888,
+        urls: {
+          apiURL: 'https://api-testnet.bobascan.com/api',
+          browserURL: 'https://testnet.bobascan.com',
         },
       },
     ],
