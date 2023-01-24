@@ -256,6 +256,8 @@ describe('Boba API Tests', async () => {
         const deadline = Math.floor(Date.now() / 1000) + 90
         const verifyingContract = L2Boba.address
 
+        await L2Boba.transfer(env.l2Wallet_2.address, value)
+
         const data: any = {
           primaryType: 'Permit',
           types: { EIP712Domain, Permit },
