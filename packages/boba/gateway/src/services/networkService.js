@@ -99,6 +99,7 @@ import { getPoolDetail } from 'util/poolDetails'
 import { getNetworkDetail, NETWORK } from 'util/network/network.util'
 import appService from './app.service'
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
+import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -489,7 +490,7 @@ class NetworkService {
 
       this.L1StandardBridgeContract = new ethers.Contract(
         this.addresses.L1StandardBridgeAddress,
-        L1StandardBridgeJson.abi,
+        L1StandardBridgeABI,
         this.L1Provider
       )
 
@@ -584,8 +585,9 @@ class NetworkService {
         this.L2Provider
       )
 
-      /*
+
       console.log('Setting up watcher CrossChainMessenger')
+
       this.watcher = new CrossChainMessenger({
         l1SignerOrProvider: this.L1Provider,
         l2SignerOrProvider: this.L2Provider,
@@ -598,8 +600,8 @@ class NetworkService {
         chainId,
         fastRelayer: true,
       })
- */
 
+      console.log([ 'WATCHER HAS BEEN SET', this.watcher, this.fastWatcher ]);
 
       this.BobaContract = new ethers.Contract(
         L2_SECONDARYFEETOKEN_ADDRESS,
@@ -1203,39 +1205,49 @@ class NetworkService {
     try {
 
       const time_start = new Date().getTime()
-      console.log("TX start time:", time_start)
+      console.log('Deposit ETH L2 Txs start time:', time_start);
 
       let depositTX;
-
-      if (!recipient) {
-        depositTX = await this.L1StandardBridgeContract
-          .connect(this.provider.getSigner())
-          .depositETH(
-            this.L2GasLimit,
-            utils.formatBytes32String(new Date().getTime().toString()),
-            {
-              value: value_Wei_String
-            }
-          )
+      if (this.network === NETWORK.ETHEREUM) {
+        if (!recipient) {
+          depositTX = await this.L1StandardBridgeContract
+            .connect(this.provider.getSigner())
+            .depositETH(
+              this.L2GasLimit,
+              utils.formatBytes32String(new Date().getTime().toString()),
+              {
+                value: value_Wei_String
+              }
+            )
+        } else {
+          depositTX = await this.L1StandardBridgeContract
+            .connect(this.provider.getSigner())
+            .depositETHTo(
+              recipient,
+              this.L2GasLimit,
+              utils.formatBytes32String(new Date().getTime().toString()),
+              {
+                value: value_Wei_String
+              }
+            )
+        }
       } else {
         depositTX = await this.L1StandardBridgeContract
           .connect(this.provider.getSigner())
-          .depositETHTo(
-            recipient,
+          .depositNativeToken(
             this.L2GasLimit,
             utils.formatBytes32String(new Date().getTime().toString()),
             {
               value: value_Wei_String
             }
-          )
+        )
       }
-
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
       const block = await this.L1Provider.getTransaction(depositTX.hash)
-      console.log(' block:', block)
+      console.log('block:', block)
 
       //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
@@ -1249,7 +1261,7 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
+      /* const data = {
         "key": SPEED_CHECK,
         "hash": depositTX.hash,
         "l1Tol2": false, //since we are going L2->L1
@@ -1266,7 +1278,7 @@ class NetworkService {
         this.networkConfig
       ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      console.log("Speed checker:", speed) */
 
       return receipt
     } catch(error) {
@@ -2052,24 +2064,24 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+      // const data = {
+      //   "key": SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": true,
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": receipt.transactionHash,
+      //   "cdmBlock": receipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkConfig
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
       this.getBalances()
 
@@ -2688,6 +2700,8 @@ class NetworkService {
       console.log(' block:', block)
 
       updateSignatureStatus_depositLP(true)
+
+      // TODO: Below part is disabled
 
       const opts = {
         fromBlock: -4000
@@ -4602,6 +4616,7 @@ class NetworkService {
 
       console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
+      // TODO: FIXME: Update this function to `withdraw` in case of other deployment than ETHERUEM.
       await Proxy__EthBridge.depositERC20(
         ETH_L1_BOBA_ADDRESS,
         ALT_L1_BOBA_ADDRESS,

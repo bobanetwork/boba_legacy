@@ -18,6 +18,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { selectLookupPrice } from 'selectors/lookupSelector'
 
 import BN from 'bignumber.js'
+import { ethers } from 'ethers'
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -30,6 +32,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const [ validValue, setValidValue ] = useState(false)
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
+  const networkName = useSelector(selectActiveNetworkName())
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
 
@@ -52,8 +55,10 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   async function doDeposit() {
 
     let res
+    console.log('Amount to bridge to L2', value_Wei_String);
 
-    if (token.symbol === 'ETH') {
+    // TO check for ETH
+    if (token.address === ethers.constants.AddressZero) {
       res = await dispatch(
         depositETHL2({
           recipient,
@@ -71,7 +76,9 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       )
     }
     if (res) {
-      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      // TODO: Setup correct alert name
+      dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
+      // dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
       handleClose()
     }
 
@@ -88,7 +95,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  console.log("Loading:", depositLoading)
 
   let buttonLabel_1 = 'Cancel'
   if (depositLoading) buttonLabel_1 = 'Close'
