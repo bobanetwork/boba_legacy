@@ -15,9 +15,10 @@ import networkService from 'services/networkService'
 import { makeStyles } from '@mui/styles'
 import Copy from 'components/copy/Copy'
 import { useSelector } from 'react-redux'
-import { selectAccountEnabled, selectMonster } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer, selectMonster } from 'selectors/setupSelector'
 import NetworkSwitcher from 'components/mainMenu/networkSwitcher/NetworkSwitcher'
 import WalletSwitch from 'components/walletSwitch/WalletSwitch'
+import { LAYER } from 'util/constant'
 
 const useStyles = makeStyles({
   root: {
@@ -36,6 +37,7 @@ const PageHeader = ({ maintenance }) => {
 
   const theme = useTheme()
   const accountEnabled = useSelector(selectAccountEnabled())
+  const layer = useSelector(selectLayer())
   const monsterNumber = useSelector(selectMonster())
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -109,7 +111,7 @@ const PageHeader = ({ maintenance }) => {
                     </S.WrapperCloseIcon>
                   </S.DrawerHeader>
                   <S.HeaderDivider />
-                  <FeeSwitcher style={{paddingTop: '15px', marginTop: '20px'}}/>
+                  {layer === LAYER.L2 ? <FeeSwitcher style={{ paddingTop: '15px', marginTop: '20px' }} /> : null}
                 </S.StyleDrawer>
               </Drawer>
             </S.HeaderWrapper>
@@ -118,7 +120,7 @@ const PageHeader = ({ maintenance }) => {
           : (<S.HeaderWrapper>
             <Logo style={{ width: '140px', paddingTop: '15px', paddingLeft: '15px' }} />
             <MenuItems setOpen={setOpen} />
-            <FeeSwitcher />
+            {layer === LAYER.L2 ? <FeeSwitcher /> : null}
             <WalletSwitch />
             <NetworkSwitcher />
             {!!accountEnabled ? <Copy value={networkService.account} light={false} /> : null}

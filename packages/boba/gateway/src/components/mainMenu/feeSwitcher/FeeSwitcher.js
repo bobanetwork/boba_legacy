@@ -38,7 +38,7 @@ import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 import { HelpOutline } from '@mui/icons-material'
 import networkService from 'services/networkService.js'
-import { selectActiveNetworkName } from 'selectors/networkSelector.js'
+import { selectActiveNetwork, selectActiveNetworkName } from 'selectors/networkSelector.js'
 import { NETWORK } from 'util/network/network.util.js'
 
 function FeeSwitcher() {
@@ -48,7 +48,7 @@ function FeeSwitcher() {
   const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const networkName = useSelector(selectActiveNetworkName())
-  const network = useSelector(selectActiveNetworkName())
+  const network = useSelector(selectActiveNetwork())
   const layer = useSelector(selectLayer())
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
@@ -61,7 +61,7 @@ function FeeSwitcher() {
   const dispatchSwitchFee = useCallback(async (targetFee) => {
 
     let tooSmallL1NativeToken = false
-    let minL1NativeBalance = network=== NETWORK.ETHEREUM ? 0.0002 : 0.5
+    let minL1NativeBalance = network === NETWORK.ETHEREUM ? 0.0002 : 0.5
     let tooSmallBOBA = false
 
     if (typeof (balanceBOBA) === 'undefined') {
