@@ -601,8 +601,6 @@ class NetworkService {
         fastRelayer: true,
       })
 
-      console.log([ 'WATCHER HAS BEEN SET', this.watcher, this.fastWatcher ]);
-
       this.BobaContract = new ethers.Contract(
         L2_SECONDARYFEETOKEN_ADDRESS,
         Boba.abi,
@@ -2490,8 +2488,8 @@ class NetworkService {
 
       if (tokenAddress === this.addresses.L2_ETH_Address) {
         tokenBalance = await this.L2Provider.getBalance(this.addresses.L2LPAddress)
-        tokenSymbol = 'BOBA'
-        tokenName = 'BOBA Token'
+        tokenSymbol = this.network === NETWORK.ETHEREUM ? 'ETH' : 'BOBA'
+        tokenName = this.network === NETWORK.ETHEREUM ? 'Ethereum' : 'BOBA Token'
         decimals = 18
       } else {
         tokenBalance = await this.L2_TEST_Contract.attach(tokenAddress).connect(this.L2Provider).balanceOf(this.addresses.L2LPAddress)
@@ -2900,7 +2898,7 @@ class NetworkService {
     let tokenAddressLC = tokenAddress.toLowerCase()
 
     if (
-      tokenAddressLC === this.addresses.L2_ETH_Address ||
+      tokenAddressLC === this.addresses.L2_BOBA_Address ||
       tokenAddressLC === this.addresses.L1_ETH_Address
     ) {
       //We are dealing with ETH
