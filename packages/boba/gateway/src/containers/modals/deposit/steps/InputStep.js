@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositErc20, depositETHL2 } from 'actions/networkAction'
-import { setActiveHistoryTab } from 'actions/uiAction'
+import { setActiveHistoryTab, openAlert } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -55,20 +55,20 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   async function doDeposit() {
 
     let res
-    console.log('Amount to bridge to L2', value_Wei_String);
+    let toL2Account = enableToL2Account ? recipient : '';
 
     // TO check for ETH
     if (token.address === ethers.constants.AddressZero) {
       res = await dispatch(
         depositETHL2({
-          recipient,
+          recipient: toL2Account,
           value_Wei_String
         })
       )
     } else {
       res = await dispatch(
         depositErc20({
-          recipient,
+          recipient: toL2Account,
           value_Wei_String,
           currency: token.address,
           currencyL2: token.addressL2,
@@ -76,9 +76,8 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       )
     }
     if (res) {
-      // TODO: Setup correct alert name
-      dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
-      // dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      dispatch(openAlert(`Your funds were bridged to ${networkName[ 'l2' ]}`))
+      dispatch(setActiveHistoryTab(`${networkName[ 'l1' ]} to ${networkName[ 'l2' ]}`))
       handleClose()
     }
 

@@ -591,13 +591,13 @@ class NetworkService {
       this.watcher = new CrossChainMessenger({
         l1SignerOrProvider: this.L1Provider,
         l2SignerOrProvider: this.L2Provider,
-        chainId,
+        l1ChainId: chainId,
         fastRelayer: false,
       })
       this.fastWatcher = new CrossChainMessenger({
         l1SignerOrProvider: this.L1Provider,
         l2SignerOrProvider: this.L2Provider,
-        chainId,
+        l1ChainId: chainId,
         fastRelayer: true,
       })
 
@@ -1232,44 +1232,60 @@ class NetworkService {
             )
         }
       } else {
-        depositTX = await this.L1StandardBridgeContract
-          .connect(this.provider.getSigner())
-          .depositNativeToken(
-            this.L2GasLimit,
-            utils.formatBytes32String(new Date().getTime().toString()),
-            {
-              value: value_Wei_String
-            }
-        )
+        if (!recipient) {
+          depositTX = await this.L1StandardBridgeContract
+            .connect(this.provider.getSigner())
+            .depositNativeToken(
+              this.L2GasLimit,
+              utils.formatBytes32String(new Date().getTime().toString()),
+              {
+                value: value_Wei_String
+              }
+          )
+        } else {
+          depositTX = await this.L1StandardBridgeContract
+            .connect(this.provider.getSigner())
+            .depositNativeTokenTo(
+              recipient,
+              this.L2GasLimit,
+              utils.formatBytes32String(new Date().getTime().toString()),
+              {
+                value: value_Wei_String
+              }
+          )
+        }
       }
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
-      console.log('block:', block)
 
-      //closes the Deposit modal
       updateSignatureStatus_depositTRAD(true)
 
       const opts = {
         fromBlock: -4000
       }
+
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed Deposit! L2 tx hash:', receipt.transactionHash)
+      const txReceipt = receipt.transactionReceipt;
+      console.log('completed Deposit! L2 tx hash:', receipt.transactionHash)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      /* const data = {
+      /*
+      // TODO: Investigate api-watcher failing with 502
+
+      const block = await this.L1Provider.getTransaction(depositTX.hash)
+      const data = {
         "key": SPEED_CHECK,
         "hash": depositTX.hash,
-        "l1Tol2": false, //since we are going L2->L1
+        "l1Tol2": true, //since we are going L1->L2
         "startTime": time_start,
         "endTime": time_stop,
         "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
+        "cdmHash": txReceipt.transactionHash,
+        "cdmBlock": txReceipt.blockNumber
       }
 
       console.log("Speed checker data payload:", data)
@@ -1280,7 +1296,7 @@ class NetworkService {
 
       console.log("Speed checker:", speed) */
 
-      return receipt
+      return txReceipt
     } catch(error) {
       console.log("NS: depositETHL2 error:",error)
       return error
@@ -2059,7 +2075,8 @@ class NetworkService {
         fromBlock: -4000
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed Deposit! L2 tx hash:', receipt.transactionHash)
+      const txReceipt = receipt.transactionReceipt;
+      console.log('completed ERC20 Deposit! L2 tx hash:', txReceipt.transactionHash)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
@@ -2071,8 +2088,8 @@ class NetworkService {
       //   "startTime": time_start,
       //   "endTime": time_stop,
       //   "block": block.blockNumber,
-      //   "cdmHash": receipt.transactionHash,
-      //   "cdmBlock": receipt.blockNumber
+      //   "cdmHash": txReceipt.transactionHash,
+      //   "cdmBlock": txReceipt.blockNumber
       // }
 
       // console.log("Speed checker data payload:", data)
@@ -2085,7 +2102,7 @@ class NetworkService {
 
       this.getBalances()
 
-      return receipt
+      return txReceipt
     } catch (error) {
       console.log("NS: depositErc20 error:", error)
       return error
@@ -3245,7 +3262,9 @@ class NetworkService {
         fromBlock: -4000
       }
       const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
+      const txReceipt = receipt.transactionReceipt;
+
+      console.log(' completed Deposit! L1 tx hash:', txReceipt.transactionHash)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
@@ -3257,8 +3276,8 @@ class NetworkService {
         "startTime": time_start,
         "endTime": time_stop,
         "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
+        "cdmHash": txReceipt.transactionHash,
+        "cdmBlock": txReceipt.blockNumber
       }
 
       console.log("Speed checker data payload:", data)
@@ -3362,7 +3381,8 @@ class NetworkService {
         fromBlock: -4000
       }
       const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed Deposit! L1 tx hash:', receipt.transactionHash)
+      const txReceipt = receipt.transactionReceipt;
+      console.log(' completed Deposit! L1 tx hash:', txReceipt.transactionHash)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
@@ -3374,8 +3394,8 @@ class NetworkService {
         "startTime": time_start,
         "endTime": time_stop,
         "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
+        "cdmHash": txReceipt.transactionHash,
+        "cdmBlock": txReceipt.blockNumber
       }
 
       console.log("Speed checker data payload:", data)
@@ -3386,7 +3406,7 @@ class NetworkService {
 
       console.log("Speed checker:", speed)
 
-      return receipt
+      return txReceipt
     } catch (error) {
       console.log("NS: depositL2LP error:", error)
       return error
