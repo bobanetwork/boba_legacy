@@ -14,6 +14,7 @@ class TransactionService {
       const responseL1 = await etherScanInstance(BEUrl).get(`&address=${networkService.account}`)
       if (responseL1.status === 200) {
         const transactionsL1 = await responseL1.data
+        console.log(['transactionsL1.result',transactionsL1.result])
         if (transactionsL1.status === '1') {
           //thread in ChainID
           L1Txs = transactionsL1.result.map(v => ({
@@ -27,7 +28,6 @@ class TransactionService {
       return L1Txs
     } catch (error) {
       console.log('TS: Error while fetching txs')
-
       return L1Txs
     }
   }
@@ -47,7 +47,7 @@ class TransactionService {
       }
       return L2Txs
     } catch (error) {
-      console.log('TS: Error while fetching txs')
+      console.log('TS: fetchL2Tx',error)
       return L2Txs
     }
   }
@@ -75,7 +75,7 @@ class TransactionService {
       }
       return L0Txs
     } catch (error) {
-      console.log('TS: Error while fetching txs')
+      console.log('TS: fetchL0Tx',error)
       return L0Txs
     }
   }
@@ -97,7 +97,7 @@ class TransactionService {
       };
       return txL1pending
     } catch (error) {
-      console.log('TS: Error while fetching txs')
+      console.log('TS: fetchL1PendingTx',error)
       return txL1pending
     }
   }
@@ -109,7 +109,6 @@ class TransactionService {
   */
   async getTransactions() {
     const result = await Promise.all([
-      this.fetchEtherscanTx(),
       this.fetchL2Tx(),
       this.fetchL0Tx(),
       this.fetchL1PendingTx()

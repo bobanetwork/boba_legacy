@@ -585,9 +585,6 @@ class NetworkService {
         this.L2Provider
       )
 
-
-      console.log('Setting up watcher CrossChainMessenger')
-
       this.watcher = new CrossChainMessenger({
         l1SignerOrProvider: this.L1Provider,
         l2SignerOrProvider: this.L2Provider,

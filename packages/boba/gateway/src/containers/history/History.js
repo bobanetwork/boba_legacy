@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { batch, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'lodash'
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
@@ -30,7 +30,7 @@ import { selectActiveHistoryTab } from 'selectors/uiSelector'
 
 import { fetchTransactions } from 'actions/networkAction'
 import { selectTransactions } from 'selectors/transactionSelector'
-import { selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
@@ -62,6 +62,7 @@ function History() {
   const [startDate, setStartDate] = useState(last_6months)
   const [endDate, setEndDate] = useState(now)
   const layer = useSelector(selectLayer())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
   const [searchHistory, setSearchHistory] = useState('')
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
@@ -78,9 +79,9 @@ function History() {
   })
 
   useInterval(() => {
-    batch(()=>{
+    if (accountEnabled) {
       dispatch(fetchTransactions())
-    })
+    }
   }, POLL_INTERVAL)
 
   return (
