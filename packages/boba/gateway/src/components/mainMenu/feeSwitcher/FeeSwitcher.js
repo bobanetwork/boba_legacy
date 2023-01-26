@@ -82,7 +82,7 @@ function FeeSwitcher() {
       tooSmallL1NativeToken = true
     } else {
       //check actual balance
-      tooSmallL1NativeToken = new BN(logAmount(balanceL1NativeToken.balance, 18)).lt(new BN(0.5))
+      tooSmallL1NativeToken = new BN(logAmount(balanceL1NativeToken.balance, 18)).lt(new BN(0.002))
     }
 
     if (!balanceBOBA && !balanceL1NativeToken) {
