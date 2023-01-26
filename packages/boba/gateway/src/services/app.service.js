@@ -142,7 +142,7 @@ const SUPPORTED_ASSETS = {
     },
     [ NETWORK.BNB ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'BNB', 'BUSD', 'USDC', "USDT" ]
+      tokens: [ 'BOBA', 'BNB', 'BUSD', 'USDC', 'USDT', 'SUSHI' ]
     },
     [ NETWORK.FANTOM ]: {
       tokenAddresses: {},
