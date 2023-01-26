@@ -6,7 +6,6 @@ gateway.boba.betwork.
 | Environment Vars             | Required | Default Valu | Description                                                     |
 | ---------------------------- | -------- | ------------ | --------------------------------------------------------------- |
 | REACT_APP_INFURA_ID          | Yes      | ''           | API key for infura account                                      |
-| REACT_APP_ETHERSCAN_API      | Yes      | ''           | API key for etherscan acount.                                   |
 | REACT_APP_POLL_INTERVAL      | Yes      | 20000        | Interval to poll the fetch api about the records                |
 | SKIP_PREFLIGHT_CHECK         | N/A      | N/A          | N/A                                                             |
 | REACT_APP_WALLET_VERSION     | Yes      | N/A          | This will be useful while prepare the build.                    |
