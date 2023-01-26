@@ -487,6 +487,12 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	xff := stripXFF(GetXForwardedFor(ctx))
+	if xff == "" {
+		writeRPCError(ctx, w, nil, ErrInvalidRequest("request does not include a remote IP"))
+		return
+	}
+
 	log.Info("received WS connection", "req_id", GetReqID(ctx))
 
 	clientConn, err := s.upgrader.Upgrade(w, r, nil)
@@ -508,7 +514,7 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 	activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Inc()
 	go func() {
 		// Below call blocks so run it in a goroutine.
-		if err := proxier.Proxy(ctx); err != nil {
+		if err := proxier.Proxy(ctx, xff, s.mainLim, s.timeout); err != nil {
 			log.Error("error proxying websocket", "auth", GetAuthCtx(ctx), "req_id", GetReqID(ctx), "err", err)
 		}
 		activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Dec()

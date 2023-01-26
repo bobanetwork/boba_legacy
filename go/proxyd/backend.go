@@ -582,16 +582,16 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 	}
 }
 
-func (w *WSProxier) Proxy(ctx context.Context) error {
+func (w *WSProxier) Proxy(ctx context.Context, xff string, mainLim FrontendRateLimiter, timeout time.Duration) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx, errC)
+	go w.clientPump(ctx, errC, xff, mainLim, timeout)
 	go w.backendPump(ctx, errC)
 	err := <-errC
 	w.close()
 	return err
 }
 
-func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
+func (w *WSProxier) clientPump(ctx context.Context, errC chan error, xff string, mainLim FrontendRateLimiter, timeout time.Duration) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
@@ -604,6 +604,24 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 		}
 
 		RecordWSMessage(ctx, w.backend.Name, SourceClient)
+
+		isLimited := func(method string) bool {
+			var lim FrontendRateLimiter = mainLim
+			if lim == nil {
+				return false
+			}
+			ok, err := lim.Take(context.Background(), xff)
+			if err != nil {
+				log.Warn("error taking rate limit", "err", err)
+				return true
+			}
+			return !ok
+		}
+
+		if isLimited("") {
+			errC <- ErrOverRateLimit
+			return
+		}
 
 		// Route control messages to the backend. These don't
 		// count towards the total RPC requests count.
