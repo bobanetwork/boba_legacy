@@ -634,6 +634,16 @@
         "name": "SushiToken",
         "symbol": "SUSHI",
         "decimals": 18
+      },
+      "0x2170Ed0880ac9A755fd29B2688956BD959F933F8": {
+        "name": "Binance-Peg Ethereum Token",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c": {
+        "name": "Binance-Peg BTCB Token",
+        "symbol": "BTCB",
+        "decimals": 18
       }
     },
     "L2": {
@@ -665,6 +675,16 @@
       "0xa84D7c48602C898EC84C4cCA78651107B3625943": {
         "name": "SushiToken",
         "symbol": "SUSHI",
+        "decimals": 18
+      },
+      "0x38Ca7a190f57D38F4DC44413508e1078cD9E0045": {
+        "name": "Binance-Peg Ethereum Token",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "0x876DF0D9582699541Caa1CD57b3a82Cd51c2AD5b": {
+        "name": "Binance-Peg BTCB Token",
+        "symbol": "BTCB",
         "decimals": 18
       }
     }
