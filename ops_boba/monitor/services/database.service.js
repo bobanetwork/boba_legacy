@@ -3,9 +3,9 @@
 const mysql = require('mysql')
 const util = require('util')
 
-const OptimismEnv = require('./utilities/optimismEnv')
+const GlobalEnv = require('./utils/globalEnv')
 
-class DatabaseService extends OptimismEnv {
+class DatabaseService extends GlobalEnv {
   constructor() {
     super(...arguments)
     this.MySQLStartTimeReceipt = parseInt(new Date().getTime() / 1000, 10)
@@ -241,6 +241,7 @@ class DatabaseService extends OptimismEnv {
     })
     const query = util.promisify(con.query).bind(con)
     await query(`USE ${this.MySQLDatabaseName}`)
+    /* eslint-disable */
     await query(`INSERT IGNORE INTO receipt
       SET hash='${receiptData.transactionHash.toString()}',
       blockHash='${receiptData.blockHash.toString()}',
@@ -251,37 +252,19 @@ class DatabaseService extends OptimismEnv {
       cumulativeGasUsed='${receiptData.cumulativeGasUsed.toString()}',
       crossDomainMessage=${receiptData.crossDomainMessage},
       crossDomainMessageFinalize=${receiptData.crossDomainMessageFinalize},
-      crossDomainMessageSendTime=${receiptData.crossDomainMessageSendTime
-        ? receiptData.crossDomainMessageSendTime
-        : null
-      },
-      crossDomainMessageEstimateFinalizedTime=${receiptData.crossDomainMessageEstimateFinalizedTime
-        ? receiptData.crossDomainMessageEstimateFinalizedTime
-        : null
-      },
-      crossDomainMessageFinalizedTime = ${receiptData.crossDomainMessageFinalizedTime
-        ? receiptData.crossDomainMessageFinalizedTime
-        : null
-      },
+      crossDomainMessageSendTime=${receiptData.crossDomainMessageSendTime ? receiptData.crossDomainMessageSendTime: null},
+      crossDomainMessageEstimateFinalizedTime=${receiptData.crossDomainMessageEstimateFinalizedTime ? receiptData.crossDomainMessageEstimateFinalizedTime: null},
+      crossDomainMessageFinalizedTime = ${receiptData.crossDomainMessageFinalizedTime ? receiptData.crossDomainMessageFinalizedTime: null},
       fastRelay=${receiptData.fastRelay ? receiptData.fastRelay : null},
-      contractAddress=${receiptData.contractAddress
-        ? "'" + receiptData.contractAddress + "'"
-        : null
-      },
-      timestamp=${receiptData.timestamp ? receiptData.timestamp.toString() : null
-      },
-      l1Hash=${receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null
-      },
-      l1BlockNumber=${receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null
-      },
-      l1BlockHash=${receiptData.l1BlockHash
-        ? `'${receiptData.l1BlockHash.toString()}'`
-        : null
-      },
-      l1From=${receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null
-      },
+      contractAddress=${receiptData.contractAddress ? "'" + receiptData.contractAddress + "'": null},
+      timestamp=${receiptData.timestamp ? receiptData.timestamp.toString() : null},
+      l1Hash=${receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null},
+      l1BlockNumber=${receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null},
+      l1BlockHash=${receiptData.l1BlockHash ? `'${receiptData.l1BlockHash.toString()}'`: null},
+      l1From=${receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null},
       l1To=${receiptData.l1To ? `'${receiptData.l1To.toString()}'` : null}
     `)
+    /* eslint-enable */
     con.end()
   }
 
@@ -331,25 +314,20 @@ class DatabaseService extends OptimismEnv {
     })
     const query = util.promisify(con.query).bind(con)
     await query(`USE ${this.MySQLDatabaseName}`)
+    /* eslint-disable */
     await query(`UPDATE receipt
       SET crossDomainMessageFinalize=${receiptData.crossDomainMessageFinalize},
-      crossDomainMessageFinalizedTime=${receiptData.crossDomainMessageFinalizedTime
-      },
+      crossDomainMessageFinalizedTime=${receiptData.crossDomainMessageFinalizedTime},
       fastRelay = ${receiptData.fastRelay},
-      l1Hash=${receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null
-      },
-      l1BlockNumber=${receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null
-      },
-      l1BlockHash=${receiptData.l1BlockHash
-        ? `'${receiptData.l1BlockHash.toString()}'`
-        : null
-      },
-      l1From=${receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null
-      },
+      l1Hash=${receiptData.l1Hash ? `'${receiptData.l1Hash.toString()}'` : null},
+      l1BlockNumber=${receiptData.l1BlockNumber ? Number(receiptData.l1BlockNumber) : null},
+      l1BlockHash=${receiptData.l1BlockHash ? `'${receiptData.l1BlockHash.toString()}'`: null},
+      l1From=${receiptData.l1From ? `'${receiptData.l1From.toString()}'` : null},
       l1To=${receiptData.l1To ? `'${receiptData.l1To.toString()}'` : null}
       WHERE hash='${receiptData.transactionHash.toString()}'
       AND blockHash='${receiptData.blockHash.toString()}'
     `)
+    /* eslint-enable */
     con.end()
   }
 
@@ -408,45 +386,30 @@ class DatabaseService extends OptimismEnv {
     })
     const query = util.promisify(con.query).bind(con)
     await query(`USE ${this.MySQLDatabaseName}`)
+    /* eslint-disable */
     await query(`INSERT IGNORE INTO l1Bridge
       SET hash='${bridgeData.hash.toString()}',
       blockHash='${bridgeData.blockHash.toString()}',
       blockNumber='${bridgeData.blockNumber.toString()}',
       \`from\`=${bridgeData.from ? "'" + bridgeData.from + "'" : null},
       \`to\`=${bridgeData.to ? "'" + bridgeData.to + "'" : null},
-      contractAddress=${bridgeData.contractAddress
-        ? "'" + bridgeData.contractAddress + "'"
-        : null
-      },
-      contractName=${bridgeData.contractName ? "'" + bridgeData.contractName + "'" : null
-      },
-      \`activity\`=${bridgeData.activity ? "'" + bridgeData.activity + "'" : null
-      },
+      contractAddress=${bridgeData.contractAddress ? "'" + bridgeData.contractAddress + "'" : null},
+      contractName=${bridgeData.contractName ? "'" + bridgeData.contractName + "'" : null},
+      \`activity\`=${bridgeData.activity ? "'" + bridgeData.activity + "'" : null},
       crossDomainMessage=${bridgeData.crossDomainMessage},
       crossDomainMessageFinalize=${bridgeData.crossDomainMessageFinalize},
-      crossDomainMessageSendTime=${bridgeData.crossDomainMessageSendTime
-        ? bridgeData.crossDomainMessageSendTime
-        : null
-      },
-      crossDomainMessageEstimateFinalizedTime=${bridgeData.crossDomainMessageEstimateFinalizedTime
-        ? bridgeData.crossDomainMessageEstimateFinalizedTime
-        : null
-      },
-      crossDomainMessageFinalizedTime = ${bridgeData.crossDomainMessageFinalizedTime
-        ? bridgeData.crossDomainMessageFinalizedTime
-        : null
-      },
-      timestamp=${bridgeData.timestamp ? bridgeData.timestamp.toString() : null
-      },
+      crossDomainMessageSendTime=${bridgeData.crossDomainMessageSendTime ? bridgeData.crossDomainMessageSendTime: null},
+      crossDomainMessageEstimateFinalizedTime=${bridgeData.crossDomainMessageEstimateFinalizedTime ? bridgeData.crossDomainMessageEstimateFinalizedTime: null},
+      crossDomainMessageFinalizedTime = ${bridgeData.crossDomainMessageFinalizedTime ? bridgeData.crossDomainMessageFinalizedTime: null},
+      timestamp=${bridgeData.timestamp ? bridgeData.timestamp.toString() : null},
       l2Hash=${bridgeData.l2Hash ? `'${bridgeData.l2Hash.toString()}'` : null},
-      l2BlockNumber=${bridgeData.l2BlockNumber ? Number(bridgeData.l2BlockNumber) : null
-      },
-      l2BlockHash=${bridgeData.l2BlockHash ? `'${bridgeData.l2BlockHash.toString()}'` : null
-      },
+      l2BlockNumber=${bridgeData.l2BlockNumber ? Number(bridgeData.l2BlockNumber) : null},
+      l2BlockHash=${bridgeData.l2BlockHash ? `'${bridgeData.l2BlockHash.toString()}'` : null},
       l2From=${bridgeData.l2From ? `'${bridgeData.l2From.toString()}'` : null},
       l2To=${bridgeData.l2To ? `'${bridgeData.l2To.toString()}'` : null},
       fastDeposit=${bridgeData.fastDeposit}
     `)
+    /* eslint-enable */
     con.end()
   }
 
@@ -723,7 +686,7 @@ class DatabaseService extends OptimismEnv {
     })
 
     const query = util.promisify(con.query).bind(con)
-    await query(`USE ${this.MySQLDatabaseNameReceipt}`)
+    await query(`USE ${this.MySQLDatabaseName}`)
     const receipts = await query(
       `SELECT * FROM receipt WHERE crossDomainMessageSendTime>${this.MySQLStartTimeReceipt}
           AND crossDomainMessageFinalize=1

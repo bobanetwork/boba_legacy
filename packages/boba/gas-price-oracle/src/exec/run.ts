@@ -85,10 +85,6 @@ const main = async () => {
     'boba-fee-ratio-100x',
     parseInt(env.BOBA_FEE_RATIO_100X, 10) || 85
   )
-  const BOBA_FEE_RATIO_MIN_PERCENT_CHANGE = config.uint(
-    'boba-fee-ratio-min-percent-change',
-    parseFloat(env.BOBA_FEE_RATIO_MIN_PERCENT_CHANGE) || 0.05
-  )
 
   // disable gasPrice=0 for local testing
   const BOBA_LOCAL_TESTNET_CHAINID = config.uint(
@@ -184,7 +180,6 @@ const main = async () => {
     minL1BaseFee: MIN_L1_BASE_FEE,
     maxL1BaseFee: MAX_L1_BASE_FEE,
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
-    bobaFeeRatioMinPercentChange: BOBA_FEE_RATIO_MIN_PERCENT_CHANGE,
     bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
     l1TokenCoinGeckoId: L1_TOKEN_COINGECKO_ID,
     l1TokenCoinMarketCapId: L1_TOKEN_COINMARKETCAP_ID,
@@ -193,4 +188,9 @@ const main = async () => {
 
   await service.start()
 }
+
+if (require.main === module) {
+  main()
+}
+
 export default main

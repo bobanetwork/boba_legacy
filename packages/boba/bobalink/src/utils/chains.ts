@@ -35,4 +35,16 @@ export const BobaLinkPairs = {
       l2ContractAddress: '0x9285eF61F09c2CAD195FEa8834C3E2bB8E442BFF',
     },
   },
+  31338: {
+    '0x4631BCAbD6dF18D94796344963cB60d44a4136b6': {
+      pair: 'ETH / USD',
+      decimals: 8,
+      l2ContractAddress: '0xA4899D35897033b927acFCf422bc745916139776',
+    },
+    '0x07882Ae1ecB7429a84f1D53048d35c4bB2056877': {
+      pair: 'BTC / USD',
+      decimals: 8,
+      l2ContractAddress: '0xA7c59f010700930003b33aB25a7a0679C860f29c',
+    },
+  },
 }

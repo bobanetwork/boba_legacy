@@ -32,6 +32,8 @@ import {
   l1Wallet_4,
   l2Wallet_4,
   getL2BOBA,
+  l2BobalinkWallet,
+  fundUser,
   getL1Bridge,
   //getL2Bridge,
   //IS_LIVE_NETWORK,
@@ -79,6 +81,7 @@ export class OptimismEnv {
   l2Wallet_3: Wallet
   l1Wallet_4: Wallet
   l2Wallet_4: Wallet
+  l2BobalinkWallet: Wallet
 
   // The providers
   messenger: CrossChainMessenger
@@ -111,6 +114,7 @@ export class OptimismEnv {
     this.l2Wallet_3 = args.l2Wallet_3
     this.l1Wallet_4 = args.l1Wallet_4
     this.l2Wallet_4 = args.l2Wallet_4
+    this.l2BobalinkWallet = args.l2BobalinkWallet
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
     this.verifierProvider = args.verifierProvider
@@ -173,6 +177,7 @@ export class OptimismEnv {
       l2Wallet_3,
       l1Wallet_4,
       l2Wallet_4,
+      l2BobalinkWallet,
       l1Provider,
       l2Provider,
       verifierProvider,

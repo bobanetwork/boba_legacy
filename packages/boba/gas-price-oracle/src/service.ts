@@ -55,9 +55,6 @@ interface GasPriceOracleOptions {
   // boba fee / eth fee
   bobaFeeRatio100X: number
 
-  // minimum percentage change for boba fee / eth fee
-  bobaFeeRatioMinPercentChange: number
-
   // local testnet chain ID
   bobaLocalTestnetChainId: number
 
@@ -116,7 +113,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       minOverhead: this.options.minOverhead,
       minL1BaseFee: this.options.minL1BaseFee,
       bobaFeeRatio100X: this.options.bobaFeeRatio100X,
-      bobaFeeRatioMinPercentChange: this.options.bobaFeeRatioMinPercentChange,
       bobaLocalTestnetChainId: this.options.bobaLocalTestnetChainId,
       l1TokenCoinGeckoId: this.options.l1TokenCoinGeckoId,
       l1TokenCoinMarketCapId: this.options.l1TokenCoinMarketCapId,
@@ -234,7 +230,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   protected async _start(): Promise<void> {
     while (this.running) {
-      await sleep(this.options.pollingInterval)
       // update price ratio
       await this._updatePriceRatio()
       // l2 gas price
@@ -243,6 +238,8 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       // l1 gas price and overhead fee
       await this._updateOverhead()
       await this._upateL1BaseFee()
+      // sleep
+      await sleep(this.options.pollingInterval)
     }
   }
 
@@ -407,7 +404,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const L1SecondaryFeeTokenBalanceLatest = balances.reduce((acc, cur) => {
         return acc.add(cur)
       }, BigNumber.from('0'))
-
       const L1RelayerETHBalanceLatest = balances[2].add(balances[3])
 
       // ETH balance
@@ -432,20 +428,6 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
           await this.options.l2RpcProvider.getBalance(
             this.options.OVM_SequencerFeeVault
           )
-      }
-
-      // Relayer ETH balance
-      if (!this.state.L1RelayerBalance.eq(BigNumber.from('0'))) {
-        // condition 1 - L1RelayerBalance <= L1RelayerETHBalanceLatest -- do nothing
-        // condition 2 - L1RelayerBalance > L1RelayerETHBalanceLatest
-        if (this.state.L1RelayerBalance.gt(L1RelayerETHBalanceLatest)) {
-          this.state.L1RelayerCostFee = this.state.L1RelayerCostFee.add(
-            this.state.L1RelayerBalance.sub(L1RelayerETHBalanceLatest)
-          )
-        }
-      } else {
-        // start from 0
-        this.state.L1RelayerCostFee = BigNumber.from(0)
       }
 
       this.state.L1SecondaryFeeTokenBalance = L1SecondaryFeeTokenBalanceLatest
@@ -553,15 +535,12 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
       // Calculate the batch size
       let L1BatchSubmissionGasUsage = BigNumber.from(0)
-      const transactionHashList = orderedOverheadLog.reduce(
-        (acc, cur, index) => {
-          if (!acc.includes(cur.transactionHash)) {
-            acc.push(cur.transactionHash)
-          }
-          return acc
-        },
-        []
-      )
+      const transactionHashList = orderedOverheadLog.reduce((acc, cur) => {
+        if (!acc.includes(cur.transactionHash)) {
+          acc.push(cur.transactionHash)
+        }
+        return acc
+      }, [])
 
       const batchSize = StateCommitmentChainLog.reduce((acc, cur) => {
         acc += cur.args._batchSize.toNumber()
@@ -580,41 +559,29 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
       const targetOverheadGas = batchFee
         .mul(BigNumber.from(this.options.overheadRatio1000X))
         .div(BigNumber.from('1000'))
+        .toNumber()
 
-      const overheadProduction = await this.state.OVM_GasPriceOracle.overhead()
+      const overheadProduction = (
+        await this.state.OVM_GasPriceOracle.overhead()
+      ).toNumber()
 
       if (
-        (targetOverheadGas.toNumber() <
-          overheadProduction.toNumber() *
-            (1 + this.options.overheadMinPercentChange) &&
-          targetOverheadGas.toNumber() >
-            overheadProduction.toNumber() *
-              (1 - this.options.overheadMinPercentChange)) ||
-        !targetOverheadGas.toNumber()
+        /* eslint-disable */
+        targetOverheadGas > overheadProduction * (1 + this.options.overheadMinPercentChange) &&
+        targetOverheadGas < overheadProduction * (1 - this.options.overheadMinPercentChange) &&
+        targetOverheadGas > this.options.minOverhead
+        /* eslint-enable */
       ) {
-        this.logger.info('No need to update overhead value', {
-          targetOverheadGas: targetOverheadGas.toNumber(),
-          overheadGas: overheadProduction.toNumber(),
+        this.logger.debug('Updating overhead gas...')
+        const tx = await this.state.OVM_GasPriceOracle.setOverhead(
+          targetOverheadGas,
+          { gasPrice: 0 }
+        )
+        await tx.wait()
+        this.logger.info('Updated overhead gas', {
+          overheadProduction,
+          targetOverheadGas,
         })
-      } else {
-        if (targetOverheadGas.toNumber() > this.options.minOverhead) {
-          this.logger.debug('Updating overhead gas...')
-          const tx = await this.state.OVM_GasPriceOracle.setOverhead(
-            targetOverheadGas,
-            { gasPrice: 0 }
-          )
-          await tx.wait()
-          this.logger.info('Updated overhead gas', {
-            overheadProduction: overheadProduction.toNumber(),
-            overheadGas: targetOverheadGas.toNumber(),
-          })
-        } else {
-          this.logger.info('No need to update overhead value', {
-            targetOverheadGas: targetOverheadGas.toNumber(),
-            overheadGas: overheadProduction.toNumber(),
-            minOverheadGas: this.options.minOverhead,
-          })
-        }
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE OVER HEAD RATIO ${error}`)
@@ -623,12 +590,16 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   private async _upateL1BaseFee(): Promise<void> {
     try {
-      const l1GasPrice = await this.options.l1RpcProvider.getGasPrice()
-      const l1BaseFee = await this.state.OVM_GasPriceOracle.l1BaseFee()
+      const l1GasPrice = (
+        await this.options.l1RpcProvider.getGasPrice()
+      ).toNumber()
+      const l1BaseFee = (
+        await this.state.OVM_GasPriceOracle.l1BaseFee()
+      ).toNumber()
       if (
-        l1GasPrice.toNumber() !== l1BaseFee.toNumber() &&
-        l1GasPrice.toNumber() > this.options.minL1BaseFee &&
-        l1GasPrice.toNumber() < this.options.maxL1BaseFee
+        l1GasPrice !== l1BaseFee &&
+        l1GasPrice > this.options.minL1BaseFee &&
+        l1GasPrice < this.options.maxL1BaseFee
       ) {
         const tx = await this.state.OVM_GasPriceOracle.setL1BaseFee(
           l1GasPrice,
@@ -637,17 +608,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
             : { gasPrice: 0 }
         )
         await tx.wait()
-        this.logger.info('Updated l1BaseFee', {
-          l1GasPrice: l1GasPrice.toNumber(),
-          l1BaseFee: l1BaseFee.toNumber(),
-        })
-      } else {
-        this.logger.info('No need to update L1 base gas price', {
-          l1GasPrice: l1GasPrice.toNumber(),
-          l1BaseFee: l1BaseFee.toNumber(),
-          minL1BaseFee: this.options.minL1BaseFee,
-          maxL1BaseFee: this.options.maxL1BaseFee,
-        })
+        this.logger.info('Updated l1BaseFee', { l1GasPrice, l1BaseFee })
       }
     } catch (error) {
       this.logger.warn(`CAN\'T UPDATE L1 BASE FEE ${error}`)

@@ -50,7 +50,7 @@ const loadContracts = () => {
   return Boba_AuthenticatedFaucet
 }
 
-const handle = async(event, callback) => {
+const handle = async (event, callback) => {
   const body = JSON.parse(event.body)
 
   const { hashedMsg, signature, tweetId, walletAddress } = body

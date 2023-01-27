@@ -2,11 +2,11 @@ import { expect } from '../../../setup'
 
 /* Imports: External */
 import hre from 'hardhat'
-import { MockContract, smockit } from '@eth-optimism/smock'
 import { Contract, Signer } from 'ethers'
 
 /* Imports: Internal */
 import { predeploys } from '../../../../src'
+import { FakeContract, smock } from '@defi-wonderland/smock'
 
 describe('OVM_SequencerFeeVault', () => {
   let signer1: Signer
@@ -14,9 +14,9 @@ describe('OVM_SequencerFeeVault', () => {
     ;[signer1] = await hre.ethers.getSigners()
   })
 
-  let Mock__L2StandardBridge: MockContract
+  let Mock__L2StandardBridge: FakeContract
   before(async () => {
-    Mock__L2StandardBridge = await smockit('L2StandardBridge', {
+    Mock__L2StandardBridge = await smock.fake<Contract>('L2StandardBridge', {
       address: predeploys.L2StandardBridge,
     })
   })
@@ -43,13 +43,21 @@ describe('OVM_SequencerFeeVault', () => {
 
       await expect(OVM_SequencerFeeVault.withdraw()).to.not.be.reverted
 
-      expect(Mock__L2StandardBridge.smocked.withdrawTo.calls[0]).to.deep.equal([
-        predeploys.L2_BOBA,
-        await signer1.getAddress(),
-        amount,
-        0,
-        '0x',
-      ])
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(0).args[0]
+      ).to.deep.equal(predeploys.OVM_ETH)
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(0).args[1]
+      ).to.deep.equal(await signer1.getAddress())
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(0).args[2]
+      ).to.deep.equal(amount)
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(0).args[3]
+      ).to.deep.equal(0)
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(0).args[4]
+      ).to.deep.equal('0x')
     })
 
     it('should succeed when the contract has more than sufficient balance', async () => {
@@ -63,14 +71,21 @@ describe('OVM_SequencerFeeVault', () => {
       })
 
       await expect(OVM_SequencerFeeVault.withdraw()).to.not.be.reverted
-
-      expect(Mock__L2StandardBridge.smocked.withdrawTo.calls[0]).to.deep.equal([
-        predeploys.L2_BOBA,
-        await signer1.getAddress(),
-        amount,
-        0,
-        '0x',
-      ])
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(1).args[0]
+      ).to.deep.equal(predeploys.OVM_ETH)
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(1).args[1]
+      ).to.deep.equal(await signer1.getAddress())
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(1).args[2]
+      ).to.deep.equal(amount)
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(1).args[3]
+      ).to.deep.equal(0)
+      expect(
+        Mock__L2StandardBridge.withdrawTo.getCall(1).args[4]
+      ).to.deep.equal('0x')
     })
 
     it('should have an owner in storage slot 0x00...00', async () => {

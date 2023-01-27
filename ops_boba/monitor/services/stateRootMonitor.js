@@ -2,10 +2,10 @@
 
 const ethers = require('ethers')
 const DatabaseService = require('./database.service')
-const OptimismEnv = require('./utilities/optimismEnv')
+const GlobalEnv = require('./utils/globalEnv')
 const { sleep } = require('@eth-optimism/core-utils')
 
-class stateRootMonitorService extends OptimismEnv {
+class stateRootMonitorService extends GlobalEnv {
   constructor() {
     super(...arguments)
 
@@ -60,7 +60,7 @@ class stateRootMonitorService extends OptimismEnv {
       }
     }
 
-    await this.initOptimismEnv()
+    await this.initGlobalEnv()
     await this.databaseService.initMySQL()
 
     // fetch the last end block
@@ -149,10 +149,6 @@ class stateRootMonitorService extends OptimismEnv {
           stateRootStartBlock++
         }
       }
-    // } else {
-    //   this.logger.info(
-    //     `No state root found from block ${this.startBlock} to ${endBlock}`
-    //   )
     }
 
     this.startBlock = endBlock

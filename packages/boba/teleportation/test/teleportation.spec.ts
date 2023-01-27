@@ -22,7 +22,7 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import { ChainInfo } from '../src/utils/types'
 
 /* Imports: Core */
-import { TeleportationService } from '../dist/service'
+import { TeleportationService } from '../dist/src/service'
 
 describe('teleportation', () => {
   let signer: Signer

@@ -10,6 +10,6 @@
   "dependencies": {
     "@eth-optimism/contracts": "^0.5.11",
     "dotenv": "^14.3.2",
-    "ethers": "^5.5.3"
+    "ethers": "^5.5.4"
   }
 }

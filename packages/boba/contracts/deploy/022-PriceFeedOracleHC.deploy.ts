@@ -73,6 +73,16 @@ const deployFn: DeployFunction = async (hre) => {
         FluxAggregatorHCDeploymentSubmission
       )
 
+      await FluxAggregatorHC.initialize(
+        token.minSubmissionValue, // min submission value
+        token.maxSubmissionValue, // max submission value
+        8, // decimals
+        `${token.name} ${quote.name}`, // description
+        '0x0000000000000000000000000000000000000000',
+        'https://example.com',
+        '0x0000000000000000000000000000000000000000'
+      )
+
       console.log(
         `${token.name}${quote.name}_AggregatorHC deployed to: ${FluxAggregatorHC.address}`
       )

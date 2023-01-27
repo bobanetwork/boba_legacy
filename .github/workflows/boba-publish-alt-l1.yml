@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN_SECRET }}
 
       - uses: actions/checkout@v2
-
+      - uses: chrisdickinson/setup-yq@latest
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -64,11 +64,57 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Build the services
-        working-directory: ./ops
+      - name: Cache yarn modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: yarn-${{ hashFiles('yarn.lock') }}
+
+      - name: Cache compilers
+        uses: actions/cache@v3
+        id: cache-compilers
+        with:
+          path: |
+            /root/.cache/hardhat-nodejs/compilers-v2/
+          key: solc-compilers-${{ hashFiles('packages/**/hardhat.config.ts') }}-${{ hashFiles('packages/boba/**/hardhat.config.ts') }}
+          restore-keys: |
+            solc-compilers-${{ hashFiles('packages/**/hardhat.config.ts') }}-${{ hashFiles('packages/boba/**/hardhat.config.ts') }}
+
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: Pull compilers
+        continue-on-error: true
         run: |
-           ./scripts/build-ci.sh
-           docker-compose -f docker-compose.yml -f docker-compose-side.yml build --parallel -- monitor gas_oracle
+          mkdir -p /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+          cd /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+          find . -name list.json | grep . || curl -L https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
+          find . -name solc-linux-amd64-v0.4.11+commit.68ef5810 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
+          find . -name solc-linux-amd64-v0.5.17+commit.d19bba13 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
+          find . -name solc-linux-amd64-v0.6.6+commit.6c089d02 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
+          find . -name solc-linux-amd64-v0.8.9+commit.e5eed63a | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
+          find . -name solc-linux-amd64-v0.8.11+commit.d7f03943 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
+          find . -name solc-linux-amd64-v0.8.15+commit.e14f2714 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714 -o ./solc-linux-amd64-v0.8.15+commit.e14f2714
+          find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.17+commit.8df45f5f
+          chmod +x /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
+
+      - name: Build the services locally
+        working-directory: ./
+        run: yarn && yarn build
+
+      - name: Whats in the compilers folder?
+        run: ls -altr ~/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+      - name: Build the core services
+        working-directory: ./ops
+        run: docker-compose build
+
+      - name: Build the side services
+        working-directory: ./ops
+        run: docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+
+      - name: Print images
+        working-directory: ./
+        run: docker images
+
       - name: Rename and retag the optimism images
         working-directory: ./ops
         run: |

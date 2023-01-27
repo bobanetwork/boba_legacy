@@ -2,7 +2,6 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
-import chalk from 'chalk'
 
 import { Contract, ContractFactory, BigNumber } from 'ethers'
 

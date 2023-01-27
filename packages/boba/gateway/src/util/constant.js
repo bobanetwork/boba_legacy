@@ -71,5 +71,6 @@ export const ROUTES_PATH = {
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
   DAO: '/DAO',
+  DEV_TOOLS: '/devtools',
 }
 export const PER_PAGE = 8

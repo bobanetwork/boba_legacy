@@ -70,3 +70,6 @@ env-mainnet.yml
 env-rinkeby.yml
 env-goerli.yml
 ops_boba/api/metatransaction-api/yarn.lock
+
+#
+packages/boba/contracts/coverage/
