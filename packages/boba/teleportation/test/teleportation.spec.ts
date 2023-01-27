@@ -57,7 +57,7 @@ describe('teleportation', () => {
     // Remove file if it exists
     const dumpsPath = path.resolve(
       __dirname,
-      '../dist/db/depositInfo-31337.json'
+      '../dist/src/db/depositInfo-31337.json'
     )
     if (fs.existsSync(dumpsPath)) {
       fs.unlinkSync(dumpsPath)
@@ -502,7 +502,7 @@ describe('teleportation', () => {
       // Remove file if it exists
       const dumpsPath = path.resolve(
         __dirname,
-        '../dist/db/depositInfo-31337.json'
+        '../dist/src/db/depositInfo-31337.json'
       )
       if (fs.existsSync(dumpsPath)) {
         fs.unlinkSync(dumpsPath)
