@@ -6,7 +6,6 @@ provider:
   stackName: sls-bobaopera-tn-metaTransaction
   stage: prod
   region: us-east-1
-  role: ${file(env-rinkeby.yml):ROLE}
 
 package:
   exclude:
@@ -19,16 +18,10 @@ functions:
     handler: metaTransaction_getTestnetETH.rinkebyHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
-    vpc:
-      securityGroupIds:
-        - ${file(env-rinkeby.yml):SECURITY_GROUPS}
-      subnetIds:
-        - ${file(env-rinkeby.yml):SUBNET_ID_1}
-        - ${file(env-rinkeby.yml):SUBNET_ID_2}
     events:
       - http:
           path: send.getTestnetETH
           method: post
           cors: true
     layers:
-      - ${file(env-rinkeby.yml):LAYERS}
+      - ${file(env.yml):LAYERS}

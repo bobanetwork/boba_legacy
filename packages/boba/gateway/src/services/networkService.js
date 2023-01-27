@@ -55,7 +55,6 @@ import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2Billing
 
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
-
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
 
@@ -208,7 +207,7 @@ const L1ChainAssets = {
     l1NameShort: 'Moonbeam',
     l2Name: 'Bobabeam',
     icon: (bool) => <MoonbeamIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, "ETH.mc", "ETH.wh", "WBTC.mc", "WBTC.wh", "USDC.mc", "USDC.wh"],
     supportedTokenAddresses: {},
     foundation: false,
   },
@@ -650,7 +649,7 @@ class NetworkService {
     console.log('NS: initializeBase() for', networkGateway)
 
     let addresses = null
-    this.networkGateway = networkGateway // e.g. mainnet | rinkeby | ...
+    this.networkGateway = networkGateway // e.g. mainnet | goerli | ...
 
     // defines the set of possible networks along with chainId for L1 and L2
     const nw = getNetwork()
@@ -697,7 +696,7 @@ class NetworkService {
       }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
-      //     console.log('Rinkeby Addresses:', addresses)
+      //     console.log('Goerli Addresses:', addresses)
       // }
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
@@ -899,7 +898,7 @@ class NetworkService {
       const L2ChainId = nw[networkGateway]['L2']['chainId']
 
       // there are numerous possible chains we could be on
-      // either local, rinkeby etc
+      // either local, goerli etc
       // also, either L1 or L2
 
       // at this point, we only know whether we want to be on local or rinkeby etc
@@ -1158,7 +1157,7 @@ class NetworkService {
   }
 
   async claimAuthenticatedTestnetTokens(tweetId) {
-    // Only Rinkeby
+    // Only Goerli
     const contract = new ethers.Contract(
       allAddresses.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
@@ -3271,6 +3270,10 @@ class NetworkService {
   }
 
   // Create Proposal
+  /************************/
+  /*****Old Dao Fix Me.****/
+  /************************/
+  // FIXME:
   async createProposal(payload) {
 
     if( this.L1orL2 !== 'L2' ) return
@@ -3287,10 +3290,17 @@ class NetworkService {
     let value3 = 0
     let description = ''
     let address = ['']
-    let callData = ['']
-    let tokenIds = payload.tokenIds
-    // create proposal only on latest contracts.
-    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+    let callData = [ '' ]
+    // FIXME: Ve DAO From here
+    /*
+      let tokenIds = payload.tokenIds
+      // create proposal only on latest contracts.
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+
+    */
+    // FIXME: Ve DAO Till here
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     if( payload.action === 'text-proposal' ) {
       address = ['0x000000000000000000000000000000000000dEaD']
@@ -3343,7 +3353,6 @@ class NetworkService {
           values,
           signatures,
           callData,
-          tokenIds,
           description
       )
 
@@ -3361,10 +3370,10 @@ class NetworkService {
    * group created proposals by `to` and make use of respective contract to prepare the proposal data list.
    *
   */
+  // Use this proposal fetch for veDao.
+  async fetchProposalsVeDao() {
 
-  async fetchProposals() {
-
-    if (!this.delegateContract) return
+    if (!this.delegateContract || this.networkGateway === 'goerli') return
 
     const delegateCheckV1 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
     const delegateCheckV2 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
@@ -3475,8 +3484,11 @@ class NetworkService {
     }
   }
 
+
+
   //Cast vote for proposal
-  async castProposalVote({id, userVote,tokenIds}) {
+  // FIXME: keeping this to refer in next release will cleanup.
+  async castProposalVoteVeDao({id, userVote,tokenIds}) {
 
     if( !this.delegateContract ) return
 
@@ -4453,6 +4465,117 @@ class NetworkService {
       return error;
     }
   }
+
+  /****************************************
+   ************* STARTS HERE **************
+   ***********OLD DAO REMOVE ME ***********
+   *****************************************/
+
+  // FIXME: remove me once deprecated old dao.
+
+  async fetchProposals() {
+
+    if (!this.delegateContract) return
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+
+    try {
+
+      let proposalList = []
+
+      const proposalCounts = await delegateCheck.proposalCount()
+      const totalProposals = await proposalCounts.toNumber()
+
+      /// @notice An event emitted when a new proposal is created
+      // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
+
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+
+      for (let i = 0; i < totalProposals; i++) {
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
+
+        //this is a number such as 2
+        let proposalData = await delegateCheck.proposals(proposalID)
+
+        const proposalStates = [
+          'Pending',
+          'Active',
+          'Canceled',
+          'Defeated',
+          'Succeeded',
+          'Queued',
+          'Expired',
+          'Executed',
+        ]
+
+        let state = await delegateCheck.state(proposalID)
+
+        let againstVotes = parseInt(formatEther(proposalData.againstVotes))
+        let forVotes = parseInt(formatEther(proposalData.forVotes))
+        let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
+
+        let startTimestamp = proposalData.startTimestamp.toString()
+        let endTimestamp = proposalData.endTimestamp.toString()
+
+        let proposal = await delegateCheck.getActions(i+2)
+
+        let hasVoted = null
+
+        let description = proposalRaw.description.toString()
+
+        proposalList.push({
+           id: proposalID?.toString(),
+           proposal,
+           description,
+           totalVotes: forVotes + againstVotes,
+           forVotes,
+           againstVotes,
+           abstainVotes,
+           state: proposalStates[state],
+           startTimestamp,
+           endTimestamp,
+           hasVoted: hasVoted
+        })
+
+      }
+      return { proposalList }
+    } catch(error) {
+      console.log("NS: fetchProposals error:",error)
+      return error
+    }
+  }
+
+
+  async castProposalVote({id, userVote}) {
+
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: castProposalVote() error - called but account === null')
+      return
+    }
+    try {
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
+      return delegateCheck.castVote(id, userVote)
+    } catch(error) {
+      console.log("NS: castProposalVote error:",error)
+      return error
+    }
+  }
+
+
+  /****************************************
+   ************* END HERE *****************
+   ***********OLD DAO REMOVE ME TILL HERE *
+   *****************************************/
+
+
 
 }
 

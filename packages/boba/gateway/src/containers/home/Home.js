@@ -36,10 +36,6 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import {
-  fetchAirdropStatusL1,
-  fetchAirdropStatusL2
-} from 'actions/airdropAction'
 import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'

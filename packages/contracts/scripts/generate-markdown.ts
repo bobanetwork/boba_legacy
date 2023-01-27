@@ -17,22 +17,6 @@ interface DeploymentInfo {
 
 const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
   {
-    folder: 'mainnet',
-    name: 'Boba (mainnet)',
-    chainid: 288,
-    rpc: 'https://mainnet.boba.network',
-    l1Explorer: 'https://etherscan.io',
-    l2Explorer: 'https://blockexplorer.boba.network',
-  },
-  {
-    folder: 'Rinkeby',
-    name: 'Boba Rinkeby (public testnet)',
-    chainid: 28,
-    rpc: 'https://rinkeby.boba.network',
-    l1Explorer: 'https://rinkeby.etherscan.io',
-    l2Explorer: 'https://blockexplorer.rinkeby.boba.network',
-  },
-  {
     folder: 'bobafuji',
     name: 'Boba Avalanche (public testnet)',
     chainid: 4328,

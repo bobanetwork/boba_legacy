@@ -716,6 +716,36 @@
         "name": "BOBA Token",
         "symbol": "BOBA",
         "decimals": 18
+      },
+      "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f": {
+        "name": "Ethereum",
+        "symbol": "ETH.mc",
+        "decimals": 18
+      },
+      "0xab3f0245B83feB11d15AAffeFD7AD465a59817eD": {
+        "name": "Ethereum",
+        "symbol": "ETH.wh",
+        "decimals": 18
+      },
+      "0x922D641a426DcFFaeF11680e5358F34d97d112E1": {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC.mc",
+        "decimals": 8
+      },
+      "0xE57eBd2d67B462E9926e04a8e33f01cD0D64346D": {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC.wh",
+        "decimals": 8
+      },
+      "0x818ec0A7Fe18Ff94269904fCED6AE3DaE6d6dC0b": {
+        "name": "USD Coin",
+        "symbol": "USDC.mc",
+        "decimals": 6
+      },
+      "0x931715FEE2d06333043d11F658C8CE934aC61D0c": {
+        "name": "USD Coin",
+        "symbol": "USDC.wh",
+        "decimals": 6
       }
     },
     "L2": {
@@ -728,6 +758,36 @@
         "name": "GLMR",
         "symbol": "GLMR",
         "decimals": 18
+      },
+      "0x9790a5640c4cca26e8689CC4163d5719C1A79A03": {
+        "name": "Ethereum",
+        "symbol": "ETH.mc",
+        "decimals": 18
+      },
+      "0x03Ee748da8951c976BfC06190b7e646c8Cc3f2d1": {
+        "name": "Ethereum",
+        "symbol": "ETH.wh",
+        "decimals": 18
+      },
+      "0x7D669C169B7161511CE061da3ad986525Ea179D6": {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC.mc",
+        "decimals": 8
+      },
+      "0x1c98d96cfcDc4599D5FbB61Aa30301d94fcA8002": {
+        "name": "Wrapped BTC",
+        "symbol": "WBTC.wh",
+        "decimals": 8
+      },
+      "0x078b2D8ce51eD85400959FC5c362d1c53A41C375": {
+        "name": "USD Coin",
+        "symbol": "USDC.mc",
+        "decimals": 6
+      },
+      "0xEa89117fC0150f9042b0aE0C3058ea6dB970A780": {
+        "name": "USD Coin",
+        "symbol": "USDC.wh",
+        "decimals": 6
       }
     }
   },

@@ -6,7 +6,6 @@ provider:
   stackName: sls-bobaopera-metaTransaction
   stage: prod
   region: us-east-1
-  role: ${file(env-bobaopera.yml):ROLE}
 
 package:
   exclude:
@@ -19,17 +18,11 @@ functions:
     handler: metaTransaction_swapNativeTokenForBOBA.mainnetHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
-    vpc:
-      securityGroupIds:
-        - ${file(env-bobaopera.yml):SECURITY_GROUPS}
-      subnetIds:
-        - ${file(env-bobaopera.yml):SUBNET_ID_1}
-        - ${file(env-bobaopera.yml):SUBNET_ID_2}
     events:
       - http:
           path: send.swapSecondaryFeeToken
           method: post
           cors: true
     layers:
-      - ${file(env-bobaopera.yml):LAYERS}
+      - ${file(env.yml):LAYERS}
 
