@@ -7,7 +7,6 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { GasPriceOracleService } from '../dist/service'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
-import { Provider } from '@ethersproject/providers'
 
 describe('gas-price-oracle', () => {
   let signer1: Signer
