@@ -13,6 +13,8 @@ ADD ${SOLC_PREFIX}solc-linux-amd64-v0.5.17+commit.d19bba13 ./solc-v0.5.17+commit
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.6.6+commit.6c089d02  ./solc-v0.6.6+commit.6c089d02
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.9+commit.e5eed63a  ./solc-v0.8.9+commit.e5eed63a
 ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.11+commit.d7f03943  ./solc-v0.8.11+commit.d7f03943
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.15+commit.e14f2714  ./solc-v0.8.15+commit.e14f2714
+ADD ${SOLC_PREFIX}solc-linux-amd64-v0.8.17+commit.8df45f5f  ./solc-v0.8.17+commit.8df45f5f
 
 FROM node:16-buster-slim as base
 
@@ -56,6 +58,7 @@ COPY packages/boba/turing/package.json ./packages/boba/turing/package.json
 COPY packages/boba/ve-boba/package.json ./packages/boba/ve-boba/package.json
 COPY packages/boba/bobalink/package.json ./packages/boba/bobalink/package.json
 COPY packages/boba/teleportation/package.json ./packages/boba/teleportation/package.json
+COPY packages/boba/account-abstraction/package.json ./packages/boba/account-abstraction/package.json
 
 FROM base as builder
 WORKDIR /opt/optimism
@@ -76,6 +79,8 @@ COPY --from=downloader solc-v0.5.17+commit.d19bba13 /root/.cache/hardhat-nodejs/
 COPY --from=downloader solc-v0.6.6+commit.6c089d02  /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02
 COPY --from=downloader solc-v0.8.9+commit.e5eed63a  /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a
 COPY --from=downloader solc-v0.8.11+commit.d7f03943 /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943
+COPY --from=downloader solc-v0.8.15+commit.e14f2714 /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714
+COPY --from=downloader solc-v0.8.17+commit.8df45f5f /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f
 
 RUN chmod +x /root/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
 
@@ -155,3 +160,11 @@ WORKDIR /opt/optimism/packages/boba
 COPY --from=builder /opt/optimism/packages/boba/teleportation ./teleportation
 WORKDIR /opt/optimism/packages/boba/teleportation
 CMD ["npm", "run", "start"]
+
+FROM packages as aa_deployer
+WORKDIR /opt/optimism/packages/boba
+COPY --from=builder /opt/optimism/packages/boba/account-abstraction ./account-abstraction
+WORKDIR /opt/optimism/packages/boba/account-abstraction
+RUN chmod +x ./scripts/wait-for-l1-and-l2.sh
+RUN chmod +x ./scripts/deployer.sh
+ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
