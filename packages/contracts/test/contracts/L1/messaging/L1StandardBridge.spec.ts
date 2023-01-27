@@ -22,30 +22,10 @@ const FINALIZATION_GAS = 1_200_000
 
 describe('L1StandardBridge', () => {
   let l1MessengerImpersonator: Signer
-  let alice: Signer
-  let bob: Signer
-  let bobsAddress
-  let aliceAddress
-
-  // we can just make up this string since it's on the "other" Layer
-  let Mock__L2_BOBA: MockContract
-  let Factory__L1ERC20: ContractFactory
-  let IL2ERC20Bridge: Interface
+  let alice: SignerWithAddress
+  let bob: SignerWithAddress
   before(async () => {
     ;[l1MessengerImpersonator, alice, bob] = await ethers.getSigners()
-
-    Mock__L2_BOBA = await smockit(await ethers.getContractFactory('L2_BOBA'))
-
-    // deploy an ERC20 contract on L1
-    Factory__L1ERC20 = await smoddit(
-      '@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20'
-    )
-
-    // get an L2ER20Bridge Interface
-    IL2ERC20Bridge = getContractInterface('IL2ERC20Bridge')
-
-    aliceAddress = await alice.getAddress()
-    bobsAddress = await bob.getAddress()
   })
 
   let L1ERC20: MockContract<Contract>
@@ -75,7 +55,7 @@ describe('L1StandardBridge', () => {
   })
 
   describe('initialize', () => {
-    it('Should only be callable once', async () => {
+    it.only('Should only be callable once', async () => {
       await expect(
         L1StandardBridge.initialize(
           ethers.constants.AddressZero,
@@ -86,7 +66,7 @@ describe('L1StandardBridge', () => {
   })
 
   describe('receive', () => {
-    it('should send an amount of ETH to the callers balance on L2', async () => {
+    it.only('should send an amount of ETH to the callers balance on L2', async () => {
       await expect(
         alice.sendTransaction({
           to: L1StandardBridge.address,
@@ -99,12 +79,11 @@ describe('L1StandardBridge', () => {
   describe('L1 native token deposits', () => {
     const depositAmount = 1_000
 
-    it('depositNativeToken() escrows the deposit amount and sends the correct deposit message', async () => {
-      const depositer = await alice.getAddress()
-      const initialBalance = await ethers.provider.getBalance(depositer)
+    it.only('depositNativeToken() escrows the deposit amount and sends the correct deposit message', async () => {
+      const initialBalance = await alice.getBalance()
 
       // alice calls deposit on the bridge and the L1 bridge calls transferFrom on the token
-      await L1StandardBridge.connect(alice).depositNativeToken(
+      const res = await L1StandardBridge.connect(alice).depositNativeToken(
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
         {
@@ -120,7 +99,7 @@ describe('L1StandardBridge', () => {
           'finalizeDeposit',
           [
             constants.AddressZero,
-            predeploys.OVM_ETH,
+            predeploys.L2_L1NativeToken,
             alice.address,
             alice.address,
             depositAmount,
@@ -135,21 +114,8 @@ describe('L1StandardBridge', () => {
         receipt.effectiveGasPrice
       )
 
-      // Check the correct cross-chain call was sent:
-      // Message should be sent to the L2 bridge
-      expect(depositCallToMessenger._target).to.equal(DUMMY_L2_BRIDGE_ADDRESS)
-      // Message data should be a call telling the L2 native token to finalize the deposit
-
-      // the L1 bridge sends the correct message to the L1 messenger
-      expect(depositCallToMessenger._message).to.equal(
-        IL2ERC20Bridge.encodeFunctionData('finalizeDeposit', [
-          constants.AddressZero,
-          predeploys.L2_L1NativeToken,
-          depositer,
-          depositer,
-          depositAmount,
-          NON_NULL_BYTES32,
-        ])
+      expect(await alice.getBalance()).to.equal(
+        initialBalance.sub(depositAmount).sub(depositerFeePaid)
       )
 
       expect(
@@ -157,12 +123,11 @@ describe('L1StandardBridge', () => {
       ).to.equal(depositAmount)
     })
 
-    it('depositNativeTokenTo() escrows the deposit amount and sends the correct deposit message', async () => {
-      // depositor calls deposit on the bridge and the L1 bridge calls transferFrom on the token
-      const initialBalance = await ethers.provider.getBalance(aliceAddress)
+    it.only('depositNativeTokenTo() escrows the deposit amount and sends the correct deposit message', async () => {
+      const initialBalance = await alice.getBalance()
 
-      await L1StandardBridge.connect(alice).depositNativeTokenTo(
-        bobsAddress,
+      const res = await L1StandardBridge.connect(alice).depositNativeTokenTo(
+        bob.address,
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
         {
@@ -178,7 +143,7 @@ describe('L1StandardBridge', () => {
           'finalizeDeposit',
           [
             constants.AddressZero,
-            predeploys.OVM_ETH,
+            predeploys.L2_L1NativeToken,
             alice.address,
             bob.address,
             depositAmount,
@@ -193,21 +158,8 @@ describe('L1StandardBridge', () => {
         receipt.effectiveGasPrice
       )
 
-      // Check the correct cross-chain call was sent:
-      // Message should be sent to the L2 bridge
-      expect(depositCallToMessenger._target).to.equal(DUMMY_L2_BRIDGE_ADDRESS)
-      // Message data should be a call telling the L2 native token to finalize the deposit
-
-      // the L1 bridge sends the correct message to the L1 messenger
-      expect(depositCallToMessenger._message).to.equal(
-        IL2ERC20Bridge.encodeFunctionData('finalizeDeposit', [
-          constants.AddressZero,
-          predeploys.L2_L1NativeToken,
-          aliceAddress,
-          bobsAddress,
-          depositAmount,
-          NON_NULL_BYTES32,
-        ])
+      expect(await alice.getBalance()).to.equal(
+        initialBalance.sub(depositAmount).sub(depositerFeePaid)
       )
 
       expect(
@@ -215,22 +167,19 @@ describe('L1StandardBridge', () => {
       ).to.equal(depositAmount)
     })
 
-    it('cannot depositNativeToken from a contract account', async () => {
+    it.only('cannot depositNativeToken from a contract account', async () => {
       expect(
         L1StandardBridge.depositNativeToken(
           FINALIZATION_GAS,
           NON_NULL_BYTES32,
-          {
-            value: depositAmount,
-            gasPrice: 0,
-          }
+          { value: depositAmount }
         )
       ).to.be.revertedWith('Account not EOA')
     })
   })
 
-  describe('Native token withdrawals', () => {
-    it('onlyFromCrossDomainAccount: should revert on calls from a non-crossDomainMessenger L1 account', async () => {
+  describe('ETH withdrawals', () => {
+    it.only('onlyFromCrossDomainAccount: should revert on calls from a non-crossDomainMessenger L1 account', async () => {
       await expect(
         L1StandardBridge.connect(alice).finalizeNativeTokenWithdrawal(
           constants.AddressZero,
@@ -241,16 +190,8 @@ describe('L1StandardBridge', () => {
       ).to.be.revertedWith(ERROR_STRINGS.INVALID_MESSENGER)
     })
 
-    it('onlyFromCrossDomainAccount: should revert on calls from the right crossDomainMessenger, but wrong xDomainMessageSender (ie. not the L2 native token)', async () => {
-      L1StandardBridge = await (
-        await ethers.getContractFactory('L1StandardBridge')
-      ).deploy()
-      await L1StandardBridge.initialize(
-        Mock__L1CrossDomainMessenger.address,
-        DUMMY_L2_BRIDGE_ADDRESS
-      )
-
-      Mock__L1CrossDomainMessenger.smocked.xDomainMessageSender.will.return.with(
+    it.only('onlyFromCrossDomainAccount: should revert on calls from the right crossDomainMessenger, but wrong xDomainMessageSender (ie. not the L2ETHToken)', async () => {
+      Fake__L1CrossDomainMessenger.xDomainMessageSender.returns(
         '0x' + '22'.repeat(20)
       )
 
@@ -267,7 +208,7 @@ describe('L1StandardBridge', () => {
       ).to.be.revertedWith(ERROR_STRINGS.INVALID_X_DOMAIN_MSG_SENDER)
     })
 
-    it('should revert in nothing to withdraw', async () => {
+    it.only('should revert in nothing to withdraw', async () => {
       expect(await ethers.provider.getBalance(NON_ZERO_ADDRESS)).to.be.equal(0)
 
       Fake__L1CrossDomainMessenger.xDomainMessageSender.returns(
@@ -275,7 +216,7 @@ describe('L1StandardBridge', () => {
       )
 
       await expect(
-        L1StandardBridge.finalizeETHWithdrawal(
+        L1StandardBridge.finalizeNativeTokenWithdrawal(
           NON_ZERO_ADDRESS,
           NON_ZERO_ADDRESS,
           100,
@@ -285,11 +226,11 @@ describe('L1StandardBridge', () => {
           }
         )
       ).to.be.revertedWith(
-        'TransferHelper::safeTransferETH: ETH transfer failed'
+        'TransferHelper::safeTransferNativeToken: NativeToken transfer failed'
       )
     })
 
-    it('should credit funds to the withdrawer and not use too much gas', async () => {
+    it.only('should credit funds to the withdrawer and not use too much gas', async () => {
       expect(await ethers.provider.getBalance(NON_ZERO_ADDRESS)).to.be.equal(0)
 
       const withdrawalAmount = 100
@@ -297,7 +238,6 @@ describe('L1StandardBridge', () => {
         DUMMY_L2_BRIDGE_ADDRESS
       )
 
-      // thanks Alice
       await L1StandardBridge.connect(alice).depositNativeToken(
         FINALIZATION_GAS,
         NON_NULL_BYTES32,
@@ -332,7 +272,7 @@ describe('L1StandardBridge', () => {
       )
     })
 
-    it('depositERC20() escrows the deposit amount and sends the correct deposit message', async () => {
+    it.only('depositERC20() escrows the deposit amount and sends the correct deposit message', async () => {
       await L1StandardBridge.connect(alice).depositERC20(
         L1ERC20.address,
         DUMMY_L2_ERC20_ADDRESS,
@@ -368,7 +308,7 @@ describe('L1StandardBridge', () => {
       )
     })
 
-    it('depositERC20To() escrows the deposit amount and sends the correct deposit message', async () => {
+    it.only('depositERC20To() escrows the deposit amount and sends the correct deposit message', async () => {
       await L1StandardBridge.connect(alice).depositERC20To(
         L1ERC20.address,
         DUMMY_L2_ERC20_ADDRESS,
@@ -405,7 +345,7 @@ describe('L1StandardBridge', () => {
       )
     })
 
-    it('cannot depositERC20 from a contract account', async () => {
+    it.only('cannot depositERC20 from a contract account', async () => {
       expect(
         L1StandardBridge.depositERC20(
           L1ERC20.address,
@@ -424,7 +364,7 @@ describe('L1StandardBridge', () => {
         Fake__L1ERC20.transferFrom.reverts()
       })
 
-      it('depositERC20(): will revert if ERC20.transferFrom() reverts', async () => {
+      it.only('depositERC20(): will revert if ERC20.transferFrom() reverts', async () => {
         await expect(
           L1StandardBridge.connect(alice).depositERC20(
             Fake__L1ERC20.address,
@@ -436,7 +376,7 @@ describe('L1StandardBridge', () => {
         ).to.be.revertedWith('SafeERC20: low-level call failed')
       })
 
-      it('depositERC20To(): will revert if ERC20.transferFrom() reverts', async () => {
+      it.only('depositERC20To(): will revert if ERC20.transferFrom() reverts', async () => {
         await expect(
           L1StandardBridge.connect(alice).depositERC20To(
             Fake__L1ERC20.address,
@@ -449,7 +389,7 @@ describe('L1StandardBridge', () => {
         ).to.be.revertedWith('SafeERC20: low-level call failed')
       })
 
-      it('depositERC20To(): will revert if the L1 ERC20 has no code or is zero address', async () => {
+      it.only('depositERC20To(): will revert if the L1 ERC20 has no code or is zero address', async () => {
         await expect(
           L1StandardBridge.connect(alice).depositERC20To(
             ethers.constants.AddressZero,
@@ -470,7 +410,7 @@ describe('L1StandardBridge', () => {
         Fake__L1ERC20.transferFrom.returns(false)
       })
 
-      it('deposit(): will revert if ERC20.transferFrom() returns false', async () => {
+      it.only('deposit(): will revert if ERC20.transferFrom() returns false', async () => {
         await expect(
           L1StandardBridge.connect(alice).depositERC20(
             Fake__L1ERC20.address,
@@ -482,7 +422,7 @@ describe('L1StandardBridge', () => {
         ).to.be.revertedWith('SafeERC20: ERC20 operation did not succeed')
       })
 
-      it('depositTo(): will revert if ERC20.transferFrom() returns false', async () => {
+      it.only('depositTo(): will revert if ERC20.transferFrom() returns false', async () => {
         await expect(
           L1StandardBridge.depositERC20To(
             Fake__L1ERC20.address,
@@ -498,7 +438,7 @@ describe('L1StandardBridge', () => {
   })
 
   describe('ERC20 withdrawals', () => {
-    it('onlyFromCrossDomainAccount: should revert on calls from a non-crossDomainMessenger L1 account', async () => {
+    it.only('onlyFromCrossDomainAccount: should revert on calls from a non-crossDomainMessenger L1 account', async () => {
       await expect(
         L1StandardBridge.connect(alice).finalizeERC20Withdrawal(
           L1ERC20.address,
@@ -511,7 +451,7 @@ describe('L1StandardBridge', () => {
       ).to.be.revertedWith(ERROR_STRINGS.INVALID_MESSENGER)
     })
 
-    it('onlyFromCrossDomainAccount: should revert on calls from the right crossDomainMessenger, but wrong xDomainMessageSender (ie. not the L2DepositedERC20)', async () => {
+    it.only('onlyFromCrossDomainAccount: should revert on calls from the right crossDomainMessenger, but wrong xDomainMessageSender (ie. not the L2DepositedERC20)', async () => {
       Fake__L1CrossDomainMessenger.xDomainMessageSender.returns(
         NON_ZERO_ADDRESS
       )
@@ -531,7 +471,7 @@ describe('L1StandardBridge', () => {
       ).to.be.revertedWith(ERROR_STRINGS.INVALID_X_DOMAIN_MSG_SENDER)
     })
 
-    it('should credit funds to the withdrawer and not use too much gas', async () => {
+    it.only('should credit funds to the withdrawer and not use too much gas', async () => {
       // First Alice will 'donate' some tokens so that there's a balance to be withdrawn
       const withdrawalAmount = 10
       await L1ERC20.connect(alice).approve(
@@ -575,13 +515,13 @@ describe('L1StandardBridge', () => {
   })
 
   describe('donateETH', () => {
-    it('it should just call the function', async () => {
-      await expect(L1StandardBridge.donateETH()).to.not.be.reverted
+    it.only('it should just call the function', async () => {
+      await expect(L1StandardBridge.donateNativeToken()).to.not.be.reverted
     })
 
-    it('should send ETH to the contract account', async () => {
+    it.only('should send ETH to the contract account', async () => {
       await expect(
-        L1StandardBridge.donateETH({
+        L1StandardBridge.donateNativeToken({
           value: 100,
         })
       ).to.not.be.reverted

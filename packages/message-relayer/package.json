@@ -31,6 +31,7 @@
   "dependencies": {
     "@eth-optimism/common-ts": "^0.2.2",
     "@eth-optimism/core-utils": "^0.8.1",
+    "@eth-optimism/ynatm": "^0.2.2",
     "@eth-optimism/sdk": "1.0.1",
     "@sentry/node": "^7.30.0",
     "bcfg": "^0.1.6",

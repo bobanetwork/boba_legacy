@@ -180,10 +180,10 @@ describe('L2StandardBridge', () => {
   describe('withdrawals', () => {
     const withdrawAmount = 1_000
 
-    let Fake__OVM_ETH: FakeContract<Contract>
+    let Fake__L2_BOBA: FakeContract<Contract>
     before(async () => {
-      Fake__OVM_ETH = await smock.fake('OVM_ETH', {
-        address: predeploys.OVM_ETH,
+      Fake__L2_BOBA = await smock.fake('L2_BOBA', {
+        address: predeploys.L2_BOBA,
       })
     })
 
@@ -207,9 +207,9 @@ describe('L2StandardBridge', () => {
       await Mock__L2Token.setVariable('l2Bridge', L2StandardBridge.address)
     })
 
-    it('withdraw() withdraws and sends the correct withdrawal message for OVM_ETH', async () => {
+    it('withdraw() withdraws and sends the correct withdrawal message for L2_BOBA', async () => {
       await L2StandardBridge.withdraw(
-        Fake__OVM_ETH.address,
+        Fake__L2_BOBA.address,
         0,
         0,
         NON_NULL_BYTES32
@@ -220,7 +220,7 @@ describe('L2StandardBridge', () => {
       ).to.deep.equal([
         DUMMY_L1_BRIDGE_ADDRESS,
         getContractInterface('L1StandardBridge').encodeFunctionData(
-          'finalizeETHWithdrawal',
+          'finalizeNativeTokenWithdrawal',
           [alice.address, alice.address, 0, NON_NULL_BYTES32]
         ),
         0,
