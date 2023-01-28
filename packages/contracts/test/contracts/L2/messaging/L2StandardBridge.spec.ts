@@ -209,7 +209,7 @@ describe('L2StandardBridge', () => {
 
     it('withdraw() withdraws and sends the correct withdrawal message for L2_BOBA', async () => {
       await L2StandardBridge.withdraw(
-        Fake__L2_BOBA.address,
+        Mock__L2Token.address,
         0,
         0,
         NON_NULL_BYTES32
@@ -220,8 +220,15 @@ describe('L2StandardBridge', () => {
       ).to.deep.equal([
         DUMMY_L1_BRIDGE_ADDRESS,
         getContractInterface('L1StandardBridge').encodeFunctionData(
-          'finalizeNativeTokenWithdrawal',
-          [alice.address, alice.address, 0, NON_NULL_BYTES32]
+          'finalizeERC20Withdrawal',
+          [
+            DUMMY_L1_ERC20_ADDRESS,
+            Mock__L2Token.address,
+            alice.address,
+            alice.address,
+            0,
+            NON_NULL_BYTES32,
+          ]
         ),
         0,
       ])

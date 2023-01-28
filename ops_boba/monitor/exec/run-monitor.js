@@ -89,11 +89,6 @@ const main = async () => {
     await layerZeroBridgeMonitor.initScan()
     loop(() => layerZeroBridgeMonitor.startMonitor()).catch()
   }
-
-  // monitor layerZero bridge:
-  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
-  await layerZeroBridgeMonitor.initScan()
-  loop(() => layerZeroBridgeMonitor.startMonitor()).catch()
 }
 
 ;(async () => {
