@@ -143,7 +143,7 @@ jobs:
           name: depcheck
           command: yarn depcheck
           working_directory: ./packages/boba/bundler
-  integration-tests:
+  integration-tests-moonbeam:
     resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
@@ -193,7 +193,7 @@ jobs:
           name: Build everything
           command: |
             docker-compose build --progress=plain
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml build bobalink aa_deployer
+            docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml build bobalink aa_deployer
           working_directory: ops
       - run:
           name: Bring up the stack
@@ -204,7 +204,7 @@ jobs:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink aa_deployer
+            docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging
@@ -239,6 +239,7 @@ jobs:
           path: /home/circleci/project/ops/result
 
   integration-tests-fantom:
+    resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
@@ -247,17 +248,64 @@ jobs:
     parallelism: 4
     steps:
       - checkout
+
+      - run:
+          name: Generate cache key from all hardhat.config.ts files
+          working_directory: ops
+          command: ./scripts/checksum.sh /tmp/checksum.txt
+
+      - restore_cache:
+          keys:
+            - solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+
+      - run:
+          name: Cache compliers
+          command: |
+            mkdir -p /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+            cd /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+            find . -name list.json | grep . || curl -L https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
+            find . -name solc-linux-amd64-v0.4.11+commit.68ef5810 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
+            find . -name solc-linux-amd64-v0.5.17+commit.d19bba13 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
+            find . -name solc-linux-amd64-v0.6.6+commit.6c089d02 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
+            find . -name solc-linux-amd64-v0.8.9+commit.e5eed63a | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
+            find . -name solc-linux-amd64-v0.8.11+commit.d7f03943 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
+            find . -name solc-linux-amd64-v0.8.15+commit.e14f2714 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714 -o ./solc-linux-amd64-v0.8.15+commit.e14f2714
+            find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.17+commit.8df45f5f
+            chmod +x /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
+          working_directory: /
+
+      - save_cache:
+          key: solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+          paths:
+            - /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+      - run:
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build everything
+          command: |
+            docker-compose build --progress=plain
+            docker-compose -f docker-compose-fantom.yml -f docker-compose-side.yml build bobalink aa_deployer
+          working_directory: ops
       - run:
           name: Bring up the stack
           command: |
-            ./scripts/build-ci-fantom.sh
-            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_fantom.sh
+            docker images
+            BUILD=2 DAEMON=1 ./up_local_fantom.sh
+          working_directory: ops
+      - run:
+          name: Bring up services
+          command: |
+            docker-compose -f docker-compose-fantom.yml -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f docker-compose-fantom.yml logs --follow
+          command: docker-compose -f docker-compose-fantom.yml -f docker-compose-side.yml logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh docker-compose-fantom.yml
@@ -286,6 +334,7 @@ jobs:
           path: /home/circleci/project/ops/result
 
   integration-tests-avalanche:
+    resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
@@ -294,17 +343,64 @@ jobs:
     parallelism: 4
     steps:
       - checkout
+
+      - run:
+          name: Generate cache key from all hardhat.config.ts files
+          working_directory: ops
+          command: ./scripts/checksum.sh /tmp/checksum.txt
+
+      - restore_cache:
+          keys:
+            - solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+
+      - run:
+          name: Cache compliers
+          command: |
+            mkdir -p /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+            cd /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+            find . -name list.json | grep . || curl -L https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
+            find . -name solc-linux-amd64-v0.4.11+commit.68ef5810 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
+            find . -name solc-linux-amd64-v0.5.17+commit.d19bba13 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
+            find . -name solc-linux-amd64-v0.6.6+commit.6c089d02 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
+            find . -name solc-linux-amd64-v0.8.9+commit.e5eed63a | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
+            find . -name solc-linux-amd64-v0.8.11+commit.d7f03943 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
+            find . -name solc-linux-amd64-v0.8.15+commit.e14f2714 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714 -o ./solc-linux-amd64-v0.8.15+commit.e14f2714
+            find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.17+commit.8df45f5f
+            chmod +x /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
+          working_directory: /
+
+      - save_cache:
+          key: solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+          paths:
+            - /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+      - run:
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build everything
+          command: |
+            docker-compose build --progress=plain
+            docker-compose -f docker-compose-avalanche.yml -f docker-compose-side.yml build bobalink aa_deployer
+          working_directory: ops
       - run:
           name: Bring up the stack
           command: |
-            ./scripts/build-ci-avalanche.sh
-            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_avalanche.sh
+            docker images
+            BUILD=2 DAEMON=1 ./up_local_avalanche.sh
+          working_directory: ops
+      - run:
+          name: Bring up services
+          command: |
+            docker-compose -f docker-compose-avalanche.yml -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f docker-compose-avalanche.yml logs --follow
+          command: docker-compose -f docker-compose-avalanche.yml -f docker-compose-side.yml logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh docker-compose-avalanche.yml
@@ -333,6 +429,7 @@ jobs:
           path: /home/circleci/project/ops/result
 
   integration-tests-bnb:
+    resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
@@ -341,11 +438,58 @@ jobs:
     parallelism: 4
     steps:
       - checkout
+
+      - run:
+          name: Generate cache key from all hardhat.config.ts files
+          working_directory: ops
+          command: ./scripts/checksum.sh /tmp/checksum.txt
+
+      - restore_cache:
+          keys:
+            - solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+
+      - run:
+          name: Cache compliers
+          command: |
+            mkdir -p /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+            cd /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+            find . -name list.json | grep . || curl -L https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
+            find . -name solc-linux-amd64-v0.4.11+commit.68ef5810 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
+            find . -name solc-linux-amd64-v0.5.17+commit.d19bba13 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
+            find . -name solc-linux-amd64-v0.6.6+commit.6c089d02 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
+            find . -name solc-linux-amd64-v0.8.9+commit.e5eed63a | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
+            find . -name solc-linux-amd64-v0.8.11+commit.d7f03943 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
+            find . -name solc-linux-amd64-v0.8.15+commit.e14f2714 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714 -o ./solc-linux-amd64-v0.8.15+commit.e14f2714
+            find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.17+commit.8df45f5f
+            chmod +x /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
+          working_directory: /
+
+      - save_cache:
+          key: solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+          paths:
+            - /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+      - run:
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build everything
+          command: |
+            docker-compose build --progress=plain
+            docker-compose -f docker-compose-bnb.yml -f docker-compose-side.yml build bobalink aa_deployer
+          working_directory: ops
       - run:
           name: Bring up the stack
           command: |
-            ./scripts/build-ci-bnb.sh
-            BUILD=2 DAEMON=1 NETWORK_PRUNE=1 ./up_local_bnb.sh
+            docker images
+            BUILD=2 DAEMON=1 ./up_local_bnb.sh
+          working_directory: ops
+      - run:
+          name: Bring up services
+          command: |
+            docker-compose -f docker-compose-bnb.yml -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging

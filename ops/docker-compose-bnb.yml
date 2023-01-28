@@ -52,29 +52,6 @@ x-integration_4_pk: &integration_4_pk
 version: "3"
 
 services:
-  # redis:
-   #   image: redis:alpine
-   #   ports:
-   #     - "6379:6379"
-   #   command:
-   #     - --save ""
-   #     - --appendonly no
-   #make sure you setup proxyd.toml
-   # proxyd:
-   #   ports:
-   #     - 8081:8080
-   #   depends_on:
-   #     - redis
-   #   image: proxyd:latest
-   #   volumes:
-   #     - ../go/proxyd:/etc/proxyd/
-   # base service builder
-  builder:
-    image: bobanetwork/builder:latest
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.monorepo
-
   l1_chain:
     image: bobanetwork/bnb:bootstrap
     restart: always
@@ -115,7 +92,8 @@ services:
     image: bobanetwork/deployer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.deployer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: deployer
     entrypoint: ./deployer.sh
     environment:
       FRAUD_PROOF_WINDOW_SECONDS: 0
@@ -159,7 +137,8 @@ services:
     image: bobanetwork/boba_deployer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_deployer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: boba_deployer
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
@@ -184,7 +163,8 @@ services:
     entrypoint: ./dtl.sh
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.data-transport-layer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: data-transport-layer
     # override with the dtl script and the env vars required for it
     env_file:
       -  ./envs/dtl.env
@@ -255,7 +235,8 @@ services:
     image: bobanetwork/message-relayer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.message-relayer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: message-relayer
     entrypoint: ./relayer.sh
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
@@ -285,8 +266,8 @@ services:
     image: bobanetwork/boba_message-relayer-fast:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.message-relayer
-    entrypoint: ["./wait-for-l1-and-l2.sh", "./relayer-fast.sh"]
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: boba_message-relayer-fast
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
@@ -343,7 +324,8 @@ services:
        replicas: 0
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.integration-tests
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: integration-tests
     entrypoint: ./integration-tests.sh
     environment:
       VERIFIER_URL: http://verifier:8545
