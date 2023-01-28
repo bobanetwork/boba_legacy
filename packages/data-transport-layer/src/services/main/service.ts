@@ -255,6 +255,10 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
 
            this.logger.info("addressRegistry PUT request for base addresses", {rb})
 
+           if (!("content-type" in req.headers) || req.headers['content-type'] !== "application/json") {
+             return res.status(400).json({error:"Request header must include content-type: application/json"})
+           }
+
            let addrList = {}
 
            /* Future - if there's an existing list, compare it with the new one and reject
@@ -275,6 +279,10 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
              } else { throw e; }
            }
 
+           if (Object.keys(rb).length === 0) {
+             return res.status(400).json({error:"List is empty"})
+           }
+
            this.logger.info("Will store new addresses.json", rb)
            await this.state.db.put("address-list", JSON.stringify(rb))
            this.logger.info("Stored addresses.json")
@@ -291,8 +299,16 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
 
            this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
 
+           if (!("content-type" in req.headers) || req.headers['content-type'] !== "application/json") {
+             return res.status(400).json({error:"Request header must include content-type: application/json"})
+           }
+
            // As with the base list, we could add future restrictions on changing
            // certain critical addresses. For now we allow anything.
+
+           if (Object.keys(rb).length === 0) {
+             return res.status(400).json({error:"List is empty"})
+           }
 
            this.logger.info("Will store new boba-addr.json", rb)
            await this.state.db.put("boba-addr", JSON.stringify(rb))
