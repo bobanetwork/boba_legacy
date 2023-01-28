@@ -97,11 +97,6 @@ module.exports.mainnetHandler = async (event, context, callback) => {
 }
 
 // Return error message
-module.exports.rinkebyHandler = async (event, context, callback) => {
-  return handle(event, callback)
-}
-
-// Return error message
 module.exports.goerliHandler = async (event, context, callback) => {
   return handle(event, callback)
 }

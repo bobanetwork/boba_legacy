@@ -127,9 +127,6 @@ export class OptimismEnv {
     const addressesBASE = await getBASEDeployerAddresses()
     const addressesBOBA = await getBOBADeployerAddresses()
 
-    console.log('l1Wallet', l1Wallet.getAddress())
-    console.log('l2Wallet', l2Wallet.getAddress())
-
     const l1Bridge = await getL1Bridge(
       l1Wallet,
       addressesBASE.Proxy__L1StandardBridge

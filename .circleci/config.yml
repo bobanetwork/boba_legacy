@@ -231,7 +231,7 @@ jobs:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f docker-compose-moonbeam.yml down -v
+          command: docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml down -v
           working_directory: ops
       - store_test_results:
           path: /home/circleci/project/ops/result
@@ -326,7 +326,7 @@ jobs:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f docker-compose-fantom.yml down -v
+          command: docker-compose -f docker-compose-fantom.yml -f docker-compose-side.yml down -v
           working_directory: ops
       - store_test_results:
           path: /home/circleci/project/ops/result
@@ -421,7 +421,7 @@ jobs:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f docker-compose-avalanche.yml down -v
+          command: docker-compose -f docker-compose-avalanche.yml -f docker-compose-side.yml down -v
           working_directory: ops
       - store_test_results:
           path: /home/circleci/project/ops/result
@@ -516,7 +516,7 @@ jobs:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f docker-compose-bnb.yml down -v
+          command: docker-compose -f docker-compose-bnb.yml -f docker-compose-side.yml down -v
           working_directory: ops
       - store_test_results:
           path: /home/circleci/project/ops/result
