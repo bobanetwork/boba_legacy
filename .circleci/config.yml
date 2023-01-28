@@ -530,7 +530,6 @@ workflows:
       - integration-tests-fantom
       - integration-tests-avalanche
       - integration-tests-bnb
-      - integration-tests
       - go-lint-test-build:
           name: proxyd-tests
           binary_name: proxyd
