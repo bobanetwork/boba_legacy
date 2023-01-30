@@ -494,16 +494,13 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		"url", url,
 		"payload", payload)
 
-	proxyUser := os.Getenv("PROXY_USER")
-	proxyPass := os.Getenv("PROXY_PASS")
-	proxyAddr := os.Getenv("PROXY_ADDR")
-	if proxyUser == "" || proxyPass == "" || proxyAddr == "" {
+	proxyStr := os.Getenv("PROXY_URL")
+	if proxyStr == "" {
 		log.Error("TURING Proxy configuration missing")
 		retError[35] = 15
 		return retError, 15
 	}
 
-	proxyStr := fmt.Sprintf("socks5://%s:%s@%s", proxyUser, proxyPass, proxyAddr)
 	client, err := rpc.ProxyDial(proxyStr, url)
 
 	if client != nil && err == nil {
