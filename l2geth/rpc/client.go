@@ -22,12 +22,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"reflect"
 	"strconv"
 	"sync/atomic"
 	"time"
-	"net/http"
 
 	"github.com/ethereum-optimism/optimism/l2geth/log"
 )
