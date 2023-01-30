@@ -2131,10 +2131,6 @@ class NetworkService {
         this.addresses.DiscretionaryExitFee
       )
 
-      if (utils.getAddress(currencyAddress) === utils.getAddress(this.addresses.TK_L2BOBA)) {
-        BobaApprovalAmount = BobaApprovalAmount.add(value)
-      }
-
       // Should approve BOBA
       if ( BobaAllowance.lt(BobaApprovalAmount) ) {
         const res = await this.approveERC20(
@@ -2171,7 +2167,7 @@ class NetworkService {
         this.L1GasLimit,
         utils.formatBytes32String(new Date().getTime().toString()),
         currencyAddress === this.addresses.L2_ETH_Address ?
-          { value: value_Wei_String } : {}
+          { value: value.add(BobaApprovalAmount) } : { value: BobaApprovalAmount }
       )
 
       //everything submitted... waiting
@@ -4491,7 +4487,7 @@ class NetworkService {
 
   async getAltL1DepositFee() {
     if (this.account === null) {
-      console.log('NS: depositErc20ToL1() error - called but account === null')
+      console.log('NS: getAltL1DepositFee() error - called but account === null')
       return
     }
     try {
@@ -4632,6 +4628,7 @@ class NetworkService {
       console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
       // TODO: FIXME: Update this function to `withdraw` in case of other deployment than ETHERUEM.
+      // INPUT STEP MULTICHAIN
       await Proxy__EthBridge.depositERC20(
         ETH_L1_BOBA_ADDRESS,
         ALT_L1_BOBA_ADDRESS,
