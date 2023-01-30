@@ -478,7 +478,7 @@ export const isAvalanche = async (network) => {
 export const waitForAndExecute = async (
   fn: () => Promise<any>,
   repeat: number,
-  intervalMs?: number,
+  intervalMs?: number
 ) => {
   while (repeat >= 0) {
     try {
@@ -489,6 +489,7 @@ export const waitForAndExecute = async (
       await sleep(intervalMs || 1000)
     }
   }
+  await fn()
 }
 
 // // eslint-disable-next-line @typescript-eslint/no-shadow

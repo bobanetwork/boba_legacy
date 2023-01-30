@@ -12,7 +12,6 @@ const fetch = require('node-fetch')
 
 import FluxAggregatorHCJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
 import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
 import { waitForAndExecute } from './shared/utils'
@@ -20,17 +19,13 @@ import { waitForAndExecute } from './shared/utils'
 describe('BobaLink Test\n', async () => {
   let env: OptimismEnv
 
-  let EthChainLinkOracle: Contract
-  let EthOracleHC: Contract
-
-  let BtcChainLinkOracle: Contract
-  let BtcOracleHC: Contract
+  let BobaChainLinkOracle: Contract
+  let BobaOracleHC: Contract
 
   let Factory__TuringHelper: ContractFactory
   let TuringHelper: Contract
 
   let BobaTuringCredit: Contract
-  let L2BOBAToken: Contract
 
   const apiPort = 1235
   let URL: string
@@ -53,18 +48,17 @@ describe('BobaLink Test\n', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
+    await env.l2Wallet.sendTransaction({
+      to: env.l2BobalinkWallet.address,
+      value: utils.parseEther('100'),
+    })
+
     const BobaTuringCreditAddress = await env.addressesBOBA.BobaTuringCredit
 
     BobaTuringCredit = getContractFactory(
       'BobaTuringCredit',
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
-
-    L2BOBAToken = new Contract(
-      env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
-      env.l2Wallet
-    )
 
     Factory__TuringHelper = new ContractFactory(
       TuringHelperJson.abi,
@@ -76,56 +70,34 @@ describe('BobaLink Test\n', async () => {
     console.log('Helper contract deployed at', TuringHelper.address)
     await TuringHelper.deployTransaction.wait()
 
-    EthChainLinkOracle = new Contract(
-      env.addressesBOBA.ETHUSD_AggregatorHC,
+    BobaChainLinkOracle = new Contract(
+      env.addressesBOBA.BOBAUSD_AggregatorHC,
       FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
-    EthOracleHC = new Contract(
-      env.addressesBOBA.Proxy__ETHUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
-      env.l2Wallet
-    )
-
-    BtcChainLinkOracle = new Contract(
-      env.addressesBOBA.WBTCUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
-      env.l2Wallet
-    )
-    BtcOracleHC = new Contract(
-      env.addressesBOBA.Proxy__WBTCUSD_AggregatorHC,
+    BobaOracleHC = new Contract(
+      env.addressesBOBA.Proxy__BOBAUSD_AggregatorHC,
       FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
 
-    await EthOracleHC.updateHCHelper(TuringHelper.address)
-    await BtcOracleHC.updateHCHelper(TuringHelper.address)
+    await BobaOracleHC.updateHCHelper(TuringHelper.address)
+    await BobaOracleHC.updateHCChainLinkPriceFeedAddr(BobaChainLinkOracle.address)
 
-    await EthOracleHC.updateHCChainLinkPriceFeedAddr(EthChainLinkOracle.address)
-    await BtcOracleHC.updateHCChainLinkPriceFeedAddr(BtcChainLinkOracle.address)
+    await addOracle(BobaOracleHC, BobaChainLinkOracle.address, env.l2BobalinkWallet.address)
+    await addOracle(BobaChainLinkOracle, BobaChainLinkOracle.address, env.l2Wallet.address)
 
-    await addOracle(EthOracleHC, EthChainLinkOracle.address, env.l2BobalinkWallet.address)
-    await addOracle(BtcOracleHC, BtcChainLinkOracle.address, env.l2BobalinkWallet.address)
-    await addOracle(EthChainLinkOracle, EthChainLinkOracle.address, env.l2Wallet.address)
-    await addOracle(BtcChainLinkOracle, BtcChainLinkOracle.address, env.l2Wallet.address)
-
-    await TuringHelper.addPermittedCaller(EthOracleHC.address)
-    await TuringHelper.addPermittedCaller(BtcOracleHC.address)
+    await TuringHelper.addPermittedCaller(BobaOracleHC.address)
 
     // add boba as credit
     const depositBOBAAmount = utils.parseEther('1')
-    const bobaBalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+    const bobaBalance = await env.l2Wallet.getBalance()
     console.log('BOBA Balance in your account', bobaBalance.toString())
-
-    const approveTx = await L2BOBAToken.approve(
-      BobaTuringCredit.address,
-      depositBOBAAmount
-    )
-    await approveTx.wait()
 
     const depositTx = await BobaTuringCredit.addBalanceTo(
       depositBOBAAmount,
-      TuringHelper.address
+      TuringHelper.address,
+      { value: depositBOBAAmount }
     )
     await depositTx.wait()
 
@@ -154,6 +126,7 @@ describe('BobaLink Test\n', async () => {
 
           const args = utils.defaultAbiCoder.decode(['uint256', 'address', 'uint256'], input)
           if (req.url === "/fake") {
+            console.log('Received Requests')
             const randomPrice = Math.floor(Math.random() * 1000)
             result = `0x${generateBytes32(32 * 3)}${generateBytes32(args[2])}${generateBytes32(randomPrice)}${generateBytes32(args[2])}`
             let response = {
@@ -185,6 +158,7 @@ describe('BobaLink Test\n', async () => {
             server.emit('success', body)
           }
           if (req.url === '/bobalink-prod-api') {
+            console.log('Received Requests')
             const asyncBobaLinkGetQuote: any = util.promisify(
               bobaLinkGetQuote
             )
@@ -211,15 +185,15 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('test of local compute endpoint: should return price', async () => {
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    const decimals = await EthChainLinkOracle.decimals()
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
+    const decimals = await BobaChainLinkOracle.decimals()
     /* eslint-disable */
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 1, utils.parseUnits('10000', decimals), 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 1, utils.parseUnits('0.1', decimals), 1000)
     /* eslint-enable */
     const roundId = lastRoundId + 1
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
-      [64, EthChainLinkOracle.address, roundId]
+      [64, BobaChainLinkOracle.address, roundId]
     )
 
     const body = {
@@ -243,10 +217,10 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('test of /bobalink-test-api endpoint: should return price', async () => {
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
-      [64, EthChainLinkOracle.address, lastRoundId]
+      [64, BobaChainLinkOracle.address, lastRoundId]
     )
 
     const body = {
@@ -270,10 +244,10 @@ describe('BobaLink Test\n', async () => {
 
   it('test of /bobalink-prod-api endpoint: should return price', async () => {
     process.env.L1_NODE_WEB3_URL = env.l2Provider.connection.url
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
     const abi_payload = utils.defaultAbiCoder.encode(
       ['uint256', 'address', 'uint256'],
-      [64, EthChainLinkOracle.address, lastRoundId]
+      [64, BobaChainLinkOracle.address, lastRoundId]
     )
 
     const body = {
@@ -296,13 +270,15 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('should get quote via Hybrid Compute', async () => {
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    await EthOracleHC.updateHCUrl(`${URL}/fake`)
-    await EthOracleHC.connect(env.l2BobalinkWallet).estimateGas.getChainLinkQuote(lastRoundId)
-    await EthOracleHC.connect(env.l2BobalinkWallet).getChainLinkQuote(lastRoundId, gasOverride)
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
+    await BobaOracleHC.updateHCUrl(`${URL}/fake`)
+    const admin = await BobaOracleHC.getAdmin()
+    const HCUrl = await BobaOracleHC.HCUrl()
+    await BobaOracleHC.connect(env.l2BobalinkWallet).estimateGas.getChainLinkQuote(lastRoundId)
+    await BobaOracleHC.connect(env.l2BobalinkWallet).getChainLinkQuote(lastRoundId, gasOverride)
     const block = await env.l2Provider.getBlockNumber()
-    const chainLinkQuoteEvents = await EthOracleHC.queryFilter(
-      EthOracleHC.filters.ChainLinkQuoteGot(),
+    const chainLinkQuoteEvents = await BobaOracleHC.queryFilter(
+      BobaOracleHC.filters.ChainLinkQuoteGot(),
       block - 1,
       block
     )
@@ -310,19 +286,19 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId)
   }).retries(3)
 
-  it('should get a single quote via bobalink using test api', async () => {
-    await EthOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    const decimals = await EthChainLinkOracle.decimals()
-    const price = utils.parseUnits('12000', decimals)
+  it.only('should get a single quote via bobalink using test api', async () => {
+    await BobaOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
+    const decimals = await BobaChainLinkOracle.decimals()
+    const price = utils.parseUnits('0.2', decimals)
     /* eslint-disable */
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 1, price, 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 1, price, 1000)
     /* eslint-enable */
     const test = async () => {
-      const latestAnswer = await EthOracleHC.latestAnswer()
+      const latestAnswer = await BobaOracleHC.latestAnswer()
       const block = await env.l2Provider.getBlockNumber()
-      const chainLinkQuoteEvents = await EthOracleHC.queryFilter(
-        EthOracleHC.filters.ChainLinkQuoteGot(),
+      const chainLinkQuoteEvents = await BobaOracleHC.queryFilter(
+        BobaOracleHC.filters.ChainLinkQuoteGot(),
         block,
         block
       )
@@ -334,40 +310,40 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('should not be able to submit answer again using Hybird Compute', async () => {
-    const lastRoundId = (await EthOracleHC.latestRound()).toNumber()
+    const lastRoundId = (await BobaOracleHC.latestRound()).toNumber()
     await expect(
-      EthOracleHC.connect(env.l2BobalinkWallet).estimateGas.submit(lastRoundId)
+      BobaOracleHC.connect(env.l2BobalinkWallet).estimateGas.submit(lastRoundId)
     ).to.be.revertedWith('invalid roundId to initialize')
   })
 
   it('should not be able to submit answer again using emergency submission', async () => {
-    const lastRoundId = (await EthOracleHC.latestRound()).toNumber()
-    const decimals = await EthOracleHC.decimals()
+    const lastRoundId = (await BobaOracleHC.latestRound()).toNumber()
+    const decimals = await BobaOracleHC.decimals()
     await expect(
-      EthOracleHC.connect(env.l2BobalinkWallet).emergencySubmit(
+      BobaOracleHC.connect(env.l2BobalinkWallet).emergencySubmit(
         lastRoundId,
-        utils.parseUnits('10000', decimals),
+        utils.parseUnits('0.3', decimals),
         lastRoundId
       )
     ).to.be.revertedWith('invalid roundId to initialize')
   })
 
   it('should get multiple quotes via bobalink using test api', async () => {
-    await EthOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    const decimals = await EthChainLinkOracle.decimals()
-    const price1 = utils.parseUnits('10000', decimals)
-    const price2 = utils.parseUnits('12000', decimals)
+    await BobaOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
+    const decimals = await BobaChainLinkOracle.decimals()
+    const price1 = utils.parseUnits('0.4', decimals)
+    const price2 = utils.parseUnits('0.5', decimals)
     /* eslint-disable */
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 1, price1, 1000)
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 2, price2, 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 1, price1, 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 2, price2, 1000)
     /* eslint-enable */
     const test = async () => {
-      const prevAnswer = await EthOracleHC.getRoundData(lastRoundId + 1)
-      const latestAnswer = await EthOracleHC.getRoundData(lastRoundId + 2)
+      const prevAnswer = await BobaOracleHC.getRoundData(lastRoundId + 1)
+      const latestAnswer = await BobaOracleHC.getRoundData(lastRoundId + 2)
       const block = await env.l2Provider.getBlockNumber()
-      const chainLinkQuoteEvents = await EthOracleHC.queryFilter(
-        EthOracleHC.filters.ChainLinkQuoteGot(),
+      const chainLinkQuoteEvents = await BobaOracleHC.queryFilter(
+        BobaOracleHC.filters.ChainLinkQuoteGot(),
         block,
         block
       )
@@ -380,18 +356,18 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('should get a single quote via bobalink using prod api', async () => {
-    await EthOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    const decimals = await EthChainLinkOracle.decimals()
-    const price = utils.parseUnits('12000', decimals)
+    await BobaOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
+    const decimals = await BobaChainLinkOracle.decimals()
+    const price = utils.parseUnits('0.6', decimals)
     /* eslint-disable */
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 1, price, 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 1, price, 1000)
     /* eslint-enable */
     const test = async () => {
-      const latestAnswer = await EthOracleHC.latestAnswer()
+      const latestAnswer = await BobaOracleHC.latestAnswer()
       const block = await env.l2Provider.getBlockNumber()
-      const chainLinkQuoteEvents = await EthOracleHC.queryFilter(
-        EthOracleHC.filters.ChainLinkQuoteGot(),
+      const chainLinkQuoteEvents = await BobaOracleHC.queryFilter(
+        BobaOracleHC.filters.ChainLinkQuoteGot(),
         block,
         block
       )
@@ -403,21 +379,21 @@ describe('BobaLink Test\n', async () => {
   })
 
   it('should get multiple quotes via bobalink using prod api', async () => {
-    await EthOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
-    const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    const decimals = await EthChainLinkOracle.decimals()
-    const price1 = utils.parseUnits('10000', decimals)
-    const price2 = utils.parseUnits('12000', decimals)
+    await BobaOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
+    const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
+    const decimals = await BobaChainLinkOracle.decimals()
+    const price1 = utils.parseUnits('0.7', decimals)
+    const price2 = utils.parseUnits('0.8', decimals)
     /* eslint-disable */
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 1, price1, 1000)
-    await EthChainLinkOracle.emergencySubmit(lastRoundId + 2, price2, 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 1, price1, 1000)
+    await BobaChainLinkOracle.emergencySubmit(lastRoundId + 2, price2, 1000)
     /* eslint-enable */
     const test = async () => {
-      const prevAnswer = await EthOracleHC.getRoundData(lastRoundId + 1)
-      const latestAnswer = await EthOracleHC.getRoundData(lastRoundId + 2)
+      const prevAnswer = await BobaOracleHC.getRoundData(lastRoundId + 1)
+      const latestAnswer = await BobaOracleHC.getRoundData(lastRoundId + 2)
       const block = await env.l2Provider.getBlockNumber()
-      const chainLinkQuoteEvents = await EthOracleHC.queryFilter(
-        EthOracleHC.filters.ChainLinkQuoteGot(),
+      const chainLinkQuoteEvents = await BobaOracleHC.queryFilter(
+        BobaOracleHC.filters.ChainLinkQuoteGot(),
         block,
         block
       )
@@ -425,38 +401,6 @@ describe('BobaLink Test\n', async () => {
       expect(latestAnswer.answer).to.be.eq(price2)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 2)
       expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
-    }
-    await waitForAndExecute(test, 10)
-  })
-
-  it('should get multiple quotes for multiple oracles using prod api', async () => {
-    await EthOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
-    const EthLastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
-    const EthDecimals = await EthChainLinkOracle.decimals()
-    const EthPrice1 = utils.parseUnits('10000', EthDecimals)
-    const EthPrice2 = utils.parseUnits('12000', EthDecimals)
-    /* eslint-disable */
-    await EthChainLinkOracle.emergencySubmit(EthLastRoundId + 1, EthPrice1, 1000)
-    await EthChainLinkOracle.emergencySubmit(EthLastRoundId + 2, EthPrice2, 1000)
-    /* eslint-enable */
-    await BtcOracleHC.updateHCUrl(`${URL}/bobalink-prod-api`)
-    const BtcLastRoundId = (await BtcChainLinkOracle.latestRound()).toNumber()
-    const BtcDecimals = await BtcChainLinkOracle.decimals()
-    const BtcPrice1 = utils.parseUnits('10000', BtcDecimals)
-    const BtcPrice2 = utils.parseUnits('12000', BtcDecimals)
-    /* eslint-disable */
-    await BtcChainLinkOracle.emergencySubmit(BtcLastRoundId + 1, BtcPrice1, 1000)
-    await BtcChainLinkOracle.emergencySubmit(BtcLastRoundId + 2, BtcPrice2, 1000)
-    /* eslint-enable */
-    const test = async () => {
-      const EthPrevAnswer = await EthOracleHC.getRoundData(EthLastRoundId + 1)
-      const EthLatestAnswer = await EthOracleHC.getRoundData(EthLastRoundId + 2)
-      const BtcPrevAnswer = await BtcOracleHC.getRoundData(BtcLastRoundId + 1)
-      const BtcLatestAnswer = await BtcOracleHC.getRoundData(BtcLastRoundId + 2)
-      expect(EthPrevAnswer.answer).to.be.eq(EthPrice1)
-      expect(EthLatestAnswer.answer).to.be.eq(EthPrice2)
-      expect(BtcPrevAnswer.answer).to.be.eq(BtcPrice1)
-      expect(BtcLatestAnswer.answer).to.be.eq(BtcPrice2)
     }
     await waitForAndExecute(test, 10)
   })
