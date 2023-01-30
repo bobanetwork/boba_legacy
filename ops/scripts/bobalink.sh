@@ -2,7 +2,7 @@
 
 set -e
 
-RETRIES=100
+RETRIES=500
 echo $URL
 until $(curl --silent --fail --output /dev/null "$URL"); do
   sleep 10
@@ -15,7 +15,7 @@ until $(curl --silent --fail --output /dev/null "$URL"); do
 done
 echo "Base addresses available at $URL"
 
-RETRIES=100
+RETRIES=500
 echo $BOBA_URL
 until $(curl --fail --output /dev/null "$BOBA_URL"); do
   sleep 10
