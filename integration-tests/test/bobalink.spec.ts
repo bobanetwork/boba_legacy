@@ -90,7 +90,7 @@ describe('BobaLink Test\n', async () => {
     await TuringHelper.addPermittedCaller(BobaOracleHC.address)
 
     // add boba as credit
-    const depositBOBAAmount = utils.parseEther('1')
+    const depositBOBAAmount = utils.parseEther('100')
     const bobaBalance = await env.l2Wallet.getBalance()
     console.log('BOBA Balance in your account', bobaBalance.toString())
 
@@ -126,7 +126,6 @@ describe('BobaLink Test\n', async () => {
 
           const args = utils.defaultAbiCoder.decode(['uint256', 'address', 'uint256'], input)
           if (req.url === "/fake") {
-            console.log('Received Requests')
             const randomPrice = Math.floor(Math.random() * 1000)
             result = `0x${generateBytes32(32 * 3)}${generateBytes32(args[2])}${generateBytes32(randomPrice)}${generateBytes32(args[2])}`
             let response = {
@@ -158,7 +157,6 @@ describe('BobaLink Test\n', async () => {
             server.emit('success', body)
           }
           if (req.url === '/bobalink-prod-api') {
-            console.log('Received Requests')
             const asyncBobaLinkGetQuote: any = util.promisify(
               bobaLinkGetQuote
             )
@@ -175,7 +173,6 @@ describe('BobaLink Test\n', async () => {
         });
 
       } else {
-        console.log("Other request:", req)
         res.writeHead(400, { 'Content-Type': 'text/plain' })
         res.end('Expected content-type: application/json')
       }
@@ -286,7 +283,7 @@ describe('BobaLink Test\n', async () => {
     expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId)
   }).retries(3)
 
-  it.only('should get a single quote via bobalink using test api', async () => {
+  it('should get a single quote via bobalink using test api', async () => {
     await BobaOracleHC.updateHCUrl(`${URL}/bobalink-test-api`)
     const lastRoundId = (await BobaChainLinkOracle.latestRound()).toNumber()
     const decimals = await BobaChainLinkOracle.decimals()
