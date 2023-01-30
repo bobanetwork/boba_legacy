@@ -76,4 +76,3 @@ function networkReducer(state = initialState, action) {
 }
 
 export default networkReducer
-

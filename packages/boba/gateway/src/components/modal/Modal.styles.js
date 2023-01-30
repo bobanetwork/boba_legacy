@@ -27,9 +27,11 @@ export const Backdrop = styled('div')`
   opacity: 0.8;
   backdrop-filter: blur(10px);
   -webkit-tap-highlight-color: transparent;
-`; 
+`;
 
-export const Style = styled(Box)`
+export const Style = styled(Box, {
+  shouldForwardProp: (props) => props !== 'transparent' && props !== 'isMobile',
+})`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -61,7 +63,7 @@ export const WrapperActionsModal = styled(Box)`
    margin-top: 50px;
  `;
 
- 
+
 export const ModalHead = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",

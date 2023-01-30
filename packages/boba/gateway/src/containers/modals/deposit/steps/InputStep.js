@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositErc20, depositETHL2 } from 'actions/networkAction'
-import { setActiveHistoryTab } from 'actions/uiAction'
+import { setActiveHistoryTab, openAlert } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -18,6 +18,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { selectLookupPrice } from 'selectors/lookupSelector'
 
 import BN from 'bignumber.js'
+import { ethers } from 'ethers'
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -30,6 +32,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const [ validValue, setValidValue ] = useState(false)
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
+  const networkName = useSelector(selectActiveNetworkName())
   const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
 
@@ -52,18 +55,20 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   async function doDeposit() {
 
     let res
+    let toL2Account = enableToL2Account ? recipient : '';
 
-    if (token.symbol === 'ETH') {
+    // TO check for ETH
+    if (token.address === ethers.constants.AddressZero) {
       res = await dispatch(
         depositETHL2({
-          recipient,
+          recipient: toL2Account,
           value_Wei_String
         })
       )
     } else {
       res = await dispatch(
         depositErc20({
-          recipient,
+          recipient: toL2Account,
           value_Wei_String,
           currency: token.address,
           currencyL2: token.addressL2,
@@ -71,7 +76,8 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       )
     }
     if (res) {
-      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      dispatch(openAlert(`Your funds were bridged to ${networkName[ 'l2' ]}`))
+      dispatch(setActiveHistoryTab(`${networkName[ 'l1' ]} to ${networkName[ 'l2' ]}`))
       handleClose()
     }
 
@@ -88,7 +94,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     }
   }, [ signatureStatus, depositLoading, handleClose ])
 
-  console.log("Loading:", depositLoading)
 
   let buttonLabel_1 = 'Cancel'
   if (depositLoading) buttonLabel_1 = 'Close'

@@ -22,9 +22,7 @@ class Nft extends React.Component {
     super(props)
 
     const {
-      list,
-      monsterNumber,
-      monsterInfo
+      list
     } = this.props.nft
 
     const {
@@ -42,9 +40,7 @@ class Nft extends React.Component {
       accountEnabled,
       netLayer,
       network,
-      walletAddress,
-      monsterNumber,
-      monsterInfo
+      walletAddress
     }
 
   }
@@ -52,9 +48,7 @@ class Nft extends React.Component {
   componentDidUpdate(prevState) {
 
     const {
-      list,
-      monsterNumber,
-      monsterInfo
+      list
     } = this.props.nft
 
     const {
@@ -66,14 +60,6 @@ class Nft extends React.Component {
 
     if (!isEqual(prevState.nft.list, list)) {
       this.setState({ list })
-    }
-
-    if (!isEqual(prevState.nft.monsterNumber, monsterNumber)) {
-      this.setState({ monsterNumber })
-    }
-
-    if (!isEqual(prevState.nft.monsterInfo, monsterInfo)) {
-      this.setState({ monsterInfo })
     }
 
     if (!isEqual(prevState.loading[ 'NFT/ADD' ], this.props.loading[ 'NFT/ADD' ])) {

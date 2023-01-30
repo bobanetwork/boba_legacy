@@ -128,6 +128,186 @@ export const CONTRACT_ADDRESSES: {
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
+  // Moonbeam local
+  1281: {
+    l1: {
+      AddressManager: '0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3',
+      L1CrossDomainMessenger: '0xab7785d56697E65c2683c8121Aac93D3A028Ba95',
+      L1CrossDomainMessengerFast: '0xB942FA2273C7Bce69833e891BDdFd7212d2dA415',
+      L1StandardBridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      StateCommitmentChain: '0x294c664f6D63bd1521231a2EeFC26d805ce00a08',
+      CanonicalTransactionChain: '0x598efcBD0B5b4Fd0142bEAae1a38f6Bd4d8a218d',
+      BondManager: '0xEC69d4f48f4f1740976968FAb9828d645Ad1d77f',
+      L1MultiMessageRelayer: '0xad856F238CBeafd064b80D12EadAea3981fB21B5',
+      L1MultiMessageRelayerFast: '0xAdD0E4aD78B01048027154c7a432a1cB6711178f',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // MoonBase
+  1287: {
+    l1: {
+      AddressManager: '0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B',
+      L1CrossDomainMessenger: '0x76DB375075F1d5Dcd1D70Fc07F69a5c7b40ab877',
+      L1CrossDomainMessengerFast: '0xAE8885D3b7937af9480cd7301925a88Dfb0cE9f6',
+      L1StandardBridge: '0xEcca5FEd8154420403549f5d8F123fcE69fae806',
+      StateCommitmentChain: '0x5E41Eaac5319CDf336c51969E2F164A686138B28',
+      CanonicalTransactionChain: '0xa8bD51a7F46321587921A33fa3c752b426c74754',
+      BondManager: '0x6c55306656E8b74F93653A753DE539c2F6ca18Db',
+      L1MultiMessageRelayer: '0x4c1bcfe4F0b1a57d3c578a8ED3dBEBCa29339c85',
+      L1MultiMessageRelayerFast: '0x874a7Ea9722b96924e186f0263866FA90a7C777b',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Moonbeam
+  1284: {
+    l1: {
+      AddressManager: '0x564c10A60af35a07f0EA8Be3106a4D81014b21a0',
+      L1CrossDomainMessenger: '0x4765f8b50Bbe049045bBA1270dc7A8CDF17165cF',
+      L1CrossDomainMessengerFast: '0x17d02C3e6cB69225d83d0bADEb0fC09aE735CA3b',
+      L1StandardBridge: '0xAf5297f68D48cd2DE37Ee5cbaC0647fbA4132985',
+      StateCommitmentChain: '0xAD379B1518f50Fc737536D2Ec2c13E4640e228A8',
+      CanonicalTransactionChain: '0x99C970105cf6EE2e22b563CB86bCA42D05ac7A95',
+      BondManager: '0xcfe333e0e48EC71f1399a76001cf39E0c6A51dA5',
+      L1MultiMessageRelayer: '0x3664bC9BA25D0d3911c39d8ae1734b0B5A3495C1',
+      L1MultiMessageRelayerFast: '0xE2EE964E39720f78Cd75BC146Ed078D301981759',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Fantom local
+  4003: {
+    l1: {
+      AddressManager: '0xf536cAF1a894E09945E649FCE3032E8E03ECb9A0',
+      L1CrossDomainMessenger: '0x03466593AE8Bc085F384bC4EB91d5035F5a7936C',
+      L1CrossDomainMessengerFast: '0xC93DD6833E6A29004FcC84C757cCf0d5551aBFe1',
+      L1StandardBridge: '0xAEa06C2B29edfac53a0538A9843D018348845Ebf',
+      StateCommitmentChain: '0xC98Dd1b152d9e4cf2A6384a78d4FFE8D50E86C6c',
+      CanonicalTransactionChain: '0xFfB9dF984DC95ab53c561d818b708135612b087f',
+      BondManager: '0xE9BC1f638d05edF64Bf3e23A08ff3e2B0fb8b7F7',
+      L1MultiMessageRelayer: '0x9257aE2144eF338Da70D6884c98BD8CB90Da639E',
+      L1MultiMessageRelayerFast: '0xB6D431Bb85298030eA27a0E3769bEa5ed1F9fF53',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Fantom testnet
+  4002: {
+    l1: {
+      AddressManager: '0x12ad9f501149D3FDd703cC10c567F416B7F0af8b',
+      L1CrossDomainMessenger: '0xEecAD665ca933eeA4a9a2db600E538c1391930d1',
+      L1CrossDomainMessengerFast: '0xE5781E5E9CbC67E91DF93eD01E922De30125e491',
+      L1StandardBridge: '0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f',
+      StateCommitmentChain: '0x352d964E9aD016f122dc78Afa5164417907E0FaF',
+      CanonicalTransactionChain: '0xE66Bd40BBeC97397758E22858331752f0ecBE02e',
+      BondManager: '0xa97a909D967B150E27AB58ca6d0cb40B39200Be1',
+      L1MultiMessageRelayer: '0xD7Cbc979C909d864c38670AcccD57209F7B556e3',
+      L1MultiMessageRelayerFast: '0x9Af237336C29dCbA346764af8e8E1F0ba83D1eE5',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Fantom mainnet
+  250: {
+    l1: {
+      AddressManager: '0x4e7325bcf09e091Bb8119258B885D4ef687B7386',
+      L1CrossDomainMessenger: '0x64Fca36c52628e40de8684C4C3B5EdB22Fd2eFd9',
+      L1CrossDomainMessengerFast: '0xC0597ED18446254E4dd0CA5D80eb07D3f2E462cF',
+      L1StandardBridge: '0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8',
+      StateCommitmentChain: '0xF764C4f8D2982432239A110Cf6B08e95631cE564',
+      CanonicalTransactionChain: '0x6001C473E020D3562Ea436B61aE4d2e91e7078cE',
+      BondManager: '0xCcA5a1CB9fAD5F2A5b88D95440dA7c83EC031Cb1',
+      L1MultiMessageRelayer: '0xD8DcA5fC53a83Cf06ec744a7226C23951a353A0f',
+      L1MultiMessageRelayerFast: '0xE7beDcedF3E3054aF891DddeF61775A23a16CB90',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Avalanche local
+  43112: {
+    l1: {
+      AddressManager: '0x52C84043CD9c865236f11d9Fc9F56aa003c1f922',
+      L1CrossDomainMessenger: '0xDFBb4b49DfAe39720f68f8297ADb2368FeffaDdb',
+      L1CrossDomainMessengerFast: '0xD054149e4345Cc00cc2f2465C02a864f60d6bd46',
+      L1StandardBridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      StateCommitmentChain: '0xF5f1f185cF359dC48469e410Aeb6983cD4DC5812',
+      CanonicalTransactionChain: '0xa1E47689f396fED7d18D797d9D31D727d2c0d483',
+      BondManager: '0x97C0FE6aB595cbFD50ad3860DA5B2017d8B35c2E',
+      L1MultiMessageRelayer: '0xEC1bf080BDFBbBa102603Cc1C55aFd215C694a2b',
+      L1MultiMessageRelayerFast: '0x1AA001Cd20F35F3F4EF1A945053CeE4Acc24aDb4',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Avalanche testnet
+  43113: {
+    l1: {
+      AddressManager: '0xcE78de95b85212BC348452e91e0e74c17cf37c79',
+      L1CrossDomainMessenger: '0x68c19B7FbAe4F8034cf6316b2045ba6aB6978F6b',
+      L1CrossDomainMessengerFast: '0xBc5249095c890F58C0b75795bd21667eFd123F5F',
+      L1StandardBridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
+      StateCommitmentChain: '0x57B9C47F2Ae857005238096486C5B107447dE221',
+      CanonicalTransactionChain: '0xA36D21C0125b5Dc52d95ED8FF1eF7188d4666EAE',
+      BondManager: '0x067cD503bd734a779830dafF0Db582B6a347c3df',
+      L1MultiMessageRelayer: '0x74546A4c6D5543Be7e8447159c47BAe7f5431C49',
+      L1MultiMessageRelayerFast: '0x5e6B412b4fA8373a17aD85B269fA5c354ea57e63',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // Avalanche Mainnet
+  43114: {
+    l1: {
+      AddressManager: '0x00220f8ce1c4be8436574e575fE38558d85e2E6b',
+      L1CrossDomainMessenger: '0x0fc742332ae6D447d6619D93985Aa288B81CBb0C',
+      L1CrossDomainMessengerFast: '0x5b6714b7926e6D7e34154C9AC945B489978fA7E7',
+      L1StandardBridge: '0xf188F1e92B2c78956D2859b84684BFD17103e22c',
+      StateCommitmentChain: '0x1ef85D873Cf451C8B9a45DbE40b478E991F51210',
+      CanonicalTransactionChain: '0x1A19A4ce2b3B0A974Df717b6F88c881a69F315e3',
+      BondManager: '0x26c319B7B2cF823365414d082698C8ac90cbBA63',
+      L1MultiMessageRelayer: '0x87e062dE99Ed71aF9b22dDA63e1b6D43333798f8',
+      L1MultiMessageRelayerFast: '0xf9821061774b9693359F582b007A5F1C39d75Ae3',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // BNB local
+  99: {
+    l1: {
+      AddressManager: '0xC194E4CFa59D2DfC520217dA22E23DF8D4658a37',
+      L1CrossDomainMessenger: '0x8b8656D5d37C3DC620B80817972E0d9a5267761b',
+      L1CrossDomainMessengerFast: '0x07B43F437c3A13eeb17EF2beBea046e61502151f',
+      L1StandardBridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      StateCommitmentChain: '0x57a243B34F9232515Fa9FD8D4c2daFd611cF1BCA',
+      CanonicalTransactionChain: '0x3717E342Bc746c01244fb40e47521945091238ce',
+      BondManager: '0xcF8dDe2accE564024B4b92ef7db81B0e6698F07f',
+      L1MultiMessageRelayer: '0x90f502229E1fAa70cCf900B2D14595a5C55B3bE8',
+      L1MultiMessageRelayerFast: '0x64160054BdD6e53915C221cBBfAAbaf1f80c7f20',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // BNB testnet
+  97: {
+    l1: {
+      AddressManager: '0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa',
+      L1CrossDomainMessenger: '0x53aD38aE4a63Fe33a86E011F7AF4d3fDe3daD145',
+      L1CrossDomainMessengerFast: '0xbbD6a271abcC44f6dE284E6051Da76b4fB57458C',
+      L1StandardBridge: '0xBf0939120b4F5E3196b9E12cAC291e03dD058e9a',
+      StateCommitmentChain: '0x37FB8bB9EA100CA9a0DE822c9923643ef48Cb8EE',
+      CanonicalTransactionChain: '0x65f291CDfB05bd1D639DF6268F98594fdacDeCa6',
+      BondManager: '0x6737867ddd04272a79E7207a008f213e336b00e1',
+      L1MultiMessageRelayer: '0x5e593AeB2Dbd855D79167831f091B4d959FbB2D1',
+      L1MultiMessageRelayerFast: '0x0F01394F5fc19bA1B9F669bA79b76c9EaAe37987',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
+  // BNB mainnet
+  56: {
+    l1: {
+      AddressManager: '0xeb989B25597259cfa51Bd396cE1d4B085EC4c753',
+      L1CrossDomainMessenger: '0x31338a7D5d123E18a9a71447136B54B6D28241ae',
+      L1CrossDomainMessengerFast: '0xBe349cABeA97bB933f8C2594634Deb858167f83c',
+      L1StandardBridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
+      StateCommitmentChain: '0xeF85fA550e6EC5486121313C895EDe1005e2397f',
+      CanonicalTransactionChain: '0xA0E38a8FE293E9e95c6A4a882F396F1c80e9e2e4',
+      BondManager: '0xEB6652A4eb6e0d003Fbb3DD76Ae72694175191cd',
+      L1MultiMessageRelayer: '0x1E633Dcd0d3D349126983D58988051F7c62c543D',
+      L1MultiMessageRelayerFast: '0x2dB5717B37Af9A1D9a28829Ea977B4aE4aEE2AED',
+    },
+    l2: DEFAULT_L2_CONTRACT_ADDRESSES,
+  },
 }
 
 /**
