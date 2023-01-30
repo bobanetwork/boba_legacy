@@ -4,17 +4,17 @@ pragma experimental ABIEncoderV2;
 import "./GovernorBravoInterfaces.sol";
 import "../../libraries/SafeMathDAO.sol";
 
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents {
+contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
     using SafeMath for uint96;
 
     /// @notice The name of this contract
     string public constant name = "Boba Governor";
 
     /// @notice The minimum setable proposal threshold
-    uint public constant MIN_PROPOSAL_THRESHOLD = 25000e18;  //  25,000 veBOBA
+    uint public constant MIN_PROPOSAL_THRESHOLD = 50000e18;  //  50,000 BOBA
 
     /// @notice The maximum setable proposal threshold
-    uint public constant MAX_PROPOSAL_THRESHOLD = 100000e18; // 100,000 veBOBA
+    uint public constant MAX_PROPOSAL_THRESHOLD = 500000e18; // 500,000 BOBA
 
     /// @notice The minimum setable voting period
     uint public constant MIN_VOTING_PERIOD = 3 days;     // seconds
@@ -29,7 +29,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     uint public constant MAX_VOTING_DELAY = 7 days; // 1 week
 
     /// @notice The number of votes in support of a proposal required for a quorum to be reached and for a vote to succeed
-    uint public constant quorumVotes = 250000e18; // 250,000 veBOBA
+    uint public constant quorumVotes = 1000000e18; // 1,000,000 BOBA
 
     /// @notice The maximum number of actions that can be included in a proposal
     uint public constant proposalMaxOperations = 10; // 10 actions
@@ -43,22 +43,25 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /**
       * @notice Used to initialize the contract during delegator contructor
       * @param timelock_ The address of the Timelock
-      * @param ve_ The address of the ve lock contract
+      * @param bobaToken_ The address of the L2 BOBA token
+      * @param xbobaToken_ The address of the L2 xBOBA token
       * @param votingPeriod_ The initial voting period in seconds
       * @param votingDelay_ The initial voting delay in seconds
       * @param proposalThreshold_ The initial proposal threshold
       */
-    function initialize(address timelock_, address ve_, uint votingPeriod_, uint votingDelay_, uint proposalThreshold_) public {
+    function initialize(address timelock_, address bobaToken_, address xbobaToken_, uint votingPeriod_, uint votingDelay_, uint proposalThreshold_) public {
         require(address(timelock) == address(0), "GovernorBravo::initialize: can only initialize once");
         require(msg.sender == admin, "GovernorBravo::initialize: admin only");
         require(timelock_ != address(0), "GovernorBravo::initialize: invalid timelock address");
-        require(ve_ != address(0), "GovernorBravo::initialize: invalid ve address");
+        require(bobaToken_ != address(0), "GovernorBravo::initialize: invalid l2 boba address");
+        require(xbobaToken_ != address(0), "GovernorBravo::initialize: invalid l2 xboba address");
         require(votingPeriod_ >= MIN_VOTING_PERIOD && votingPeriod_ <= MAX_VOTING_PERIOD, "GovernorBravo::initialize: invalid voting period");
         require(votingDelay_ >= MIN_VOTING_DELAY && votingDelay_ <= MAX_VOTING_DELAY, "GovernorBravo::initialize: invalid voting delay");
         require(proposalThreshold_ >= MIN_PROPOSAL_THRESHOLD && proposalThreshold_ <= MAX_PROPOSAL_THRESHOLD, "GovernorBravo::initialize: invalid proposal threshold");
 
         timelock = TimelockInterface(timelock_);
-        ve = VeInterface(ve_);
+        boba = BobaInterface(bobaToken_);
+        xboba = BobaInterface(xbobaToken_);
         votingPeriod = votingPeriod_;
         votingDelay = votingDelay_;
         proposalThreshold = proposalThreshold_;
@@ -70,32 +73,13 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
       * @param values Eth values for proposal calls
       * @param signatures Function signatures for proposal calls
       * @param calldatas Calldatas for proposal calls
-      * @param tokenIds tokenIds to use to propose
       * @param description String description of the proposal
       * @return Proposal id of new proposal
       */
-    function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, uint[] memory tokenIds, string memory description) public returns (uint) {
+    function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, string memory description) public returns (uint) {
         // Reject proposals before initiating as Governor
         require(initialProposalId != 0, "GovernorBravo::propose: Governor Bravo not active");
-        // check if the length is not zero
-        require(tokenIds.length != 0, "GovernorBravo::propose: must provide tokenIds");
-        uint256 totalVePower;
-        // loop through tokenIds array
-        for (uint i = 0; i < tokenIds.length; i++) {
-          // check if token is not already used on this proposal
-          // if user repeats
-          Receipt storage receipt = veReceipts[proposalCount + 1][tokenIds[i]];
-          require(receipt.hasVoted == false, "GovernorBravo::propose: tokenId already used for proposal");
-          // check if owner or approved
-          require(ve.isApprovedOrOwner(msg.sender, tokenIds[i]), "GovernorBravo::propose: Invalid tokenId provided");
-          // add tokenId power
-          // ve power at current timestamp, user cannot unlock tokens before expiry
-          totalVePower += ve.balanceOfNFT(tokenIds[i]);
-          // set tokenId used on receipt so cannot be used again on this proposal
-          receipt.hasVoted = true;
-        }
-
-        require(totalVePower > proposalThreshold, "GovernorBravo::propose: proposer votes below proposal threshold");
+        require(boba.getPriorVotes(msg.sender, sub256(block.number, 1)).add(xboba.getPriorVotes(msg.sender, sub256(block.number, 1))) > proposalThreshold, "GovernorBravo::propose: proposer votes below proposal threshold");
         require(targets.length == values.length && targets.length == signatures.length && targets.length == calldatas.length, "GovernorBravo::propose: proposal function information arity mismatch");
         require(targets.length != 0, "GovernorBravo::propose: must provide actions");
         require(targets.length <= proposalMaxOperations, "GovernorBravo::propose: too many actions");
@@ -121,6 +105,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             signatures: signatures,
             calldatas: calldatas,
             description: description,
+            startBlock: 0,
             startTimestamp: startTimestamp,
             endTimestamp: endTimestamp,
             forVotes: 0,
@@ -172,14 +157,14 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     }
 
     /**
-      * @notice Cancels a proposal only if sender is the proposer
+      * @notice Cancels a proposal only if sender is the proposer, or proposer delegates dropped below proposal threshold
       * @param proposalId The id of the proposal to cancel
       */
     function cancel(uint proposalId) external {
         require(state(proposalId) != ProposalState.Executed, "GovernorBravo::cancel: cannot cancel executed proposal");
 
         Proposal storage proposal = proposals[proposalId];
-        require(msg.sender == proposal.proposer, "GovernorBravo::cancel: only proposer can cancel");
+        require(msg.sender == proposal.proposer || boba.getPriorVotes(proposal.proposer, sub256(block.number, 1)).add(xboba.getPriorVotes(proposal.proposer, sub256(block.number, 1))) < proposalThreshold, "GovernorBravo::cancel: proposer above threshold");
 
         proposal.canceled = true;
         for (uint i = 0; i < proposal.targets.length; i++) {
@@ -202,11 +187,11 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /**
       * @notice Gets the receipt for a voter on a given proposal
       * @param proposalId the id of proposal
-      * @param tokenId The veNFT tokenId
+      * @param voter The address of the voter
       * @return The voting receipt
       */
-    function getReceipt(uint proposalId, uint tokenId) external view returns (Receipt memory) {
-        return veReceipts[proposalId][tokenId];
+    function getReceipt(uint proposalId, address voter) external view returns (Receipt memory) {
+        return proposals[proposalId].receipts[voter];
     }
 
     /**
@@ -240,33 +225,32 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
       * @notice Cast a vote for a proposal
       * @param proposalId The id of the proposal to vote on
       * @param support The support value for the vote. 0=against, 1=for, 2=abstain
-      * @param tokenIds The tokenIds to use to vote
       */
-    function castVote(uint proposalId, uint8 support, uint[] calldata tokenIds) external {
-        emit VoteCast(msg.sender, proposalId, support, castVoteInternal(msg.sender, proposalId, support, tokenIds), "");
+    function castVote(uint proposalId, uint8 support) external {
+        emit VoteCast(msg.sender, proposalId, support, castVoteInternal(msg.sender, proposalId, support), "");
     }
 
     /**
       * @notice Cast a vote for a proposal with a reason
       * @param proposalId The id of the proposal to vote on
       * @param support The support value for the vote. 0=against, 1=for, 2=abstain
-      * @param tokenIds The tokenIds to use to vote
       * @param reason The reason given for the vote by the voter
       */
-    function castVoteWithReason(uint proposalId, uint8 support, uint[] calldata tokenIds, string calldata reason) external {
-        emit VoteCast(msg.sender, proposalId, support, castVoteInternal(msg.sender, proposalId, support, tokenIds), reason);
+    function castVoteWithReason(uint proposalId, uint8 support, string calldata reason) external {
+        emit VoteCast(msg.sender, proposalId, support, castVoteInternal(msg.sender, proposalId, support), reason);
     }
 
     /**
       * @notice Cast a vote for a proposal by signature
       * @dev External function that accepts EIP-712 signatures for voting on proposals.
       */
-    function castVoteBySig(uint proposalId, uint8 support, uint[] calldata tokenIds, uint8 v, bytes32 r, bytes32 s) external {
+    function castVoteBySig(uint proposalId, uint8 support, uint8 v, bytes32 r, bytes32 s) external {
         bytes32 domainSeparator = keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name)), getChainIdInternal(), address(this)));
         bytes32 structHash = keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support));
-        address signatory = ecrecover(keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash)), v, r, s);
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
+        address signatory = ecrecover(digest, v, r, s);
         require(signatory != address(0), "GovernorBravo::castVoteBySig: invalid signature");
-        emit VoteCast(signatory, proposalId, support, castVoteInternal(signatory, proposalId, support, tokenIds), "");
+        emit VoteCast(signatory, proposalId, support, castVoteInternal(signatory, proposalId, support), "");
     }
 
     /**
@@ -274,43 +258,37 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
       * @param voter The voter that is casting their vote
       * @param proposalId The id of the proposal to vote on
       * @param support The support value for the vote. 0=against, 1=for, 2=abstain
-      * @param tokenIds The tokenIds to use to vote
       * @return The number of votes cast
       */
-    function castVoteInternal(address voter, uint proposalId, uint8 support, uint[] memory tokenIds) internal returns (uint) {
+    function castVoteInternal(address voter, uint proposalId, uint8 support) internal returns (uint96) {
         require(state(proposalId) == ProposalState.Active, "GovernorBravo::castVoteInternal: voting is closed");
         require(support <= 2, "GovernorBravo::castVoteInternal: invalid vote type");
-        // check if the length is not zero
-        require(tokenIds.length != 0, "GovernorBravo::castVoteInternal: must provide tokenIds");
-
         Proposal storage proposal = proposals[proposalId];
 
-        uint256 totalVePower;
-        for (uint i = 0; i < tokenIds.length; i++) {
-          // check if token is not already used on this proposal
-          Receipt storage receipt = veReceipts[proposalId][tokenIds[i]];
-          require(receipt.hasVoted == false, "GovernorBravo::castVoteInternal: tokenId already used for proposal");
-          // check if owner or approved
-          // ve locks that have been merged with other locks are burned, and cannot be used here
-          require(ve.isApprovedOrOwner(voter, tokenIds[i]), "GovernorBravo::castVoteInternal: Invalid tokenId provided");
-          // get ve balance at startTimestamp of this proposal
-          uint veBalance = ve.ve_for_at(tokenIds[i], proposal.startTimestamp);
-          totalVePower += veBalance;
-          // set tokenId used on receipt so cannot be used again on this proposal
-          receipt.hasVoted = true;
-          receipt.support = support;
-          receipt.votes = uint96(veBalance);
+        // set the startBlock to the first voters block
+        // this is to solve the unpredicatble blocks on L2
+        // the first voter in the voting period also sets the voting power snapshot
+        if (proposal.startBlock == 0) {
+          proposal.startBlock = sub256(block.number, 1);
         }
+
+        Receipt storage receipt = proposal.receipts[voter];
+        require(receipt.hasVoted == false, "GovernorBravo::castVoteInternal: voter already voted");
+        uint96 votes = boba.getPriorVotes(voter, proposal.startBlock).add(xboba.getPriorVotes(voter, proposal.startBlock));
 
         if (support == 0) {
-            proposal.againstVotes = add256(proposal.againstVotes, totalVePower);
+            proposal.againstVotes = add256(proposal.againstVotes, votes);
         } else if (support == 1) {
-            proposal.forVotes = add256(proposal.forVotes, totalVePower);
+            proposal.forVotes = add256(proposal.forVotes, votes);
         } else if (support == 2) {
-            proposal.abstainVotes = add256(proposal.abstainVotes, totalVePower);
+            proposal.abstainVotes = add256(proposal.abstainVotes, votes);
         }
 
-        return totalVePower;
+        receipt.hasVoted = true;
+        receipt.support = support;
+        receipt.votes = votes;
+
+        return votes;
     }
 
     /**

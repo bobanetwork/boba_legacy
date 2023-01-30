@@ -144,7 +144,7 @@ const BaseServices = {
   // Mainnet meta transaction
   MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
   // goerli meta transaction
-  Goerli_META_TRANSACTION: `https://api-meta-transaction.goerli.boba.network/`,
+  GOERLI_META_TRANSACTION: `https://api-meta-transaction.goerli.boba.network/`,
 }
 
 export function getNetwork() {

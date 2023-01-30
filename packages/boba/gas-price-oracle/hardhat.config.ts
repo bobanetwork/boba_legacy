@@ -1,7 +1,6 @@
 import { HardhatUserConfig } from 'hardhat/types'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import 'hardhat-deploy'
 
 const config: HardhatUserConfig = {
   mocha: {

@@ -95,32 +95,34 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const preL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
     const preL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
 
-    const approveL1BOBATX = await L1BOBAToken.approve(
-      L1StandardBridge.address,
-      depositBOBAAmount
-    )
-    await approveL1BOBATX.wait()
-
-    await env.waitForXDomainTransaction(
-      L1StandardBridge.depositERC20(
-        L1BOBAToken.address,
-        L2BOBAToken.address,
-        depositBOBAAmount,
-        9999999,
-        ethers.utils.formatBytes32String(new Date().getTime().toString())
+    if (preL2BOBABalance.lt(depositBOBAAmount)) {
+      const approveL1BOBATX = await L1BOBAToken.approve(
+        L1StandardBridge.address,
+        depositBOBAAmount
       )
-    )
+      await approveL1BOBATX.wait()
 
-    const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
-    const postL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+      await env.waitForXDomainTransaction(
+        L1StandardBridge.depositERC20(
+          L1BOBAToken.address,
+          L2BOBAToken.address,
+          depositBOBAAmount,
+          9999999,
+          ethers.utils.formatBytes32String(new Date().getTime().toString())
+        )
+      )
 
-    expect(preL1BOBABalance).to.deep.eq(
-      postL1BOBABalance.add(depositBOBAAmount)
-    )
+      const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
+      const postL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
 
-    expect(preL2BOBABalance).to.deep.eq(
-      postL2BOBABalance.sub(depositBOBAAmount)
-    )
+      expect(preL1BOBABalance).to.deep.eq(
+        postL1BOBABalance.add(depositBOBAAmount)
+      )
+
+      expect(preL2BOBABalance).to.deep.eq(
+        postL2BOBABalance.sub(depositBOBAAmount)
+      )
+    }
   }).retries(3)
 
   it('contract should be whitelisted', async () => {

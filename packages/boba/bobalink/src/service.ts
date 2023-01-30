@@ -65,7 +65,7 @@ export class BobaLinkService extends BaseService<BobaLinkOptions> {
     }, {})
     /* eslint-enable */
 
-    for (const [_, contracts] of Object.entries(this.state.bobaLinkContracts)) {
+    for (const [, contracts] of Object.entries(this.state.bobaLinkContracts)) {
       this.logger.info('Connected to bobaLink contract', {
         pair: this.options.bobaLinkPairs[contracts.l1Contract.address].pair,
         l1ContractAddress: contracts.l1Contract.address,
@@ -80,7 +80,7 @@ export class BobaLinkService extends BaseService<BobaLinkOptions> {
 
   async _start(): Promise<void> {
     while (this.running) {
-      for (const [_, contracts] of Object.entries(
+      for (const [, contracts] of Object.entries(
         this.state.bobaLinkContracts
       )) {
         try {
