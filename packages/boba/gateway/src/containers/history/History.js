@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { batch, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'lodash'
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
@@ -30,7 +30,7 @@ import { selectActiveHistoryTab } from 'selectors/uiSelector'
 
 import { fetchTransactions } from 'actions/networkAction'
 import { selectTransactions } from 'selectors/transactionSelector'
-import { selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
@@ -47,6 +47,7 @@ import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function History() {
 
@@ -61,9 +62,11 @@ function History() {
   const [startDate, setStartDate] = useState(last_6months)
   const [endDate, setEndDate] = useState(now)
   const layer = useSelector(selectLayer())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
   const [searchHistory, setSearchHistory] = useState('')
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
+  const networkName = useSelector(selectActiveNetworkName())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
@@ -76,9 +79,9 @@ function History() {
   })
 
   useInterval(() => {
-    batch(()=>{
+    if (accountEnabled) {
       dispatch(fetchTransactions())
-    })
+    }
   }, POLL_INTERVAL)
 
   return (
@@ -139,7 +142,7 @@ function History() {
           <Tabs
             onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
             activeTab={activeTab}
-            tabs={['All', 'Ethereum to Boba Ethereum L2', 'Boba Ethereum L2 to Ethereum', 'Bridge between L1s', 'Pending']}
+            tabs={['All', `${networkName['l1']} to ${networkName['l2']}`, `${networkName['l2']} to ${networkName['l1']}`, 'Bridge between L1s', 'Pending']}
           />
 
           {activeTab === 'All' && (
@@ -149,14 +152,14 @@ function History() {
             />
           )}
 
-          {activeTab === 'Ethereum to Boba Ethereum L2' &&
+          {activeTab === `${networkName['l1']} to ${networkName['l2']}` &&
             <Deposits
               searchHistory={searchHistory}
               transactions={transactions}
             />
           }
 
-          {activeTab === 'Boba Ethereum L2 to Ethereum' &&
+          {activeTab === `${networkName['l2']} to ${networkName['l1']}` &&
             <Exits
               searchHistory={searchHistory}
               transactions={transactions}

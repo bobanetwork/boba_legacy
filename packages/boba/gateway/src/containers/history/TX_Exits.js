@@ -34,8 +34,8 @@ const PER_PAGE = 8
 
 function TX_Exits({ searchHistory, transactions, chainLink }) {
 
-  const [page, setPage] = useState(1)
-  const loading = useSelector(selectLoading(['EXIT/GETALL']))
+  const [ page, setPage ] = useState(1)
+  const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
   const tokenList = useSelector(selectTokens)
   const allAddresses = networkService.getAllAddresses()
 

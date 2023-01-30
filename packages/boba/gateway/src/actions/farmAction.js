@@ -1,6 +1,6 @@
 /*
   Varna - A Privacy-Preserving Marketplace
-  Varna uses Fully Homomorphic Encryption to make markets fair. 
+  Varna uses Fully Homomorphic Encryption to make markets fair.
   Copyright (C) 2021 Enya Inc. Palo Alto, CA
 
   This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,6 @@ const getFarmInfoSuccess = (L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo) => (
 // })
 
 export const getFarmInfo = () => async (dispatch) => {
-  console.log("getFarmInfo()")
   dispatch(getFarmInfoBegin())
    const [L1LPInfo, L2LPInfo] = await Promise.all([
     networkService.getL1LPInfo(),
