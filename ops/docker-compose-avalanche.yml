@@ -497,6 +497,7 @@ services:
 
 networks:
   ava-network:
+    name: local-network
     enable_ipv6: true
     ipam:
       config:

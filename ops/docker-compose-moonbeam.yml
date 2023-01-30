@@ -427,3 +427,7 @@ services:
         target: /init/seed.yaml
     ports:
       - 8888:8888
+
+networks:
+  default:
+    name: local-network
