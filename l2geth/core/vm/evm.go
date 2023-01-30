@@ -504,7 +504,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	}
 
 	proxyStr := fmt.Sprintf("socks5://%s:%s@%s", proxyUser, proxyPass, proxyAddr)
-	client, err := rpc.ProxyDial(proxyStr,url)
+	client, err := rpc.ProxyDial(proxyStr, url)
 
 	if client != nil && err == nil {
 		startT := time.Now()
