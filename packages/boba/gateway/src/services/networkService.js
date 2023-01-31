@@ -403,7 +403,6 @@ class NetworkService {
     networkType
   }) {
 
-    let addresses = null;
     this.network = network; //// refer this in other services and clean up iteratively.
     this.networkGateway = network // e.g. mainnet | goerli | ...
     this.networkType = networkType // e.g. mainnet | goerli | ...
@@ -444,15 +443,6 @@ class NetworkService {
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
 
-      if (!!NETWORK[ network ]) {
-        addresses = appService.fetchAddresses({
-          network,
-          networkType
-        });
-      }
-
-      this.addresses = addresses
-
       // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
 
@@ -465,19 +455,19 @@ class NetworkService {
 
       if (network === NETWORK.ETHEREUM) {
         // check only if selected network is ETHEREUM
-        if (!(await this.getAddressCached(addresses, 'BobaMonsters', 'BobaMonsters'))) return
-        if (!(await this.getAddressCached(addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
-        if (!(await this.getAddressCached(addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
-        if (!(await this.getAddressCached(addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
+        if (!(await this.getAddressCached(this.addresses, 'BobaMonsters', 'BobaMonsters'))) return
+        if (!(await this.getAddressCached(this.addresses, 'Proxy__L1LiquidityPool', 'L1LPAddress'))) return
+        if (!(await this.getAddressCached(this.addresses, 'Proxy__L2LiquidityPool', 'L2LPAddress'))) return
+        if (!(await this.getAddressCached(this.addresses, 'Proxy__BobaFixedSavings', 'BobaFixedSavings'))) return
       }
 
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
-      if (!(await this.getAddressCached(addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
+      if (!(await this.getAddressCached(this.addresses, 'Proxy__L1CrossDomainMessenger', 'L1MessengerAddress'))) return
+      if (!(await this.getAddressCached(this.addresses, 'Proxy__L1CrossDomainMessengerFast', 'L1FastMessengerAddress'))) return
+      if (!(await this.getAddressCached(this.addresses, 'Proxy__L1StandardBridge', 'L1StandardBridgeAddress'))) return
+      if (!(await this.getAddressCached(this.addresses, 'Proxy__Boba_GasPriceOracle', 'Boba_GasPriceOracle'))) return
 
       // not critical
-      this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
+      this.getAddressCached(this.addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
 
       this.L1StandardBridgeContract = new ethers.Contract(
         this.addresses.L1StandardBridgeAddress,
@@ -497,8 +487,8 @@ class NetworkService {
       const tokenList = {}
 
       this.supportedTokens.forEach((key) => {
-        const L1a = addresses[ 'TK_L1' + key ]
-        const L2a = addresses[ 'TK_L2' + key ]
+        const L1a = this.addresses[ 'TK_L1' + key ]
+        const L2a = this.addresses[ 'TK_L2' + key ]
 
         if (key === 'xBOBA') {
           if (L2a === ERROR_ADDRESS) {
@@ -528,16 +518,16 @@ class NetworkService {
       this.tokenAddresses = tokenList
       allTokens = tokenList;
 
-      if(addresses.L2StandardBridgeAddress !== null) {
+      if(this.addresses.L2StandardBridgeAddress !== null) {
         this.L2StandardBridgeContract = new ethers.Contract(
-          addresses.L2StandardBridgeAddress,
+          this.addresses.L2StandardBridgeAddress,
           L2StandardBridgeJson.abi,
           this.L2Provider
         )
       }
 
       this.L2_ETH_Contract = new ethers.Contract(
-        addresses.L2_ETH_Address,
+        this.addresses.L2_ETH_Address,
         L2ERC20Json.abi,
         this.L2Provider
       )
@@ -567,12 +557,12 @@ class NetworkService {
       // Liquidity pools
 
       this.L1LPContract = new ethers.Contract(
-        addresses.L1LPAddress,
+        this.addresses.L1LPAddress,
         L1LPJson.abi,
         this.L1Provider
       )
       this.L2LPContract = new ethers.Contract(
-        addresses.L2LPAddress,
+        this.addresses.L2LPAddress,
         L2LPJson.abi,
         this.L2Provider
       )
@@ -603,8 +593,8 @@ class NetworkService {
           this.L2Provider
         )
 
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
-        if (!(await this.getAddressCached(addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
+        if (!(await this.getAddressCached(this.addresses, 'GovernorBravoDelegate', 'GovernorBravoDelegate'))) return
+        if (!(await this.getAddressCached(this.addresses, 'GovernorBravoDelegator', 'GovernorBravoDelegator'))) return
 
         this.delegateContract = new ethers.Contract(
           this.addresses.GovernorBravoDelegate,
@@ -639,7 +629,7 @@ class NetworkService {
     }
   }
 
-  async initializeAccount({ networkGateway, networkType }) {
+  async initializeAccount({ networkGateway: network, networkType }) {
 
     try {
 
@@ -651,14 +641,25 @@ class NetworkService {
       const networkMM = await this.provider.getNetwork()
       this.chainID = networkMM.chainId
       this.networkName = networkMM.name
-      this.networkGateway = networkGateway
+      this.networkGateway = network
       this.networkType = networkType
 
       // defines the set of possible networks along with chainId for L1 and L2
       const networkDetail = getNetworkDetail({
-        network: networkGateway,
+        network,
         networkType
       })
+
+      let addresses;
+      // setting up all address;
+      if (!!NETWORK[ network ]) {
+        addresses = appService.fetchAddresses({
+          network,
+          networkType
+        });
+      }
+
+      this.addresses = addresses
 
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
@@ -666,22 +667,19 @@ class NetworkService {
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
-      if (!!NETWORK[ networkGateway ] && networkMM.chainId === L2ChainId) {
+      if (!!NETWORK[ network ] && networkMM.chainId === L2ChainId) {
         this.L1orL2 = 'L2';
-      } else if(!!NETWORK[ networkGateway ] && networkMM.chainId === L1ChainId) {
+      } else if(!!NETWORK[ network ] && networkMM.chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
-        console.log("ERROR: networkGateway does not match actual network.chainId")
+        console.log("ERROR: network does not match actual network.chainId")
         this.bindProviderListeners()
         return 'wrongnetwork'
       }
 
       this.bindProviderListeners()
       // this should not do anything unless we changed chains
-      if (this.L1orL2 === 'L2') {
-        // only fetch boba fee choice incase of Layer 2
-        await this.getBobaFeeChoice()
-      }
+      await this.getBobaFeeChoice()
 
       return this.L1orL2 // return the layer we are actually on
 

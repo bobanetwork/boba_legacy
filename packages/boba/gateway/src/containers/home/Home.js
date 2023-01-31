@@ -182,6 +182,8 @@ function Home() {
 
       //specific to ETH network
       if (activeNetwork === NETWORK.ETHEREUM) {
+        // FIXME: Clear Interval on switch network
+        // FIXME: Or Find out some otherways to avoid crash of undefined contract address.
         dispatch(fetchDaoBalance())      // account specific
         dispatch(fetchDaoVotes())        // account specific
         dispatch(fetchDaoBalanceX())     // account specific
