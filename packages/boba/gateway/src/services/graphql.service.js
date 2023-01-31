@@ -1,6 +1,6 @@
 import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
 import fetch from 'cross-fetch';
-import { NETWORK, NETWORK_TYPE } from 'util/network/network.util';
+import { NETWORK_TYPE } from 'util/network/network.util';
 import networkService from './networkService';
 
 class GraphQLService {
