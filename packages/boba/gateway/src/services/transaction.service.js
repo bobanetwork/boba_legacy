@@ -1,36 +1,9 @@
-import etherScanInstance from "api/etherScanAxios";
 import omgxWatcherAxiosInstance from "api/omgxWatcherAxios";
 import networkService from "./networkService";
 
 
 class TransactionService {
 
-
-  // fetch L1 transactions from EtherScan
-  async fetchEtherscanTx() {
-    let L1Txs = [];
-    try {
-      const BEUrl = networkService.networkConfig[ networkService.L1orL2 ].blockExplorer;
-      const responseL1 = await etherScanInstance(BEUrl).get(`&address=${networkService.account}`)
-      if (responseL1.status === 200) {
-        const transactionsL1 = await responseL1.data
-        console.log(['transactionsL1.result',transactionsL1.result])
-        if (transactionsL1.status === '1') {
-          //thread in ChainID
-          L1Txs = transactionsL1.result.map(v => ({
-            ...v,
-            blockNumber: parseInt(v.blockNumber), //fix bug - sometimes this is string, sometimes an integer
-            timeStamp: parseInt(v.timeStamp),     //fix bug - sometimes this is string, sometimes an integer
-            chain: 'L1'
-          }))
-        }
-      }
-      return L1Txs
-    } catch (error) {
-      console.log('TS: Error while fetching txs')
-      return L1Txs
-    }
-  }
   // fetch L2 transactions from omgxWatcherAxiosInstance
   async fetchL2Tx() {
     let L2Txs = [];
