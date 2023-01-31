@@ -17,6 +17,7 @@ import Lock from 'containers/veboba/Lock';
 import Vote from 'containers/VoteAndDao/Vote/Vote';
 import BobaScope from 'containers/bobaScope/BobaScope';
 import Help from 'containers/help/Help';
+import DevTools from 'containers/devtools/DevTools';
 
 export const COMMON_ROUTES = [
   {
@@ -28,6 +29,11 @@ export const COMMON_ROUTES = [
     path: ROUTES_PATH.BOBASCOPE,
     element: <BobaScope />,
     key: 'bobascope',
+  },
+  {
+    path: ROUTES_PATH.DEV_TOOLS,
+    element: <DevTools />,
+    key: 'Devtool',
   },
   {
     path: ROUTES_PATH.HELP,
