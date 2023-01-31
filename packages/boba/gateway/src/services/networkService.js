@@ -164,7 +164,6 @@ class NetworkService {
     this.AtomicSwapContract = null
 
     this.tokenAddresses = null
-    this.addresses = null
 
     // chain ID
     this.chainID = null
@@ -687,8 +686,10 @@ class NetworkService {
 
       this.bindProviderListeners()
       // this should not do anything unless we changed chains
-
-      await this.getBobaFeeChoice()
+      if (this.L1orL2 === 'L2') {
+        // only fetch boba fee choice incase of Layer 2
+        await this.getBobaFeeChoice()
+      }
 
       return this.L1orL2 // return the layer we are actually on
 
