@@ -1,35 +1,28 @@
-import { DeployFunction } from 'hardhat-deploy/types'
+import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
+import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
+import EntryPointJson from '../artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 
-// const UNSTAKE_DELAY_SEC = 100
-// const PAYMASTER_STAKE = ethers.utils.parseEther('1')
+let Factory__EntryPoint: ContractFactory
+let EntryPoint: Contract
 
-// deploy entrypoint - but only on debug network..
 const deployFn: DeployFunction = async (hre) => {
-  // first verify if already deployed:
-  try {
-    await hre.deployments.deploy(
-      'EntryPoint', {
-        from: ethers.constants.AddressZero,
-        args: [],
-        deterministicDeployment: true,
-        log: true
-      })
+  Factory__EntryPoint = new ContractFactory(
+    EntryPointJson.abi,
+    EntryPointJson.bytecode,
+    (hre as any).deployConfig.deployer_l2
+  )
+  EntryPoint = await Factory__EntryPoint.deploy()
+  await EntryPoint.deployTransaction.wait()
 
-    // already deployed. do nothing.
-    return
-  } catch (e) {
+  const EntryPointDeploymentSubmission: DeploymentSubmission = {
+    ...EntryPoint,
+    receipt: EntryPoint.receipt,
+    address: EntryPoint.address,
+    abi: EntryPointJson.abi
   }
-
-  const EntryPoint = await hre.deployments.deploy(
-    'EntryPoint', {
-      from: (hre as any).deployConfig.deployer_l2.address,
-      args: [],
-      gasLimit: 4e6,
-      deterministicDeployment: true,
-      log: true
-    })
+  await hre.deployments.save('EntryPoint', EntryPointDeploymentSubmission)
 
   await registerBobaAddress( (hre as any).deployConfig.addressManager, 'Boba_EntryPoint', EntryPoint.address )
 }
