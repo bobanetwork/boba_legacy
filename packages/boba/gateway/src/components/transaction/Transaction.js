@@ -47,6 +47,8 @@ function Transaction({
   toChain
 }) {
 
+  console.log(['chain',chain])
+
   const [dropDownBox, setDropDownBox] = useState(false)
 
   const theme = useTheme()
@@ -107,7 +109,7 @@ function Transaction({
   }
 
   return (
-    <S.Wrapper dropDownBox={dropDownBox}>
+    <S.Wrapper>
 
       <S.GridContainer
         container
