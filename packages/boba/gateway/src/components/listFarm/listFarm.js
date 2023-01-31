@@ -208,7 +208,7 @@ class ListFarm extends React.Component {
     }
 
     return (
-      <S.Wrapper dropDownBox={dropDownBox}>
+      <S.Wrapper>
         {pageLoading ? (
           <Box sx={{ textAlign: 'center' }}>
             <CircularProgress color="secondary" />
