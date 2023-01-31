@@ -128,47 +128,57 @@ const SUPPORTED_ASSETS = {
           'L1': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a',
           'L2': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a'
         }
-      }
+      },
+      altL1Chains: [ 'Moonbeam', 'BNB', 'Fantom', 'Avalanche' ]
     },
     [ NETWORK.AVAX ]: {
       tokenAddresses: {
         'EVO': { 'L1': '0x42006Ab57701251B580bDFc24778C43c9ff589A1', 'L2': '0xc8849f32138de93F6097199C5721a9EfD91ceE01' }
       },
-      tokens: [ 'BOBA', 'AVAX', 'EVO', 'USDT.e', 'USDt', 'USDC.e', 'BUSD.e', 'BUSD', 'DAI.e' ]
+      tokens: [ 'BOBA', 'AVAX', 'EVO', 'USDT.e', 'USDt', 'USDC.e', 'BUSD.e', 'BUSD', 'DAI.e' ],
+      altL1Chains: [ 'Avalanche' ]
     },
     [ NETWORK.MOONBEAM ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'GLMR' ]
+      tokens: [ 'BOBA', 'GLMR' ],
+      altL1Chains: [ 'Moonbeam' ]
     },
     [ NETWORK.BNB ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'BNB', 'BUSD', 'USDC', 'USDT', 'SUSHI' ]
+      tokens: [ 'BOBA', 'BNB', 'BUSD', 'USDC', 'USDT', 'SUSHI' ],
+      altL1Chains: [ 'BNB' ]
     },
     [ NETWORK.FANTOM ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'FTM', 'USDC', 'DAI' ]
+      tokens: [ 'BOBA', 'FTM', 'USDC', 'DAI' ],
+      altL1Chains: [ 'Bobaopera Mainnet' ]
     },
   },
   [ NETWORK_TYPE.TESTNET ]: {
     [ NETWORK.ETHEREUM ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'USDC', 'OMG', 'xBOBA' ]
+      tokens: [ 'BOBA', 'USDC', 'OMG', 'xBOBA' ],
+      altL1Chains: [ 'BNB', 'Fantom', 'Avalanche' ]
     },
     [ NETWORK.AVAX ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'AVAX' ]
+      tokens: [ 'BOBA', 'AVAX' ],
+      altL1Chains: [ 'Avalanche' ]
     },
     [ NETWORK.MOONBEAM ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'GLMR' ]
+      tokens: [ 'BOBA', 'GLMR' ],
+      altL1Chains: [ 'Moonbase' ]
     },
     [ NETWORK.BNB ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'BNB' ]
+      tokens: [ 'BOBA', 'BNB' ],
+      altL1Chains: [ 'BNB' ]
     },
     [ NETWORK.FANTOM ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'FTM' ]
+      tokens: [ 'BOBA', 'FTM' ],
+      altL1Chains: [ 'Fantom' ]
     },
   }
 }
@@ -224,7 +234,6 @@ class AppService {
   }) {
     return SUPPORTED_ASSETS[ networkType ][ network ] || {};
   }
-
 
   /**
    * @setupInitState

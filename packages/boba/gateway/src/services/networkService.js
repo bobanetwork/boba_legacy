@@ -93,7 +93,7 @@ import GraphQLService from "./graphql.service"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { getNetworkDetail, NETWORK } from 'util/network/network.util'
 import appService from './app.service'
@@ -108,13 +108,6 @@ const L2_ETH_Address = '0x4200000000000000000000000000000000000006'
 const L2GasOracle = '0x420000000000000000000000000000000000000F'
 const L2_SECONDARYFEETOKEN_ADDRESS = '0x4200000000000000000000000000000000000023'
 
-let supportedAltL1Chains = []
-
-if (APP_CHAIN === 'goerli') {
-  supportedAltL1Chains = ['BNB', 'Fantom', 'Avalanche']
-} else if (APP_CHAIN === 'mainnet') {
-  supportedAltL1Chains = ['Moonbeam','BNB', 'Fantom', 'Avalanche']
-}
 let allTokens = {}
 
 function handleChangeChainOnce(chainID_hex_string) {
@@ -196,7 +189,7 @@ class NetworkService {
     this.supportedTokenAddresses = {}
 
     // support alt l1 tokens
-    this.supportedAltL1Chains = supportedAltL1Chains
+    this.supportedAltL1Chains = []
 
     // token info
     this.tokenInfo = {}
@@ -500,6 +493,7 @@ class NetworkService {
 
       this.supportedTokens = tokenAsset.tokens;
       this.supportedTokenAddresses = tokenAsset.tokenAddresses;
+      this.supportedAltL1Chains = tokenAsset.altL1Chains;
       const tokenList = {}
 
       this.supportedTokens.forEach((key) => {
@@ -4461,7 +4455,7 @@ class NetworkService {
       return
     }
     try {
-      const pResponse = supportedAltL1Chains.map(async (type) => {
+      const pResponse = this.supportedAltL1Chains.map(async (type) => {
         let L0_ETH_ENDPOINT = this.addresses.Layer_Zero_Endpoint;
         let ETH_L1_BOBA_ADDRESS = this.addresses.TK_L1BOBA;
         let L0_TARGET_CHAIN_ID = this.addresses.layerZeroTargetChainID;
@@ -4758,7 +4752,6 @@ class NetworkService {
     const delegateCheck = await this.delegateContract.attach(this.addresses.GovernorBravoDelegator)
 
     try {
-
       let proposalList = []
 
       const proposalCounts = await delegateCheck.proposalCount()

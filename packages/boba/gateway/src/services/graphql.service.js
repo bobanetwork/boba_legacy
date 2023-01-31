@@ -1,13 +1,15 @@
 import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client';
 import fetch from 'cross-fetch';
-import { APP_CHAIN } from 'util/constant'
+import { NETWORK_TYPE } from 'util/network/network.util';
+import networkService from './networkService';
 
 class GraphQLService {
 
   getBridgeEndpoint = () => {
-    if (APP_CHAIN === 'mainnet') {
+
+    if (networkService.networkType === NETWORK_TYPE.MAINNET) {
       return `https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph`
-    } else if (APP_CHAIN === 'goerli') {
+    } else if (networkService.networkType === NETWORK_TYPE.TESTNET) {
       return `https://graph.goerli.boba.network/subgraphs/name/boba/Bridges`
     } else {
       return ''
