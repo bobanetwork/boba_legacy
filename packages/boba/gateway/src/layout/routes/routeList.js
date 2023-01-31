@@ -97,7 +97,7 @@ export const ROUTE_LIST = [
       {
         path: ROUTES_PATH.BOBA_CHAINS,
         element: <Ecosystem ecosystemType='BOBA' />,
-        key: 'Ecosystem',
+        key: 'LinksToBobaChains',
         children: [
           {
             path: ':category',
@@ -108,7 +108,7 @@ export const ROUTE_LIST = [
       {
         path: ROUTES_PATH.ECOSYSTEM,
         element: <Ecosystem />,
-        key: 'LinksToBobaChains',
+        key: 'Ecosystem',
         children: [
           {
             path: ':category',

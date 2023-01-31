@@ -801,10 +801,8 @@ class NetworkService {
       if (monsterList.hasOwnProperty('data')) {
         const monsters = monsterList.data.turingMonstersTransferEvents
         for (let i = 0; i < monsters.length; i++) {
-          // console.log("adding monster:", i + 1)
           const tokenId = monsters[i].tokenId
           const owner = await contract.ownerOf(tokenId)
-          //console.log("owner:", owner)
           if (owner.toLowerCase() === this.account.toLowerCase()) {
             await this.addNFT(this.addresses.BobaMonsters, tokenId)
           }
@@ -840,6 +838,7 @@ class NetworkService {
 
     try {
 
+      console.log(['Monster Contract',this.addresses.BobaMonsters])
       const contract = new ethers.Contract(
         this.addresses.BobaMonsters,
         TuringMonsterJson.abi,
