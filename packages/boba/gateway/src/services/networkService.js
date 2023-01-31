@@ -82,7 +82,6 @@ import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardER
 import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
 
 import { getNftImageUrl } from 'util/nftImage'
-import { getNetwork } from 'util/masterConfig'
 
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
@@ -662,7 +661,6 @@ class NetworkService {
       this.networkType = networkType
 
       // defines the set of possible networks along with chainId for L1 and L2
-      // const nw = getNetwork()
       const networkDetail = getNetworkDetail({
         network: networkGateway,
         networkType
@@ -697,35 +695,6 @@ class NetworkService {
       console.log(`NS: ERROR: InitializeAccount `,error)
       return false
     }
-  }
-
-  async addL2Network() {
-
-    console.log("MetaMask: Adding network to MetaMask")
-
-    const nw = getNetwork()
-    const masterConfig = store.getState().setup.masterConfig
-
-    const chainParam = {
-      chainId: '0x' + nw[masterConfig].L2.chainId.toString(16),
-      chainName: nw[masterConfig].L2.name,
-      rpcUrls: [nw[masterConfig].L2.rpcUrl],
-      blockExplorerUrls: [nw[masterConfig].L2.blockExplorer.slice(0, -1)],
-    }
-
-    console.log("MetaMask: Adding ", chainParam)
-
-    // connect to the wallet
-    this.provider = new ethers.providers.Web3Provider(window.ethereum)
-    console.log([ 'Switch Chain addL2Network', chainParam ]);
-    let res = await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-
-    if( res === null ){
-      console.log("MetaMask - Added new RPC")
-    } else {
-      console.log("MetaMask - Error adding new RPC: ", res)
-    }
-
   }
 
 
