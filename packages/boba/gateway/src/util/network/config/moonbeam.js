@@ -1,5 +1,3 @@
-import { ETHERSCAN_API_KEY } from "util/constant";
-
 export const moonbeamConfig = {
   Testnet: {
     OMGX_WATCHER_URL: `https://api-watcher.bobabase.boba.network/`,
@@ -11,7 +9,6 @@ export const moonbeamConfig = {
       chainId: 1287,
       chainIdHex: '0x507',
       rpcUrl: `https://rpc.api.moonbase.moonbeam.network`,
-      blockExplorer: `https://api-moonbase.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://moonbase.moonscan.io/tx/`,
       blockExplorerUrl: `https://moonbase.moonscan.io`,
       symbol: 'DEV',
@@ -39,7 +36,6 @@ export const moonbeamConfig = {
       chainId: 1284,
       chainIdHex: '0x504',
       rpcUrl: `https://rpc.api.moonbeam.network`,
-      blockExplorer: `https://api-moonbeam.moonscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://moonscan.io/tx/`,
       blockExplorerUrl: `https://moonscan.io/`,
       symbol: "GLMR",

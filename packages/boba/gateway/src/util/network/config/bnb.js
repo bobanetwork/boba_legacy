@@ -1,4 +1,3 @@
-import { ETHERSCAN_API_KEY } from "util/constant";
 
 export const bnbConfig = {
   Testnet: {
@@ -11,7 +10,6 @@ export const bnbConfig = {
       chainId: 97,
       chainIdHex: '0x61',
       rpcUrl: `https://data-seed-prebsc-1-s1.binance.org:8545`,
-      blockExplorer: `https://api-testnet.bscscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://testnet.bscscan.com/tx/`,
       blockExplorerUrl: `https://testnet.bscscan.com/`,
       symbol: "tBNB",
@@ -39,7 +37,6 @@ export const bnbConfig = {
       chainId: 56,
       chainIdHex: '0x38',
       rpcUrl: `https://bsc-dataseed.binance.org`,
-      blockExplorer: `https://api.bscscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${process.env.REACT_APP_ETHERSCAN_API}`,
       transaction: `https://bscscan.com/tx/`,
       blockExplorerUrl: `https://bscscan.com/`,
       symbol: "BNB",
