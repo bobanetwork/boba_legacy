@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import {
-  APP_CHAIN, ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
+  APP_CHAIN, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
 } from './constant'
 
 let NETWORK
@@ -31,7 +31,6 @@ if (APP_CHAIN === 'goerli') {
         chainId: 5,
         chainIdHex: '0x5',
         rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
-        blockExplorer: `https://api-goerli.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: `https://goerli.etherscan.io/tx/`
       },
       L2: {
@@ -79,7 +78,6 @@ if (APP_CHAIN === 'goerli') {
         chainId: 1,
         chainIdHex: '0x1',
         rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-        blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: ` https://etherscan.io/tx/`,
       },
       L2: {
@@ -118,7 +116,6 @@ if (APP_CHAIN === 'goerli') {
         chainId: 31337,
         chainIdHex: '0x7A69',
         rpcUrl: `http://${window.location.hostname}:9545`,
-        blockExplorer: null, //does not exist on local
       },
       L2: {
         name: "Local L2",
