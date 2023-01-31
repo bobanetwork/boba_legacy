@@ -735,19 +735,6 @@ class NetworkService {
       networkType: this.networkType
     })
 
-    //the chainParams are only needed for the L2s
-    const chainParam = {
-      chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
-      chainName: networkDetail[targetLayer].name,
-      rpcUrls: [networkDetail[targetLayer].rpcUrl],
-      nativeCurrency: {
-        name: 'BOBA TOKEN',
-        symbol: 'BOBA',
-        decimals: 18,
-      },
-      blockExplorerUrls: [networkDetail[targetLayer].blockExplorer.slice(0, -1)]
-    }
-
     const targetIDHex = networkDetail[targetLayer].chainIdHex
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -763,7 +750,20 @@ class NetworkService {
       // So, lets add it
       if (error.code === 4902) {
         try {
-          console.log([ 'Switch Chain 123', chainParam, targetIDHex ]);
+          //the chainParams are only needed for the L2s
+          const chainParam = {
+            chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
+            chainName: networkDetail[targetLayer].name,
+            rpcUrls: [networkDetail[targetLayer].rpcUrl],
+            nativeCurrency: {
+              name: 'BOBA TOKEN',
+              symbol: 'BOBA',
+              decimals: 18,
+            },
+            blockExplorerUrls: [networkDetail['L2']?.blockExplorer?.slice(0, -1)]
+          }
+
+          console.log([ 'Adding etheruem Chain', chainParam, targetIDHex ]);
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
           window.ethereum.on('chainChanged', handleChangeChainOnce)
           return true
