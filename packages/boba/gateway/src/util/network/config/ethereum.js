@@ -1,4 +1,4 @@
-import { ETHERSCAN_API_KEY, INFURA_ID } from "util/constant";
+import {INFURA_ID } from "util/constant";
 
 export const ethereumConfig = {
   Testnet: {
@@ -12,7 +12,6 @@ export const ethereumConfig = {
       chainId: 5,
       chainIdHex: '0x5',
       rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
-      blockExplorer: `https://api-goerli.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://goerli.etherscan.io/tx/`,
       blockExplorerUrl: `https://goerli.etherscan.io/`,
       symbol: 'ETH',
@@ -63,7 +62,6 @@ export const ethereumConfig = {
       chainId: 1,
       chainIdHex: '0x1',
       rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-      blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: ` https://etherscan.io/tx/`,
       blockExplorerUrl: `https://etherscan.io/`,
       symbol: 'ETH',

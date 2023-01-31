@@ -1,4 +1,3 @@
-import { ETHERSCAN_API_KEY } from "util/constant";
 
 export const fantomConfig = {
   Testnet: {
@@ -11,7 +10,6 @@ export const fantomConfig = {
       chainId: 4002,
       chainIdHex: '0xFA2',
       rpcUrl: `https://rpc.testnet.fantom.network`,
-      blockExplorer: `https://api-testnet.ftmscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://testnet.ftmscan.com/tx/`,
       blockExplorerUrl: `https://testnet.ftmscan.com/`,
       symbol: 'FTM',
@@ -39,7 +37,6 @@ export const fantomConfig = {
       chainId: 250,
       chainIdHex: '0xFA',
       rpcUrl: `https://rpc.fantom.network`,
-      blockExplorer: `https://api.ftmscan.com/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://ftmscan.com/tx/`,
       blockExplorerUrl: `https://ftmscan.com/`,
       symbol: 'FTM',

@@ -1,4 +1,3 @@
-import { ETHERSCAN_API_KEY } from "util/constant";
 
 export const avaxConfig = {
   Testnet: {
@@ -11,7 +10,6 @@ export const avaxConfig = {
       chainId: 43113,
       chainIdHex: '0xA869',
       rpcUrl: `https://api.avax-test.network/ext/bc/C/rpc`,
-      blockExplorer: `https://api-testnet.snowtrace.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://testnet.snowtrace.io/tx/`,
       blockExplorerUrl: `https://testnet.snowtrace.io/`,
       symbol: "AVAX",
@@ -39,7 +37,6 @@ export const avaxConfig = {
       chainId: 43114,
       chainIdHex: '0xA86A',
       rpcUrl: `https://api.avax.network/ext/bc/C/rpc`,
-      blockExplorer: `https://api.snowtrace.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
       transaction: `https://snowtrace.io/tx/`,
       blockExplorerUrl: `https://snowtrace.io/`,
       symbol: "AVAX",
