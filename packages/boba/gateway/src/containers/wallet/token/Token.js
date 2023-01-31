@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectNetwork } from 'selectors/networkSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
@@ -36,6 +36,7 @@ function TokenPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
   const tokenList = useSelector(selectTokens)
 
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
@@ -132,9 +133,9 @@ function TokenPage() {
   }, [ tokenList, dispatch, accountEnabled ])
 
   useEffect(() => {
-    if (!accountEnabled) return
+    if (!baseEnabled) return
     getLookupPrice()
-  }, [ getLookupPrice, accountEnabled ])
+  }, [ getLookupPrice, baseEnabled ])
 
   const GasEstimateApprove = () => {
     let approval = networkService.estimateApprove()
