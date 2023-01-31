@@ -475,15 +475,6 @@ class NetworkService {
         this.L1Provider
       )
 
-      // fech suported assets eg. tokens and address.
-      const tokenAsset = appService.fetchSupportedAssets({
-        network,
-        networkType
-      })
-
-      this.supportedTokens = tokenAsset.tokens;
-      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
-      this.supportedAltL1Chains = tokenAsset.altL1Chains;
       const tokenList = {}
 
       this.supportedTokens.forEach((key) => {
@@ -649,6 +640,16 @@ class NetworkService {
         network,
         networkType
       })
+
+      // fetch supported tokens, addresses, assets for network selected.
+      const tokenAsset = appService.fetchSupportedAssets({
+        network,
+        networkType
+      })
+
+      this.supportedTokens = tokenAsset.tokens;
+      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
+      this.supportedAltL1Chains = tokenAsset.altL1Chains;
 
       let addresses;
       // setting up all address;
@@ -836,7 +837,8 @@ class NetworkService {
 
     try {
 
-      console.log(['Monster Contract',this.addresses.BobaMonsters])
+      if (!this.addresses.BobaMonsters) return Number('0');
+
       const contract = new ethers.Contract(
         this.addresses.BobaMonsters,
         TuringMonsterJson.abi,
