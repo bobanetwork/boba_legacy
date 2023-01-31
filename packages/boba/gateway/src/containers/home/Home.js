@@ -179,24 +179,18 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-
-      //specific to ETH network
-      if (activeNetwork === NETWORK.ETHEREUM) {
-        // FIXME: Clear Interval on switch network
-        // FIXME: Or Find out some otherways to avoid crash of undefined contract address.
-        dispatch(fetchDaoBalance())      // account specific
-        dispatch(fetchDaoVotes())        // account specific
-        dispatch(fetchDaoBalanceX())     // account specific
-        dispatch(fetchDaoVotesX())       // account specific
-        dispatch(getFS_Info())   // account specific
-        dispatch(getFS_Saves()) // account specific
-        dispatch(getMonsterInfo()) // account specific
-      }
     }
     /*== we only have have Base L1 and L2 providers*/
     if (baseEnabled && activeNetwork === NETWORK.ETHEREUM) {
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
+      dispatch(fetchDaoBalance())      // account specific
+      dispatch(fetchDaoVotes())        // account specific
+      dispatch(fetchDaoBalanceX())     // account specific
+      dispatch(fetchDaoVotesX())       // account specific
+      dispatch(getFS_Info())   // account specific
+      dispatch(getFS_Saves()) // account specific
+      dispatch(getMonsterInfo()) // account specific
     }
   }, POLL_INTERVAL)
 
