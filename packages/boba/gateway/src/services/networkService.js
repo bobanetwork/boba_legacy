@@ -46,7 +46,7 @@ import {
 } from 'actions/signAction'
 
 // Base contracts
-import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
+// import L1StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json'
 import L2StandardBridgeJson from '@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json'
 import L2ERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 import OVM_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json'
@@ -3905,7 +3905,7 @@ class NetworkService {
               this.addresses.BobaFixedSavings,
               approveAmount_BN
             )
-          const TX = await approveStatus.wait()
+          await approveStatus.wait()
         }
         else {
           console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
