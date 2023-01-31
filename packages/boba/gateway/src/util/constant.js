@@ -9,7 +9,6 @@ export const POLL_INTERVAL = process.env.REACT_APP_POLL_INTERVAL || 20000
 export const GAS_POLL_INTERVAL = process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
 export const GA4_MEASUREMENT_ID = process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV = process.env.REACT_APP_ENV || 'dev'
-export const APP_CHAIN = process.env.REACT_APP_CHAIN
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN || null
 export const APP_ZENDESK_KEY = process.env.REACT_APP_ZENDESK_KEY || null
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID
