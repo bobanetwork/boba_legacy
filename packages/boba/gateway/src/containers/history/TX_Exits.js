@@ -29,6 +29,7 @@ import Pager from 'components/pager/Pager'
 import networkService from 'services/networkService'
 
 import * as S from './History.styles'
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 const PER_PAGE = 8
 
@@ -38,6 +39,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
   const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
   const tokenList = useSelector(selectTokens)
   const allAddresses = networkService.getAllAddresses()
+  const networkName = useSelector(selectActiveNetworkName())
 
   const _exits = transactions.filter(i => {
     return i.hash.includes(searchHistory) && i.to !== null && i.exitL2
@@ -106,7 +108,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
     return (
       <Transaction
         key={`${index}`}
-        chain='Boba Ethereum L2 to Ethereum'
+        chain={`${networkName['l2']} to ${networkName['l1']}`}
         title={`${chain} Hash: ${i.hash}`}
         blockNumber={`Block ${i.blockNumber}`}
         time={timeLabel}
