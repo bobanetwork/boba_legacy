@@ -47,8 +47,6 @@ function Transaction({
   toChain
 }) {
 
-  console.log(['chain',chain])
-
   const [dropDownBox, setDropDownBox] = useState(false)
 
   const theme = useTheme()
