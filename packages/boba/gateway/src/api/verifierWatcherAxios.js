@@ -3,6 +3,10 @@ import axios from 'axios'
 export default function verifierWatcherAxiosInstance(networkConfig) {
   const url = networkConfig[ 'VERIFIER_WATCHER_URL' ]
 
+  if (!url) {
+    return null;
+  }
+
   let axiosInstance = axios.create({
     baseURL: url
   })
