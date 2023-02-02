@@ -12,7 +12,7 @@ description: A collection of links and addresses to get started on Boba-BNB
   * [Boba BNB Addresses](#boba-bnb-addresses)
   * [Analytics and eth_getLogs for Boba BNB](#analytics-and-eth-getlogs-for-boba-bnb)
   * [Boba BNB Links and Endpoints](#boba-bnb-links-and-endpoints)
-  
+
 # Boba BNB Testnet L2 (9728) for the BNB Testnet (97)
 
 ## Testnet Fountain for Developers on BNB Testnet L2
@@ -60,6 +60,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Gateway       | [https://gateway.testnet.bnb.boba.network](https://gateway.testnet.bnb.boba.network) |
 | Blockexplorer | [https://blockexplorer.testnet.bnb.boba.network](https://blockexplorer.testnet.bnb.boba.network) |
 | Websocket     | [wss://wss.testnet.bnb.boba.network](wss://wss.testnet.bnb.boba.network) |
+| Gas Cap         | 50000000                   |
 
 # Boba BNB L2 (56288) for the BNB L1 (56)
 
@@ -102,3 +103,4 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Gateway       | [https://gateway.bnb.boba.network](https://gateway.bnb.boba.network) |
 | Blockexplorer | [https://blockexplorer.bnb.boba.network](https://blockexplorer.bnb.boba.network) |
 | Websocket     | [wss://wss.bnb.boba.network](wss://wss.bnb.boba.network)     |
+| Gas Cap         | 50000000                   |

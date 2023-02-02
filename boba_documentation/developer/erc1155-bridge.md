@@ -9,7 +9,7 @@ Bridging a token to Boba takes several minutes, and bridging a token from Boba t
 
 ## Native L1 ERC1155 token - developer requirements
 
-Assuming you have already deployed an ERC1155 token contract on L1, and you wish to transfer those tokens to L2, please make sure that your L1 ERC1155 token contract is [ERC1155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md) compatible. Your contract must implemented `ERC165`  and `ERC721` interfaces. We will check the interface before registering your token contracts to our bridges.
+Assuming you have already deployed an ERC1155 token contract on L1, and you wish to transfer those tokens to L2, please make sure that your L1 ERC1155 token contract is [ERC1155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md) compatible. Your contract must implement `ERC165`  and `ERC721` interfaces. We will check the interface before registering your token contracts to our bridges.
 
 ```solidity
 bytes4 erc1155 = 0xd9b67a26;
@@ -35,24 +35,24 @@ await L2StandardERC1155.deployTransaction.wait()
 If you want to deploy your own L2 ERC1155 token contract, please follow requirements:
 
 * Your L2 token contract must be [ERC1155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md) compatible and implemented `ERC165`  and `ERC1155` interfaces.
-* The following functions in your L2 ERC1155 contract should be overriden by 
+* The following functions in your L2 ERC1155 contract should be overriden by
 
   ```solidity
   function mint(address _to, uint256 _tokenId, uint256 _amount, bytes memory _data) public virtual override onlyL2Bridge {
     _mint(_to, _tokenId, _amount, _data);
     emit Mint(_to, _tokenId, _amount);
   }
-  
+
   function mintBatch(address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data) public virtual override onlyL2Bridge {
     _mintBatch(_to, _tokenIds, _amounts, _data);
     emit MintBatch(_to, _tokenIds, _amounts);
   }
-  
+
   function burn(address _from, uint256 _tokenId, uint256 _amount) public virtual override onlyL2Bridge {
     _burn(_from, _tokenId, _amount);
     emit Burn(_from, _tokenId, _amount);
   }
-  
+
   function burnBatch(address _from, uint256[] memory _tokenIds, uint256[] memory _amounts) public virtual override onlyL2Bridge {
     _burnBatch(_from, _tokenIds, _amounts);
     emit BurnBatch(_from, _tokenIds, _amounts);
@@ -74,15 +74,15 @@ contract L2StandardERC1155 is IL2StandardERC1155, ERC1155 {
   // [This is not mandatory] You can use other names or other ways to only allow l2 bridge to mint and burn tokens
   // This is L2 brigde contract address
   address public l2Bridge;
-	
+
   // [This is not mandatory]
   // Only l2Brigde (L2 bridge) can mint or burn tokens
   modifier onlyL2Bridge {
     require(msg.sender == l2Bridge, "Only L2 Bridge can mint and burn");
     _;
   }
-  
-  // [This is mandatory] 
+
+  // [This is mandatory]
   // You must export this interface
   function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC1155) returns (bool) {
     bytes4 bridgingSupportedInterface = IL2StandardERC1155.l1Contract.selector
@@ -97,10 +97,10 @@ contract L2StandardERC1155 is IL2StandardERC1155, ERC1155 {
   // [SECURITY] Make sure that only L2 ERC1155 bridge can mint tokens
   function mint(address _to, uint256 _tokenId, uint256 _amount, bytes memory _data) public virtual override onlyL2Bridge {
     _mint(_to, _tokenId, _amount, _data);
-    
+
     emit Mint(_to, _tokenId, _amount);
   }
-  
+
   // [The input is mandatory] The input must be `address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data`
   // [SECURITY] Make sure that only L2 ERC1155 bridge can mint tokens
   function mintBatch(address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data) public virtual override onlyL2Bridge {
@@ -113,7 +113,7 @@ contract L2StandardERC1155 is IL2StandardERC1155, ERC1155 {
   // [SECURITY] Make sure that only L2 ERC1155 bridge can burn tokens
   function burn(address _from, uint256 _tokenId, uint256 _amount) public virtual override onlyL2Bridge {
     _burn(_from, _tokenId, _amount);
-    
+
    emit Burn(_from, _tokenId, _amount);
   }
 
@@ -150,30 +150,30 @@ await L1StandardERC1155.deployTransaction.wait()
 If you want to deploy your own L1 ERC1155 token contract, please follow requirements:
 
 * Your L1 token contract must be [ERC1155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md) compatible and implemented `ERC165`  and `ERC1155` interfaces.
-* The following functions in your L1 ERC1155 contract should be overriden by 
+* The following functions in your L1 ERC1155 contract should be overriden by
 
   ```solidity
   function mint(address _to, uint256 _tokenId, uint256 _amount, bytes memory _data) public virtual override onlyL1Bridge {
     _mint(_to, _tokenId, _amount, _data);
     emit Mint(_to, _tokenId, _amount);
   }
-  
+
   function mintBatch(address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data) public virtual override onlyL1Bridge {
     _mintBatch(_to, _tokenIds, _amounts, _data);
     emit MintBatch(_to, _tokenIds, _amounts);
   }
-  
+
   function burn(address _from, uint256 _tokenId, uint256 _amount) public virtual override onlyL1Bridge {
     _burn(_from, _tokenId, _amount);
     emit Burn(_from, _tokenId, _amount);
   }
-  
+
   function burnBatch(address _from, uint256[] memory _tokenIds, uint256[] memory _amounts) public virtual override onlyL1Bridge {
     _burnBatch(_from, _tokenIds, _amounts);
     emit BurnBatch(_from, _tokenIds, _amounts);
   }
   ```
-  
+
 * In your L1 ERC1155 token contract, you must add the following code to bypass our interface check in our bridge
 
 ```solidity
@@ -189,15 +189,15 @@ contract L1StandardERC1155 is IL1StandardERC1155, ERC1155 {
   // [This is not mandatory] You can use other names or other ways to only allow l2 bridge to mint and burn tokens
   // This is L1 brigde contract address
   address public l1Bridge;
-	
+
   // [This is not mandatory]
   // Only l1Brigde (L1 bridge) can mint or burn tokens
   modifier onlyL1Bridge {
     require(msg.sender == l1Bridge, "Only L1 Bridge can mint and burn");
     _;
   }
-  
-  // [This is mandatory] 
+
+  // [This is mandatory]
   // You must export this interface
   function supportsInterface(bytes4 _interfaceId) public view override(IERC165, ERC1155) returns (bool) {
     bytes4 bridgingSupportedInterface = IL1StandardERC1155.l1Contract.selector
@@ -212,10 +212,10 @@ contract L1StandardERC1155 is IL1StandardERC1155, ERC1155 {
   // [SECURITY] Make sure that only L1 ERC1155 bridge can mint tokens
   function mint(address _to, uint256 _tokenId, uint256 _amount, bytes memory _data) public virtual override onlyL1Bridge {
     _mint(_to, _tokenId, _amount, _data);
-    
+
     emit Mint(_to, _tokenId, _amount);
   }
-  
+
   // [The input is mandatory] The input must be `address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data`
   // [SECURITY] Make sure that only L1 ERC1155 bridge can mint tokens
   function mintBatch(address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data) public virtual override onlyL1Bridge {
@@ -228,7 +228,7 @@ contract L1StandardERC1155 is IL1StandardERC1155, ERC1155 {
   // [SECURITY] Make sure that only L1 ERC1155 bridge can burn tokens
   function burn(address _from, uint256 _tokenId, uint256 _amount) public virtual override onlyL1Bridge {
     _burn(_from, _tokenId, _amount);
-    
+
    emit Burn(_from, _tokenId, _amount);
   }
 
@@ -363,7 +363,7 @@ const tx = await L2ERC1155Brige.withdraw(
 await tx.wait()
 ```
 
- 
+
 
 ## ERC1155 bridge addresses
 
@@ -397,7 +397,7 @@ await tx.wait()
 | L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
-#### Fantom 
+#### Fantom
 
 | Layer | Contract Name          | Contract Address                           |
 | ----- | ---------------------- | ------------------------------------------ |
@@ -405,6 +405,13 @@ await tx.wait()
 | L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 ### Testnet
+
+#### Goerli
+
+| Layer | Contract Name          | Contract Address                           |
+| ----- | ---------------------- | ------------------------------------------ |
+| L1    | Proxy__L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 
 #### Avalanche Testnet (Fuji)
 
