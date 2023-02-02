@@ -50,7 +50,7 @@ const loadContracts = () => {
   return Boba_AuthenticatedFaucet
 }
 
-const handle = async(event, callback) => {
+const handle = async (event, callback) => {
   const body = JSON.parse(event.body)
 
   const { hashedMsg, signature, tweetId, walletAddress } = body
@@ -93,11 +93,6 @@ const handle = async(event, callback) => {
 
 // Verify message and send to node if it's correct
 module.exports.mainnetHandler = async (event, context, callback) => {
-  return handle(event, callback)
-}
-
-// Return error message
-module.exports.rinkebyHandler = async (event, context, callback) => {
   return handle(event, callback)
 }
 

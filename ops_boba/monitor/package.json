@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./exec/run-monitor.js",
-    "try": "node ./exec/try-monitor.js"
+    "test": "hardhat test --show-stack-traces"
   },
   "license": "MIT",
   "dependencies": {
@@ -15,20 +15,15 @@
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "@eth-optimism/sdk": "1.0.1",
-    "@ethersproject/providers": "5.4.5",
-    "async-mutex": "^0.3.1",
-    "axios": "0.26.0",
-    "dotenv": "^16.0.0",
-    "ethers": "^5.1.4",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.3.4",
+    "dotenv": "^9.0.0",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.5.4",
+    "hardhat": "^2.12.5",
     "lodash": "4.17.21",
     "mysql": "^2.18.1",
-    "node-fetch": "2.6.0",
-    "web3": "1.6.0",
-    "winston": "3.3.3"
-  },
-  "devDependencies": {
-    "eslint": "^7.27.0",
-    "eslint-config-airbnb": "18.2.1",
-    "eslint-plugin-import": "^2.23.4"
+    "node-fetch": "2.6.0"
   }
 }

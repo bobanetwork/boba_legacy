@@ -80,6 +80,12 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     /// @notice The address of the Boba Timelock
     TimelockInterface public timelock;
 
+    /// @notice The address of the L2 BOBA governance token
+    BobaInterface public boba;
+
+    /// @notice The address of the L2 xBOBA governance token
+    BobaInterface public xboba;
+
     /// @notice The official record of all proposals ever proposed
     mapping (uint => Proposal) public proposals;
 
@@ -112,6 +118,9 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
         /// @notice Proposal metadata such as description and URI
         string description;
 
+        /// @notice The block at which voting power is measured: holders must delegate their votes prior to this block
+        uint startBlock;
+
         /// @notice The time at which voting begins
         uint startTimestamp;
 
@@ -132,6 +141,9 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
 
         /// @notice Flag marking whether the proposal has been executed
         bool executed;
+
+        /// @notice Receipts of ballots for the entire set of voters
+        mapping (address => Receipt) receipts;
     }
 
     /// @notice Ballot receipt record for a voter
@@ -159,14 +171,6 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     }
 }
 
-contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
-    /// @notice The address of the ve lock Contract
-    VeInterface public ve;
-    /// @notice receipts v2 for ve tokenIds and vote status
-    // proposalId to tokenId to receipt
-    mapping (uint => mapping (uint => Receipt)) public veReceipts;
-}
-
 interface TimelockInterface {
     function delay() external view returns (uint);
     function GRACE_PERIOD() external view returns (uint);
@@ -177,8 +181,6 @@ interface TimelockInterface {
     function executeTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external payable returns (bytes memory);
 }
 
-interface VeInterface {
-    function balanceOfNFT(uint _tokenId) external view returns (uint);
-    function ve_for_at(uint _tokenId, uint _timestamp) external view returns (uint);
-    function isApprovedOrOwner(address _spender, uint _tokenId) external view returns (bool);
+interface BobaInterface {
+    function getPriorVotes(address account, uint blockNumber) external view returns (uint96);
 }

@@ -146,6 +146,12 @@ describe('Oracle Flux Aggregator Tests', async () => {
         FluxAggregatorHC.transferOracleAdmin(signer2Addr)
       ).to.be.revertedWith('Caller is not the oracle owner')
     })
+
+    it('should get oracle address', async () => {
+      const signerAddr = await (await ethers.getSigners())[0].getAddress()
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      expect(await FluxAggregatorHC.getOracles()).to.be.deep.eq([signerAddr])
+    })
   })
 
   describe('Data submission tests', async () => {

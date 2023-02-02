@@ -103,11 +103,10 @@ contract BobaTuringCredit {
      * @param _addBalanceAmount the prepaid amount that the user want to add
      * @param _helperContractAddress the address of the turing helper contract
      */
-    function addBalanceTo(uint256 _addBalanceAmount, address _helperContractAddress)
-        public
-        payable
-        onlyInitialized
-    {
+    function addBalanceTo(
+        uint256 _addBalanceAmount,
+        address _helperContractAddress
+    ) public payable onlyInitialized {
         require(_addBalanceAmount != 0 && msg.value == _addBalanceAmount, "Invalid amount");
         require(Address.isContract(_helperContractAddress), "Address is EOA");
         require(

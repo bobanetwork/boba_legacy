@@ -17,7 +17,9 @@ contract L2_BOBA is L2StandardERC20 {
      * Constructor *
      ***************/
 
-    constructor(address _l1TokenAddress)
+    constructor(
+        address _l1TokenAddress
+    )
         L2StandardERC20(
             Lib_PredeployAddresses.L2_STANDARD_BRIDGE,
             _l1TokenAddress,
@@ -44,21 +46,17 @@ contract L2_BOBA is L2StandardERC20 {
         revert("L2_BOBA: transferFrom is disabled pending further community discussion.");
     }
 
-    function increaseAllowance(address spender, uint256 addedValue)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function increaseAllowance(
+        address spender,
+        uint256 addedValue
+    ) public virtual override returns (bool) {
         revert("L2_BOBA: increaseAllowance is disabled pending further community discussion.");
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function decreaseAllowance(
+        address spender,
+        uint256 subtractedValue
+    ) public virtual override returns (bool) {
         revert("L2_BOBA: decreaseAllowance is disabled pending further community discussion.");
     }
 }

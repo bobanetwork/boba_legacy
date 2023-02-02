@@ -38,9 +38,10 @@ contract L2StandardBridge is IL2ERC20Bridge, CrossDomainEnabled {
      * @param _l2CrossDomainMessenger Cross-domain messenger used by this contract.
      * @param _l1TokenBridge Address of the L1 bridge deployed to the main chain.
      */
-    constructor(address _l2CrossDomainMessenger, address _l1TokenBridge)
-        CrossDomainEnabled(_l2CrossDomainMessenger)
-    {
+    constructor(
+        address _l2CrossDomainMessenger,
+        address _l1TokenBridge
+    ) CrossDomainEnabled(_l2CrossDomainMessenger) {
         l1TokenBridge = _l1TokenBridge;
     }
 

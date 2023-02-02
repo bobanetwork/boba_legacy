@@ -22,7 +22,7 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import { ChainInfo } from '../src/utils/types'
 
 /* Imports: Core */
-import { TeleportationService } from '../dist/service'
+import { TeleportationService } from '../dist/src/service'
 
 describe('teleportation', () => {
   let signer: Signer
@@ -57,7 +57,7 @@ describe('teleportation', () => {
     // Remove file if it exists
     const dumpsPath = path.resolve(
       __dirname,
-      '../dist/db/depositInfo-31337.json'
+      '../dist/src/db/depositInfo-31337.json'
     )
     if (fs.existsSync(dumpsPath)) {
       fs.unlinkSync(dumpsPath)
@@ -502,7 +502,7 @@ describe('teleportation', () => {
       // Remove file if it exists
       const dumpsPath = path.resolve(
         __dirname,
-        '../dist/db/depositInfo-31337.json'
+        '../dist/src/db/depositInfo-31337.json'
       )
       if (fs.existsSync(dumpsPath)) {
         fs.unlinkSync(dumpsPath)

@@ -93,12 +93,6 @@ x-integration_4_pk: &integration_4_pk
   GAS_PRICE_ORACLE_PRIVATE_KEY: '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de'
 
 services:
-  builder:
-    image: bobanetwork/builder:latest
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.monorepo
-
   l1_chain:
     image: bobanetwork/avalanche:latest
     container_name: l1_chain
@@ -122,7 +116,8 @@ services:
     image: bobanetwork/deployer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.deployer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: deployer
     container_name: deployer
     entrypoint: ./deployer.sh
     environment:
@@ -168,7 +163,8 @@ services:
     image: bobanetwork/boba_deployer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.boba_deployer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: boba_deployer
     container_name: boba_deployer
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
@@ -195,7 +191,8 @@ services:
     entrypoint: ./dtl.sh
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.data-transport-layer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: data-transport-layer
     # override with the dtl script and the env vars required for it
     env_file:
       -  ./envs/dtl.env
@@ -264,7 +261,8 @@ services:
     image: bobanetwork/message-relayer:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.message-relayer
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: message-relayer
     entrypoint: ./relayer.sh
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
@@ -295,8 +293,8 @@ services:
     image: bobanetwork/boba_message-relayer-fast:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.message-relayer
-    entrypoint: ["./wait-for-l1-and-l2.sh", "./relayer-fast.sh"]
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: boba_message-relayer-fast
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
       L2_NODE_WEB3_URL: http://l2geth:8545
@@ -355,7 +353,8 @@ services:
        replicas: 0
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.integration-tests
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: integration-tests
     entrypoint: ./integration-tests.sh
     environment:
       VERIFIER_URL: http://verifier:8545
@@ -498,6 +497,7 @@ services:
 
 networks:
   ava-network:
+    name: local-network
     enable_ipv6: true
     ipam:
       config:

@@ -4575,8 +4575,55 @@ class NetworkService {
    ***********OLD DAO REMOVE ME TILL HERE *
    *****************************************/
 
+   async submitTxBuilder(contract, methodIndex, methodName, inputs) {
 
+    const parseResult = (result, outputs) => {
+      let parseResult = []
+      if (outputs.length === 1) {
+        return result.toString()
+      }
+      for (let i = 0; i < outputs.length; i++) {
+        try {
+          const output = outputs[i]
+          const key = output.name ? output.name : output.type
+          if (output.type.includes('uint')) {
+            parseResult.push({[key]: result[i].toString()})
+          } else {
+            parseResult.push({[key]:result[i]})
+          }
+        } catch (err) {
+          return 'Error: Failed to parse result'
+        }
+      }
+      return JSON.stringify(parseResult)
+    }
 
+    let parseInput = Object.values(inputs)
+    let value = 0
+    const stateMutability = contract.interface.functions[methodName].stateMutability
+    const outputs = contract.interface.functions[methodName].outputs
+    if (stateMutability === 'payable') {
+      value = parseInput[parseInput.length - 1]
+      parseInput = parseInput.slice(0, parseInput.length - 1)
+    }
+
+    let result
+    try {
+      if (stateMutability === 'view' || stateMutability === 'pure') {
+        result = await contract[methodName](...parseInput)
+        return { methodIndex, result: { result: parseResult(result, outputs), err: null }}
+      } else if (stateMutability === 'payable') {
+        console.log({ value }, ...parseInput)
+        const tx = await contract[methodName](...parseInput, { value })
+        return { methodIndex, result: { transactionHash: tx.hash, err: null }}
+      } else {
+        const tx = await contract[methodName](...parseInput)
+        return { methodIndex, result: { transactionHash: tx.hash, err: null }}
+      }
+    } catch (err) {
+      return { methodIndex, result: { err: JSON.stringify(err) }}
+    }
+   }
 }
 
 const networkService = new NetworkService()

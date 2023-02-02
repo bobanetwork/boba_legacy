@@ -1,42 +1,59 @@
 const ethers = require('ethers')
-const configs = require('./utilities/configs')
-const { logger } = require('./utilities/logger')
-const bobaJson = require('@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json')
+const GlobalEnv = require('./utils/globalEnv')
+const { sleep } = require('@eth-optimism/core-utils')
 
-const provider = new ethers.providers.JsonRpcProvider(configs.periodicL2Web3Url)
+class periodicTransactionService extends GlobalEnv {
+  constructor() {
+    super(...arguments)
 
-const wallet = configs.periodicTransactionPrivateKey
-  ? new ethers.Wallet(configs.periodicTransactionPrivateKey, provider)
-  : undefined
-
-const bobaContract = new ethers.Contract(
-  configs.bobaContractL2Address,
-  bobaJson.abi,
-  wallet
-)
-
-module.exports.sendTransactionPeriodically = async () => {
-  if (!wallet) {
-    return
+    this.wallet = null
   }
 
-  const startingTime = new Date()
-  try {
-    const tx = await bobaContract.transfer(
-      wallet.address,
-      configs.periodicBobaAmount
-    )
-    await tx.wait()
-    logger.info('Transfered Boba token periodically for testing in L2', {
-      amount: configs.periodicBobaAmount,
-      address: wallet.address,
-      totalTime: (new Date() - startingTime) / 1000,
-    })
-  } catch (e) {
-    logger.error('Error while transfer Boba periodically for testing in L2', {
-      amount: configs.periodicBobaAmount,
-      address: wallet.address,
-      error: e.message,
-    })
+  async initConnection() {
+    this.logger.info('Trying to connect to the L2 network...')
+    for (let i = 0; i < 10; i++) {
+      try {
+        await this.L2Provider.detectNetwork()
+        this.logger.info('Successfully connected to the L2 network.')
+        break
+      } catch (err) {
+        if (i < 9) {
+          this.logger.info('Unable to connect to L2 network', {
+            retryAttemptsRemaining: 10 - i,
+          })
+          await sleep(1000)
+        } else {
+          throw new Error(
+            `Unable to connect to the L2 network, check that your L2 endpoint is correct.`
+          )
+        }
+      }
+    }
+  }
+
+  async sendTransactionPeriodically() {
+    const transferAmount = ethers.utils.parseEther('0.01')
+    if (this.periodicTransactionPK) {
+      this.wallet = new ethers.Wallet(this.periodicTransactionPK).connect(
+        this.L2Provider
+      )
+      try {
+        await this.wallet.sendTransaction({
+          to: this.wallet.address,
+          value: transferAmount,
+        })
+        this.logger.info('Sent transaction periodically for testing in L2', {
+          to: this.wallet.address,
+          amount: transferAmount,
+        })
+      } catch {
+        this.logger.error(
+          'Error while sending transaction periodically for testing in L2'
+        )
+      }
+    }
+    await sleep(this.periodicTransactionInterval)
   }
 }
+
+module.exports = periodicTransactionService

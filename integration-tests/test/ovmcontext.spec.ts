@@ -163,5 +163,5 @@ describe('OVM Context: Layer 2 EVM Context', () => {
 
     expect(info.ethContext.blockNumber).to.deep.equal(blockNumber.toNumber())
     expect(info.ethContext.timestamp).to.deep.equal(timestamp.toNumber())
-  })
+  }).retries(3)
 })

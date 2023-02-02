@@ -1,5 +1,5 @@
 /* Imports: External */
-import { BaseService, Metrics } from '@eth-optimism/common-ts'
+import { BaseService, LegacyMetrics } from '@eth-optimism/common-ts'
 import { LevelUp } from 'levelup'
 import level from 'level'
 import { Counter } from 'prom-client'
@@ -26,7 +26,7 @@ export interface L1DataTransportServiceOptions {
   l1RpcProvider: string
   l2ChainId: number
   l2RpcProvider: string
-  metrics?: Metrics
+  metrics?: LegacyMetrics
   dbPath: string
   logsPerPollingInterval: number
   pollingInterval: number
@@ -70,7 +70,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
     l1IngestionService?: L1IngestionService
     l2IngestionService?: L2IngestionService
     l1TransportServer: L1TransportServer
-    metrics: Metrics
+    metrics: LegacyMetrics
     failureCounter: Counter<string>,
     addressRegistry: express.Express
     arServer: any,
@@ -83,7 +83,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
     this.state.db = level(this.options.dbPath)
     await this.state.db.open()
 
-    this.state.metrics = new Metrics({
+    this.state.metrics = new LegacyMetrics({
       labels: {
         environment: this.options.nodeEnv,
         network: this.options.ethNetworkName,
@@ -230,6 +230,25 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
            })
          }
        })
+       this.state.addressRegistry['get']("/aa-addr.json", async (req, res) => {
+        try {
+          let aList
+          try {
+            aList = JSON.parse(await this.state.db.get("aa-addr"))
+          } catch(e) {
+            if (e.notFound) {
+              this.logger.warn("Address Registry is not yet ready to serve AA addresses (db notFound)")
+              return res.status(503).json({error: "Address Registry is not yet populated"})
+            } else { throw e }
+          }
+
+          return res.json(aList)
+        } catch (e) {
+          return res.status(500).json({
+            error: e.toString(),
+          })
+        }
+      })
        this.state.addressRegistry['put']("/addresses.json", async (req, res) => {
          try {
            const rb = req.body
@@ -285,6 +304,25 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
            })
          }
        })
+       this.state.addressRegistry['put']("/aa-addr.json", async (req, res) => {
+        try {
+          const rb = req.body
+
+          this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
+
+          // As with the base list, we could add future restrictions on changing
+          // certain critical addresses. For now we allow anything.
+
+          this.logger.info("Will store new aa-addr.json", rb)
+          await this.state.db.put("aa-addr", JSON.stringify(rb))
+          this.logger.info("Stored aa-addr.json")
+          return res.sendStatus(201).end()
+        } catch (e) {
+          return res.status(500).json({
+            error: e.toString(),
+          })
+        }
+      })
 
        this.state.addressRegistry['get']("/state-dump.latest.json", async (req, res) => {
          try {
@@ -301,13 +339,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
          try {
            this.logger.info("addressRegistry PUT request for state-dump file")
 
-           req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json_TMP"))
-
-           await fs.rename(
-             "./state-dumps/state-dump.latest.json_TMP",
-             "./state-dumps/state-dump.latest.json",
-             (err) => { if (err) { throw err; } }
-           )
+           req.pipe(fs.createWriteStream("./state-dumps/state-dump.latest.json"))
 
            this.logger.info("Saved new state-dump.latest.json")
            return res.sendStatus(201).end()

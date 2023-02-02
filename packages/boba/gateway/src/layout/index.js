@@ -45,6 +45,7 @@ import Projects from 'containers/ecosystem/Projects'
 import { DISABLE_VE_DAO, ROUTES_PATH } from 'util/constant'
 import VoteAndDao from 'containers/VoteAndDao'
 import OldDao from 'containers/dao/OldDao'
+import DevTools from 'containers/devtools/DevTools'
 
 function App() {
 
@@ -313,10 +314,11 @@ function App() {
                   <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
                     <Route path=":category" element={<Projects projectType='BOBA' />} />
                   </Route>
+                  <Route path={ROUTES_PATH.DEV_TOOLS} element={<DevTools />} />
                   {/* FIXME: On setting flag below to 1 below routes will not be available to user. */}
                   {/* {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.LOCK} element={<Lock />} />} */}
                   {/* {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />} */}
-                  <Route path={ROUTES_PATH.DAO} element={<OldDao />} />
+                  {/* <Route path={ROUTES_PATH.DAO} element={<OldDao />} /> */}
                   <Route path="*" element={<Navigate to="/" />} />
                 </Route>
               </Routes>

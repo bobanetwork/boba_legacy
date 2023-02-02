@@ -15,6 +15,7 @@ services:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
+<<<<<<<< HEAD:boba_community/boba-node/docker-compose-bobabeam.yml
       DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://replica.bobabeam.boba.network'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
@@ -22,11 +23,23 @@ services:
       DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 1687903
       DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
       DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x564c10A60af35a07f0EA8Be3106a4D81014b21a0'
+========
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://goerli.boba.network
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 2888
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 7867494
+      DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148'
+>>>>>>>> develop:boba_community/boba-node/docker-compose-goerli.yml
       DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
       DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     volumes:
+<<<<<<<< HEAD:boba_community/boba-node/docker-compose-bobabeam.yml
       - ./state-dumps/bobabeam:/opt/optimism/packages/data-transport-layer/state-dumps/
+========
+      - ./state-dumps/goerli/:/opt/optimism/packages/data-transport-layer/state-dumps/
+>>>>>>>> develop:boba_community/boba-node/docker-compose-goerli.yml
     logging:
       driver: "json-file"
       options:
@@ -45,7 +58,11 @@ services:
       replicas: 1
     entrypoint: sh ./geth.sh
     env_file:
+<<<<<<<< HEAD:boba_community/boba-node/docker-compose-bobabeam.yml
       - ../../ops/envs/geth.env
+========
+      - ../../ops/envs/geth-goerli.env
+>>>>>>>> develop:boba_community/boba-node/docker-compose-goerli.yml
     #volumes:
     #  - ./<YOUR PERSISTED STORAGE>:/root/.ethereum/
     environment:
@@ -61,13 +78,20 @@ services:
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
       ROLLUP_POLL_INTERVAL_FLAG: "10s"
       ROLLUP_ENFORCE_FEES: 'true'
+<<<<<<<< HEAD:boba_community/boba-node/docker-compose-bobabeam.yml
+========
+      SEQUENCER_CLIENT_HTTP: https://goerli.boba.network
+>>>>>>>> develop:boba_community/boba-node/docker-compose-goerli.yml
       # turing
       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
       # fee token
       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+<<<<<<<< HEAD:boba_community/boba-node/docker-compose-bobabeam.yml
       # sequencer http endpoint
       SEQUENCER_CLIENT_HTTP: https://bobabeam.boba.network
+========
+>>>>>>>> develop:boba_community/boba-node/docker-compose-goerli.yml
     logging:
       driver: "json-file"
       options:

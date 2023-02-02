@@ -139,10 +139,10 @@ contract Boba_GasPriceOracle {
     /**
      * Initialize feeWallet and secondaryFeeToken.
      */
-    function initialize(address payable _feeWallet, address _secondaryFeeToken)
-        public
-        onlyNotInitialized
-    {
+    function initialize(
+        address payable _feeWallet,
+        address _secondaryFeeToken
+    ) public onlyNotInitialized {
         require(_feeWallet != address(0) && _secondaryFeeToken != address(0));
         feeWallet = _feeWallet;
         secondaryFeeTokenAddress = _secondaryFeeToken;
@@ -184,7 +184,7 @@ contract Boba_GasPriceOracle {
     ) public {
         require(!Address.isContract(tokenOwner), "Account not EOA");
         require(spender == address(this), "Spender is not this contract");
-        uint256 multiplier = 10**decimals;
+        uint256 multiplier = 10 ** decimals;
         uint256 totalCost = receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(
             metaTransactionFee
         );
@@ -290,7 +290,7 @@ contract Boba_GasPriceOracle {
      */
     function getSecondaryFeeTokenForSwap() public view returns (uint256) {
         // marketPriceRatio = native token price / boba price
-        uint256 multiplier = 10**decimals;
+        uint256 multiplier = 10 ** decimals;
         return receivedBOBAAmount.mul(marketPriceRatio).div(multiplier).add(metaTransactionFee);
     }
 
@@ -299,7 +299,7 @@ contract Boba_GasPriceOracle {
      * @param _txData the data payload
      */
     function getSecondaryFeeTokenFee(bytes memory _txData) public view returns (uint256) {
-        uint256 multiplier = 10**decimals;
+        uint256 multiplier = 10 ** decimals;
         OVM_GasPriceOracle gasPriceOracleContract = OVM_GasPriceOracle(gasPriceOracleAddress);
         return gasPriceOracleContract.getL1Fee(_txData).mul(priceRatio).div(multiplier);
     }

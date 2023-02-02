@@ -1,0 +1,187 @@
+{
+  "address": "0x0eE84f618AF1dD83fd818B0eB76163630FfF52Bf",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "name": "CalledFrom",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "count",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "counters",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "repeat",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "gasWaster",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "justemit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "offset",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "xxx",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x5511066377167166bd5ac03d36219a60107f21d44a5f20c47e413cf78fb4cc43",
+  "receipt": {
+    "to": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+    "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "contractAddress": null,
+    "transactionIndex": 0,
+    "gasUsed": "228458",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x7c08253bed0abd0112cb2a6c79e88c4c4b57221df555e95863979627706f420c",
+    "transactionHash": "0x5511066377167166bd5ac03d36219a60107f21d44a5f20c47e413cf78fb4cc43",
+    "logs": [],
+    "blockNumber": 6,
+    "cumulativeGasUsed": "228458",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "e376366c733c42ebd5d8ea2622270719",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.15+commit.e14f2714\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"CalledFrom\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"count\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"counters\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"repeat\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"gasWaster\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"justemit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"offset\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"xxx\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/test/TestCounter.sol\":\"TestCounter\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"contracts/test/TestCounter.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n//sample \\\"receiver\\\" contract, for testing \\\"exec\\\" from wallet.\\ncontract TestCounter {\\n    mapping(address => uint256) public counters;\\n\\n    function count() public {\\n        counters[msg.sender] = counters[msg.sender] + 1;\\n\\n    }\\n\\n    function justemit() public {\\n        emit CalledFrom(msg.sender);\\n    }\\n\\n    event CalledFrom(address sender);\\n\\n    //helper method to waste gas\\n    // repeat - waste gas on writing storage in a loop\\n    // junk - dynamic buffer to stress the function size.\\n    mapping(uint256 => uint256) public xxx;\\n    uint256 public offset;\\n\\n    function gasWaster(uint256 repeat, string calldata /*junk*/) external {\\n        for (uint256 i = 1; i <= repeat; i++) {\\n            offset++;\\n            xxx[offset] = i;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xa29efca8976d2652567ea1be1d1db69bc82b588ff981080aa58de2b7353b2548\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061032b806100206000396000f3fe608060405234801561001057600080fd5b50600436106100725760003560e01c8063a5e9585f11610050578063a5e9585f1461009c578063be65ab8c146100ce578063d5556544146100ee57600080fd5b806306661abd14610077578063278ddd3c14610081578063a1b4689014610089575b600080fd5b61007f6100f7565b005b61007f610124565b61007f6100973660046101a4565b610159565b6100bc6100aa366004610220565b60016020526000908152604090205481565b60405190815260200160405180910390f35b6100bc6100dc366004610239565b60006020819052908152604090205481565b6100bc60025481565b336000908152602081905260409020546101129060016102a5565b33600090815260208190526040902055565b6040513381527ffb3b4d6258432a9a3d78dd9bffbcb6cfb1bd94f58da35fd530d08da7d1d058329060200160405180910390a1565b60015b83811161019e5760028054906000610173836102bd565b9091555050600254600090815260016020526040902081905580610196816102bd565b91505061015c565b50505050565b6000806000604084860312156101b957600080fd5b83359250602084013567ffffffffffffffff808211156101d857600080fd5b818601915086601f8301126101ec57600080fd5b8135818111156101fb57600080fd5b87602082850101111561020d57600080fd5b6020830194508093505050509250925092565b60006020828403121561023257600080fd5b5035919050565b60006020828403121561024b57600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811461026f57600080fd5b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600082198211156102b8576102b8610276565b500190565b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82036102ee576102ee610276565b506001019056fea26469706673582212209c245c19cc28bca70f4ff536aa58d3e5ad65f0aab817db4f3719e17b9c8817fc64736f6c634300080f0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100725760003560e01c8063a5e9585f11610050578063a5e9585f1461009c578063be65ab8c146100ce578063d5556544146100ee57600080fd5b806306661abd14610077578063278ddd3c14610081578063a1b4689014610089575b600080fd5b61007f6100f7565b005b61007f610124565b61007f6100973660046101a4565b610159565b6100bc6100aa366004610220565b60016020526000908152604090205481565b60405190815260200160405180910390f35b6100bc6100dc366004610239565b60006020819052908152604090205481565b6100bc60025481565b336000908152602081905260409020546101129060016102a5565b33600090815260208190526040902055565b6040513381527ffb3b4d6258432a9a3d78dd9bffbcb6cfb1bd94f58da35fd530d08da7d1d058329060200160405180910390a1565b60015b83811161019e5760028054906000610173836102bd565b9091555050600254600090815260016020526040902081905580610196816102bd565b91505061015c565b50505050565b6000806000604084860312156101b957600080fd5b83359250602084013567ffffffffffffffff808211156101d857600080fd5b818601915086601f8301126101ec57600080fd5b8135818111156101fb57600080fd5b87602082850101111561020d57600080fd5b6020830194508093505050509250925092565b60006020828403121561023257600080fd5b5035919050565b60006020828403121561024b57600080fd5b813573ffffffffffffffffffffffffffffffffffffffff8116811461026f57600080fd5b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600082198211156102b8576102b8610276565b500190565b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82036102ee576102ee610276565b506001019056fea26469706673582212209c245c19cc28bca70f4ff536aa58d3e5ad65f0aab817db4f3719e17b9c8817fc64736f6c634300080f0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 16460,
+        "contract": "contracts/test/TestCounter.sol:TestCounter",
+        "label": "counters",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_uint256)"
+      },
+      {
+        "astId": 16493,
+        "contract": "contracts/test/TestCounter.sol:TestCounter",
+        "label": "xxx",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_uint256,t_uint256)"
+      },
+      {
+        "astId": 16495,
+        "contract": "contracts/test/TestCounter.sol:TestCounter",
+        "label": "offset",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_uint256"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_address,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_uint256,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

@@ -173,15 +173,11 @@ module.exports.mainnetHandler = async (event, context, callback) => {
 }
 
 // Return error message
-module.exports.rinkebyHandler = async (event, context, callback) => {
+module.exports.goerliHandler = async (event, context, callback) => {
   const body = JSON.parse(event.body)
 
-  const [Boba_GasPriceOracle, L2SecondaryFeeToken] = loadContracts()
-  const isVerified = await verifyBobay(
-    body,
-    Boba_GasPriceOracle,
-    L2SecondaryFeeToken
-  )
+  const [Boba_GasPriceOracle, L2Boba] = loadContracts()
+  const isVerified = await verifyBobay(body, Boba_GasPriceOracle, L2Boba)
   if (isVerified.isVerified === false) {
     return callback(null, {
       headers,
@@ -198,16 +194,15 @@ module.exports.rinkebyHandler = async (event, context, callback) => {
   const sig = ethers.utils.splitSignature(signature)
   // Send transaction to node
   try {
-    const tx =
-      await Boba_GasPriceOracle.swapSecondaryFeeTokenForBOBAMetaTransaction(
-        owner,
-        spender,
-        value,
-        deadline,
-        sig.v,
-        sig.r,
-        sig.s
-      )
+    const tx = await Boba_GasPriceOracle.swapBOBAForETHMetaTransaction(
+      owner,
+      spender,
+      value,
+      deadline,
+      sig.v,
+      sig.r,
+      sig.s
+    )
     await tx.wait()
   } catch (err) {
     return callback(null, {

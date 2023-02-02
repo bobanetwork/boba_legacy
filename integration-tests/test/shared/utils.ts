@@ -8,13 +8,8 @@ import {
   utils,
   constants,
 } from 'ethers'
-import {
-  getContractFactory,
-  getContractInterface,
-  predeploys,
-  loadContract
-} from '@eth-optimism/contracts'
-import { remove0x } from '@eth-optimism/core-utils'
+import { getContractInterface,predeploys } from '@eth-optimism/contracts'
+import { remove0x, sleep } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,
   NumberLike,
@@ -114,7 +109,10 @@ const env = cleanEnv(process.env, {
     default:
       '0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18',
   }),
-
+  BOBALINK_PRIVATE_KEY: str({
+    default:
+      '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e',
+  }),
   IS_LIVE_NETWORK: bool({ default: false }),
   OVMCONTEXT_SPEC_NUM_TXS: num({
     default: 5,
@@ -179,6 +177,7 @@ export const l1Wallet = new Wallet(env.PRIVATE_KEY, l1Provider)
 export const l1Wallet_2 = new Wallet(env.PRIVATE_KEY_2, l1Provider)
 export const l1Wallet_3 = new Wallet(env.PRIVATE_KEY_3, l1Provider)
 export const l1Wallet_4 = new Wallet(env.PRIVATE_KEY_4, l1Provider)
+export const l1BobaLinkWallet = new Wallet(env.BOBALINK_PRIVATE_KEY, l1Provider)
 
 // A random private key which should always be funded with deposits from L1 -> L2
 // if it's using non-0 gas price
@@ -186,6 +185,7 @@ export const l2Wallet = l1Wallet.connect(l2Provider)
 export const l2Wallet_2 = l1Wallet_2.connect(l2Provider)
 export const l2Wallet_3 = l1Wallet_3.connect(l2Provider)
 export const l2Wallet_4 = l1Wallet_4.connect(l2Provider)
+export const l2BobalinkWallet = l1BobaLinkWallet.connect(l2Provider)
 
 // The owner of the GasPriceOracle on L2
 export const gasPriceOracleWallet = new Wallet(
@@ -473,6 +473,23 @@ export const getGasLimitOption = async (network) => {
 
 export const isAvalanche = async (network) => {
   return (await network.getNetwork()).chainId === AVALANCHE_CHAIN_ID
+}
+
+export const waitForAndExecute = async (
+  fn: () => Promise<any>,
+  repeat: number,
+  intervalMs?: number
+) => {
+  while (repeat >= 0) {
+    try {
+      await fn()
+      break
+    } catch (e) {
+      repeat = repeat - 1
+      await sleep(intervalMs || 1000)
+    }
+  }
+  await fn()
 }
 
 // // eslint-disable-next-line @typescript-eslint/no-shadow

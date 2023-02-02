@@ -1,8 +1,5 @@
 #!/usr/bin/env node
-
-const configs = require('../services/utilities/configs')
 const { sleep } = require('@eth-optimism/core-utils')
-const { logger } = require('../services/utilities/logger')
 require('dotenv').config()
 
 const loop = async (func) => {
@@ -20,40 +17,15 @@ const loop = async (func) => {
   }
 }
 
-const loopLogTx = async () => {
-  const ResponseTimeService = require('../services/responseTime.service')
-  const responseTimeService = new ResponseTimeService()
-
-  while (true) {
-    await responseTimeService.logResponseTime()
-    await sleep(5000)
-  }
-}
-
-const loopTransferTx = async () => {
-  const {
-    sendTransactionPeriodically,
-  } = require('../services/periodicTransaction')
-
-  while (true) {
-    await sendTransactionPeriodically()
-    await sleep(configs.periodicIntervalInMinute * 60 * 1000)
-  }
-}
-
 const main = async () => {
   const BlockMonitorService = require('../services/blockMonitor')
   const stateRootMonitorService = require('../services/stateRootMonitor')
   const exitMonitorService = require('../services/exitMonitor')
   const l1BridgeMonitorService = require('../services/l1BridgeMonitor')
-  const messageMonitorService = require('../services/messageMonitor')
   const LayerZeroBridgeMonitor = require('../services/layerZeroBridge')
-
-  // l1 message monitor
-  const messageService = new messageMonitorService()
-  await messageService.initConnection()
-
-  loop(() => messageService.startMessageMonitor()).catch()
+  const periodicTransactionService = require('../services/periodicTransaction')
+  const bobaStrawMonitorService = require('../services/bobaStrawMonitor')
+  const balanceMonitorService = require('../services/balanceMonitor')
 
   // l1 bridge monitor
   const l1BridgeService = new l1BridgeMonitorService()
@@ -87,63 +59,41 @@ const main = async () => {
   loop(() => blockService.startTransactionMonitor()).catch()
   loop(() => blockService.startCrossDomainMessageMonitor()).catch()
 
-  // enable the tx response time report
-  if (
-    process.env.SERVICE_MONITOR_ENABLE_TX_RESPONSE_TIME?.toLowerCase() ===
-    'true'
-  ) {
-    if (configs.enableTxResponseTime) {
-      loop(() => loopLogTx()).catch()
-    }
+  // periodic transaction
+  if (process.env.PERIODIC_TRANSACTION_PRIVATE_KEY) {
+    const periodicTXService = new periodicTransactionService()
+    await periodicTXService.initConnection()
+    loop(() => periodicTXService.sendTransactionPeriodically()).catch()
   }
 
-  // enable the LP balance check
-  if (
-    process.env.SERVICE_MONITOR_ENABLE_BALANCE_MONITOR?.toLowerCase() === 'true'
-  ) {
-    const L1_MONITOR_INTERVAL = process.env.L1_MONITOR_INTERVAL || 5 * 60
-    const L2_MONITOR_INTERVAL = process.env.L2_MONITOR_INTERVAL || 5 * 60
-
-    const {
-      setupProvider,
-      validateMonitoring,
-    } = require('../services/monitoring')
-
-    if (validateMonitoring()) {
-      logger.info('Start addresses monitoring service!')
-      setupProvider(
-        configs.OMGXNetwork.L1,
-        configs.l1Url,
-        L1_MONITOR_INTERVAL
-      ).catch()
-      setupProvider(
-        configs.OMGXNetwork.L2,
-        configs.l2Url,
-        L2_MONITOR_INTERVAL
-      ).catch()
-    } else {
-      logger.error(
-        'Addresses Monitoring: Env variables for monitoring is missing!'
-      )
-    }
+  // boba straw monitor
+  if (process.env.BOBASTRAW_CONTACT_ADDRESSES) {
+    const bobaStrawService = new bobaStrawMonitorService()
+    await bobaStrawService.initConnection()
+    loop(() => bobaStrawService.startBobaStrawMonitor()).catch()
   }
 
-  // Enable the periodic transaction
+  // balance monitor
   if (
-    process.env.SERVICE_MONITOR_ENABLE_LOOP_TRANSFER?.toLowerCase() === 'true'
+    process.env.L1_BALANCE_MONITOR_ADDRESSES ||
+    process.env.L2_BALANCE_MONITOR_ADDRESSES
   ) {
-    loop(() => loopTransferTx()).catch()
+    const balanceService = new balanceMonitorService()
+    await balanceService.initConnection()
+    loop(() => balanceService.startBalanceMonitor()).catch()
   }
 
-  // monitor layerZero bridge:
-  const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
-  await layerZeroBridgeMonitor.initScan()
-  loop(() => layerZeroBridgeMonitor.startMonitor()).catch()
+  // monitor layerZero bridge
+  if (process.env.LAYER_ZERO_BRIDGES) {
+    const layerZeroBridgeMonitor = new LayerZeroBridgeMonitor()
+    await layerZeroBridgeMonitor.initScan()
+    loop(() => layerZeroBridgeMonitor.startMonitor()).catch()
+  }
 }
 
 ;(async () => {
-main().catch()
+  main().catch()
 })().catch((err) => {
-console.log(err)
-process.exit(1)
+  console.log(err)
+  process.exit(1)
 })
