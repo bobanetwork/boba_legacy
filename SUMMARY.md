@@ -1,7 +1,6 @@
 # Table of Contents
 
 * [Welcome to Boba](README.md)
-* [Bug Bounty Program](bug-bounty.md)
 * [FAQ](faq.md)
 
 * User Docs
