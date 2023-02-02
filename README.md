@@ -122,7 +122,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 To run unit tests for a specific package:
 
 ```bash
-cd packages/package-to-test
+cd packages/<package-to-test>
 yarn test
 ```
 
