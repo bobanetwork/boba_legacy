@@ -125,10 +125,9 @@ func ValidateRPCReq(req *RPCReq) error {
 		return ErrInvalidRequest("no method specified")
 	}
 
-	// cosmic universe
-	// if !IsValidID(req.ID) {
-	// 	return ErrInvalidRequest("invalid ID")
-	// }
+	if !IsValidID(req.ID) {
+		return ErrInvalidRequest("invalid ID")
+	}
 
 	return nil
 }
