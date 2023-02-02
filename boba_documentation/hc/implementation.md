@@ -2,9 +2,9 @@
 description: Learn how to use Turing hybrid compute
 ---
 
-Turing is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as social networking or weather data are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
+Hybrid Compute (formerly "Turing") is a system for interacting with the outside world from within solidity smart contracts. All data returned from external APIs, such as social networking or weather data are deposited into a public data-storage contract on Ethereum Mainnet. This extra data allows replicas, verifiers, and fraud-detectors to reproduce and validate the Boba L2 blockchain, block by block.
 
-Using Turing is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
+Using Hybrid Compute is as easy as calling specific functions from inside your smart contract. For example, to obtain a random number for minting NFTs, call:
 
 ```javascript
 
@@ -124,13 +124,58 @@ You should lock down your off-chain endpoint to only accept queries from your sm
 
 Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided in `./packages/boba/turing/AWS_code`. Specific instructions for setting up AWS lambda endpoints are [here](./AWS_code/AWS_lambda_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
-## Important Properties of Turing
+## Important Properties of Hybrid Compute
 
-* Strings returned from external endpoints are limited to 322 characters (`5*64+2=322`)
 * Only one Turing call per execution
 * There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistent failure of your first call to your endpoint.
 
-### String length limit
+### One Turing call per Transaction
+At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert.
+
+
+### TuringTxV2() - V2
+The new HybridCompute version allows endpoints to return more complex data structures or just larger payloads in general.
+
+* Maximum allowed length of the modified calldata is 65508 (selector + req + response).
+
+When using the new TuringTxV2() function, then you don't need to supply a length parameter on the backend.
+
+```javascript
+  // Payload from the external API
+  // 0x
+  // 0000000000000000000000000000000000000000000000000000000000418b95 ** first uint256
+  // 0000000000000000000000000000000000000000000000000000017e60d3b45f ** second uint256
+
+  // decoding of those data within the smart contract
+  (uint256 market_price, uint256 time) = abi.decode(encResponse,(uint256,uint256));
+```
+
+To return more complex types, we recommend using an AbiEncoder instead of building the payload manually.
+
+```python
+from eth_abi import encode_abi, decode_abi
+from web3 import Web3
+
+encoded_str = encode_abi(['string[]', 'string', 'bytes'], [yourArray, aStringVal, someBytes])
+res = Web3.toHex(encoded_str)
+```
+
+On the smart contract side, it could look like this:
+
+```solidity
+bytes memory byteRes = turingHelper.TuringTxV2(_turingUri, encRequest);
+
+(string[] memory yourArray, string memory aStringVal, bytes memory someBytes) = abi.decode(byteRes, (string[], string, bytes));
+```
+
+
+### TuringTx() - V1
+The legacy version of Hybrid Compute had a smaller maximum response size, which didn't allow you to return larger or more complex payloads from an API such as arrays.
+
+* Strings returned from external endpoints in V1 are limited to 322 characters (`5*64+2=322`)
+
+
+#### String length limit
 
 The string length cap of 322 is large enough to return, for example, four `uint256` from the external api:
 
@@ -160,10 +205,6 @@ You can return anything you want - e.g. numbers, strings, ... - and this informa
   (uint256 market_price, uint256 time) = abi.decode(encResponse,(uint256,uint256));
 
 ```
-
-### One Turing call per Transaction
-
-At present, you can only have one Turing call per transaction, i.e. a Turing call cannot call other contracts that invoke Turing as well. Transactions that result in multiple Turing calls in the call stack will revert.
 
 ## Turing Architecture
 
