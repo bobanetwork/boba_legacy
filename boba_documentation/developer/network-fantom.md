@@ -60,6 +60,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Gateway       | [https://gateway.testnet.bobaopera.boba.network](https://gateway.testnet.bobaopera.boba.network) |
 | Blockexplorer | [https://blockexplorer.testnet.bobaopera.boba.network](https://blockexplorer.testnet.bobaopera.boba.network) |
 | Websocket     | [wss://wss.testnet.bobaopera.boba.network](wss://wss.testnet.bobaopera.boba.network) |
+| Gas Cap         | 50000000                   |
 
 # Bobaopera L2 (301) for the Fantom L1 (250)
 
@@ -100,3 +101,4 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Gateway       | [https://gateway.bobaopera.boba.network](https://gateway.bobaopera.boba.network) |
 | Blockexplorer | [https://blockexplorer.bobaopera.boba.network](https://blockexplorer.bobaopera.boba.network) |
 | Websocket     | [wss://wss.bobaopera.boba.network](wss://wss.bobaopera.boba.network) |
+| Gas Cap         | 50000000                   |

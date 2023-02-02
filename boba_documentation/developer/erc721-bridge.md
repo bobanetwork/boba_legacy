@@ -9,7 +9,7 @@ Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to 
 
 ## Native L1 NFT - developer requirements
 
-Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please make sure that your L1 NFT contract is [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible. Your contract must implemented `ERC165`  and `ERC721` interfaces. We will check the interface before registering your NFT contracts to our bridges.
+Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please make sure that your L1 NFT contract is [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible. Your contract must implement `ERC165`  and `ERC721` interfaces. We will check the interface before registering your NFT contracts to our bridges.
 
 ```solidity
 bytes4 erc721 = 0x80ac58cd;

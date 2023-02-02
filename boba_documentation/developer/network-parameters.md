@@ -19,6 +19,7 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 | Gateway         | [https://gateway.goerli.boba.network](https://gateway.goerli.boba.network)             |
 | Blockexplorer   | [https://testnet.bobascan.com](https://testnet.bobascan.com) |
 | Websocket       | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)                   |
+| Gas Cap         | 50000000                   |
 
 # Mainnet (288)
 
@@ -38,3 +39,4 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 | Gateway           | [https://gateway.boba.network](https://gateway.boba.network)                     |
 | Blockexplorer     | [https://bobascan.com](https://bobascan.com)         |
 | Websocket         | [wss://ws.mainnet.boba.network](wss://wss.mainnet.boba.network)                  |
+| Gas Cap           | 50000000                   |

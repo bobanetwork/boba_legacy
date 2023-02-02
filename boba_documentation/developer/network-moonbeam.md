@@ -61,6 +61,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Blockexplorer     | [https://blockexplorer.bobabase.boba.network](https://blockexplorer.bobabase.boba.network) |
 | Websocket         | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network) |
 | Replica Websocket | [wss://replica-wss.bobabeam.boba.network](wss://replica-wss.bobabeam.boba.network) |
+| Gas Cap         | 50000000                   |
 
 # Bobabeam L2 (1294) for the Moonbeam L1 (1284)
 
@@ -102,3 +103,4 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Blockexplorer     | [https://blockexplorer.bobabeam.boba.network](https://blockexplorer.bobabeam.boba.network) |
 | Websocket         | [wss://wss.bobabeam.boba.network](wss://wss.bobabeam.boba.network) |
 | Replica Websocket | [wss://replica-wss.bobabeam.boba.network](wss://replica-wss.bobabeam.boba.network) |
+| Gas Cap         | 50000000                   |

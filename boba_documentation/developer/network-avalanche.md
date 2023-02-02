@@ -63,6 +63,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Gateway       | [https://gateway.testnet.avax.boba.network](https://gateway.testnet.avax.boba.network) |
 | Blockexplorer | [https://blockexplorer.testnet.avax.boba.network](https://blockexplorer.testnet.avax.boba.network) |
 | Websocket     | [wss://wss.testnet.avax.boba.network](wss://wss.testnet.avax.boba.network) |
+| Gas Cap         | 50000000                   |
 
 # Boba Avalanche L2 (43288) for the Avalanche L1 (43114)
 
@@ -104,3 +105,4 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 | Gateway       | [https://gateway.avax.boba.network](https://gateway.avax.boba.network) |
 | Blockexplorer | [https://blockexplorer.avax.boba.network](https://blockexplorer.avax.boba.network) |
 | Websocket     | [wss://wss.avax.boba.network](wss://wss.avax.boba.network)   |
+| Gas Cap         | 50000000                   |
