@@ -448,8 +448,8 @@ func (st *StateTransition) refundGas() {
 
 			// BOBA to vault - this is written to state and receipt
 			ethVaultVal := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.msg.GasPrice())
-			bobaToVaultVal := new(big.Int).Div(new(big.Int).Mul(ethVaultVal, st.bobaPriceRatio), st.bobaPriceRatioDivisor)
-			remainingBoba = new(big.Int).Sub(bobaVal, bobaToVaultVal)
+			bobaVaultVal := new(big.Int).Div(new(big.Int).Mul(ethVaultVal, st.bobaPriceRatio), st.bobaPriceRatioDivisor)
+			remainingBoba = new(big.Int).Sub(bobaVal, bobaVaultVal)
 		}
 		st.state.AddBobaBalance(st.msg.From(), remainingBoba)
 	} else {
