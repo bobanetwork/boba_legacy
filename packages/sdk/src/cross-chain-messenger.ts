@@ -15,6 +15,7 @@ import {
   ICrossChainMessenger,
   OEContracts,
   OEContractsLike,
+  BOBAContractsLike,
   MessageLike,
   MessageRequestLike,
   TransactionLike,
@@ -48,6 +49,7 @@ import {
   encodeCrossChainMessage,
   DEPOSIT_CONFIRMATION_BLOCKS,
   CHAIN_BLOCK_TIMES,
+  BOBAContractAddresses,
 } from './utils'
 
 export class CrossChainMessenger implements ICrossChainMessenger {
@@ -55,6 +57,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   public l2SignerOrProvider: Signer | Provider
   public l1ChainId: number
   public contracts: OEContracts
+  public BOBAContractAddresses: BOBAContractsLike
   public bridges: BridgeAdapters
   public depositConfirmationBlocks: number
   public l1BlockTimeSeconds: number
@@ -109,6 +112,8 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     this.bridges = getBridgeAdapters(this.l1ChainId, this, {
       overrides: opts.bridges,
     })
+
+    this.BOBAContractAddresses = BOBAContractAddresses[this.l1ChainId]
   }
 
   get l1Provider(): Provider {

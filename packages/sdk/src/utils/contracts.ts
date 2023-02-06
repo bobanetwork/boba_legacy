@@ -9,6 +9,7 @@ import {
   OEL2Contracts,
   OEContractsLike,
   OEL2ContractsLike,
+  BOBAContractsLike,
   AddressLike,
   BridgeAdapters,
   BridgeAdapterData,
@@ -370,4 +371,39 @@ export const getBridgeAdapters = (
   }
 
   return adapters
+}
+
+export const BOBAContractAddresses: {
+  [l1ChainId: number]: BOBAContractsLike
+} = {
+  // mainnet
+  1: {
+    l1: {
+      BOBAToken: '0x42bbfa2e77757c645eeaad1655e0911a7553efbc',
+    },
+    l2: {
+      BOBAToken: '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7',
+      Proxy__BobaBillingContract: '0x29F373e4869e69faaeCD3bF747dd1d965328b69f',
+    },
+  },
+  // goerli
+  5: {
+    l1: {
+      BOBAToken: '0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1',
+    },
+    l2: {
+      BOBAToken: '0x4200000000000000000000000000000000000023',
+      Proxy__BobaBillingContract: '0x04A6e2AB38BB53bD82ae1Aa0521633D640304ab9',
+    },
+  },
+  // Hardhat local
+  31337: {
+    l1: {
+      BOBAToken: '0x1613beB3B2C4f22Ee086B2b38C1476A3cE7f78E8',
+    },
+    l2: {
+      BOBAToken: '0x4200000000000000000000000000000000000023',
+      Proxy__BobaBillingContract: '0xC9a43158891282A2B1475592D5719c001986Aaec',
+    },
+  },
 }

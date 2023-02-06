@@ -20,6 +20,7 @@ import {
   MessageStatus,
   TokenBridgeMessage,
   OEContracts,
+  BOBAContractsLike,
   MessageReceipt,
   StateRoot,
   StateRootBatch,
@@ -90,6 +91,11 @@ export interface ICrossChainMessenger {
    * Use the fast message relayer?
    */
   fastRelayer: boolean
+
+  /**
+   * Addresses of the BOBA core contract addresses.
+   */
+  BOBAContractAddresses: BOBAContractsLike
 
   /**
    * Retrieves all cross chain messages sent within a given transaction.

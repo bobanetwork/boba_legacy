@@ -40,6 +40,21 @@ export interface OEL2Contracts {
 }
 
 /**
+ * L1 contract references.
+ */
+export interface BOBAL1Contracts {
+  BOBAToken: Contract
+}
+
+/**
+ * L2 contract references.
+ */
+export interface BOBAL2Contracts {
+  BOBAToken: Contract
+  Proxy__BobaBillingContract: Contract
+}
+
+/**
  * Represents Optimism contracts, assumed to be connected to their appropriate
  * providers and addresses.
  */
@@ -65,12 +80,37 @@ export type OEL2ContractsLike = {
 }
 
 /**
+ * Convenience type for something that looks like the L1 BOBA contract interface but could be
+ * addresses instead of actual contract objects.
+ */
+export type BOBAL1ContractsLike = {
+  [K in keyof BOBAL1Contracts]: string
+}
+
+/**
+ * Convenience type for something that looks like the L2 BOBA contract interface but could be
+ * addresses instead of actual contract objects.
+ */
+export type BOBAL2ContractsLike = {
+  [K in keyof BOBAL2Contracts]: string
+}
+
+/**
  * Convenience type for something that looks like the OE contract interface but could be
  * addresses instead of actual contract objects.
  */
 export interface OEContractsLike {
   l1: OEL1ContractsLike
   l2: OEL2ContractsLike
+}
+
+/**
+ * Convenience type for something that looks like the BOBA contract interface but could be
+ * addresses instead of actual contract objects.
+ */
+export interface BOBAContractsLike {
+  l1: BOBAL1ContractsLike
+  l2: BOBAL2ContractsLike
 }
 
 /**

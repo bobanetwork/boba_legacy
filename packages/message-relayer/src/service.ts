@@ -1,5 +1,5 @@
 /* Imports: External */
-import { Wallet, utils, constants, BigNumber } from 'ethers'
+import { Wallet, utils, constants, BigNumber, Contract } from 'ethers'
 import { Address, sleep } from '@eth-optimism/core-utils'
 import fetch from 'node-fetch'
 import { Logger, BaseService, LegacyMetrics } from '@eth-optimism/common-ts'
@@ -8,6 +8,7 @@ import {
   CrossChainMessenger,
   MessageStatus,
   ProviderLike,
+  toProvider,
 } from '@eth-optimism/sdk'
 
 interface MessageRelayerOptions {
@@ -130,6 +131,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     messageBuffer: Array<any>
     timeOfLastPendingRelay: any
     didWork: boolean
+    // interface
+    billingContractAddr: string
+    bilingContract: Contract
+    l2BOBAToken: Contract
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -164,6 +169,21 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.timeOfLastRelayS = Date.now()
     this.state.messageBuffer = []
     this.state.timeOfLastPendingRelay = false
+
+    // interface
+    /* eslint-disable */
+    this.state.billingContractAddr = this.state.messenger.BOBAContractAddresses.l2.Proxy__BobaBillingContract
+    this.state.bilingContract = new Contract(
+      this.state.billingContractAddr,
+      new utils.Interface(['function exitFee() view returns (uint256)']),
+      toProvider(this.options.l2RpcProvider)
+    )
+    this.state.l2BOBAToken = new Contract(
+      this.state.messenger.BOBAContractAddresses.l2.BOBAToken,
+      new utils.Interface(['event Transfer(address indexed from, address indexed to, uint256 amount)']),
+      toProvider(this.options.l2RpcProvider)
+    )
+    /* eslint-enable */
   }
 
   protected async _start(): Promise<void> {
@@ -444,9 +464,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
             // we skip messages which are targeted to CanonicalTransactionChain
             // since they are not allowed and to avoid top level relay fails
-            const canonicalTransactionChain =
-              this.state.messenger.contracts.l1.CanonicalTransactionChain
-                .address
+            /* eslint-disable */
+            const canonicalTransactionChain = this.state.messenger.contracts.l1.CanonicalTransactionChain.address
+            const l1StandardBridge = this.state.messenger.contracts.l1.L1StandardBridge.address
+            /* eslint-enable */
 
             // If we got here then all messages in the transaction are finalized. Now we can relay
             // each message to L1.
@@ -468,6 +489,28 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
                   isFastRelayerMessage
                 ) {
                   this.logger.info('Message not intended for target, skipping.')
+                  continue
+                }
+              }
+
+              // skip messages to l1StandardBridge that bypass the billing
+              // contract on L2
+              if (message.target === l1StandardBridge) {
+                const exitFee = await this.state.bilingContract.exitFee({
+                  blockTag: message.blockNumber,
+                })
+                const events = await this.state.l2BOBAToken.queryFilter(
+                  this.state.l2BOBAToken.filters.Transfer(),
+                  message.blockNumber,
+                  message.blockNumber
+                )
+                const filterEvent = events.filter(i =>
+                    i.args.to === this.state.bilingContract &&
+                    i.transactionHash === message.transactionHash &&
+                    i.args.value.eq(exitFee)
+                )
+                if (filterEvent.length === 0) {
+                  this.logger.info('Message is not paying exit fee, skipping.')
                   continue
                 }
               }
