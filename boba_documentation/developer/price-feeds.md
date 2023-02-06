@@ -361,7 +361,7 @@ function latestRound()
 
 ### Contract Addresses
 
-Bobalink is available on Boba Mainnt L2, Boba Goerli L2, Bobabeam. It will be available on more L2s soon.
+Bobalink is available on Boba Mainnet L2, Boba Goerli L2, Bobabeam. It will be available on more L2s soon.
 
 #### Boba Mainnet L2
 
