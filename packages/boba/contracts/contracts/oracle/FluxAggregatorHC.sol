@@ -45,7 +45,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
   string constant private V3_NO_DATA_ERROR = "No data present";
 
   uint80 internal latestRoundId;
-  uint80 public staringRoundId;
+  uint80 public startingRoundId;
   uint256 public chainLinkLatestRoundId;
 
   address private oracleAddress;
@@ -209,7 +209,7 @@ contract FluxAggregatorHC is AggregatorV2V3Interface {
     require(_added != address(0), "oracleAddress cannot be zero address");
     oracleAddress = _added;
     oracleAdmin = _addedAdmin;
-    staringRoundId = _roundId;
+    startingRoundId = _roundId;
     latestRoundId = _roundId;
 
     emit OracleSet(_added, _addedAdmin, _roundId);
