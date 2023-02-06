@@ -1,8 +1,20 @@
 import {
   rinkebySwapBOBAForETH,
+  goerliSwapBOBAForETH,
   mainnetSwapBOBAForETH,
   rinkebyGetTestnetETH,
+  goerliGetTestnetETH,
   mainnetGetTestnetETH,
 } from './metatransaction-api'
 
-export { rinkebySwapBOBAForETH, mainnetSwapBOBAForETH, rinkebyGetTestnetETH, mainnetGetTestnetETH }
+import { bobaLinkGetQuote } from './bobalink-api'
+
+export {
+  rinkebySwapBOBAForETH,
+  goerliSwapBOBAForETH,
+  mainnetSwapBOBAForETH,
+  rinkebyGetTestnetETH,
+  goerliGetTestnetETH,
+  mainnetGetTestnetETH,
+  bobaLinkGetQuote,
+}

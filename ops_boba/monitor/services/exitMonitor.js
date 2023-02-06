@@ -2,10 +2,10 @@
 
 const ethers = require('ethers')
 const DatabaseService = require('./database.service')
-const OptimismEnv = require('./utilities/optimismEnv')
+const GlobalEnv = require('./utils/globalEnv')
 const { sleep } = require('@eth-optimism/core-utils')
 
-class exitMonitorService extends OptimismEnv {
+class exitMonitorService extends GlobalEnv {
   constructor() {
     super(...arguments)
 
@@ -58,7 +58,7 @@ class exitMonitorService extends OptimismEnv {
       }
     }
 
-    await this.initOptimismEnv()
+    await this.initGlobalEnv()
     await this.databaseService.initMySQL()
 
     // fetch the last end block
@@ -133,10 +133,6 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    // } else {
-      // this.logger.info(
-      //   `No LP fast exit found from block ${this.startBlock} to ${endBlock}`
-      // )
     }
 
     if (OVM_L2StandardBridgeLog.length) {
@@ -169,10 +165,6 @@ class exitMonitorService extends OptimismEnv {
         )
         await this.databaseService.insertExitData(payload)
       }
-    // } else {
-      // this.logger.info(
-      //   `No standard bridge exit found from block ${this.startBlock} to ${endBlock}`
-      // )
     }
 
     this.startBlock = endBlock

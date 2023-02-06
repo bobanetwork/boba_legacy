@@ -86,7 +86,6 @@ import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMoc
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
-import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
@@ -1002,28 +1001,9 @@ class NetworkService {
     if (this.networkGateway === 'local') return
     if (this.account === null) return
 
-    let txL1 = []
     let txL1pending = []
     let txL2 = []
     let txL0 = []
-
-    const responseL1 = await etherScanInstance(
-      this.networkGateway,
-      'L1'
-    ).get(`&address=${this.account}`)
-
-    if (responseL1.status === 200) {
-      const transactionsL1 = await responseL1.data
-      if (transactionsL1.status === '1') {
-        //thread in ChainID
-        txL1 = transactionsL1.result.map(v => ({
-          ...v,
-          blockNumber: parseInt(v.blockNumber), //fix bug - sometimes this is string, sometimes an integer
-          timeStamp: parseInt(v.timeStamp),     //fix bug - sometimes this is string, sometimes an integer
-          chain: 'L1'
-        }))
-      }
-    }
 
     const responseL2 = await omgxWatcherAxiosInstance(
       this.networkGateway
@@ -1068,7 +1048,6 @@ class NetworkService {
       //add the chain: 'L1pending' field
       txL1pending = responseL1pending.data.map(v => ({ ...v, chain: 'L1pending' }))
       const annotated = [
-        ...txL1,
         ...txL2,
         ...txL0,
         ...txL1pending //the new data product
@@ -5191,8 +5170,55 @@ class NetworkService {
    ***********OLD DAO REMOVE ME TILL HERE *
    *****************************************/
 
+   async submitTxBuilder(contract, methodIndex, methodName, inputs) {
 
+    const parseResult = (result, outputs) => {
+      let parseResult = []
+      if (outputs.length === 1) {
+        return result.toString()
+      }
+      for (let i = 0; i < outputs.length; i++) {
+        try {
+          const output = outputs[i]
+          const key = output.name ? output.name : output.type
+          if (output.type.includes('uint')) {
+            parseResult.push({[key]: result[i].toString()})
+          } else {
+            parseResult.push({[key]:result[i]})
+          }
+        } catch (err) {
+          return 'Error: Failed to parse result'
+        }
+      }
+      return JSON.stringify(parseResult)
+    }
 
+    let parseInput = Object.values(inputs)
+    let value = 0
+    const stateMutability = contract.interface.functions[methodName].stateMutability
+    const outputs = contract.interface.functions[methodName].outputs
+    if (stateMutability === 'payable') {
+      value = parseInput[parseInput.length - 1]
+      parseInput = parseInput.slice(0, parseInput.length - 1)
+    }
+
+    let result
+    try {
+      if (stateMutability === 'view' || stateMutability === 'pure') {
+        result = await contract[methodName](...parseInput)
+        return { methodIndex, result: { result: parseResult(result, outputs), err: null }}
+      } else if (stateMutability === 'payable') {
+        console.log({ value }, ...parseInput)
+        const tx = await contract[methodName](...parseInput, { value })
+        return { methodIndex, result: { transactionHash: tx.hash, err: null }}
+      } else {
+        const tx = await contract[methodName](...parseInput)
+        return { methodIndex, result: { transactionHash: tx.hash, err: null }}
+      }
+    } catch (err) {
+      return { methodIndex, result: { err: JSON.stringify(err) }}
+    }
+   }
 }
 
 const networkService = new NetworkService()

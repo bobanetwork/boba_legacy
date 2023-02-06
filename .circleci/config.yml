@@ -2,7 +2,149 @@
 version: 2.1
 
 jobs:
+  go-lint-test-build:
+    parameters:
+      binary_name:
+        description: Binary name to build
+        type: string
+      working_directory:
+        description: Working directory
+        type: string
+      build:
+        description: Whether or not to build the binary
+        type: boolean
+        default: true
+      dependencies:
+        description: Regex matching dependent packages
+        type: string
+        default: this-package-does-not-exist
+    docker:
+      - image: ethereumoptimism/ci-builder:latest
+      - image: cimg/postgres:14.1
+    steps:
+      - checkout
+      - run:
+          name: Check if we should run
+          command: |
+            shopt -s inherit_errexit
+            CHANGED=$(check-changed "(<<parameters.working_directory>>|<<parameters.dependencies>>)" || echo "TRUE")
+            echo $CHANGED
+            if [[ "$CHANGED" = "FALSE" ]]; then
+              circleci step halt
+            fi
+      - run:
+          name: Lint
+          command: golangci-lint run -E goimports,sqlclosecheck,bodyclose,asciicheck,misspell,errorlint -e "errors.As" -e "errors.Is" ./...
+          working_directory: <<parameters.working_directory>>
+      - store_test_results:
+          path: /test-results
+      - run:
+          name: Test
+          command: |
+            mkdir -p /test-results
+            DB_USER=postgres gotestsum --junitfile /test-results/tests.xml
+          working_directory: <<parameters.working_directory>>
+      - when:
+          condition:
+            equal: [ true, <<parameters.build>> ]
+          steps:
+            - run:
+                name: Build
+                command: make <<parameters.binary_name>>
+                working_directory: <<parameters.working_directory>>
+
+  build_bundler: # runs not using Workflows must have a `build` job as entry point
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
+
+      - run:
+          name: package-json-all-deps
+          command: yarn create-all-deps
+          working_directory: ./packages/boba/bundler
+
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}-{{ .Environment.CACHE_VERSION }}
+
+      - run:
+          name: yarn-install-if-no-cache
+          command:  test -d node_modules/truffle || yarn
+          working_directory: ./packages/boba/bundler
+
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}-{{ .Environment.CACHE_VERSION }}
+          paths:
+            - ./packages/boba/bundler/node_modules
+            - ./packages/boba/bundler/packages/node_modules
+            # - ./packages/boba/bundler/packages/client/node_modules
+            # - ./packages/boba/bundler/packages/common/node_modules
+            # - ./packages/boba/bundler/packages/contracts/node_modules
+
+      - run:
+          name: yarn-preprocess
+          command: yarn preprocess
+          working_directory: ./packages/boba/bundler
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./packages/boba/bundler
+
+  test_bundler:
+    working_directory: ~/aa # directory where steps will run
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: test
+          command: yarn lerna-test | tee /tmp/test-dev-results.log
+          working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-dev-results.log
+  test_flow_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run hardhat-node as standalone process fork
+          name: hardhat-node-process
+          command: yarn hardhat-node
+          background: true
+          working_directory: ./packages/boba/bundler
+      - run: # run tests
+          name: test
+          command: yarn lerna-test-flows | tee /tmp/test-flows-results.log
+          working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-flow-results.log
+
+  lint_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: lint
+          command: yarn lerna-lint
+          working_directory: ./packages/boba/bundler
+  depcheck_bundler:
+    docker: # run the steps with Docker
+      - image: cimg/node:16.6.2
+    steps: # a collection of executable commands
+      - attach_workspace:
+          at: .
+      - run: # run tests
+          name: depcheck
+          command: yarn depcheck
+          working_directory: ./packages/boba/bundler
   integration-tests:
+    resource_class: xlarge
     machine:
       image: ubuntu-2004:202111-02
       docker_layer_caching: true
@@ -11,17 +153,64 @@ jobs:
     parallelism: 4
     steps:
       - checkout
+
+      - run:
+          name: Generate cache key from all hardhat.config.ts files
+          working_directory: ops
+          command: ./scripts/checksum.sh /tmp/checksum.txt
+
+      - restore_cache:
+          keys:
+            - solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+
+      - run:
+          name: Cache compliers
+          command: |
+            mkdir -p /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+            cd /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+            find . -name list.json | grep . || curl -L https://github.com/ethereum/solc-bin/raw/gh-pages/linux-amd64/list.json -o ./list.json
+            find . -name solc-linux-amd64-v0.4.11+commit.68ef5810 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.4.11+commit.68ef5810 -o ./solc-linux-amd64-v0.4.11+commit.68ef5810
+            find . -name solc-linux-amd64-v0.5.17+commit.d19bba13 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.5.17+commit.d19bba13 -o ./solc-linux-amd64-v0.5.17+commit.d19bba13
+            find . -name solc-linux-amd64-v0.6.6+commit.6c089d02 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.6.6+commit.6c089d02 -o ./solc-linux-amd64-v0.6.6+commit.6c089d02
+            find . -name solc-linux-amd64-v0.8.9+commit.e5eed63a | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.9+commit.e5eed63a -o ./solc-linux-amd64-v0.8.9+commit.e5eed63a
+            find . -name solc-linux-amd64-v0.8.11+commit.d7f03943 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.11+commit.d7f03943 -o ./solc-linux-amd64-v0.8.11+commit.d7f03943
+            find . -name solc-linux-amd64-v0.8.15+commit.e14f2714 | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.15+commit.e14f2714 -o ./solc-linux-amd64-v0.8.15+commit.e14f2714
+            find . -name solc-linux-amd64-v0.8.17+commit.8df45f5f | grep . || curl -L https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v0.8.17+commit.8df45f5f -o ./solc-linux-amd64-v0.8.17+commit.8df45f5f
+            chmod +x /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/*
+          working_directory: /
+
+      - save_cache:
+          key: solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
+          paths:
+            - /home/circleci/.cache/hardhat-nodejs/compilers-v2/linux-amd64/
+
+      - run:
+          name: Build the project
+          command: yarn && yarn build
+          working_directory: ./
+      - run:
+          name: Build everything
+          command: |
+            docker-compose build --progress=plain
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml build bobalink aa_deployer
+          working_directory: ops
       - run:
           name: Bring up the stack
           command: |
-            ./scripts/build-ci.sh
+            docker images
             BUILD=2 DAEMON=1 ./up_local.sh
+          working_directory: ops
+      - run:
+          name: Bring up services
+          command: |
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f docker-compose.yml logs --follow
+          command: docker-compose -f docker-compose.yml -f docker-compose-side.yml logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
@@ -49,3 +238,21 @@ workflows:
   main:
     jobs:
       - integration-tests
+      - go-lint-test-build:
+          name: proxyd-tests
+          binary_name: proxyd
+          working_directory: go/proxyd
+      - build_bundler
+      - test_bundler:
+          requires:
+            - build_bundler
+      - test_flow_bundler:
+          requires:
+            - build_bundler
+      - lint_bundler:
+          requires:
+            - build_bundler
+      - depcheck_bundler:
+          requires:
+            - build_bundler
+

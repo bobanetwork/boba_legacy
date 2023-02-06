@@ -14,7 +14,6 @@ export const APP_CHAIN = process.env.REACT_APP_CHAIN
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN || null
 export const APP_ZENDESK_KEY = process.env.REACT_APP_ZENDESK_KEY || null
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID
-export const ETHERSCAN_API_KEY = process.env.REACT_APP_ETHERSCAN_API
 export const MAX_HEALTH_BLOCK_LAG = process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION
 export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
@@ -71,5 +70,6 @@ export const ROUTES_PATH = {
   MONSTER: '/monster',
   VOTE_DAO: '/votedao',
   DAO: '/DAO',
+  DEV_TOOLS: '/devtools',
 }
 export const PER_PAGE = 8

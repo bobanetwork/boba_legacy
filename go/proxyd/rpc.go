@@ -3,7 +3,7 @@ package proxyd
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
+	"strings"
 )
 
 type RPCReq struct {
@@ -14,120 +14,96 @@ type RPCReq struct {
 }
 
 type RPCRes struct {
+	JSONRPC string
+	Result  interface{}
+	Error   *RPCErr
+	ID      json.RawMessage
+}
+
+type rpcResJSON struct {
 	JSONRPC string          `json:"jsonrpc"`
 	Result  interface{}     `json:"result,omitempty"`
 	Error   *RPCErr         `json:"error,omitempty"`
 	ID      json.RawMessage `json:"id"`
 }
 
-func (s *RPCReq) UnmarshalJSON(data []byte) error {
-	type Alias RPCReq
-	aux := &struct {
-		*Alias
-	}{
-		Alias: (*Alias)(s),
-	}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		auxAlt := &struct {
-			ID json.RawMessage `json:"id"`
-			*Alias
-		}{
-			Alias: (*Alias)(s),
-		}
-		if err := json.Unmarshal(data, &auxAlt); err == nil {
-			s.ID = auxAlt.ID
-		}
-	}
-	return nil
-}
-
-func (s *RPCRes) UnmarshalJSON(data []byte) error {
-	type Alias RPCRes
-	aux := &struct {
-		*Alias
-	}{
-		Alias: (*Alias)(s),
-	}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		auxAlt := &struct {
-			ID json.RawMessage `json:"id"`
-			*Alias
-		}{
-			Alias: (*Alias)(s),
-		}
-		if err := json.Unmarshal(data, &auxAlt); err == nil {
-			s.ID = auxAlt.ID
-		}
-	}
-	return nil
+type nullResultRPCRes struct {
+	JSONRPC string          `json:"jsonrpc"`
+	Result  interface{}     `json:"result"`
+	ID      json.RawMessage `json:"id"`
 }
 
 func (r *RPCRes) IsError() bool {
 	return r.Error != nil
 }
 
+func (r *RPCRes) MarshalJSON() ([]byte, error) {
+	if r.Result == nil && r.Error == nil {
+		return json.Marshal(&nullResultRPCRes{
+			JSONRPC: r.JSONRPC,
+			Result:  nil,
+			ID:      r.ID,
+		})
+	}
+
+	return json.Marshal(&rpcResJSON{
+		JSONRPC: r.JSONRPC,
+		Result:  r.Result,
+		Error:   r.Error,
+		ID:      r.ID,
+	})
+}
+
 type RPCErr struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+	Code          int    `json:"code"`
+	Message       string `json:"message"`
+	Data          string `json:"data,omitempty"`
+	HTTPErrorCode int    `json:"-"`
 }
 
 func (r *RPCErr) Error() string {
 	return r.Message
 }
 
-func ParseRPCReq(r io.Reader) ([]RPCReq, bool, error) {
-	body, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, true, wrapErr(err, "error reading request body")
-	}
-	if isBatch(body) {
-		var arr []RPCReq
-		err := json.Unmarshal(body, &arr)
-		if err != nil {
-			return nil, true, wrapErr(err, "failed to parse JSON batch request: ")
-		}
-		for _, t := range arr {
-			if t.JSONRPC != JSONRPCVersion {
-				return nil, true, ErrInvalidRequest
-			}
-
-			if t.Method == "" {
-				return nil, true, ErrInvalidRequest
-			}
-		}
-		return arr, true, nil
-	} else {
-
-		req := new(RPCReq)
-		if err := json.Unmarshal(body, req); err != nil {
-			return nil, false, ErrParseErr
-		}
-
-		if req.JSONRPC != JSONRPCVersion {
-			return nil, false, ErrInvalidRequest
-		}
-
-		if req.Method == "" {
-			return nil, false, ErrInvalidRequest
-		}
-		arr := make([]RPCReq, 1)
-		arr[0] = *req
-		return arr, false, nil
+func (r *RPCErr) Clone() *RPCErr {
+	return &RPCErr{
+		Code:          r.Code,
+		Message:       r.Message,
+		HTTPErrorCode: r.HTTPErrorCode,
 	}
 }
 
-func isBatch(msg []byte) bool {
-	for _, c := range msg {
-		if c == 0x20 || c == 0x09 || c == 0x0a || c == 0x0d {
-			continue
-		}
-		return c == '['
+func IsValidID(id json.RawMessage) bool {
+	// handle the case where the ID is a string
+	if strings.HasPrefix(string(id), "\"") && strings.HasSuffix(string(id), "\"") {
+		return len(id) > 2
 	}
-	return false
+
+	// technically allows a boolean/null ID, but so does Geth
+	// https://github.com/ethereum/go-ethereum/blob/master/rpc/json.go#L72
+	return len(id) > 0 && id[0] != '{' && id[0] != '['
+}
+
+func ParseRPCReq(body []byte) (*RPCReq, error) {
+	req := new(RPCReq)
+	if err := json.Unmarshal(body, req); err != nil {
+		return nil, ErrParseErr
+	}
+
+	return req, nil
+}
+
+func ParseBatchRPCReq(body []byte) ([]json.RawMessage, error) {
+	batch := make([]json.RawMessage, 0)
+	if err := json.Unmarshal(body, &batch); err != nil {
+		return nil, err
+	}
+
+	return batch, nil
 }
 
 func ParseRPCRes(r io.Reader) (*RPCRes, error) {
-	body, err := ioutil.ReadAll(r)
+	body, err := io.ReadAll(r)
 	if err != nil {
 		return nil, wrapErr(err, "error reading RPC response")
 	}
@@ -138,6 +114,22 @@ func ParseRPCRes(r io.Reader) (*RPCRes, error) {
 	}
 
 	return res, nil
+}
+
+func ValidateRPCReq(req *RPCReq) error {
+	if req.JSONRPC != JSONRPCVersion {
+		return ErrInvalidRequest("invalid JSON-RPC version")
+	}
+
+	if req.Method == "" {
+		return ErrInvalidRequest("no method specified")
+	}
+
+	if !IsValidID(req.ID) {
+		return ErrInvalidRequest("invalid ID")
+	}
+
+	return nil
 }
 
 func NewRPCErrorRes(id json.RawMessage, err error) *RPCRes {
@@ -156,4 +148,23 @@ func NewRPCErrorRes(id json.RawMessage, err error) *RPCRes {
 		Error:   rpcErr,
 		ID:      id,
 	}
+}
+
+func NewRPCRes(id json.RawMessage, result interface{}) *RPCRes {
+	return &RPCRes{
+		JSONRPC: JSONRPCVersion,
+		Result:  result,
+		ID:      id,
+	}
+}
+
+func IsBatch(raw []byte) bool {
+	for _, c := range raw {
+		// skip insignificant whitespace (http://www.ietf.org/rfc/rfc4627.txt)
+		if c == 0x20 || c == 0x09 || c == 0x0a || c == 0x0d {
+			continue
+		}
+		return c == '['
+	}
+	return false
 }

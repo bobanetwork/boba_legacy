@@ -1,0 +1,40 @@
+{
+  "name": "@boba/bobalink",
+  "version": "1.0.0",
+  "description": "BOBA Link Service",
+  "main": "dist/src/index",
+  "files": [
+    "dist/src/index",
+    "test/**/*.ts"
+  ],
+  "scripts": {
+    "start": "ts-node ./src/exec/run.ts",
+    "build": "tsc -p ./tsconfig.json",
+    "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
+    "lint": "yarn lint:fix && yarn lint:check",
+    "lint:fix": "prettier --config .prettierrc.json --write \"{src,exec,test}/**/*.ts\"",
+    "lint:check": "tslint --format stylish --project .",
+    "test": "hardhat test --show-stack-traces",
+    "test:coverage": "nyc hardhat test && nyc merge .nyc_output coverage.json"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@boba/contracts": "0.0.1",
+    "@eth-optimism/core-utils": "0.8.1",
+    "@types/mocha": "^8.2.2",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.5.4",
+    "hardhat": "^2.12.5",
+    "mocha": "^8.3.1",
+    "typescript": "^4.3.5",
+    "chai": "^4.3.4"
+  },
+  "dependencies": {
+    "@eth-optimism/common-ts": "0.2.2",
+    "bcfg": "^0.1.6",
+    "dotenv": "^8.2.0",
+    "ethers": "^5.5.4"
+  }
+}

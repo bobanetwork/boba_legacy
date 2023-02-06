@@ -42,11 +42,7 @@ library Lib_Buffer {
      * @param _value Value to push to the buffer.
      * @param _extraData Global extra data.
      */
-    function push(
-        Buffer storage _self,
-        bytes32 _value,
-        bytes27 _extraData
-    ) internal {
+    function push(Buffer storage _self, bytes32 _value, bytes27 _extraData) internal {
         BufferContext memory ctx = _self.getContext();
 
         _self.buf[ctx.length] = _value;

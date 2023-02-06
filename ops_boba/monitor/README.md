@@ -7,7 +7,6 @@ yarn install
 yarn copy
 # Start transaction monitor service
 yarn start
-
 ```
 
 ## Build a DockerHub
@@ -19,56 +18,94 @@ To build the docker image(note you only have to run `yarn copy` once):
 yarn install
 yarn copy
 
-# Build Transaction Monitor Image
-docker build . --file ./Dockerfile --tag omg/transaction-monitor:production-v1
+# Build Monitor Image
+cd ops
+docker build . --file ./docker/Dockerfile.monitor --tag bobanetwork/monitor
 docker push omg/transaction-monitor:production-v1
 ```
-You will have to create the `.env-docker` file and populate it with your
-credentials. Look at `.env-docker.example` for an example.
-You will use this file to set environment variables:
 ```bash
-# Set environment variables
-source ./.env-docker
-```
-To run the docker image:
-```bash
-# Start Transaction Monitor
+# Start Monitor
 docker-compose up
 ```
 
 
 ## Monitor
 
-It scans the L2 and write the new block data, transaction data and receipt data into MySQL and checks whether the message from L2 to L1 has been finalized.
+### Global env
 
-| Environment Variable                      | Required? | Default Value                                   | Description                                                  |
-| ----------------------------------------- | --------- | ----------------------------------------------- | ------------------------------------------------------------ |
-| `L1_NODE_WEB3_URL`                        | No        | http://localhost:8545                           | HTTP endpoint for a Layer 1 (Ethereum) node.                 |
-| `L2_NODE_WEB3_URL`                        | No        | [http://localhost:9545](http://localhost:9545/) | HTTP endpoint for a Layer 2 (Optimism) Verifier node.        |
-| `MYSQL_HOST_URL`                          | No        | 127.0.0.1                                       | HTTP endpoint for MySQL.                                     |
-| `MYSQL_PORT`                              | No        | 3306                                            | Port for the MySQL connection.                               |
-| `MYSQL_USERNAME`                          | Yes       | N/A                                             | Name of the user to connect with.                            |
-| `MYSQL_PASSWORD`                          | Yes       | N/A                                             | The user's password.                                         |
-| `MYSQL_DATABASE_NAME`                     | No        | OMGXV1                                          | Name for the database.                                       |
-| `ADDRESS_MANAGER_ADDRESS`                 | Yes       | N/A                                             | Contract address of the address manager                      |
-| `L2_MESSENGER_ADDRESS`                    | No        | 0x4200000000000000000000000000000000000007      | Contract address of L2 messenger                             |
-| `DEPLOYER_PRIVATE_KEY`                    | Yes       | N/A                                             | Private key for an account on Layer 1 (Ethereum) to be used to deploy contracts. |
-| `TRANSACTION_MONITOR_INTERVAL`            | No        | 60,000                                          | Time (in milliseconds) to wait while scanning for new blocks. |
-| `CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL`   | No        | 300,000                                         | Time (in milliseconds) to wait while updating message receipts. |
-| `L1_LIQUIDITY_POOL_ADDRESS`               | Yes       | N/A                                             | L1 liquidity pool address                                    |
-| `L2_LIQUIDITY_POOL_ADDRESS`               | Yes       | N/A                                             | L2 liquidity pool address                                    |
-| `L1_NODE_WEB3_WS`                         | Yes       | N/A                                             | Websocket endpoint for a Layer 1 (Ethereum) node.            |
-| `L2_NODE_WEB3_WS`                         | Yes       | N/A                                             | Websocket endpoint for a Layer 2 (Optimism) node.            |
-| `MONITORING_RECONNECT_SECS`               | No        | 15                                              | Time (in second) to wait for reconnecting after network is disconnected. |
-| `MYSQL_DBNAME_TX`                         | Yes       | N/A                                             | MySQL database name for TX Log.                              |
-| `MYSQL_DBNAME_RECEIPT`                    | Yes       | N/A                                             | MySQL database name for Receipt Log.                         |
-| `SERVICE_MONITOR_ENABLE_TX_RESPONSE_TIME` | Yes       | N/A                                             | set to `true` if you want to log tx and receipt              |
-| `PERIODIC_TRANSACTION_PRIVATE_KEY`        | Yes       | N/A                                             | private key of address that you want to send transaction periodically |
-| `PERIODIC_INTERVAL_IN_MINUTE`             | No        | 15                                              | periodic interval time in minute                             |
-| `PERIODIC_BOBA_AMOUNT`                    | No        | 5                                               | Boba amount to make transfer periodically                    |
-| `BOBA_CONTRACT_L2_ADDRESS`                | Yes       | N/A                                             | Boba token contract address in L2                            |
-| `PERIODIC_L2_WEB3_URL`                    | Yes       | N/A                                             | L2 Web3 Url for send transaction                             |
-| `ORACLE_ADDRESSES`                        | Yes       | N/A                                             | Oracle contract address keys, eg: BobaStraw_ETHUSD,BobaStraw_BOBAUSD |
-| `SERVICE_MONITOR_ENABLE_LOOP_TRANSFER`    | No        | false                                           | Whether enable the feature of sending the test transaction   |
-| `NUMBER_OF_BLOCKS_TO_FETCH`               | No        | 10000000                                        | block range for querying data                                |
-| `SERVICE_MONITOR_ENABLE_BALANCE_MONITOR`  | No        | false                                           | Whether monitor the balances of Liquidity pools              |
+| Environment Variable  | Required? | Default Value                                   | Description                                  |
+| --------------------- | --------- | ----------------------------------------------- | -------------------------------------------- |
+| L1_NODE_WEB3_URL      | No        | http://localhost:8545                           | HTTP endpoint for a Layer 1 (Ethereum) node. |
+| L2_NODE_WEB3_URL      | No        | [http://localhost:9545](http://localhost:9545/) | HTTP endpoint for a Layer 2                  |
+| MYSQL_HOST_URL        | No        | 127.0.0.1                                       | HTTP endpoint for MySQL.                     |
+| MYSQL_PORT            | No        | 3306                                            | Port for the MySQL connection.               |
+| MYSQL_USERNAME        | Yes       | N/A                                             | Name of the user to connect with.            |
+| MYSQL_PASSWORD        | Yes       | N/A                                             | The user's password.                         |
+| MYSQL_DATABASE_NAME   | No        | BOBAV1                                          | Name for the database.                       |
+| BOBA_DEPLOYER_URL     | Yes       | N/A                                             | The URL for querying addresses.json file     |
+| FILTER_ENDPOINT       | Yes       | N/A                                             | The URL for querying boba-addr.json file     |
+| L1_BLOCK_CONFIRMATION | No        | 0                                               | The block confirmation for L1                |
+
+### Block and receipt monitor
+
+| Environment Variable                  | Required? | Default Value | Description                              |
+| ------------------------------------- | --------- | ------------- | ---------------------------------------- |
+| TRANSACTION_MONITOR_INTERVAL          | No        | 3 seconds     | The polling interval for L2 transactions |
+| CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL | No        | 15 minutes    | The polling interval for CDM             |
+| L1_CROSS_DOMAIN_MESSAGE_WAITING_TIME  | No        | 5 minutes     | The waiting for messages from L1 to L2   |
+| L2_CROSS_DOMAIN_MESSAGE_WAITING_TIME  | No        | 1 hour        | The waiting for messages from L2 to L1   |
+| NUMBER_OF_BLOCKS_TO_FETCH             | No        | 10000000      | The block range in SDK                   |
+
+### State root monitor
+
+| Environment Variable            | Required? | Default Value | Description                           |
+| ------------------------------- | --------- | ------------- | ------------------------------------- |
+| STATE_ROOT_MONITOR_INTERVAL     | No        | 1 hour        | The polling interval for state roots  |
+| STATE_ROOT_MONITOR_START_BLOCK  | No        | 0             | The starting block number for monitor |
+| STATE_ROOT_MONITOR_LOG_INTERVAL | No        | 2000          | The block range for querying events   |
+
+### Exit message monitor
+
+| Environment Variable      | Required? | Default Value | Description                         |
+| ------------------------- | --------- | ------------- | ----------------------------------- |
+| EXIT_MONITOR_INTERVAL     | No        | 15 minutes    | The polling interval for exits      |
+| EXIT_MONITOR_LOG_INTERVAL | No        | 2000          | The block range for querying events |
+
+### Deposit monitor
+
+| Environment Variable           | Required? | Default Value | Description                               |
+| ------------------------------ | --------- | ------------- | ----------------------------------------- |
+| L1_BRIDGE_MONITOR_INTERVAL     | No        | 3 minutes     | The polling interval for tx from L1 to L2 |
+| L1_BRIDGE_MONITOR_START_BLOCK  | No        | 0             | The starting block for L1 bridge          |
+| L1_BRIDGE_MONITOR_LOG_INTERVAL | No        | 2000          | The block range for querying events       |
+
+### Layer Zero monitor
+
+| Environment Variable    | Required? | Default Value | Description                              |
+| ----------------------- | --------- | ------------- | ---------------------------------------- |
+| LAYER_ZERO_ENABLE_TEST  | No        | false         | Monitor testnet or mainnet               |
+| LAYER_ZERO_CHAIN        | No        | Testnet       | The chain name                           |
+| LAYER_ZERO_BRIDGES      | Yes       | N/A           | The bridge name                          |
+| LAYER_ZERO_LATEST_BLOCK | No        | 0             | The starting block for Layer Zero bridge |
+
+### Periodic transaction
+
+| Environment Variable             | Required? | Default Value | Description                                 |
+| -------------------------------- | --------- | ------------- | ------------------------------------------- |
+| PERIODIC_TRANSACTION_PRIVATE_KEY | Yes       | N/A           | PK for test                                 |
+| PERIODIC_TRANSACTION_INTERVAL    | No        | 10 minutes    | The waiting period for periodic transaction |
+
+### Bobastraw monitor
+
+| Environment Variable        | Required? | Default Value | Description                      |
+| --------------------------- | --------- | ------------- | -------------------------------- |
+| BOBASTRAW_CONTACT_ADDRESSES | Yes       | N/A           | Bobastraw contract addresses     |
+| BOBASTRAW_MONITOR_INTERVAL  | No        | 10 minutes    | The polling interval for monitor |
+
+### Balance monitor
+
+| Environment Variable         | Required? | Default Value | Description                       |
+| ---------------------------- | --------- | ------------- | --------------------------------- |
+| L1_BALANCE_MONITOR_ADDRESSES | Yes       | N/A           | L1 contract addresses for monitor |
+| L2_BALANCE_MONITOR_ADDRESSES | Yes       | N/A           | L2 contract addresses for monitor |
+| BALANCE_MONITOR_INTERVAL     | No        | 10 minutes    | The polling interval for monitor  |
