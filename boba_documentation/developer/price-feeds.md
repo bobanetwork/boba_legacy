@@ -261,7 +261,7 @@ The `latestRoundData` function returns five values representing information abou
 
 ### How To Use Bobalink To Get Historical Price Data
 
-The most common use case for Data Feeds is to get the latest data from a feed. However, the [`FluxAggregatorHC.sol`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/oracle/FluxAggregatorHC.sol) also has functions to retrieve data of a previous round IDs.
+The most common use case for Data Feeds is to get the latest data from a feed. However, the [`FluxAggregatorHC.sol`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/oracle/FluxAggregatorHC.sol) also has functions to retrieve data of a previous round ID.
 
 #### `roundId` in Aggregator (aggregatorRoundId)
 
