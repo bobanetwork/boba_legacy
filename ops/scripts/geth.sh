@@ -52,4 +52,5 @@ exec geth \
   --miner.etherbase $BLOCK_SIGNER_ADDRESS \
   --rangelimit \
   --rpc.gascap ${GAS_CAP:-11000000} \
+  --sequencer.hcproxy=${SEQUENCER_HC_PROXY} \
   "$@"

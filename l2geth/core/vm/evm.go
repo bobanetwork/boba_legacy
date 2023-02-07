@@ -21,7 +21,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -494,14 +493,13 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		"url", url,
 		"payload", payload)
 
-	proxyStr := os.Getenv("PROXY_URL")
-	if proxyStr == "" {
+	if rcfg.HCProxy == "" {
 		log.Error("TURING Proxy configuration missing")
 		retError[35] = 15
 		return retError, 15
 	}
 
-	client, err := rpc.ProxyDial(proxyStr, url)
+	client, err := rpc.ProxyDial(rcfg.HCProxy, url)
 
 	if client != nil && err == nil {
 		startT := time.Now()

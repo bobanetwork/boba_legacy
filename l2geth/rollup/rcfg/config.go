@@ -16,6 +16,8 @@ var (
 	OvmBobaGasPricOracle common.Address
 	// OvmL2BobaToken is boba token address
 	OvmL2BobaToken common.Address
+	// Hybrid Compute (Turing) proxy URL
+	HCProxy string
 )
 
 var (

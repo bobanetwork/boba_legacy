@@ -61,6 +61,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/p2p/netutil"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup"
+	"github.com/ethereum-optimism/optimism/l2geth/rollup/rcfg"
 	"github.com/ethereum-optimism/optimism/l2geth/rpc"
 	whisper "github.com/ethereum-optimism/optimism/l2geth/whisper/whisperv6"
 	pcsclite "github.com/gballet/go-libpcsclite"
@@ -870,6 +871,11 @@ var (
 		Usage:  "HTTP endpoint for the sequencer client",
 		EnvVar: "SEQUENCER_CLIENT_HTTP",
 	}
+	SequencerHCProxyFlag = cli.StringFlag{
+		Name:   "sequencer.hcproxy",
+		Usage:  "Proxy URL for Hybrid Compute requests",
+		EnvVar: "SEQUENCER_HC_PROXY",
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating
@@ -1148,6 +1154,10 @@ func setRollup(ctx *cli.Context, cfg *rollup.Config) {
 	}
 	if ctx.GlobalIsSet(SequencerClientHttpFlag.Name) {
 		cfg.SequencerClientHttp = ctx.GlobalString(SequencerClientHttpFlag.Name)
+	}
+	// This has to be stored somewhere visible to core/vm/evm.go
+	if ctx.GlobalIsSet(SequencerHCProxyFlag.Name) {
+		rcfg.HCProxy = ctx.GlobalString(SequencerHCProxyFlag.Name)
 	}
 }
 

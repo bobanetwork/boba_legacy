@@ -165,6 +165,7 @@ var (
 		utils.RollupFeeThresholdDownFlag,
 		utils.RollupFeeThresholdUpFlag,
 		utils.SequencerClientHttpFlag,
+		utils.SequencerHCProxyFlag,
 	}
 
 	rpcFlags = []cli.Flag{
