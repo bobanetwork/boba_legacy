@@ -48,6 +48,10 @@ import {
   encodeCrossChainMessage,
   DEPOSIT_CONFIRMATION_BLOCKS,
   CHAIN_BLOCK_TIMES,
+  WHITELIST_CHAIN_ID,
+  getStateBatchAppendedEventByBatchIndexFromGraph,
+  getRelayedMessageEventsFromGraph,
+  getFailedRelayedMessageEventsFromGraph,
 } from './utils'
 
 export class CrossChainMessenger implements ICrossChainMessenger {
@@ -412,6 +416,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     message: MessageLike,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<MessageStatus> {
     const resolved = await this.toCrossChainMessage(message)
@@ -486,11 +491,23 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       console.log('SDK-fast: waiting for MessageReceipt...')
     }
 
-    const relayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.RelayedMessage(messageHash),
-      opts?.fromBlock,
-      opts?.toBlock
-    )
+    let relayedMessageEvents: ethers.Event[] = []
+    if (
+      WHITELIST_CHAIN_ID.includes(this.l1ChainId) &&
+      resolved.direction === MessageDirection.L2_TO_L1
+    ) {
+      relayedMessageEvents = await getRelayedMessageEventsFromGraph(
+        this.l1Provider,
+        messageHash,
+        this.fastRelayer
+      )
+    } else {
+      relayedMessageEvents = await messenger.queryFilter(
+        messenger.filters.RelayedMessage(messageHash),
+        opts?.fromBlock,
+        opts?.toBlock
+      )
+    }
 
     // Great, we found the message. Convert it into a transaction receipt.
     if (relayedMessageEvents.length === 1) {
@@ -506,11 +523,23 @@ export class CrossChainMessenger implements ICrossChainMessenger {
 
     // We didn't find a transaction that relayed the message. We now attempt to find
     // FailedRelayedMessage events instead.
-    const failedRelayedMessageEvents = await messenger.queryFilter(
-      messenger.filters.FailedRelayedMessage(messageHash),
-      opts?.fromBlock,
-      opts?.toBlock
-    )
+    let failedRelayedMessageEvents: ethers.Event[] = []
+    if (
+      WHITELIST_CHAIN_ID.includes(this.l1ChainId) &&
+      resolved.direction === MessageDirection.L2_TO_L1
+    ) {
+      failedRelayedMessageEvents = await getFailedRelayedMessageEventsFromGraph(
+        this.l1Provider,
+        messageHash,
+        this.fastRelayer
+      )
+    } else {
+      failedRelayedMessageEvents = await messenger.queryFilter(
+        messenger.filters.FailedRelayedMessage(messageHash),
+        opts?.fromBlock,
+        opts?.toBlock
+      )
+    }
 
     // A transaction can fail to be relayed multiple times. We'll always return the last
     // transaction that attempted to relay the message.
@@ -740,6 +769,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     message: MessageLike,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<StateRoot | null> {
     const resolved = await this.toCrossChainMessage(message)
@@ -795,15 +825,23 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     batchIndex: number,
     opts?: {
       fromBlock?: BlockTag
+      blockRange?: number
     }
   ): Promise<ethers.Event | null> {
-    const events = await this.contracts.l1.StateCommitmentChain.queryFilter(
-      this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
+    let events: ethers.Event[] = []
+    if (WHITELIST_CHAIN_ID.includes(this.l1ChainId)) {
+      events = await getStateBatchAppendedEventByBatchIndexFromGraph(
+        this.l1Provider,
         batchIndex
-      ),
-      opts?.fromBlock
-    )
-
+      )
+    } else {
+      events = await this.contracts.l1.StateCommitmentChain.queryFilter(
+        this.contracts.l1.StateCommitmentChain.filters.StateBatchAppended(
+          batchIndex
+        ),
+        opts?.fromBlock
+      )
+    }
     if (events.length === 0) {
       return null
     } else if (events.length > 1) {
@@ -818,6 +856,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     transactionIndex: number,
     opts: {
       fromBlock?: BlockTag
+      blockRange?: number
     } = {}
   ): Promise<ethers.Event | null> {
     const isEventHi = (event: ethers.Event, index: number) => {
@@ -913,14 +952,17 @@ export class CrossChainMessenger implements ICrossChainMessenger {
   }
 
   public async getMessageProof(
-    message: MessageLike
+    message: MessageLike,
+    opts?: {
+      fromBlock?: BlockTag
+    }
   ): Promise<CrossChainMessageProof> {
     const resolved = await this.toCrossChainMessage(message)
     if (resolved.direction === MessageDirection.L1_TO_L2) {
       throw new Error(`can only generate proofs for L2 to L1 messages`)
     }
 
-    const stateRoot = await this.getMessageStateRoot(resolved)
+    const stateRoot = await this.getMessageStateRoot(resolved, opts)
     if (stateRoot === null) {
       throw new Error(`state root for message not yet published`)
     }
@@ -1010,6 +1052,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
     opts?: {
       signer?: Signer
       overrides?: Overrides
+      fromBlock?: BlockTag
     }
   ): Promise<TransactionResponse> {
     return (opts?.signer || this.l1Signer).sendTransaction(
@@ -1224,6 +1267,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       messages: Array<MessageLike>,
       opts?: {
         overrides?: Overrides
+        fromBlock?: BlockTag
       }
     ): Promise<TransactionRequest> => {
       const batchMessage = []
@@ -1233,7 +1277,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
         if (resolved.direction === MessageDirection.L1_TO_L2) {
           throw new Error(`cannot finalize L1 to L2 message`)
         }
-        const proof = await this.getMessageProof(resolved)
+        const proof = await this.getMessageProof(resolved, opts)
         batchMessage.push({
           target: resolved.target,
           sender: resolved.sender,
@@ -1374,6 +1418,7 @@ export class CrossChainMessenger implements ICrossChainMessenger {
       messages: Array<MessageLike>,
       opts?: {
         overrides?: Overrides
+        fromBlock?: BlockTag
       }
     ): Promise<BigNumber> => {
       return this.l1Provider.estimateGas(

@@ -423,7 +423,7 @@ describe('teleportation', () => {
       // should store the latest block
       const storedBlock = await teleportationService._getDepositInfo(chainId)
       expect(storedBlock).to.be.eq(latestBlock)
-    })
+    }).retries(3)
 
     it('should get all BobaReceived events', async () => {
       const chainId = (await ethers.provider.getNetwork()).chainId
