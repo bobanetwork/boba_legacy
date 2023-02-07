@@ -695,6 +695,11 @@
         "name": "BOBA Token",
         "symbol": "BOBA",
         "decimals": 18
+      },
+      "0x02Ed46AA41fcb4a6f06a5F2D43A958F1e8c0A4E6": {
+        "name": "Meta Token Test",
+        "symbol": "MTT",
+        "decimals": 18
       }
     },
     "L2": {
@@ -706,6 +711,11 @@
       "0x4200000000000000000000000000000000000023": {
         "name": "tBNB",
         "symbol": "tBNB",
+        "decimals": 18
+      },
+      "0xb3BE5C928E3ec6b11985753f7B3C43A8bB12Bc03": {
+        "name": "Meta Token Test",
+        "symbol": "MTT",
         "decimals": 18
       }
     }
