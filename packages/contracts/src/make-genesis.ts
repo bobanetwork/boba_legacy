@@ -163,9 +163,6 @@ export const makeL2GenesisFile = async (
       metaTransactionFee: utils.parseEther('3'),
       receivedETHAmount: utils.parseEther('0.005'),
       marketPriceRatio: 2000,
-      secondaryFeeTokenAddress: predeploys.L2_L1NativeToken_ALT_L1,
-      receivedBOBAAmount: utils.parseEther('0.005'),
-      decimals: 0,
     },
     L2_BOBA: {
       _name: 'Boba Network',
@@ -180,6 +177,19 @@ export const makeL2GenesisFile = async (
       _symbol: cfg.l1NativeTokenSymbol, // from env
       _decimals: cfg.l1NativeTokenDecimals, // from env
     },
+    Boba_GasPriceOracleAltL1: {
+      _owner: cfg.gasPriceOracleOwner,
+      feeWallet: cfg.l1FeeWalletAddress,
+      secondaryFeeTokenAddress: predeploys.L2_L1NativeToken_ALT_L1,
+      minPriceRatio: 500,
+      maxPriceRatio: 5000,
+      priceRatio: 2000,
+      gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
+      metaTransactionFee: utils.parseEther('3'),
+      receivedBOBAAmount: utils.parseEther('0.005'),
+      marketPriceRatio: 2000,
+      decimals: 0,
+    }
   }
 
   const HIDDEN_CONTRACTS_FOR_ALT_L1 = [
@@ -190,7 +200,8 @@ export const makeL2GenesisFile = async (
 
   const HIDDEN_CONTRACTS_FOR_ETHEREUM = [
     'L2_BOBA',
-    'L2_L1NativeToken'
+    'L2_L1NativeToken',
+    'Boba_GasPriceOracleAltL1'
   ]
 
   const RENAME_SPECIAL_CONTRACTS = {

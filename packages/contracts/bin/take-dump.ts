@@ -97,7 +97,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   ensure(l1BobaTokenAddress, 'L1_BOBA_TOKEN_ADDRESS')
 
   const l1Web3 = new providers.JsonRpcProvider(l1NodeWeb3Url)
-  const l1chainId = (await l1Web3.getNetwork()).chainId
+  const l1ChainId = (await l1Web3.getNetwork()).chainId
 
   // Basic warning so users know that the whitelist will be disabled if the owner is the zero address.
   if (env.WHITELIST_OWNER === '0x' + '00'.repeat(20)) {
@@ -116,7 +116,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     gasPriceOracleGasPrice,
     gasPriceOracleDecimals,
     l2BlockGasLimit,
-    l1chainId,
+    l1ChainId,
     l2ChainId,
     blockSignerAddress,
     l1StandardBridgeAddress,
