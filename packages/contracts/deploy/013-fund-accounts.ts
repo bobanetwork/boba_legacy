@@ -14,14 +14,15 @@ const deployFn: DeployFunction = async (hre) => {
   const { chainId } = await hre.ethers.provider.getNetwork()
   const networkConfig = supportedLocalTestnet[chainId]
   if (typeof networkConfig === 'undefined') {
-    throw new Error("Unsupported local chain ID!");
-
+    throw new Error('Unsupported local chain ID!')
   }
   const L1StandardBridge = await getDeployedContract(
     hre,
     'Proxy__L1StandardBridge',
     {
-      iface: networkConfig.isLocalAltL1 ? 'L1StandardBridgeAltL1' : 'L1StandardBridge',
+      iface: networkConfig.isLocalAltL1
+        ? 'L1StandardBridgeAltL1'
+        : 'L1StandardBridge',
     }
   )
 
@@ -33,7 +34,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   // Boba holder
   const BobaHolder = new hre.ethers.Wallet(
-    accounts.privateKey,
+    accounts[0].privateKey,
     hre.ethers.provider
   )
 
@@ -47,7 +48,7 @@ const deployFn: DeployFunction = async (hre) => {
     const depositAmount = balance.div(2) // Deposit half of the wallet's balance into L2.
 
     await L1StandardBridge.connect(wallet).functions[
-      networkConfig.isLocalAltL1? 'depositNativeToken': 'depositETH'
+      networkConfig.isLocalAltL1 ? 'depositNativeToken' : 'depositETH'
     ](networkConfig.depositL2Gas, '0x', {
       value: depositAmount,
       ...networkConfig.gasLimitOption,
@@ -55,7 +56,7 @@ const deployFn: DeployFunction = async (hre) => {
     console.log(
       `✓ Funded ${wallet.address} on L2 with ${hre.ethers.utils.formatEther(
         depositAmount
-      )} ${networkConfig.isLocalAltL1? "L1 native token": "ETH"}`
+      )} ${networkConfig.isLocalAltL1 ? 'L1 native token' : 'ETH'}`
     )
 
     // Deposit Boba tokens to L2 accounts

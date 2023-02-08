@@ -39,7 +39,8 @@ contract Boba_GasPriceOracleAltL1 {
     address public feeWallet;
 
     // L1 native token token L2 address
-    address public secondaryFeeTokenAddress = Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS_ALT_L1;
+    address public secondaryFeeTokenAddress =
+        Lib_PredeployAddresses.L1_NATIVE_TOKEN_L2_ADDRESS_ALT_L1;
 
     // The maximum price ratio of BOBA and BOBA
     uint256 public maxPriceRatio = 5000;
