@@ -2,14 +2,7 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
-import {
-  Contract,
-  Signer,
-  BigNumber,
-  utils,
-  BigNumberish,
-  ContractFactory,
-} from 'ethers'
+import { Contract, Signer, utils } from 'ethers'
 
 let L2Boba: Contract
 let L2BillingContract: Contract
@@ -25,7 +18,7 @@ const initialSupply = utils.parseEther('10000000000')
 const tokenName = 'BOBA'
 const tokenSymbol = 'BOBA'
 
-describe('L2 Billing Contract', async () => {
+describe('L2BillingContract Tests', async () => {
   before(async () => {
     signer = (await ethers.getSigners())[0]
     signer2 = (await ethers.getSigners())[1]
@@ -45,13 +38,18 @@ describe('L2 Billing Contract', async () => {
   })
 
   describe('Initialization', async () => {
-    it('should revert when initialize with invalid params', async () =>{
-      const billingContract = await ethers.getContractFactory('L2BillingContract')
+    it('should revert when initialize with invalid params', async () => {
+      const billingContract = await ethers.getContractFactory(
+        'L2BillingContract'
+      )
       const l2BillingContract = await billingContract.deploy()
       await l2BillingContract.deployed()
-      await expect(l2BillingContract.
-        initialize('0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000')
-        ).to.be.revertedWith('Fee token address cannot be zero')
+      await expect(
+        l2BillingContract.initialize(
+          '0x0000000000000000000000000000000000000000',
+          '0x0000000000000000000000000000000000000000',
+          '0x0000000000000000000000000000000000000000'
+        )).to.be.revertedWith('Fee token address cannot be zero')
     })
 
     it('should have correct address', async () => {

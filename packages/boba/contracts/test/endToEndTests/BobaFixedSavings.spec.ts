@@ -52,7 +52,7 @@ before(async () => {
   await addController.wait()
 })
 
-describe('Boba Fixed Savings Tests', async () => {
+describe('BobaFixedSavings Tests', async () => {
   before(async () => {
     signer = (await ethers.getSigners())[0]
     signer2 = (await ethers.getSigners())[1]
