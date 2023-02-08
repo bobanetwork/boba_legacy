@@ -56,17 +56,17 @@ The first mechanism prevents unauthorized use of your on-chain resources and the
 
 Here are five fully worked out examples for you to build on:
 
-* Use Hybrid Compute to build a [CAPTCHA-gated token faucet](../../boba\_community/turing-captcha-faucet/README.md)
-* Use Hybrid Compute to [mint NFTs with random attributives](../../boba\_community/turing-monsters/README.md)
-* Do all [stableswap quadratic math off-chain, just in time](../../packages/boba/turing/test/003_stable_swap.ts)
-* Query [centralized off-chain price feeds](../../packages/boba/turing/test/005_lending.ts). Note - these cannot replace on-chain oracles and this approach should not be used in production. An on-chain oracle such as ChainLink is the better design pattern.
-* Connect [on-chain events with commercial KYC providers](../../boba\_community/turing-kyc/README.md)
+* Use Hybrid Compute to build a [CAPTCHA-gated token faucet](../hc/hc-captcha-faucet.md)
+* Use Hybrid Compute to [mint NFTs with random attributives](../hc/monsters.md)
+* Do all [stableswap quadratic math off-chain, just in time](https://github.com/bobanetwork/boba/tree/develop/boba_examples/turing-lending)
+* Query [centralized off-chain price feeds](./price-feeds.md#3-bobalink)
+* Connect [on-chain events with commercial KYC providers](../hc/kyc.md)
 
 There is more information on setting up your own servers and compute endpoints here:
 
-* [Hybrid Compute API Endpoints](../../packages/boba/turing/AWS\_code/AWS\_lambda\_setup.md)
+* [Hybrid Compute API Endpoints](../hc/AWS_lambda_setup.md)
 
-Separately, there is a new system to help you deploy all the right contracts and set up a working test system at [[Mainnet: turing.boba.network]](https://turing.boba.network) and [[Goerli: hc.goerli.boba.network]](https://hc.goerli.boba.network).
+Separately, there is a new system to help you deploy all the right contracts and set up a working test system at [[Mainnet: turing.boba.network]](https://turing.boba.network).
 
 Have fun using hybrid_compute and contact us right away if you run into any problems!
 
@@ -76,5 +76,4 @@ Have fun using hybrid_compute and contact us right away if you run into any prob
 
 There is a community-built factory contract for Hybrid Compute helper. You can deploy, manage, and fund your Hybrid Compute helpers all through a graphical interface.
 
-* dapp: https://turing-hub.medievaldao.games/
 * github: https://github.com/medieval-dao/turing-subscription
