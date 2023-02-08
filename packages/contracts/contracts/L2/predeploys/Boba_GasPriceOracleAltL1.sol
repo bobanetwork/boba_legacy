@@ -7,7 +7,7 @@ import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /* Contract Imports */
-import { L2StandardBridgeAltL1 } from "./L2StandardBridgeAltL1.sol";
+import { L2StandardBridgeAltL1 } from "../messaging/L2StandardBridgeAltL1.sol";
 import { L2_L1NativeToken } from "./L2_L1NativeToken.sol";
 import { OVM_GasPriceOracle } from "../../L2/predeploys/OVM_GasPriceOracle.sol";
 

@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 /* Interface Imports */
 import { IL1StandardBridgeAltL1 } from "./IL1StandardBridgeAltL1.sol";
-import { IL1ERC20Bridge } from "../../L1/messaging/IL1ERC20Bridge.sol";
+import { IL1ERC20Bridge } from "./IL1ERC20Bridge.sol";
 import { IL2ERC20Bridge } from "../../L2/messaging/IL2ERC20Bridge.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 

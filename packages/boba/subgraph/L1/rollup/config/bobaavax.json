@@ -1,0 +1,21 @@
+{
+  "network": "avalanche",
+  "contracts": {
+    "L1CrossDomainMessenger": {
+      "address": "0x0fc742332ae6D447d6619D93985Aa288B81CBb0C",
+      "startBlock": 19286932
+    },
+    "L1CrossDomainMessengerFast": {
+      "address": "0x5b6714b7926e6D7e34154C9AC945B489978fA7E7",
+      "startBlock": 19286932
+    },
+    "StateCommitmentChain": {
+      "address": "0x1ef85D873Cf451C8B9a45DbE40b478E991F51210",
+      "startBlock": 19286932
+    },
+    "Lib_AddressManager": {
+      "address": "0x00220f8ce1c4be8436574e575fE38558d85e2E6b",
+      "startBlock": 19286932
+    }
+  }
+}

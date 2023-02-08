@@ -5,7 +5,7 @@ pragma solidity ^0.8.9;
 import { Lib_PredeployAddresses } from "../../libraries/constants/Lib_PredeployAddresses.sol";
 
 /* Contract Imports */
-import { L2StandardBridgeAltL1 } from "./L2StandardBridgeAltL1.sol";
+import { L2StandardBridgeAltL1 } from "../messaging/L2StandardBridgeAltL1.sol";
 
 /**
  * @title OVM_SequencerFeeVault
