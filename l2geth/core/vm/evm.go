@@ -532,6 +532,8 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	log.Debug("TURING bobaTuringCall:Have valid response from offchain API",
 		"Target", url,
 		"Payload", payload,
+		"responseLen", len(responseString))
+	log.Trace("TURING bobaTuringCall:Full offchain response",
 		"ResponseStringEnc", responseStringEnc,
 		"ResponseString", hexutil.Bytes(responseString))
 
@@ -716,7 +718,14 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			log.Error("TURING bobaTuringCall:Insufficient credit")
 			return nil, gas, ErrInsufficientBalance
 		}
-		log.Debug("TURING REQUEST END", "updated_input", updated_input)
+
+		// Arbitrary cutoff; balance of logfile readability vs. having enough info to debug issues
+		if len(updated_input) > 500 {
+			log.Trace("TURING REQUEST END", "updated_input (full)", updated_input)
+			log.Debug("TURING REQUEST END", "updated_input (truncated)", updated_input[:500])
+		} else {
+			log.Debug("TURING REQUEST END", "updated_input", updated_input)
+		}
 	} else {
 		ret, err = run(evm, contract, input, false)
 	}
