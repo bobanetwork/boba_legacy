@@ -172,7 +172,7 @@ const SUPPORTED_ASSETS = {
     },
     [ NETWORK.BNB ]: {
       tokenAddresses: {},
-      tokens: [ 'BOBA', 'BNB' ],
+      tokens: [ 'BOBA', 'BNB', 'MMT' ],
       altL1Chains: [ 'BNB' ]
     },
     [ NETWORK.FANTOM ]: {

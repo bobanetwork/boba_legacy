@@ -32,7 +32,8 @@ import oloLogo from 'images/olo.svg'
 import CGTLogo from 'images/CGT.svg'
 import avaxLog from 'images/avax.svg'
 import moonbase from 'images/moonbase.png'
-import glmrLog from 'images/glmr.svg'
+import glmrLogo from 'images/glmr.svg'
+import mttLogo from 'images/mtt.png'
 
 export const getCoinImage = (symbol) => {
 
@@ -148,10 +149,13 @@ export const getCoinImage = (symbol) => {
       logo = avaxLog;
       break;
     case "GLMR":
-      logo = glmrLog;
+      logo = glmrLogo;
       break;
     case "DEV":
       logo = moonbase;
+      break;
+    case "MTT":
+      logo = mttLogo;
       break;
     default:
       logo = ethLogo;
