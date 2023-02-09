@@ -240,14 +240,14 @@ func (evm *EVM) bobaTuringRandom(input []byte, caller common.Address) hexutil.By
 	// 1 for Request, 2 for Response, integer >= 10 for various failures
 	rType := int(rest[31])
 	if rType != 1 {
-		log.Error("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
+		log.Debug("TURING bobaTuringRandom:Wrong state (rType != 1)", "rType", rType)
 		retError[35] = 10 // Wrong input state
 		return retError
 	}
 
 	rlen := len(rest)
 	if rlen < 2*32 {
-		log.Error("TURING bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
+		log.Debug("TURING bobaTuringRandom:Calldata too short", "len < 2*32", rlen)
 		retError[35] = 11 // Calldata too short
 		return retError
 	}
@@ -457,7 +457,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 	// Check the URL length
 	// Note: we do not handle URLs that are longer than 64 characters
 	if lengthURL > 64 {
-		log.Error("TURING bobaTuringCall:URL > 64", "urlLength", lengthURL)
+		log.Debug("TURING bobaTuringCall:URL > 64", "urlLength", lengthURL)
 		retError[35] = 12 // URL string > 64 bytes
 		return retError, 12
 	}
@@ -500,7 +500,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		log.Trace("TURING bobaTuringCall:Calling off-chain client at", "url", url)
 		err := client.CallTimeout(&responseStringEnc, caller.String(), time.Duration(1200)*time.Millisecond, payload)
 		if err != nil {
-			log.Error("TURING bobaTuringCall:Client error", "err", err)
+			log.Info("TURING bobaTuringCall:Client error", "err", err)
 			retError[35] = 13 // Client Error
 			return retError, 13
 		}
@@ -524,7 +524,7 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 		elapsed := t.Sub(startT)
 		log.Trace("TURING API response time", "elapsed", elapsed)
 	} else {
-		log.Error("TURING bobaTuringCall:Failed to create client for off-chain request", "err", err)
+		log.Info("TURING bobaTuringCall:Failed to create client for off-chain request", "err", err)
 		retError[35] = 15 // Could not create client
 		return retError, 15
 	}
@@ -715,7 +715,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			log.Trace("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
 		}
 		if evm.StateDB.TuringCharge(caller.Address()) != nil {
-			log.Error("TURING bobaTuringCall:Insufficient credit")
+			log.Info("TURING bobaTuringCall:Insufficient credit")
 			return nil, gas, ErrInsufficientBalance
 		}
 
