@@ -122,3 +122,7 @@ services:
       dockerfile: ./proxyd/Dockerfile
     deploy:
       replicas: 0
+
+networks:
+  default:
+    name: local-network

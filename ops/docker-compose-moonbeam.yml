@@ -1,106 +1,85 @@
 # # Accounts and their usage
-# l1_chain_1                   | Account #0: 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 (10000 ETH)
-# l1_chain_1                   | Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-# l1_chain_1                   |
-# l1_chain_1                   | Account #1: 0x70997970c51812dc3a010c7d01b50e0d17dc79c8 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
-# l1_chain_1                   |
-# l1_chain_1                   | Account #2: 0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc (10000 ETH)
-# l1_chain_1                   | Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
-# l1_chain_1                   |
-# l1_chain_1                   | Account #3: 0x90f79bf6eb2c4f870365e785982e1f101e93b906 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
-# l1_chain_1                   |
-# l1_chain_1                   | Account #4: 0x15d34aaf54267db7d7c367839aaf71a00a2c6a65 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
-# l1_chain_1                   |
-# l1_chain_1                   | Account #5: 0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc (10000 ETH)
-# l1_chain_1                   | Private Key: 0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
-# l1_chain_1                   |
-# l1_chain_1                   | Account #6: 0x976ea74026e726554db657fa54763abd0c3a0aa9 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
-# l1_chain_1                   |
-# l1_chain_1                   | Account #7: 0x14dc79964da2c08b23698b3d3cc7ca32193d9955 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
-# l1_chain_1                   |
-# l1_chain_1                   | Account #8: 0x23618e81e3f5cdf7f54c3d65f7fbc0abf5b21e8f (10000 ETH)
-# l1_chain_1                   | Private Key: 0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
-# l1_chain_1                   |
-# l1_chain_1                   | Account #9: 0xa0ee7a142d267c1f36714e4a8f75612f20a79720 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
-# l1_chain_1                   |
-# l1_chain_1                   | Account #10: 0xbcd4042de499d14e55001ccbb24a551f3b954096 (10000 ETH)
-# l1_chain_1                   | Private Key: 0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897
-# l1_chain_1                   |
-# l1_chain_1                   | Account #11: 0x71be63f3384f5fb98995898a86b02fb2426c5788 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x701b615bbdfb9de65240bc28bd21bbc0d996645a3dd57e7b12bc2bdf6f192c82
-# l1_chain_1                   |
-# l1_chain_1                   | Account #12: 0xfabb0ac9d68b0b445fb7357272ff202c5651694a (10000 ETH)
-# l1_chain_1                   | Private Key: 0xa267530f49f8280200edf313ee7af6b827f2a8bce2897751d06a843f644967b1
-# l1_chain_1                   |
-# l1_chain_1                   | Account #13: 0x1cbd3b2770909d4e10f157cabc84c7264073c9ec (10000 ETH)
-# l1_chain_1                   | Private Key: 0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd
-# l1_chain_1                   |
-# l1_chain_1                   | Account #14: 0xdf3e18d64bc6a983f673ab319ccae4f1a57c7097 (10000 ETH)
-# l1_chain_1                   | Private Key: 0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa
-# l1_chain_1                   |
-# l1_chain_1                   | Account #15: 0xcd3b766ccdd6ae721141f452c550ca635964ce71 (10000 ETH)
-# l1_chain_1                   | Private Key: 0x8166f546bab6da521a8369cab06c5d2b9e46670292d85c875ee9ec20e84ffb61
-# l1_chain_1                   |
-# l1_chain_1                   | Account #16: 0x2546bcd3c84621e976d8185a91a922ae77ecec30 (10000 ETH)
-# l1_chain_1                   | Private Key: 0xea6c44ac03bff858b476bba40716402b03e41b8e97e276d1baec7c37d42484a0
-# l1_chain_1                   |
-# l1_chain_1                   | Account #17: 0xbda5747bfd65f08deb54cb465eb87d40e51b197e (10000 ETH)
-# l1_chain_1                   | Private Key: 0x689af8efa8c651a91ad287602527f3af2fe9f6501a7ac4b061667b5a93e037fd
-# l1_chain_1                   |
-# l1_chain_1                   | Account #18: 0xdd2fd4581271e230360230f9337d5c0430bf44c0 (10000 ETH)
-# l1_chain_1                   | Private Key: 0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0
-# l1_chain_1                   |
-# l1_chain_1                   | Account #19: 0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199 (10000 ETH)
-# l1_chain_1                   | Private Key: 0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e
+#  0 Alith:
+#- Address: 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac
+#- PrivKey: 0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133
 
-# Account #0
+## 1 Baltathar:
+#- Address: 0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0
+#- PrivKey: 0x8075991ce870b93a8870eca0c0f91913d12f47948ca0fd25b49c6fa7cdbeee8b
+
+## 2 Charleth:
+#- Address: 0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc
+#- PrivKey: 0x0b6e18cafb6ed99687ec547bd28139cafdd2bffe70e6b688025de6b445aa5c5b
+
+## 3 Dorothy:
+#- Address: 0x773539d4Ac0e786233D90A233654ccEE26a613D9
+#- PrivKey: 0x39539ab1876910bbf3a223d84a29e28f1cb4e2e456503e7e91ed39b2e7223d68
+
+## 4 Ethan:
+#- Address: 0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB
+#- PrivKey: 0x7dce9bc8babb68fec1409be38c8e1a52650206a7ed90ff956ae8a6d15eeaaef4
+
+## 5 Faith:
+#- Address: 0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3
+#- PrivKey: 0xb9d2ea9a615f3165812e8d44de0d24da9bbd164b65c4f0573e1ce2c8dbd9c8df
+
+## 6 Goliath:
+#- Address: 0x7BF369283338E12C90514468aa3868A551AB2929
+#- PrivKey: 0x96b8a38e12e1a31dee1eab2fffdf9d9990045f5b37e44d8cc27766ef294acf18
+
+## 7 Heath:
+#- Address: 0x931f3600a299fd9B24cEfB3BfF79388D19804BeA
+#- PrivKey: 0x0d6dcaaef49272a5411896be8ad16c01c35d6f8c18873387b71fbc734759b0ab
+
+## 8 Ida:
+#- Address: 0xC41C5F1123ECCd5ce233578B2e7ebd5693869d73
+#- PrivKey: 0x4c42532034540267bf568198ccec4cb822a025da542861fcb146a5fab6433ff8
+
+## 9 Judith:
+#- Address: 0x2898FE7a42Be376C8BC7AF536A940F7Fd5aDd423
+#- PrivKey: 0x94c49300a58d576011096bcb006aa06f5a91b34b4383891e8029c21dc39fbb8b
+
+# 10 Gerald:
+#- Address: 0x6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b
+#- PrivKey: 0x99b3c12287537e38c90a9219d4cb074a89a16e9cdb20bf85728ebd97c343e342
+
+## Account #0
 x-deployer_pk: &deployer_pk
-  DEPLOYER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  DEPLOYER_PRIVATE_KEY: '0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133'
 
-# Account #8
 x-relayer_pk: &relayer_pk
-  RELAYER_PRIVATE_KEY: '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97'
+  RELAYER_PRIVATE_KEY: '0x4c42532034540267bf568198ccec4cb822a025da542861fcb146a5fab6433ff8'
 
-# Account #18
+# Account #9
 x-fast-relayer_pk: &fast-relayer_pk
-  FAST_RELAYER_PRIVATE_KEY: '0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0'
+  FAST_RELAYER_PRIVATE_KEY: '0x94c49300a58d576011096bcb006aa06f5a91b34b4383891e8029c21dc39fbb8b'
 
-# Account #19 - allows the fee test
+# Account #0 - allows the fee test
 x-integration_pk: &integration_pk
-  PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  PRIVATE_KEY: '0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133'
 
-# Account #14 - allows the fee test
+# Account #10 - allows the fee test
 x-integration_2_pk: &integration_2_pk
-  PRIVATE_KEY_2: '0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa'
+  PRIVATE_KEY_2: '0x99b3c12287537e38c90a9219d4cb074a89a16e9cdb20bf85728ebd97c343e342'
 
-# Account #15 - allows the fee test
+# Account #7 - allows the fee test
 x-integration_3_pk: &integration_3_pk
-  PRIVATE_KEY_3: '0x8166f546bab6da521a8369cab06c5d2b9e46670292d85c875ee9ec20e84ffb61'
-
-# Account #6 - allows the bobalink test
-x-bobalink_pk: &bobalink_pk
-  BOBALINK_PRIVATE_KEY: '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
+  PRIVATE_KEY_3: '0x0d6dcaaef49272a5411896be8ad16c01c35d6f8c18873387b71fbc734759b0ab'
 
 version: "3"
 
 services:
   # this is a helper service used because there's no official hardhat image
   l1_chain:
-    image: bobanetwork/hardhat:latest
-    build:
-      context: ./docker/hardhat
-      dockerfile: Dockerfile
-    environment:
-      GAS_PRICE: 54321012345
+    image: purestake/moonbeam:v0.22.0
+    command: --dev --ws-external --rpc-external
+    # build:
+    #   context: ./docker/hardhat
+    #   dockerfile: Dockerfile
     ports:
       # expose the service to the host for integration testing
-      - ${L1CHAIN_HTTP_PORT:-9545}:8545
+      - ${L1CHAIN_HTTP_PORT:-9545}:9933
+      - 9944:9944
 
   deployer:
     depends_on:
@@ -114,24 +93,27 @@ services:
     entrypoint: ./deployer.sh
     environment:
       FRAUD_PROOF_WINDOW_SECONDS: 0
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_NODE_WEB3_URL: http://l1_chain:9933
       # these keys are hardhat's first 2 accounts, DO NOT use in production
       << : *deployer_pk
       << : *relayer_pk
-      SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
-      PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
+      SEQUENCER_ADDRESS: "0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0"
+      PROPOSER_ADDRESS: "0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc"
       # setting the whitelist owner to address(0) disables the whitelist
       WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
       L1_FEE_WALLET_ADDRESS: "0x391716d440c151c42cdf1c95c1d83a5427bca52c"
       L2_CHAIN_ID: 31338
       L2_BLOCK_GAS_LIMIT: 11000000
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-      GAS_PRICE_ORACLE_OWNER: "0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199"
+      GAS_PRICE_ORACLE_OWNER: "0x7BF369283338E12C90514468aa3868A551AB2929"
       GAS_PRICE_ORACLE_OVERHEAD: "2750"
       GAS_PRICE_ORACLE_SCALAR: "1500000"
       GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
       GAS_PRICE_ORACLE_GAS_PRICE: "1000000000"
       GAS_PRICE_ORACLE_DECIMALS: "6"
+      L1_NATIVE_TOKEN_NAME: "Moonbeam"
+      L1_NATIVE_TOKEN_SYMBOL: "GLMR"
+      L1_NATIVE_TOKEN_DECIMALS: "18"
       # skip compilation when run in docker-compose, since the contracts
       # were already compiled in the builder step
       NO_COMPILE: 1
@@ -153,9 +135,9 @@ services:
       dockerfile: ./ops/docker/Dockerfile.packages
       target: boba_deployer
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_NODE_WEB3_URL: http://l1_chain:9933
       L2_NODE_WEB3_URL: http://l2geth:8545
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      ADDRESS_MANAGER_ADDRESS: "0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3"
       URL: http://dtl:8081/addresses.json
       # DO NOT use in production
       << : *deployer_pk
@@ -184,13 +166,15 @@ services:
     environment:
       URL: http://deployer:8082/addresses.json
       # connect to the 2 layers
-      DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:8545
+      DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:9933
       DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://l2geth:8545
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
       DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
       DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
       RETRIES: 200
+      # reduce the polling interval for auto mining L1
+      DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 500
       # if no need to support Turing v0 set height of v0 = v1
       DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
@@ -212,7 +196,7 @@ services:
       - ./envs/geth.env
     restart: always
     environment:
-      ETH1_HTTP: http://l1_chain:8545
+      ETH1_HTTP: http://l1_chain:9933
       ROLLUP_TIMESTAMP_REFRESH: 5s
       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
       # connecting to the DTL
@@ -226,7 +210,8 @@ services:
       EMERGENCY_FORK_NUMBER: 0
       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
-      IS_ETHEREUM_L2: 'true'
+      # reduce the polling interval for auto mining L1
+      ROLLUP_POLL_INTERVAL_FLAG: 500ms
     ports:
       - ${L2GETH_HTTP_PORT:-8545}:8545
       - ${L2GETH_WS_PORT:-8546}:8546
@@ -243,7 +228,7 @@ services:
       target: message-relayer
     entrypoint: ./relayer.sh
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_NODE_WEB3_URL: http://l1_chain:9933
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       # a funded hardhat account
@@ -255,6 +240,8 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      RESUBMISSION_TIMEOUT: 5
+      MULTI_RELAY_LIMIT: 5
 
   # a second relay system for messages that need to get to L1 quickly
   # NOTE - all withdrawal messages use the standard relayer with its 7 day window
@@ -269,7 +256,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.packages
       target: boba_message-relayer-fast
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_NODE_WEB3_URL: http://l1_chain:9933
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
@@ -282,6 +269,8 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      RESUBMISSION_TIMEOUT: 5
+      MULTI_RELAY_LIMIT: 5
       FAST_RELAYER: 'true'
 
   batch_submitter:
@@ -299,14 +288,13 @@ services:
     env_file:
       - ./envs/batch-submitter.env
     environment:
-      L1_ETH_RPC: http://l1_chain:8545
+      L1_ETH_RPC: http://l1_chain:9933
       L2_ETH_RPC: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       RETRIES: 200
       #KMS access setup
       AWS_ACCESS_KEY_ID: "1"
       AWS_SECRET_ACCESS_KEY: "11"
-      BATCH_SUBMITTER_LOG_LEVEL: "info"
       BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
       BATCH_SUBMITTER_KMS_REGION: us-east-1
       #aliases are setup, check seed.yml
@@ -325,21 +313,19 @@ services:
     environment:
       VERIFIER_URL: http://verifier:8545
       REPLICA_URL: http://replica:8545
-      L1_URL: http://l1_chain:8545
+      L1_URL: http://l1_chain:9933
       L2_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       BASE_URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       ENABLE_GAS_REPORT: 1
       NO_NETWORK: 1
-      RETRIES: 200
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
       << : *integration_pk
       << : *integration_2_pk
       << : *integration_3_pk
-      << : *bobalink_pk
     volumes:
-      - ~/result:/opt/optimism/integration-tests/result
+       - ~/result:/opt/optimism/integration-tests/result
 
   replica:
     depends_on:
@@ -355,7 +341,7 @@ services:
     env_file:
       - ./envs/geth.env
     environment:
-      ETH1_HTTP: http://l1_chain:8545
+      ETH1_HTTP: http://l1_chain:9933
       ROLLUP_TIMESTAMP_REFRESH: 5s
       ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
       ROLLUP_CLIENT_HTTP: http://dtl:7878
@@ -365,7 +351,7 @@ services:
       # no need to keep this secret, only used internally to sign blocks
       BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
       BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      ROLLUP_POLL_INTERVAL_FLAG: "500ms"
       TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
       SEQUENCER_CLIENT_HTTP: http://l2geth:8545
       EMERGENCY_FORK_NUMBER: 0
@@ -388,7 +374,7 @@ services:
     env_file:
       - ./envs/geth.env
     environment:
-        ETH1_HTTP: http://l1_chain:8545
+        ETH1_HTTP: http://l1_chain:9933
         ROLLUP_TIMESTAMP_REFRESH: 5s
         ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
         ROLLUP_CLIENT_HTTP: http://dtl:7878
@@ -418,12 +404,12 @@ services:
       context: ..
       dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_NODE_WEB3_URL: http://l1_chain:9933
       L1_CONFIRMATIONS: 8
       L2_NODE_WEB3_URL: http://l2geth:8545
       L2_CHECK_INTERVAL: 10
       VERIFIER_WEB3_URL: http://verifier:8545
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      ADDRESS_MANAGER_ADDRESS: "0xc01Ee7f10EA4aF4673cFff62710E1D7792aBa8f3"
       L1_DEPLOYMENT_BLOCK: 8
       L2_START_BLOCK: 1
     ports:
@@ -437,7 +423,7 @@ services:
       KMS_REGION: "us-east-1"
     volumes:
       - type: bind
-        source: ./seed.yaml
+        source: ./seed-moonbeam.yaml
         target: /init/seed.yaml
     ports:
       - 8888:8888
