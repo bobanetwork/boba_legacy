@@ -1,16 +1,21 @@
-import { Box, IconButton, Typography } from '@mui/material'
-import { Telegram, Twitter } from '@mui/icons-material'
-import DiscordIcon from 'components/icons/DiscordIcon'
 import React from 'react'
-import BobaLogo from '../../images/boba2/logo-boba2.svg'
-import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
-import * as S from './PageFooter.styles'
-import { useMediaQuery, useTheme } from '@mui/material'
-import { GATEWAY_VERSION, LAYER, ROUTES_PATH } from 'util/constant'
 import { useSelector } from 'react-redux'
+
+import { Box, IconButton, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Telegram, Twitter } from '@mui/icons-material'
+
+import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
+
 import { selectLayer } from 'selectors/setupSelector'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
+
+import { LAYER, ROUTES_PATH, WALLET_VERSION } from 'util/constant'
 import { getBlockExplorerUrl } from 'util/network/network.util'
+
+import DiscordIcon from 'components/icons/DiscordIcon'
+import BobaLogo from '../../images/boba2/logo-boba2.svg'
+
+import * as S from './PageFooter.styles'
 
 const PageFooter = ({ maintenance }) => {
 
@@ -20,7 +25,7 @@ const PageFooter = ({ maintenance }) => {
   const layer = useSelector(selectLayer())
   const network = useSelector(selectActiveNetwork())
   const networkType = useSelector(selectActiveNetworkType())
-  const appVersion = GATEWAY_VERSION;
+  const appVersion = WALLET_VERSION;
 
   if (maintenance) {
     return (
