@@ -25,7 +25,6 @@ class GasService {
         blockL1: Number(block1),
         blockL2: Number(block2),
       }
-
       return gasData
     } catch (error) {
       console.log("GS: getGas error:",error)
