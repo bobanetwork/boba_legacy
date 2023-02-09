@@ -69,7 +69,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   // deploy FluxAggregator for each pair and register on FeedRegistry
   for (const token of tokens) {
-    // Only deploy oracle for BOBA on Alt L1
+    // Only deploy oracle of BOBA on Alt L1
     if ((hre as any).deployConfig.isLocalAltL1 && token.name !== 'BOBA') {
       continue
     }

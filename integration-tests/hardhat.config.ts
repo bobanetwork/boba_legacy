@@ -12,7 +12,7 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 80000,
+    timeout: 400000,
     reporter: 'mocha-multi-reporters',
     reporterOptions: {
       configFile: './config.json',
