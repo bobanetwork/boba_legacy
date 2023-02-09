@@ -63,6 +63,10 @@ const deployFn: DeployFunction = async (hre) => {
   let tokenDecimals = null
 
   for (const token of preSupportedTokens.supportedTokens) {
+    // Skip other tokens on local Alt L1s
+    if ((hre as any).deployConfig.isLocalAltL1 && token.symbol !== 'TEST') {
+      continue
+    }
     // Bypass BOBA token, because we have deployed it
     if (token.symbol === 'BOBA') {
       continue
@@ -231,6 +235,10 @@ const deployFn: DeployFunction = async (hre) => {
 
   await registerLPToken(L1BobaAddress, L2BobaAddress)
   console.log(`BOBA was registered in LPs`)
+
+  if ((hre as any).deployConfig.isLocalAltL1) {
+    return
+  }
 
   // Deploy xBoba
   L2ERC20 = await Factory__xL2Boba.deploy('xBOBA Token', 'xBOBA', 18)

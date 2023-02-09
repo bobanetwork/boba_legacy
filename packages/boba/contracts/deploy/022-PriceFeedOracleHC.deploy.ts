@@ -77,6 +77,9 @@ const deployFn: DeployFunction = async (hre) => {
 
   // deploy FluxAggregatorHC for each pair and register on FeedRegistry
   for (const token of tokens) {
+    if ((hre as any).deployConfig.isLocalAltL1 && token.name !== 'BOBA') {
+      continue
+    }
     for (const quote of quotes) {
       FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy()
       await FluxAggregatorHC.deployTransaction.wait()

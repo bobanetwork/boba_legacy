@@ -30,6 +30,9 @@ const getTimestamp = async (hre) => {
 }
 
 const deployFn: DeployFunction = async (hre) => {
+  if ((hre as any).deployConfig.isLocalAltL1) {
+    return
+  }
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
