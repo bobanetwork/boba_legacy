@@ -29,4 +29,4 @@ curl \
     --output /dev/null \
     $L2_URL
 
-npx hardhat test ./test/* --network boba --no-compile --config ./hardhat.config.ts "$@"
+npx hardhat test ./test/*.ts --network boba --no-compile --config ./hardhat.config.ts "$@"
