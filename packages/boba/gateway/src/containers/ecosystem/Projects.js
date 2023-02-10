@@ -10,11 +10,13 @@ import Tooltip from 'components/tooltip/Tooltip'
 import { useParams } from 'react-router-dom'
 import * as S from './Ecosystem.styles'
 import { loadProjectByCategory, loadBobaProjectByCategory } from './project.list'
-import { SvgIcon } from '@mui/material'
+import { SvgIcon, useMediaQuery, useTheme } from '@mui/material'
+import ShowMoreShowLess from 'components/showMoreShowLess/ShowMoreShowLess'
 
 const Projects = ({projectType}) => {
   const [ projectByCategory, setprojectByCategory ] = useState({})
-
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const params = useParams();
 
   useEffect(() => {
@@ -48,9 +50,19 @@ const Projects = ({projectType}) => {
           <S.ProjectContent
           >
             <Typography alignSelf="center" variant="h4">{project.title}</Typography>
-            <Tooltip title={project.description}>
-              <S.ProjectDescription variant='body2'> {project.description}</S.ProjectDescription>
-            </Tooltip>
+            {isMobile ?
+              <ShowMoreShowLess
+                sx={{
+                  width: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  opacity: 0.85,
+                  fontWeight: 400,
+                }}
+              >{project.description}</ShowMoreShowLess>
+              : <Tooltip title={project.description}>
+                <S.ProjectDescription variant='body2'> {project.description}</S.ProjectDescription>
+              </Tooltip>}
           </S.ProjectContent>
           <S.DividerLine />
           <S.TileFooter
