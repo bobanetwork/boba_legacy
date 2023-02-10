@@ -41,8 +41,7 @@ import {
 import {
   updateSignatureStatus_exitLP,
   updateSignatureStatus_exitTRAD,
-  updateSignatureStatus_depositLP,
-  updateSignatureStatus_depositTRAD
+  updateSignatureStatus_depositLP
 } from 'actions/signAction'
 
 // Base contracts
@@ -1160,8 +1159,6 @@ class NetworkService {
     value_Wei_String
   }) {
 
-    updateSignatureStatus_depositTRAD(false)
-
     try {
 
       const time_start = new Date().getTime()
@@ -1218,9 +1215,6 @@ class NetworkService {
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
-
-
-      updateSignatureStatus_depositTRAD(true)
 
       const opts = {
         fromBlock: -4000
@@ -1942,8 +1936,6 @@ class NetworkService {
     currency,
     currencyL2 }) {
 
-    updateSignatureStatus_depositTRAD(false)
-
     const L1_TEST_Contract = this.L1_TEST_Contract.attach(currency)
 
     let allowance_BN = await L1_TEST_Contract.allowance(
@@ -2020,23 +2012,16 @@ class NetworkService {
         )
       }
 
-      console.log("depositTxStatus:",depositTX)
-
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
       const block = await this.L1Provider.getTransaction(depositTX.hash)
-      console.log(' block:', block)
-
-      //closes the Deposit modal
-      updateSignatureStatus_depositTRAD(true)
 
       const opts = {
         fromBlock: -4000
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
-      console.log('completed ERC20 Deposit! L2 tx hash:', txReceipt.transactionHash)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)

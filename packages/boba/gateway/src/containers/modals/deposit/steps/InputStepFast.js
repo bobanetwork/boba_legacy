@@ -234,7 +234,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   }, [signatureStatus, depositLoading, handleClose])
 
   let buttonLabel_1 = 'Cancel'
-  if (depositLoading || approvalLoading) buttonLabel_1 = 'CLOSE WINDOW'
+  if( depositLoading || approvalLoading ) buttonLabel_1 = 'Close window'
 
   let buttonLabel_2 = 'Bridge'
 

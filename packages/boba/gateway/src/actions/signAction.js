@@ -26,7 +26,3 @@ export async function updateSignatureStatus_exitTRAD ( sigStatus ) {
 export async function updateSignatureStatus_depositLP ( sigStatus ) {
   store.dispatch({type: 'DEPOSIT/LP/SIGNED',payload: sigStatus})
 }
-
-export async function updateSignatureStatus_depositTRAD ( sigStatus ) {
-  store.dispatch({type: 'DEPOSIT/TRAD/SIGNED',payload: sigStatus})
-}
