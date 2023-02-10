@@ -245,7 +245,7 @@ const L1ChainAssets = {
     l1NameShort: 'BNB',
     l2Name: 'Boba BNB Testnet',
     icon: (bool) => <BnbIcon selected={bool}/>,
-    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL],
+    supportedTokens: [ 'BOBA', process.env.REACT_APP_L1_NATIVE_TOKEN_SYMBOL, 'MTT'],
     supportedTokenAddresses: {},
     foundation: true,
   },
