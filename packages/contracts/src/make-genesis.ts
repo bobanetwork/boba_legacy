@@ -304,7 +304,7 @@ export const makeL2GenesisFile = async (
       }
     } else if (predeployName === 'L2_BOBA') {
       dump[predeployAddress].code = L2_BOBA.L2_BOBABytecode
-    } else if (SPECIAL_CONTRACTS_FOR_ALT_L1.includes(predeployName)) {
+    } else if (isLocalAltL1 && SPECIAL_CONTRACTS_FOR_ALT_L1.includes(predeployName)) {
       // Special case: get the deployed bytecode from the artifact for alt L1s
       const artifact = getContractArtifact(`${predeployName}AltL1`)
       dump[predeployAddress].code = artifact.deployedBytecode
