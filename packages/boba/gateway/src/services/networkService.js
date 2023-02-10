@@ -443,6 +443,27 @@ class NetworkService {
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
 
+      // fetch supported tokens, addresses, assets for network selected.
+      const tokenAsset = appService.fetchSupportedAssets({
+        network,
+        networkType
+      })
+
+      this.supportedTokens = tokenAsset.tokens;
+      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
+      this.supportedAltL1Chains = tokenAsset.altL1Chains;
+
+      let addresses = {};
+      // setting up all address;
+      if (!!NETWORK[ network ]) {
+        addresses = appService.fetchAddresses({
+          network,
+          networkType
+        });
+      }
+
+      this.addresses = addresses
+
       // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
 
@@ -645,27 +666,6 @@ class NetworkService {
         networkType
       })
 
-      // fetch supported tokens, addresses, assets for network selected.
-      const tokenAsset = appService.fetchSupportedAssets({
-        network,
-        networkType
-      })
-
-      this.supportedTokens = tokenAsset.tokens;
-      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
-      this.supportedAltL1Chains = tokenAsset.altL1Chains;
-
-      let addresses;
-      // setting up all address;
-      if (!!NETWORK[ network ]) {
-        addresses = appService.fetchAddresses({
-          network,
-          networkType
-        });
-      }
-
-      this.addresses = addresses
-
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
@@ -729,7 +729,6 @@ class NetworkService {
             blockExplorerUrls: [networkDetail['L2']?.blockExplorer?.slice(0, -1)]
           }
 
-          console.log([ 'Adding ethereum Chain', chainParam, targetIDHex ]);
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
           window.ethereum.on('chainChanged', handleChangeChainOnce)
           return true
