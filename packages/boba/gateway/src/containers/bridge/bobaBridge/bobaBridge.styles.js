@@ -25,6 +25,16 @@ export const BobaContent = styled(Box)(({ theme }) => ({
   gap: '10px',
 }))
 
+export const BridgeConnectButton = styled(Box)(({theme})=> ({
+  alignSelf: 'flex-start',
+  [ theme.breakpoints.down('md') ]: {
+    alignSelf: 'stretch',
+    'button': {
+      width: '100%'
+    }
+  }
+}));
+
 export const BobaContentWrapper = styled(Box, {
   shouldForwardProp: (props) => props !== 'fullWidth',
 })(({ theme, flexDirection }) => ({
