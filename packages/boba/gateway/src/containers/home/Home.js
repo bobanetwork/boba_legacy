@@ -36,7 +36,6 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
@@ -197,7 +196,6 @@ function Home() {
   useEffect(() => {
     if (maintenance) return
     // load the following functions when the home page is open
-    checkVersion()
     dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 

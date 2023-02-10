@@ -12,12 +12,6 @@ This folder contains all Boba APIs for the production
 
   This API is used to swap BOBA for a small amount of ETH paying a zero gas fee
 
-## Service API
-
-#### - `get.wallet.version`
-
-  This API returns the gateway version
-
 ## Token API
 
 #### - `get.supply`

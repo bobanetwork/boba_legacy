@@ -7,13 +7,13 @@
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
-    "start": "npm run buildenv-dev && react-scripts start",
-    "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build",
-    "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_ENV=dev react-scripts build",
+    "start": "npm run buildenv-dev && REACT_APP_WALLET_VERSION=$npm_package_version react-scripts start",
+    "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod react-scripts build",
+    "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=dev react-scripts build",
     "audit-check": "audit-ci --moderate",
     "postinstall": "patch-package",
-    "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
-    "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr --recursive && aws s3 sync build s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr && aws s3 cp s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
+    "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
+    "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr --recursive && aws s3 sync build s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr && aws s3 cp s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",

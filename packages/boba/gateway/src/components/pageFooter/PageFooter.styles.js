@@ -1,25 +1,18 @@
 import { styled } from '@mui/material/styles'
-import { Box, Divider } from '@mui/material'
+import { Box, Container, Divider } from '@mui/material'
 import { NavLink } from 'react-router-dom';
 
-export const Wrapper = styled(Box)(({ theme }) => ({
+export const Wrapper = styled(Container)(({ theme }) => ({
   display: "flex",
   flexDirection: 'column',
   justifyContent: 'flex-start',
   alignItems: 'center',
-  //margin: '0',
-  //padding: '0 20px',
-  //bottom: 0,
-  //width: '100%',
-  //height: '184px',
   background: theme.background,
   [ theme.breakpoints.down('md') ]: {
-    marginTop: 0,
-    height: '450px',
+    maxHeight: '400px',
     justifyContent: 'flex-start',
     padding: '0 20px',
-  },
-  [ theme.breakpoints.up('md') ]: {
+    marginTop: '10px'
   },
 }))
 
@@ -98,16 +91,17 @@ export const FooterLinkWrapperLeft = styled(Box)(({ theme }) => ({
 
 export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
-  alignSelf: 'flex-start',
+  // alignSelf: 'flex-start',
   justifyContent: 'space-between',
   alignItems: 'center',
-  width: '70%',
-  margin: '20px auto',
+  width: '100%',
+  margin: '20px',
   [ theme.breakpoints.down('md') ]: {
     width: '100%',
     justifyContent: 'space-around',
     flexDirection: 'column',
     margin: '0',
+    marginTop: '20px',
     alignItems: 'flex-start',
   }
 }))
@@ -120,10 +114,9 @@ export const LinkWrapper = styled(Box)(({ theme }) => ({
   [ theme.breakpoints.down('md') ]: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    margin: '20px 0',
-  },
-  [ theme.breakpoints.down('sm') ]: {
-    width: '100%'
+    margin: '10px 0',
+    width: '100%',
+    gap: 0
   }
 }))
 
@@ -136,10 +129,8 @@ export const SocialWrapper = styled(Box)(({ theme }) => ({
     cursor: 'pointer',
   },
   [ theme.breakpoints.down('md') ]: {
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     margin: '10px 0',
+    width: '100%',
   },
-  [ theme.breakpoints.down('sm') ]: {
-    width: '100%'
-  }
 }))
