@@ -1,22 +1,25 @@
 /* Imports: External */
+import { Contract, utils } from 'ethers'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, ethers, utils, Transaction } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import { registerBobaAddress } from '../src/hardhat-deploy-ethers'
 
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
-let L1Boba: Contract
 let L2Boba: Contract
 
 let BobaTuringHelper: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  const isLocalAltL1 = (hre as any).deployConfig.isLocalAltL1
+
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  const BobaTuringCredit = getContractFactory('BobaTuringCredit')
+  const BobaTuringCredit = getContractFactory(
+    isLocalAltL1 ? 'BobaTuringCreditAltL1' : 'BobaTuringCredit'
+  )
     .connect((hre as any).deployConfig.deployer_l2)
     .attach((hre as any).deployConfig.BobaTuringCreditAddress)
 
@@ -42,7 +45,7 @@ const deployFn: DeployFunction = async (hre) => {
 
   const depositBobaAmountL2 = utils.parseEther('500') //too much?
 
-  if (!(hre as any).deployConfig.isLocalAltL1) {
+  if (!isLocalAltL1) {
     // Deposit Boba to BobaTuringHelper and set Turing price
     const approveL2BobaTx = await L2Boba.approve(
       BobaTuringCredit.address,
@@ -54,7 +57,7 @@ const deployFn: DeployFunction = async (hre) => {
   const addBalanceTx = await BobaTuringCredit.addBalanceTo(
     depositBobaAmountL2,
     BobaTuringHelper.address,
-    (hre as any).deployConfig.isLocalAltL1 ? { value: depositBobaAmountL2 } : {}
+    isLocalAltL1 ? { value: depositBobaAmountL2 } : {}
   )
   await addBalanceTx.wait()
 

@@ -7,8 +7,9 @@
   "license": "MIT",
   "types": "dist/index",
   "scripts": {
-    "build": "yarn build:contracts",
+    "build": "yarn build:contracts && yarn autogen:artifacts",
     "build:contracts": "hardhat compile",
+    "autogen:artifacts": "ts-node src/generate-artifacts.ts",
     "deploy": "ts-node \"./bin/deploy.ts\"",
     "clean": "rm -rf ./artifacts ./cache",
     "lint": "yarn lint:check",
@@ -32,7 +33,8 @@
     "@openzeppelin/contracts": "4.3.2",
     "@openzeppelin/contracts-upgradeable": "4.3.2",
     "chalk": "^4.1.1",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "glob": "^7.1.6"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

@@ -1,24 +1,18 @@
 /* Imports: External */
+import { Contract, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
-import { registerBobaAddress } from './000-Messenger.deploy'
-
-// import CompJson from '../artifacts/contracts/DAO/Comp.sol/Comp.json'
-import GovernorBravoDelegateJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json'
-import GovernorBravoDelegatorJson from '../artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
-import TimelockJson from '../artifacts/contracts/DAO/governance/Timelock.sol/Timelock.json'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+} from '../src/hardhat-deploy-ethers'
 
 // let Factory__Comp: ContractFactory
 // let Comp: Contract
 
-let Factory__GovernorBravoDelegate: ContractFactory
 let GovernorBravoDelegate: Contract
-
-let Factory__GovernorBravoDelegator: ContractFactory
 let GovernorBravoDelegator: Contract
-
-let Factory__Timelock: ContractFactory
 let Timelock: Contract
 
 const getTimestamp = async (hre) => {
@@ -66,49 +60,32 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`L2_BOBA is located at: ${BobaL2.address}`)
   console.log(`L2_xBOBA is located at: ${xBobaL2.address}`)
 
-  Factory__Timelock = new ContractFactory(
-    TimelockJson.abi,
-    TimelockJson.bytecode,
+  Timelock = await deployBobaContract(
+    hre,
+    'Timelock',
+    [(hre as any).deployConfig.deployer_l2.address, delay_before_execute_s],
     (hre as any).deployConfig.deployer_l2
   )
-
-  Timelock = await Factory__Timelock.deploy(
-    (hre as any).deployConfig.deployer_l2.address,
-    delay_before_execute_s
-  )
-  await Timelock.deployTransaction.wait()
   console.log(`Timelock deployed to: ${Timelock.address}`)
 
-  const TimelockDeploymentSubmission: DeploymentSubmission = {
-    ...Timelock,
-    receipt: Timelock.receipt,
-    address: Timelock.address,
-    abi: Timelock.abi,
-  }
-
+  const TimelockDeploymentSubmission = getDeploymentSubmission(Timelock)
   await hre.deployments.save('Timelock', TimelockDeploymentSubmission)
   await registerBobaAddress(addressManager, 'Timelock', Timelock.address)
 
   // deploy governorDelegate
-  Factory__GovernorBravoDelegate = new ContractFactory(
-    GovernorBravoDelegateJson.abi,
-    GovernorBravoDelegateJson.bytecode,
+  GovernorBravoDelegate = await deployBobaContract(
+    hre,
+    'GovernorBravoDelegate',
+    [],
     (hre as any).deployConfig.deployer_l2
   )
-
-  GovernorBravoDelegate = await Factory__GovernorBravoDelegate.deploy()
-  await GovernorBravoDelegate.deployTransaction.wait()
   console.log(
     `GovernorBravoDelegate deployed to: ${GovernorBravoDelegate.address}`
   )
 
-  const GovernorBravoDelegateDeploymentSubmission: DeploymentSubmission = {
-    ...GovernorBravoDelegate,
-    receipt: GovernorBravoDelegate.receipt,
-    address: GovernorBravoDelegate.address,
-    abi: GovernorBravoDelegate.abi,
-  }
-
+  const GovernorBravoDelegateDeploymentSubmission = getDeploymentSubmission(
+    GovernorBravoDelegate
+  )
   await hre.deployments.save(
     'GovernorBravoDelegate',
     GovernorBravoDelegateDeploymentSubmission
@@ -120,34 +97,28 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
   // deploy GovernorBravoDelegator
-  Factory__GovernorBravoDelegator = new ContractFactory(
-    GovernorBravoDelegatorJson.abi,
-    GovernorBravoDelegatorJson.bytecode,
+  GovernorBravoDelegator = await deployBobaContract(
+    hre,
+    'GovernorBravoDelegator',
+    [
+      Timelock.address,
+      BobaL2.address,
+      xBobaL2.address,
+      Timelock.address,
+      GovernorBravoDelegate.address,
+      governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
+      governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
+      governor_proposal_threshold, // the votes necessary to propose
+    ],
     (hre as any).deployConfig.deployer_l2
   )
-
-  GovernorBravoDelegator = await Factory__GovernorBravoDelegator.deploy(
-    Timelock.address,
-    BobaL2.address,
-    xBobaL2.address,
-    Timelock.address,
-    GovernorBravoDelegate.address,
-    governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
-    governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
-    governor_proposal_threshold // the votes necessary to propose
-  )
-  await GovernorBravoDelegator.deployTransaction.wait()
   console.log(
     `GovernorBravoDelegator deployed to: ${GovernorBravoDelegator.address}`
   )
 
-  const GovernorBravoDelegatorDeploymentSubmission: DeploymentSubmission = {
-    ...GovernorBravoDelegator,
-    receipt: GovernorBravoDelegator.receipt,
-    address: GovernorBravoDelegator.address,
-    abi: GovernorBravoDelegator.abi,
-  }
-
+  const GovernorBravoDelegatorDeploymentSubmission = getDeploymentSubmission(
+    GovernorBravoDelegator
+  )
   await hre.deployments.save(
     'GovernorBravoDelegator',
     GovernorBravoDelegatorDeploymentSubmission

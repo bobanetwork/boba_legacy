@@ -1,7 +1,6 @@
 /* Imports: External */
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { predeploys } from '../src/predeploys'
-import { supportedLocalTestnet } from '../src/local-network-config'
 
 /* Imports: Internal */
 import { getDeployedContract } from '../src/hardhat-deploy-ethers'
@@ -10,9 +9,7 @@ import { getDeployedContract } from '../src/hardhat-deploy-ethers'
 // to make a modification to hardhat-ovm. However, I don't have the time right now to figure the
 // details of how to make that work cleanly. This is fine in the meantime.
 const deployFn: DeployFunction = async (hre) => {
-  // Only execute this step if we're on the hardhat chain ID.
-  const { chainId } = await hre.ethers.provider.getNetwork()
-  const networkConfig = supportedLocalTestnet[chainId]
+  const networkConfig = (hre as any).deployConfig.networkConfig
   if (typeof networkConfig === 'undefined') {
     throw new Error('Unsupported local chain ID!')
   }

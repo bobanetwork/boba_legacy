@@ -218,6 +218,8 @@ export const makeL2GenesisFile = async (
 
   const dump = {}
   for (let predeployName of Object.keys(predeploys)) {
+    const predeployAddress = predeploys[predeployName]
+
     if (RENAME_SPECIAL_CONTRACTS[predeployName]) {
       predeployName = RENAME_SPECIAL_CONTRACTS[predeployName]
     }
@@ -227,7 +229,7 @@ export const makeL2GenesisFile = async (
     if (!isLocalAltL1 && HIDDEN_CONTRACTS_FOR_ETHEREUM.includes(predeployName)) {
       continue
     }
-    const predeployAddress = predeploys[predeployName]
+
     dump[predeployAddress] = {
       balance: '00',
       storage: {},
@@ -302,7 +304,7 @@ export const makeL2GenesisFile = async (
       }
     } else if (predeployName === 'L2_BOBA') {
       dump[predeployAddress].code = L2_BOBA.L2_BOBABytecode
-    } else if (SPECIAL_CONTRACTS_FOR_ALT_L1[predeployName]) {
+    } else if (SPECIAL_CONTRACTS_FOR_ALT_L1.includes(predeployName)) {
       // Special case: get the deployed bytecode from the artifact for alt L1s
       const artifact = getContractArtifact(`${predeployName}AltL1`)
       dump[predeployAddress].code = artifact.deployedBytecode
