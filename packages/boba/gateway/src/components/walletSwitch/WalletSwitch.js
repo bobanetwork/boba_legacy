@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setActiveNetwork } from 'actions/networkAction';
-import { setBaseState, setConnect, setConnectBOBA, setConnectETH } from 'actions/setupAction';
+import { setBaseState, setConnect, setConnectBOBA, setConnectETH, setEnableAccount } from 'actions/setupAction';
 import { selectActiveNetwork, selectActiveNetworkType, selectNetwork, selectNetworkType } from 'selectors/networkSelector';
 
 import Button from 'components/button/Button';
@@ -27,6 +27,7 @@ const WalletSwitch = () => {
     // reset baseState to false to trigger initialization on chain change.
     // and trigger the connect to BOBA & ETH base on current chain.
     dispatch(setBaseState(false));
+    dispatch(setEnableAccount(false));
     setReconnect(true);
   }
 

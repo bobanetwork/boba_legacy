@@ -682,7 +682,9 @@ class NetworkService {
 
       this.bindProviderListeners()
       // this should not do anything unless we changed chains
-      await this.getBobaFeeChoice()
+      if (this.L1orL2 === 'L2') {
+        await this.getBobaFeeChoice()
+      }
 
       return this.L1orL2 // return the layer we are actually on
 

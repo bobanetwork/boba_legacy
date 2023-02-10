@@ -102,12 +102,12 @@ function LayerSwitcher({ visisble = true }) {
       } else if (initialized === 'wrongnetwork') {
         dispatch(openModal('wrongNetworkModal'))
         return false
-      } else if (initialized === false) {
-        console.log('WP: Account NOT enabled for', network, accountEnabled)
+      }
+      else if (initialized === false) {
         dispatch(setEnableAccount(false))
         return false
-      } else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
-        console.log('WP: Account IS enabled for', initialized)
+      }
+      else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
@@ -134,25 +134,37 @@ function LayerSwitcher({ visisble = true }) {
     dispatchBootAccount()
   }, [ dispatchBootAccount ])
 
-  const dispatchSwitchLayer = useCallback(
-    (targetLayer) => {
-      if (targetLayer === 'L1') {
-        connectToETH()
-      } else if (targetLayer === 'L2') {
-        connectToBOBA()
-      } else {
-        // handles the strange targetLayer === null when people click on ETH icon a second time
-        connectToETH()
-      }
-    },
-    [connectToBOBA, connectToETH]
-  )
+
+  useEffect(() => {
+    if (connectETHRequest) {
+      connectToETH()
+    }
+  }, [ connectETHRequest, connectToETH ])
+
+  useEffect(() => {
+    if (connectBOBARequest) {
+      connectToBOBA()
+    }
+  }, [ connectBOBARequest, connectToBOBA ])
+
+
+  const dispatchSwitchLayer = useCallback((targetLayer) => {
+
+    if (targetLayer === 'L1') {
+       connectToETH()
+    }
+    else if (targetLayer === 'L2') {
+      connectToBOBA()
+    } else {
+      // handles the strange targetLayer === null when people click on ETH icon a second time
+      connectToETH()
+    }
+
+  }, [ connectToBOBA, connectToETH ])
 
   useEffect(() => {
     // detect mismatch and correct the mismatch
-    if (wantChain === 'L1' && layer === 'L2') {
-      dispatchBootAccount()
-    } else if (wantChain === 'L2' && layer === 'L1') {
+    if (wantChain !== layer) {
       dispatchBootAccount()
     }
   }, [wantChain, layer, dispatchBootAccount])
@@ -174,22 +186,6 @@ function LayerSwitcher({ visisble = true }) {
       localStorage.setItem('chainChangedFromMM', false)
     }
   }, [chainChangedFromMM, dispatchBootAccount])
-
-  useEffect(() => {
-    if (connectETHRequest) {
-      localStorage.setItem('wantChain', JSON.stringify('L1'))
-      networkService.switchChain('L1')
-      dispatchBootAccount()
-    }
-  }, [connectETHRequest, dispatchBootAccount])
-
-  useEffect(() => {
-    if (connectBOBARequest) {
-      localStorage.setItem('wantChain', JSON.stringify('L2'))
-      networkService.switchChain('L2')
-      dispatchBootAccount()
-    }
-  }, [connectBOBARequest, dispatchBootAccount])
 
   useEffect(() => {
     if (connectRequest) {
