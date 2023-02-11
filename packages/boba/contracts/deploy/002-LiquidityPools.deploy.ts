@@ -44,7 +44,7 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
     'L1LiquidityPool',
     [],
-    (hre as any).deployConfig.deployer_l2
+    (hre as any).deployConfig.deployer_l1
   )
 
   const L1LiquidityPoolDeploymentSubmission = getDeploymentSubmission(L1LiquidityPool)
