@@ -29,4 +29,25 @@ curl \
     --output /dev/null \
     $L2_URL
 
-npx hardhat test --network boba --no-compile --config ./hardhat.config.ts "$@"
+echo "Calling: "$L1_URL
+CURL_L1_CHAIN_ID=$(
+  curl \
+  --show-error \
+  -H "Content-Type: application/json" \
+  --retry $RETRIES \
+  --retry-delay 3 \
+  --retry-connrefused \
+  -X POST \
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_chainId","params":[]}'
+  $L1_URL
+)
+L1_CHAIN_ID=$(echo $CURL_L1_CHAIN_ID | jq -r '.result')
+# filter on chain id
+if [ $L1_CHAIN_ID == 0x501 ]; then
+  echo "Run tests targeting non-standard L1 chain id: $L1_CHAIN_ID"
+  npx hardhat test ./test-alt-l1/*.ts --network boba --no-compile --config ./hardhat.config.ts "$@"
+else
+  echo "Run tests targeting standard L1 chain id: $L1_CHAIN_ID"
+  npx hardhat test ./test/*.ts --network boba --no-compile --config ./hardhat.config.ts "$@"
+fi
+
