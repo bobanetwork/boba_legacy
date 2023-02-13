@@ -8,7 +8,7 @@ pragma experimental ABIEncoderV2;
 
 /* Interface Imports */
 import { iL1NFTBridge } from "./interfaces/iL1NFTBridge.sol";
-import { iL2NFTBridge } from "./interfaces/iL2NFTBridge.sol";
+import { iL2NFTBridgeAltL1 } from "./interfaces/iL2NFTBridgeAltL1.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
@@ -46,7 +46,7 @@ import { L2BillingContract } from "../L2BillingContract.sol";
  * Runtime target: OVM
  */
  // add is interface
-contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -221,7 +221,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
      ***************/
 
     /**
-     * @inheritdoc iL2NFTBridge
+     * @inheritdoc iL2NFTBridgeAltL1
      */
     function withdraw(
         address _l2Contract,
@@ -231,6 +231,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
         external
         virtual
         override
+        payable
         nonReentrant()
         whenNotPaused()
     {
@@ -245,7 +246,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
     }
 
     /**
-     * @inheritdoc iL2NFTBridge
+     * @inheritdoc iL2NFTBridgeAltL1
      */
     function withdrawTo(
         address _l2Contract,
@@ -256,6 +257,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
         external
         virtual
         override
+        payable
         nonReentrant()
         whenNotPaused()
     {
@@ -270,7 +272,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
     }
 
     /**
-     * @inheritdoc iL2NFTBridge
+     * @inheritdoc iL2NFTBridgeAltL1
      */
     function withdrawWithExtraData(
         address _l2Contract,
@@ -280,6 +282,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
         external
         virtual
         override
+        payable
         nonReentrant()
         whenNotPaused()
     {
@@ -307,7 +310,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
     }
 
     /**
-     * @inheritdoc iL2NFTBridge
+     * @inheritdoc iL2NFTBridgeAltL1
      */
     function withdrawWithExtraDataTo(
         address _l2Contract,
@@ -318,6 +321,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
         external
         virtual
         override
+        payable
         nonReentrant()
         whenNotPaused()
     {
@@ -366,15 +370,11 @@ contract L2NFTBridgeAltL1 is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Ree
         internal
         onlyWithBillingContract()
     {
-        // NEED TO FIX
-        // ERC721 is non-payable, so I can't override it to the payable function
-        // // Load billingContract contract
-        // L2BillingContract billingContract = L2BillingContract(payable(billingContractAddress));
-        // // Check Boba amount
-        // require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
-        // // Collect the exit fee
-        // (bool sent,) = billingContractAddress.call{value: billingContract.exitFee()}("");
-        // require(sent, "Failed to collect exit fee");
+        // Collect the exit fee
+        L2BillingContract billingContract = L2BillingContract(billingContractAddress);
+        require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
+        (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
+        require(sent, "Failed to collect exit fee");
 
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
         require(pairNFT.l1Contract != address(0), "Can't Find L1 NFT Contract");

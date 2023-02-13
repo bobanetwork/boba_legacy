@@ -1,6 +1,5 @@
 /* Imports: External */
 import { Wallet, utils, BigNumber, Contract } from 'ethers'
-import { serialize } from '@ethersproject/transactions'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 import { expectApprox } from '@eth-optimism/core-utils'
 
@@ -63,11 +62,11 @@ describe('Native BOBA Integration Tests', async () => {
   })
 
   describe('estimateGas', () => {
-    it('{tag:other} Should estimate gas for BOBA withdraw', async () => {
+    it('Should estimate gas for BOBA withdraw', async () => {
       const amount = utils.parseEther('0.0000001')
       const gas =
         await env.messenger.contracts.l2.L2StandardBridge.estimateGas.withdraw(
-          predeploys.L2_BOBA,
+          predeploys.L2_BOBA_ALT_L1,
           amount,
           0,
           '0xFFFF'
@@ -77,14 +76,14 @@ describe('Native BOBA Integration Tests', async () => {
     })
   })
 
-  it('{tag:other} receive BOBA', async () => {
+  it('receive BOBA', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
     await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
-    const { tx, receipt } = await env.waitForXDomainTransaction(
+    await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         depositAmount,
         DEFAULT_TEST_GAS_L1,
         '0xFFFF'
@@ -104,14 +103,14 @@ describe('Native BOBA Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} depositERC20 BOBA', async () => {
+  it('depositERC20 BOBA', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
     await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
-    const { tx, receipt } = await env.waitForXDomainTransaction(
+    await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         depositAmount,
         DEFAULT_TEST_GAS_L1,
         '0xFFFF'
@@ -131,14 +130,14 @@ describe('Native BOBA Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} depositERC20To BOBA', async () => {
+  it('depositERC20To BOBA', async () => {
     const depositAmount = 10
     const preBalances = await getBalances(env)
     await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
-    const depositReceipts = await env.waitForXDomainTransaction(
+    await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20To(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         l2Bob.address,
         depositAmount,
         DEFAULT_TEST_GAS_L1,
@@ -158,7 +157,7 @@ describe('Native BOBA Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} deposit passes with a large data argument', async () => {
+  it('deposit passes with a large data argument', async () => {
     const ASSUMED_L2_GAS_LIMIT = 8_000_000
     const depositAmount = 10
     const preBalances = await getBalances(env)
@@ -170,10 +169,10 @@ describe('Native BOBA Integration Tests', async () => {
       data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE - 20_000)
     }
     await approveERC20(L1BOBAToken, L1StandardBridge.address, depositAmount)
-    const { tx, receipt } = await env.waitForXDomainTransaction(
+    await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         depositAmount,
         ASSUMED_L2_GAS_LIMIT,
         data
@@ -192,7 +191,7 @@ describe('Native BOBA Integration Tests', async () => {
     )
   })
 
-  it('{tag:other} deposit BOBA fails with a TOO large data argument', async () => {
+  it('deposit BOBA fails with a TOO large data argument', async () => {
     const depositAmount = 10
 
     const data = `0x` + 'ab'.repeat(MAX_ROLLUP_TX_SIZE + 1)
@@ -200,7 +199,7 @@ describe('Native BOBA Integration Tests', async () => {
     await expect(
       L1StandardBridge.depositERC20(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         depositAmount,
         DEFAULT_TEST_GAS_L1,
         data
@@ -208,7 +207,7 @@ describe('Native BOBA Integration Tests', async () => {
     ).to.be.reverted
   })
 
-  withdrawalTest('{tag:other} withdraw', async () => {
+  withdrawalTest('withdraw', async () => {
     const withdrawAmount = BigNumber.from(3)
     const preBalances = await getBalances(env)
     expect(
@@ -218,7 +217,7 @@ describe('Native BOBA Integration Tests', async () => {
 
     const transaction =
       await env.messenger.contracts.l2.L2StandardBridge.withdraw(
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         withdrawAmount,
         DEFAULT_TEST_GAS_L2,
         '0xFFFF'
@@ -248,7 +247,7 @@ describe('Native BOBA Integration Tests', async () => {
     )
   })
 
-  withdrawalTest('{tag:other} withdrawTo', async () => {
+  withdrawalTest('withdrawTo', async () => {
     const withdrawAmount = BigNumber.from(3)
 
     const preBalances = await getBalances(env)
@@ -260,7 +259,7 @@ describe('Native BOBA Integration Tests', async () => {
 
     const transaction =
       await env.messenger.contracts.l2.L2StandardBridge.withdrawTo(
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         l1Bob.address,
         withdrawAmount,
         DEFAULT_TEST_GAS_L2,
@@ -292,7 +291,7 @@ describe('Native BOBA Integration Tests', async () => {
   })
 
   withdrawalTest(
-    '{tag:other} deposit, transfer, withdraw',
+    'deposit, transfer, withdraw',
     async () => {
       // 1. deposit
       const amount = utils.parseEther('1')
@@ -300,7 +299,7 @@ describe('Native BOBA Integration Tests', async () => {
       await env.waitForXDomainTransaction(
         L1StandardBridge.depositERC20(
           L1BOBAToken.address,
-          predeploys.L2_BOBA,
+          predeploys.L2_BOBA_ALT_L1,
           amount,
           DEFAULT_TEST_GAS_L1,
           '0xFFFF'
@@ -323,7 +322,7 @@ describe('Native BOBA Integration Tests', async () => {
         await env.messenger.contracts.l2.L2StandardBridge.connect(
           other
         ).withdraw(
-          predeploys.L2_BOBA,
+          predeploys.L2_BOBA_ALT_L1,
           withdrawnAmount,
           DEFAULT_TEST_GAS_L1,
           '0xFFFF'

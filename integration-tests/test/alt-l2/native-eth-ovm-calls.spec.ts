@@ -31,7 +31,7 @@ describe('Native BOBA value integration tests', () => {
     )
   })
 
-  it('{tag:other} should allow an L2 EOA to send to a new account and back again', async () => {
+  it('should allow an L2 EOA to send to a new account and back again', async () => {
     const getBalances = async (): Promise<BigNumber[]> => {
       return [
         await wallet.provider.getBalance(wallet.address),
@@ -70,7 +70,7 @@ describe('Native BOBA value integration tests', () => {
     await env.waitForXDomainTransaction(
       L1StandardBridge.depositERC20To(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         wallet.address,
         value,
         9999999,
@@ -183,7 +183,7 @@ describe('Native BOBA value integration tests', () => {
       await env.waitForXDomainTransaction(
         L1StandardBridge.depositERC20To(
           L1BOBAToken.address,
-          predeploys.L2_BOBA,
+          predeploys.L2_BOBA_ALT_L1,
           ValueCalls0.address,
           initialBalance0,
           9999999,
@@ -194,7 +194,7 @@ describe('Native BOBA value integration tests', () => {
       await checkBalances([initialBalance0, 0])
     })
 
-    it('{tag:other} should allow BOBA to be sent', async () => {
+    it('should allow BOBA to be sent', async () => {
       const sendAmount = 15
       const tx = await ValueCalls0.simpleSend(ValueCalls1.address, sendAmount, {
         gasPrice: 0,
@@ -204,7 +204,7 @@ describe('Native BOBA value integration tests', () => {
       await checkBalances([initialBalance0 - sendAmount, sendAmount])
     })
 
-    it('{tag:other} should revert if a function is nonpayable', async () => {
+    it('should revert if a function is nonpayable', async () => {
       const sendAmount = 15
       const [success, returndata] = await ValueCalls0.callStatic.sendWithData(
         ValueCalls1.address,
@@ -216,7 +216,7 @@ describe('Native BOBA value integration tests', () => {
       expect(returndata).to.eq('0x')
     })
 
-    it('{tag:other} should allow BOBA to be sent and have the correct ovmCALLVALUE', async () => {
+    it('should allow BOBA to be sent and have the correct ovmCALLVALUE', async () => {
       const sendAmount = 15
       const [success, returndata] = await ValueCalls0.callStatic.sendWithData(
         ValueCalls1.address,
@@ -228,7 +228,7 @@ describe('Native BOBA value integration tests', () => {
       expect(BigNumber.from(returndata)).to.deep.eq(BigNumber.from(sendAmount))
     })
 
-    it('{tag:other} should have the correct ovmSELFBALANCE which includes the msg.value', async () => {
+    it('should have the correct ovmSELFBALANCE which includes the msg.value', async () => {
       // give an initial balance which the ovmCALLVALUE should be added to when calculating ovmSELFBALANCE
       const initialBalance = 10
 
@@ -236,7 +236,7 @@ describe('Native BOBA value integration tests', () => {
       await env.waitForXDomainTransaction(
         L1StandardBridge.depositERC20To(
           L1BOBAToken.address,
-          predeploys.L2_BOBA,
+          predeploys.L2_BOBA_ALT_L1,
           ValueCalls1.address,
           initialBalance,
           9999999,
@@ -257,7 +257,7 @@ describe('Native BOBA value integration tests', () => {
       )
     })
 
-    it('{tag:other} should have the correct callvalue but not persist the transfer if the target reverts', async () => {
+    it('should have the correct callvalue but not persist the transfer if the target reverts', async () => {
       const sendAmount = 15
       const internalCalldata = ValueCalls1.interface.encodeFunctionData(
         'verifyCallValueAndRevert',
@@ -275,7 +275,7 @@ describe('Native BOBA value integration tests', () => {
       await checkBalances([initialBalance0, 0])
     })
 
-    it('{tag:other} should look like the subcall reverts with no data if value exceeds balance', async () => {
+    it('should look like the subcall reverts with no data if value exceeds balance', async () => {
       const sendAmount = initialBalance0 + 1
       const internalCalldata = ValueCalls1.interface.encodeFunctionData(
         'verifyCallValueAndReturn',
@@ -291,7 +291,7 @@ describe('Native BOBA value integration tests', () => {
       expect(returndata).to.eq('0x')
     })
 
-    it('{tag:other} should preserve msg.value through ovmDELEGATECALLs', async () => {
+    it('should preserve msg.value through ovmDELEGATECALLs', async () => {
       const Factory__ValueContext = await ethers.getContractFactory(
         'ValueContext',
         wallet
@@ -324,7 +324,7 @@ describe('Native BOBA value integration tests', () => {
       expect(delegatedOvmCALLVALUE).to.deep.eq(BigNumber.from(sendAmount))
     })
 
-    it('{tag:other} should have correct address(this).balance through ovmDELEGATECALLs to another account', async () => {
+    it('should have correct address(this).balance through ovmDELEGATECALLs to another account', async () => {
       const Factory__ValueContext = await ethers.getContractFactory(
         'ValueContext',
         wallet
@@ -341,7 +341,7 @@ describe('Native BOBA value integration tests', () => {
       expect(delegatedReturndata).to.deep.eq(BigNumber.from(initialBalance0))
     })
 
-    it('{tag:other} should have correct address(this).balance through ovmDELEGATECALLs to same account', async () => {
+    it('should have correct address(this).balance through ovmDELEGATECALLs to same account', async () => {
       const [delegatedSuccess, delegatedReturndata] =
         await ValueCalls0.callStatic.delegateCallToAddressThisBalance(
           ValueCalls0.address
@@ -351,7 +351,7 @@ describe('Native BOBA value integration tests', () => {
       expect(delegatedReturndata).to.deep.eq(BigNumber.from(initialBalance0))
     })
 
-    it('{tag:other} should allow delegate calls which preserve msg.value even with no balance going into the inner call', async () => {
+    it('should allow delegate calls which preserve msg.value even with no balance going into the inner call', async () => {
       const Factory__SendBOBAAwayAndDelegateCall: ContractFactory =
         await ethers.getContractFactory('SendETHAwayAndDelegateCall', wallet)
       const SendBOBAAwayAndDelegateCall: Contract =

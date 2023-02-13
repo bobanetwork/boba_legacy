@@ -2,9 +2,8 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract } from 'ethers'
+import { getBobaContractAt } from '@boba/contracts'
 
-import L1MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
-import L2MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'
 import { OptimismEnv } from './shared/env'
 
 describe('Fast Messenge Relayer Test', async () => {
@@ -16,15 +15,15 @@ describe('Fast Messenge Relayer Test', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    L1Message = new Contract(
+    L1Message = await getBobaContractAt(
+      'L1Message',
       env.addressesBOBA.L1Message,
-      L1MessageJson.abi,
       env.l1Wallet
     )
 
-    L2Message = new Contract(
+    L2Message = await getBobaContractAt(
+      'L2Message',
       env.addressesBOBA.L2Message,
-      L2MessageJson.abi,
       env.l2Wallet
     )
   })
