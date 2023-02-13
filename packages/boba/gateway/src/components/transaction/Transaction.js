@@ -124,25 +124,25 @@ function Transaction({
         md={6}
         >
           <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start', paddingLeft: '3px' }}>
-            <Typography variant="overline" style={{lineHeight: '1.1em'}}>{chain}</Typography>
-            <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{time}</Typography>
+            <Typography variant="body2" style={{lineHeight: '1.1em'}}>{chain}</Typography>
+            <Typography variant="body2" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{time}</Typography>
             {completion === '' &&
-              <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>&nbsp;</Typography>
+              <Typography variant="body2" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>&nbsp;</Typography>
             }
             {completion !== '' &&
-              <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{completion}</Typography>
+              <Typography variant="body2" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>{completion}</Typography>
             }
-            {toChain && <Typography variant="overline" style={{ lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)' }}>
+            {toChain && <Typography variant="body2" style={{ lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)' }}>
               {toChain}
             </Typography>}
-            <Typography variant="body3" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
+            <Typography variant="body2" style={{lineHeight: '1.1em', fontSize: '0.7em', color: 'rgba(255, 255, 255, 0.3)'}}>
               {oriChain}&nbsp;Hash:&nbsp;
               <a
                 href={
                   oriChain === 'L0' ? tx_ref : chainLink({ hash: oriHash, chain: oriChain })}
                 target={'_blank'}
                 rel='noopener noreferrer'
-                style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
+                style={{ color: theme.palette.mode === 'light' ? 'black' : 'white', fontFamily: 'MessinaSB'}}
               >
                 {isMobile ? truncate(oriHash, 6, 6, '...') : oriHash}
               </a>
@@ -156,19 +156,19 @@ function Transaction({
         md={3}
       >
         <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems:'flex-start'}}>
-          <Typography variant="overline" style={{lineHeight: '1.1em'}}>
+          <Typography variant="body2" style={{lineHeight: '1.1em'}}>
             {blockNumber}
           </Typography>
-          <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
+          <Typography variant="body2" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
             {typeTX}
           </Typography>
-          {eventType ? <Typography variant="overline" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
+          {eventType ? <Typography variant="body2" style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}>
             {eventType}
           </Typography> : null}
           {amountTx ?
             <Typography
-              variant="overline"
-              style={{lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)'}}
+              variant="body2"
+              style={{lineHeight: '1.1em'}}
              >
                {amountTx}
              </Typography> : null
@@ -183,7 +183,7 @@ function Transaction({
       >
         {!!detail &&
           <Typography
-            variant="overline"
+            variant="body2"
             sx={{cursor: 'pointer',display: 'flex', alignItems: 'center',lineHeight: '1.1em'}}
             onClick={()=>{setDropDownBox(!dropDownBox)}}
           >

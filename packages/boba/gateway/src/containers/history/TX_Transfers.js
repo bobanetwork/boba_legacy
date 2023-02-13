@@ -56,7 +56,7 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
         oriChain={chain}
         oriHash={i.hash}
         amountTx={amountTx}
-        tx_ref={i.reference}
+        tx_ref={!!i.reference ? i.reference : null}
         eventType={i.event_type}
         toChain={i.destination_chain}
       />

@@ -69,7 +69,11 @@ export const ProjectContent = styled(Box)(({ theme }) => ({
   gap: 1,
   marginTop: '50px',
   width: '100%',
-  height: '140px'
+  height: '140px',
+  [ theme.breakpoints.down('md') ]: {
+    minHeight: '140px',
+    height: 'auto'
+  },
 }))
 
 export const ImageContainer = styled(Box)(({ theme, ...props }) => ({

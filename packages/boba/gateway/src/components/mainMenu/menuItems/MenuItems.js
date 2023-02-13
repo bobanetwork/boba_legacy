@@ -7,8 +7,14 @@ import { MENU_LIST } from './menu.config'
 import * as S from './MenuItems.styles'
 import { PAGES_BY_NETWORK } from 'util/constant'
 import { selectActiveNetwork } from 'selectors/networkSelector'
+import { useTheme, useMediaQuery } from '@mui/material'
 
-const MenuItems = () => {
+const MenuItems = ({
+  setOpen
+}) => {
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const menuList = MENU_LIST;
 
@@ -46,6 +52,7 @@ const MenuItems = () => {
             key={item.key}
             to={item.url}
             activeclassname="active"
+            onClick={() => isMobile ? setOpen(false): null}
           >
             {item.title}
           </S.MenuListItem>
