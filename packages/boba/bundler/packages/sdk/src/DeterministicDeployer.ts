@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from 'ethers'
+import { BigNumber, BigNumberish, Wallet } from 'ethers'
 import { hexConcat, hexlify, hexZeroPad, keccak256 } from 'ethers/lib/utils'
 import { TransactionRequest } from '@ethersproject/abstract-provider'
 import { JsonRpcProvider } from '@ethersproject/providers'
@@ -34,7 +34,20 @@ export class DeterministicDeployer {
   deploymentGasPrice = 100e9
   deploymentGasLimit = 100000
 
-  constructor (readonly provider: JsonRpcProvider) {
+  constructor (readonly provider: JsonRpcProvider, readonly wallet?: Wallet, network?: string) {
+    if (network == "boba_mainnet") {
+      this.proxyAddress = '0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7'
+      this.deploymentTransaction = '0xf8a7808504a817c800830186a08080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf3820264a02836f16b67fdf74d02d4d9548495cffd739f509b9bc4b8fdffd2611c38489642a07864709b3f830a661897f4d60d98efc26754f44be447cf35a65ff92a06cb7bd0'
+      this.deploymentSignerAddress = '0xE1CB04A0fA36DdD16a06ea828007E35e1a3cBC37'
+      this.deploymentGasPrice = 20000000000
+      this.deploymentGasLimit = 100000
+    } else if (network == "boba_goerli") {
+      this.proxyAddress = '0x4e59b44847b379578588920ca78fbf26c0b4956c'
+      this.deploymentTransaction = '0xf8a58085174876e800830186a08080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf31ba02222222222222222222222222222222222222222222222222222222222222222a02222222222222222222222222222222222222222222222222222222222222222'
+      this.deploymentSignerAddress = '0x3fab184622dc19b6109349b94811493bf2a45362'
+      this.deploymentGasPrice = 100e9
+      this.deploymentGasLimit = 100000
+    }
   }
 
   async isContractDeployed (address: string): Promise<boolean> {
@@ -53,11 +66,19 @@ export class DeterministicDeployer {
     const neededBalance = BigNumber.from(this.deploymentGasLimit).mul(this.deploymentGasPrice)
     const signer = this.provider.getSigner()
     if (bal.lt(neededBalance)) {
-      await signer.sendTransaction({
-        to: this.deploymentSignerAddress,
-        value: neededBalance,
-        gasLimit: this.deploymentGasLimit
-      })
+      if (this.wallet) {
+        await this.wallet.sendTransaction({
+          to: this.deploymentSignerAddress,
+          value: neededBalance,
+          gasLimit: this.deploymentGasLimit
+        })
+      } else {
+        await signer.sendTransaction({
+          to: this.deploymentSignerAddress,
+          value: neededBalance,
+          gasLimit: this.deploymentGasLimit
+        })
+      }
     }
     await this.provider.send('eth_sendRawTransaction', [this.deploymentTransaction])
     if (!await this.isContractDeployed(this.proxyAddress)) {
@@ -92,16 +113,21 @@ export class DeterministicDeployer {
   async deterministicDeploy (ctrCode: string, salt: BigNumberish = 0): Promise<string> {
     const addr = await this.getDeterministicDeployAddress(ctrCode, salt)
     if (!await this.isContractDeployed(addr)) {
-      await this.provider.getSigner().sendTransaction(
-        await this.getDeployTransaction(ctrCode, salt))
+      if (this.wallet) {
+        await this.wallet.sendTransaction(
+          await this.getDeployTransaction(ctrCode, salt))
+      } else {
+        await this.provider.getSigner().sendTransaction(
+          await this.getDeployTransaction(ctrCode, salt))
+      }
     }
     return addr
   }
 
   private static _instance?: DeterministicDeployer
 
-  static init (provider: JsonRpcProvider): void {
-    this._instance = new DeterministicDeployer(provider)
+  static init (provider: JsonRpcProvider, wallet?: Wallet, network?: string): void {
+    this._instance = new DeterministicDeployer(provider, wallet, network)
   }
 
   static get instance (): DeterministicDeployer {

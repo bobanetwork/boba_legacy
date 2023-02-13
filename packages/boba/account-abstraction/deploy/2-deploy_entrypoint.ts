@@ -3,9 +3,10 @@ import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
 import EntryPointJson from '../artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import { DeterministicDeployer } from '../../bundler/packages/sdk/src/DeterministicDeployer'
+// import { DeterministicDeployer } from '@account-abstraction/sdk'
 
 let Factory__EntryPoint: ContractFactory
-let EntryPoint: Contract
 
 const deployFn: DeployFunction = async (hre) => {
   Factory__EntryPoint = new ContractFactory(
@@ -13,18 +14,16 @@ const deployFn: DeployFunction = async (hre) => {
     EntryPointJson.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
-  EntryPoint = await Factory__EntryPoint.deploy()
-  await EntryPoint.deployTransaction.wait()
+  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2)
+  const EntryPointAddress = await dep.deterministicDeploy(Factory__EntryPoint.bytecode)
+  console.log('Deployed EntryPoint at', EntryPointAddress)
 
   const EntryPointDeploymentSubmission: DeploymentSubmission = {
-    ...EntryPoint,
-    receipt: EntryPoint.receipt,
-    address: EntryPoint.address,
+    address: EntryPointAddress,
     abi: EntryPointJson.abi
   }
   await hre.deployments.save('EntryPoint', EntryPointDeploymentSubmission)
-
-  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'Boba_EntryPoint', EntryPoint.address )
+  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'Boba_EntryPoint', EntryPointAddress )
 }
 
 export default deployFn

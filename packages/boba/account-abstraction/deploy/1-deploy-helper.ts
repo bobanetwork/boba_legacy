@@ -2,6 +2,8 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import BundlerHelperJson from '../artifacts/contracts/bundler/BundlerHelper.sol/BundlerHelper.json'
+import { DeterministicDeployer } from '../../bundler/packages/sdk/src/DeterministicDeployer'
+// import { DeterministicDeployer } from '@account-abstraction/sdk'
 
 const sleep = async (ms: number): Promise<void> => {
   return new Promise<void>((resolve) => {
@@ -70,7 +72,6 @@ export const registerBobaAddress = async (
 }
 
 let Factory__BundlerHelper: ContractFactory
-let BundlerHelper: Contract
 
 const deployFn: DeployFunction = async (hre) => {
   Factory__BundlerHelper = new ContractFactory(
@@ -79,18 +80,17 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  BundlerHelper = await Factory__BundlerHelper.deploy()
-  await BundlerHelper.deployTransaction.wait()
+  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2)
+  const BundlerHelperAddress = await dep.deterministicDeploy(Factory__BundlerHelper.bytecode)
+  console.log('Deployed BundlerHelper at', BundlerHelperAddress)
 
   const BundlerHelperDeploymentSubmission: DeploymentSubmission = {
-    ...BundlerHelper,
-    receipt: BundlerHelper.receipt,
-    address: BundlerHelper.address,
+    address: BundlerHelperAddress,
     abi: BundlerHelperJson.abi
   }
   await hre.deployments.save('BundlerHelper', BundlerHelperDeploymentSubmission)
 
-  await registerBobaAddress((hre as any).deployConfig.addressManager, 'Boba_BundlerHelper', BundlerHelper.address )
+  await registerBobaAddress((hre as any).deployConfig.addressManager, 'Boba_BundlerHelper', BundlerHelperAddress )
 }
 
 export default deployFn
