@@ -1,24 +1,12 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
+import { ethers } from 'hardhat'
 import { Contract, ContractFactory, utils } from 'ethers'
+import { getBobaContractAt, getBobaContractABI, deployBobaContractCore } from '@boba/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
-
-import L1ERC1155BridgeJson from '@boba/contracts/artifacts/contracts/ERC1155Bridges/L1ERC1155Bridge.sol/L1ERC1155Bridge.json'
-import L2ERC1155BridgeJson from '@boba/contracts/artifacts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol/L2ERC1155Bridge.json'
-import ERC1155Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC1155.sol/L1ERC1155.json'
-import L1StandardERC1155Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC1155.sol/L1StandardERC1155.json'
-import L2StandardERC1155Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC1155.sol/L2StandardERC1155.json'
-
-import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-
-import L1ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL1StandardERC1155.sol/TestFailingMintL1StandardERC1155.json'
-import L2ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL2StandardERC1155.sol/TestFailingMintL2StandardERC1155.json'
-
 import { OptimismEnv } from './shared/env'
-import { ethers } from 'hardhat'
 
 describe('ERC1155 Bridge Test', async () => {
   let Factory__L1ERC1155: ContractFactory
@@ -28,7 +16,6 @@ describe('ERC1155 Bridge Test', async () => {
   let L1ERC1155: Contract
   let L2ERC1155: Contract
 
-  let L2BOBAToken: Contract
   let BOBABillingContract: Contract
 
   let env: OptimismEnv
@@ -44,56 +31,39 @@ describe('ERC1155 Bridge Test', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    L1Bridge = new Contract(
+    L1Bridge = await getBobaContractAt(
+      'L1ERC1155Bridge',
       env.addressesBOBA.Proxy__L1ERC1155Bridge,
-      L1ERC1155BridgeJson.abi,
       env.l1Wallet
     )
 
-    L2Bridge = new Contract(
+    L2Bridge = await getBobaContractAt(
+      'L2ERC1155BridgeAltL1',
       env.addressesBOBA.Proxy__L2ERC1155Bridge,
-      L2ERC1155BridgeJson.abi,
       env.l2Wallet
     )
 
-    L2BOBAToken = new Contract(
-      env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
-      env.l2Wallet
-    )
-
-    BOBABillingContract = new Contract(
+    BOBABillingContract = await getBobaContractAt(
+      'L2BillingContract',
       env.addressesBOBA.Proxy__BobaBillingContract,
-      L2BillingContractJson.abi,
       env.l2Wallet
     )
   })
 
   describe('L1 native ERC1155 token tests', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L1 native token token each time if existing contracts are used for tests
+      L1ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
         env.l1Wallet
       )
 
-      Factory__L2ERC1155 = new ContractFactory(
-        L2StandardERC1155Json.abi,
-        L2StandardERC1155Json.bytecode,
+      L2ERC1155 = await deployBobaContractCore(
+        'L2StandardERC1155',
+        [L2Bridge.address, L1ERC1155.address, DUMMY_URI_1],
         env.l2Wallet
       )
-
-      // deploy a L1 native token token each time if existing contracts are used for tests
-      L1ERC1155 = await Factory__L1ERC1155.deploy(DUMMY_URI_1)
-
-      await L1ERC1155.deployTransaction.wait()
-
-      L2ERC1155 = await Factory__L2ERC1155.deploy(
-        L2Bridge.address,
-        L1ERC1155.address,
-        DUMMY_URI_1
-      )
-      await L2ERC1155.deployTransaction.wait()
 
       // register token
       const registerL1BridgeTx = await L1Bridge.registerPair(
@@ -111,7 +81,7 @@ describe('ERC1155 Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should deposit token to L2', async () => {
+    it.only('should deposit token to L2', async () => {
       // mint token
       const mintTx = await L1ERC1155.mint(
         env.l1Wallet.address,
@@ -158,7 +128,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL2Balance).to.deep.eq(preL2Balance.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to transfer tokens on L2', async () => {
+    it.only('should be able to transfer tokens on L2', async () => {
       const preOwnerBalance = await L2ERC1155.balanceOf(
         env.l2Wallet.address,
         DUMMY_TOKEN_ID_1
@@ -190,7 +160,7 @@ describe('ERC1155 Bridge Test', async () => {
       )
     })
 
-    it('should not be able to withdraw non-owned tokens', async () => {
+    it.only('should not be able to withdraw non-owned tokens', async () => {
       await expect(
         L2Bridge.connect(env.l2Wallet).withdraw(
           L2ERC1155.address,
@@ -211,7 +181,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should fail to withdraw the token if not enough Boba balance', async () => {
+    it.only('should fail to withdraw the token if not enough Boba balance', async () => {
       const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
       await env.l2Wallet.sendTransaction({
         to: newWallet.address,
@@ -230,7 +200,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should fail to withdraw the token if not paying Boba fee', async () => {
+    it.only('should fail to withdraw the token if not paying Boba fee', async () => {
       await expect(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
           L2ERC1155.address,
@@ -242,7 +212,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should fail to withdraw the token if the amount is 0', async () => {
+    it.only('should fail to withdraw the token if the amount is 0', async () => {
       const approveTX = await L2ERC1155.connect(
         env.l2Wallet_2
       ).setApprovalForAll(L2Bridge.address, true)
@@ -262,7 +232,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Amount should be greater than 0')
     })
 
-    it('should be able to withdraw tokens to L1', async () => {
+    it.only('should be able to withdraw tokens to L1', async () => {
       const preL1Balance = await L1ERC1155.balanceOf(
         env.l2Wallet_2.address,
         DUMMY_TOKEN_ID_1
@@ -278,6 +248,7 @@ describe('ERC1155 Bridge Test', async () => {
       await approveTX.wait()
 
       const exitFee = await BOBABillingContract.exitFee()
+      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155BridgeAltL1')
 
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
@@ -293,11 +264,11 @@ describe('ERC1155 Bridge Test', async () => {
       // check event WithdrawalInitiated is emitted with empty data
       const returnedlogIndex = await getFilteredLogIndex(
         withdrawTx.receipt,
-        L2ERC1155BridgeJson.abi,
+        L2ERC1155BridgeABI,
         L2Bridge.address,
         'WithdrawalInitiated'
       )
-      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeJson.abi)
+      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeABI)
       const log = ifaceL2Bridge.parseLog(
         withdrawTx.receipt.logs[returnedlogIndex]
       )
@@ -316,9 +287,12 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance).to.deep.eq(preL1Balance.add(DUMMY_TOKEN_AMOUNT_1))
     })
 
-    it('should not be able to deposit unregistered token ', async () => {
-      const L1ERC721Test = await Factory__L1ERC1155.deploy(DUMMY_URI_1)
-      await L1ERC721Test.deployTransaction.wait()
+    it.only('should not be able to deposit unregistered token ', async () => {
+      const L1ERC721Test = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
+        env.l1Wallet
+      )
 
       const mintTx = await L1ERC721Test.mint(
         env.l1Wallet.address,
@@ -353,7 +327,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith("Can't Find L2 token Contract")
     })
 
-    it('should not be able to mint token on L2', async () => {
+    it.only('should not be able to mint token on L2', async () => {
       await expect(
         L2ERC1155.mint(
           env.l2Wallet.address,
@@ -364,7 +338,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Only L2 Bridge can mint and burn')
     })
 
-    it('should not be able to burn token on L2', async () => {
+    it.only('should not be able to burn token on L2', async () => {
       await expect(
         L2ERC1155.burn(
           env.l1Wallet.address,
@@ -374,7 +348,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Only L2 Bridge can mint and burn')
     })
 
-    it('should be able to deposit zero amount of token to L2', async () => {
+    it.only('should be able to deposit zero amount of token to L2', async () => {
       // mint token
       const mintTx = await L1ERC1155.mint(
         env.l1Wallet.address,
@@ -387,7 +361,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Amount should be greater than 0')
     })
 
-    it('should be able to deposit token to another wallet on L2', async () => {
+    it.only('should be able to deposit token to another wallet on L2', async () => {
       const preOwnerL1Balance = await L1ERC1155.balanceOf(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1
@@ -420,7 +394,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL2Balance).to.deep.eq(preL2Balance.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to withdraw token to another wallet on L1', async () => {
+    it.only('should be able to withdraw token to another wallet on L1', async () => {
       const preOwnerL2Balance = await L2ERC1155.balanceOf(
         env.l1Wallet_2.address,
         DUMMY_TOKEN_ID_1
@@ -463,7 +437,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance).to.deep.eq(preL1Balance.add(DUMMY_TOKEN_AMOUNT_1))
     })
 
-    it('should be able to deposit a batch of tokens to L2', async () => {
+    it.only('should be able to deposit a batch of tokens to L2', async () => {
       const mintType1Tx = await L1ERC1155.mint(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -519,7 +493,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance3).to.deep.eq(preL1Balance3.sub(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should not deposit a batch of tokens to L2 if the amount is zero', async () => {
+    it.only('should not deposit a batch of tokens to L2 if the amount is zero', async () => {
       const mintType1Tx = await L1ERC1155.mint(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -550,7 +524,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Amount should be greater than 0')
     })
 
-    it('should withdraw a batch of tokens from L2 to L1', async () => {
+    it.only('should withdraw a batch of tokens from L2 to L1', async () => {
       const [preL1Balance1, preL1Balance2, preL1Balance3] =
         await L1ERC1155.balanceOfBatch(
           [env.l1Wallet.address, env.l1Wallet.address, env.l1Wallet.address],
@@ -599,7 +573,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance3).to.deep.eq(preL1Balance3.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to deposit a batch of tokens to another wallet on L2', async () => {
+    it.only('should be able to deposit a batch of tokens to another wallet on L2', async () => {
       const mintType1Tx = await L1ERC1155.mint(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -664,7 +638,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance3).to.deep.eq(preL1Balance3.sub(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should withdraw a batch of tokens to another wallet from L2 to L1', async () => {
+    it.only('should withdraw a batch of tokens to another wallet from L2 to L1', async () => {
       const [preL1Balance1, preL1Balance2, preL1Balance3] =
         await L1ERC1155.balanceOfBatch(
           [env.l1Wallet.address, env.l1Wallet.address, env.l1Wallet.address],
@@ -724,29 +698,18 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('L2 native ERC1155 token tests', async () => {
     before(async () => {
-      Factory__L2ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L2 native token token each time if existing contracts are used for tests
+      L2ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
         env.l2Wallet
       )
 
-      Factory__L1ERC1155 = new ContractFactory(
-        L1StandardERC1155Json.abi,
-        L1StandardERC1155Json.bytecode,
+      L1ERC1155 = await deployBobaContractCore(
+        'L1StandardERC1155',
+        [L1Bridge.address, L2ERC1155.address, DUMMY_URI_1],
         env.l1Wallet
       )
-
-      // deploy a L2 native token token each time if existing contracts are used for tests
-      L2ERC1155 = await Factory__L2ERC1155.deploy(DUMMY_URI_1)
-
-      await L2ERC1155.deployTransaction.wait()
-
-      L1ERC1155 = await Factory__L1ERC1155.deploy(
-        L1Bridge.address,
-        L2ERC1155.address,
-        DUMMY_URI_1
-      )
-      await L1ERC1155.deployTransaction.wait()
 
       // register token
       const registerL1BridgeTx = await L1Bridge.registerPair(
@@ -764,7 +727,7 @@ describe('ERC1155 Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should withdraw token from L2 to L1', async () => {
+    it.only('should withdraw token from L2 to L1', async () => {
       // mint token
       const mintTx = await L2ERC1155.mint(
         env.l2Wallet.address,
@@ -814,7 +777,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL2Balance).to.deep.eq(preL2Balance.sub(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to transfer tokens on L1', async () => {
+    it.only('should be able to transfer tokens on L1', async () => {
       const preOwnerBalance = await L1ERC1155.balanceOf(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1
@@ -846,7 +809,7 @@ describe('ERC1155 Bridge Test', async () => {
       )
     })
 
-    it('should not be able to deposit non-owned tokens', async () => {
+    it.only('should not be able to deposit non-owned tokens', async () => {
       await expect(
         L1Bridge.connect(env.l1Wallet).deposit(
           L1ERC1155.address,
@@ -867,7 +830,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should fail to deposit the token if not enough Boba balance', async () => {
+    it.only('should fail to deposit the token if not enough Boba balance', async () => {
       const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
       await env.l2Wallet.sendTransaction({
         to: newWallet.address,
@@ -902,7 +865,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should fail to withdraw the token if not sending Boba', async () => {
+    it.only('should fail to withdraw the token if not sending Boba', async () => {
       const mintTx = await L2ERC1155.mint(
         env.l2Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -935,7 +898,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.reverted
     })
 
-    it('should fail to withdraw the token if the amount is 0', async () => {
+    it.only('should fail to withdraw the token if the amount is 0', async () => {
       const approveTX = await L2ERC1155.connect(
         env.l2Wallet_2
       ).setApprovalForAll(L2Bridge.address, true)
@@ -955,7 +918,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Amount should be greater than 0')
     })
 
-    it('should be able to deposit tokens from L1 to L2', async () => {
+    it.only('should be able to deposit tokens from L1 to L2', async () => {
       const preL1Balance = await L1ERC1155.balanceOf(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1
@@ -1001,9 +964,12 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance).to.deep.eq(preL1Balance.sub(DUMMY_TOKEN_AMOUNT_1))
     })
 
-    it('should not be able to withdraw unregistered token ', async () => {
-      const L2ERC1155Test = await Factory__L2ERC1155.deploy(DUMMY_URI_1)
-      await L2ERC1155Test.deployTransaction.wait()
+    it.only('should not be able to withdraw unregistered token ', async () => {
+      const L2ERC1155Test = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
+        env.l2Wallet,
+      )
 
       const mintTx = await L2ERC1155Test.mint(
         env.l2Wallet.address,
@@ -1042,7 +1008,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith("Can't Find L1 token Contract")
     })
 
-    it('should not be able to mint token on L1', async () => {
+    it.only('should not be able to mint token on L1', async () => {
       await expect(
         L1ERC1155.mint(
           env.l2Wallet.address,
@@ -1053,7 +1019,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Only L1 Bridge can mint and burn')
     })
 
-    it('should not be able to burn token on L1', async () => {
+    it.only('should not be able to burn token on L1', async () => {
       await expect(
         L1ERC1155.burn(
           env.l1Wallet.address,
@@ -1063,7 +1029,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Only L1 Bridge can mint and burn')
     })
 
-    it('should be able to withdraw token to another wallet on L1', async () => {
+    it.only('should be able to withdraw token to another wallet on L1', async () => {
       const preOwnerL2Balance = await L2ERC1155.balanceOf(
         env.l2Wallet.address,
         DUMMY_TOKEN_ID_1
@@ -1100,7 +1066,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance).to.deep.eq(preL1Balance.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to deposit token to another wallet on L2', async () => {
+    it.only('should be able to deposit token to another wallet on L2', async () => {
       const preOwnerL1Balance = await L1ERC1155.balanceOf(
         env.l1Wallet_2.address,
         DUMMY_TOKEN_ID_1
@@ -1140,7 +1106,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL2Balance).to.deep.eq(preL2Balance.add(DUMMY_TOKEN_AMOUNT_1))
     }).retries(3)
 
-    it('should withdraw a batch of tokens from L2 to L1', async () => {
+    it.only('should withdraw a batch of tokens from L2 to L1', async () => {
       const mintType1Tx = await L2ERC1155.mint(
         env.l2Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -1208,7 +1174,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance3).to.deep.eq(preL1Balance3.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should not withdraw a batch of tokens to L1 if the amount is zero', async () => {
+    it.only('should not withdraw a batch of tokens to L1 if the amount is zero', async () => {
       const mintType1Tx = await L2ERC1155.mint(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -1242,7 +1208,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Amount should be greater than 0')
     })
 
-    it('should be able to deposit a batch of tokens to L2', async () => {
+    it.only('should be able to deposit a batch of tokens to L2', async () => {
       const [preL1Balance1, preL1Balance2, preL1Balance3] =
         await L1ERC1155.balanceOfBatch(
           [env.l1Wallet.address, env.l1Wallet.address, env.l1Wallet.address],
@@ -1281,7 +1247,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL2Balance3).to.deep.eq(preL2Balance3.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should withdraw a batch of tokens to another wallet from L2 to L1', async () => {
+    it.only('should withdraw a batch of tokens to another wallet from L2 to L1', async () => {
       const mintType1Tx = await L2ERC1155.mint(
         env.l2Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -1358,7 +1324,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance3).to.deep.eq(preL1Balance3.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to deposit a batch of tokens to another wallet on L2', async () => {
+    it.only('should be able to deposit a batch of tokens to another wallet on L2', async () => {
       const [preL1Balance1, preL1Balance2, preL1Balance3] =
         await L1ERC1155.balanceOfBatch(
           [
@@ -1412,21 +1378,17 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('L1 native token - failing mint on L2', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L1 native token token each time if existing contracts are used for tests
+      L1ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        ['uri'],
         env.l1Wallet
       )
 
-      Factory__L2ERC1155 = new ContractFactory(
-        L2ERC1155FailingMintJson.abi,
-        L2ERC1155FailingMintJson.bytecode,
+      Factory__L2ERC1155 = await ethers.getContractFactory(
+        'TestFailingMintL2StandardERC1155',
         env.l2Wallet
       )
-
-      // deploy a L1 native token token each time if existing contracts are used for tests
-      L1ERC1155 = await Factory__L1ERC1155.deploy('uri')
-      await L1ERC1155.deployTransaction.wait()
 
       L2ERC1155 = await Factory__L2ERC1155.deploy(
         L2Bridge.address,
@@ -1451,7 +1413,7 @@ describe('ERC1155 Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should try deposit token to L2', async () => {
+    it.only('should try deposit token to L2', async () => {
       // mint token on L1
       const mintTx = await L1ERC1155.mint(
         env.l1Wallet.address,
@@ -1488,14 +1450,16 @@ describe('ERC1155 Bridge Test', async () => {
       )
       await env.waitForXDomainTransaction(backTx)
 
+      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155BridgeAltL1')
+
       // check event DepositFailed is emittted
       const returnedlogIndex = await getFilteredLogIndex(
         depositTx.remoteReceipt,
-        L2ERC1155BridgeJson.abi,
+        L2ERC1155BridgeABI,
         L2Bridge.address,
         'DepositFailed'
       )
-      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeJson.abi)
+      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeABI)
       const log = ifaceL2Bridge.parseLog(
         depositTx.remoteReceipt.logs[returnedlogIndex]
       )
@@ -1516,22 +1480,17 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('L2 native token - failing mint on L1', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        L1ERC1155FailingMintJson.abi,
-        L1ERC1155FailingMintJson.bytecode,
-        env.l1Wallet
-      )
-
-      Factory__L2ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L2 native token token each time if existing contracts are used for tests
+      L2ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        ['uri'],
         env.l2Wallet
       )
 
-      // deploy a L2 native token token each time if existing contracts are used for tests
-      L2ERC1155 = await Factory__L2ERC1155.deploy('uri')
-      await L2ERC1155.deployTransaction.wait()
-
+      Factory__L1ERC1155 = await ethers.getContractFactory(
+        'TestFailingMintL1StandardERC1155',
+        env.l1Wallet
+      )
       L1ERC1155 = await Factory__L1ERC1155.deploy(
         L1Bridge.address,
         L2ERC1155.address,
@@ -1555,7 +1514,7 @@ describe('ERC1155 Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should try withdraw token to L1', async () => {
+    it.only('should try withdraw token to L1', async () => {
       // mint token on L1
       const mintTx = await L2ERC1155.mint(
         env.l2Wallet.address,
@@ -1598,30 +1557,18 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('Bridges pause tests', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L1 native token token each time if existing contracts are used for tests
+      L1ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        ['uri'],
         env.l1Wallet
       )
 
-      Factory__L2ERC1155 = new ContractFactory(
-        L2StandardERC1155Json.abi,
-        L2StandardERC1155Json.bytecode,
+      L2ERC1155 = await deployBobaContractCore(
+        'L2StandardERC1155',
+        [L2Bridge.address, L1ERC1155.address, 'uri'],
         env.l2Wallet
       )
-
-      // deploy a L1 native token token each time if existing contracts are used for tests
-      L1ERC1155 = await Factory__L1ERC1155.deploy('uri')
-
-      await L1ERC1155.deployTransaction.wait()
-
-      L2ERC1155 = await Factory__L2ERC1155.deploy(
-        L2Bridge.address,
-        L1ERC1155.address,
-        'uri'
-      )
-
-      await L2ERC1155.deployTransaction.wait()
 
       // register token
       const registerL1BridgeTx = await L1Bridge.registerPair(
@@ -1639,7 +1586,7 @@ describe('ERC1155 Bridge Test', async () => {
       await registerL2BridgeTx.wait()
     })
 
-    it('should pause and unpause L1 bridge', async () => {
+    it.only('should pause and unpause L1 bridge', async () => {
       const mintTx = await L1ERC1155.mint(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1,
@@ -1702,7 +1649,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(balanceL2).to.deep.eq(DUMMY_TOKEN_AMOUNT_1)
     })
 
-    it('should pause and unpause L2 bridge', async () => {
+    it.only('should pause and unpause L2 bridge', async () => {
       const approveTx = await L2ERC1155.setApprovalForAll(
         L2Bridge.address,
         true
@@ -1761,7 +1708,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(balanceL2).to.be.eq(0)
     })
 
-    it('should not allow to pause bridges for non-owner', async () => {
+    it.only('should not allow to pause bridges for non-owner', async () => {
       await expect(L1Bridge.connect(env.l1Wallet_2).pause()).to.be.revertedWith(
         'Caller is not the owner'
       )
@@ -1770,7 +1717,7 @@ describe('ERC1155 Bridge Test', async () => {
       )
     })
 
-    it('should not allow to unpause bridges for non-owner', async () => {
+    it.only('should not allow to unpause bridges for non-owner', async () => {
       await expect(
         L1Bridge.connect(env.l1Wallet_2).unpause()
       ).to.be.revertedWith('Caller is not the owner')
@@ -1781,7 +1728,7 @@ describe('ERC1155 Bridge Test', async () => {
   })
 
   describe('Configuration tests', async () => {
-    it('should not allow to configure billing contract address for non-owner', async () => {
+    it.only('should not allow to configure billing contract address for non-owner', async () => {
       await expect(
         L2Bridge.connect(env.l2Wallet_2).configureBillingContractAddress(
           env.addressesBOBA.Proxy__BobaBillingContract
@@ -1789,7 +1736,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it('should not allow to configure billing contract address to zero address', async () => {
+    it.only('should not allow to configure billing contract address to zero address', async () => {
       await expect(
         L2Bridge.connect(env.l2Wallet).configureBillingContractAddress(
           ethers.constants.AddressZero

@@ -5,8 +5,8 @@ import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
 
-import HelloTuringJson from '../artifacts/contracts/HelloTuring.sol/HelloTuring.json'
-import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import HelloTuringJson from '../../artifacts/contracts/HelloTuring.sol/HelloTuring.json'
+import TuringHelperJson from '../../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 

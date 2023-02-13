@@ -5,8 +5,8 @@ const expect = chai.expect
 
 import { BigNumber, Contract, ContractFactory, utils, Wallet } from 'ethers'
 
-import SelfDestructTestJson from '../artifacts/contracts/TestSelfDestruct.sol/TestSelfDestruct.json'
-import Create2DeployerJson from '../artifacts/contracts/TestSelfDestruct.sol/Create2Deployer.json'
+import SelfDestructTestJson from '../../artifacts/contracts/TestSelfDestruct.sol/TestSelfDestruct.json'
+import Create2DeployerJson from '../../artifacts/contracts/TestSelfDestruct.sol/Create2Deployer.json'
 
 import { OptimismEnv } from './shared/env'
 

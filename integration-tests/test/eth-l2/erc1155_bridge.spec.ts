@@ -1,24 +1,12 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
+import { ethers } from 'hardhat'
 import { Contract, ContractFactory, utils } from 'ethers'
+import { getBobaContractAt, getBobaContractABI, deployBobaContractCore } from '@boba/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
-
-import L1ERC1155BridgeJson from '@boba/contracts/artifacts/contracts/ERC1155Bridges/L1ERC1155Bridge.sol/L1ERC1155Bridge.json'
-import L2ERC1155BridgeJson from '@boba/contracts/artifacts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol/L2ERC1155Bridge.json'
-import ERC1155Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC1155.sol/L1ERC1155.json'
-import L1StandardERC1155Json from '@boba/contracts/artifacts/contracts/standards/L1StandardERC1155.sol/L1StandardERC1155.json'
-import L2StandardERC1155Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC1155.sol/L2StandardERC1155.json'
-
-import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-
-import L1ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL1StandardERC1155.sol/TestFailingMintL1StandardERC1155.json'
-import L2ERC1155FailingMintJson from '../artifacts/contracts/TestFailingMintL2StandardERC1155.sol/TestFailingMintL2StandardERC1155.json'
-
 import { OptimismEnv } from './shared/env'
-import { ethers } from 'hardhat'
 
 describe('ERC1155 Bridge Test', async () => {
   let Factory__L1ERC1155: ContractFactory
@@ -44,56 +32,45 @@ describe('ERC1155 Bridge Test', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    L1Bridge = new Contract(
+    L1Bridge = await getBobaContractAt(
+      'L1ERC1155Bridge',
       env.addressesBOBA.Proxy__L1ERC1155Bridge,
-      L1ERC1155BridgeJson.abi,
       env.l1Wallet
     )
 
-    L2Bridge = new Contract(
+    L2Bridge = await getBobaContractAt(
+      'L2ERC1155Bridge',
       env.addressesBOBA.Proxy__L2ERC1155Bridge,
-      L2ERC1155BridgeJson.abi,
       env.l2Wallet
     )
 
-    L2BOBAToken = new Contract(
+    L2BOBAToken = await getBobaContractAt(
+      'L2GovernanceERC20',
       env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
       env.l2Wallet
     )
 
-    BOBABillingContract = new Contract(
+    BOBABillingContract = await getBobaContractAt(
+      'L2BillingContract',
       env.addressesBOBA.Proxy__BobaBillingContract,
-      L2BillingContractJson.abi,
       env.l2Wallet
     )
   })
 
   describe('L1 native ERC1155 token tests', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L1 native token token each time if existing contracts are used for tests
+      L1ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
         env.l1Wallet
       )
 
-      Factory__L2ERC1155 = new ContractFactory(
-        L2StandardERC1155Json.abi,
-        L2StandardERC1155Json.bytecode,
+      L2ERC1155 = await deployBobaContractCore(
+        'L2StandardERC1155',
+        [L2Bridge.address, L1ERC1155.address, DUMMY_URI_1],
         env.l2Wallet
       )
-
-      // deploy a L1 native token token each time if existing contracts are used for tests
-      L1ERC1155 = await Factory__L1ERC1155.deploy(DUMMY_URI_1)
-
-      await L1ERC1155.deployTransaction.wait()
-
-      L2ERC1155 = await Factory__L2ERC1155.deploy(
-        L2Bridge.address,
-        L1ERC1155.address,
-        DUMMY_URI_1
-      )
-      await L2ERC1155.deployTransaction.wait()
 
       // register token
       const registerL1BridgeTx = await L1Bridge.registerPair(
@@ -299,14 +276,16 @@ describe('ERC1155 Bridge Test', async () => {
         )
       )
 
+      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155Bridge')
+
       // check event WithdrawalInitiated is emitted with empty data
       const returnedlogIndex = await getFilteredLogIndex(
         withdrawTx.receipt,
-        L2ERC1155BridgeJson.abi,
+        L2ERC1155BridgeABI,
         L2Bridge.address,
         'WithdrawalInitiated'
       )
-      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeJson.abi)
+      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeABI)
       const log = ifaceL2Bridge.parseLog(
         withdrawTx.receipt.logs[returnedlogIndex]
       )
@@ -326,8 +305,11 @@ describe('ERC1155 Bridge Test', async () => {
     })
 
     it('should not be able to deposit unregistered token ', async () => {
-      const L1ERC721Test = await Factory__L1ERC1155.deploy(DUMMY_URI_1)
-      await L1ERC721Test.deployTransaction.wait()
+      const L1ERC721Test = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
+        env.l1Wallet
+      )
 
       const mintTx = await L1ERC721Test.mint(
         env.l1Wallet.address,
@@ -748,29 +730,18 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('L2 native ERC1155 token tests', async () => {
     before(async () => {
-      Factory__L2ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L2 native token token each time if existing contracts are used for tests
+      L2ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
         env.l2Wallet
       )
 
-      Factory__L1ERC1155 = new ContractFactory(
-        L1StandardERC1155Json.abi,
-        L1StandardERC1155Json.bytecode,
+      L1ERC1155 = await deployBobaContractCore(
+        'L1StandardERC1155',
+        [L1Bridge.address, L2ERC1155.address, DUMMY_URI_1],
         env.l1Wallet
       )
-
-      // deploy a L2 native token token each time if existing contracts are used for tests
-      L2ERC1155 = await Factory__L2ERC1155.deploy(DUMMY_URI_1)
-
-      await L2ERC1155.deployTransaction.wait()
-
-      L1ERC1155 = await Factory__L1ERC1155.deploy(
-        L1Bridge.address,
-        L2ERC1155.address,
-        DUMMY_URI_1
-      )
-      await L1ERC1155.deployTransaction.wait()
 
       // register token
       const registerL1BridgeTx = await L1Bridge.registerPair(
@@ -1008,14 +979,15 @@ describe('ERC1155 Bridge Test', async () => {
         )
       )
 
+      const L1ERC1155BridgeABI = await getBobaContractABI('L1ERC1155Bridge')
       // check event WithdrawalInitiated is emitted with empty data
       const returnedlogIndex = await getFilteredLogIndex(
         depositTx.receipt,
-        L1ERC1155BridgeJson.abi,
+        L1ERC1155BridgeABI,
         L1Bridge.address,
         'DepositInitiated'
       )
-      const ifaceL1Bridge = new ethers.utils.Interface(L1ERC1155BridgeJson.abi)
+      const ifaceL1Bridge = new ethers.utils.Interface(L1ERC1155BridgeABI)
       const log = ifaceL1Bridge.parseLog(
         depositTx.receipt.logs[returnedlogIndex]
       )
@@ -1035,8 +1007,11 @@ describe('ERC1155 Bridge Test', async () => {
     })
 
     it('should not be able to withdraw unregistered token ', async () => {
-      const L2ERC1155Test = await Factory__L2ERC1155.deploy(DUMMY_URI_1)
-      await L2ERC1155Test.deployTransaction.wait()
+      const L2ERC1155Test = await deployBobaContractCore(
+        'L1ERC1155',
+        [DUMMY_URI_1],
+        env.l2Wallet,
+      )
 
       const mintTx = await L2ERC1155Test.mint(
         env.l2Wallet.address,
@@ -1460,22 +1435,17 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('L1 native token - failing mint on L2', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L1 native token token each time if existing contracts are used for tests
+      L1ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        ['uri'],
         env.l1Wallet
       )
 
-      Factory__L2ERC1155 = new ContractFactory(
-        L2ERC1155FailingMintJson.abi,
-        L2ERC1155FailingMintJson.bytecode,
+      Factory__L2ERC1155 = await ethers.getContractFactory(
+        'TestFailingMintL2StandardERC1155',
         env.l2Wallet
       )
-
-      // deploy a L1 native token token each time if existing contracts are used for tests
-      L1ERC1155 = await Factory__L1ERC1155.deploy('uri')
-      await L1ERC1155.deployTransaction.wait()
-
       L2ERC1155 = await Factory__L2ERC1155.deploy(
         L2Bridge.address,
         L1ERC1155.address,
@@ -1536,14 +1506,15 @@ describe('ERC1155 Bridge Test', async () => {
       )
       await env.waitForXDomainTransaction(backTx)
 
+      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155Bridge')
       // check event DepositFailed is emittted
       const returnedlogIndex = await getFilteredLogIndex(
         depositTx.remoteReceipt,
-        L2ERC1155BridgeJson.abi,
+        L2ERC1155BridgeABI,
         L2Bridge.address,
         'DepositFailed'
       )
-      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeJson.abi)
+      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeABI)
       const log = ifaceL2Bridge.parseLog(
         depositTx.remoteReceipt.logs[returnedlogIndex]
       )
@@ -1564,21 +1535,17 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('L2 native token - failing mint on L1', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        L1ERC1155FailingMintJson.abi,
-        L1ERC1155FailingMintJson.bytecode,
-        env.l1Wallet
-      )
-
-      Factory__L2ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      // deploy a L2 native token token each time if existing contracts are used for tests
+      L2ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        ['uri'],
         env.l2Wallet
       )
 
-      // deploy a L2 native token token each time if existing contracts are used for tests
-      L2ERC1155 = await Factory__L2ERC1155.deploy('uri')
-      await L2ERC1155.deployTransaction.wait()
+      Factory__L1ERC1155 = await ethers.getContractFactory(
+        'TestFailingMintL1StandardERC1155',
+        env.l1Wallet
+      )
 
       L1ERC1155 = await Factory__L1ERC1155.deploy(
         L1Bridge.address,
@@ -1648,30 +1615,17 @@ describe('ERC1155 Bridge Test', async () => {
 
   describe('Bridges pause tests', async () => {
     before(async () => {
-      Factory__L1ERC1155 = new ContractFactory(
-        ERC1155Json.abi,
-        ERC1155Json.bytecode,
+      L1ERC1155 = await deployBobaContractCore(
+        'L1ERC1155',
+        ['uri'],
         env.l1Wallet
       )
 
-      Factory__L2ERC1155 = new ContractFactory(
-        L2StandardERC1155Json.abi,
-        L2StandardERC1155Json.bytecode,
+      L2ERC1155 = await deployBobaContractCore(
+        'L2StandardERC1155',
+        [L2Bridge.address, L1ERC1155.address, 'uri'],
         env.l2Wallet
       )
-
-      // deploy a L1 native token token each time if existing contracts are used for tests
-      L1ERC1155 = await Factory__L1ERC1155.deploy('uri')
-
-      await L1ERC1155.deployTransaction.wait()
-
-      L2ERC1155 = await Factory__L2ERC1155.deploy(
-        L2Bridge.address,
-        L1ERC1155.address,
-        'uri'
-      )
-
-      await L2ERC1155.deployTransaction.wait()
 
       // register token
       const registerL1BridgeTx = await L1Bridge.registerPair(

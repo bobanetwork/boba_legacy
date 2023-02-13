@@ -6,9 +6,9 @@ const expect = chai.expect
 import { BigNumber, Contract, ContractFactory, utils, Wallet } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
 
-import SelfDestructTestJson from '../artifacts/contracts/TestSelfDestruct.sol/TestSelfDestruct.json'
-import Create2DeployerJson from '../artifacts/contracts/TestSelfDestruct.sol/Create2Deployer.json'
-import SSTORETestJson from '../artifacts/contracts/TestSelfDestruct.sol/TestDeleteSlot.json'
+import SelfDestructTestJson from '../../artifacts/contracts/TestSelfDestruct.sol/TestSelfDestruct.json'
+import Create2DeployerJson from '../../artifacts/contracts/TestSelfDestruct.sol/Create2Deployer.json'
+import SSTORETestJson from '../../artifacts/contracts/TestSelfDestruct.sol/TestDeleteSlot.json'
 
 import { OptimismEnv } from './shared/env'
 
