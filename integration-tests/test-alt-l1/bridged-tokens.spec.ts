@@ -2,7 +2,6 @@ import { BigNumber, Contract, ContractFactory, utils, Wallet } from 'ethers'
 import { ethers } from 'hardhat'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { MessageStatus } from '@eth-optimism/sdk'
-import { sleep } from '@eth-optimism/core-utils'
 
 import { expect } from './shared/setup'
 import { OptimismEnv } from './shared/env'
@@ -97,7 +96,7 @@ describe('Bridged tokens', () => {
     console.log('     Completion TX hash:', completion.transactionHash)
   })
 
-  it('{tag:other} should deposit tokens from L1 into L2', async () => {
+  it('should deposit tokens from L1 into L2', async () => {
     await env.messenger.waitForMessageReceipt(
       await env.messenger.depositERC20(
         L1__ERC20.address,
@@ -114,7 +113,7 @@ describe('Bridged tokens', () => {
     )
   })
 
-  it('{tag:other} should transfer tokens on L2', async () => {
+  it('should transfer tokens on L2', async () => {
     const tx = await L2__ERC20.transfer(otherWalletL1.address, 500)
     await tx.wait()
 
@@ -127,7 +126,7 @@ describe('Bridged tokens', () => {
   })
 
   withdrawalTest(
-    '{tag:other} should withdraw tokens from L2 to the depositor',
+    'should withdraw tokens from L2 to the depositor',
     async () => {
       const tx = await env.messenger.withdrawERC20(
         L1__ERC20.address,
@@ -156,7 +155,7 @@ describe('Bridged tokens', () => {
   )
 
   withdrawalTest(
-    '{tag:other} should withdraw tokens from L2 to the transfer recipient',
+    'should withdraw tokens from L2 to the transfer recipient',
     async () => {
       const tx = await env.messenger.withdrawERC20(
         L1__ERC20.address,
@@ -191,7 +190,7 @@ describe('Bridged tokens', () => {
   // Specifically, the L2 bridge does not check that the L2 token being burned corresponds
   // with the L1 token which is specified for the withdrawal.
   withdrawalTest(
-    '{tag:other} should not allow an arbitrary L2 token to be withdrawn in exchange for a legitimate L1 token',
+    'should not allow an arbitrary L2 token to be withdrawn in exchange for a legitimate L1 token',
     async () => {
       // First deposit some of the L1 token to L2, so that there is something which could be stolen.
       await env.messenger.waitForMessageReceipt(

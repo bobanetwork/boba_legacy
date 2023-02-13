@@ -1,17 +1,16 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
+import { ethers } from 'hardhat'
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { getBobaContractAt } from '@boba/contracts'
 import { bobaLinkGetQuote } from '@boba/api'
 import util from 'util'
 
 /* eslint-disable */
 const fetch = require('node-fetch')
 /* eslint-enable */
-
-import FluxAggregatorHCJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
-import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
 import { OptimismEnv } from './shared/env'
 import { waitForAndExecute } from './shared/utils'
@@ -60,9 +59,8 @@ describe('BobaLink Test\n', async () => {
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
 
-    Factory__TuringHelper = new ContractFactory(
-      TuringHelperJson.abi,
-      TuringHelperJson.bytecode,
+    Factory__TuringHelper = await ethers.getContractFactory(
+      'TuringHelper',
       env.l2Wallet
     )
 
@@ -70,14 +68,14 @@ describe('BobaLink Test\n', async () => {
     console.log('Helper contract deployed at', TuringHelper.address)
     await TuringHelper.deployTransaction.wait()
 
-    BobaChainLinkOracle = new Contract(
+    BobaChainLinkOracle = await getBobaContractAt(
+      'FluxAggregatorHC',
       env.addressesBOBA.BOBAUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
-    BobaOracleHC = new Contract(
+    BobaChainLinkOracle = await getBobaContractAt(
+      'FluxAggregatorHC',
       env.addressesBOBA.Proxy__BOBAUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
 

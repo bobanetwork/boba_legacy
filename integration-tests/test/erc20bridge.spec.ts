@@ -3,17 +3,14 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-import { Contract, ContractFactory, utils, Wallet } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
-
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import { Contract, utils, Wallet } from 'ethers'
+import { getBobaContractAt } from '@boba/contracts'
 
 import { OptimismEnv } from './shared/env'
 
 describe('ERC20 Bridge', async () => {
   let L1ERC20: Contract
   let L2ERC20: Contract
-  let Factory__L2ERC20: ContractFactory
 
   let env: OptimismEnv
 
@@ -41,21 +38,20 @@ describe('ERC20 Bridge', async () => {
     env = await OptimismEnv.new()
 
     //let's tap into the contract we just deployed
-    L1ERC20 = new Contract(
+    L1ERC20 = await getBobaContractAt(
+      'L1ERC20',
       env.addressesBOBA.TOKENS.TEST.L1,
-      L1ERC20Json.abi,
       env.l1Wallet
     )
-    Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
     //let's tap into the contract we just deployed
-    L2ERC20 = new Contract(
+    L2ERC20 = await getBobaContractAt(
+      'L1ERC20',
       env.addressesBOBA.TOKENS.TEST.L2,
-      Factory__L2ERC20.interface,
       env.l2Wallet
     )
   })
 
-  it('{tag:other} should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
+  it('should use the recently deployed ERC20 TEST token and send some from L1 to L2', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -87,7 +83,7 @@ describe('ERC20 Bridge', async () => {
     )
   })
 
-  it('{tag:other} should transfer ERC20 TEST token to Kate', async () => {
+  it('should transfer ERC20 TEST token to Kate', async () => {
     const transferL2ERC20Amount = utils.parseEther('9')
     await depositERC20ToL2(env.l2Wallet)
     const preKateL2ERC20Balance = await L2ERC20.balanceOf(

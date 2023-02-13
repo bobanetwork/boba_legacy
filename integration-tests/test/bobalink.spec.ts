@@ -1,18 +1,16 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
+import { ethers } from 'hardhat'
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
+import { getBobaContractAt } from '@boba/contracts'
 import { bobaLinkGetQuote } from '@boba/api'
 import util from 'util'
 
 /* eslint-disable */
 const fetch = require('node-fetch')
 /* eslint-enable */
-
-import FluxAggregatorHCJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
-import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
 import { waitForAndExecute } from './shared/utils'
@@ -60,15 +58,14 @@ describe('BobaLink Test\n', async () => {
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
 
-    L2BOBAToken = new Contract(
+    L2BOBAToken = await getBobaContractAt(
+      'L2GovernanceERC20',
       env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
       env.l2Wallet
     )
 
-    Factory__TuringHelper = new ContractFactory(
-      TuringHelperJson.abi,
-      TuringHelperJson.bytecode,
+    Factory__TuringHelper = await ethers.getContractFactory(
+      'TuringHelper',
       env.l2Wallet
     )
 
@@ -76,25 +73,25 @@ describe('BobaLink Test\n', async () => {
     console.log('Helper contract deployed at', TuringHelper.address)
     await TuringHelper.deployTransaction.wait()
 
-    EthChainLinkOracle = new Contract(
+    EthChainLinkOracle = await getBobaContractAt(
+      'FluxAggregatorHC',
       env.addressesBOBA.ETHUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
-    EthOracleHC = new Contract(
+    EthOracleHC = await getBobaContractAt(
+      'FluxAggregatorHC',
       env.addressesBOBA.Proxy__ETHUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
 
-    BtcChainLinkOracle = new Contract(
+    BtcChainLinkOracle = await getBobaContractAt(
+      'FluxAggregatorHC',
       env.addressesBOBA.WBTCUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
-    BtcOracleHC = new Contract(
+    BtcOracleHC = await getBobaContractAt(
+      'FluxAggregatorHC',
       env.addressesBOBA.Proxy__WBTCUSD_AggregatorHC,
-      FluxAggregatorHCJson.abi,
       env.l2Wallet
     )
 
