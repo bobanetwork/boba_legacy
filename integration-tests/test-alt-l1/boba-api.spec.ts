@@ -5,7 +5,7 @@ chai.use(chaiAsPromised)
 /* Imports: External */
 import { ethers, BigNumber, Contract, Wallet } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
-import { mainnetSwapL2SecondaryFeeTokenForBOBA } from '@boba/api'
+import { mainnetSwapNativeTokenForBOBA } from '@boba/api'
 import ethSigUtil from 'eth-sig-util'
 import util from 'util'
 
@@ -22,9 +22,9 @@ describe('Boba API Tests', async () => {
     env = await OptimismEnv.new()
 
     L2SecondaryFeeToken = getContractFactory('L2_L1NativeToken')
-      .attach(predeploys.L2_L1NativeToken)
+      .attach(predeploys.L2_L1NativeToken_ALT_L1)
       .connect(env.l2Wallet)
-    Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
+    Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracleAltL1')
       .attach(predeploys.Proxy__Boba_GasPriceOracle)
       .connect(env.l2Wallet)
   })
@@ -79,7 +79,7 @@ describe('Boba API Tests', async () => {
     })
 
     describe('Mainnet and Testnet', async () => {
-      it('{tag:boba} should swap L2 secondary token for BOBA', async () => {
+      it('should swap L2 secondary token for BOBA', async () => {
         const owner = env.l2Wallet_2.address
         const spender = Boba_GasPriceOracle.address
         const receivedBOBAAmount =
@@ -109,7 +109,7 @@ describe('Boba API Tests', async () => {
 
         const payload = { owner, spender, value, deadline, signature, data }
         const asyncMainnetSwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
-          mainnetSwapL2SecondaryFeeTokenForBOBA
+          mainnetSwapNativeTokenForBOBA
         )
 
         const L2SecondaryFeeTokenBalanceBefore =
@@ -179,7 +179,7 @@ describe('Boba API Tests', async () => {
 
         const payload_1 = { owner, spender, value, deadline, signature }
         const asyncMainnetSwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
-          mainnetSwapL2SecondaryFeeTokenForBOBA
+          mainnetSwapNativeTokenForBOBA
         )
         const response_1 = await asyncMainnetSwapL2SecondaryFeeTokenForBOBA(
           { body: JSON.stringify(payload_1) },
@@ -264,7 +264,7 @@ describe('Boba API Tests', async () => {
         expect(GPO_BOBABalanceAfter).to.be.deep.eq(GPO_BOBABalanceBefore)
       })
 
-      it('{tag:boba} should return reverted reason from API if Boba_GasPriceOracle has insufficient BOBA', async () => {
+      it('should return reverted reason from API if Boba_GasPriceOracle has insufficient BOBA', async () => {
         // withdraw BOBA first
         await Boba_GasPriceOracle.connect(gasPriceOracleWallet).withdrawBOBA()
         const Boba_GasPriceOracleBalance = await env.l2Provider.getBalance(
@@ -300,7 +300,7 @@ describe('Boba API Tests', async () => {
 
         const payload = { owner, spender, value, deadline, signature, data }
         const asyncMainnetSwapL2SecondaryFeeTokenForBOBA: any = util.promisify(
-          mainnetSwapL2SecondaryFeeTokenForBOBA
+          mainnetSwapNativeTokenForBOBA
         )
 
         const L2SecondaryFeeTokenBalanceBefore =

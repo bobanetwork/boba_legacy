@@ -1,24 +1,14 @@
 /* Imports: External */
-import { utils, Wallet, providers, Transaction, Contract } from 'ethers'
+import { Wallet, providers, Transaction, Contract } from 'ethers'
 import {
   TransactionResponse,
   TransactionReceipt,
 } from '@ethersproject/providers'
 import { sleep } from '@eth-optimism/core-utils'
-import {
-  CrossChainMessenger,
-  MessageStatus,
-  MessageDirection,
-  DEFAULT_L2_CONTRACT_ADDRESSES,
-  StandardBridgeAdapter,
-  ETHBridgeAdapter,
-} from '@eth-optimism/sdk'
-
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
+import { CrossChainMessenger, MessageStatus, MessageDirection } from '@eth-optimism/sdk'
 
 /* Imports: Internal */
 import {
-  //getAddressManager,
   l1Provider,
   l2Provider,
   replicaProvider,
@@ -33,13 +23,9 @@ import {
   l2Wallet_4,
   getL2BOBA,
   l2BobalinkWallet,
-  fundUser,
   getL1Bridge,
-  //getL2Bridge,
-  //IS_LIVE_NETWORK,
   getBASEDeployerAddresses,
   getBOBADeployerAddresses,
-  envConfig,
 } from './utils'
 
 export interface CrossDomainMessagePair {
@@ -52,25 +38,12 @@ export interface CrossDomainMessagePair {
 // Helper class for instantiating a test environment with a funded account
 export class OptimismEnv {
   // L1 Contracts
-  //addressManager: Contract
   addressesBASE
   addressesBOBA
   l1Bridge: Contract
-  //l1Messenger: Contract
-  //l1BlockNumber: Contract
-  //ctc: Contract
-  //scc: Contract
 
   // L2 Contracts
   L2BOBA: Contract
-  //l2Bridge: Contract
-  //l2Messenger: Contract
-  //gasPriceOracle: Contract
-  //sequencerFeeVault: Contract
-
-  // The L1 <> L2 State watcher
-  //watcher: Watcher
-  //watcherFast: Watcher
 
   // The wallets
   l1Wallet: Wallet
@@ -95,15 +68,7 @@ export class OptimismEnv {
     this.addressesBASE = args.addressesBASE
     this.addressesBOBA = args.addressesBOBA
     this.l1Bridge = args.l1Bridge
-    //this.l1Messenger = args.l1Messenger
-    //this.l1BlockNumber = args.l1BlockNumber
     this.L2BOBA = args.L2BOBA
-    //this.l2Bridge = args.l2Bridge
-    //this.l2Messenger = args.l2Messenger
-    //this.gasPriceOracle = args.gasPriceOracle
-    //this.sequencerFeeVault = args.sequencerFeeVault
-    //this.watcher = args.watcher
-    //this.watcherFast = args.watcherFast
     this.l1Wallet = args.l1Wallet
     this.l2Wallet = args.l2Wallet
     this.messenger = args.messenger
@@ -119,8 +84,6 @@ export class OptimismEnv {
     this.l2Provider = args.l2Provider
     this.verifierProvider = args.verifierProvider
     this.replicaProvider = args.replicaProvider
-    //this.ctc = args.ctc
-    //this.scc = args.scc
   }
 
   static async new(): Promise<OptimismEnv> {
@@ -150,16 +113,6 @@ export class OptimismEnv {
       fastRelayer: true,
     })
 
-    // fund the user if needed
-    const balance = await l2Wallet.getBalance()
-    const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
-    const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
-    if (balance.lt(utils.parseEther(min))) {
-      // NEED TO FIX
-      // await fundUser(messenger, utils.parseEther(topUp))
-      console.error('NEED TO FIX - fundUser')
-    }
-
     return new OptimismEnv({
       addressesBASE,
       addressesBOBA,
@@ -182,127 +135,6 @@ export class OptimismEnv {
       l1Bridge,
     })
   }
-  //   //const addressManager = getAddressManager(l1Wallet)
-  // const addressesBOBA = await getBOBADeployerAddresses()
-
-  //   const watcher = await initWatcherOld(l1Provider, l2Provider, addressManager)
-  //   const watcherFast = await initWatcherFastOld(
-  //     l1Provider,
-  //     l2Provider,
-  //     addressManager
-  //   )
-  //   const l1Bridge = await getL1Bridge(l1Wallet, addressManager)
-
-  //   const l1MessengerAddress = await addressManager.getAddress(
-  //     'Proxy__OVM_L1CrossDomainMessenger'
-  //   )
-  //   const l2MessengerAddress = await addressManager.getAddress(
-  //     'L2CrossDomainMessenger'
-  //   )
-
-  //   const l1Messenger = getContractFactory('L1CrossDomainMessenger')
-  //     .connect(l1Wallet)
-  //     .attach(l1MessengerAddress)
-
-  //   const l1MessengerOld = getContractFactory('L1CrossDomainMessenger')
-  //     .connect(l1Wallet)
-  //     .attach(watcher.l1.messengerAddress)
-
-  //   const l1MessengerFastOld = getContractFactory('IL1CrossDomainMessenger')
-  //     .connect(l1Wallet)
-  //     .attach(watcherFast.l1.messengerAddress)
-
-  //   const ovmEth = getOvmEth(l2Wallet)
-  //   const l2Bridge = await getL2Bridge(l2Wallet)
-
-  //   const l2MessengerOld = getContractFactory('L2CrossDomainMessenger')
-  //     .connect(l2Wallet)
-  //     .attach(watcher.l2.messengerAddress)
-
-  //   const l2Messenger = getContractFactory('L2CrossDomainMessenger')
-  //     .connect(l2Wallet)
-  //     .attach(l2MessengerAddress)
-
-  //   const ctcAddress = await addressManager.getAddress(
-  //     'CanonicalTransactionChain'
-  //   )
-  //   const ctc = getContractFactory('CanonicalTransactionChain')
-  //     .connect(l1Wallet)
-  //     .attach(ctcAddress)
-
-  //   const gasPriceOracle = getContractFactory('OVM_GasPriceOracle')
-  //     .connect(l2Wallet_4)
-  //     .attach(predeploys.OVM_GasPriceOracle)
-
-  //   const sccAddress = await addressManager.getAddress('StateCommitmentChain')
-  //   const scc = getContractFactory('StateCommitmentChain')
-  //     .connect(l1Wallet)
-  //     .attach(sccAddress)
-
-  //   const sequencerFeeVault = getContractFactory('OVM_SequencerFeeVault')
-  //     .connect(l2Wallet)
-  //     .attach(predeploys.OVM_SequencerFeeVault)
-
-  //   const l1BlockNumber = getContractFactory('iOVM_L1BlockNumber')
-  //     .connect(l2Wallet)
-  //     .attach(predeploys.OVM_L1BlockNumber)
-
-  //   const messenger = new CrossChainMessenger({
-  //     l1SignerOrProvider: l1Wallet,
-  //     l2SignerOrProvider: l2Wallet,
-  //     l1ChainId: network.chainId,
-  //     contracts: {
-  //       l1: {
-  //         AddressManager: envConfig.ADDRESS_MANAGER,
-  //         L1CrossDomainMessenger: l1Messenger.address,
-  //         L1StandardBridge: l1Bridge.address,
-  //         StateCommitmentChain: sccAddress,
-  //         CanonicalTransactionChain: ctcAddress,
-  //         BondManager: await addressManager.getAddress('BondManager'),
-  //       },
-  //     },
-  //   })
-
-  //   // fund the user if needed
-  //   const balance = await l2Wallet.getBalance()
-  //   const min = envConfig.L2_WALLET_MIN_BALANCE_ETH.toString()
-  //   const topUp = envConfig.L2_WALLET_TOP_UP_AMOUNT_ETH.toString()
-  //   if (balance.lt(utils.parseEther(min))) {
-  //     await fundUser(messenger, utils.parseEther(topUp))
-  //   }
-
-  //   return new OptimismEnv({
-  //     addressManager,
-  //     addressesBOBA,
-  //     l1Bridge,
-  //     ctc,
-  //     scc,
-  //     l1Messenger,
-  //     l1BlockNumber,
-  //     l1MessengerOld,
-  //     l1MessengerFastOld,
-  //     ovmEth,
-  //     gasPriceOracle,
-  //     sequencerFeeVault,
-  //     l2Bridge,
-  //     l2Messenger,
-  //     watcher,
-  //     watcherFast,
-  //     l1Wallet,
-  //     l2Wallet,
-  //     l1Wallet_2,
-  //     l2Wallet_2,
-  //     l1Wallet_3,
-  //     l2Wallet_3,
-  //     l1Wallet_4,
-  //     l2Wallet_4,
-  //     messenger,
-  //     l1Provider,
-  //     l2Provider,
-  //     verifierProvider,
-  //     replicaProvider,
-  //   })
-  // }
 
   async waitForXDomainTransaction(
     tx: Promise<TransactionResponse> | TransactionResponse

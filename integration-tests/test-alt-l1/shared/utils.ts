@@ -10,14 +10,7 @@ import {
 } from 'ethers'
 import { getContractInterface,predeploys } from '@eth-optimism/contracts'
 import { remove0x, sleep } from '@eth-optimism/core-utils'
-import {
-  CrossChainMessenger,
-  NumberLike,
-  asL2Provider,
-  DEFAULT_L2_CONTRACT_ADDRESSES,
-  StandardBridgeAdapter,
-  ETHBridgeAdapter,
-} from '@eth-optimism/sdk'
+import { asL2Provider } from '@eth-optimism/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
@@ -45,7 +38,7 @@ export const DEFAULT_TEST_GAS_L1 = 330_000
 export const DEFAULT_TEST_GAS_L2 = 1_300_000
 export const ON_CHAIN_GAS_PRICE = 'onchain'
 export const GWEI = BigNumber.from(1e9)
-export const L2_BOBA_ADDRESS = predeploys.L2_BOBA
+export const L2_BOBA_ADDRESS = predeploys.L2_BOBA_ALT_L1
 
 // { chainID: gasLimit }
 // The default gas limit for L1 transaction is 9_000_000
@@ -219,7 +212,7 @@ export const BASE_URL =
 
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
-  const l1BridgeInterface = getContractInterface('L1StandardBridge')
+  const l1BridgeInterface = getContractInterface('L1StandardBridgeAltL1')
   const ProxyBridgeAddress = bridgeAddress
 
   if (
@@ -245,38 +238,6 @@ export const getL2BOBA = (wallet: Wallet) => {
   )
 
   return L2_BOBA
-}
-
-// NEED TO FIX
-export const fundUser = async (
-  messenger: CrossChainMessenger,
-  amount: NumberLike,
-  recipient?: string
-) => {
-  console.log("DEPOSIT ETH");
-
-  const mes = await messenger.depositNativeToken(amount, {
-    l2GasLimit: DEFAULT_TEST_GAS_L2,
-    // overrides: {
-    //   gasPrice: DEFAULT_TEST_GAS_L1,
-    // },
-  });
-
-  console.log("WAIT FOR RECEIPT");
-
-  await messenger.waitForMessageReceipt(
-    mes
-  )
-
-  console.log("TRANSFER");
-
-  if (recipient !== undefined) {
-    const tx = await messenger.l2Signer.sendTransaction({
-      to: recipient,
-      value: amount,
-    })
-    await tx.wait()
-  }
 }
 
 export const approveERC20 = async (

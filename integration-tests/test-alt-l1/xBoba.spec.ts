@@ -12,7 +12,7 @@ import { isNonEthereumChain } from './shared/utils'
 describe('xBOBA Test', async () => {
   const isMB = await isNonEthereumChain()
   if (isMB) {
-    console.log('Skipping xBOBA tests on Moonbeam')
+    console.log('Skipping xBOBA tests on non-Ethereum chains.')
     return
   }
 

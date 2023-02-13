@@ -434,22 +434,3 @@ export const waitForAndExecute = async (
     }
   }
 }
-
-// // eslint-disable-next-line @typescript-eslint/no-shadow
-// export const isMainnet = async () => {
-//   const chainId = await l1Wallet.getChainId()
-//   return chainId === 1
-// }
-
-// export const gasPriceForL1 = async () => {
-//   if (env.L1_GAS_PRICE === ON_CHAIN_GAS_PRICE) {
-//     return l1Wallet.getGasPrice()
-//   }
-
-//   return utils.parseUnits(env.L1_GAS_PRICE, 'wei')
-// }
-
-// export const isHardhat = async () => {
-//   const chainId = await l1Wallet.getChainId()
-//   return chainId === HARDHAT_CHAIN_ID
-// }

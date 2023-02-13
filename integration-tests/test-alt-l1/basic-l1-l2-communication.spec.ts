@@ -15,7 +15,6 @@ import {
   DEFAULT_TEST_GAS_L1,
   DEFAULT_TEST_GAS_L2,
   envConfig,
-  withdrawalTest,
 } from './shared/utils'
 
 describe('Basic L1<>L2 Communication', async () => {
@@ -53,7 +52,7 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L2 => L1', () => {
-    it('{tag:other} should be able to perform a withdrawal from L2 -> L1', async () => {
+    it('should be able to perform a withdrawal from L2 -> L1', async () => {
       const value = `0x${'77'.repeat(32)}`
 
       // Send L2 -> L1 message.
@@ -97,7 +96,7 @@ describe('Basic L1<>L2 Communication', async () => {
   })
 
   describe('L1 => L2', () => {
-    it('{tag:other} should deposit from L1 -> L2', async () => {
+    it('should deposit from L1 -> L2', async () => {
       const value = `0x${'42'.repeat(32)}`
 
       // Send L1 -> L2 message.
@@ -136,7 +135,7 @@ describe('Basic L1<>L2 Communication', async () => {
       expect((await L2SimpleStorage.totalCount()).toNumber()).to.equal(1)
     })
 
-    it('{tag:other} should deposit from L1 -> L2 directly via enqueue', async function () {
+    it('should deposit from L1 -> L2 directly via enqueue', async function () {
       this.timeout(
         envConfig.MOCHA_TIMEOUT * 2 +
           envConfig.DTL_ENQUEUE_CONFIRMATIONS * 15000

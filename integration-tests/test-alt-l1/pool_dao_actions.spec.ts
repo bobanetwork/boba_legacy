@@ -24,7 +24,7 @@ import { isNonEthereumChain } from './shared/utils'
 describe('Dao Action Test', async () => {
   const isMB = await isNonEthereumChain()
   if (isMB) {
-    console.log('Skipping NFT Bridge tests on Moonbeam')
+    console.log('Skipping DAO tests on Non-Ethereum chains.')
     return
   }
   let Factory__GovernorBravoDelegate: ContractFactory

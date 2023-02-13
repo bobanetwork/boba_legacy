@@ -1,21 +1,16 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
-import { Contract, BigNumber, utils, ethers, ContractFactory } from 'ethers'
+import { Contract, BigNumber, utils, ContractFactory } from 'ethers'
+import { ethers } from 'hardhat'
 
 import { getContractFactory } from '@eth-optimism/contracts'
-
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import TuringHelperJson from '../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-
-import TuringTestJson from '../artifacts/contracts/TuringTest.sol/TuringTest.json'
+import { getBobaContractAt } from '@boba/contracts'
 
 import { OptimismEnv } from './shared/env'
 import { verifyStateRoots } from './shared/state-root-verification'
 
 describe('Boba Turing Credit Test', async () => {
-  let BobaTuringHelper: Contract
   let BobaTuringCredit: Contract
   let L1StandardBridge: Contract
 
@@ -34,33 +29,31 @@ describe('Boba Turing Credit Test', async () => {
     env = await OptimismEnv.new()
 
     BobaTuringCredit = getContractFactory(
-      'BobaTuringCredit',
+      'BobaTuringCreditAltL1',
       env.l2Wallet
     ).attach(env.addressesBOBA.BobaTuringCredit)
 
-    L1BOBAToken = new Contract(
+    L1BOBAToken = await getBobaContractAt(
+      'L1ERC20',
       env.addressesBOBA.TOKENS.BOBA.L1,
-      L1ERC20Json.abi,
       env.l1Wallet
     )
 
-    L2BOBAToken = new Contract(
+    L2BOBAToken = await getBobaContractAt(
+      'L2GovernanceERC20',
       env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
       env.l2Wallet
     )
 
-    Factory__TuringHelper = new ContractFactory(
-      TuringHelperJson.abi,
-      TuringHelperJson.bytecode,
+    Factory__TuringHelper = await ethers.getContractFactory(
+      'TuringHelper',
       env.l2Wallet
     )
     TuringHelper = await Factory__TuringHelper.deploy()
     await TuringHelper.deployTransaction.wait()
 
-    Factory__TuringTest = new ContractFactory(
-      TuringTestJson.abi,
-      TuringTestJson.bytecode,
+    Factory__TuringTest = await ethers.getContractFactory(
+      'TuringTest',
       env.l2Wallet
     )
     TuringTest = await Factory__TuringTest.deploy()
@@ -141,7 +134,7 @@ describe('Boba Turing Credit Test', async () => {
     await restoreTx.wait()
   }).retries(3)
 
-  it('{tag:boba} Should increase balance for a specified Turing helper contract', async () => {
+  it('Should increase balance for a specified Turing helper contract', async () => {
     const depositAmount = utils.parseEther('100')
     const TuringHelperAddress = TuringHelper.address
 
@@ -163,7 +156,7 @@ describe('Boba Turing Credit Test', async () => {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it('{tag:boba} Should not increase balance for not Turing helper contracts', async () => {
+  it('Should not increase balance for not Turing helper contracts', async () => {
     const depositAmount = utils.parseEther('100')
 
     await expect(
@@ -173,7 +166,7 @@ describe('Boba Turing Credit Test', async () => {
     ).to.be.revertedWith('Invalid Helper Contract')
   })
 
-  it('{tag:boba} Should return the correct credit amount', async () => {
+  it('Should return the correct credit amount', async () => {
     const prepaidBalance = await BobaTuringCredit.prepaidBalance(
       env.l2Wallet.address
     )
@@ -184,7 +177,7 @@ describe('Boba Turing Credit Test', async () => {
     expect(calculatedCredit).to.be.deep.eq(credit)
   })
 
-  it('{tag:boba} Should increase balance for a non-specified test contract that has the TuringTx selector', async () => {
+  it('Should increase balance for a non-specified test contract that has the TuringTx selector', async () => {
     const depositAmount = utils.parseEther('100')
     const TuringTestAddress = TuringTest.address
 
@@ -202,7 +195,7 @@ describe('Boba Turing Credit Test', async () => {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it('{tag:boba} Should not charge credit when calling the non-specified test contract', async () => {
+  it('Should not charge credit when calling the non-specified test contract', async () => {
     const TuringTestAddress = TuringTest.address
 
     const preBalance = await BobaTuringCredit.prepaidBalance(TuringTestAddress)
@@ -224,7 +217,7 @@ describe('Boba Turing Credit Test', async () => {
     expect(returnTime).to.be.deep.eq(payloadTime)
   })
 
-  it('{tag:boba} Should not increase balance for incorrect amount', async () => {
+  it('Should not increase balance for incorrect amount', async () => {
     const depositAmount = utils.parseEther('100')
     const TuringHelperAddress = TuringHelper.address
 
@@ -241,7 +234,7 @@ describe('Boba Turing Credit Test', async () => {
     ).to.be.revertedWith('Invalid amount')
   })
 
-  it('{tag:boba} Should not increase balance for EOA accounts as helper contract address', async () => {
+  it('Should not increase balance for EOA accounts as helper contract address', async () => {
     const depositAmount = utils.parseEther('100')
 
     await expect(

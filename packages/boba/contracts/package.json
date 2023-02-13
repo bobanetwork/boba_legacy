@@ -5,10 +5,12 @@
   "private": true,
   "author": "Enya.ai",
   "license": "MIT",
+  "main": "dist/index",
   "types": "dist/index",
   "scripts": {
-    "build": "yarn build:contracts && yarn autogen:artifacts",
+    "build": "yarn build:contracts && yarn autogen:artifacts && yarn build:typescript",
     "build:contracts": "hardhat compile",
+    "build:typescript": "tsc -p ./tsconfig.json",
     "autogen:artifacts": "ts-node src/generate-artifacts.ts",
     "deploy": "ts-node \"./bin/deploy.ts\"",
     "clean": "rm -rf ./artifacts ./cache",

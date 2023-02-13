@@ -1,7 +1,6 @@
-import { Contract, utils } from 'ethers'
+import { Contract, utils, ContractFactory } from 'ethers'
 import { sleep, hexStringEquals } from '@eth-optimism/core-utils'
 import { DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { getContractArtifact } from './contract-artifacts'
 
 const waitUntilTrue = async (
@@ -65,8 +64,38 @@ export const getDeploymentSubmission = (
   }
 }
 
+/**
+ * deploying a contract uses ethers
+ *
+ * @param name name of contract
+ * @param args input arguments for contract constructor
+ * @param signer signer wallet
+ * @returns contract
+ */
+export const deployBobaContractCore = async (
+  name: string,
+  args: any[],
+  signer: any
+) => {
+  const abi = await getBobaContractABI(name)
+  const bytecode = await getBobaContractBytecode(name)
+  const factory = new ContractFactory(abi, bytecode, signer)
+  const deployedContract = await factory.deploy(...args)
+  await deployedContract.deployTransaction.wait()
+  return deployedContract
+}
+
+/**
+ * deploying a contract uses @nomiclabs/hardhat-ethers
+ *
+ * @param hre hardhat runtime environment
+ * @param name name of contract
+ * @param args input arguments for contract constructor
+ * @param signer signer wallet
+ * @returns contract
+ */
 export const deployBobaContract = async (
-  hre: HardhatRuntimeEnvironment,
+  hre: any,
   name: string,
   args: any[],
   signer: any
@@ -89,4 +118,8 @@ export const getBobaContractAt = async (
 
 export const getBobaContractABI = (name: string) => {
   return getContractArtifact(name).abi
+}
+
+export const getBobaContractBytecode = (name: string) => {
+  return getContractArtifact(name).bytecode
 }

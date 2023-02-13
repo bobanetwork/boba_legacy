@@ -30,7 +30,6 @@ export const verifyStateRoots = async () => {
     startBlock,
     l1BlockNumber
   )
-  console.log(events.length)
   if (events.length === 0) {
     console.log('There were no StateBatchAppended events')
     return false
