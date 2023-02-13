@@ -2,8 +2,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import BundlerHelperJson from '../artifacts/contracts/bundler/BundlerHelper.sol/BundlerHelper.json'
-import { DeterministicDeployer } from '../../bundler/packages/sdk/src/DeterministicDeployer'
-// import { DeterministicDeployer } from '@account-abstraction/sdk'
+import { DeterministicDeployer } from '@account-abstraction/sdk'
 
 const sleep = async (ms: number): Promise<void> => {
   return new Promise<void>((resolve) => {

@@ -2,6 +2,37 @@
 # yarn lockfile v1
 
 
+"@account-abstraction/contracts@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@account-abstraction/contracts/-/contracts-0.2.0.tgz#d353fd4b26d8867a3c0067fc0e20da03c99ca2dd"
+  integrity sha512-CbPYA7o55u1S5Fee5qIWffD/4dxJ7v+86Si8TOUOE/tAMUWP+nzU1kHKUwFrM/HT8OxAQpeXccCD4UtROLtfwA==
+
+"@account-abstraction/sdk@file:./../bundler/packages/sdk/account-abstraction-sdk-v0.2.3.tgz":
+  version "0.2.3"
+  resolved "file:./../bundler/packages/sdk/account-abstraction-sdk-v0.2.3.tgz#011bb915a6d9bafebe7b3f14a03f8a38110678be"
+  dependencies:
+    "@account-abstraction/contracts" "^0.2.0"
+    "@account-abstraction/utils" "^0.2.3"
+    "@ethersproject/abstract-provider" "^5.5.0"
+    "@ethersproject/abstract-signer" "^5.5.0"
+    "@ethersproject/networks" "^5.5.0"
+    "@ethersproject/properties" "^5.5.0"
+    "@ethersproject/providers" "^5.5.0"
+    "@types/debug" "^4.1.7"
+    debug "^4.3.4"
+    ethers "^5.5.4"
+
+"@account-abstraction/utils@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@account-abstraction/utils/-/utils-0.2.3.tgz#13f56cd47aa546cbd2896884dab58f715bb0a8d2"
+  integrity sha512-t6i4/aJ2544fr5H1WjRIP/G4vw38+zyLF9xYsJ+ZYkjzVDWnilfiMr5D8ragJ0TRadupHJ6LGeBfOMiJu1YtBQ==
+  dependencies:
+    "@account-abstraction/contracts" "^0.2.0"
+    "@ethersproject/abi" "^5.7.0"
+    "@ethersproject/providers" "^5.7.0"
+    "@openzeppelin/contracts" "^4.7.3"
+    ethers "^5.7.0"
+
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -2061,7 +2092,7 @@
     "@ethersproject/bytes" "^5.7.0"
     "@ethersproject/sha2" "^5.7.0"
 
-"@ethersproject/properties@5.7.0", "@ethersproject/properties@>=5.0.0-beta.131", "@ethersproject/properties@^5.7.0":
+"@ethersproject/properties@5.7.0", "@ethersproject/properties@>=5.0.0-beta.131", "@ethersproject/properties@^5.5.0", "@ethersproject/properties@^5.7.0":
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/properties/-/properties-5.7.0.tgz#a6e12cb0439b878aaf470f1902a176033067ed30"
   integrity sha512-J87jy8suntrAkIZtecpxEPxY//szqr1mlBaYlQ0r4RCaiD2hjheqF9s1LVE8vVuJCXisjIP+JgtK/Do54ej4Sw==
@@ -4870,6 +4901,11 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.8.0.tgz#6854c37df205dd2c056bdfa1b853f5d732109109"
   integrity sha512-AGuwhRRL+NaKx73WKRNzeCxOCOCxpaqF+kp8TJ89QzAipSwZy/NoflkWaL9bywXFRhIzXt8j38sfF7KBKCPWLw==
 
+"@openzeppelin/contracts@^4.7.3":
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.8.1.tgz#709cfc4bbb3ca9f4460d60101f15dac6b7a2d5e4"
+  integrity sha512-xQ6eUZl+RDyb/FiZe1h+U7qr/f4p/SrTSQcTPH2bjur3C5DbuW/zFgCU/b1P/xcIaEqJep+9ju4xDRi3rmChdQ==
+
 "@openzeppelin/test-helpers@^0.5.15":
   version "0.5.16"
   resolved "https://registry.yarnpkg.com/@openzeppelin/test-helpers/-/test-helpers-0.5.16.tgz#2c9054f85069dfbfb5e8cef3ed781e8caf241fb3"
@@ -5610,6 +5646,13 @@
   resolved "https://registry.yarnpkg.com/@types/d3-time/-/d3-time-2.1.1.tgz#743fdc821c81f86537cbfece07093ac39b4bc342"
   integrity sha512-9MVYlmIgmRR31C5b4FVSWtuMmBHh2mOWQYfl7XAYOa8dsnb7iEmUmRSWSFgXFtkjxO65d7hTUHQC+RhR/9IWFg==
 
+"@types/debug@^4.1.7":
+  version "4.1.7"
+  resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.7.tgz#7cc0ea761509124709b8b2d1090d8f6c17aadb82"
+  integrity sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==
+  dependencies:
+    "@types/ms" "*"
+
 "@types/eslint-scope@^3.7.3":
   version "3.7.4"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.4.tgz#37fc1223f0786c39627068a12e94d6e6fc61de16"
@@ -5813,6 +5856,11 @@
   integrity sha512-cXoc4k+6+YAllH3ZHmx4hf7La1dzUk6keTR4bF4b4Sc0mZxU/zK4wO7l+ZzezXm/jkYj/qC+uYGZrarZdIVvyQ==
   dependencies:
     "@types/node" "*"
+
+"@types/ms@*":
+  version "0.7.31"
+  resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.31.tgz#31b7ca6407128a3d2bbc27fe2d21b345397f6197"
+  integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
 "@types/node-fetch@^2.5.10", "@types/node-fetch@^2.5.5":
   version "2.6.2"
