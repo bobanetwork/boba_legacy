@@ -38,7 +38,7 @@ CURL_L1_CHAIN_ID=$(
   --retry-delay 3 \
   --retry-connrefused \
   -X POST \
-  -d '{"jsonrpc":"2.0","id":1,"method":"eth_chainId","params":[]}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"eth_chainId","params":[]}' \
   $L1_URL
 )
 L1_CHAIN_ID=$(echo $CURL_L1_CHAIN_ID | jq -r '.result')
