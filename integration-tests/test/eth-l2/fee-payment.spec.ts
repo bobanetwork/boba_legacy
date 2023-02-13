@@ -1,16 +1,12 @@
 /* Imports: External */
-import { ethers, BigNumber, Contract, utils, ContractFactory } from 'ethers'
-import { sleep } from '@eth-optimism/core-utils'
-import { serialize } from '@ethersproject/transactions'
+import { ethers, BigNumber, Contract, utils } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
+import { deployBobaContractCore } from '@boba/contracts'
 
 /* Imports: Internal */
 import { expect } from './shared/setup'
 import { hardhatTest, gasPriceOracleWallet } from './shared/utils'
 import { OptimismEnv } from './shared/env'
-
-/* Imports: ABI */
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 const initialSupply = utils.parseEther('10000000000')
 const tokenName = 'JLKN'
@@ -30,7 +26,6 @@ const setPrices = async (env: OptimismEnv, value: number | BigNumber) => {
 describe('Fee Payment Integration Tests', async () => {
   let env: OptimismEnv
 
-  let Factory__L2ERC20: ContractFactory
   let L2ERC20: Contract
 
   const other = '0x1234123412341234123412341234123412341234'
@@ -38,22 +33,15 @@ describe('Fee Payment Integration Tests', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    Factory__L2ERC20 = new ContractFactory(
-      L1ERC20Json.abi,
-      L1ERC20Json.bytecode,
+    L2ERC20 = await deployBobaContractCore(
+      'L1ERC20',
+      [initialSupply, tokenName, tokenSymbol, 18],
       env.l2Wallet
     )
-    L2ERC20 = await Factory__L2ERC20.deploy(
-      initialSupply,
-      tokenName,
-      tokenSymbol,
-      18
-    )
-    await L2ERC20.deployTransaction.wait()
   })
 
   hardhatTest(
-    `{tag:other} should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice`,
+    `should return eth_gasPrice equal to OVM_GasPriceOracle.gasPrice`,
     async () => {
       const assertGasPrice = async () => {
         const gasPrice = await env.l2Wallet.getGasPrice()
@@ -75,7 +63,7 @@ describe('Fee Payment Integration Tests', async () => {
     }
   )
 
-  it('{tag:other} Paying a nonzero but acceptable gasPrice fee', async () => {
+  it('Paying a nonzero but acceptable gasPrice fee', async () => {
     await setPrices(env, 1000)
 
     const amount = utils.parseEther('0.0000001')
@@ -112,7 +100,7 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should compute correct fee', async () => {
+  it('should compute correct fee', async () => {
     await setPrices(env, 1000)
 
     const preBalance = await env.l2Wallet.getBalance()
@@ -144,7 +132,7 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should compute correct fee with different gas limit', async () => {
+  it('should compute correct fee with different gas limit', async () => {
     await setPrices(env, 1000)
 
     const WETH = getContractFactory('OVM_ETH')
@@ -187,13 +175,13 @@ describe('Fee Payment Integration Tests', async () => {
     await setPrices(env, 1)
   })
 
-  it('{tag:other} should not be able to withdraw fees before the minimum is met', async () => {
+  it('should not be able to withdraw fees before the minimum is met', async () => {
     await expect(env.messenger.contracts.l2.OVM_SequencerFeeVault.withdraw()).to
       .be.rejected
   })
 
   hardhatTest(
-    '{tag:other} should be able to withdraw fees back to L1 once the minimum is met',
+    'should be able to withdraw fees back to L1 once the minimum is met',
     async () => {
       const l1FeeWallet =
         await env.messenger.contracts.l2.OVM_SequencerFeeVault.l1FeeWallet()
@@ -230,7 +218,7 @@ describe('Fee Payment Integration Tests', async () => {
   )
 
   // The configuration of allowing the different gas price shouldn't go into the production
-  it('{tag:other} should compute correct fee with different gas price', async () => {
+  it('should compute correct fee with different gas price', async () => {
     await setPrices(env, 1)
 
     const WETH = getContractFactory('OVM_ETH')
@@ -269,7 +257,7 @@ describe('Fee Payment Integration Tests', async () => {
     }
   })
 
-  it('{tag:other} should transfer all ETH with correct gas limit', async () => {
+  it('should transfer all ETH with correct gas limit', async () => {
     await setPrices(env, 1000)
     const randomWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
 
@@ -329,7 +317,7 @@ describe('Fee Payment Integration Tests', async () => {
   })
 
   // https://github.com/bobanetwork/boba/pull/22
-  it('{tag:other} should be able to configure l1 gas price in a rare situation', async () => {
+  it('should be able to configure l1 gas price in a rare situation', async () => {
     // This blocks all txs, because the gas usage for the l1 security fee is too large
     const gasPrice =
       await env.messenger.contracts.l2.OVM_GasPriceOracle.connect(

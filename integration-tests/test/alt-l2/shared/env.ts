@@ -88,16 +88,21 @@ export class OptimismEnv {
 
   static async new(): Promise<OptimismEnv> {
     const addressesBASE = await getBASEDeployerAddresses()
+    console.log('addressesBASE', addressesBASE)
     const addressesBOBA = await getBOBADeployerAddresses()
+    console.log('addressesBOBA', addressesBOBA)
 
     const l1Bridge = await getL1Bridge(
       l1Wallet,
       addressesBASE.Proxy__L1StandardBridge
     )
+    console.log('l1Bridge', l1Bridge)
 
     const network = await l1Provider.getNetwork()
+    console.log('network', network)
 
     const L2BOBA = getL2BOBA(l2Wallet)
+    console.log('L2BOBA', L2BOBA)
 
     const messenger = new CrossChainMessenger({
       l1SignerOrProvider: l1Wallet,
@@ -112,7 +117,7 @@ export class OptimismEnv {
       l1ChainId: network.chainId,
       fastRelayer: true,
     })
-
+    console.log('DONE!')
     return new OptimismEnv({
       addressesBASE,
       addressesBOBA,

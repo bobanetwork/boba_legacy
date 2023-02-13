@@ -1,26 +1,15 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
-import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
+import { ethers } from 'hardhat'
+import { Contract, BigNumber, utils } from 'ethers'
+import { getContractFactory, predeploys } from '@eth-optimism/contracts'
+import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
 
 import { expectLogs, isNonEthereumChain, getGasLimitOption } from './shared/utils'
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-
-import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
-import L2TokenPoolJson from '@boba/contracts/artifacts/contracts/TokenPool.sol/TokenPool.json'
-import OMGLikeTokenJson from '@boba/contracts/artifacts/contracts/test-helpers/OMGLikeToken.sol/OMGLikeToken.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import xL2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
-import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
-
 import { OptimismEnv } from './shared/env'
 
 describe('Liquidity Pool Test', async () => {
-  let Factory__L1ERC20: ContractFactory
-  let Factory__L2ERC20: ContractFactory
-
   let L1LiquidityPool: Contract
   let L2LiquidityPool: Contract
   let L1ERC20: Contract
@@ -39,10 +28,12 @@ describe('Liquidity Pool Test', async () => {
 
   let L1BOBAToken: Contract
   let L2BOBAToken: Contract
-
   let L2SecondaryFeeToken: Contract
 
   let BOBABillingContract: Contract
+
+  let L1LiquidityPoolABI: any
+  let L2LiquidityPoolABI: any
 
   let env: OptimismEnv
 
@@ -55,18 +46,6 @@ describe('Liquidity Pool Test', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    Factory__L1ERC20 = new ContractFactory(
-      L1ERC20Json.abi,
-      L1ERC20Json.bytecode,
-      env.l1Wallet
-    )
-
-    const Factory__OMGLikeToken = new ContractFactory(
-      OMGLikeTokenJson.abi,
-      OMGLikeTokenJson.bytecode,
-      env.l1Wallet
-    )
-
     const L1StandardBridgeAddress = await env.addressesBASE
       .Proxy__L1StandardBridge
 
@@ -78,82 +57,80 @@ describe('Liquidity Pool Test', async () => {
     const L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
 
     //we deploy a new erc20, so tests won't fail on a rerun on the same contracts
-    L1ERC20 = await Factory__L1ERC20.deploy(
-      initialSupply,
-      tokenName,
-      tokenSymbol,
-      18
+    L1ERC20 = await deployBobaContractCore(
+      'L1ERC20',
+      [initialSupply, tokenName, tokenSymbol, 18],
+      env.l1Wallet,
     )
-    await L1ERC20.deployTransaction.wait()
 
-    OMGLIkeToken = await Factory__OMGLikeToken.deploy()
-    await OMGLIkeToken.deployTransaction.wait()
+    OMGLIkeToken = await deployBobaContractCore(
+      'OMGLikeToken',
+      [],
+      env.l1Wallet,
+    )
 
-    Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
-
+    const Factory__L2ERC20 = getContractFactory(
+      'L2StandardERC20',
+      env.l2Wallet
+    )
     L2ERC20 = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress,
-      L1ERC20.address,
-      tokenName,
-      tokenSymbol,
-      18
+      L2StandardBridgeAddress, L1ERC20.address, tokenName, tokenSymbol, 18,
     )
     await L2ERC20.deployTransaction.wait()
 
     L2OMGLikeToken = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress,
-      OMGLIkeToken.address,
-      'OMG',
-      'OMG',
-      18
+      L2StandardBridgeAddress, OMGLIkeToken.address, 'OMG', 'OMG', 18,
     )
     await L2OMGLikeToken.deployTransaction.wait()
 
-    L1LiquidityPool = new Contract(
+    L1LiquidityPool = await getBobaContractAt(
+      'L1LiquidityPool',
       env.addressesBOBA.Proxy__L1LiquidityPool,
-      L1LiquidityPoolJson.abi,
       env.l1Wallet
     )
 
-    L2LiquidityPool = new Contract(
+    L2LiquidityPool = await getBobaContractAt(
+      'L2LiquidityPoolAltL1',
       env.addressesBOBA.Proxy__L2LiquidityPool,
-      L2LiquidityPoolJson.abi,
       env.l2Wallet
     )
 
-    L2TokenPool = new Contract(
+    L2TokenPool = await getBobaContractAt(
+      'TokenPool',
       env.addressesBOBA.L2TokenPool,
-      L2TokenPoolJson.abi,
       env.l2Wallet
     )
 
-    L1BOBAToken = new Contract(
+    L1BOBAToken = await getBobaContractAt(
+      'L1ERC20',
       env.addressesBOBA.TOKENS.BOBA.L1,
-      L1ERC20Json.abi,
       env.l1Wallet
     )
 
-    L2BOBAToken = new Contract(
+    L2BOBAToken = await getBobaContractAt(
+      'L2GovernanceERC20',
       env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
       env.l2Wallet
     )
 
-    BOBABillingContract = new Contract(
+    BOBABillingContract = await getBobaContractAt(
+      'L2BillingContract',
       env.addressesBOBA.Proxy__BobaBillingContract,
-      L2BillingContractJson.abi,
       env.l2Wallet
     )
 
     L2SecondaryFeeToken = getContractFactory(
       'L2_L1NativeToken',
       env.l2Wallet
-    ).attach(predeploys.L2_L1NativeToken)
+    ).attach(predeploys.L2_L1NativeToken_ALT_L1)
 
     gasLimitOption = await getGasLimitOption(env.l1Provider)
+
+    L1LiquidityPoolABI = await getBobaContractABI('L1LiquidityPool')
+    L2LiquidityPoolABI = await getBobaContractABI('L2LiquidityPoolAltL1')
   })
 
-  it('{tag:mrf} should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
+  it('should deposit 10000 TEST ERC20 token from L1 to L2', async () => {
     const depositL2ERC20Amount = utils.parseEther('10000')
 
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -187,7 +164,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('{tag:mrf} should transfer L2 ERC20 TEST token from Bob to Alice and Kate', async () => {
+  it('should transfer L2 ERC20 TEST token from Bob to Alice and Kate', async () => {
     const transferL2ERC20Amount = utils.parseEther('150')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -235,7 +212,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('{tag:mrf} should add 1000 ERC20 TEST tokens to the L2 token pool', async () => {
+  it('should add 1000 ERC20 TEST tokens to the L2 token pool', async () => {
     const addL2TPAmount = utils.parseEther('1000')
 
     const approveL2TPTX = await L2ERC20.approve(
@@ -257,7 +234,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L2TPBalance).to.deep.eq(addL2TPAmount)
   })
 
-  it('{tag:mrf} should register L1 the pool', async () => {
+  it('should register L1 the pool', async () => {
     const registerPoolERC20TX = await L1LiquidityPool.registerPool(
       L1ERC20.address,
       L2ERC20.address
@@ -277,10 +254,10 @@ describe('Liquidity Pool Test', async () => {
       '0x0000000000000000000000000000000000000000'
     )
     // console.log(poolETHInfo.l2TokenAddress)
-    expect(poolETHInfo.l2TokenAddress).to.deep.eq(predeploys.L2_L1NativeToken)
+    expect(poolETHInfo.l2TokenAddress).to.deep.eq(predeploys.L2_L1NativeToken_ALT_L1)
   })
 
-  it('{tag:mrf} should register L2 the pool', async () => {
+  it('should register L2 the pool', async () => {
     const registerPoolERC20TX = await L2LiquidityPool.registerPool(
       L1ERC20.address,
       L2ERC20.address
@@ -293,16 +270,16 @@ describe('Liquidity Pool Test', async () => {
     expect(poolERC20Info.l2TokenAddress).to.deep.eq(L2ERC20.address)
 
     const poolETHInfo = await L2LiquidityPool.poolInfo(
-      predeploys.L2_L1NativeToken
+      predeploys.L2_L1NativeToken_ALT_L1
     )
 
     expect(poolETHInfo.l1TokenAddress).to.deep.eq(
       '0x0000000000000000000000000000000000000000'
     )
-    expect(poolETHInfo.l2TokenAddress).to.deep.eq(predeploys.L2_L1NativeToken)
+    expect(poolETHInfo.l2TokenAddress).to.deep.eq(predeploys.L2_L1NativeToken_ALT_L1)
   })
 
-  it('{tag:mrf} shouldnt update the pool', async () => {
+  it('shouldnt update the pool', async () => {
     const registerPoolTX = await L2LiquidityPool.registerPool(
       L1ERC20.address,
       L2ERC20.address,
@@ -311,7 +288,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(registerPoolTX.wait()).to.be.eventually.rejected
   })
 
-  it('{tag:mrf} should add L1 liquidity', async () => {
+  it('should add L1 liquidity', async () => {
     const addLiquidityAmount = utils.parseEther('100')
 
     const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -341,7 +318,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L1LPERC20Balance).to.deep.eq(addLiquidityAmount)
   })
 
-  it('{tag:mrf} should add L2 liquidity', async () => {
+  it('should add L2 liquidity', async () => {
     const addLiquidityAmount = utils.parseEther('100')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -407,7 +384,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L2LPERC20Balance).to.deep.eq(addLiquidityAmount.mul(2))
   })
 
-  it('{tag:mrf} should fast exit L2', async () => {
+  it('should fast exit L2', async () => {
     const fastExitAmount = utils.parseEther('10')
 
     const preKateL1ERC20Balance = await L1ERC20.balanceOf(
@@ -490,7 +467,7 @@ describe('Liquidity Pool Test', async () => {
     // check event ClientDepositL2 is emitted
     await expectLogs(
       depositTx.receipt,
-      L2LiquidityPoolJson.abi,
+      L2LiquidityPoolABI,
       L2LiquidityPool.address,
       'ClientDepositL2',
       {
@@ -503,7 +480,7 @@ describe('Liquidity Pool Test', async () => {
     // check event ClientPayL1 is emitted
     await expectLogs(
       depositTx.remoteReceipt,
-      L1LiquidityPoolJson.abi,
+      L1LiquidityPoolABI,
       L1LiquidityPool.address,
       'ClientPayL1',
       {
@@ -514,7 +491,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('{tag:mrf} should withdraw liquidity', async () => {
+  it('should withdraw liquidity', async () => {
     const withdrawAmount = utils.parseEther('10')
 
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -560,7 +537,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('{tag:mrf} shouldnt withdraw liquidity', async () => {
+  it('shouldnt withdraw liquidity', async () => {
     const withdrawAmount = utils.parseEther('100')
 
     const withdrawTX = await L2LiquidityPool.withdrawLiquidity(
@@ -572,7 +549,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(withdrawTX.wait()).to.be.eventually.rejected
   })
 
-  it('{tag:mrf} should withdraw reward from L2 pool', async () => {
+  it('should withdraw reward from L2 pool', async () => {
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
     const preBobUserInfo = await L2LiquidityPool.userInfo(
       L2ERC20.address,
@@ -601,7 +578,7 @@ describe('Liquidity Pool Test', async () => {
     expect(preL2ERC20Balance).to.deep.eq(postL2ERC20Balance.sub(pendingReward))
   })
 
-  it('{tag:mrf} should withdraw reward from L1 pool', async () => {
+  it('should withdraw reward from L1 pool', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preBobUserInfo = await L1LiquidityPool.userInfo(
       L1ERC20.address,
@@ -634,7 +611,7 @@ describe('Liquidity Pool Test', async () => {
     expect(preL1ERC20Balance).to.deep.eq(postL1ERC20Balance.sub(pendingReward))
   })
 
-  it('{tag:mrf} shouldnt withdraw reward from L2 pool', async () => {
+  it('shouldnt withdraw reward from L2 pool', async () => {
     const withdrawRewardAmount = utils.parseEther('100')
 
     const withdrawRewardTX = await L2LiquidityPool.withdrawReward(
@@ -646,7 +623,7 @@ describe('Liquidity Pool Test', async () => {
     await expect(withdrawRewardTX.wait()).to.be.eventually.rejected
   })
 
-  it('{tag:mrf} should fast onramp', async () => {
+  it('should fast onramp', async () => {
     const depositAmount = utils.parseEther('10')
 
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -700,7 +677,7 @@ describe('Liquidity Pool Test', async () => {
     // check event ClientDepositL1 is emitted
     await expectLogs(
       depositTx.receipt,
-      L1LiquidityPoolJson.abi,
+      L1LiquidityPoolABI,
       L1LiquidityPool.address,
       'ClientDepositL1',
       {
@@ -713,7 +690,7 @@ describe('Liquidity Pool Test', async () => {
     // check event ClientPayL2 is emitted
     await expectLogs(
       depositTx.remoteReceipt,
-      L2LiquidityPoolJson.abi,
+      L2LiquidityPoolABI,
       L2LiquidityPool.address,
       'ClientPayL2',
       {
@@ -729,7 +706,7 @@ describe('Liquidity Pool Test', async () => {
      If the system is working correctly, this should trigger a revert
   */
 
-  // it('{tag:mrf} 1 should revert unfulfillable swap-offs', async () => {
+  // it('1 should revert unfulfillable swap-offs', async () => {
   //   const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
   //   const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
 
@@ -785,7 +762,7 @@ describe('Liquidity Pool Test', async () => {
 
   // })
 
-  it('{tag:mrf} should revert unfulfillable swap-offs', async () => {
+  it('should revert unfulfillable swap-offs', async () => {
     const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -846,7 +823,7 @@ describe('Liquidity Pool Test', async () => {
     // expect(postBobL2ERC20Balance).to.deep.eq(preBobL2ERC20Balance.sub(exitFees))
   })
 
-  it('{tag:mrf} should revert unfulfillable swap-ons', async () => {
+  it('should revert unfulfillable swap-ons', async () => {
     const preL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -891,7 +868,7 @@ describe('Liquidity Pool Test', async () => {
     // expect(postBobL1ERC20Balance).to.deep.eq(preL1ERC20Balance.sub(swapOnFees))
   })
 
-  it('{tag:mrf} Should rebalance ERC20 from L1 to L2', async () => {
+  it('Should rebalance ERC20 from L1 to L2', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await L1ERC20.balanceOf(L1LiquidityPool.address)
@@ -918,7 +895,7 @@ describe('Liquidity Pool Test', async () => {
     // )
   })
 
-  it('{tag:mrf} Should rebalance ERC20 from L2 to L1', async () => {
+  it('Should rebalance ERC20 from L2 to L1', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await L1ERC20.balanceOf(L1LiquidityPool.address)
@@ -944,7 +921,7 @@ describe('Liquidity Pool Test', async () => {
     // )
   })
 
-  it('{tag:mrf} Should revert rebalancing LP', async () => {
+  it('Should revert rebalancing LP', async () => {
     const balanceERC20Amount = utils.parseEther('10000')
 
     await expect(
@@ -1031,7 +1008,7 @@ describe('Liquidity Pool Test', async () => {
     await AddLiquidity.wait()
   })
 
-  it('{tag:mrf} Should rebalance OMGLikeToken from L1 to L2', async () => {
+  it('Should rebalance OMGLikeToken from L1 to L2', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
@@ -1067,7 +1044,7 @@ describe('Liquidity Pool Test', async () => {
     expect(L1LPOMGLikeTokenAllowance).to.deep.eq(BigNumber.from(0))
   })
 
-  it('{tag:mrf} Should rebalance OMGLikeToken from L2 to L1', async () => {
+  it('Should rebalance OMGLikeToken from L2 to L1', async () => {
     const balanceERC20Amount = utils.parseEther('10')
 
     const preLPL1ERC20Balance = await OMGLIkeToken.balanceOf(
@@ -1096,7 +1073,7 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  it('{tag:mrf} should be able to pause L1LiquidityPool contract', async function () {
+  it('should be able to pause L1LiquidityPool contract', async function () {
     const poolOwner = await L1LiquidityPool.owner()
 
     // since tests are with deployed contracts
@@ -1146,7 +1123,7 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
-  it('{tag:mrf} should be able to pause L2LiquidityPool contract', async function () {
+  it('should be able to pause L2LiquidityPool contract', async function () {
     const poolOwner = await L2LiquidityPool.owner()
 
     // since tests are with deployed contracts
@@ -1193,7 +1170,7 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
-  it('{tag:mrf} the DAO should be able to configure fee for L2LP', async function () {
+  it('the DAO should be able to configure fee for L2LP', async function () {
     // Disable this test
     // We don't have DAO in other chains
     this.skip()
@@ -1245,7 +1222,7 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
-  it('{tag:mrf} should fail configuring L2LP fee for non DAO', async function () {
+  it('should fail configuring L2LP fee for non DAO', async function () {
     const isMB = await isNonEthereumChain()
     if (isMB) {
       this.skip()
@@ -1256,7 +1233,7 @@ describe('Liquidity Pool Test', async () => {
     ).to.be.revertedWith('Caller is not the DAO')
   })
 
-  it('{tag:mrf} the DAO should be able to configure fee for L1LP', async function () {
+  it('the DAO should be able to configure fee for L1LP', async function () {
     const isMB = await isNonEthereumChain()
     if (isMB) {
       this.skip()
@@ -1313,7 +1290,7 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
-  it('{tag:mrf} should fail configuring L1LP fee for non DAO', async function () {
+  it('should fail configuring L1LP fee for non DAO', async function () {
     const isMB = await isNonEthereumChain()
     if (isMB) {
       this.skip()
@@ -1329,7 +1306,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   describe('BOBA tests', async () => {
-    it('{tag:mrf} should add L1 liquidity', async () => {
+    it('should add L1 liquidity', async () => {
       const addLiquidityAmount = utils.parseEther('100')
 
       const preL1LPBobaBalance = await L1BOBAToken.balanceOf(
@@ -1358,7 +1335,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should add L2 liquidity', async () => {
+    it('should add L2 liquidity', async () => {
       const addLiquidityAmount = utils.parseEther('100')
 
       const approveTx = await L1BOBAToken.approve(
@@ -1369,7 +1346,7 @@ describe('Liquidity Pool Test', async () => {
 
       const deposit = env.l1Bridge.depositERC20(
         L1BOBAToken.address,
-        predeploys.L2_BOBA,
+        predeploys.L2_BOBA_ALT_L1,
         addLiquidityAmount,
         9999999,
         ethers.utils.formatBytes32String(new Date().getTime().toString())
@@ -1415,7 +1392,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should fail to fast exit L2 with incorrect inputs', async () => {
+    it('should fail to fast exit L2 with incorrect inputs', async () => {
       const fastExitAmount = utils.parseEther('10')
 
       // Approve BOBA
@@ -1454,7 +1431,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Either Amount Incorrect or Token Address Incorrect')
     })
 
-    it('{tag:mrf} should fast exit L2', async () => {
+    it('should fast exit L2', async () => {
       const fastExitAmount = utils.parseEther('10')
 
       const preBobL1BobaBalance = await L1BOBAToken.balanceOf(
@@ -1497,7 +1474,7 @@ describe('Liquidity Pool Test', async () => {
       // check event ClientDepositL2 is emitted
       await expectLogs(
         depositTx.receipt,
-        L2LiquidityPoolJson.abi,
+        L2LiquidityPoolABI,
         L2LiquidityPool.address,
         'ClientDepositL2',
         {
@@ -1510,7 +1487,7 @@ describe('Liquidity Pool Test', async () => {
       // check event ClientPayL1 is emitted
       await expectLogs(
         depositTx.remoteReceipt,
-        L1LiquidityPoolJson.abi,
+        L1LiquidityPoolABI,
         L1LiquidityPool.address,
         'ClientPayL1',
         {
@@ -1521,7 +1498,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} Should rebalance BOBA from L1 to L2', async () => {
+    it('Should rebalance BOBA from L1 to L2', async () => {
       const balanceBobaAmount = utils.parseEther('10')
 
       const preL1LPBoba = await L1BOBAToken.balanceOf(L1LiquidityPool.address)
@@ -1542,7 +1519,7 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2LPBoba).to.deep.eq(postL2LPBoba.sub(balanceBobaAmount))
     })
 
-    it('{tag:mrf} Should rebalance  from L2 to L1', async () => {
+    it('Should rebalance  from L2 to L1', async () => {
       const balanceBobaAmount = utils.parseEther('1')
 
       const preL1LPBoba = await L1BOBAToken.balanceOf(L1LiquidityPool.address)
@@ -1563,7 +1540,7 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2LPBoba).to.deep.eq(postL2LPBoba.add(balanceBobaAmount))
     })
 
-    it('{tag:mrf} Should revert rebalancing LP', async () => {
+    it('Should revert rebalancing LP', async () => {
       const balanceBobaAmount = utils.parseEther('10000')
 
       await expect(
@@ -1592,7 +1569,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.reverted
     })
 
-    it('{tag:mrf} should withdraw liquidity', async () => {
+    it('should withdraw liquidity', async () => {
       const withdrawAmount = utils.parseEther('10')
 
       const preBobUserInfo = await L2LiquidityPool.userInfo(
@@ -1618,7 +1595,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should withdraw reward from L2 pool', async () => {
+    it('should withdraw reward from L2 pool', async () => {
       const preBobUserInfo = await L2LiquidityPool.userInfo(
         env.L2BOBA.address,
         env.l2Wallet.address
@@ -1644,7 +1621,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should fast onramp', async () => {
+    it('should fast onramp', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL2BobaBalance = await env.l2Wallet.getBalance()
@@ -1678,7 +1655,7 @@ describe('Liquidity Pool Test', async () => {
       // check event ClientDepositL1 is emitted
       await expectLogs(
         depositTx.receipt,
-        L1LiquidityPoolJson.abi,
+        L1LiquidityPoolABI,
         L1LiquidityPool.address,
         'ClientDepositL1',
         {
@@ -1691,7 +1668,7 @@ describe('Liquidity Pool Test', async () => {
       // check event ClientPayL2 is emitted
       await expectLogs(
         depositTx.remoteReceipt,
-        L2LiquidityPoolJson.abi,
+        L2LiquidityPoolABI,
         L2LiquidityPool.address,
         'ClientPayL2',
         {
@@ -1702,7 +1679,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should revert unfulfillable BOBA swap-offs', async () => {
+    it('should revert unfulfillable BOBA swap-offs', async () => {
       const userRewardFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
         env.L2BOBA.address
       )
@@ -1743,7 +1720,7 @@ describe('Liquidity Pool Test', async () => {
       expect(preBobL1BobaBalance).to.deep.eq(postBobL1BobaBalance)
     })
 
-    it('{tag:mrf} should revert unfulfillable BOBA swap-ons', async () => {
+    it('should revert unfulfillable BOBA swap-ons', async () => {
       const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
         L1BOBAToken.address
       )
@@ -1787,14 +1764,14 @@ describe('Liquidity Pool Test', async () => {
   })
 
   describe('Exit fee tests', async () => {
-    it('{tag:mrf} should not allow updating exit fee for non-owner', async () => {
+    it('should not allow updating exit fee for non-owner', async () => {
       const nexExitFee = ethers.utils.parseEther('120')
       await expect(
         BOBABillingContract.connect(env.l2Wallet_2).updateExitFee(nexExitFee)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it('{tag:mrf} should allow updating exit fee for owner', async () => {
+    it('should allow updating exit fee for owner', async () => {
       const exitFeeBefore = await BOBABillingContract.exitFee()
       const newExitFee = exitFeeBefore.mul(2)
       const configureTx = await BOBABillingContract.connect(
@@ -1806,7 +1783,7 @@ describe('Liquidity Pool Test', async () => {
       expect(newExitFee).to.eq(updatedExitFee)
     })
 
-    it('{tag:mrf} should be able to fast exit with correct exit fee', async () => {
+    it('should be able to fast exit with correct exit fee', async () => {
       const fastExitAmount = utils.parseEther('10')
 
       const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
@@ -1859,7 +1836,7 @@ describe('Liquidity Pool Test', async () => {
       // expect(BobBobaBalanceAfter).to.deep.eq(BobBobaBalanceBefore.sub(exitFee))
     })
 
-    it('{tag:mrf} should not fast exit without Boba', async () => {
+    it('should not fast exit without Boba', async () => {
       const fastExitAmount = utils.parseEther('10')
 
       const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
@@ -1876,7 +1853,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Insufficient Boba amount')
     })
 
-    it('{tag:mrf} should not fast exit with wrong input', async () => {
+    it('should not fast exit with wrong input', async () => {
       const fastExitAmount = utils.parseEther('10')
       const exitFee = await BOBABillingContract.exitFee()
 
@@ -1897,20 +1874,17 @@ describe('Liquidity Pool Test', async () => {
   describe('Onramp batch tests', async () => {
     const createTokenPair = async () => {
       const L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
-      L1ERC20 = await Factory__L1ERC20.deploy(
-        initialSupply,
-        tokenName,
-        tokenSymbol,
-        18
+      L1ERC20 = await deployBobaContractCore(
+        'L1ERC20',
+        [initialSupply, tokenName, tokenSymbol, 18],
+        env.l1Wallet
       )
-      await L1ERC20.deployTransaction.wait()
-
+      const Factory__L2ERC20 = getContractFactory(
+        'L2StandardERC20',
+        env.l2Wallet
+      )
       L2ERC20 = await Factory__L2ERC20.deploy(
-        L2StandardBridgeAddress,
-        L1ERC20.address,
-        tokenName,
-        tokenSymbol,
-        18
+        L2StandardBridgeAddress, L1ERC20.address, tokenName, tokenSymbol, 18
       )
       await L2ERC20.deployTransaction.wait()
 
@@ -1987,7 +1961,7 @@ describe('Liquidity Pool Test', async () => {
       ;[L1ERC20_3, L2ERC20_3] = await createTokenPair()
     })
 
-    it('{tag:mrf} should deposit ERC20', async () => {
+    it('should deposit ERC20', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
@@ -2024,15 +1998,13 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should not deposit ERC20 for an unregistered token', async () => {
+    it('should not deposit ERC20 for an unregistered token', async () => {
       const depositAmount = utils.parseEther('10')
-      const L1ERC20Test = await Factory__L1ERC20.deploy(
-        initialSupply,
-        tokenName,
-        tokenSymbol,
-        18
+      const L1ERC20Test = await deployBobaContractCore(
+        'L1ERC20',
+        [initialSupply, tokenName, tokenSymbol, 18],
+        env.l1Wallet
       )
-      await L1ERC20Test.deployTransaction.wait()
 
       await approveTransaction(
         L1ERC20Test,
@@ -2050,7 +2022,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Invaild Token')
     })
 
-    it('{tag:mrf} should add liquidities for l1 native token on l1 and l2', async () => {
+    it('should add liquidities for l1 native token on l1 and l2', async () => {
       const depositAmount = utils.parseEther('100')
 
       const preL2SecondaryFeeTokenBalance = await L2SecondaryFeeToken.balanceOf(
@@ -2110,7 +2082,7 @@ describe('Liquidity Pool Test', async () => {
       expect(postL2LPBalance).to.be.equal(preL2LPBalance.add(depositAmount))
     })
 
-    it('{tag:mrf} should deposit l1 native token', async () => {
+    it('should deposit l1 native token', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL2SecondaryFeeTokenBalance = await L2SecondaryFeeToken.balanceOf(
@@ -2143,7 +2115,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should not deposit l1 native token for the wrong payload', async () => {
+    it('should not deposit l1 native token for the wrong payload', async () => {
       const depositAmount = utils.parseEther('10')
       const depositAmountMismatch = utils.parseEther('9')
 
@@ -2160,7 +2132,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Invalid ETH Amount')
     })
 
-    it('{tag:mrf} should depoist l1 native token and ERC20 together', async () => {
+    it('should depoist l1 native token and ERC20 together', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
@@ -2221,7 +2193,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should not deposit l1 native token and ERC20 together for the wrong payload', async () => {
+    it('should not deposit l1 native token and ERC20 together for the wrong payload', async () => {
       const depositAmount = utils.parseEther('10')
       const depositAmountMismatch = utils.parseEther('9')
 
@@ -2286,7 +2258,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Invalid Amount')
     })
 
-    it('{tag:mrf} should deposit l1 native token and three ERC20 together', async () => {
+    it('should deposit l1 native token and three ERC20 together', async () => {
       const depositAmount = utils.parseEther('10')
 
       await approveTransaction(
@@ -2415,7 +2387,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should not deposit l1 native token and ERC20 for too large payload', async () => {
+    it('should not deposit l1 native token and ERC20 for too large payload', async () => {
       const depositAmount = utils.parseEther('10')
 
       await approveTransaction(
@@ -2451,7 +2423,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Too Many Tokens')
     })
 
-    it('{tag:mrf} should deposit ERC20 twice in batch', async () => {
+    it('should deposit ERC20 twice in batch', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL1ERC20Balance = await L1ERC20_1.balanceOf(env.l1Wallet.address)
@@ -2490,7 +2462,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should deposit l1 native token twice in batch', async () => {
+    it('should deposit l1 native token twice in batch', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL2SecondaryFeeTokenBalance = await L2SecondaryFeeToken.balanceOf(
@@ -2528,7 +2500,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should deposit Boba', async () => {
+    it('should deposit Boba', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL2BobaBalance = await env.l2Wallet.getBalance()
@@ -2560,7 +2532,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should deposit Boba and l1 native token in batch', async () => {
+    it('should deposit Boba and l1 native token in batch', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL2BobaBalance = await env.l2Wallet.getBalance()
@@ -2614,7 +2586,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should deposit Boba, l1 native token and ERC20 token in batch', async () => {
+    it('should deposit Boba, l1 native token and ERC20 token in batch', async () => {
       const depositAmount = utils.parseEther('10')
 
       const preL2BobaBalance = await env.l2Wallet.getBalance()
@@ -2690,7 +2662,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should revert an unfulfillable swap-on for l1 native token', async () => {
+    it('should revert an unfulfillable swap-on for l1 native token', async () => {
       const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
         ethers.constants.AddressZero
       )
@@ -2737,7 +2709,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should revert an unfulfillable swap-on for Boba', async () => {
+    it('should revert an unfulfillable swap-on for Boba', async () => {
       const userRewardFeeRate = await L1LiquidityPool.getUserRewardFeeRate(
         L1BOBAToken.address
       )
@@ -2782,7 +2754,7 @@ describe('Liquidity Pool Test', async () => {
       expect(preL2BobaBalance).to.deep.eq(postL2BobaBalance)
     })
 
-    it('{tag:mrf} should revert an unfulfillable swap-on in batch', async () => {
+    it('should revert an unfulfillable swap-on in batch', async () => {
       const depositAmount = utils.parseEther('10')
 
       await approveTransaction(
@@ -2857,7 +2829,7 @@ describe('Liquidity Pool Test', async () => {
       )
     })
 
-    it('{tag:mrf} should revert unfulfillable swap-ons in batch', async () => {
+    it('should revert unfulfillable swap-ons in batch', async () => {
       const depositAmount = utils.parseEther('10')
 
       await approveTransaction(
@@ -2985,7 +2957,7 @@ describe('Liquidity Pool Test', async () => {
   })
 
   describe('Configuration tests', async () => {
-    it('{tag:mrf} should not allow to configure billing contract address for non-owner', async () => {
+    it('should not allow to configure billing contract address for non-owner', async () => {
       await expect(
         L2LiquidityPool.connect(env.l2Wallet_2).configureBillingContractAddress(
           env.addressesBOBA.Proxy__BobaBillingContract
@@ -2993,7 +2965,7 @@ describe('Liquidity Pool Test', async () => {
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it('{tag:mrf} should not allow to configure billing contract address to zero address', async () => {
+    it('should not allow to configure billing contract address to zero address', async () => {
       await expect(
         L2LiquidityPool.connect(env.l2Wallet).configureBillingContractAddress(
           ethers.constants.AddressZero

@@ -173,6 +173,8 @@ export const gasPriceOracleWallet = new Wallet(
   l2Provider
 )
 
+console.log(`Running tests against Ethereum L2!`)
+
 if (!process.env.BOBA_URL) {
   console.log(`!!You did not set process.env.BOBA_URL!!`)
   console.log(
