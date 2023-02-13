@@ -11,8 +11,8 @@
     "lint:check": "eslint .",
     "build": "hardhat compile",
     "test:integration": "hardhat --network boba test",
-    "test:integration:alt-l1": "hardhat --network boba test ./test-alt-l1/*.ts",
-    "test:integration:ethereum": "hardhat --network boba test ./test/*.ts",
+    "test:integration:alt-l1": "hardhat --network boba test ./test/alt-l2/*.ts",
+    "test:integration:ethereum": "hardhat --network boba test ./test/eth-l2/*.ts",
     "test:integration:live": "IS_LIVE_NETWORK=true hardhat --network boba test",
     "test:sync": "hardhat --network boba test sync-tests/*.spec.ts --no-compile",
     "clean": "rimraf cache artifacts"

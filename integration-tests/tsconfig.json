@@ -6,7 +6,6 @@
   },
   "include": [
     "./test",
-    "./test-alt-l1",
     "sync-tests/*.ts",
     "./actor-tests/**/*.ts",
     "./artifacts/**/*.json",

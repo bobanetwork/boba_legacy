@@ -217,7 +217,7 @@ jobs:
           working_directory: ops
       - run:
           name: Split tests
-          command: circleci tests glob "../integration-tests/test/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
+          command: circleci tests glob "../integration-tests/test/eth-l2/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
           working_directory: ops
       - run:
           name: Run integration tests
@@ -307,7 +307,7 @@ jobs:
           working_directory: ops
       - run:
           name: Split tests
-          command: circleci tests glob "../integration-tests/test-alt-l1/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
+          command: circleci tests glob "../integration-tests/test/alt-l2/*.spec.ts" | circleci tests split --split-by=timings --time-default=10s | tee splits.txt
           working_directory: ops
       - run:
           name: Run integration tests
