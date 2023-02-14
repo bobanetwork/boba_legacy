@@ -4,7 +4,7 @@ chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import { getBobaContractAt, deployBobaContractCore } from '@boba/contracts'
 
 import { OptimismEnv } from './shared/env'
 
@@ -98,7 +98,7 @@ describe('Dao Action Test', async () => {
       env.l2Wallet
     )
 
-    GovernorBravoDelegator = await ethers.deployContract(
+    GovernorBravoDelegator = await deployBobaContractCore(
       'GovernorBravoDelegator',
       [
         Timelock.address,

@@ -73,6 +73,12 @@ describe('Standard Exit Fee', async () => {
     )
     await L2ERC20.deployTransaction.wait()
 
+    L2BOBAToken = await getBobaContractAt(
+      'L2GovernanceERC20',
+      env.addressesBOBA.TOKENS.BOBA.L2,
+      env.l2Wallet
+    )
+
     L2OMGLikeToken = await Factory__L2ERC20.deploy(
       L2StandardBridgeAddress,
       OMGLIkeToken.address,

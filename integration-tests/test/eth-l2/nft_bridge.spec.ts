@@ -986,17 +986,17 @@ describe('NFT Bridge Test', async () => {
 
   describe('L1 native NFT - with Unique Data tests', async () => {
     before(async () => {
-      // deploy a L2 native NFT token each time if existing contracts are used for tests
-      L2ERC721 = await ethers.deployContract(
+      // deploy a L1 native NFT token each time if existing contracts are used for tests
+      L1ERC721 = await ethers.deployContract(
         'TestUniqueDataERC721',
         ['Test', 'TST'],
-        env.l2Wallet
+        env.l1Wallet
       )
 
-      L1ERC721 = await ethers.deployContract(
-        'TestUniqueDataL1StandardERC721',
-        [L1Bridge.address, L2ERC721.address, 'Test', 'TST', ''],
-        env.l1Wallet
+      L2ERC721 = await ethers.deployContract(
+        'TestUniqueDataL2StandardERC721',
+        [L2Bridge.address, L1ERC721.address, 'Test', 'TST', ''],
+        env.l2Wallet
       )
 
       // register NFT

@@ -170,8 +170,6 @@ describe('Self Destruct Tests', async () => {
         env.l2Wallet_2
       ).useSecondaryFeeTokenAsFeeToken()
 
-      console.log(`Set ${env.l2Wallet_2.address} as secondary fee token user`)
-
       const isSecondaryFeeTokenSelect =
         await Boba_GasPriceOracle.secondaryFeeTokenUsers(env.l2Wallet_2.address)
       expect(isSecondaryFeeTokenSelect).to.be.eq(true)
@@ -354,7 +352,7 @@ describe('SSTORE tests', async () => {
         env.l2Wallet
       )
 
-      Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
+      Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracleAltL1')
         .attach(predeploys.Proxy__Boba_GasPriceOracle)
         .connect(env.l2Wallet)
 
