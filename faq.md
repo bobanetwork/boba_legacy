@@ -6,7 +6,7 @@ description: Frequently asked questions
 
 <figure><img src=".gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
-[Boba](https://boba.network) a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
+[Boba](https://boba.network) is a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
 <figure><img src=".gitbook/assets/HYBRID-COMPUTE-GRAPH.png" alt=""><figcaption></figcaption></figure>
 
@@ -117,7 +117,7 @@ These methods are described [here](boba\_documentation/developer/xdomain-tx-stat
 * Transactions
 * Hybrid Compute
 
-<figure><img src=".gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Can't I Deploy My 100kb Copy/Paste Contract?
 
@@ -193,7 +193,7 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-<figure><img src=".gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Isn’t My Transaction Going Through?
 
