@@ -24,7 +24,7 @@ describe('Replica Tests', () => {
   })
 
   describe('Matching blocks', () => {
-    it('{tag:other} should sync a transaction', async () => {
+    it('should sync a transaction', async () => {
       const tx = defaultTransactionFactory()
       tx.gasPrice = await gasPriceForL2()
       const result = await env.l2Wallet.sendTransaction(tx)
@@ -47,7 +47,7 @@ describe('Replica Tests', () => {
       expect(sequencerBlock.hash).to.deep.eq(replicaBlock.hash)
     })
 
-    it('{tag:other} sync an unprotected tx (eip155)', async () => {
+    it('sync an unprotected tx (eip155)', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         nonce: await env.l2Wallet.getTransactionCount(),
@@ -75,7 +75,7 @@ describe('Replica Tests', () => {
       expect(sequencerBlock.hash).to.deep.eq(replicaBlock.hash)
     })
 
-    it('{tag:other} should forward tx to sequencer', async () => {
+    it('should forward tx to sequencer', async () => {
       const tx = {
         ...defaultTransactionFactory(),
         nonce: await env.l2Wallet.getTransactionCount(),

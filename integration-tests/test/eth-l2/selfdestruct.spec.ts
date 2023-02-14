@@ -2,11 +2,8 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
-
-import { BigNumber, Contract, ContractFactory, utils, Wallet } from 'ethers'
-
-import SelfDestructTestJson from '../../artifacts/contracts/TestSelfDestruct.sol/TestSelfDestruct.json'
-import Create2DeployerJson from '../../artifacts/contracts/TestSelfDestruct.sol/Create2Deployer.json'
+import { ethers } from 'hardhat'
+import { BigNumber, Contract, ContractFactory, utils } from 'ethers'
 
 import { OptimismEnv } from './shared/env'
 
@@ -29,9 +26,8 @@ describe('Self Destruct Tests', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    Factory__Create2Deployer = new ContractFactory(
-      Create2DeployerJson.abi,
-      Create2DeployerJson.bytecode,
+    Factory__Create2Deployer = await ethers.getContractFactory(
+      'Create2Deployer',
       env.l2Wallet
     )
 
@@ -41,9 +37,9 @@ describe('Self Destruct Tests', async () => {
     await Create2Deployer.deploy()
     SelfDestructTestAddress = await Create2Deployer.t()
 
-    SelfDestructTest = new Contract(
+    SelfDestructTest = await ethers.getContractAt(
+      'TestSelfDestruct',
       SelfDestructTestAddress,
-      SelfDestructTestJson.abi,
       env.l2Wallet
     )
   })
@@ -57,7 +53,7 @@ describe('Self Destruct Tests', async () => {
       })
     })
 
-    it('{tag:other} should send funds to the contract', async () => {
+    it('should send funds to the contract', async () => {
       balanceSelfDestructContractPre = await env.l2Provider.getBalance(
         SelfDestructTest.address
       )
@@ -72,7 +68,7 @@ describe('Self Destruct Tests', async () => {
         await SelfDestructTest.suicideMethod(env.l2Wallet_2.address)
       })
 
-      it('{tag:other} should send all contract funds to receiver', async () => {
+      it('should send all contract funds to receiver', async () => {
         balanceSelfDestructContractPost = await env.l2Provider.getBalance(
           SelfDestructTest.address
         )
@@ -91,14 +87,14 @@ describe('Self Destruct Tests', async () => {
           await Create2Deployer.deploy()
         })
 
-        it('{tag:other} should not have funds to send', async () => {
+        it('should not have funds to send', async () => {
           const SelfDestructTestAddressReCreated = await Create2Deployer.t()
           expect(SelfDestructTestAddressReCreated).to.be.eq(
             SelfDestructTestAddress
           )
-          const SelfDestructTestReCreated = new Contract(
+          const SelfDestructTestReCreated = await ethers.getContractAt(
+            'TestSelfDestruct',
             SelfDestructTestAddressReCreated,
-            SelfDestructTestJson.abi,
             env.l2Wallet
           )
 

@@ -7,8 +7,13 @@ import 'mocha-multi-reporters'
 
 const config: HardhatUserConfig = {
   networks: {
+    default: {
+      url: 'http://localhost:8545',
+      gas: 'auto',
+    },
     boba: {
       url: process.env.L2_URL || 'http://localhost:8545',
+      gas: "auto"
     },
   },
   mocha: {

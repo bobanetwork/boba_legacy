@@ -2,21 +2,13 @@ import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
-import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
+import { Contract, utils, BigNumber } from 'ethers'
 import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
 
-import { getFilteredLogIndex, isNonEthereumChain } from './shared/utils'
+import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
 describe('NFT Bridge Test', async () => {
-  const skipNFT = await isNonEthereumChain()
-  if (skipNFT) {
-    console.log('Skipping NFT Bridge tests on Non-Ethereum chain')
-    return
-  }
-
-  let Factory__L1ERC721: ContractFactory
-  let Factory__L2ERC721: ContractFactory
   let L1Bridge: Contract
   let L2Bridge: Contract
   let L1ERC721: Contract
@@ -314,8 +306,11 @@ describe('NFT Bridge Test', async () => {
     })
 
     it('should not be able to deposit unregistered NFT ', async () => {
-      const L1ERC721Test = await Factory__L1ERC721.deploy('Test', 'TST')
-      await L1ERC721Test.deployTransaction.wait()
+      const L1ERC721Test = await deployBobaContractCore(
+        'L1ERC721',
+        ['Test', 'TST'],
+        env.l1Wallet
+      )
 
       const mintTx = await L1ERC721Test.mint(
         env.l1Wallet.address,
@@ -358,13 +353,13 @@ describe('NFT Bridge Test', async () => {
     before(async () => {
       // deploy a L2 native NFT token each time if existing contracts are used for tests
       L2ERC721 = await deployBobaContractCore(
-        'L2StandardERC721',
+        'L1ERC721',
         ['Test', 'TST'],
         env.l2Wallet
       )
 
       L1ERC721 = await deployBobaContractCore(
-        'L1ERC721',
+        'L1StandardERC721',
         [L1Bridge.address, L2ERC721.address, 'Test', 'TST', ''],
         env.l1Wallet
       )
@@ -394,9 +389,7 @@ describe('NFT Bridge Test', async () => {
           9999999,
           { value: exitFee.sub(BigNumber.from('1')) }
         )
-      ).to.be.revertedWith(
-        'execution reverted: ERC20: transfer amount exceeds allowance'
-      )
+      ).to.be.revertedWith('Insufficient Boba amount')
     })
 
     it('should exit NFT from L2', async () => {
@@ -481,9 +474,7 @@ describe('NFT Bridge Test', async () => {
           9999999,
           { value: exitFee.sub(BigNumber.from('1'))}
         )
-      ).to.be.revertedWith(
-        'execution reverted: ERC20: transfer amount exceeds allowance'
-      )
+      ).to.be.revertedWith('Insufficient Boba amount')
     })
 
     it('should exit NFT to another L1 wallet', async () => {
@@ -515,14 +506,12 @@ describe('NFT Bridge Test', async () => {
       )
       await approveTx.wait()
 
-      const exitFee = await BOBABillingContract.exitFee()
       await env.waitForXDomainTransaction(
         L1Bridge.connect(env.l1Wallet_2).depositNFTTo(
           L1ERC721.address,
           env.l2Wallet.address,
           DUMMY_TOKEN_ID,
-          9999999,
-          { value: exitFee }
+          9999999
         )
       )
 
@@ -621,8 +610,11 @@ describe('NFT Bridge Test', async () => {
     })
 
     it('should not be able to withdraw unregistered NFT ', async () => {
-      const L2ERC721Test = await Factory__L2ERC721.deploy('Test', 'TST')
-      await L2ERC721Test.deployTransaction.wait()
+      const L2ERC721Test = await deployBobaContractCore(
+        'L1ERC721',
+        ['Test', 'TST'],
+        env.l2Wallet
+      )
 
       const mintTx = await L2ERC721Test.mint(
         env.l2Wallet.address,
@@ -797,30 +789,18 @@ describe('NFT Bridge Test', async () => {
 
   describe('L1 native NFT - with Unique Data tests', async () => {
     before(async () => {
-      Factory__L1ERC721 = await ethers.getContractFactory(
+      // deploy a L1 native NFT token each time if existing contracts are used for tests
+      L1ERC721 = await ethers.deployContract(
         'TestUniqueDataERC721',
+        ['Test', 'TST'],
         env.l1Wallet
       )
 
-      Factory__L2ERC721 = await ethers.getContractFactory(
+      L2ERC721 = await ethers.deployContract(
         'TestUniqueDataL2StandardERC721',
+        [L2Bridge.address, L1ERC721.address, 'Test', 'TST', ''],
         env.l2Wallet
       )
-
-      // deploy a L1 native NFT token each time if existing contracts are used for tests
-      L1ERC721 = await Factory__L1ERC721.deploy('Test', 'TST')
-
-      await L1ERC721.deployTransaction.wait()
-
-      L2ERC721 = await Factory__L2ERC721.deploy(
-        L2Bridge.address,
-        L1ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
-      )
-
-      await L2ERC721.deployTransaction.wait()
 
       // register NFT
       const registerL1BridgeTx = await L1Bridge.registerNFTPair(
@@ -1080,30 +1060,18 @@ describe('NFT Bridge Test', async () => {
 
   describe('L1 native NFT - with Extra Generative Data tests', async () => {
     before(async () => {
-      Factory__L1ERC721 = await ethers.getContractFactory(
+      // deploy a L1 native NFT token each time if existing contracts are used for tests
+      L1ERC721 = await ethers.deployContract(
         'TestExtraDataERC721',
+        ['Test', 'TST'],
         env.l1Wallet
       )
 
-      Factory__L2ERC721 = await ethers.getContractFactory(
+      L2ERC721 = await ethers.deployContract(
         'TestExtraDataL2StandardERC721',
+        [L2Bridge.address, L1ERC721.address, 'Test', 'TST', ''],
         env.l2Wallet
       )
-
-      // deploy a L1 native NFT token each time if existing contracts are used for tests
-      L1ERC721 = await Factory__L1ERC721.deploy('Test', 'TST')
-
-      await L1ERC721.deployTransaction.wait()
-
-      L2ERC721 = await Factory__L2ERC721.deploy(
-        L2Bridge.address,
-        L1ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
-      )
-
-      await L2ERC721.deployTransaction.wait()
 
       // register NFT
       const registerL1BridgeTx = await L1Bridge.registerNFTPair(
@@ -1374,29 +1342,19 @@ describe('NFT Bridge Test', async () => {
 
   describe('L2 native NFT - with Unique Data tests', async () => {
     before(async () => {
-      Factory__L2ERC721 = await ethers.getContractFactory(
+      // deploy a L2 native NFT token each time if existing contracts are used for tests
+      L2ERC721 = await ethers.deployContract(
         'TestUniqueDataERC721',
+        ['Test', 'TST'],
         env.l2Wallet
       )
-
-      Factory__L1ERC721 = await ethers.getContractFactory(
-        'TestUniqueDataL1StandardERC721',
-        env.l1Wallet
-      )
-
-      // deploy a L2 native NFT token each time if existing contracts are used for tests
-      L2ERC721 = await Factory__L2ERC721.deploy('Test', 'TST')
-
       await L2ERC721.deployTransaction.wait()
 
-      L1ERC721 = await Factory__L1ERC721.deploy(
-        L1Bridge.address,
-        L2ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
+      L1ERC721 = await ethers.deployContract(
+        'TestUniqueDataL1StandardERC721',
+        [L1Bridge.address, L2ERC721.address, 'Test', 'TST', ''],
+        env.l1Wallet
       )
-
       await L1ERC721.deployTransaction.wait()
 
       // register NFT
@@ -1657,29 +1615,19 @@ describe('NFT Bridge Test', async () => {
 
   describe('L2 native NFT - with Extra Generative Data tests', async () => {
     before(async () => {
-      Factory__L2ERC721 = await ethers.getContractFactory(
+      // deploy a L2 native NFT token each time if existing contracts are used for tests
+      L2ERC721 = await ethers.deployContract(
         'TestExtraDataERC721',
+        ['Test', 'TST'],
         env.l2Wallet
       )
-
-      Factory__L1ERC721 = await ethers.getContractFactory(
-        'TestExtraDataL1StandardERC721',
-        env.l1Wallet
-      )
-
-      // deploy a L2 native NFT token each time if existing contracts are used for tests
-      L2ERC721 = await Factory__L2ERC721.deploy('Test', 'TST')
-
       await L2ERC721.deployTransaction.wait()
 
-      L1ERC721 = await Factory__L1ERC721.deploy(
-        L1Bridge.address,
-        L2ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
+      L1ERC721 = await ethers.deployContract(
+        'TestExtraDataL1StandardERC721',
+        [L1Bridge.address, L2ERC721.address, 'Test', 'TST', ''],
+        env.l1Wallet
       )
-
       await L1ERC721.deployTransaction.wait()
 
       // register NFT
@@ -1956,20 +1904,13 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l1Wallet
       )
+      await L1ERC721.deployTransaction.wait()
 
-      Factory__L2ERC721 = await ethers.getContractFactory(
+      L2ERC721 = await ethers.deployContract(
         'TestFailingMintL2StandardERC721',
+        [L2Bridge.address, L1ERC721.address, 'Test', 'TST', ''],
         env.l2Wallet
       )
-
-      L2ERC721 = await Factory__L2ERC721.deploy(
-        L2Bridge.address,
-        L1ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
-      )
-
       await L2ERC721.deployTransaction.wait()
 
       // register NFT
@@ -2044,17 +1985,12 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l2Wallet
       )
+      await L2ERC721.deployTransaction.wait()
 
-      Factory__L1ERC721 = await ethers.getContractFactory(
-        'TestFailingMintL2StandardERC721',
+      L1ERC721 = await ethers.deployContract(
+        'TestFailingMintL1StandardERC721',
+        [L1Bridge.address, L2ERC721.address, 'Test', 'TST', ''],
         env.l1Wallet
-      )
-      L1ERC721 = await Factory__L1ERC721.deploy(
-        L1Bridge.address,
-        L2ERC721.address,
-        'Test',
-        'TST',
-        '' // base-uri
       )
       await L1ERC721.deployTransaction.wait()
 
@@ -2082,8 +2018,9 @@ describe('NFT Bridge Test', async () => {
       const approveTx = await L2ERC721.approve(L2Bridge.address, DUMMY_TOKEN_ID)
       await approveTx.wait()
 
+      const exitFee = await BOBABillingContract.exitFee()
       await env.waitForRevertXDomainTransactionL1(
-        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999)
+        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999, { value: exitFee })
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(

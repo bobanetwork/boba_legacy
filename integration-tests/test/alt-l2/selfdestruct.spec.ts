@@ -2,13 +2,9 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
-
-import { BigNumber, Contract, ContractFactory, utils, Wallet } from 'ethers'
+import { ethers } from 'hardhat'
+import { BigNumber, Contract, utils } from 'ethers'
 import { predeploys, getContractFactory } from '@eth-optimism/contracts'
-
-import SelfDestructTestJson from '../../artifacts/contracts/TestSelfDestruct.sol/TestSelfDestruct.json'
-import Create2DeployerJson from '../../artifacts/contracts/TestSelfDestruct.sol/Create2Deployer.json'
-import SSTORETestJson from '../../artifacts/contracts/TestSelfDestruct.sol/TestDeleteSlot.json'
 
 import { OptimismEnv } from './shared/env'
 
@@ -16,8 +12,6 @@ describe('Self Destruct Tests', async () => {
   let env: OptimismEnv
 
   let SelfDestructTest: Contract
-
-  let Factory__Create2Deployer: ContractFactory
   let Create2Deployer: Contract
 
   let Boba_GasPriceOracle: Contract
@@ -36,30 +30,26 @@ describe('Self Destruct Tests', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    Factory__Create2Deployer = new ContractFactory(
-      Create2DeployerJson.abi,
-      Create2DeployerJson.bytecode,
+    Create2Deployer = await ethers.deployContract(
+      'Create2Deployer',
+      [],
       env.l2Wallet
     )
-
-    Create2Deployer = await Factory__Create2Deployer.deploy()
-    await Create2Deployer.deployTransaction.wait()
-
     await Create2Deployer.deploy()
     SelfDestructTestAddress = await Create2Deployer.t()
 
-    SelfDestructTest = new Contract(
+    SelfDestructTest = await ethers.getContractAt(
+      'TestSelfDestruct',
       SelfDestructTestAddress,
-      SelfDestructTestJson.abi,
       env.l2Wallet
     )
 
-    Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
+    Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracleAltL1')
       .attach(predeploys.Proxy__Boba_GasPriceOracle)
       .connect(env.l2Wallet)
 
     secondaryFeeToken = getContractFactory('L2_L1NativeToken')
-      .attach(predeploys.L2_L1NativeToken)
+      .attach(predeploys.L2_L1NativeToken_ALT_L1)
       .connect(env.l2Wallet)
   })
 
@@ -72,7 +62,7 @@ describe('Self Destruct Tests', async () => {
       })
     })
 
-    it('{tag:other} should send funds to the contract', async () => {
+    it('should send funds to the contract', async () => {
       balanceSelfDestructContractPre = await env.l2Provider.getBalance(
         SelfDestructTest.address
       )
@@ -87,7 +77,7 @@ describe('Self Destruct Tests', async () => {
         await SelfDestructTest.suicideMethod(env.l2Wallet_2.address)
       })
 
-      it('{tag:other} should send all contract funds to receiver', async () => {
+      it('should send all contract funds to receiver', async () => {
         balanceSelfDestructContractPost = await env.l2Provider.getBalance(
           SelfDestructTest.address
         )
@@ -106,14 +96,14 @@ describe('Self Destruct Tests', async () => {
           await Create2Deployer.deploy()
         })
 
-        it('{tag:other} should not have funds to send', async () => {
+        it('should not have funds to send', async () => {
           const SelfDestructTestAddressReCreated = await Create2Deployer.t()
           expect(SelfDestructTestAddressReCreated).to.be.eq(
             SelfDestructTestAddress
           )
-          const SelfDestructTestReCreated = new Contract(
+          const SelfDestructTestReCreated = await ethers.getContractAt(
+            'TestSelfDestruct',
             SelfDestructTestAddressReCreated,
-            SelfDestructTestJson.abi,
             env.l2Wallet
           )
 
@@ -138,21 +128,17 @@ describe('Self Destruct Tests', async () => {
     before(async () => {
       env = await OptimismEnv.new()
 
-      Factory__Create2Deployer = new ContractFactory(
-        Create2DeployerJson.abi,
-        Create2DeployerJson.bytecode,
+      Create2Deployer = await ethers.deployContract(
+        'Create2Deployer',
+        [],
         env.l2Wallet
       )
-
-      Create2Deployer = await Factory__Create2Deployer.deploy()
-      await Create2Deployer.deployTransaction.wait()
-
       await Create2Deployer.deploy()
       SelfDestructTestAddress = await Create2Deployer.t()
 
-      SelfDestructTest = new Contract(
+      SelfDestructTest = await ethers.getContractAt(
+        'TestSelfDestruct',
         SelfDestructTestAddress,
-        SelfDestructTestJson.abi,
         env.l2Wallet
       )
 
@@ -162,14 +148,19 @@ describe('Self Destruct Tests', async () => {
       })
     })
 
-    it('{tag:other} should send funds to the contract', async () => {
+    it('should send funds to the contract', async () => {
       balanceSelfDestructContractPre = await env.l2Provider.getBalance(
         SelfDestructTest.address
       )
       expect(balanceSelfDestructContractPre).to.be.eq(supplyAmount)
     })
 
-    it('{tag:other} should use secondary fee token as fee token', async () => {
+    it('should use secondary fee token as fee token', async () => {
+      await env.l2Wallet.sendTransaction({
+        to: env.l2Wallet_2.address,
+        value: utils.parseEther('10'),
+      })
+
       await secondaryFeeToken.transfer(
         env.l2Wallet_2.address,
         utils.parseEther('10')
@@ -178,6 +169,8 @@ describe('Self Destruct Tests', async () => {
       await Boba_GasPriceOracle.connect(
         env.l2Wallet_2
       ).useSecondaryFeeTokenAsFeeToken()
+
+      console.log(`Set ${env.l2Wallet_2.address} as secondary fee token user`)
 
       const isSecondaryFeeTokenSelect =
         await Boba_GasPriceOracle.secondaryFeeTokenUsers(env.l2Wallet_2.address)
@@ -195,7 +188,7 @@ describe('Self Destruct Tests', async () => {
         await SelfDestructTest.suicideMethod(env.l2Wallet_2.address)
       })
 
-      it('{tag:other} should send all contract funds to receiver', async () => {
+      it('should send all contract funds to receiver', async () => {
         balanceSelfDestructContractPost = await env.l2Provider.getBalance(
           SelfDestructTest.address
         )
@@ -219,14 +212,14 @@ describe('Self Destruct Tests', async () => {
           await Create2Deployer.deploy()
         })
 
-        it('{tag:other} should not have funds to send', async () => {
+        it('should not have funds to send', async () => {
           const SelfDestructTestAddressReCreated = await Create2Deployer.t()
           expect(SelfDestructTestAddressReCreated).to.be.eq(
             SelfDestructTestAddress
           )
-          const SelfDestructTestReCreated = new Contract(
+          const SelfDestructTestReCreated = await ethers.getContractAt(
+            'TestSelfDestruct',
             SelfDestructTestAddressReCreated,
-            SelfDestructTestJson.abi,
             env.l2Wallet
           )
 
@@ -250,7 +243,7 @@ describe('Self Destruct Tests', async () => {
       })
     })
 
-    it('{tag:other} should use Boba as fee token', async () => {
+    it('should use Boba as fee token', async () => {
       await Boba_GasPriceOracle.connect(env.l2Wallet_2).useBobaAsFeeToken()
 
       const isSecondaryFeeTokenSelect =
@@ -264,12 +257,9 @@ describe('SSTORE tests', async () => {
   let env: OptimismEnv
 
   let SSTORETest: Contract
-  let Factory__SSTORETest: ContractFactory
 
   let Boba_GasPriceOracle: Contract
   let secondaryFeeToken: Contract
-
-  const supplyAmount = utils.parseEther('1')
 
   let balanceReceiverPre: BigNumber
   let balanceReceiverPost: BigNumber
@@ -279,21 +269,18 @@ describe('SSTORE tests', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    Factory__SSTORETest = new ContractFactory(
-      SSTORETestJson.abi,
-      SSTORETestJson.bytecode,
+    SSTORETest = await ethers.deployContract(
+      'TestDeleteSlot',
+      [],
       env.l2Wallet
     )
-
-    SSTORETest = await Factory__SSTORETest.deploy()
-    await SSTORETest.deployTransaction.wait()
 
     Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
       .attach(predeploys.Proxy__Boba_GasPriceOracle)
       .connect(env.l2Wallet)
 
     secondaryFeeToken = getContractFactory('L2_L1NativeToken')
-      .attach(predeploys.L2_L1NativeToken)
+      .attach(predeploys.L2_L1NativeToken_ALT_L1)
       .connect(env.l2Wallet)
 
     // Should set variables
@@ -307,7 +294,7 @@ describe('SSTORE tests', async () => {
     expect(storedArray).to.be.equal(BigNumber.from('3'))
   })
 
-  it('{tag:other} should delete testInt slot storage', async () => {
+  it('should delete testInt slot storage', async () => {
     balanceReceiverPre = await env.l2Provider.getBalance(env.l2Wallet_2.address)
     secondaryFeeTokenBalancePre = await secondaryFeeToken.balanceOf(
       env.l2Wallet_2.address
@@ -332,7 +319,7 @@ describe('SSTORE tests', async () => {
     expect(testInt).to.be.eq(BigNumber.from('0'))
   })
 
-  it('{tag:other} should delete testArray slot storage', async () => {
+  it('should delete testArray slot storage', async () => {
     balanceReceiverPre = await env.l2Provider.getBalance(env.l2Wallet_2.address)
     secondaryFeeTokenBalancePre = await secondaryFeeToken.balanceOf(
       env.l2Wallet_2.address
@@ -361,21 +348,18 @@ describe('SSTORE tests', async () => {
     before(async () => {
       env = await OptimismEnv.new()
 
-      Factory__SSTORETest = new ContractFactory(
-        SSTORETestJson.abi,
-        SSTORETestJson.bytecode,
+      SSTORETest = await ethers.deployContract(
+        'TestDeleteSlot',
+        [],
         env.l2Wallet
       )
-
-      SSTORETest = await Factory__SSTORETest.deploy()
-      await SSTORETest.deployTransaction.wait()
 
       Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
         .attach(predeploys.Proxy__Boba_GasPriceOracle)
         .connect(env.l2Wallet)
 
       secondaryFeeToken = getContractFactory('L2_L1NativeToken')
-        .attach(predeploys.L2_L1NativeToken)
+        .attach(predeploys.L2_L1NativeToken_ALT_L1)
         .connect(env.l2Wallet)
 
       // Should set variables
@@ -389,7 +373,12 @@ describe('SSTORE tests', async () => {
       expect(storedArray).to.be.equal(BigNumber.from('3'))
     })
 
-    it('{tag:other} should use secondary fee token as fee token', async () => {
+    it('should use secondary fee token as fee token', async () => {
+      await env.l2Wallet.sendTransaction({
+        to: env.l2Wallet_2.address,
+        value: utils.parseEther('10'),
+      })
+
       await secondaryFeeToken.transfer(
         env.l2Wallet_2.address,
         utils.parseEther('10')
@@ -404,7 +393,7 @@ describe('SSTORE tests', async () => {
       expect(isSecondaryFeeTokenSelect).to.be.eq(true)
     })
 
-    it('{tag:other} should delete testInt slot storage', async () => {
+    it('should delete testInt slot storage', async () => {
       balanceReceiverPre = await env.l2Provider.getBalance(
         env.l2Wallet_2.address
       )
@@ -439,7 +428,7 @@ describe('SSTORE tests', async () => {
       expect(testInt).to.be.eq(BigNumber.from('0'))
     })
 
-    it('{tag:other} should delete testArray slot storage', async () => {
+    it('should delete testArray slot storage', async () => {
       balanceReceiverPre = await env.l2Provider.getBalance(
         env.l2Wallet_2.address
       )
@@ -474,7 +463,7 @@ describe('SSTORE tests', async () => {
       expect(storedArray).to.be.eq(BigNumber.from('0'))
     })
 
-    it('{tag:other} should use Boba as fee token', async () => {
+    it('should use Boba as fee token', async () => {
       await Boba_GasPriceOracle.connect(env.l2Wallet_2).useBobaAsFeeToken()
 
       const isSecondaryFeeTokenSelect =

@@ -1,14 +1,10 @@
-import { Contract, ContractFactory, utils } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
 import { ethers } from 'hardhat'
+import { Contract, utils } from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { getBobaContractAt } from '@boba/contracts'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
-
-import HelloTuringJson from '../../artifacts/contracts/HelloTuring.sol/HelloTuring.json'
-import TuringHelperJson from '../../artifacts/contracts/TuringHelper.sol/TuringHelper.json'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 import { OptimismEnv } from './shared/env'
 import { verifyStateRoots } from './shared/state-root-verification'
@@ -22,9 +18,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
   let L2BOBAToken: Contract
 
   let TuringHelper: Contract
-  let Factory__TuringHelper: ContractFactory
 
-  let Factory__Random: ContractFactory
   let random: Contract
 
   before(async () => {
@@ -33,37 +27,35 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const BobaTuringCreditAddress = await env.addressesBOBA.BobaTuringCredit
 
     BobaTuringCredit = getContractFactory(
-      'BobaTuringCredit',
+      'BobaTuringCreditAltL1',
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
 
-    L1BOBAToken = new Contract(
+    L1BOBAToken = await getBobaContractAt(
+      'L1ERC20',
       env.addressesBOBA.TOKENS.BOBA.L1,
-      L1ERC20Json.abi,
       env.l1Wallet
     )
 
-    L2BOBAToken = new Contract(
+    L2BOBAToken = await getBobaContractAt(
+      'L2GovernanceERC20',
       env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
       env.l2Wallet
     )
 
-    Factory__TuringHelper = new ContractFactory(
-      TuringHelperJson.abi,
-      TuringHelperJson.bytecode,
+    TuringHelper = await ethers.deployContract(
+      'TuringHelper',
+      [],
       env.l2Wallet
     )
-    TuringHelper = await Factory__TuringHelper.deploy()
     console.log('    Helper contract deployed at', TuringHelper.address)
     await TuringHelper.deployTransaction.wait()
 
-    Factory__Random = new ContractFactory(
-      HelloTuringJson.abi,
-      HelloTuringJson.bytecode,
+    random = await ethers.deployContract(
+      'HelloTuring',
+      [TuringHelper.address],
       env.l2Wallet
     )
-    random = await Factory__Random.deploy(TuringHelper.address)
     console.log('    Test random contract deployed at', random.address)
     await random.deployTransaction.wait()
 

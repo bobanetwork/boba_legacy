@@ -1,21 +1,14 @@
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
-import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
+import { Contract, ContractFactory, utils, ethers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-
-import DiscretionaryExitFeeJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
-import OMGLikeTokenJson from '@boba/contracts/artifacts/contracts/test-helpers/OMGLikeToken.sol/OMGLikeToken.json'
-import L2BillingContractJson from '@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json'
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import { deployBobaContractCore, getBobaContractAt } from '@boba/contracts'
 
 import { OptimismEnv } from './shared/env'
 
 describe('Standard Exit Fee', async () => {
-  let Factory__L1ERC20: ContractFactory
   let Factory__L2ERC20: ContractFactory
-  let Factory__ExitFeeContract: ContractFactory
 
   let L1ERC20: Contract
   let L2ERC20: Contract
@@ -37,18 +30,6 @@ describe('Standard Exit Fee', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    Factory__L1ERC20 = new ContractFactory(
-      L1ERC20Json.abi,
-      L1ERC20Json.bytecode,
-      env.l1Wallet
-    )
-
-    const Factory__OMGLikeToken = new ContractFactory(
-      OMGLikeTokenJson.abi,
-      OMGLikeTokenJson.bytecode,
-      env.l1Wallet
-    )
-
     const L1StandardBridgeAddress = await env.addressesBASE
       .Proxy__L1StandardBridge
 
@@ -59,14 +40,10 @@ describe('Standard Exit Fee', async () => {
 
     const L2StandardBridgeAddress = await L1StandardBridge.l2TokenBridge()
 
-    Factory__ExitFeeContract = new ContractFactory(
-      DiscretionaryExitFeeJson.abi,
-      DiscretionaryExitFeeJson.bytecode,
-      env.l2Wallet
-    )
-
-    ExitFeeContract = await Factory__ExitFeeContract.deploy(
-      L2StandardBridgeAddress
+    ExitFeeContract = await deployBobaContractCore(
+      'DiscretionaryExitFee',
+      [L2StandardBridgeAddress],
+      env.l2Wallet,
     )
 
     await ExitFeeContract.configureBillingContractAddress(
@@ -74,17 +51,17 @@ describe('Standard Exit Fee', async () => {
     )
 
     //we deploy a new erc20, so tests won't fail on a rerun on the same contracts
-    L1ERC20 = await Factory__L1ERC20.deploy(
-      initialSupply,
-      tokenName,
-      tokenSymbol,
-      18
+    L1ERC20 = await deployBobaContractCore(
+      'L1ERC20',
+      [initialSupply, tokenName, tokenSymbol, 18],
+      env.l1Wallet,
     )
-    await L1ERC20.deployTransaction.wait()
 
-    OMGLIkeToken = await Factory__OMGLikeToken.deploy()
-    await OMGLIkeToken.deployTransaction.wait()
-
+    OMGLIkeToken = await deployBobaContractCore(
+      'OMGLikeToken',
+      [],
+      env.l1Wallet,
+    )
     Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
 
     L2ERC20 = await Factory__L2ERC20.deploy(
@@ -105,15 +82,9 @@ describe('Standard Exit Fee', async () => {
     )
     await L2OMGLikeToken.deployTransaction.wait()
 
-    L2BOBAToken = new Contract(
-      env.addressesBOBA.TOKENS.BOBA.L2,
-      L2GovernanceERC20Json.abi,
-      env.l2Wallet
-    )
-
-    BOBABillingContract = new Contract(
+    BOBABillingContract = await getBobaContractAt(
+      'L2BillingContract',
       env.addressesBOBA.Proxy__BobaBillingContract,
-      L2BillingContractJson.abi,
       env.l2Wallet
     )
   })
@@ -139,14 +110,14 @@ describe('Standard Exit Fee', async () => {
       )
     })
 
-    it('{tag:other} should not allow updating exit fee for non-owner', async () => {
+    it('should not allow updating exit fee for non-owner', async () => {
       const nexExitFee = ethers.utils.parseEther('120')
       await expect(
         BOBABillingContract.connect(env.l2Wallet_2).updateExitFee(nexExitFee)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
-    it('{tag:other} should allow updating exit fee for owner', async () => {
+    it('should allow updating exit fee for owner', async () => {
       const exitFeeBefore = await BOBABillingContract.exitFee()
       const newExitFee = exitFeeBefore.mul(2)
       const configureTx = await BOBABillingContract.connect(
@@ -180,7 +151,7 @@ describe('Standard Exit Fee', async () => {
       )
     })
 
-    it('{tag:other} should pay exit fee and withdraw erc20', async () => {
+    it('should pay exit fee and withdraw erc20', async () => {
       const preBalanceExitorL1 = await L1ERC20.balanceOf(env.l1Wallet.address)
       const preBalanceExitorL2 = await L2ERC20.balanceOf(env.l2Wallet.address)
 
@@ -234,7 +205,7 @@ describe('Standard Exit Fee', async () => {
       expect(postBobaBalance).to.eq(preBobaBalance.sub(exitFee))
     })
 
-    it('{tag:other} should fail if not enough erc20 balance', async () => {
+    it('should fail if not enough erc20 balance', async () => {
       const preBalanceExitorL2 = await L2ERC20.balanceOf(env.l2Wallet.address)
 
       expect(preBalanceExitorL2).to.eq(0)
@@ -258,7 +229,7 @@ describe('Standard Exit Fee', async () => {
       ).to.be.revertedWith('ERC20: transfer amount exceeds balance')
     })
 
-    it('{tag:other} should fail if not enough Boba balance', async () => {
+    it('should fail if not enough Boba balance', async () => {
       const exitAmount = utils.parseEther('10')
 
       const newWallet = ethers.Wallet.createRandom().connect(env.l2Provider)
@@ -279,7 +250,7 @@ describe('Standard Exit Fee', async () => {
       )
     })
 
-    it('{tag:other} should fail if not approving Boba', async () => {
+    it('should fail if not approving Boba', async () => {
       const exitAmount = utils.parseEther('10')
 
       // Approve BOBA
@@ -315,7 +286,7 @@ describe('Standard Exit Fee', async () => {
       await env.waitForXDomainTransaction(deposit)
     })
 
-    it('{tag:other} should burn and withdraw ovm_eth', async () => {
+    it('should burn and withdraw ovm_eth', async () => {
       const preBalanceExitorL1 = await env.l1Wallet.getBalance()
       const preBalanceExitorL2 = await env.l2Wallet.getBalance()
 
@@ -366,7 +337,7 @@ describe('Standard Exit Fee', async () => {
   })
 
   describe('Configuration tests', async () => {
-    it('{tag:other} should not allow to configure billing contract address for non-owner', async () => {
+    it('should not allow to configure billing contract address for non-owner', async () => {
       await expect(
         ExitFeeContract.connect(env.l2Wallet_2).configureBillingContractAddress(
           env.addressesBOBA.Proxy__BobaBillingContract
@@ -374,7 +345,7 @@ describe('Standard Exit Fee', async () => {
       ).to.be.revertedWith('Ownable: caller is not the owner')
     })
 
-    it('{tag:other} should not allow to configure billing contract address to zero address', async () => {
+    it('should not allow to configure billing contract address to zero address', async () => {
       await expect(
         ExitFeeContract.connect(env.l2Wallet).configureBillingContractAddress(
           ethers.constants.AddressZero
