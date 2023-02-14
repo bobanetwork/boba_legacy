@@ -1,12 +1,10 @@
----
-description: Introduction to Boba Network
----
-
 # Welcome to Boba
+
+<figure><img src=".gitbook/assets/WELCOME-TO-BOBA-COVER.png" alt=""><figcaption></figcaption></figure>
 
 This is the primary place where [Boba](https://boba.network) works on the Boba L2, a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
-![turing](packages/boba/gateway/src/images/boba2/turing.png)
+<figure><img src=".gitbook/assets/HYBRID-COMPUTE-GRAPH.png" alt=""><figcaption></figcaption></figure>
 
 Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from it focus on augmenting compute, Boba differs from Optimism by:
 
