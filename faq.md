@@ -8,7 +8,7 @@ description: Frequently asked questions
 
 [Boba](https://boba.network) a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
-![Boba---August-08---Hybrid-Compute-Slide2](https://user-images.githubusercontent.com/107710263/184889568-34e1a67c-a448-471c-a92d-60dfbe2ee890.png)
+<figure><img src=".gitbook/assets/HYBRID-COMPUTE-GRAPH.png" alt=""><figcaption></figcaption></figure>
 
 Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). We chose to build on Optimism because it is essentially a modified version of Ethereum, which makes it relatively easy to ensure EVM and Solidity compatibility, minimizing the efforts required to migrate smart contracts from L1 to L2.
 
@@ -153,7 +153,9 @@ First, you have to download MetaMask on your browser as a plug-in and set up a M
 
 Don’t be surprised by the fox that will follow your cursor when you first launch the application. He’s friendly.
 
-![Screen Shot 2022-06-15 at 3 39 21 PM](https://user-images.githubusercontent.com/107710263/184896453-1d7ff6b8-98c1-48d1-9b78-a989abc1fe55.png)
+<figure><img src=".gitbook/assets/WELCOME-TO-METAMASK.png" alt=""><figcaption></figcaption></figure>
+
+
 
 After you’ve set up your MetaMask account, you can [connect to the Rinkeby network Testnet](https://gateway.rinkeby.boba.network/). After that, follow these steps:
 
@@ -163,12 +165,17 @@ After you’ve set up your MetaMask account, you can [connect to the Rinkeby net
 * Allow permissions by hitting Connect.
 * Observe that all of the network details such as the Network name, URL, and Chain ID have all been auto-filled.
 * Hit Approve.
+*
 
-![Screen Shot 2022-06-15 at 4 25 41 PM](https://user-images.githubusercontent.com/107710263/184896877-5ce5a35f-287a-401e-9c31-7d99cf62ce17.png)
+    <figure><img src=".gitbook/assets/ALLOW-THIS-SITE-TO-ADD-NETWORK.png" alt=""><figcaption></figcaption></figure>
+
+
 
 Now that you’re connected to the network, you can authenticate with Twitter:
 
-![Screen Shot 2022-07-29 at 4 13 39 PM](https://user-images.githubusercontent.com/107710263/184897259-1937d096-738d-4534-b5ed-1f6cee2cf7e2.png)
+<figure><img src=".gitbook/assets/BOBA-WALLET-SCREENSHOT.png" alt=""><figcaption></figcaption></figure>
+
+
 
 * Hit the Tweet Now button to tweet your “Boba Bubble” token.
 * Once your tweet is shared, copy the link leading to it.
@@ -186,7 +193,7 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-<figure><img src=".gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Isn’t My Transaction Going Through?
 
@@ -235,11 +242,13 @@ This question is already answered [in our documentation on subgraphs](https://do
 
 Actually, there are multiple bridges available. You can check it out on our ecosystem page, as can be seen below.
 
-![Screen Shot 2022-08-16 at 4 03 04 PM](https://user-images.githubusercontent.com/107710263/184899440-3d50fc80-2f79-4075-acff-05eb8e2a2954.png)
+<figure><img src=".gitbook/assets/BOBA-ECOSYSTEM-BRIDGES.png" alt=""><figcaption></figcaption></figure>
+
+
 
 [Simply follow this link](https://gateway.boba.network/) and navigate to the Ecosystem tab.
 
-<figure><img src=".gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: What Are the Limits on Hybrid Compute Web2 Calls?
 
