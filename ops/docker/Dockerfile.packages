@@ -163,6 +163,7 @@ WORKDIR /opt/optimism/packages/boba/teleportation
 CMD ["npm", "run", "start"]
 
 FROM packages as aa_deployer
+COPY /optimism/packages/boba/bundler/packages/sdk /opt/optimism/node_modules/@account-abstraction/sdk
 WORKDIR /opt/optimism/packages/boba
 COPY --from=builder /opt/optimism/packages/boba/account-abstraction ./account-abstraction
 WORKDIR /opt/optimism/packages/boba/account-abstraction
