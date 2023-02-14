@@ -59,6 +59,7 @@ COPY packages/boba/ve-boba/package.json ./packages/boba/ve-boba/package.json
 COPY packages/boba/bobalink/package.json ./packages/boba/bobalink/package.json
 COPY packages/boba/teleportation/package.json ./packages/boba/teleportation/package.json
 COPY packages/boba/account-abstraction/package.json ./packages/boba/account-abstraction/package.json
+COPY packages/boba/bundler/packages/sdk/package.json ./packages/boba/bundler/packages/sdk/package.json
 
 FROM base as builder
 WORKDIR /opt/optimism
