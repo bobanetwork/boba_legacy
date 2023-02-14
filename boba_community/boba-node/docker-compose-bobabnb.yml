@@ -1,9 +1,9 @@
 
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://rpc.api.moonbeam.network'
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://bsc-dataseed.binance.org/'
 
 x-l1_rpc_geth: &l1_rpc_geth
-  ETH1_HTTP: 'https://rpc.api.moonbeam.network'
+  ETH1_HTTP: 'https://bsc-dataseed.binance.org/'
 
 version: "3.9"
 
@@ -15,19 +15,19 @@ services:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
-
-      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://replica.bobabeam.boba.network'
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://replica.bnb.boba.network'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
-      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 1294
-      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 1687903
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 56288
       DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
-      DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x564c10A60af35a07f0EA8Be3106a4D81014b21a0'
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 1305672
+      DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0xeb989B25597259cfa51Bd396cE1d4B085EC4c753'
       DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
       DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     volumes:
-      - ./state-dumps/bobabeam:/opt/optimism/packages/data-transport-layer/state-dumps/
+
+      - ./state-dumps/bobabnb:/opt/optimism/packages/data-transport-layer/state-dumps/
     logging:
       driver: "json-file"
       options:
@@ -68,7 +68,7 @@ services:
       L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
       BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
       # sequencer http endpoint
-      SEQUENCER_CLIENT_HTTP: https://bobabeam.boba.network
+      SEQUENCER_CLIENT_HTTP: https://bnb.boba.network/
     logging:
       driver: "json-file"
       options:
