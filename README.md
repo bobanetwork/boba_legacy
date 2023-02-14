@@ -57,7 +57,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
   * [`register`](packages/boba/register/): Code for registering addresses in the AddressManager
   * [`subgraph`](packages/boba/subgraph/): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
 
-<figure><img src=".gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
 
 Follow these instructions to set up your local development environment.
 
@@ -90,7 +90,7 @@ $ cd ops
 $ BUILD=1 DAEMON=0 ./up_local.sh
 ```
 
-<figure><img src=".gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 4 (1).png" alt=""><figcaption></figcaption></figure>
 
 Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialization. Recommended settings in docker - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
 
@@ -112,7 +112,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
 * _To (re)build individual Boba ts services_: `docker-compose build -- builder` then `docker-compose build -- dtl`, for example
 
-<figure><img src=".gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
 
 To run unit tests for a specific package:
 

@@ -4,7 +4,7 @@ description: Frequently asked questions
 
 # FAQ
 
-### What is Boba Network?
+<figure><img src=".gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 [Boba](https://boba.network) a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
@@ -50,7 +50,7 @@ To move assets into or out of an Optimistic Ethereum network you can use the [**
 
 #### Can I cancel a withdrawal after it has been submitted?
 
-**No, withdrawals currently cannot be cancelled once submitted.**
+No, withdrawals currently cannot be cancelled once submitted.
 
 #### Can I transfer directly from Boba to a centralized Exchange?
 
@@ -108,16 +108,16 @@ There are 4 different mechanisms for following the status of a transaction.
 
 These methods are described [here](boba\_documentation/developer/xdomain-tx-status.md).
 
-## Developer FAQ
+<figure><img src=".gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
-Categories:
+**Categories:**
 
 * Smart Contracts
 * Testing and Testnets
 * Transactions
 * Hybrid Compute
 
-### Smart Contracts
+<figure><img src=".gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Can't I Deploy My 100kb Copy/Paste Contract?
 
@@ -143,7 +143,7 @@ Unfortunately no, not at the moment.
 
 See Q2 of Transactions
 
-### Testing and Testnets
+<figure><img src=".gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Does Boba Network Have a Testnet/How Do I Get Testnet Boba or Eth?
 
@@ -186,7 +186,7 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-### Transactions
+<figure><img src=".gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Isn’t My Transaction Going Through?
 
@@ -239,7 +239,7 @@ Actually, there are multiple bridges available. You can check it out on our ecos
 
 [Simply follow this link](https://gateway.boba.network/) and navigate to the Ecosystem tab.
 
-### Hybrid Compute
+<figure><img src=".gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: What Are the Limits on Hybrid Compute Web2 Calls?
 
