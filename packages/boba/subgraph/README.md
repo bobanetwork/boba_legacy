@@ -1,4 +1,4 @@
-# Boba Network Subgraphs
+# Using The Graph
 
 These subgraphs index the **StandardBridge**, the **LiquidityPool**, the **Boba DAO**, and the **TuringMonster** contracts.
 
@@ -49,7 +49,7 @@ graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph
 # or, yarn deploy:subgraph:rinkeby
 ```
 
-*NOTE: When you log into https://thegraph.com/hosted-service/dashboard, you may have more than one account. Make sure that you are using the ACCESS_TOKEN associated with the correct account, otherwise your depoyment will fail. You can cycle through your multiple accounts by clicking on your GitHub user ID or whatever other account is displayed next to your user Avatar.*
+_NOTE: When you log into https://thegraph.com/hosted-service/dashboard, you may have more than one account. Make sure that you are using the ACCESS\_TOKEN associated with the correct account, otherwise your depoyment will fail. You can cycle through your multiple accounts by clicking on your GitHub user ID or whatever other account is displayed next to your user Avatar._
 
 ## Example
 
@@ -62,7 +62,6 @@ Here is some example queries to get you started:
     -H "Content-Type: application/json" \
     -d '{"query":"{ governorProposalCreateds {proposalId values description proposer}}"}' \
     https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph
-
 ```
 
 ```bash
@@ -72,18 +71,16 @@ Here is some example queries to get you started:
     -H "Content-Type: application/json" \
     -d '{"query":"{ governorProposalCreateds {proposalId values description proposer}}"}' \
     https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges
-
 ```
 
 ## Querying
 
-* The Mainnet Graph Node is hosted by **The Graph**. Visit https://thegraph.com/hosted-service/ to deploy your subgraphs. You can experiment here: [ bobanetwork/boba-l2-subgraph](https://thegraph.com/hosted-service/subgraph/bobanetwork/boba-l2-subgraph?query=Example%20query).
-
+* The Mainnet Graph Node is hosted by **The Graph**. Visit https://thegraph.com/hosted-service/ to deploy your subgraphs. You can experiment here: [bobanetwork/boba-l2-subgraph](https://thegraph.com/hosted-service/subgraph/bobanetwork/boba-l2-subgraph?query=Example%20query).
 * Rinkeby endpoint: https://graph.rinkeby.boba.network. You can experiment here: [boba/Bridges/graphql](https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges/graphql)
 
-| **Port** | **Purpose**                               | **Routes**              | URL                                                          | **Permission** |
-| -------- | ----------------------------------------- | ----------------------- | ------------------------------------------------------------ | -------------- |
-| 8000     | GraphQL HTTP server                       | /subgraphs/name/.../... | https://graph.rinkeby.boba.network <br />https://graph.rinkeby.boba.network:8000 | Public         |
-| 8020     | JSON-RPC<br /> (for managing deployments) | /                       | https://graph.rinkeby.boba.network:8020                      | Private        |
-| 8030     | Subgraph indexing status API              | /graphql                | https://graph.rinkeby.boba.network:8030                      | Public         |
-| 8040     | Prometheus metrics                        | /metrics                | https://graph.rinkeby.boba.network:8040                      | Public         |
+| **Port** | **Purpose**                                   | **Routes**              | URL                                                                                  | **Permission** |
+| -------- | --------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------ | -------------- |
+| 8000     | GraphQL HTTP server                           | /subgraphs/name/.../... | <p>https://graph.rinkeby.boba.network<br>https://graph.rinkeby.boba.network:8000</p> | Public         |
+| 8020     | <p>JSON-RPC<br>(for managing deployments)</p> | /                       | https://graph.rinkeby.boba.network:8020                                              | Private        |
+| 8030     | Subgraph indexing status API                  | /graphql                | https://graph.rinkeby.boba.network:8030                                              | Public         |
+| 8040     | Prometheus metrics                            | /metrics                | https://graph.rinkeby.boba.network:8040                                              | Public         |

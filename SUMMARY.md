@@ -1,31 +1,28 @@
-# Table of Contents
+# Table of contents
 
 * [Welcome to Boba](README.md)
 * [FAQ](faq.md)
-
-* User Docs
+* [User Docs](user-docs/README.md)
   * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
-  * [Fraud Detection](https://github.com/bobanetwork/boba/blob/develop/boba_community/fraud-detector/README.md)
+  * [Fraud Detection](https://github.com/bobanetwork/boba/blob/develop/boba\_community/fraud-detector/README.md)
   * [NFTs](boba\_documentation/user/003\_nfts.md)
-  * [Running a Boba node](https://github.com/bobanetwork/boba/blob/develop/boba_community/boba-node/README.md)
-
-* [Welcome to Hybrid Compute](boba\_documentation/developer/hybrid_compute.md)
-  * [Hybrid Compute 101](https://github.com/bobanetwork/HybridCompute_Tutorial/blob/non-local-starter/README.md)
+  * [Running a Boba node](https://github.com/bobanetwork/boba/blob/develop/boba\_community/boba-node/README.md)
+* [Welcome to Hybrid Compute](boba\_documentation/developer/hybrid\_compute.md)
+  * [Hybrid Compute 101](https://github.com/bobanetwork/HybridCompute\_Tutorial/blob/non-local-starter/README.md)
   * [Implementation](boba\_documentation/hc/implementation.md)
   * [BOBA Faucet](boba\_documentation/hc/hc-captcha-faucet.md)
   * [KYC](boba\_documentation/hc/kyc.md)
   * [Monster Minting](boba\_documentation/hc/monsters.md)
   * [Wizard](boba\_documentation/hc/start.md)
-  * [API Endpoints](boba\_documentation/hc/AWS_lambda_setup.md)
-
-* For Developers
+  * [API Endpoints](boba\_documentation/hc/AWS\_lambda\_setup.md)
+* [For Developers](for-developers/README.md)
   * [Testnet faucets for developers](boba\_documentation/developer/faucets.md)
   * [Welcome to Boba](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Basic Operations](boba\_documentation/developer/basic-ops.md)
-  * [Dual fee system](https://github.com/bobanetwork/boba/blob/develop/boba_examples/boba-fee/README.md)
+  * [Dual fee system](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/boba-fee/README.md)
   * [Contract Deployment Example](boba\_documentation/developer/contract-deployment.md)
-  * [Sending ETH to L2](https://github.com/bobanetwork/boba/blob/develop/boba_examples/init-fund-l2/README.md)
+  * [Sending ETH to L2](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/init-fund-l2/README.md)
   * [Adding a new ERC20 to Boba](boba\_documentation/developer/add-new-token.md)
   * [Fees](boba\_documentation/developer/fee-scheme.md)
   * [Contract Addresses Boba/Ethereum](boba\_documentation/developer/network-parameters.md)
@@ -47,8 +44,7 @@
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
     * [Using the BOBA Token Bridge Between L1s](boba\_documentation/developer/bridge-l1-and-l2/boba-token-bridge.md)
   * [Token Addresses](boba\_documentation/developer/token-addresses.md)
-
-* [Other](packages/README.md)
+* [Other](other/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
   * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
   * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
