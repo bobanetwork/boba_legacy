@@ -50,7 +50,7 @@ describe('Liquidity Pool Test', async () => {
       .Proxy__L1StandardBridge
 
     L1StandardBridge = getContractFactory(
-      'L1StandardBridge',
+      'L1StandardBridgeAltL1',
       env.l1Wallet
     ).attach(L1StandardBridgeAddress)
 
@@ -701,67 +701,6 @@ describe('Liquidity Pool Test', async () => {
     )
   })
 
-  /* In this test, we provide liquidity X to a pool,
-     but then trigger a X + 1000 liquidity request.
-     If the system is working correctly, this should trigger a revert
-  */
-
-  // it('1 should revert unfulfillable swap-offs', async () => {
-  //   const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
-  //   const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
-
-  //   const userRewardFeeRate = await L2LiquidityPool.getUserRewardFeeRate(
-  //     L2ERC20.address
-  //   )
-  //   const ownerRewardFeeRate = await L2LiquidityPool.ownerRewardFeeRate()
-  //   const totalFeeRate = userRewardFeeRate.add(ownerRewardFeeRate)
-  //   const remainingPercent = BigNumber.from(1000).sub(totalFeeRate)
-
-  //   const requestedLiquidity = (
-  //     await L1ERC20.balanceOf(L1LiquidityPool.address)
-  //   ).add(1000)
-  //   const fastExitAmount = requestedLiquidity.mul(1000).div(remainingPercent)
-
-  //   const approveBobL2TX = await L2ERC20.connect(env.l2Wallet).approve(
-  //     L2LiquidityPool.address,
-  //     fastExitAmount,
-  //     { gasLimit: 7000000 }
-  //   )
-  //   await approveBobL2TX.wait()
-
-  //   // FIXME write revert version
-  //   // await env.waitForRevertXDomainTransactionFast(
-  //   //   L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
-  //   //     fastExitAmount,
-  //   //     L2ERC20.address,
-  //   //     { gasLimit: 7000000 }
-  //   //   )
-  //   // )
-
-  //   await env.waitForXDomainTransactionFast(
-  //     L2LiquidityPool.connect(env.l2Wallet).clientDepositL2(
-  //       fastExitAmount,
-  //       L2ERC20.address,
-  //       { gasLimit: 7000000 }
-  //     )
-  //   )
-
-  //   const postBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
-  //   const postBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
-
-  //   // FIXME
-  //   // expect(preBobL1ERC20Balance).to.deep.eq(postBobL1ERC20Balance)
-
-  //   // for precise calculation
-  //   const exitFeesOne = fastExitAmount.mul(userRewardFeeRate).div(1000)
-  //   const exitFeesTwo = fastExitAmount.mul(ownerRewardFeeRate).div(1000)
-  //   const exitFees = exitFeesOne.add(exitFeesTwo)
-
-  //   // FIXME - failing with AssertionError: Expected "8517976822810590630347" to be equal 8617986822810590631347
-  //   expect(postBobL2ERC20Balance).to.deep.eq(preBobL2ERC20Balance.sub(exitFees))
-
-  // })
-
   it('should revert unfulfillable swap-offs', async () => {
     const preBobL1ERC20Balance = await L1ERC20.balanceOf(env.l1Wallet.address)
     const preBobL2ERC20Balance = await L2ERC20.balanceOf(env.l2Wallet.address)
@@ -1170,141 +1109,6 @@ describe('Liquidity Pool Test', async () => {
     }
   })
 
-  it('the DAO should be able to configure fee for L2LP', async function () {
-    // Disable this test
-    // We don't have DAO in other chains
-    this.skip()
-
-    // admin will be set to the DAO/timelock in the future
-    const poolAdmin = await L2LiquidityPool.DAO()
-
-    // since tests are with deployed contracts
-    if (env.l2Wallet.address === poolAdmin) {
-      const initialUserRewardMinFeeRate =
-        await L2LiquidityPool.userRewardMinFeeRate()
-      const initialUserRewardMaxFeeRate =
-        await L2LiquidityPool.userRewardMaxFeeRate()
-      const initialOwnerRewardFeeRate =
-        await L2LiquidityPool.ownerRewardFeeRate()
-
-      // update fee rate
-      await L2LiquidityPool.configureFee(
-        initialUserRewardMinFeeRate.add(10),
-        initialUserRewardMaxFeeRate.add(10),
-        initialOwnerRewardFeeRate.add(10)
-      )
-
-      const updatedUserRewardMinFeeRate =
-        await L2LiquidityPool.userRewardMinFeeRate()
-      const updatedUserRewardMaxFeeRate =
-        await L2LiquidityPool.userRewardMaxFeeRate()
-      const updatedOwnerRewardFeeRate =
-        await L2LiquidityPool.ownerRewardFeeRate()
-
-      expect(updatedUserRewardMinFeeRate).to.deep.eq(
-        initialUserRewardMinFeeRate.add(10)
-      )
-      expect(updatedUserRewardMaxFeeRate).to.deep.eq(
-        initialUserRewardMaxFeeRate.add(10)
-      )
-      expect(updatedOwnerRewardFeeRate).to.deep.eq(
-        initialOwnerRewardFeeRate.add(10)
-      )
-
-      // change to fee back to default
-      await L2LiquidityPool.configureFee(
-        initialUserRewardMinFeeRate,
-        initialUserRewardMaxFeeRate,
-        initialOwnerRewardFeeRate
-      )
-    } else {
-      this.skip()
-    }
-  })
-
-  it('should fail configuring L2LP fee for non DAO', async function () {
-    const isMB = await isNonEthereumChain()
-    if (isMB) {
-      this.skip()
-    }
-
-    await expect(
-      L2LiquidityPool.connect(env.l2Wallet_2).configureFee(5, 35, 15)
-    ).to.be.revertedWith('Caller is not the DAO')
-  })
-
-  it('the DAO should be able to configure fee for L1LP', async function () {
-    const isMB = await isNonEthereumChain()
-    if (isMB) {
-      this.skip()
-    }
-
-    // admin will be set to the DAO timelock in the future
-    const poolAdmin = await L2LiquidityPool.DAO()
-
-    // since tests are with deployed contracts
-    if (env.l2Wallet.address === poolAdmin) {
-      const initialUserRewardMinFeeRate =
-        await L1LiquidityPool.userRewardMinFeeRate()
-      const initialUserRewardMaxFeeRate =
-        await L1LiquidityPool.userRewardMaxFeeRate()
-      const initialOwnerRewardFeeRate =
-        await L1LiquidityPool.ownerRewardFeeRate()
-
-      // update fee rate
-      await env.waitForXDomainTransactionFast(
-        L2LiquidityPool.configureFeeExits(
-          initialUserRewardMinFeeRate.add(10),
-          initialUserRewardMaxFeeRate,
-          initialOwnerRewardFeeRate.add(10)
-        )
-      )
-
-      const updatedUserRewardMinFeeRate =
-        await L1LiquidityPool.userRewardMinFeeRate()
-      const updatedUserRewardMaxFeeRate =
-        await L1LiquidityPool.userRewardMaxFeeRate()
-      const updatedOwnerRewardFeeRate =
-        await L1LiquidityPool.ownerRewardFeeRate()
-
-      expect(updatedUserRewardMinFeeRate).to.deep.eq(
-        initialUserRewardMinFeeRate.add(10)
-      )
-      expect(updatedUserRewardMaxFeeRate).to.deep.eq(
-        initialUserRewardMaxFeeRate
-      )
-      expect(updatedOwnerRewardFeeRate).to.deep.eq(
-        initialOwnerRewardFeeRate.add(10)
-      )
-
-      // change to fee back to default
-      await env.waitForXDomainTransactionFast(
-        L2LiquidityPool.configureFeeExits(
-          initialUserRewardMinFeeRate,
-          initialUserRewardMaxFeeRate,
-          initialOwnerRewardFeeRate
-        )
-      )
-    } else {
-      this.skip()
-    }
-  })
-
-  it('should fail configuring L1LP fee for non DAO', async function () {
-    const isMB = await isNonEthereumChain()
-    if (isMB) {
-      this.skip()
-    }
-
-    await expect(
-      L2LiquidityPool.connect(env.l2Wallet_2).configureFeeExits(5, 35, 15)
-    ).to.be.revertedWith('Caller is not the DAO')
-
-    await expect(L1LiquidityPool.configureFee(5, 35, 15)).to.be.revertedWith(
-      'XCHAIN: messenger contract unauthenticated'
-    )
-  })
-
   describe('BOBA tests', async () => {
     it('should add L1 liquidity', async () => {
       const addLiquidityAmount = utils.parseEther('100')
@@ -1367,10 +1171,6 @@ describe('Liquidity Pool Test', async () => {
         { value: addLiquidityAmount }
       )
       await BobAddLiquidity.wait()
-
-      // expect(preBobL2EthBalance).to.deep.eq(
-      //   postBobL2EthBalance.add(addLiquidityAmount)
-      // )
 
       // User deposit amount
       const postBobPoolAmount = await L2LiquidityPool.userInfo(

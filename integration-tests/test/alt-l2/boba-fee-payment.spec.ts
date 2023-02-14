@@ -1172,7 +1172,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         value: ethers.utils.parseEther('0.5'),
       })
     ).to.be.rejectedWith(
-      'insufficient secondary fee token balance to pay for gas'
+      'insufficient l1 native token balance to pay for gas'
     )
   })
 

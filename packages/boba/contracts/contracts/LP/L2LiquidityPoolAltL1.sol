@@ -272,7 +272,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         L1LiquidityPoolAddress = _L1LiquidityPoolAddress;
         owner = msg.sender;
         DAO = msg.sender;
-        BOBAAddress = Lib_PredeployAddresses.L2_BOBA;
+        BOBAAddress = Lib_PredeployAddresses.L2_BOBA_ALT_L1;
         // translates to fee rates 0.1%, 1% and 1.5% respectively
         configureFee(1, 10, 15);
         configureGas(100000);
@@ -382,7 +382,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         PoolInfo storage pool = poolInfo[_l2TokenAddress];
         uint256 poolLiquidity = pool.userDepositAmount;
         uint256 poolBalance;
-        if (_l2TokenAddress == Lib_PredeployAddresses.L2_BOBA) {
+        if (_l2TokenAddress == Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             poolBalance = address(this).balance;
         } else {
             poolBalance = IERC20(_l2TokenAddress).balanceOf(address(this));
@@ -485,14 +485,14 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         nonReentrant
         whenNotPaused
     {
-        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
+        require(msg.value != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error
-        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
+        require(!(msg.value != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends BOBA or ERC20
         if (msg.value != 0) {
             // override the _amount and token address
             _amount = msg.value;
-            _tokenAddress = Lib_PredeployAddresses.L2_BOBA;
+            _tokenAddress = Lib_PredeployAddresses.L2_BOBA_ALT_L1;
         }
 
         PoolInfo storage pool = poolInfo[_tokenAddress];
@@ -525,7 +525,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         );
 
         // transfer funds if users deposit ERC20
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
     }
@@ -555,14 +555,14 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         // BOBA amount
         uint256 netBobaAmount = msg.value - billingContract.exitFee();
 
-        require(netBobaAmount != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA, "Either Amount Incorrect or Token Address Incorrect");
+        require(netBobaAmount != 0 || _tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1, "Either Amount Incorrect or Token Address Incorrect");
         // combine to make logical XOR to avoid user error
-        require(!(netBobaAmount != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA), "Either Amount Incorrect or Token Address Incorrect");
+        require(!(netBobaAmount != 0 && _tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1), "Either Amount Incorrect or Token Address Incorrect");
         // check whether user sends BOBA or ERC20
         if (netBobaAmount != 0) {
             // override the _amount and token address
             _amount = netBobaAmount;
-            _tokenAddress = Lib_PredeployAddresses.L2_BOBA;
+            _tokenAddress = Lib_PredeployAddresses.L2_BOBA_ALT_L1;
         }
         PoolInfo storage pool = poolInfo[_tokenAddress];
 
@@ -575,7 +575,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         );
 
         // transfer funds if users deposit ERC20
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             IERC20(_tokenAddress).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
@@ -637,7 +637,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
@@ -673,7 +673,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
@@ -716,7 +716,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
@@ -744,7 +744,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         require(L1LiquidityPoolAddress != address(0), "L1 Liquidity Pool Not Registered");
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
 
-        if (_tokenAddress == Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress == Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             require(_amount <= address(this).balance, "Requested BOBA exceeds pool balance");
             L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
                 _tokenAddress,
@@ -849,7 +849,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         uint256 totalFee = userRewardFee.add(ownerRewardFee);
         uint256 receivedAmount = _amount.sub(totalFee);
 
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             if (receivedAmount > IERC20(_tokenAddress).balanceOf(address(this))) {
                 replyNeeded = true;
             } else {
@@ -931,7 +931,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
             _tokenAddress
         );
 
-        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA) {
+        if (_tokenAddress != Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             IERC20(_tokenAddress).safeTransfer(_to, receivedAmount);
         } else {
             //this is BOBA
