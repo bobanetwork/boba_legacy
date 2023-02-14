@@ -2017,8 +2017,6 @@ class NetworkService {
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
-
       const opts = {
         fromBlock: -4000
       }
@@ -2028,6 +2026,7 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
+      // const block = await this.L1Provider.getTransaction(depositTX.hash)
       // const data = {
       //   "key": SPEED_CHECK,
       //   "hash": depositTX.hash,
