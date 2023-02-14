@@ -55,7 +55,7 @@ describe('BobaLink Test\n', async () => {
     const BobaTuringCreditAddress = await env.addressesBOBA.BobaTuringCredit
 
     BobaTuringCredit = getContractFactory(
-      'BobaTuringCredit',
+      'BobaTuringCreditAltL1',
       env.l2Wallet
     ).attach(BobaTuringCreditAddress)
 
@@ -73,7 +73,7 @@ describe('BobaLink Test\n', async () => {
       env.addressesBOBA.BOBAUSD_AggregatorHC,
       env.l2Wallet
     )
-    BobaChainLinkOracle = await getBobaContractAt(
+    BobaOracleHC = await getBobaContractAt(
       'FluxAggregatorHC',
       env.addressesBOBA.Proxy__BOBAUSD_AggregatorHC,
       env.l2Wallet

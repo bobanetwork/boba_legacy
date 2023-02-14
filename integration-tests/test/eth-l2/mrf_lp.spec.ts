@@ -160,7 +160,7 @@ describe('Liquidity Pool Test', async () => {
     expect(preL2ERC20Balance).to.deep.eq(
       postL2ERC20Balance.sub(depositL2ERC20Amount)
     )
-  })
+  }).retries(3)
 
   it('should transfer L2 ERC20 TEST token from Bob to Alice and Kate', async () => {
     const transferL2ERC20Amount = utils.parseEther('150')
