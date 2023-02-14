@@ -352,7 +352,7 @@ class NetworkService {
     }
 
     try {
-      // change url if network is etheruem
+      // change url if network is ethereum
       const swapUrl = this.networkGateway === NETWORK.ETHEREUM ? '/send.swapBOBAForETH' : '/send.swapSecondaryFeeToken'
       const response = await metaTransactionAxiosInstance(
         this.networkConfig
@@ -726,7 +726,7 @@ class NetworkService {
             blockExplorerUrls: [networkDetail['L2']?.blockExplorer?.slice(0, -1)]
           }
 
-          console.log([ 'Adding etheruem Chain', chainParam, targetIDHex ]);
+          console.log([ 'Adding ethereum Chain', chainParam, targetIDHex ]);
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
           window.ethereum.on('chainChanged', handleChangeChainOnce)
           return true
@@ -4590,7 +4590,7 @@ class NetworkService {
 
       console.log(`🆙 Depositing ${value} 👉 ${type} l1 with 💵 FEE ${ethers.utils.formatEther(estimatedFee._nativeFee)}`);
 
-      // TODO: FIXME: Update this function to `withdraw` in case of other deployment than ETHERUEM.
+      // TODO: FIXME: Update this function to `withdraw` in case of other deployment than ETHEREUM.
       // INPUT STEP MULTICHAIN
       await Proxy__EthBridge.depositERC20(
         ETH_L1_BOBA_ADDRESS,

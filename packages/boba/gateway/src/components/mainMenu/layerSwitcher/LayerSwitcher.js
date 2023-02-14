@@ -255,10 +255,10 @@ function LayerSwitcher({
         onChange={(e, n) => dispatchSwitchLayer(n)}
         aria-label="text alignment"
       >
-        <ToggleButton sx={{p: "5px 10px", borderRadius: '12px 0 0 12px'}} value="L1" aria-label="L1">
+        <ToggleButton sx={{p: "7px 3.5px 7px 7px", borderRadius: '12px', border: "none"}} value="L1" aria-label="L1">
           <L1Icon selected={layer === LAYER.L1}/>
         </ToggleButton>
-        <ToggleButton sx={{p: "5px 10px", borderRadius: '0 12px 12px 0'}} value="L2" aria-label="L2">
+        <ToggleButton sx={{p: "7px 7px 7px 3.5px",  borderRadius: '12px', border: "none"}} value="L2" aria-label="L2">
           <L2Icon selected={layer === LAYER.L2} />
         </ToggleButton>
       </ToggleButtonGroup>
@@ -267,11 +267,11 @@ function LayerSwitcher({
         <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
       </S.LayerContent> : null}
       {!layer ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Not connected</Typography>
+        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Connect</Typography>
         <Typography variant="body4" sx={{
           opacity: '0.3',
           whiteSpace: 'nowrap'
-        }} >Select chain to connect</Typography>
+        }} >connect wallet</Typography>
       </S.LayerContent> : null}
       {layer === 'L2' ? <S.LayerContent>
         <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba</Typography>

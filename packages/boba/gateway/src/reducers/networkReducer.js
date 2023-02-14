@@ -16,7 +16,7 @@ limitations under the License. */
 import { NETWORK, NETWORK_TYPE } from "util/network/network.util"
 
 /**
- * network : etheruem, bnb, fantom, avax, moonbase, moonbeam
+ * network : ethereum, bnb, fantom, avax, moonbase, moonbeam
  * networkType : mainnet, testnet.
  **/
 

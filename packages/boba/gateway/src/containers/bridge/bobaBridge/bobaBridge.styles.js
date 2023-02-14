@@ -2,14 +2,14 @@ import styled from '@emotion/styled';
 import { Box, Button, Divider as MuiDivider, IconButton, Typography } from "@mui/material";
 
 export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
-  background: theme.palette.background.secondary,
-  backdropFilter: 'blur(100px)',
-  borderRadius: theme.palette.primary.borderRadius,
-  border: theme.palette.primary.border,
+  background: theme.palette.background.glassy,
+  backdropFilter: 'blur(50px)',
+  borderRadius: theme.palette.secondary.borderRadius,
   flex: 1,
   minHeight: 'fit-content',
-  padding: '20px',
+  padding: '24px',
   width: '100%',
+  maxWidth: '600px',
 }))
 
 export const BobaContent = styled(Box)(({ theme }) => ({
@@ -28,15 +28,16 @@ export const BobaContentWrapper = styled(Box, {
   flexGrow: 1
 }))
 
-export const Divider = styled(MuiDivider)(({ theme }) => ({
+export const BobaDivider = styled(MuiDivider)(({ theme }) => ({
   background: theme.palette.background.secondary,
   boxSizing: 'border-box',
-  width: '100%'
+  width: '100%',
+  margin: '32px 0 32px 0',
 }))
 
 export const ChainInput = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.secondary,
-  border: theme.palette.primary.border,
+  background: theme.palette.background.input,
+  border: theme.palette.secondary.border,
   boxSizing: 'border-box',
   borderRadius: theme.palette.primary.borderRadius,
   height: '50px',
@@ -74,9 +75,8 @@ export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   borderRadius: theme.palette.primary.borderRadius,
-  border: theme.palette.primary.border,
   width: '100%',
-  padding: '10px',
+  padding: '20px',
   '&:hover > span': {
     color: theme.palette.secondary.main
   }
@@ -113,13 +113,14 @@ export const AlertInfo = styled(Box)`
 `;
 
 export const IconSwitcher = styled(IconButton)(({ theme }) => ({
-  background: theme.palette.background.secondary,
-  border: theme.palette.primary.border,
+  background: theme.palette.background.input,
   borderRadius: theme.palette.primary.borderRadius,
   height: '40px',
   width: '40px',
   display: 'flex',
   alignSelf: 'center',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+
 }))
+

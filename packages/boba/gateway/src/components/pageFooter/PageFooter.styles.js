@@ -1,18 +1,25 @@
 import { styled } from '@mui/material/styles'
-import { Box, Container, Divider } from '@mui/material'
+import { Box, Divider } from '@mui/material'
 import { NavLink } from 'react-router-dom';
 
-export const Wrapper = styled(Container)(({ theme }) => ({
+export const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: 'column',
   justifyContent: 'flex-start',
   alignItems: 'center',
-  background: theme.background,
+  //margin: '0',
+  //padding: '0 20px',
+  //bottom: 0,
+  //width: '100%',
+  //height: '184px',
+  background: theme.palette.background.footer,
   [ theme.breakpoints.down('md') ]: {
-    maxHeight: '400px',
+    marginTop: 0,
+    height: '450px',
     justifyContent: 'flex-start',
     padding: '0 20px',
-    marginTop: '10px'
+  },
+  [ theme.breakpoints.up('md') ]: {
   },
 }))
 
@@ -91,17 +98,16 @@ export const FooterLinkWrapperLeft = styled(Box)(({ theme }) => ({
 
 export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
-  // alignSelf: 'flex-start',
+  alignSelf: 'flex-start',
   justifyContent: 'space-between',
   alignItems: 'center',
-  width: '100%',
-  margin: '20px',
+  width: '70%',
+  margin: '32px auto',
   [ theme.breakpoints.down('md') ]: {
     width: '100%',
     justifyContent: 'space-around',
     flexDirection: 'column',
     margin: '0',
-    marginTop: '20px',
     alignItems: 'flex-start',
   }
 }))
@@ -114,23 +120,26 @@ export const LinkWrapper = styled(Box)(({ theme }) => ({
   [ theme.breakpoints.down('md') ]: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    margin: '10px 0',
-    width: '100%',
-    gap: 0
+    margin: '20px 0',
+  },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%'
   }
 }))
 
 export const SocialWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   width: '20%',
-  justifyContent: 'flex-end',
+  justifyContent: 'flex-start',
   gap: '10px',
   'a': {
     cursor: 'pointer',
   },
   [ theme.breakpoints.down('md') ]: {
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     margin: '10px 0',
-    width: '100%',
   },
+  [ theme.breakpoints.down('sm') ]: {
+    width: '100%'
+  }
 }))

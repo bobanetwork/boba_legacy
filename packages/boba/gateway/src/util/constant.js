@@ -89,11 +89,11 @@ export const LAYER = {
 
 export const DEFAULT_NETWORK = {
   NAME: {
-    L1: 'Etheruem',
+    L1: 'Ethereum',
     L2: 'Boba'
   },
   ICON: {
-    L1: 'etheruem',
+    L1: 'ethereum',
     L2: 'boba'
   }
 }

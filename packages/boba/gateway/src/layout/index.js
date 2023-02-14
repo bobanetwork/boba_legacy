@@ -36,7 +36,7 @@ function App() {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const buttonColor = '#228fe5' //blue
+  const buttonColor = '#BAE21A' //radioGreen
   const darkGrey = '#1b1c1f'
 
   let MUItheme = createTheme({
@@ -47,12 +47,14 @@ function App() {
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
         border: light ? 'solid 1px rgba(0, 0, 0, 0.12)' : 'solid 1px #2d2f3a',
-        borderRadius: '8px',
+        borderRadius: '12px',
         borderBottom: light ? 'solid 1px rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.04)',
         tabBorderBottom: light ? `solid 2px ${buttonColor}}` : `2px solid ${buttonColor}}`,
       },
       secondary: {
         main: light ? buttonColor : buttonColor,
+        borderRadius: '20px',
+        border: light ? 'solid 1px rgba(0, 0, 0, 0.12)' : 'solid 1px rgba(255, 255, 255, 0.06)',
       },
       background: {
         default: light ? "#FFFFFF" : "#111315",
@@ -62,6 +64,8 @@ function App() {
         modal: light ? "#fff" : '#1A1D1F',
         modalTransparent: light ? "#fff" : 'transparent',
         input: light ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)",
+        footer: light ? "#fff" : '#1A1D1F',
+        glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
       },
       neutral: {
         main: '#fff',
@@ -134,15 +138,17 @@ function App() {
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: buttonColor,
+              background: radioGreen,
               borderWidth: '1.4px',
-              borderColor: buttonColor,
+              borderColor: radioGreen,
               fontWeight: 500,
-              color: '#fff',
+              fontSize: '16px',
+              font: 'Roboto',
+              color: '#031313',
               "&:hover": {
                 boxShadow: 'inset 0px 0px 0px 3px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: buttonColor,
+                backgroundColor: radioGreen,
               }
             },
           },
