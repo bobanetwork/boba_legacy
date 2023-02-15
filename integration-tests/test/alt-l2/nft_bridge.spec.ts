@@ -769,7 +769,9 @@ describe('NFT Bridge Test', async () => {
     })
 
     it('should deposit NFT to L2 when approved for all', async () => {
-      await L1ERC721.setApprovalForAll(env.l1Wallet_2.address, true)
+      const approveTx = await L1ERC721.setApprovalForAll(env.l1Wallet_2.address, true)
+      await approveTx.wait()
+
       await env.waitForXDomainTransaction(
         L1Bridge.connect(env.l1Wallet_2).depositNFT(
           L1ERC721.address,
@@ -795,6 +797,7 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l1Wallet
       )
+      await L1ERC721.deployTransaction.wait()
 
       L2ERC721 = await ethers.deployContract(
         'TestUniqueDataL2StandardERC721',
@@ -1066,6 +1069,7 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l1Wallet
       )
+      await L1ERC721.deployTransaction.wait()
 
       L2ERC721 = await ethers.deployContract(
         'TestExtraDataL2StandardERC721',

@@ -60,10 +60,11 @@ export const BobaLinkPairs = {
       decimals: 8,
       l2ContractAddress: '0xa74B10eF5f4DBcB7fb600b36541ca47bd47E0dCE',
     },
-    '0xccDc49E3271329B995566eEDd8b6b31472DAbFad': {
+    // local avalanche
+    '0xB6157727b2989aE46e970B451A289941Ce8B41FA': {
       pair: 'BOBA / USD',
       decimals: 8,
-      l2ContractAddress: '0x76bB3987bAA2971c5BbE9bE0Ac15E77106c2C76A',
+      l2ContractAddress: '0x4359190563c0F38C84037a28288E01A2b1011Ec8',
     },
   },
 }

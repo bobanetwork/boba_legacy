@@ -148,6 +148,7 @@ services:
       NO_COMPILE: 1
       DTL_REGISTRY_URL: http://dtl:8081/addresses.json
       DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+      RETRIES: 500
     ports:
         # expose the service to the host for getting the contract addrs
       - ${DEPLOYER_PORT:-8077}:8082
@@ -501,5 +502,5 @@ networks:
     enable_ipv6: true
     ipam:
       config:
-        - subnet: "fd00:1::/64"
+        - subnet: "fd00:1::/80"
           # gateway: "fd00:1::1":w
