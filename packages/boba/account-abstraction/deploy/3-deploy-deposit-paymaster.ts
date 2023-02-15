@@ -28,7 +28,7 @@ const deployFn: DeployFunction = async (hre) => {
       [Factory__BobaDepositPaymaster.bytecode, bobaDepositPaymasterConstructorArgs]
     )
 
-    const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2)
+    const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
     const BobaDepositPaymasterAddress = await dep.deterministicDeploy(bobaDepositPaymasterCreationCode)
     console.log('Boba Deposit Paymaster at', BobaDepositPaymasterAddress)
 

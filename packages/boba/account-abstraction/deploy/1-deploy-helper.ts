@@ -79,7 +79,10 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2)
+  // specify network here to deploy on mainnet/goerli or other networks
+  // for example:   const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, "boba_mainnet")
+  // third parameter for DeterministicDeployer is network
+  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
   const BundlerHelperAddress = await dep.deterministicDeploy(Factory__BundlerHelper.bytecode)
   console.log('Deployed BundlerHelper at', BundlerHelperAddress)
 

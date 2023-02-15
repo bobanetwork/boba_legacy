@@ -13,7 +13,7 @@ const deployFn: DeployFunction = async (hre) => {
     EntryPointJson.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
-  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2)
+  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
   const EntryPointAddress = await dep.deterministicDeploy(Factory__EntryPoint.bytecode)
   console.log('Deployed EntryPoint at', EntryPointAddress)
 
