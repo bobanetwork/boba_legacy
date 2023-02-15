@@ -12,7 +12,9 @@ description: How to bridge with Metamask
 
 ## How to bridge to Boba L2
 
-{% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=share_link" %}
+## How to connect your Metamask
+
+{% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
 
 1\) Go to [https://gateway.boba.network/](https://gateway.boba.network)
 
