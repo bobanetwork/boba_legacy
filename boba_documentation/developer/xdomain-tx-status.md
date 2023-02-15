@@ -2,24 +2,23 @@
 description: How to monitor cross-domain transaction status
 ---
 
-# Crossdomain Transaction Status
+# xDomain Transaction Status
 
 There are 4 different mechanisms for following the status of a transaction. In addition to using the Boba Blockexplorer (for L2) and Etherscan (for L1), you can use:
 
-2. Third-party analytics
-3. A typescript `messenger`
-4. The Boba `watcher-api`
+1. Third-party analytics
+2. A typescript `messenger`
+3. The Boba `watcher-api`
 
 ## Using Third Party Analytics
 
-Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](../../packages/boba/subgraph/README.md) for more information.
+Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](../../packages/boba/subgraph/) for more information.
 
 ## Running a messenger
 
 Internally in all the services and also in the `gateway`, the status of transactions is monitored through a `messenger`. Here is an example for how that is done.
 
 ```javascript
-
   import {
     CrossChainMessenger,
     MessageStatus,
@@ -57,12 +56,11 @@ Internally in all the services and also in the `gateway`, the status of transact
       )
     }
   )
-
 ```
 
 ## Using the Boba Transaction API
 
-The system is [documented here](../../ops_boba/api/watcher-api/README.md). For example, to get L2 transactions between two blocks, use `get.l2.transactions`: 
+The system is [documented here](../../ops\_boba/api/watcher-api/). For example, to get L2 transactions between two blocks, use `get.l2.transactions`:
 
 ### get.l2.transactions
 

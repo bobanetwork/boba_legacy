@@ -1,5 +1,7 @@
 ---
-description: Learn how to use basic features of Boba (e.g. bridges, basic L2 ops) through examples
+description: >-
+  Learn how to use basic features of Boba (e.g. bridges, basic L2 ops) through
+  examples
 ---
 
 # Basic Operations
@@ -7,7 +9,6 @@ description: Learn how to use basic features of Boba (e.g. bridges, basic L2 ops
 Below, we provide code snippets for several typical operations on the L2, such as checking the gas price and bridging funds. Overall, note that from the perspective of solidity code and rpc calls, Boba is identical to mainchain in most aspects, so your experience (and code) from mainchain should carry over directly. The main practical differences center on Gas and on cross-chain bridging operations.
 
 To see examples of how to perform dozens of basic operations on Boba, you can also look at the react code for the [Boba Gateway](../../packages/boba/gateway/src/services/networkService.js).
-
 
 ## Check the Current Gas Price
 
@@ -144,7 +145,6 @@ async transfer(address, value_Wei_String, currency) {
 	  return error
 	}
 }
-
 ```
 
 ## An L1->L2 Classic Bridge Operation
@@ -201,7 +201,7 @@ async transfer(address, value_Wei_String, currency) {
 
 The hex value that corresponds to the `L1BLOCKNUMBER` opcode (`0x4B`) may be changed in the future. **We strongly discourage direct use of this opcode within your contracts.** Instead, if you want to access the latest L1 block number, please use the `OVM_L1BlockNumber` contract as described below.
 
-The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so there is a simple contract located at [`0x4200000000000000000000000000000000000013` that will allow you to trigger this opcode. You can use this contract as follows:
+The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so there is a simple contract located at \[`0x4200000000000000000000000000000000000013` that will allow you to trigger this opcode. You can use this contract as follows:
 
 ```javascript
 import { iOVM_L1BlockNumber } from "@eth-optimism/contracts/L2/predeploys/iOVM_L1BlockNumber.sol";

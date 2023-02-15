@@ -1,14 +1,12 @@
-# BOBA Smart Contracts Registration
+# Contracts Registration
 
 ## 1. Automatic contract deployment and serving
 
 This spins up the entire stack, with all contracts deployed, and all the right things needed for the wallet to function, and for development work on the wallet.
 
 ```bash
-
 $ cd ops
 $ ./up_local.sh
-
 ```
 
 **Note - please provide syntax for setting the .env variables (BUILD: 1, DAEMON: 1)**
@@ -16,10 +14,8 @@ $ ./up_local.sh
 To get the contract addresses for the basic stack, and the BOBA-specific contracts:
 
 ```bash
-
 curl http://127.0.0.1:8078/addresses.json | jq #basic stack
 curl http://127.0.0.1:8080/addresses.json | jq #BOBA-specific contracts
-
 ```
 
 ## 2. Manual Deployment and Testing
@@ -27,16 +23,13 @@ curl http://127.0.0.1:8080/addresses.json | jq #BOBA-specific contracts
 Spin up the base local L1/L2:
 
 ```
-
 $ cd ops
 $ docker-compose up -V
-
 ```
 
 Create a `.env` file in the root directory of the contracts folder. Add environment-specific variables on new lines in the form of `NAME=VALUE`. Examples are given in the `.env.example` file. Just pick which net you want to work on and copy either the "Rinkeby" _or_ the "Local" envs to your `.env`.
 
 ```bash
-
 # Local
 NODE_ENV=local
 L1_NODE_WEB3_URL=http://localhost:9545
@@ -48,22 +41,18 @@ TEST_PRIVATE_KEY_3=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cda
 TARGET_GAS_LIMIT=9000000000
 CHAIN_ID=28
 TEST=1 #This deploys the ERC20 test token
-
 ```
 
 Build and deploy all the needed contracts:
 
 ```bash
-
 $ yarn build
 $ yarn deploy
-
 ```
 
 You will now see this, if everything worked correctly:
 
 ```bash
-
  % yarn deploy
 yarn run v1.22.10
 $ ts-node "./bin/deploy.ts"
@@ -89,5 +78,4 @@ L1 and L2 pools have registered ETH and OETH
 ⭐️ L1 Message initialized: 0x37fbbe3ef0ed3f1f4ae6c94fcd1f1825ea6c425091b038c4d4541c8760ea2c53
 ⭐️ L2 Message initialized: 0xa736724e36f8098f70f737ac0c643490732a9ff350bd0fc9629a6face73178a8
 ✨  Done in 10.84s.
-
 ```

@@ -1,8 +1,20 @@
 ---
-description: How to bridge with Metamask
+description: Setup a wallet, buy & transfer cryptocurrencies, use the different chains...
 ---
 
-# How To Bridge
+# How To use Boba's services
+
+[https://gateway.boba.network/](https://gateway.boba.network)
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
+
+{% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+
+{% embed url="https://drive.google.com/file/d/1TxuP6myVAhtPsEQ0wfmS2HdI0E9rjT3b/view" %}
+
+<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 **Before getting started, make sure you have enough ETH in your Metamask wallet to approve and send transactions (we recommend 0.05 ETH).**
 
@@ -10,58 +22,24 @@ description: How to bridge with Metamask
 
 **If you use a Ledger HW wallet, make sure Ledger Firmware, Ledger ETH App, Ledger Live, and Metamask are all updated to the latest version and smart contracts are enabled in your Ledger Ethereum App!**
 
-## How to bridge to Boba L2
+{% embed url="https://drive.google.com/file/d/1Lf-X1xwP9M-ZZM6HiQ1qRhV-0yaBKitA/view?usp=share_link" %}
 
-1\) Go to [https://gateway.boba.network/](https://gateway.boba.network)
+<figure><img src="../../.gitbook/assets/Artboard 4 (2).png" alt=""><figcaption></figcaption></figure>
 
-2\) Connect your Metamask wallet&#x20;
+{% embed url="https://drive.google.com/file/d/1IyXQNTFLEfJ7Sfyqh7iqMM6tWis26Jg3/view?usp=share_link" %}
 
-![image](https://user-images.githubusercontent.com/100376939/165361436-dd32bd62-e3cb-45ba-a251-707c3d7dbb54.png)
+<figure><img src="../../.gitbook/assets/Artboard 5 (2).png" alt=""><figcaption></figcaption></figure>
 
-3\) Click on 'Wallet' on the navigation bar on the top&#x20;
+{% embed url="https://drive.google.com/file/d/1TSyk7T_-TqhXywcbeO41dJZgCsrPIzGq/view?usp=share_link" %}
 
-![Screenshot 2022-04-26 105020](https://user-images.githubusercontent.com/100376939/165361896-6f831302-7510-4ce4-bd97-70a67ed5cb30.png)
+<figure><img src="../../.gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
 
-4\) Click 'Bridge' next to the token you want to bridge to Boba&#x20;
+{% embed url="https://drive.google.com/file/d/1HeHlr9FsBAQwW5YE0ho8g_GygRWWI9jU/view?usp=share_link" %}
 
-![Screenshot 2022-04-26 105020](https://user-images.githubusercontent.com/100376939/165362295-8d19154c-b565-40cc-b65b-0c537485ae71.png)
+<figure><img src="../../.gitbook/assets/Artboard 7 (2).png" alt=""><figcaption></figcaption></figure>
 
-5\) Choose 'Bridge' or 'Fast Bridge' - fast bridge is faster but charges 0.1% LP fee&#x20;
+{% embed url="https://drive.google.com/file/d/1KxHc3ymjErviLBV1bASzzHs8xsLMIDcd/view?usp=share_link" %}
 
-6\) Type in the amount you want to bridge
+<figure><img src="../../.gitbook/assets/Artboard 8 (1).png" alt=""><figcaption></figcaption></figure>
 
-![](../.gitbook/assets/screen-shot-2021-09-26-at-15.07.32.png)
-
-7\) Approve your **spend amount** in Metamask. Don't edit the gas fees, your transaction might fail.
-
-![](../.gitbook/assets/screen-shot-2021-09-26-at-15.09.45.png)
-
-8\) Approve **the transaction** in Metamask one more time. Don't edit the gas fees, your transaction might fail.
-
-![](<../.gitbook/assets/image (9).png>)
-
-## How to change Metamask network
-
-1\) Switch your Metamask to Boba L2 network by clicking the Boba Wallet button
-
-![image](https://user-images.githubusercontent.com/100376939/165362740-7f4a3b7a-d2ba-46d9-b1d6-cf7cb258caa8.png)
-
-2\) Confirm that you want to change networks
-
-![](../.gitbook/assets/screen-shot-2021-09-26-at-15.13.13.png)
-
-3\) If you want to switch back to Layer 1, simply click on the Layer 1 `Change To` (Ethereum) icon again and confirm the network switch in Metamask once again
-
-![image](https://user-images.githubusercontent.com/100376939/165362999-fd8e3713-bd5e-4f72-8f56-76ef4a0824d6.png)
-
-![](../.gitbook/assets/screen-shot-2021-09-26-at-15.15.19.png)
-
-## Manually add the Boba L2 network
-
-1\) Under Metamask settings > networks, click add network
-
-![](../.gitbook/assets/screen-shot-2021-09-26-at-15.16.29.png)
-
-2\) Follow these settings
-
-![](<../.gitbook/assets/image (10).png>)
+{% embed url="https://drive.google.com/file/d/1GHMpC0h_BwEpW-BlgQG5JMHvsLG58bgH/view?usp=sharing" %}
