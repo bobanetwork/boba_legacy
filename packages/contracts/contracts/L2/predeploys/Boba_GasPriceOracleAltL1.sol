@@ -22,6 +22,13 @@ contract Boba_GasPriceOracleAltL1 {
     using SafeMath for uint256;
 
     /*************
+     * Constants *
+     *************/
+
+    // Minimum BOBA balance that can be withdrawn in a single withdrawal.
+    uint256 public constant MIN_WITHDRAWAL_AMOUNT = 10e18;
+
+    /*************
      * Variables *
      *************/
 
@@ -65,13 +72,6 @@ contract Boba_GasPriceOracleAltL1 {
 
     //Minimum alt token
     uint256 public secondaryFeeTokenMinimum = 2e15;
-
-    /*************
-     * Constants *
-     *************/
-
-    // Minimum BOBA balance that can be withdrawn in a single withdrawal.
-    uint256 public constant MIN_WITHDRAWAL_AMOUNT = 10e18;
 
     /*************
      *  Events   *
