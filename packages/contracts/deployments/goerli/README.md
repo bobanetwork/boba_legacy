@@ -1,7 +1,7 @@
 # Boba Goerli (public testnet)
 ## Network Info
 - **Chain ID**: 2888
-- **Public RPC**: https://goerli.boba.netwokr
+- **Public RPC**: https://goerli.boba.network
 - **Block Explorer**: https://testnet.bobascan.com
 ## Layer 1 Contracts
 <table>

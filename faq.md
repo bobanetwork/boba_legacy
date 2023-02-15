@@ -56,7 +56,7 @@ Only if the centralized exchange supports Boba Network (at writing none of them 
 
 ### Where can I find RPC endpoints and connection details?
 
-Connection details for our Mainnet and Rinkeby network can be found [here](./boba_documentation/developer/network_parameters.md).
+Connection details for our Mainnet and Goerli network can be found [here](./boba_documentation/developer/network_parameters.md).
 
 ./boba\_documentation/developer/xdomain-tx-status.md
 
