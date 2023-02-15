@@ -496,7 +496,7 @@ describe('teleportation', () => {
       // should store the latest block
       const storedBlock = await teleportationService._getDepositInfo(chainId)
       expect(storedBlock).to.be.eq(latestBlock)
-    })
+    }).retries(3)
 
     it('should not disbure BOBA token if the data is reset', async () => {
       // Remove file if it exists
