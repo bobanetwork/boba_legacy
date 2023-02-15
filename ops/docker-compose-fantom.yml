@@ -107,6 +107,7 @@ services:
       NO_COMPILE: 1
       DTL_REGISTRY_URL: http://dtl:8081/addresses.json
       DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+      RETRIES: 500
     ports:
         # expose the service to the host for getting the contract addrs
       - ${DEPLOYER_PORT:-8077}:8082

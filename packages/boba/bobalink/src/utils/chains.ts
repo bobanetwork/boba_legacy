@@ -48,25 +48,22 @@ export const BobaLinkPairs = {
       decimals: 8,
       l2ContractAddress: '0xf2D374B77db32284D79FCbf72b0d97d16D031cdf',
     },
-    '0x79D08B1fDDcc8961bc252E77e28A8519243d3D28': {
+    // local bnb
+    '0x38141A097335a2AA6E07Cf5CF2AA05d2Ad34FA9b': {
       pair: 'BOBA / USD',
       decimals: 8,
-      l2ContractAddress: '0xcd13A508cF33C8aB8920b74B7280829c86F42e5f',
+      l2ContractAddress: '0x4a3CfD53427a0C5D69B1F0F254CFc038F991fECB',
     },
-    '0x30deBc9A93Cb3Fa5dB32dE9e4F74C5E4c4384D72': {
+    // local fantom
+    '0x607635FE7B1F3273B58852bcc54C4bb5ED9939dC': {
       pair: 'BOBA / USD',
       decimals: 8,
-      l2ContractAddress: '0x1023230f7D1DF9D0A8EfC703D7e904EC06D41027',
+      l2ContractAddress: '0xa74B10eF5f4DBcB7fb600b36541ca47bd47E0dCE',
     },
     '0xccDc49E3271329B995566eEDd8b6b31472DAbFad': {
       pair: 'BOBA / USD',
       decimals: 8,
       l2ContractAddress: '0x76bB3987bAA2971c5BbE9bE0Ac15E77106c2C76A',
-    },
-    '0xa95357c0d46f6d130d34d567a581725cE3bE8b38': {
-      pair: 'BOBA / USD',
-      decimals: 8,
-      l2ContractAddress: '0xDbDa30ad00b67702BDCEd019C3b46D35DB9e94ce',
     },
   },
 }
