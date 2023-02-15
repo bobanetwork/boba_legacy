@@ -14,8 +14,11 @@ Hybrid Compute is a **pipe** between (**1**) Boba's Geth (aka sequencer), which 
 
 A typical Hybrid Compute system for gaming or Web3 social networking<>blockchain interoperability has four parts:
 
-1. A contract that uses Hybrid Compute, such as by calling `bytes memory encResponse = myHelper.TuringTx(serverURL, encRequest);`
-2. A second contract, the `TuringHelper`, which serves as your standardized door to Turing.
+1. A contract that uses Hybrid Compute, such as by calling `bytes memory encResponse = myHelper.TuringTxV2(serverURL, encRequest);`
+In some places you may find `myHelper.TuringTx(...)` which is just the previous version (still working) that doesn't support more complex return values such as arrays.
+
+2. A second contract, the `TuringHelper`, which serves as your standardized door to Hybrid Compute (formerly "Turing").
+
 3. Some BOBA. Each Hybrid Compute call costs 0.01 BOBA, equivalent to about 1 cent at the moment. This fee covers the cost of writing all input calldata and responses from your servers to Ethereum Mainnet.
 4. A server which accepts POST requests from Boba's Geth and returns data to it in the right format.
 

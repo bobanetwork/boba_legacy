@@ -151,7 +151,7 @@ def lambda_handler(event, context):
   timestamp = result['last']['timestamp']
 
   # create return payload
-  res = '0x'+ '{0:0{1}x}'.format(int(       64),64)
+  res = '0x'+ '{0:0{1}x}'.format(int(       64),64) # NOTE: This parameter is not needed when using TuringTxV2()
   #64 denotes the number of bytes in the `bytes` dynamic argument
   #since we are sending back 2 32 byte numbers, 2*32 = 64
   res = res + '{0:0{1}x}'.format(int(    price),64) #the price
@@ -176,4 +176,27 @@ def lambda_handler(event, context):
 
   return returnPayload
 
+```
+
+
+## More complex Types
+There is a new version of Hybrid Compute available that allows you to return larger payloads and more complex types such as arrays as well.
+The previous version will still continue to work.
+
+To return more complex types, we recommend using an AbiEncoder instead of building the payload manually.
+
+```python
+from eth_abi import encode_abi, decode_abi
+from web3 import Web3
+
+encoded_str = encode_abi(['string[]', 'string', 'bytes'], [yourArray, aStringVal, someBytes])
+res = Web3.toHex(encoded_str)
+```
+
+On the smart contract side, it could look like this:
+
+```solidity
+bytes memory byteRes = turingHelper.TuringTxV2(_turingUri, encRequest);
+
+(string[] memory yourArray, string memory aStringVal, bytes memory someBytes) = abi.decode(byteRes, (string[], string, bytes));
 ```
