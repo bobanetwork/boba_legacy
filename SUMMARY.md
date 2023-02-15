@@ -3,7 +3,7 @@
 * [Welcome to Boba](README.md)
 * [FAQ](faq.md)
 * [User Docs](user-docs/README.md)
-  * [How To Bridge](boba\_documentation/user/001\_how-to-bridge.md)
+  * [How To use Boba's services](boba\_documentation/user/001\_how-to-bridge.md)
   * [Fraud Detection](https://github.com/bobanetwork/boba/blob/develop/boba\_community/fraud-detector/README.md)
   * [NFTs](boba\_documentation/user/003\_nfts.md)
   * [Running a Boba node](https://github.com/bobanetwork/boba/blob/develop/boba\_community/boba-node/README.md)
