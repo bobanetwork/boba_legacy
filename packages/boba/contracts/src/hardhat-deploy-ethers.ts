@@ -101,6 +101,7 @@ export const deployBobaContract = async (
   signer: any
 ) => {
   const deployedContract = await hre.ethers.deployContract(name, args, signer)
+  await deployedContract.deployTransaction.wait()
   return new Contract(
     deployedContract.address,
     getContractArtifact(name).abi,
