@@ -10,11 +10,15 @@ description: How to bridge with Metamask
 
 **If you use a Ledger HW wallet, make sure Ledger Firmware, Ledger ETH App, Ledger Live, and Metamask are all updated to the latest version and smart contracts are enabled in your Ledger Ethereum App!**
 
-## How to bridge to Boba L2
+[https://gateway.boba.network/](https://gateway.boba.network)
 
-## How to connect your Metamask
+## Get started with Metamask
 
 {% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
+
+## Add Boba Network on Metamask
+
+{% embed url="https://drive.google.com/file/d/1TxuP6myVAhtPsEQ0wfmS2HdI0E9rjT3b/view?usp=share_link" %}
 
 1\) Go to [https://gateway.boba.network/](https://gateway.boba.network)
 
