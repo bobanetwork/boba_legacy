@@ -193,7 +193,7 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-<figure><img src=".gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Isn’t My Transaction Going Through?
 
@@ -248,7 +248,7 @@ Actually, there are multiple bridges available. You can check it out on our ecos
 
 [Simply follow this link](https://gateway.boba.network/) and navigate to the Ecosystem tab.
 
-<figure><img src=".gitbook/assets/Artboard 6 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: What Are the Limits on Hybrid Compute Web2 Calls?
 

@@ -6,11 +6,11 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 [https://gateway.boba.network/](https://gateway.boba.network)
 
-<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
 
-<figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1TxuP6myVAhtPsEQ0wfmS2HdI0E9rjT3b/view" %}
 
@@ -32,11 +32,11 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 {% embed url="https://drive.google.com/file/d/1TSyk7T_-TqhXywcbeO41dJZgCsrPIzGq/view?usp=share_link" %}
 
-<figure><img src="../../.gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1HeHlr9FsBAQwW5YE0ho8g_GygRWWI9jU/view?usp=share_link" %}
 
-<figure><img src="../../.gitbook/assets/Artboard 7.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 7 (2).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1KxHc3ymjErviLBV1bASzzHs8xsLMIDcd/view?usp=share_link" %}
 
