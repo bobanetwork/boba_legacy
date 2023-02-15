@@ -12,21 +12,23 @@ description: How to bridge with Metamask
 
 ## How to bridge to Boba L2
 
+{% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=share_link" %}
+
 1\) Go to [https://gateway.boba.network/](https://gateway.boba.network)
 
-2\) Connect your Metamask wallet&#x20;
+2\) Connect your Metamask wallet
 
 ![image](https://user-images.githubusercontent.com/100376939/165361436-dd32bd62-e3cb-45ba-a251-707c3d7dbb54.png)
 
-3\) Click on 'Wallet' on the navigation bar on the top&#x20;
+3\) Click on 'Wallet' on the navigation bar on the top
 
 ![Screenshot 2022-04-26 105020](https://user-images.githubusercontent.com/100376939/165361896-6f831302-7510-4ce4-bd97-70a67ed5cb30.png)
 
-4\) Click 'Bridge' next to the token you want to bridge to Boba&#x20;
+4\) Click 'Bridge' next to the token you want to bridge to Boba
 
 ![Screenshot 2022-04-26 105020](https://user-images.githubusercontent.com/100376939/165362295-8d19154c-b565-40cc-b65b-0c537485ae71.png)
 
-5\) Choose 'Bridge' or 'Fast Bridge' - fast bridge is faster but charges 0.1% LP fee&#x20;
+5\) Choose 'Bridge' or 'Fast Bridge' - fast bridge is faster but charges 0.1% LP fee
 
 6\) Type in the amount you want to bridge
 
