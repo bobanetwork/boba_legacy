@@ -323,11 +323,6 @@ export const isHardhat = async () => {
   return chainId === HARDHAT_CHAIN_ID
 }
 
-export const isNonEthereumChain = async () => {
-  const chainId = await l1Wallet.getChainId()
-  return NON_ETHEREUM_CHAIN.indexOf(chainId) !== -1
-}
-
 export const die = (...args) => {
   console.log(...args)
   process.exit(1)

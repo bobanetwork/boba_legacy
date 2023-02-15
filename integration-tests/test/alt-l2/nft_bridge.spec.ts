@@ -1908,7 +1908,6 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l1Wallet
       )
-      await L1ERC721.deployTransaction.wait()
 
       L2ERC721 = await ethers.deployContract(
         'TestFailingMintL2StandardERC721',
@@ -1989,7 +1988,6 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l2Wallet
       )
-      await L2ERC721.deployTransaction.wait()
 
       L1ERC721 = await ethers.deployContract(
         'TestFailingMintL1StandardERC721',

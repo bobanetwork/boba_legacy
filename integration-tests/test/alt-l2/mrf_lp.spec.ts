@@ -6,7 +6,7 @@ import { Contract, BigNumber, utils } from 'ethers'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
 
-import { expectLogs, isNonEthereumChain, getGasLimitOption } from './shared/utils'
+import { expectLogs, getGasLimitOption } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
 describe('Liquidity Pool Test', async () => {

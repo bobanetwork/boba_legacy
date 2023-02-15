@@ -71,8 +71,6 @@ describe('NFT Bridge Test', async () => {
         env.l2Wallet
       )
 
-      await L2ERC721.deployTransaction.wait()
-
       // register NFT
       const registerL1BridgeTx = await L1Bridge.registerNFTPair(
         L1ERC721.address,
@@ -391,7 +389,6 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l1Wallet
       )
-      await L1ERC721Test.deployTransaction.wait()
 
       const mintTx = await L1ERC721Test.mint(
         env.l1Wallet.address,
@@ -2171,7 +2168,6 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l1Wallet
       )
-      await L1ERC721.deployTransaction.wait()
 
       L2ERC721 = await ethers.deployContract(
         'TestFailingMintL2StandardERC721',
@@ -2252,7 +2248,6 @@ describe('NFT Bridge Test', async () => {
         ['Test', 'TST'],
         env.l2Wallet
       )
-      await L2ERC721.deployTransaction.wait()
 
       L1ERC721 = await ethers.deployContract(
         'TestFailingMintL1StandardERC721',
