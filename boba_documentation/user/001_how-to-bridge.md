@@ -6,15 +6,15 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 [https://gateway.boba.network/](https://gateway.boba.network)
 
-## Get started with Metamask
+<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
 
-## Add Boba Network on Metamask
+<figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1TxuP6myVAhtPsEQ0wfmS2HdI0E9rjT3b/view" %}
 
-## Transfer cryptocurrencies
+<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 **Before getting started, make sure you have enough ETH in your Metamask wallet to approve and send transactions (we recommend 0.05 ETH).**
 
@@ -24,22 +24,22 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 {% embed url="https://drive.google.com/file/d/1Lf-X1xwP9M-ZZM6HiQ1qRhV-0yaBKitA/view?usp=share_link" %}
 
-## Transfer on Boba's own network
+<figure><img src="../../.gitbook/assets/Artboard 4 (2).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1IyXQNTFLEfJ7Sfyqh7iqMM6tWis26Jg3/view?usp=share_link" %}
 
-## How to use a dApp
+<figure><img src="../../.gitbook/assets/Artboard 5 (2).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1TSyk7T_-TqhXywcbeO41dJZgCsrPIzGq/view?usp=share_link" %}
 
-## How to set the fees
+<figure><img src="../../.gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1HeHlr9FsBAQwW5YE0ho8g_GygRWWI9jU/view?usp=share_link" %}
 
-## How to use Boba - BNB
+<figure><img src="../../.gitbook/assets/Artboard 7.png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1KxHc3ymjErviLBV1bASzzHs8xsLMIDcd/view?usp=share_link" %}
 
-## How to use Boba - Avalanche
+<figure><img src="../../.gitbook/assets/Artboard 8 (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1GHMpC0h_BwEpW-BlgQG5JMHvsLG58bgH/view?usp=sharing" %}

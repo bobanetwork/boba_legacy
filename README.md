@@ -25,7 +25,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
 
-<figure><img src=".gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 
@@ -57,7 +57,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
   * [`register`](packages/boba/register/): Code for registering addresses in the AddressManager
   * [`subgraph`](packages/boba/subgraph/): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
 
-<figure><img src=".gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 Follow these instructions to set up your local development environment.
 
@@ -121,7 +121,7 @@ cd packages/package-to-test
 yarn test
 ```
 
-<figure><img src=".gitbook/assets/Artboard 7.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 7 (1).png" alt=""><figcaption></figcaption></figure>
 
 Make sure you are in the `ops` folder and then run
 
