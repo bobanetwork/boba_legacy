@@ -8,7 +8,7 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
 
 * `boba_community/turing-captcha-faucet/packages`: Contains all the typescript packages and contracts
   * `contracts`: Smart contracts implementing the Boba Faucet
@@ -108,7 +108,7 @@ On the contract level, we decode the result from the Turing request and release 
 
 <figure><img src="../../.gitbook/assets/client-geth-aws.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 #### Step 1: Creating API endpoints
 
@@ -179,7 +179,7 @@ with open("env.yml", 'r') as ymlfile:
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (5).png" alt=""><figcaption></figcaption></figure>
 
 ### Deployment
 
