@@ -8,7 +8,7 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 * `boba_community/turing-captcha-faucet/packages`: Contains all the typescript packages and contracts
   * `contracts`: Smart contracts implementing the Boba Faucet
@@ -18,7 +18,7 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
 
 The token-claiming process takes place in five steps:
 
@@ -179,7 +179,7 @@ with open("env.yml", 'r') as ymlfile:
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
 
 ### Deployment
 

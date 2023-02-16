@@ -1,8 +1,10 @@
 ---
-description: Turing Example - Minting NFTs with Random Attributes
+description: Hybrid Compute Example - Minting NFTs with Random Attributes
 ---
 
-## Mint your Monster!
+# Monster Minting
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
 
 Clone the repository, open it, and install packages with `yarn`:
 
@@ -36,11 +38,13 @@ const testPrivateKey = process.env.PRIVATE_KEY ?? '0x____'
 
 You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`, or whatever you usually do. Whatever account/key you use, it needs some ETH and BOBA - small amounts should be sufficient.
 
-## Getting Geth ETH and Geth BOBA
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
 
 If you do not have testnet ETH, you can get some here [Faucets](https://docs.boba.network/for-developers/faucets).
 
-## Testing the Turing Monster NFT
+### Testing the Turing Monster NFT
 
 To run the tests you will also need some Goerli ETH on Goerli (L1) as the tests also test the NFT bridging functionality.
 
@@ -70,7 +74,9 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 
 ```
 
-## Deploy the Turing Monster NFT without running the tests
+
+
+<figure><img src="../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 To deploy run:
 
@@ -82,19 +88,21 @@ $ PRIVATE_KEY=0x... yarn run deploy -- --network boba_rinkeby
 
 Add the ERC721 as permitted caller to the deployed TuringHelper. Call the method `startTrading()` once you feel ready so that your community is able to mint their NFTs.
 
-## Solidity Code Walkthrough
 
-The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract.
-Nevertheless, the contract has been distributed into several smaller contracts to make them easily reusable for your own project.
+
+<figure><img src="../../.gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
+
+The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract. Nevertheless, the contract has been distributed into several smaller contracts to make them easily reusable for your own project.
 
 Core features:
-- You'll mint a random tokenID issued by Turing; `@ref RandomlyAssigned.sol:nextToken()`
-- MetaData is onChain and also is randomized via Turing; `@ref WithOnChainMetaData.sol:getMetadata()`
-- Recover functions for tokens when someone accidentally sends funds to the contract; `@ref WithRecover.sol`
-- Max Mint per wallet is limited and minting a NFT costs an additional fee (see the PRICE constant); `@ref NFTMonsterV2.sol:mint()`
-- NFT implements the `IERC2981` standard for royalty fees; `@ref NFTMonsterV2.sol:royaltyInfo()`
-- Minting revenue will be split across project owners via claim function; `@ref NFTMonsterV2.sol:withdraw()`
-- NFT not tradeable until project owner calls `startTrading()`; `@ref NFTMonsterV2.sol:saleIsOpen[modifier]`
+
+* You'll mint a random tokenID issued by Turing; `@ref RandomlyAssigned.sol:nextToken()`
+* MetaData is onChain and also is randomized via Turing; `@ref WithOnChainMetaData.sol:getMetadata()`
+* Recover functions for tokens when someone accidentally sends funds to the contract; `@ref WithRecover.sol`
+* Max Mint per wallet is limited and minting a NFT costs an additional fee (see the PRICE constant); `@ref NFTMonsterV2.sol:mint()`
+* NFT implements the `IERC2981` standard for royalty fees; `@ref NFTMonsterV2.sol:royaltyInfo()`
+* Minting revenue will be split across project owners via claim function; `@ref NFTMonsterV2.sol:withdraw()`
+* NFT not tradeable until project owner calls `startTrading()`; `@ref NFTMonsterV2.sol:saleIsOpen[modifier]`
 
 ```javascript
 

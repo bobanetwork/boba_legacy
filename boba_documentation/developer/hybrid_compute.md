@@ -8,7 +8,7 @@ Hybrid Compute is a system for interacting with the outside world from within so
 
 Hybrid Compute is a **pipe** between (**1**) Boba's Geth (aka sequencer), which takes transactions, advances the state, and forms blocks, and (**2**) your server. To use this pipe, all you need is a smart contract on Boba that makes Hybrid Compute calls and an external server that accepts these calls and returns data in a format that can be understood by the EVM. This is not hard to do and we provide many examples which will allow you to quickly build a working Hybrid Compute system.
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (3).png" alt=""><figcaption></figcaption></figure>
 
 A typical Hybrid Compute system for gaming or Web3 social networking<>blockchain interoperability has four parts:
 
@@ -17,15 +17,15 @@ A typical Hybrid Compute system for gaming or Web3 social networking<>blockchain
 3. Some BOBA. Each Hybrid Compute call costs 0.01 BOBA, equivalent to about 1 cent at the moment. This fee covers the cost of writing all input calldata and responses from your servers to Ethereum Mainnet.
 4. A server which accepts POST requests from Boba's Geth and returns data to it in the right format.
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 Hybrid Compute is a general purpose pipe between computers and this pipe does not have a native feature set (e.g. storage, cron jobs, cryptographic operations, gaming engines, blockchain history lookups, ...). Rather, _it's up to you_ to deploy servers or endpoints to perform those functions and then expose the right functionality/data to external callers. For many situations, serverless endpoints such as AWS Lambda or Google Cloud Services allow you to build complex logic in just a few lines of code, so if you have not done that before, it's surprisingly easy and we provide many examples for you to use and copy.
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 Hybrid Compute is general-purpose pipe between computers and not an Oracle. Decentralized Oracles were invented to solve a very specific problem, which is _decentralized trustless approximation of the truth_ (e.g. temperature in NYC, the price of BTC/USD, ...) for later consumption on-chain (e.g. by a DEX or lending protocol). A pipe between computers such as Hybrid Compute has no direct bearing on questions of data authenticity, timeliness, and trust, but rather, those must be tackled by the smart contract deployer and data provider(s) in whatever way is most suitable to their specific use case, industry, and application. To reiterate, Hybrid Compute is a pipe, not an Oracle.
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 On chain Oracles typically operate in a **push** manner, meaning that they update data on a fixed schedule (e.g. every 15 seconds), even when those data are not being used. This `push` update schedule allows calling smart contracts to have confidence that the data they pull are current, but a fixed push update cycle comes at high gas expense that does not decrease in time of low data utilization.
 
