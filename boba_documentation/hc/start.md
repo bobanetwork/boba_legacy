@@ -8,7 +8,7 @@ Use HybridCompute with ease by navigating through a minimal web-app.
 
 <figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (6).png" alt=""><figcaption></figcaption></figure>
 
 Using HybridCompute basically requires 3 things:
 
@@ -20,7 +20,7 @@ This process can be tedious for new fellow coders, so we decided to build this H
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
 
 ### [contracts](https://github.com/bobanetwork/boba/tree/develop/boba\_community/hc-start/packages/contracts)
 
