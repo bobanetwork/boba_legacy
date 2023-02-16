@@ -6,7 +6,9 @@ description: Turing Example - CAPTCHA-based token faucet
 
 Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's implemented using Turing hybrid compute. Before claiming tokens, users answer a CAPTCHA. Their answer is hashed and compared off-chain to the correct answer via Turing. Once their answer is verified, the smart contract releases the funds.
 
-### Directory Structure
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 * `boba_community/turing-captcha-faucet/packages`: Contains all the typescript packages and contracts
   * `contracts`: Smart contracts implementing the Boba Faucet
@@ -14,7 +16,9 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
   * `deployment`: Boba faucet Rinkeby contract addresses
   * `api`: Boba faucet backend API
 
-### Specification
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
 
 The token-claiming process takes place in five steps:
 
@@ -104,7 +108,7 @@ On the contract level, we decode the result from the Turing request and release 
 
 <figure><img src="../../.gitbook/assets/client-geth-aws.png" alt=""><figcaption></figcaption></figure>
 
-### Implementation
+<figure><img src="../../.gitbook/assets/Artboard 3 (3).png" alt=""><figcaption></figcaption></figure>
 
 #### Step 1: Creating API endpoints
 
@@ -173,7 +177,9 @@ with open("env.yml", 'r') as ymlfile:
 
 #### Step 2: Creating the Boba Faucet Contract
 
-## BOBA Faucet Smart Contracts
+
+
+<figure><img src="../../.gitbook/assets/Artboard 4 (5).png" alt=""><figcaption></figcaption></figure>
 
 ### Deployment
 

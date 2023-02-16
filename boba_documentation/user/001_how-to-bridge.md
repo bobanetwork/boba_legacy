@@ -6,7 +6,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 [https://gateway.boba.network/](https://gateway.boba.network)
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
 
@@ -14,7 +14,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 {% embed url="https://drive.google.com/file/d/1TxuP6myVAhtPsEQ0wfmS2HdI0E9rjT3b/view" %}
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Before getting started, make sure you have enough ETH in your Metamask wallet to approve and send transactions (we recommend 0.05 ETH).**
 
