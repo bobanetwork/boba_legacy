@@ -4,7 +4,7 @@ description: Frequently asked questions
 
 # FAQ
 
-<figure><img src=".gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
 
 [Boba](https://boba.network) is a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
@@ -143,7 +143,7 @@ Unfortunately no, not at the moment.
 
 See Q2 of Transactions
 
-<figure><img src=".gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 4 (4).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Does Boba Network Have a Testnet/How Do I Get Testnet Boba or Eth?
 
@@ -193,7 +193,7 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-<figure><img src=".gitbook/assets/Artboard 5 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Isn’t My Transaction Going Through?
 
@@ -248,7 +248,7 @@ Actually, there are multiple bridges available. You can check it out on our ecos
 
 [Simply follow this link](https://gateway.boba.network/) and navigate to the Ecosystem tab.
 
-<figure><img src=".gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 6 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: What Are the Limits on Hybrid Compute Web2 Calls?
 
