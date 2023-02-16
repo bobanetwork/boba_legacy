@@ -14,35 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import {
-  APP_CHAIN, ETHERSCAN_API_KEY, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
-  RINKEBY_L1_NAME,
-  RINKEBY_L1_CHAIN_ID,
-  RINKEBY_L1_CHAIN_ID_HEX,
-  RINKEBY_L1_RPC_URL
+  APP_CHAIN, INFURA_ID, MAX_HEALTH_BLOCK_LAG,
 } from './constant'
 
 let NETWORK
 
-if (APP_CHAIN === 'rinkeby') {
+if (APP_CHAIN === 'goerli') {
   NETWORK = {
-    rinkeby: {
-      OMGX_WATCHER_URL: `https://api-watcher.rinkeby.boba.network/`,
-      VERIFIER_WATCHER_URL: `https://api-verifier.rinkeby.boba.network/`,
-      MM_Label: `Rinkeby`,
-      addressManager: `0x93A96D6A5beb1F661cf052722A1424CDDA3e9418`,
+    goerli: {
+      OMGX_WATCHER_URL: `https://api-watcher.goerli.boba.network/`,
+      VERIFIER_WATCHER_URL: `https://api-verifier.goerli.boba.network/`,
+      MM_Label: `Goerli`,
+      addressManager: `0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148`,
       L1: {
-        name: RINKEBY_L1_NAME,
-        chainId: Number(RINKEBY_L1_CHAIN_ID),
-        chainIdHex: RINKEBY_L1_CHAIN_ID_HEX,
-        rpcUrl: RINKEBY_L1_RPC_URL,
-        blockExplorer: `https://api-rinkeby.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
-        transaction: `https://rinkeby.etherscan.io/tx/`
+        name: "Goerli",
+        chainId: 5,
+        chainIdHex: '0x5',
+        rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
+        transaction: `https://goerli.etherscan.io/tx/`
       },
       L2: {
-        name: "BOBA Rinkeby L2",
-        chainId: 28,
-        chainIdHex: '0x1C',
-        rpcUrl: `https://rinkeby.boba.network`,
+        name: "BOBA Goerli L2",
+        chainId: 2888,
+        chainIdHex: '0xB48',
+        rpcUrl: `https://goerli.boba.network`,
         blockExplorer: `https://testnet.bobascan.com/`,
         transaction: `https://testnet.bobascan.com/tx/`
       },
@@ -83,7 +78,6 @@ if (APP_CHAIN === 'rinkeby') {
         chainId: 1,
         chainIdHex: '0x1',
         rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
-        blockExplorer: `https://api.etherscan.io/api?module=account&action=txlist&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`,
         transaction: ` https://etherscan.io/tx/`,
       },
       L2: {
@@ -122,7 +116,6 @@ if (APP_CHAIN === 'rinkeby') {
         chainId: 31337,
         chainIdHex: '0x7A69',
         rpcUrl: `http://${window.location.hostname}:9545`,
-        blockExplorer: null, //does not exist on local
       },
       L2: {
         name: "Local L2",
@@ -147,8 +140,8 @@ const BaseServices = {
   ETH_GAS_STATION_URL: `https://ethgasstation.info/`,
   // Mainnet meta transaction
   MAINNET_META_TRANSACTION: `https://api-meta-transaction.mainnet.boba.network/`,
-  // Rinkeby meta transaction
-  RINKEBY_META_TRANSACTION: `https://api-meta-transaction.rinkeby.boba.network/`,
+  // goerli meta transaction
+  GOERLI_META_TRANSACTION: `https://api-meta-transaction.goerli.boba.network/`,
 }
 
 export function getNetwork() {

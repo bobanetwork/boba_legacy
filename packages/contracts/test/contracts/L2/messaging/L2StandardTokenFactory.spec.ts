@@ -3,22 +3,24 @@ import { expect } from '../../../setup'
 /* External Imports */
 import { ethers } from 'hardhat'
 import { Signer, ContractFactory, Contract } from 'ethers'
-import { smoddit } from '@eth-optimism/smock'
 
 /* Internal Imports */
 import { predeploys, getContractInterface } from '../../../../src'
+import {
+  MockContract,
+  MockContractFactory,
+  smock,
+} from '@defi-wonderland/smock'
 
 describe('L2StandardTokenFactory', () => {
   let signer: Signer
-  let Factory__L1ERC20: ContractFactory
-  let L1ERC20: Contract
+  let Factory__L1ERC20: MockContractFactory<ContractFactory>
+  let L1ERC20: MockContract<Contract>
   let L2StandardTokenFactory: Contract
   before(async () => {
     ;[signer] = await ethers.getSigners()
     // deploy an ERC20 contract on L1
-    Factory__L1ERC20 = await smoddit(
-      '@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20'
-    )
+    Factory__L1ERC20 = await smock.mock('ERC20')
     L1ERC20 = await Factory__L1ERC20.deploy('L1ERC20', 'ERC')
 
     L2StandardTokenFactory = await (

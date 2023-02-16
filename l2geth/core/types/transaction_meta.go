@@ -153,7 +153,7 @@ func TxMetaDecode(input []byte) (*TransactionMeta, error) {
 	turing, err := common.ReadVarBytes(b, 0, 65508, "Turing") // The "Turing" fieldName string is not important and is only used in error messages
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			log.Debug("Legacy block decode - no Turing field - setting to nil")
+			log.Trace("Legacy block decode - no Turing field - setting to nil")
 			meta.L1Turing = nil
 		} else {
 			return nil, err

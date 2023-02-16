@@ -1,8 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
-import { Contract, ContractFactory, utils } from 'ethers'
-import chalk from 'chalk'
+import { Contract } from 'ethers'
 
 import L1MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
 import L2MessageJson from '@boba/contracts/artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'

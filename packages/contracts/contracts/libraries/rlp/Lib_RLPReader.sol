@@ -261,15 +261,9 @@ library Lib_RLPReader {
      * @return Length of the encoded data.
      * @return RLP item type (LIST_ITEM or DATA_ITEM).
      */
-    function _decodeLength(RLPItem memory _in)
-        private
-        pure
-        returns (
-            uint256,
-            uint256,
-            RLPItemType
-        )
-    {
+    function _decodeLength(
+        RLPItem memory _in
+    ) private pure returns (uint256, uint256, RLPItemType) {
         require(_in.length > 0, "RLP item cannot be null.");
 
         uint256 ptr = _in.ptr;
@@ -366,7 +360,7 @@ library Lib_RLPReader {
         // Pick out the remaining bytes.
         uint256 mask;
         unchecked {
-            mask = 256**(32 - (_length % 32)) - 1;
+            mask = 256 ** (32 - (_length % 32)) - 1;
         }
 
         assembly {

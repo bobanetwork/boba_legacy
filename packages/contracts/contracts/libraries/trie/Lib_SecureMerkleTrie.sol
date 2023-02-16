@@ -78,11 +78,10 @@ library Lib_SecureMerkleTrie {
      * @param _value Value for the single node.
      * @return _updatedRoot Hash of the trie.
      */
-    function getSingleNodeRootHash(bytes memory _key, bytes memory _value)
-        internal
-        pure
-        returns (bytes32 _updatedRoot)
-    {
+    function getSingleNodeRootHash(
+        bytes memory _key,
+        bytes memory _value
+    ) internal pure returns (bytes32 _updatedRoot) {
         bytes memory key = _getSecureKey(_key);
         return Lib_MerkleTrie.getSingleNodeRootHash(key, _value);
     }

@@ -65,8 +65,6 @@ import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2Billing
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'
 import OMGJson from '../deployment/contracts/OMG.json'
-import BobaAirdropJson from "../deployment/contracts/BobaAirdrop.json"
-import BobaAirdropL1Json from "../deployment/contracts/BobaAirdropSecond.json"
 import TuringMonsterJson from "../deployment/contracts/NFTMonsterV2.json"
 import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet.json"
 import Boba_GasPriceOracleJson from "../deployment/contracts/Boba_GasPriceOracle.json"
@@ -88,7 +86,6 @@ import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMoc
 import { getNftImageUrl } from 'util/nftImage'
 import { getNetwork } from 'util/masterConfig'
 
-import etherScanInstance from 'api/etherScanAxios'
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import verifierWatcherAxiosInstance from 'api/verifierWatcherAxios'
@@ -97,7 +94,7 @@ import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 import { sortRawTokens } from 'util/common'
 import GraphQLService from "./graphQLService"
 
-import addresses_Rinkeby from "@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418"
+import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
 
 import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
@@ -106,7 +103,7 @@ import layerZeroMainnet from "@boba/register/addresses/layerZeroMainnet"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { APP_AIRDROP, APP_CHAIN, SPEED_CHECK } from 'util/constant'
+import { APP_CHAIN, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -120,14 +117,14 @@ let supportedAltL1Chains = []
 let allAddresses = {}
 let l0AllProtocols = {}
 // preload allAddresses
-if (APP_CHAIN === 'rinkeby') {
+if (APP_CHAIN === 'goerli') {
   const bobaBridges = layerZeroTestnet.BOBA_Bridges.Testnet;
   const l0Protocols = layerZeroTestnet.Layer_Zero_Protocol.Testnet;
   l0AllProtocols = layerZeroTestnet.Layer_Zero_Protocol;
   allAddresses = {
-    ...addresses_Rinkeby,
-    L1LPAddress: addresses_Rinkeby.Proxy__L1LiquidityPool,
-    L2LPAddress: addresses_Rinkeby.Proxy__L2LiquidityPool,
+    ...addresses_Goerli,
+    L1LPAddress: addresses_Goerli.Proxy__L1LiquidityPool,
+    L2LPAddress: addresses_Goerli.Proxy__L2LiquidityPool,
     ...bobaBridges,
     ...l0Protocols
   }
@@ -263,208 +260,6 @@ class NetworkService {
       console.log("Bad verifier response")
       return false
     }
-  }
-
-  async fetchAirdropStatusL1() {
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('get.l1.airdrop', {
-      address: this.account,
-      key: APP_AIRDROP
-    })
-
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
-    }
-
-  }
-
-  async fetchAirdropStatusL2() {
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkGateway
-    ).post('get.l2.airdrop', {
-      address: this.account,
-      key: APP_AIRDROP
-    })
-
-    if (response.status === 201) {
-      const status = response.data
-      return status
-    } else {
-      console.log("Bad gateway response")
-      return false
-    }
-
-  }
-
-  async initiateAirdrop(callData) {
-
-    console.log("Initiating airdrop")
-    console.log("getAirdropL1(callData)",callData.merkleProof)
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL1,
-      BobaAirdropL1Json.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL1Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.initiateClaim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l1.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('initiate.l1.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L1 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L1 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
-  }
-
-  async getAirdropL1(callData) {
-
-    console.log("getAirdropL1")
-    console.log("getAirdropL1(callData)",callData.merkleProof)
-    console.log("this.account:",this.account)
-
-    //Interact with contract
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL1,
-      BobaAirdropL1Json.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL1Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.claim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l1.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.l1.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L1 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L1 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
-  }
-
-  async getAirdropL2(callData) {
-
-    console.log("getAirdropL2(callData)",callData)
-    console.log("this.account:",this.account)
-
-    //Interact with contract
-    const airdropContract = new ethers.Contract(
-      allAddresses.BobaAirdropL2,
-      BobaAirdropJson.abi,
-      this.provider.getSigner()
-    )
-
-    console.log("airdropL2Contract.address:", airdropContract.address)
-
-    try {
-
-      //function claim(uint256 index, address account, uint256 amount, bytes32[] calldata merkleProof)
-      let claim = await airdropContract.claim(
-        callData.merkleProof.index,  //Spec - 1 - Type Number,
-        this.account,                //wallet address
-        callData.merkleProof.amount, //Spec 101 Number - this is Number in the spec but an StringHexWei in the payload
-        callData.merkleProof.proof   //proof1
-      )
-
-      await claim.wait()
-
-      //Interact with API if the contract interaction was successful
-      //success of this this call has no bearing on the airdrop itself, since the api is just
-      //used for user status updates etc.
-      //send.l2.airdrop
-      const response = await omgxWatcherAxiosInstance(
-        this.networkGateway
-      ).post('send.l2.airdrop', {
-          address: this.account,
-          key: APP_AIRDROP
-      })
-
-      if (response.status === 201) {
-        console.log("L2 Airdrop gateway response:",response.data)
-      } else {
-        console.log("L2 Airdrop gateway response:",response)
-      }
-
-      return claim
-
-    } catch (error) {
-      console.log(error)
-      return error
-    }
-
   }
 
   async getBobaFeeChoice() {
@@ -603,7 +398,7 @@ class NetworkService {
     console.log("triggering getTestnetETH")
 
     const Boba_AuthenticatedFaucet = new ethers.Contract(
-      addresses_Rinkeby.AuthenticatedFaucet,
+      addresses_Goerli.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
     )
@@ -703,7 +498,7 @@ class NetworkService {
     console.log('NS: initializeBase() for', networkGateway)
 
     let addresses = null
-    this.networkGateway = networkGateway // e.g. mainnet | rinkeby | ...
+    this.networkGateway = networkGateway // e.g. mainnet | goerli | ...
 
     // defines the set of possible networks along with chainId for L1 and L2
     const nw = getNetwork()
@@ -721,7 +516,7 @@ class NetworkService {
       //this.L1ProviderBASE.eth.handleRevert = true
       //this.L2ProviderBASE.eth.handleRevert = true
 
-      if (networkGateway === 'mainnet' || networkGateway === 'rinkeby') {
+      if (networkGateway === 'mainnet' || networkGateway === 'goerli') {
         this.payloadForL1SecurityFee = nw[networkGateway].payloadForL1SecurityFee
         this.payloadForFastDepositBatchCost = nw[networkGateway].payloadForFastDepositBatchCost
         this.gasEstimateAccount = nw[networkGateway].gasEstimateAccount
@@ -739,14 +534,14 @@ class NetworkService {
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
 
-      if (networkGateway === 'rinkeby') {
-        addresses = addresses_Rinkeby
+      if (networkGateway === 'goerli') {
+        addresses = addresses_Goerli
       } else if (networkGateway === 'mainnet') {
         addresses = addresses_Mainnet
       }
       // else if (networkGateway === 'local') {
       //     //addresses = addresses_Local
-      //     console.log('Rinkeby Addresses:', addresses)
+      //     console.log('Goerli Addresses:', addresses)
       // }
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
@@ -769,14 +564,6 @@ class NetworkService {
       // not critical
       this.getAddressCached(addresses, 'DiscretionaryExitFee', 'DiscretionaryExitFee')
       console.log("DiscretionaryExitFee:",allAddresses.DiscretionaryExitFee)
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL1', 'BobaAirdropL1')
-      console.log("BobaAirdropL1:",allAddresses.BobaAirdropL1)
-
-      // not critical
-      this.getAddressCached(addresses, 'BobaAirdropL2', 'BobaAirdropL2')
-      console.log("BobaAirdropL2:",allAddresses.BobaAirdropL2)
 
       //L2CrossDomainMessenger is a predeploy, so add by hand....
       allAddresses = {
@@ -827,13 +614,9 @@ class NetworkService {
                                'CGT'
                               ]
 
-      //not all tokens are on Rinkeby
-      if ( networkGateway === 'rinkeby') {
-        this.supportedTokens = [ 'USDT', 'DAI', 'USDC',  'WBTC',
-                                 'BAT',  'ZRX', 'SUSHI',
-                                 'LINK', 'UNI', 'BOBA', 'xBOBA',
-                                 'OMG', 'DOM'
-                                ]
+      //not all tokens are on Goerli
+      if ( networkGateway === 'goerli') {
+        this.supportedTokens = [ 'BOBA', 'USDC', 'OMG', 'xBOBA' ]
       }
 
       await Promise.all(this.supportedTokens.map(async (key) => {
@@ -989,17 +772,17 @@ class NetworkService {
           l1ChainId: 1,
           fastRelayer: true,
         })
-      } else if (networkGateway === 'rinkeby') {
+      } else if (networkGateway === 'goerli') {
         this.watcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
+          l1ChainId: 5,
           fastRelayer: false,
         })
         this.fastWatcher = new CrossChainMessenger({
           l1SignerOrProvider: this.L1Provider,
           l2SignerOrProvider: this.L2Provider,
-          l1ChainId: Number(RINKEBY_L1_CHAIN_ID),
+          l1ChainId: 5,
           fastRelayer: true,
         })
       }
@@ -1083,10 +866,10 @@ class NetworkService {
       const L2ChainId = nw[networkGateway]['L2']['chainId']
 
       // there are numerous possible chains we could be on
-      // either local, rinkeby etc
+      // either local, goerli etc
       // also, either L1 or L2
 
-      // at this point, we only know whether we want to be on local or rinkeby etc
+      // at this point, we only know whether we want to be on local or goerli etc
       if (networkGateway === 'local' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
         //local deployment, L2
@@ -1095,29 +878,21 @@ class NetworkService {
         //ok, that's reasonable
         //local deployment, L1
         this.L1orL2 = 'L1'
-      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L1ChainId) {
+      } else if (networkGateway === 'goerli' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
-        //rinkeby, L1
+        //goerli, L1
         this.L1orL2 = 'L1'
-      } else if (networkGateway === 'rinkeby' && networkMM.chainId === L2ChainId) {
+      } else if (networkGateway === 'goerli' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
-        //rinkeby, L2
-        this.L1orL2 = 'L2'
-      } else if (networkGateway === 'rinkeby_integration' && networkMM.chainId === L1ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L1
-        this.L1orL2 = 'L1'
-      } else if (networkGateway === 'rinkeby_integration' && networkMM.chainId === L2ChainId) {
-        //ok, that's reasonable
-        //rinkeby, L2
+        //goerli, L2
         this.L1orL2 = 'L2'
       } else if (networkGateway === 'mainnet' && networkMM.chainId === L1ChainId) {
         //ok, that's reasonable
-        //rinkeby, L2
+        //mainnet, L2
         this.L1orL2 = 'L1'
       } else if (networkGateway === 'mainnet' && networkMM.chainId === L2ChainId) {
         //ok, that's reasonable
-        //rinkeby, L2
+        //mainnet, L2
         this.L1orL2 = 'L2'
       } else {
         console.log("ERROR: networkGateway does not match actual network.chainId")
@@ -1184,6 +959,11 @@ class NetworkService {
       chainId: '0x' + nw[network].L2.chainId.toString(16),
       chainName: nw[network].L2.name,
       rpcUrls: [nw[network].L2.rpcUrl],
+      nativeCurrency: {
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+      },
       blockExplorerUrls
     }
 
@@ -1221,28 +1001,9 @@ class NetworkService {
     if (this.networkGateway === 'local') return
     if (this.account === null) return
 
-    let txL1 = []
     let txL1pending = []
     let txL2 = []
     let txL0 = []
-
-    const responseL1 = await etherScanInstance(
-      this.networkGateway,
-      'L1'
-    ).get(`&address=${this.account}`)
-
-    if (responseL1.status === 200) {
-      const transactionsL1 = await responseL1.data
-      if (transactionsL1.status === '1') {
-        //thread in ChainID
-        txL1 = transactionsL1.result.map(v => ({
-          ...v,
-          blockNumber: parseInt(v.blockNumber), //fix bug - sometimes this is string, sometimes an integer
-          timeStamp: parseInt(v.timeStamp),     //fix bug - sometimes this is string, sometimes an integer
-          chain: 'L1'
-        }))
-      }
-    }
 
     const responseL2 = await omgxWatcherAxiosInstance(
       this.networkGateway
@@ -1287,7 +1048,6 @@ class NetworkService {
       //add the chain: 'L1pending' field
       txL1pending = responseL1pending.data.map(v => ({ ...v, chain: 'L1pending' }))
       const annotated = [
-        ...txL1,
         ...txL2,
         ...txL0,
         ...txL1pending //the new data product
@@ -1395,9 +1155,9 @@ class NetworkService {
   }
 
   async claimAuthenticatedTestnetTokens(tweetId) {
-    // Only Rinkeby
+    // Only Goerli
     const contract = new ethers.Contract(
-      addresses_Rinkeby.AuthenticatedFaucet,
+      addresses_Goerli.AuthenticatedFaucet,
       AuthenticatedFaucetJson.abi,
       this.L2Provider,
     ).connect()
@@ -1830,7 +1590,7 @@ class NetworkService {
     // ONLY SUPPORTED on L2
     if( this.L1orL2 !== 'L2' ) return
 
-    // ONLY SUPPORTED on Rinkeby and Mainnet
+    // ONLY SUPPORTED on Goerli and Mainnet
     if (this.networkGateway === 'local') return
 
     try {
@@ -4104,6 +3864,10 @@ class NetworkService {
   }
 
   // Create Proposal
+  /************************/
+  /*****Old Dao Fix Me.****/
+  /************************/
+  // FIXME:
   async createProposal(payload) {
 
     if( this.L1orL2 !== 'L2' ) return
@@ -4120,10 +3884,17 @@ class NetworkService {
     let value3 = 0
     let description = ''
     let address = ['']
-    let callData = ['']
-    let tokenIds = payload.tokenIds
-    // create proposal only on latest contracts.
-    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+    let callData = [ '' ]
+    // FIXME: Ve DAO From here
+    /*
+      let tokenIds = payload.tokenIds
+      // create proposal only on latest contracts.
+      const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
+
+    */
+    // FIXME: Ve DAO Till here
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
 
     if( payload.action === 'text-proposal' ) {
       address = ['0x000000000000000000000000000000000000dEaD']
@@ -4176,7 +3947,6 @@ class NetworkService {
           values,
           signatures,
           callData,
-          tokenIds,
           description
       )
 
@@ -4194,10 +3964,10 @@ class NetworkService {
    * group created proposals by `to` and make use of respective contract to prepare the proposal data list.
    *
   */
+  // Use this proposal fetch for veDao.
+  async fetchProposalsVeDao() {
 
-  async fetchProposals() {
-
-    if (!this.delegateContract) return
+    if (!this.delegateContract || this.networkGateway === 'goerli') return
 
     const delegateCheckV1 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
     const delegateCheckV2 = await this.delegateContract.attach(allAddresses.GovernorBravoDelegatorV2)
@@ -4308,8 +4078,11 @@ class NetworkService {
     }
   }
 
+
+
   //Cast vote for proposal
-  async castProposalVote({id, userVote,tokenIds}) {
+  // FIXME: keeping this to refer in next release will cleanup.
+  async castProposalVoteVeDao({id, userVote,tokenIds}) {
 
     if( !this.delegateContract ) return
 
@@ -5288,6 +5061,164 @@ class NetworkService {
     }
   }
 
+  /****************************************
+   ************* STARTS HERE **************
+   ***********OLD DAO REMOVE ME ***********
+   *****************************************/
+
+  // FIXME: remove me once deprecated old dao.
+
+  async fetchProposals() {
+
+    if (!this.delegateContract) return
+
+    const delegateCheck = await this.delegateContract.attach(allAddresses.GovernorBravoDelegator)
+
+    try {
+
+      let proposalList = []
+
+      const proposalCounts = await delegateCheck.proposalCount()
+      const totalProposals = await proposalCounts.toNumber()
+
+      /// @notice An event emitted when a new proposal is created
+      // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
+
+      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+
+      for (let i = 0; i < totalProposals; i++) {
+        const proposalRaw = descriptionList.data.governorProposalCreateds[i]
+
+        if(typeof(proposalRaw) === 'undefined') continue
+
+        let proposalID = proposalRaw.proposalId
+
+        //this is a number such as 2
+        let proposalData = await delegateCheck.proposals(proposalID)
+
+        const proposalStates = [
+          'Pending',
+          'Active',
+          'Canceled',
+          'Defeated',
+          'Succeeded',
+          'Queued',
+          'Expired',
+          'Executed',
+        ]
+
+        let state = await delegateCheck.state(proposalID)
+
+        let againstVotes = parseInt(formatEther(proposalData.againstVotes))
+        let forVotes = parseInt(formatEther(proposalData.forVotes))
+        let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
+
+        let startTimestamp = proposalData.startTimestamp.toString()
+        let endTimestamp = proposalData.endTimestamp.toString()
+
+        let proposal = await delegateCheck.getActions(i+2)
+
+        let hasVoted = null
+
+        let description = proposalRaw.description.toString()
+
+        proposalList.push({
+           id: proposalID?.toString(),
+           proposal,
+           description,
+           totalVotes: forVotes + againstVotes,
+           forVotes,
+           againstVotes,
+           abstainVotes,
+           state: proposalStates[state],
+           startTimestamp,
+           endTimestamp,
+           hasVoted: hasVoted
+        })
+
+      }
+      return { proposalList }
+    } catch(error) {
+      console.log("NS: fetchProposals error:",error)
+      return error
+    }
+  }
+
+
+  async castProposalVote({id, userVote}) {
+
+    if( !this.delegateContract ) return
+
+    if( !this.account ) {
+      console.log('NS: castProposalVote() error - called but account === null')
+      return
+    }
+    try {
+      const delegateCheck = await this.delegateContract
+        .connect(this.provider.getSigner())
+        .attach(allAddresses.GovernorBravoDelegator)
+      return delegateCheck.castVote(id, userVote)
+    } catch(error) {
+      console.log("NS: castProposalVote error:",error)
+      return error
+    }
+  }
+
+
+  /****************************************
+   ************* END HERE *****************
+   ***********OLD DAO REMOVE ME TILL HERE *
+   *****************************************/
+
+   async submitTxBuilder(contract, methodIndex, methodName, inputs) {
+
+    const parseResult = (result, outputs) => {
+      let parseResult = []
+      if (outputs.length === 1) {
+        return result.toString()
+      }
+      for (let i = 0; i < outputs.length; i++) {
+        try {
+          const output = outputs[i]
+          const key = output.name ? output.name : output.type
+          if (output.type.includes('uint')) {
+            parseResult.push({[key]: result[i].toString()})
+          } else {
+            parseResult.push({[key]:result[i]})
+          }
+        } catch (err) {
+          return 'Error: Failed to parse result'
+        }
+      }
+      return JSON.stringify(parseResult)
+    }
+
+    let parseInput = Object.values(inputs)
+    let value = 0
+    const stateMutability = contract.interface.functions[methodName].stateMutability
+    const outputs = contract.interface.functions[methodName].outputs
+    if (stateMutability === 'payable') {
+      value = parseInput[parseInput.length - 1]
+      parseInput = parseInput.slice(0, parseInput.length - 1)
+    }
+
+    let result
+    try {
+      if (stateMutability === 'view' || stateMutability === 'pure') {
+        result = await contract[methodName](...parseInput)
+        return { methodIndex, result: { result: parseResult(result, outputs), err: null }}
+      } else if (stateMutability === 'payable') {
+        console.log({ value }, ...parseInput)
+        const tx = await contract[methodName](...parseInput, { value })
+        return { methodIndex, result: { transactionHash: tx.hash, err: null }}
+      } else {
+        const tx = await contract[methodName](...parseInput)
+        return { methodIndex, result: { transactionHash: tx.hash, err: null }}
+      }
+    } catch (err) {
+      return { methodIndex, result: { err: JSON.stringify(err) }}
+    }
+   }
 }
 
 const networkService = new NetworkService()

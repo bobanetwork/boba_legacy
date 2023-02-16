@@ -41,7 +41,6 @@ const config: HardhatUserConfig = {
       live: false,
       saveDeployments: false,
       tags: ['local'],
-      hardfork: 'istanbul',
     },
     optimism: {
       url: 'http://127.0.0.1:8545',
@@ -62,6 +61,9 @@ const config: HardhatUserConfig = {
     },
     'boba-mainnet': {
       url: 'https://mainnet.boba.network',
+    },
+    goerli: {
+      url: process.env.L1_NODE_WEB3_URL || '',
     },
   },
   mocha: {
@@ -119,6 +121,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: process.env.ETHERSCAN_KEY,
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
+      goerli: process.env.ETHERSCAN_GOERLI_KEY,
     },
     customChains: [
       {

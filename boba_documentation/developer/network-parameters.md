@@ -2,23 +2,23 @@
 description: A collection of links and addresses to get started on Boba-Ethereum
 ---
 
-# Rinkeby (28)
+# Goerli (2888)
 
-## Rinkeby Addresses
+## Goerli Addresses
 
-For **primary network contracts and addresses** see [packages/contracts/deployments/rinkeby/README.md](../../packages/contracts/deployments/rinkeby/README.md)
+For **primary network contracts and addresses** see [packages/contracts/deployments/goerli/README.md](../../packages/contracts/deployments/goerli/README.md)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Rinkeby address registration dump](../../packages/boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json).
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Goerli address registration dump](../../packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json).
 
-## Rinkeby Links and Endpoints
+## Goerli Links and Endpoints
 
 |                 |                                                                                          |
 | --------------- | ---------------------------------------------------------------------------------------- |
-| Rinkeby ChainID | 28                                                                                       |
-| Rinkeby RPC     | [https://rinkeby.boba.network](https://rinkeby.boba.network)                             |
-| Gateway         | [https://gateway.rinkeby.boba.network](https://gateway.rinkeby.boba.network)             |
-| Blockexplorer   | [https://blockexplorer.rinkeby.boba.network](https://blockexplorer.rinkeby.boba.network) |
-| Websocket       | [wss://wss.rinkeby.boba.network](wss://wss.rinkeby.boba.network)                   |
+| Goerli ChainID | 2888                                                                                       |
+| Goerli RPC     | [https://goerli.boba.network](https://goerli.boba.network)                             |
+| Gateway         | [https://gateway.goerli.boba.network](https://gateway.goerli.boba.network)             |
+| Blockexplorer   | [https://testnet.bobascan.com/](https://testnet.bobascan.com/) |
+| Websocket       | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)                   |
 
 # Mainnet (288)
 

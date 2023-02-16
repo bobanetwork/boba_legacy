@@ -141,8 +141,8 @@ dataSources:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTuringMonstersTransferEvent
       file: ./src/TuringMonstersMapping.ts
-      
-      
+
+
   - kind: ethereum/contract
     name: TuringHelperFactory
     network: {{network}}
