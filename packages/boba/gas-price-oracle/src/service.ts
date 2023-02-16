@@ -102,7 +102,7 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
   }
 
   protected async _init(): Promise<void> {
-    this.logger.info('Initializing gas price oracle', {
+    this.logger.info('Initializing gas price oracle for Ethereum L2', {
       gasPriceOracleAddress: this.options.gasPriceOracleAddress,
       OVM_SequencerFeeVault: this.options.OVM_SequencerFeeVault,
       gasOracleOwnerAddress: this.options.gasPriceOracleOwnerWallet.address,
@@ -772,7 +772,7 @@ export class GasPriceOracleAltL1Service extends BaseService<GasPriceOracleOption
   }
 
   protected async _init(): Promise<void> {
-    this.logger.info('Initializing gas price oracle', {
+    this.logger.info('Initializing gas price oracle for Alt L2s', {
       gasPriceOracleAddress: this.options.gasPriceOracleAddress,
       OVM_SequencerFeeVault: this.options.OVM_SequencerFeeVault,
       gasOracleOwnerAddress: this.options.gasPriceOracleOwnerWallet.address,
