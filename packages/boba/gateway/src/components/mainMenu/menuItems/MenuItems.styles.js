@@ -14,7 +14,7 @@ export const Nav = styled('nav')(({ theme }) => ({
   flexWrap: 'wrap',
   [theme.breakpoints.down('md')]: {
     width: '100%',
-    gap: '20px',
+    gap: '10px',
     height: '250px',
     marginTop: '20px',
     flexWrap: 'nowrap',
@@ -34,6 +34,7 @@ export const MenuListItem = styled(NavLink)(({ theme }) => ({
     fontSize: '20px',
     fontWeight: '400',
     marginLeft: '20px',
+    padding: '0 24px',
   },
   color: 'inherit',
   '&:hover': {

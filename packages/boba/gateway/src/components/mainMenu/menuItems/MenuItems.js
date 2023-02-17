@@ -3,21 +3,26 @@ import { useSelector } from 'react-redux'
 import { intersection } from 'lodash'
 import { selectMonster } from 'selectors/setupSelector'
 import { MENU_LIST } from './menu.config'
-import { ReactComponent as BobaIcon } from '../../../images/boba2/boba2Icon.svg'
 import { useLocation } from 'react-router-dom'
 
 import * as S from './MenuItems.styles'
 import { PAGES_BY_NETWORK } from 'util/constant'
 import { selectActiveNetwork } from 'selectors/networkSelector'
+import { useTheme, useMediaQuery } from '@mui/material'
 
-const MenuItems = () => {
-  const location = useLocation()
-  const menuList = MENU_LIST
+const MenuItems = ({
+  setOpen
+}) => {
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const menuList = MENU_LIST;
 
   const monsterNumber = useSelector(selectMonster())
   const network = useSelector(selectActiveNetwork())
 
   const [list, setList] = useState([])
+  const location = useLocation()
 
   useEffect(() => {
     let _menuList = menuList
@@ -48,7 +53,7 @@ const MenuItems = () => {
     <S.Nav>
       {list.map((item) => {
         return (
-          <S.MenuListItem key={item.key} to={item.url} activeclassname="active">
+          <S.MenuListItem key={item.key} to={item.url} activeclassname="active" onClick={() => isMobile ? setOpen(false): null}>
             {item.url.split('/')[1] === location.pathname.split('/')[1] && (
               <S.MenuIcon />
             )}
