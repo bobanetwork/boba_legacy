@@ -10,8 +10,11 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 // use local sdk
 import { SimpleWalletAPI } from '@account-abstraction/sdk'
+import { wrapProvider } from '@account-abstraction/sdk/src/Provider'
+import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
 import SimpleWalletDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWalletDeployer.sol/SimpleWalletDeployer.json'
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
+import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import { SampleRecipient, SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
@@ -108,6 +111,28 @@ describe('AA Wallet Test\n', async () => {
       owner: env.l2Wallet_2,
       factoryAddress: SimpleWalletDeployer.address,
     })
+
+    // deploy a senderCreator contract to get the create2 address on the provide
+    const SenderCreator__factory = new ContractFactory(
+        SenderCreatorJson.abi,
+        SenderCreatorJson.bytecode,
+        env.l2Wallet
+    )
+
+    const senderCreator = await SenderCreator__factory.deploy()
+
+    const aasigner = env.l2Provider.getSigner()
+    const config = {
+    chainId: await env.l2Provider.getNetwork().then(net => net.chainId),
+    entryPointAddress,
+    bundlerUrl: 'http://localhost:3000/rpc'
+    }
+
+    const dep = new DeterministicDeployer(env.l2Provider, env.l2Wallet)
+
+
+    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet, senderCreator.address)
+    // const walletAddress = await aaProvider.getSigner().getAddress()
 
     // `createUnsignedUserOp()` on the sdk failes only for boba:
     // Fails getting sender address from initCode at - `getCounterFactualAddress`
