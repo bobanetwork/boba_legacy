@@ -68,7 +68,7 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (14).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (14) (2).png" alt=""><figcaption></figcaption></figure>
 
 ### Analytics and eth\_getLogs for Bobabeam
 

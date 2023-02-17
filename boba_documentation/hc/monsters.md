@@ -4,7 +4,7 @@ description: Hybrid Compute Example - Minting NFTs with Random Attributes
 
 # Monster Minting
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (16) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (16).png" alt=""><figcaption></figcaption></figure>
 
 Clone the repository, open it, and install packages with `yarn`:
 

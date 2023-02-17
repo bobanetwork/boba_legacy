@@ -26,7 +26,7 @@ Go to the Application Services section of the Amazon **API Gateway** web console
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (12) (1).png" alt=""><figcaption></figcaption></figure>
 
 Go back to the **Lambda** web console. In the `Function overview`, you will now see an API Gateway trigger. Click it, and then click the `Triggers>API endpoint: https://...`. A new browser tab will open and you will see the string `"Hello from Lambda!"`. The basic system is now in place and working. Next, add some math, or whatever functionality you need.
 

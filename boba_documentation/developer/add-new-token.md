@@ -4,7 +4,7 @@ description: Adding a new ERC20 token to Boba
 
 # Adding a new ERC20 to Boba
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (9) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Deploy [L2StandardERC20.sol](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/contracts/contracts/standards/L2StandardERC20.sol) via block explorer
 

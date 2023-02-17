@@ -4,7 +4,7 @@ description: A collection of links and addresses to get started on Boba-Ethereum
 
 # Contract Addresses Boba/Ethereum
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (8).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (8) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Goerli Addresses
 

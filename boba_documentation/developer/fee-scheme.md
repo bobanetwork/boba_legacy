@@ -80,7 +80,7 @@ const fee = WETH.estimateGas.transfer(to, amount)
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (11) (1).png" alt=""><figcaption></figcaption></figure>
 
 There are three common errors that would cause your transaction to be rejected
 
