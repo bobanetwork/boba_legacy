@@ -8,7 +8,7 @@ Hybrid Compute can interact with any computer with an API. Examples include doze
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (6).png" alt=""><figcaption></figcaption></figure>
 
 Set up an AWS account if you do not have one. Go to the **Amazon Lambda** web console. Click `Create function` (top right). Select `Author from scratch`. Give it a good name (e.g. `basic_math`). Select Runtime: Node.js 14.x (for running javascript code) or Python 3.9 (for running Python code). Leave everything else as is and click `Create function` (bottom right).
 
@@ -20,19 +20,19 @@ Set up a basic test: `Test > Configure test event`, name the test (e.g. `basic_m
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (6).png" alt=""><figcaption></figcaption></figure>
 
 Go to the Application Services section of the Amazon **API Gateway** web console - you can go there directly by searching for `API Gateway` in the service search bar (top left). Select `Get Started` or `Create API`. Chose HTTP API, `Build`, then `Add integration` - select Lambda from the dropdown - use same region; select your Lambda function (`basic_math`) from the dropdown. Click `Create`. This will give you an Invoke URL. That's what you will provide as one of the parameters for your Hybrid Compute calls.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (3).png" alt=""><figcaption></figcaption></figure>
 
 Go back to the **Lambda** web console. In the `Function overview`, you will now see an API Gateway trigger. Click it, and then click the `Triggers>API endpoint: https://...`. A new browser tab will open and you will see the string `"Hello from Lambda!"`. The basic system is now in place and working. Next, add some math, or whatever functionality you need.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (6).png" alt=""><figcaption></figcaption></figure>
 
 See [./turing\_stableSwap.py](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/turing-stable-swap/aws/turing\_stableSwap.py) for deployable stableSwap code. Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in [turing\_stableSwap.py](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/turing-stable-swap/aws/turing\_stableSwap.py). To test it from your terminal, run:
 
@@ -100,7 +100,7 @@ curl -X POST \
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 7.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 7 (1).png" alt=""><figcaption></figcaption></figure>
 
 See `./turing_oracle.py` for deployable price feed API query code. Depending on the details of the API you are interating with, you will need to make minor changes.
 
