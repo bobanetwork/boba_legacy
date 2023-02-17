@@ -17,7 +17,7 @@ With Turing you can build your own KYC gatekeeper for specific smart contract fu
 
 <figure><img src="../../.gitbook/assets/dapp-usser-KYC-graph.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 The idea is, that the user has to once KYC his wallet on any KYC provider that supports KYCing wallets. The KYC process itself is completely independent of this code base, as well as the process associated with it.
 
@@ -57,7 +57,7 @@ contracts/
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (7).png" alt=""><figcaption></figcaption></figure>
 
 Inside the folder, run `yarn install`.
 

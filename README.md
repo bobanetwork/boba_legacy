@@ -25,7 +25,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
 
-<figure><img src=".gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 
@@ -106,13 +106,13 @@ If the command returns with no log output, the sequencer is up. Once the sequenc
 
 When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
 
-<figure><img src=".gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5 (5).png" alt=""><figcaption></figcaption></figure>
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
 * _To (re)build individual Boba ts services_: `docker-compose build -- builder` then `docker-compose build -- dtl`, for example
 
-<figure><img src=".gitbook/assets/Artboard 6 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 6 (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 To run unit tests for a specific package:
 
