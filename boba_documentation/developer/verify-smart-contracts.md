@@ -2,11 +2,15 @@
 description: Learn how to verify smart contracts on Boba
 ---
 
+# Verifying Contracts
+
 The Boba Explorers support verifying smart contracts via the [hardhat-etherscan](https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#hardhat-etherscan) plug
 
-## Verify contracts with hardhat-etherscan
 
-## Installation
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (16).png" alt=""><figcaption></figcaption></figure>
+
+### Installation
 
 ```bash
 npm install --save-dev @nomiclabs/hardhat-etherscan
@@ -24,7 +28,7 @@ Or, if you are using TypeScript, add this to your `hardhat.config.ts`:
 import "@nomiclabs/hardhat-etherscan";
 ```
 
-## Usage
+### Usage
 
 You need to add the following Etherscan config to your `hardhat.config.js` file:
 
@@ -108,12 +112,14 @@ Lastly, run the `verify` task, passing the address of the contract, the network 
 npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
 ```
 
-## Verify contracts with Blockscout
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (16).png" alt=""><figcaption></figcaption></figure>
 
 On contract creation, you will receive an address to check a pending transaction. If it does not redirect you to block explorer, verify you are on the chain where the contract was deployed, and type the contract's address into the search bar. Your contract details should come up.
 
-![](../.gitbook/assets/085337.png)
+<figure><img src="../../.gitbook/assets/Artboard 46 (1).png" alt=""><figcaption></figcaption></figure>
 
 Once you have provided all the necessary information, hit 'Verify & Publish'
 
-![](../.gitbook/assets/085339.png)
+<figure><img src="../../.gitbook/assets/Artboard 46_1.png" alt=""><figcaption></figcaption></figure>
