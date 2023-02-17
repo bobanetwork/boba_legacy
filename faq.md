@@ -108,7 +108,7 @@ There are 4 different mechanisms for following the status of a transaction.
 
 These methods are described [here](boba\_documentation/developer/xdomain-tx-status.md).
 
-<figure><img src=".gitbook/assets/Artboard 2 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Categories:**
 

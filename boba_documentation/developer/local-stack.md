@@ -2,7 +2,7 @@
 description: Learn how to run the Boba development stack
 ---
 
-## Running the Boba development stack
+# Development Stack
 
 **Note: this is only relevant to developers who wish to work on Boba core services**.
 
@@ -23,7 +23,9 @@ $ cd ops
 $ BUILD=1 DAEMON=0 ./up_local.sh
 ```
 
-### Spinning up the stack
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (7).png" alt=""><figcaption></figcaption></figure>
 
 Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialisation. Recommended settings - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
 
@@ -39,13 +41,17 @@ If the command returns with no log output, the sequencer is up. Once the sequenc
 
 When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
 
-### Helpful commands
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
 * _To (re)build individual Boba services_: `docker-compose -f "docker-compose.yml" build -- boba_message-relayer-fast` Note: First you will have to comment out various dependencies in `docker-compose.yml`.
 
-### Running unit tests
+
+
+<figure><img src="../../.gitbook/assets/Artboard 3 (6).png" alt=""><figcaption></figcaption></figure>
 
 To run unit tests for a specific package:
 
@@ -54,7 +60,9 @@ cd packages/package-to-test
 yarn test
 ```
 
-### Running integration tests
+
+
+<figure><img src="../../.gitbook/assets/Artboard 4 (1).png" alt=""><figcaption></figcaption></figure>
 
 Make sure you are in the `ops` folder and then run
 
