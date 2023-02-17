@@ -25,7 +25,7 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (12) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet Addresses
 

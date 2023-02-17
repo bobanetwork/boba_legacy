@@ -17,7 +17,7 @@ description: A collection of links and addresses to get started on Boba-Moonbeam
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (13).png" alt=""><figcaption></figcaption></figure>
 
 ### Testnet Fountain for Developers on Bobabase L2
 

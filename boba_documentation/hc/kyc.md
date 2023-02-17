@@ -4,7 +4,7 @@ description: Turing Example - OnChain KYC
 
 # KYC
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (11) (1).png" alt=""><figcaption></figcaption></figure>
 
 Regulation is coming, there is no doubt. Some examples:
 

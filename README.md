@@ -25,7 +25,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
 
-<figure><img src=".gitbook/assets/Artboard 2 (14).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (14) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 
