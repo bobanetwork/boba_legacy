@@ -25,7 +25,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
 
-<figure><img src=".gitbook/assets/Artboard 2 (7).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (6).png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 
@@ -131,7 +131,7 @@ docker-compose run integration_tests
 
 Expect the full test suite with more than 110 tests including load tests to complete in between _30 minutes_ to _two hours_ depending on your computer hardware.
 
-<figure><img src=".gitbook/assets/Artboard 8 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 8 (2).png" alt=""><figcaption></figcaption></figure>
 
 By default, the `docker-compose up` command will show logs from all services, and that can be hard to filter through. In order to view the logs from a specific service, you can run:
 

@@ -4,7 +4,7 @@ description: Turing Example - OnChain KYC
 
 # KYC
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (7).png" alt=""><figcaption></figcaption></figure>
 
 Regulation is coming, there is no doubt. Some examples:
 
@@ -17,7 +17,7 @@ With Turing you can build your own KYC gatekeeper for specific smart contract fu
 
 <figure><img src="../../.gitbook/assets/dapp-usser-KYC-graph.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (2).png" alt=""><figcaption></figcaption></figure>
 
 The idea is, that the user has to once KYC his wallet on any KYC provider that supports KYCing wallets. The KYC process itself is completely independent of this code base, as well as the process associated with it.
 
@@ -25,7 +25,7 @@ This means, that smart contracts that implement this KYC gatekeeper, will actual
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (4).png" alt=""><figcaption></figcaption></figure>
 
 This example basically consists just like all other Turing use cases, of a `TuringHelper.sol` and its corresponding interface called `ITuringHelper.sol`. The TuringHelper is just as usual needed, to actually be charged for your off-chain calls and to limit unauthorized access (refer to `permittedCallers` etc.). Please refer to the appendix of this ReadMe or to the general Turing documentation.
 
@@ -57,7 +57,7 @@ contracts/
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (8).png" alt=""><figcaption></figcaption></figure>
 
 Inside the folder, run `yarn install`.
 

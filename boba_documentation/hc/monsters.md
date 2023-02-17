@@ -4,7 +4,7 @@ description: Hybrid Compute Example - Minting NFTs with Random Attributes
 
 # Monster Minting
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (6).png" alt=""><figcaption></figcaption></figure>
 
 Clone the repository, open it, and install packages with `yarn`:
 
@@ -40,7 +40,7 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (7).png" alt=""><figcaption></figcaption></figure>
 
 If you do not have testnet ETH, you can get some here [Faucets](https://docs.boba.network/for-developers/faucets).
 
