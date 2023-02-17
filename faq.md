@@ -4,7 +4,7 @@ description: Frequently asked questions
 
 # FAQ
 
-<figure><img src=".gitbook/assets/Artboard 1 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 1 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 [Boba](https://boba.network) is a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
@@ -108,7 +108,7 @@ There are 4 different mechanisms for following the status of a transaction.
 
 These methods are described [here](boba\_documentation/developer/xdomain-tx-status.md).
 
-<figure><img src=".gitbook/assets/Artboard 2 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Categories:**
 
