@@ -25,7 +25,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
 
-<figure><img src=".gitbook/assets/Artboard 2 (13).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 
@@ -57,7 +57,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
   * [`register`](packages/boba/register/): Code for registering addresses in the AddressManager
   * [`subgraph`](packages/boba/subgraph/): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
 
-<figure><img src=".gitbook/assets/Artboard 3 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 Follow these instructions to set up your local development environment.
 
@@ -106,7 +106,7 @@ If the command returns with no log output, the sequencer is up. Once the sequenc
 
 When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
 
-<figure><img src=".gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5 (4).png" alt=""><figcaption></figcaption></figure>
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
@@ -121,7 +121,7 @@ cd packages/package-to-test
 yarn test
 ```
 
-<figure><img src=".gitbook/assets/Artboard 7 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 7 (2).png" alt=""><figcaption></figcaption></figure>
 
 Make sure you are in the `ops` folder and then run
 

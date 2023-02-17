@@ -14,7 +14,7 @@ We'll work though one of those examples in more detail.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (6).png" alt=""><figcaption></figcaption></figure>
 
 Welcome to our ERC20 Truffle example. If you're interested in writing your first L2 smart contract using Truffle as your smart contract testing framework, then you've come to the right place. This repo serves as an example for how go through and compile/test/deploy your contracts on Ethereum and the Boba L2.
 
@@ -22,7 +22,7 @@ Let's begin.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (9).png" alt=""><figcaption></figcaption></figure>
 
 Compiling a contract for Boba is identical to compiling a contract for Ethereum mainchain. Notably, all standard solidity compiler versions can be used. For this ERC20, we will use `0.6.12`. Create a `truffle-config.js` and add the following to it:
 
@@ -67,7 +67,7 @@ Yep, it's that easy. You can verify that everything went well by looking for the
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (11).png" alt=""><figcaption></figcaption></figure>
 
 Woot! It's time to test our contract. Since the JSON RPC provider URL (for Boba Goerli) has already been specified in your Truffle config file, all we need to do next is run the test command. Run:
 
@@ -109,7 +109,7 @@ If so, congrats! You're ready to deploy an application to Boba. It really is tha
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (6).png" alt=""><figcaption></figcaption></figure>
 
 Now we're going to deploy a contract using `truffle`. For Truffle based deployments, we're going to use Truffle's `migrate` command to run a migrations file for us that will deploy the contract we specify.
 
@@ -197,6 +197,6 @@ That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (8).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (5).png" alt=""><figcaption></figcaption></figure>
 
 Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/issues).

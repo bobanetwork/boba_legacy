@@ -108,7 +108,7 @@ There are 4 different mechanisms for following the status of a transaction.
 
 These methods are described [here](boba\_documentation/developer/xdomain-tx-status.md).
 
-<figure><img src=".gitbook/assets/Artboard 2 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Categories:**
 
@@ -143,7 +143,7 @@ Unfortunately no, not at the moment.
 
 See Q2 of Transactions
 
-<figure><img src=".gitbook/assets/Artboard 4 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 4 (4) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Does Boba Network Have a Testnet/How Do I Get Testnet Boba or Eth?
 
@@ -193,7 +193,7 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-<figure><img src=".gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 5 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Isn’t My Transaction Going Through?
 
