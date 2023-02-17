@@ -1,0 +1,32 @@
+service: sls-bobabeam-bobalink # NOTE: update this with your service name
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stackName: sls-bobabeam-bobalink
+  stage: prod
+  region: us-east-1
+
+package:
+  exclude:
+    - .gitignore
+    - node_modules
+  individually: true
+
+functions:
+  bobalink_getQuote:
+    handler: bobalink_getQuote.exportHandler
+    memorySize: 10240 # optional, in MB, default is 1024
+    timeout: 60 # optional, in seconds, default is 6
+    events:
+      - http:
+          path: get.quote
+          method: post
+          cors: true
+      - schedule:
+          rate: rate(10 minutes)
+          description: 'Warm up get token'
+          name: 'sls-bobabeam-bobalink-bobalink_getQuote'
+    layers:
+      - ${file(env.yml):LAYERS}
+
