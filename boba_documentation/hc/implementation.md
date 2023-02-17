@@ -36,7 +36,7 @@ To obtain **Twitter** or **Spotify** data you could set up a system like this:
 
 ###
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
@@ -335,7 +335,7 @@ $ hardhat --network boba_local test
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 6 (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Step 1: Invoking Turing for inside a Smart contract
 

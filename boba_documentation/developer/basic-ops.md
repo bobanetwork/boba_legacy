@@ -12,7 +12,7 @@ To see examples of how to perform dozens of basic operations on Boba, you can al
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (15).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
 
 The Gas Price on L2 changes every **30 seconds**, with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change of the L2 gas price is 5% in the gas price oracle. Like on mainchain, the current gas price can be obtained via `.getGasPrice()`:
 
@@ -32,7 +32,7 @@ Typical values are 3 to 10 Gwei.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (7).png" alt=""><figcaption></figcaption></figure>
 
 Like on mainchain, the cost of a L2 transaction is the product of the current gas price and the 'complexity' of the contract call, with some calls being much more expensive than others. The contract call complexity is quantified via the `gas`. For example, the cost of an approval on L2 is about 0.0004 ETH, or about $1.70 (Oct. 2021):
 
@@ -109,7 +109,7 @@ NOTE: To protect users, _overpaying by more than a 10% percent will also revert 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (10).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 ```javascript
 //Transfer funds from one account to another, on the L2
@@ -155,7 +155,7 @@ async transfer(address, value_Wei_String, currency) {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (8).png" alt=""><figcaption></figcaption></figure>
 
 ```javascript
   //Move ERC20 Tokens from L1 to L2
@@ -207,7 +207,7 @@ async transfer(address, value_Wei_String, currency) {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (7).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
 
 The hex value that corresponds to the `L1BLOCKNUMBER` opcode (`0x4B`) may be changed in the future. **We strongly discourage direct use of this opcode within your contracts.** Instead, if you want to access the latest L1 block number, please use the `OVM_L1BlockNumber` contract as described below.
 
@@ -232,7 +232,7 @@ contract MyContract {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
 
 ### Block production is not constant
 

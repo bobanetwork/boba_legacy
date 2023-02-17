@@ -4,7 +4,7 @@ description: Hybrid Compute Example - Minting NFTs with Random Attributes
 
 # Monster Minting
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (16).png" alt=""><figcaption></figcaption></figure>
 
 Clone the repository, open it, and install packages with `yarn`:
 
@@ -40,7 +40,7 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (8).png" alt=""><figcaption></figcaption></figure>
 
 If you do not have testnet ETH, you can get some here [Faucets](https://docs.boba.network/for-developers/faucets).
 
@@ -76,7 +76,7 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (10).png" alt=""><figcaption></figcaption></figure>
 
 To deploy run:
 
@@ -90,7 +90,7 @@ Add the ERC721 as permitted caller to the deployed TuringHelper. Call the method
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (8).png" alt=""><figcaption></figcaption></figure>
 
 The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract. Nevertheless, the contract has been distributed into several smaller contracts to make them easily reusable for your own project.
 
