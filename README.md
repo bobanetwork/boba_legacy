@@ -25,7 +25,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
 
-<figure><img src=".gitbook/assets/Artboard 2 (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 2 (13).png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 
@@ -121,7 +121,7 @@ cd packages/package-to-test
 yarn test
 ```
 
-<figure><img src=".gitbook/assets/Artboard 7 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 7 (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 Make sure you are in the `ops` folder and then run
 
