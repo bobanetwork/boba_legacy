@@ -424,7 +424,7 @@ export const waitForAndExecute = async (
   repeat: number,
   intervalMs?: number,
 ) => {
-  while (repeat >= 0) {
+  while (repeat > 0) {
     try {
       await fn()
       break
@@ -433,6 +433,7 @@ export const waitForAndExecute = async (
       await sleep(intervalMs || 1000)
     }
   }
+  await fn()
 }
 
 // // eslint-disable-next-line @typescript-eslint/no-shadow
