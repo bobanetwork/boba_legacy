@@ -1,18 +1,13 @@
 #!/usr/bin/env node
 
 const ethers = require('ethers')
-const { CrossChainMessenger } = require('@eth-optimism/sdk')
+const { getContractFactory } = require('@eth-optimism/contracts')
+const { getBobaContractAt, getBobaContractABI } = require('@boba/contracts')
+const { CrossChainMessenger, isChainIDForGraph } = require('@eth-optimism/sdk')
 const { Logger } = require('@eth-optimism/common-ts')
 const fetch = require('node-fetch')
 
 const { removeBlankStringInArray } = require('./utils')
-
-const addressManagerJSON = require('@eth-optimism/contracts/artifacts/contracts/libraries/resolver/Lib_AddressManager.sol/Lib_AddressManager.json')
-const L1LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json')
-const L2LiquidityPoolJson = require('@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json')
-const L1StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L1/messaging/L1StandardBridge.sol/L1StandardBridge.json')
-const L2StandardBridgeJson = require('@eth-optimism/contracts/artifacts/contracts/L2/messaging/L2StandardBridge.sol/L2StandardBridge.json')
-const StateCommitmentChainJson = require('@eth-optimism/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json')
 
 require('dotenv').config()
 
@@ -42,10 +37,10 @@ const L1LiquidityPoolAddress = env.PROXY__L1_LIQUIDITY_POOL_ADDRESS
 const L2LiquidityPoolAddress = env.PROXY__L2_LIQUIDITY_POOL_ADDRESS
 
 const TRANSACTION_MONITOR_INTERVAL = env.TRANSACTION_MONITOR_INTERVAL || 3 * second
-const CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL = env.CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL || 15 * minute
+const CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL = env.CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL || 3 * second
 const STATE_ROOT_MONITOR_INTERVAL = env.STATE_ROOT_MONITOR_INTERVAL || hour
 const EXIT_MONITOR_INTERVAL = env.EXIT_MONITOR_INTERVAL || 15 * minute
-const L1_BRIDGE_MONITOR_INTERVAL = env.L1_BRIDGE_MONITOR_INTERVAL || 3 * minute
+const L1_BRIDGE_MONITOR_INTERVAL = env.L1_BRIDGE_MONITOR_INTERVAL || 3 * second
 
 const STATE_ROOT_MONITOR_START_BLOCK = env.STATE_ROOT_MONITOR_START_BLOCK || 0
 const L1_BRIDGE_MONITOR_START_BLOCK = env.L1_BRIDGE_MONITOR_START_BLOCK || 0
@@ -150,15 +145,17 @@ class GlobalEnv {
     this.l1BalanceMonitorAddresses = removeBlankStringInArray(L1_BALANCE_MONITOR_ADDRESSES.split(','))
     this.l2BalanceMonitorAddresses = removeBlankStringInArray(L2_BALANCE_MONITOR_ADDRESSES.split(','))
     this.balanceMonitorInterval = BALANCE_MONITOR_INTERVAL
+
+    this.isAltL1Network = false
     /* eslint-enable */
   }
 
   async initGlobalEnv() {
-    const addressManager = new ethers.Contract(
-      this.addressManagerAddress,
-      addressManagerJSON.abi,
-      this.L1Provider
-    )
+    this.isAltL1Network = await isChainIDForGraph(this.L1Provider)
+
+    const addressManager = getContractFactory('Lib_AddressManager')
+      .attach(this.addressManagerAddress)
+      .connect(this.L1Provider)
 
     // Get addresses
     this.L1CrossDomainMessenger = await addressManager.getAddress(
@@ -184,29 +181,31 @@ class GlobalEnv {
     )
 
     // Load SCC
-    this.StateCommitmentChainContract = new ethers.Contract(
-      this.StateCommitmentChain,
-      StateCommitmentChainJson.abi,
-      this.L1Provider
+    this.StateCommitmentChainContract = getContractFactory(
+      'StateCommitmentChain'
     )
+      .attach(this.StateCommitmentChain)
+      .connect(this.L1Provider)
 
     this.sequencerPublishWindow = (
       await this.StateCommitmentChainContract.SEQUENCER_PUBLISH_WINDOW()
     ).toNumber()
 
     // Load L1 Standard Bridge
-    this.OVM_L1StandardBridgeContract = new ethers.Contract(
-      this.Proxy__L1StandardBridge,
-      L1StandardBridgeJson.abi,
-      this.L1Provider
+    this.OVM_L1StandardBridgeContract = getContractFactory(
+      this.isAltL1Network ? 'L1StandardBridgeAltL1' : 'L1StandardBridge'
     )
+      .attach(this.Proxy__L1StandardBridge)
+      .connect(this.L1Provider)
+
     // Interface
     this.L1LiquidityPoolInterface = new ethers.utils.Interface(
-      L1LiquidityPoolJson.abi
+      this.isAltL1Network
+        ? await getBobaContractABI('L1LiquidityPoolAltL1')
+        : await getBobaContractABI('L1LiquidityPoolAlt')
     )
-    this.OVM_L1StandardBridgeInterface = new ethers.utils.Interface(
-      L1StandardBridgeJson.abi
-    )
+    this.OVM_L1StandardBridgeInterface =
+      this.OVM_L1StandardBridgeContract.interface
 
     if (BOBA_DEPLOYER_URL) {
       const response = await fetch(BOBA_DEPLOYER_URL)
@@ -223,23 +222,23 @@ class GlobalEnv {
       L2LiquidityPoolAddress: this.L2LiquidityPoolAddress,
     })
     // Load L1 LP
-    this.L1LiquidityPoolContract = new ethers.Contract(
+    this.L1LiquidityPoolContract = await getBobaContractAt(
+      this.isAltL1Network ? 'L1LiquidityPoolAltL1' : 'L1LiquidityPool',
       this.L1LiquidityPoolAddress,
-      L1LiquidityPoolJson.abi,
       this.L1Provider
     )
     // Load L2 LP
-    this.L2LiquidityPoolContract = new ethers.Contract(
+    this.L2LiquidityPoolContract = await getBobaContractAt(
+      this.isAltL1Network ? 'L2LiquidityPoolAltL1' : 'L2LiquidityPool',
       this.L2LiquidityPoolAddress,
-      L2LiquidityPoolJson.abi,
       this.L2Provider
     )
     // Load L2 Standard Bridge
-    this.OVM_L2StandardBridgeContract = new ethers.Contract(
-      this.OVM_L2StandardBridge,
-      L2StandardBridgeJson.abi,
-      this.L2Provider
+    this.OVM_L2StandardBridgeContract = getContractFactory(
+      this.isAltL1Network ? 'L2StandardBridgeAltL1' : 'L2StandardBridge',
     )
+      .attach(this.OVM_L2StandardBridge)
+      .connect(this.L2Provider)
 
     // watcher
     const { chainId } = await this.L1Provider.getNetwork()
@@ -250,7 +249,9 @@ class GlobalEnv {
       fastRelayer: false,
     })
 
-    this.logger.info('Set up')
+    this.logger.info(
+      `Set up for ${this.isAltL1Network ? 'Alt' : 'Ethereum'} L2`
+    )
   }
 }
 
