@@ -6,7 +6,6 @@ provider:
   stackName: sls-boba-bobalink
   stage: prod
   region: us-east-1
-  role: ${file(env.yml):ROLE}
 
 package:
   exclude:
@@ -19,17 +18,15 @@ functions:
     handler: bobalink_getQuote.exportHandler
     memorySize: 10240 # optional, in MB, default is 1024
     timeout: 60 # optional, in seconds, default is 6
-    vpc:
-      securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
-      subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
     events:
       - http:
           path: get.quote
           method: post
           cors: true
+      - schedule:
+          rate: rate(10 minutes)
+          description: 'Warm up get token'
+          name: 'sls-boba-bobalink-bobalink_getQuote'
     layers:
       - ${file(env.yml):LAYERS}
 
