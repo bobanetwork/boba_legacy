@@ -15,11 +15,15 @@ limitations under the License. */
 
 import React, { Suspense, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { BrowserRouter } from "react-router-dom"
+import { BrowserRouter } from 'react-router-dom'
 
 import { Box, useMediaQuery } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
-import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles'
+import {
+  createTheme,
+  responsiveFontSizes,
+  ThemeProvider,
+} from '@mui/material/styles'
 
 import { setTheme } from 'actions/uiAction'
 import { selectModalState } from 'selectors/uiSelector'
@@ -29,15 +33,15 @@ import Notification from 'containers/notification/Notification'
 import Router from './routes'
 
 function App() {
-
   const dispatch = useDispatch()
 
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const buttonColor = '#BAE21A' //radioGreen
   const darkGrey = '#1b1c1f'
+
+  const buttonColor = '#BAE21A' //radioGreen
 
   let MUItheme = createTheme({
     palette: {
@@ -48,24 +52,33 @@ function App() {
         contrastText: '#fff',
         border: light ? 'solid 1px rgba(0, 0, 0, 0.12)' : 'solid 1px #2d2f3a',
         borderRadius: '12px',
-        borderBottom: light ? 'solid 1px rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.04)',
-        tabBorderBottom: light ? `solid 2px ${buttonColor}}` : `2px solid ${buttonColor}}`,
+        borderBottom: light
+          ? 'solid 1px rgba(0, 0, 0, 0.08)'
+          : '1px solid rgba(255, 255, 255, 0.04)',
+        tabBorderBottom: light
+          ? `solid 2px ${buttonColor}`
+          : `solid 2px ${buttonColor}`,
       },
       secondary: {
         main: light ? buttonColor : buttonColor,
         borderRadius: '20px',
-        border: light ? 'solid 1px rgba(0, 0, 0, 0.12)' : 'solid 1px rgba(255, 255, 255, 0.06)',
+        border: light
+          ? 'solid 1px rgba(0, 0, 0, 0.12)'
+          : 'solid 1px rgba(255, 255, 255, 0.06)',
       },
       background: {
-        default: light ? "#FFFFFF" : "#111315",
+        default: light ? '#FFFFFF' : '#111315',
         secondary: light ? 'rgba(0, 0, 0, 0.04)' : darkGrey,
-        secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
+        secondaryLight: light
+          ? 'rgba(0, 0, 0, 0.08)'
+          : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
-        modal: light ? "#fff" : '#1A1D1F',
-        modalTransparent: light ? "#fff" : 'transparent',
-        input: light ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)",
-        footer: light ? "#fff" : '#1A1D1F',
+        modal: light ? '#fff' : '#1A1D1F',
+        modalTransparent: light ? '#fff' : 'transparent',
+        input: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)',
+        footer: light ? '#fff' : '#1A1D1F',
         glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
+        tooltip: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)',
       },
       neutral: {
         main: '#fff',
@@ -73,7 +86,7 @@ function App() {
       },
     },
     typography: {
-      fontFamily: [ "MrEavesXL", 'Roboto' ].join(','),
+      fontFamily: ['MrEavesXL', 'Roboto'].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,
@@ -92,21 +105,21 @@ function App() {
       },
       body1: {
         fontSize: 18,
-        display: 'block'
+        display: 'block',
       },
       body2: {
         fontSize: 16,
         fontWeight: 400,
         lineHeight: '1.0em',
-        display: 'block'
+        display: 'block',
       },
       body3: {
         fontSize: 14,
         lineHeight: '1.1em',
-        display: 'block'
+        display: 'block',
       },
       body4: {
-        fontSize: 12
+        fontSize: 12,
       },
     },
     components: {
@@ -118,19 +131,33 @@ function App() {
           root: {},
         },
       },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            backgroundColor: light
+              ? 'rgba(0, 0, 0, 0.08)'
+              : 'rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+            borderRadius: '12px',
+          },
+          arrow: {
+            color: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)',
+          },
+        },
+      },
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: "8px",
-            textTransform: "none",
-            boxShadow: "box-shadow: 0px 0px 7px rgba(73, 107, 239, 0.35)",
-            minWidth: "0",
+            borderRadius: '8px',
+            textTransform: 'none',
+            boxShadow: 'box-shadow: 0px 0px 7px rgba(73, 107, 239, 0.35)',
+            minWidth: '0',
             color: '#031313',
-            "&.Mui-disabled": {
+            '&.Mui-disabled': {
               background: light ? 'transparent' : 'rgba(255, 255, 255, 0.04)',
               color: light ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
               border: light ? '1px solid rgba(0, 0, 0, 0.5)' : 'none',
-            }
+            },
           },
         },
         variants: [
@@ -145,11 +172,11 @@ function App() {
               fontSize: '16px',
               font: 'Roboto',
               color: '#031313',
-              "&:hover": {
+              '&:hover': {
                 boxShadow: 'inset 0px 0px 0px 3px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
                 backgroundColor: radioGreen,
-              }
+              },
             },
           },
           {
@@ -160,66 +187,73 @@ function App() {
               background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
-              filter: "drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))",
-              "&:hover": {
+              filter: 'drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))',
+              '&:hover': {
                 color: '#000',
                 borderColor: buttonColor,
                 backgroundColor: buttonColor,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
-              }
+              },
             },
           },
           {
             props: { variant: 'standard', color: 'primary' },
             style: {
-              color: light ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.45)',
-              background: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+              color: light
+                ? 'rgba(0, 0, 0, 0.45)'
+                : 'rgba(255, 255, 255, 0.45)',
+              background: light
+                ? 'rgba(0, 0, 0, 0.06)'
+                : 'rgba(255, 255, 255, 0.06)',
               borderWidth: '1.4px',
-              borderColor: radioGreen,
-              filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
-              "&:hover": {
-                color: radioGreen,
-                boxShadow: light ? 'none' : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
-              }
+              borderColor: buttonColor,
+              filter: 'drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))',
+              '&:hover': {
+                color: buttonColor,
+                boxShadow: light
+                  ? 'none'
+                  : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              },
             },
           },
           {
             props: { variant: 'contained', color: 'neutral' },
             style: {
-              "&:hover": {
+              '&:hover': {
                 opacity: 0.9,
                 transition: 'opacity 0.3s ease-in-out',
-              }
+              },
             },
           },
           {
             props: { variant: 'outlined', color: 'neutral' },
             style: {
-              color: light ? "#000" : "rgba(255, 255, 255, 0.65)",
+              color: light ? '#000' : buttonColor,
               borderWidth: '1.4px',
-              borderColor: light ? "#000" : "rgba(255, 255, 255, 0.25)",
-              "&:hover": {
+              borderColor: light ? '#000' : 'rgba(255, 255, 255, 0.25)',
+              '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',
                 transition: 'opacity 0.3s ease-in-out',
-                borderColor: light ? "#000" : "#fff",
+                borderColor: light ? '#000' : buttonColor,
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
-              }
+              },
             },
           },
           {
             props: { variant: 'small' },
             style: {
               fontSize: '14px',
-              background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
+              background:
+                'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
               textTransform: 'uppercase',
               borderRadius: '12px',
               minWidth: '0',
-              "&:hover": {
+              '&:hover': {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-              }
+              },
             },
           },
           {
@@ -237,7 +271,7 @@ function App() {
         ],
       },
       MuiInputBase: {
-        backgroundColor: "#f00",
+        backgroundColor: '#f00',
       },
       MuiAlert: {
         variants: [
@@ -245,13 +279,13 @@ function App() {
             props: { variant: 'simple' },
             style: {
               padding: 0,
-              backgroundColor: 'transparent'
-            }
-          }
-        ]
-      }
-    }
-  });
+              backgroundColor: 'transparent',
+            },
+          },
+        ],
+      },
+    },
+  })
 
   MUItheme = responsiveFontSizes(MUItheme)
 
@@ -260,21 +294,22 @@ function App() {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-  }, [ dispatch ])
-
+  }, [dispatch])
 
   return (
     <ThemeProvider theme={MUItheme}>
       <CssBaseline />
       <BrowserRouter>
-        <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
+        <Box
+          sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+        >
           <div
             style={{
               display: 'flex',
               flex: '1 0',
               flexDirection: 'column',
               minHeight: `100vh`,
-              backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`
+              backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
             }}
           >
             <Notification />

@@ -1,4 +1,3 @@
-import { IconButton } from '@mui/material'
 import { Telegram, Twitter } from '@mui/icons-material'
 import DiscordIcon from 'components/icons/DiscordIcon'
 import React from 'react'
@@ -18,6 +17,7 @@ import { getBlockExplorerUrl } from 'util/network/network.util'
 const PageFooter = ({ maintenance }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [isDiscordHover, setIsDiscordHover] = React.useState(false)
 
   const layer = useSelector(selectLayer())
   const network = useSelector(selectActiveNetwork())
@@ -45,27 +45,29 @@ const PageFooter = ({ maintenance }) => {
           </S.LinkWrapper>
           <S.FooterDividerMobile />
           <S.SocialWrapper>
-            <IconButton
+            <S.SocialButton
               href="https://boba.eco/twitter"
               target="_blank"
               aria-label="twitter"
             >
-              <Twitter sx={{ opacity: 0.65 }} />
-            </IconButton>
-            <IconButton
+              <Twitter />
+            </S.SocialButton>
+            <S.SocialButton
               href="https://boba.eco/discord"
               target="_blank"
               aria-label="discord"
+              onMouseEnter={() => setIsDiscordHover(true)}
+              onMouseLeave={() => setIsDiscordHover(false)}
             >
-              <DiscordIcon />
-            </IconButton>
-            <IconButton
+              <DiscordIcon isDiscordHover={isDiscordHover} />
+            </S.SocialButton>
+            <S.SocialButton
               href="https://boba.eco/telegram"
               target="_blank"
               aria-label="telegram"
             >
-              <Telegram sx={{ opacity: 0.65 }} />
-            </IconButton>
+              <Telegram />
+            </S.SocialButton>
             <S.FooterLinkExt
               href="https://boba.network"
               component="a"
@@ -83,27 +85,29 @@ const PageFooter = ({ maintenance }) => {
     <S.Wrapper>
       <S.FooterLinkWrapper>
         <S.SocialWrapper>
-          <IconButton
+          <S.SocialButton
             href="https://boba.eco/twitter"
             target="_blank"
             aria-label="twitter"
           >
             <Twitter sx={{ opacity: 0.65 }} />
-          </IconButton>
-          <IconButton
+          </S.SocialButton>
+          <S.SocialButton
             href="https://boba.eco/discord"
             target="_blank"
             aria-label="discord"
+            onMouseEnter={() => setIsDiscordHover(true)}
+            onMouseLeave={() => setIsDiscordHover(false)}
           >
-            <DiscordIcon />
-          </IconButton>
-          <IconButton
+            <DiscordIcon isDiscordHover={isDiscordHover} />
+          </S.SocialButton>
+          <S.SocialButton
             href="https://boba.eco/telegram"
             target="_blank"
             aria-label="telegram"
           >
             <Telegram sx={{ opacity: 0.65 }} />
-          </IconButton>
+          </S.SocialButton>
         </S.SocialWrapper>
         {!isMobile && <GasSwitcher />}
       </S.FooterLinkWrapper>

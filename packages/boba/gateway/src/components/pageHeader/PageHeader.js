@@ -165,7 +165,7 @@ const PageHeader = ({ maintenance }) => {
             style={{ width: '140px', paddingTop: '', paddingLeft: '15px' }}
           />
           <MenuItems setOpen={setOpen} />
-          {layer === LAYER.L2 ? <FeeSwitcher /> : null}
+          <FeeSwitcher />
           <WalletSwitch />
           <NetworkSwitcher />
           {!!accountEnabled ? (

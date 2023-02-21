@@ -1,6 +1,5 @@
 import { styled } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
-import { Box, Button } from '@mui/material'
 import { ReactComponent as BobaIcon } from '../../../images/boba2/boba2Icon.svg'
 
 export const Nav = styled('nav')(({ theme }) => ({

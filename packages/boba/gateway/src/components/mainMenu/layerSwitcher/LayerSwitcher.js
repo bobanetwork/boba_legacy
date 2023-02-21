@@ -1,4 +1,3 @@
-
 /*
 Copyright 2021-present Boba Network.
 
@@ -14,7 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { Typography, useMediaQuery, ToggleButtonGroup, ToggleButton, IconButton } from '@mui/material'
+import {
+  Typography,
+  useMediaQuery,
+  ToggleButtonGroup,
+  ToggleButton,
+  IconButton,
+} from '@mui/material'
 import { useTheme } from '@mui/styles'
 import { setConnect, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
@@ -27,34 +32,29 @@ import {
   selectLayer,
   selectConnectETH,
   selectConnectBOBA,
-  selectConnect
+  selectConnect,
 } from 'selectors/setupSelector'
 
-import {selectActiveNetwork, selectActiveNetworkIcon, selectActiveNetworkType } from 'selectors/networkSelector'
+import {
+  selectActiveNetwork,
+  selectActiveNetworkIcon,
+  selectActiveNetworkType,
+} from 'selectors/networkSelector'
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
 
-import {
-  setEnableAccount,
-  setWalletAddress,
-} from 'actions/setupAction'
+import { setEnableAccount, setWalletAddress } from 'actions/setupAction'
 
-import {
-  fetchTransactions,
-  fetchBalances
-} from 'actions/networkAction'
+import { fetchTransactions, fetchBalances } from 'actions/networkAction'
 
 import { openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
 import { LAYER } from 'util/constant.js'
 
-function LayerSwitcher({
-  visisble = true
-}) {
-
+function LayerSwitcher({ visisble = true }) {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -64,8 +64,8 @@ function LayerSwitcher({
 
   const networkIcon = useSelector(selectActiveNetworkIcon())
 
-  const L1Icon = L1_ICONS[ networkIcon ];
-  const L2Icon = L2_ICONS[ networkIcon ];
+  const L1Icon = L1_ICONS[networkIcon]
+  const L2Icon = L2_ICONS[networkIcon]
 
   const connectETHRequest = useSelector(selectConnectETH())
   const connectBOBARequest = useSelector(selectConnectBOBA())
@@ -74,47 +74,45 @@ function LayerSwitcher({
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const wAddress = networkService.account ? truncate(networkService.account, 6, 4, '...') : ''
+  const wAddress = networkService.account
+    ? truncate(networkService.account, 6, 4, '...')
+    : ''
 
-  const chainChangedFromMM = JSON.parse(localStorage.getItem('chainChangedFromMM'))
+  const chainChangedFromMM = JSON.parse(
+    localStorage.getItem('chainChangedFromMM')
+  )
   const wantChain = JSON.parse(localStorage.getItem('wantChain'))
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
 
   const dispatchBootAccount = useCallback(() => {
-
     if (!accountEnabled) initializeAccount()
 
     async function initializeAccount() {
-
       const initialized = await networkService.initializeAccount({
         networkGateway: network,
-        networkType
+        networkType,
       })
 
       if (initialized === 'wrongnetwork') {
         dispatch(openModal('wrongNetworkModal'))
         return false
-      }
-      else if (initialized === false) {
-        console.log("WP: Account NOT enabled for", network, accountEnabled)
+      } else if (initialized === false) {
+        console.log('WP: Account NOT enabled for', network, accountEnabled)
         dispatch(setEnableAccount(false))
         return false
-      }
-      else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
-        console.log("WP: Account IS enabled for", initialized)
+      } else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
+        console.log('WP: Account IS enabled for', initialized)
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
         dispatch(fetchTransactions())
         dispatch(fetchBalances())
         return true
-      }
-      else {
+      } else {
         return false
       }
     }
-
-  }, [ dispatch, accountEnabled, network,networkType ])
+  }, [dispatch, accountEnabled, network, networkType])
 
   // this will switch chain, if needed, and then connect to Boba
   const connectToBOBA = useCallback(() => {
@@ -123,37 +121,35 @@ function LayerSwitcher({
     dispatchBootAccount()
   }, [dispatchBootAccount])
 
-   // this will switch chain, if needed, and then connect to Ethereum
+  // this will switch chain, if needed, and then connect to Ethereum
   const connectToETH = useCallback(() => {
     localStorage.setItem('wantChain', JSON.stringify('L1'))
     networkService.switchChain('L1')
     dispatchBootAccount()
   }, [dispatchBootAccount])
 
-  const dispatchSwitchLayer = useCallback((targetLayer) => {
-
-    if (targetLayer === 'L1') {
-       connectToETH()
-    }
-    else if (targetLayer === 'L2') {
-      connectToBOBA()
-    } else {
-      // handles the strange targetLayer === null when people click on ETH icon a second time
-      connectToETH()
-    }
-
-  }, [ connectToBOBA, connectToETH ])
+  const dispatchSwitchLayer = useCallback(
+    (targetLayer) => {
+      if (targetLayer === 'L1') {
+        connectToETH()
+      } else if (targetLayer === 'L2') {
+        connectToBOBA()
+      } else {
+        // handles the strange targetLayer === null when people click on ETH icon a second time
+        connectToETH()
+      }
+    },
+    [connectToBOBA, connectToETH]
+  )
 
   useEffect(() => {
     // detect mismatch and correct the mismatch
     if (wantChain === 'L1' && layer === 'L2') {
       dispatchBootAccount()
-    }
-    else if (wantChain === 'L2' && layer === 'L1')
-    {
+    } else if (wantChain === 'L2' && layer === 'L1') {
       dispatchBootAccount()
     }
-  }, [ wantChain, layer, dispatchBootAccount ])
+  }, [wantChain, layer, dispatchBootAccount])
 
   useEffect(() => {
     // auto reconnect to MM if we just switched chains from
@@ -162,7 +158,7 @@ function LayerSwitcher({
       dispatchBootAccount()
       localStorage.setItem('chainChangedInit', false)
     }
-  }, [ chainChangedInit, dispatchBootAccount ])
+  }, [chainChangedInit, dispatchBootAccount])
 
   useEffect(() => {
     // auto reconnect to MM if we just switched chains from
@@ -171,7 +167,7 @@ function LayerSwitcher({
       dispatchBootAccount()
       localStorage.setItem('chainChangedFromMM', false)
     }
-  }, [ chainChangedFromMM, dispatchBootAccount ])
+  }, [chainChangedFromMM, dispatchBootAccount])
 
   useEffect(() => {
     if (connectETHRequest) {
@@ -179,7 +175,7 @@ function LayerSwitcher({
       networkService.switchChain('L1')
       dispatchBootAccount()
     }
-  }, [ connectETHRequest, dispatchBootAccount ])
+  }, [connectETHRequest, dispatchBootAccount])
 
   useEffect(() => {
     if (connectBOBARequest) {
@@ -187,59 +183,72 @@ function LayerSwitcher({
       networkService.switchChain('L2')
       dispatchBootAccount()
     }
-  }, [ connectBOBARequest, dispatchBootAccount ])
+  }, [connectBOBARequest, dispatchBootAccount])
 
   useEffect(() => {
     if (connectRequest) {
       dispatchBootAccount()
     }
-  }, [ connectRequest, dispatchBootAccount ])
+  }, [connectRequest, dispatchBootAccount])
 
   if (!visisble) {
     return null
   }
 
-  const MobileLayer = ({layer, title, icon, onConnect, isConnected}) => {
-    return <S.LayerWrapper>
-      <IconButton
-        sx={{ gap: '5px' }}
-        aria-label="eth"
-      >
-        {icon}
-      </IconButton>
-      <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >{title} </Typography>
-        <S.Label >{(layer === LAYER.L1 || layer === LAYER.L2)? wAddress : 'Not Connected' }</S.Label>
-      </S.LayerContent>
-      {!layer ?
-        <Button
-          type="primary"
-          variant="contained"
-          size='small'
-          onClick={() => dispatch(setConnect(true))}
-        >
-          Connect
-        </Button> : !isConnected ?
-        <Button
-          type="primary"
-          variant="contained"
-          size='small'
-          onClick={onConnect}
-        >
-          Switch
-        </Button> : null}
-    </S.LayerWrapper>
+  const MobileLayer = ({ layer, title, icon, onConnect, isConnected }) => {
+    return (
+      <S.LayerWrapper>
+        <IconButton sx={{ gap: '5px' }} aria-label="eth">
+          {icon}
+        </IconButton>
+        <S.LayerContent>
+          <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+            {title}{' '}
+          </Typography>
+          <S.Label>
+            {layer === LAYER.L1 || layer === LAYER.L2
+              ? wAddress
+              : 'Not Connected'}
+          </S.Label>
+        </S.LayerContent>
+        {!layer ? (
+          <Button
+            type="primary"
+            variant="contained"
+            size="small"
+            onClick={() => dispatch(setConnect(true))}
+          >
+            Connect
+          </Button>
+        ) : !isConnected ? (
+          <Button
+            type="primary"
+            variant="contained"
+            size="small"
+            onClick={onConnect}
+          >
+            Switch
+          </Button>
+        ) : null}
+      </S.LayerWrapper>
+    )
   }
 
   if (isMobile) {
     return (
       <S.LayerSwitcherWrapperMobile>
-        <MobileLayer title="Ethereum" layer={layer} icon={<EthereumIcon />}
+        <MobileLayer
+          title="Ethereum"
+          layer={layer}
+          icon={<EthereumIcon />}
           onConnect={() => connectToETH()}
           isConnected={layer === LAYER.L1}
         />
         <S.LayerDivider />
-        <MobileLayer title="Boba Network" layer={layer} icon={<BobaIcon />}
+        <MobileLayer
+          title="Boba Network"
+          layer={layer}
+          icon={<BobaIcon />}
           onConnect={() => connectToBOBA()}
           isConnected={layer === LAYER.L2}
         />
@@ -248,36 +257,80 @@ function LayerSwitcher({
   }
 
   return (
-    <S.LayerSwitcherWrapper >
+    <S.LayerSwitcherWrapper>
       <ToggleButtonGroup
         value={layer}
         exclusive
         onChange={(e, n) => dispatchSwitchLayer(n)}
         aria-label="text alignment"
       >
-        <ToggleButton sx={{p: "7px 3.5px 7px 7px", borderRadius: '12px', border: "none"}} value="L1" aria-label="L1">
-          <L1Icon selected={layer === LAYER.L1}/>
+        <ToggleButton
+          sx={{
+            p: '7px 3.5px 7px 7px',
+            borderRadius: '12px',
+            border: 'none',
+            '&:hover': {
+              background: 'none',
+            },
+          }}
+          value="L1"
+          aria-label="L1"
+        >
+          <L1Icon selected={layer === LAYER.L1} />
         </ToggleButton>
-        <ToggleButton sx={{p: "7px 7px 7px 3.5px",  borderRadius: '12px', border: "none"}} value="L2" aria-label="L2">
+        <ToggleButton
+          sx={{
+            p: '7px 7px 7px 3.5px',
+            borderRadius: '12px',
+            border: 'none',
+            '&:hover': {
+              background: 'none',
+            },
+          }}
+          value="L2"
+          aria-label="L2"
+        >
           <L2Icon selected={layer === LAYER.L2} />
         </ToggleButton>
       </ToggleButtonGroup>
-      {layer === 'L1' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Ethereum</Typography>
-        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
-      </S.LayerContent> : null}
-      {!layer ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Connect</Typography>
-        <Typography variant="body4" sx={{
-          opacity: '0.3',
-          whiteSpace: 'nowrap'
-        }} >connect wallet</Typography>
-      </S.LayerContent> : null}
-      {layer === 'L2' ? <S.LayerContent>
-        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }} >Boba</Typography>
-        <Typography component='p' variant="body4" sx={{ opacity: 0.3 }} >{wAddress}</Typography>
-      </S.LayerContent> : null}
-    </S.LayerSwitcherWrapper>)
+      {layer === 'L1' ? (
+        <S.LayerContent>
+          <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+            Ethereum
+          </Typography>
+          <Typography component="p" variant="body4" sx={{ opacity: 0.3 }}>
+            {wAddress}
+          </Typography>
+        </S.LayerContent>
+      ) : null}
+      {!layer ? (
+        <S.LayerContent>
+          <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+            Connect
+          </Typography>
+          <Typography
+            variant="body4"
+            sx={{
+              opacity: '0.3',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            connect wallet
+          </Typography>
+        </S.LayerContent>
+      ) : null}
+      {layer === 'L2' ? (
+        <S.LayerContent>
+          <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+            Boba
+          </Typography>
+          <Typography component="p" variant="body4" sx={{ opacity: 0.3 }}>
+            {wAddress}
+          </Typography>
+        </S.LayerContent>
+      ) : null}
+    </S.LayerSwitcherWrapper>
+  )
 }
 
 export default LayerSwitcher

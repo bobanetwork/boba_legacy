@@ -1,5 +1,5 @@
-import { Box, Divider, Grid, IconButton, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Divider, Grid, IconButton, Typography } from '@mui/material'
+import { styled } from '@mui/material/styles'
 
 export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
@@ -9,15 +9,15 @@ export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({
   padding: '10px',
   paddingTop: '0px',
   width: '70%',
-  [ theme.breakpoints.between('md', 'lg') ]: {
+  [theme.breakpoints.between('md', 'lg')]: {
     width: '90%',
     padding: '0px',
   },
-  [ theme.breakpoints.between('sm', 'md') ]: {
+  [theme.breakpoints.between('sm', 'md')]: {
     width: '90%',
     padding: '0px',
   },
-  [ theme.breakpoints.down('sm') ]: {
+  [theme.breakpoints.down('sm')]: {
     width: '100%',
     padding: '0px',
   },
@@ -29,14 +29,14 @@ export const CategoryList = styled(Box)(({ theme }) => ({
   gap: '10px',
   alignItems: 'center',
   margin: '10px',
-  [ theme.breakpoints.down('sm') ]: {
-    overflowX: 'scroll'
+  [theme.breakpoints.down('sm')]: {
+    overflowX: 'scroll',
   },
 }))
 
 export const ProjectListContainer = styled(Grid)(({ theme }) => ({
-  margin: "20px 10px !important",
-  gap: '10px'
+  margin: '20px 10px !important',
+  gap: '22px',
 }))
 
 export const ProjectListItem = styled(Grid)(({ theme }) => ({
@@ -44,7 +44,7 @@ export const ProjectListItem = styled(Grid)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'flex-start'
+  justifyContent: 'flex-start',
 }))
 
 export const ProjectContainer = styled(Box)(({ theme }) => ({
@@ -59,20 +59,20 @@ export const ProjectContainer = styled(Box)(({ theme }) => ({
 export const ProjectContent = styled(Box)(({ theme }) => ({
   borderTopLeftRadius: '8px',
   borderTopRightRadius: '8px',
-  background: theme.palette.background.secondary, //'rgba(255, 255, 255, 0.06)',
+  background: theme.palette.background.glassy, //'rgba(255, 255, 255, 0.06)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
   alignItems: 'center',
-  padding: '10px',
+  padding: '16px',
   paddingTop: '50px',
   gap: 1,
   marginTop: '50px',
   width: '100%',
   height: '140px',
-  [ theme.breakpoints.down('md') ]: {
+  [theme.breakpoints.down('md')]: {
     minHeight: '140px',
-    height: 'auto'
+    height: 'auto',
   },
 }))
 
@@ -87,19 +87,25 @@ export const ImageContainer = styled(Box)(({ theme, ...props }) => ({
   position: 'absolute',
   margin: 'auto',
   top: '15px',
-  background:  theme.palette.mode === 'light' ? '#c7c3c3' : '#272B30',
-  'img': {
+  background: theme.palette.mode === 'light' ? '#c7c3c3' : '#272B30',
+  img: {
     width: '50px',
     maxHeight: '60px',
-    padding: '2px'
-  }
+    padding: '2px',
+  },
 }))
 
 export const DividerLine = styled(Divider)(({ theme }) => ({
-  background: `${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.04)' : 'rgba(3, 19, 19, 0.04)'}`,
+  background: `${
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.04)'
+      : 'rgba(3, 19, 19, 0.04)'
+  }`,
   boxSizing: 'border-box',
-  boxShadow: `${theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'}`,
-  width: '100%'
+  boxShadow: `${
+    theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'
+  }`,
+  width: '100%',
 }))
 
 export const ProjectDescription = styled(Typography)(({ theme }) => ({
@@ -110,8 +116,8 @@ export const ProjectDescription = styled(Typography)(({ theme }) => ({
   fontSize: '0.7em',
   fontWeight: 400,
   display: '-webkit-box',
-  'WebkitLineClamp': 3,
-  'WebkitBoxOrient': 'vertical'
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: 'vertical',
 }))
 
 export const TileFooter = styled(Box)(({ theme, ...props }) => ({
@@ -135,7 +141,8 @@ export const footerLink = styled(IconButton)(({ theme }) => ({
       path: {
         fill: theme.palette.primary.main,
         fillOpacity: 1,
-      }
-    }
-  }
+      },
+    },
+    background: 'none',
+  },
 }))

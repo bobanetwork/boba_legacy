@@ -1,5 +1,11 @@
-import styled from '@emotion/styled';
-import { Box, Button, Divider as MuiDivider, IconButton, Typography } from "@mui/material";
+import styled from '@emotion/styled'
+import {
+  Box,
+  Button,
+  Divider as MuiDivider,
+  IconButton,
+  Typography,
+} from '@mui/material'
 
 export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.glassy,
@@ -16,16 +22,16 @@ export const BobaContent = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '10px'
+  gap: '10px',
 }))
 
 export const BobaContentWrapper = styled(Box, {
-  shouldForwardProp: (props) => props !== 'fullWidth'
+  shouldForwardProp: (props) => props !== 'fullWidth',
 })(({ theme, flexDirection }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   flexDirection: flexDirection || 'column',
-  flexGrow: 1
+  flexGrow: 1,
 }))
 
 export const BobaDivider = styled(MuiDivider)(({ theme }) => ({
@@ -48,12 +54,12 @@ export const ChainInput = styled(Box)(({ theme }) => ({
   gap: '10px',
   width: '100%',
   minWidth: '180px',
-  [ theme.breakpoints.down('sm') ]: {
+  [theme.breakpoints.down('sm')]: {
     justifyContent: 'flex-start',
     gap: '5px',
     padding: '5px 10px',
-    minWidth: '120px'
-  }
+    minWidth: '120px',
+  },
 }))
 
 export const ChainLabel = styled(Typography)(({ theme }) => ({
@@ -61,29 +67,30 @@ export const ChainLabel = styled(Typography)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '10px',
-  [ theme.breakpoints.down('sm') ]: {
+  [theme.breakpoints.down('sm')]: {
     fontSize: '14px',
-  }
+  },
 }))
 
 export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
   margin: '20px 0px',
   width: 'fit-content',
-  alignSelf: 'center'
+  alignSelf: 'center',
 }))
 
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   borderRadius: theme.palette.primary.borderRadius,
   width: '100%',
+  maxWidth: '600px',
   padding: '20px',
   '&:hover > span': {
-    color: theme.palette.secondary.main
-  }
+    color: theme.palette.secondary.main,
+  },
 }))
 
 export const LayerAlert = styled(Box)(({ theme }) => ({
-  width: "100%",
+  width: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
@@ -95,14 +102,12 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     padding: '25px 50px',
   },
-
 }))
 
 export const AlertText = styled(Typography)(({ theme }) => ({
   marginLeft: '10px',
   flex: 4,
-  [theme.breakpoints.up('md')]: {
-  },
+  [theme.breakpoints.up('md')]: {},
 }))
 
 export const AlertInfo = styled(Box)`
@@ -110,7 +115,7 @@ export const AlertInfo = styled(Box)`
   justify-content: space-around;
   align-items: center;
   flex: 1;
-`;
+`
 
 export const IconSwitcher = styled(IconButton)(({ theme }) => ({
   background: theme.palette.background.input,
@@ -121,6 +126,4 @@ export const IconSwitcher = styled(IconButton)(({ theme }) => ({
   alignSelf: 'center',
   justifyContent: 'center',
   alignItems: 'center',
-
 }))
-
