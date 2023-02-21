@@ -8,7 +8,7 @@ Hybrid Compute is a system for interacting with the outside world from within so
 
 Hybrid Compute is a **pipe** between (**1**) Boba's Geth (aka sequencer), which takes transactions, advances the state, and forms blocks, and (**2**) your server. To use this pipe, all you need is a smart contract on Boba that makes Hybrid Compute calls and an external server that accepts these calls and returns data in a format that can be understood by the EVM. This is not hard to do and we provide many examples which will allow you to quickly build a working Hybrid Compute system.
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 A typical Hybrid Compute system for gaming or Web3 social networking<>blockchain interoperability has four parts:
 

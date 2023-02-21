@@ -1,10 +1,14 @@
 ---
-description: Boba Network docs for Exchanges looking to integrate deposits and withdrawals with Boba Network
+description: >-
+  Boba Network docs for Exchanges looking to integrate deposits and withdrawals
+  with Boba Network
 ---
 
 # Exchange Integration
 
-## Bridging basics
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
 
 Although Boba Network is an L2 (and therefore fundamentally connected to Ethereum), it's also a separate blockchain. App developers commonly need to move data and assets between Boba Network and Ethereum. We call the process of moving data and assets between the two networks "bridging".
 
@@ -14,8 +18,9 @@ For the most common usecase, moving tokens around, we've created the Standard To
 
 Beside the Standard Token Bridge, we created the Fast Token Bridge to allow you to exit assets from L2 in serval hours or even serval minutes based on the number of transactions. The Fast Token Bridge collects a certain percentage of the deposit amount as the transaction fee and distributes them to the liquidity providers.
 
-Using the Standard Token Bridge
--------------------------------
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 The standard bridge functionality provides a method for an ERC20 token to be deposited and locked on L1 in exchange of the same amount of an equivalent token on L2. This process is known as "bridging a token", e.g. depositing 100 BOBA on L1 in exchange for 100 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the same amount on L1. In addition to bridging tokens the standard bridge is also used for ETH.
 
@@ -173,10 +178,10 @@ await depositToTx.wait()
 
 The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meaning that there can be many Boba implementations of an L1 token. However there is always a one-to-one mapping between L1 and L2 tokens in the Boba token list.
 
-| Network | URL                                                                                                                                                                                  |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
+| Network | URL                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Goerli  | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli\_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json)   |
 
 ### Links
 
@@ -194,7 +199,9 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 | Proxy\_\_L1StandardBridge | 0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2 |
 | Proxy\_\_L2StandardBridge | 0x4200000000000000000000000000000000000010 |
 
-## Using the Fast Token Bridge
+
+
+<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
 
 The fast bridge provides a method for both side users to add liquidities for the L1 Fast Bridge Pool and the L2 Fast Bridge Pool. When an ERC20 token is deposited and added to L1 Fast Bridge Pool, the L2 Fast Bridge releases the token on L2 and charges a certain percentage of the deposit amount as the transaction feee. This process is known as "fast bridge a token". e.g. depositing 100 BOBA on L1 in exchange for 99.7 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the 99.7 BOBA on L1. In addition to bridging tokens the standard bridge is also used for ETH.
 
@@ -288,7 +295,7 @@ await depositETHTx.wait()
 
 The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
-| Network | URL                                                                                                                                                                                  |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
+| Network | URL                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Goerli  | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli\_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json)   |

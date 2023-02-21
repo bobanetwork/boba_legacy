@@ -15,7 +15,7 @@ yarn global add --dev @graphprotocol/graph-ts
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 First, `cd` to either the **L1** or the **L2** folders, depending on where you will be deploying your subgraphs to. There are four subgraphs: Ethereum, Boba, Rinkeby, and Boba-Rinkeby. A deploy key or access token is required to deploy subgraphs. Depending on which chain you are indexing, provide either `mainnet` or `rinkeby` as a setting to `yarn prepare:`.
 
