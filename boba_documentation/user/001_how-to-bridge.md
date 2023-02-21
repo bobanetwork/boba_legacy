@@ -42,4 +42,4 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 <figure><img src="../../.gitbook/assets/Artboard 8 (1).png" alt=""><figcaption></figcaption></figure>
 
-{% embed url="https://drive.google.com/file/d/1GHMpC0h_BwEpW-BlgQG5JMHvsLG58bgH/view?usp=sharing" %}
+{% embed url="https://youtu.be/PP4DJCT0WsE" %}
