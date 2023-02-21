@@ -161,7 +161,7 @@ describe('BobaLink Test\n', async () => {
             const response = await asyncBobaLinkGetQuote({
               body: JSON.stringify({params: [input]}
             )}, null)
-            res.end(JSON.stringify(response))
+            res.end(response.body)
             server.emit('success', body)
           }
           if (req.url === '/invalidapi') {
