@@ -99,7 +99,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L1StandardERC721.sol) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
@@ -184,7 +184,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 ### CASE 1 - Native L1 NFT - Bridge NFTs from Ethereum to Boba
 

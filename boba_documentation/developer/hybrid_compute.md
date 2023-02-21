@@ -31,7 +31,7 @@ On chain Oracles typically operate in a **push** manner, meaning that they updat
 
 A system like Hybrid Compute is typically configured in the opposite manner, as a **pull** system, where nothing happens until a smart contract needs data or compute. In that case, the external API services the Hybrid Compute call `just in time` during the EVM execution flow. This means that systems that use Hybrid Compute have zero baseline gas consumption and provide compute or data only when needed.
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (2).png" alt=""><figcaption></figcaption></figure>
 
 Hybrid Compute is invoked when needed during the normal EVM execution flow, and therefore, transactions are atomic. Notably, computations later in the EVM execution flow can operate on responses from your off-chain servers all in one transaction.
 

@@ -6,7 +6,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 [https://gateway.boba.network/](https://gateway.boba.network)
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1ybrKdXxlRNrZOkPO4fLc9bWQ56gRZXfQ/view?usp=sharing" %}
 
