@@ -1,6 +1,8 @@
 # Contracts Registration
 
-## 1. Automatic contract deployment and serving
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
 
 This spins up the entire stack, with all contracts deployed, and all the right things needed for the wallet to function, and for development work on the wallet.
 
@@ -18,7 +20,9 @@ curl http://127.0.0.1:8078/addresses.json | jq #basic stack
 curl http://127.0.0.1:8080/addresses.json | jq #BOBA-specific contracts
 ```
 
-## 2. Manual Deployment and Testing
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 2 (18).png" alt=""><figcaption></figcaption></figure>
 
 Spin up the base local L1/L2:
 
