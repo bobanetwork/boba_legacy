@@ -202,7 +202,7 @@ class GlobalEnv {
     this.L1LiquidityPoolInterface = new ethers.utils.Interface(
       this.isAltL1Network
         ? await getBobaContractABI('L1LiquidityPoolAltL1')
-        : await getBobaContractABI('L1LiquidityPoolAlt')
+        : await getBobaContractABI('L1LiquidityPool')
     )
     this.OVM_L1StandardBridgeInterface =
       this.OVM_L1StandardBridgeContract.interface
