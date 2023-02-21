@@ -14,7 +14,7 @@ Finally, the pools are controlled by an **admin** (`OnlyAdmin`) and/or the **Bob
 
 
 
-<figure><img src="../../../../../.gitbook/assets/Artboard 1 (5) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
 
 *   A deposits 100
 

@@ -8,7 +8,7 @@ Although Boba Network is an L2 (and therefore fundamentally connected to Ethereu
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (2) (5).png" alt=""><figcaption></figcaption></figure>
 
 For the most common use case, moving tokens around, we use the Standard Token Bridge. The Standard Token Bridge is a simple smart contract with all the functionality you need to move tokens between Boba Network and Ethereum.
 

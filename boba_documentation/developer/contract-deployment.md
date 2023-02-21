@@ -197,6 +197,6 @@ That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (6) (1).png" alt=""><figcaption></figcaption></figure>
 
 Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/issues).

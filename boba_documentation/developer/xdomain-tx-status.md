@@ -18,7 +18,7 @@ Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/)
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (3) (2).png" alt=""><figcaption></figcaption></figure>
 
 Internally in all the services and also in the `gateway`, the status of transactions is monitored through a `messenger`. Here is an example for how that is done.
 

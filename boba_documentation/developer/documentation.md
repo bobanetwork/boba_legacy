@@ -6,15 +6,21 @@ description: How to format documentation correctly
 
 **Our goal is to have a single .md file display well in both GitBook and GitHub**. To that end, we have to be careful about how we do things in the `.md` file.
 
-### Crazy GitBook things
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
 
 GitBook disregards the top level header (`# Title`) in the `.md` file and instead will give that page the title defined in the `SUMMARY.md` file that determines the GitBook table of contents and file menu. In general, top level headers are not that critical, so best leave them out of the `.md` file unless you want pages in GitBook to have 2 different titles at the top.
 
-### Table of Contents
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 The GitBook TOC and navigation, including order, is completely defined by the `SUMMARY.md` file. White space matters! To add a new entry to the TOC, add it to the `SUMMARY.md` file.
 
-### Headers
+
+
+<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 For all `.md` files, please a description header to the file:
 
@@ -30,7 +36,9 @@ description: How to format documentation correctly
 
 Note that the header must be right at the top of the file to work.
 
-### Links
+
+
+<figure><img src="../../.gitbook/assets/Artboard 4 (12).png" alt=""><figcaption></figcaption></figure>
 
 In general, please use 'full' paths to various files, like this:
 
@@ -44,7 +52,9 @@ Note the use of `../../` - this is shorthand for the repo root, and will, remark
 
 **Strange behavior**. Note that `/../../` is completely different than `../../`. The first one will not work universally, but `../../` will so please use that.
 
-### Images
+
+
+<figure><img src="../../.gitbook/assets/Artboard 5 (6).png" alt=""><figcaption></figcaption></figure>
 
 Generally, all images for the documentation live in `./boba_documentation/.gitbook/assets`. To show an image in a documentation file, access it like this:
 

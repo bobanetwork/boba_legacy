@@ -98,7 +98,7 @@ await depositETHTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 3 (14) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 3 (14).png" alt=""><figcaption></figcaption></figure>
 
 The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
@@ -109,7 +109,7 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 4 (13) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 4 (13).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 

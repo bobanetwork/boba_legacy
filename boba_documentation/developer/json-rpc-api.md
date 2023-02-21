@@ -16,7 +16,7 @@ curl https://lightning-replica.boba.network/ -X POST --header 'Content-type: app
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 **`eth_getBlockRange`**
 
@@ -265,7 +265,7 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (1) (3).png" alt=""><figcaption></figcaption></figure>
 
 **`eth_getAccounts`**
 
