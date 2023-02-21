@@ -179,7 +179,7 @@ with open("env.yml", 'r') as ymlfile:
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (11) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Deployment
 

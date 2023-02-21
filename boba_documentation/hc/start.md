@@ -8,7 +8,7 @@ Use HybridCompute with ease by navigating through a minimal web-app.
 
 <figure><img src="../../.gitbook/assets/Artboard 4 (10).png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (12) (1).png" alt=""><figcaption></figcaption></figure>
 
 Using HybridCompute basically requires 3 things:
 
