@@ -32,7 +32,7 @@ Go back to the **Lambda** web console. In the `Function overview`, you will now 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (10).png" alt=""><figcaption></figcaption></figure>
 
 See [./turing\_stableSwap.py](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/turing-stable-swap/aws/turing\_stableSwap.py) for deployable stableSwap code. Since AWS Lambda can run `Python 3.9` you can take advantage of Python's full math support. Most obviously, you can work with floats, do not need to think about nearest integer division (`//`) and have the usual `sqrt()` and `math.pow()` functions to draw upon. The StableSwap code is in [turing\_stableSwap.py](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/turing-stable-swap/aws/turing\_stableSwap.py). To test it from your terminal, run:
 

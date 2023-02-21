@@ -4,7 +4,7 @@ description: Frequently asked questions
 
 # FAQ
 
-<figure><img src=".gitbook/assets/Artboard 1 (2) (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 1 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 [Boba](https://boba.network) is a compute-focused L2. Fundamentally, Ethereum is a distributed computer. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference).
 
@@ -117,7 +117,7 @@ These methods are described [here](boba\_documentation/developer/xdomain-tx-stat
 * Transactions
 * Hybrid Compute
 
-<figure><img src=".gitbook/assets/Artboard 3 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Can't I Deploy My 100kb Copy/Paste Contract?
 

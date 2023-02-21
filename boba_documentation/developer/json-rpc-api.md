@@ -265,7 +265,7 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 **`eth_getAccounts`**
 

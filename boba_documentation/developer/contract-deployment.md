@@ -22,7 +22,7 @@ Let's begin.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (6) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (6).png" alt=""><figcaption></figcaption></figure>
 
 Compiling a contract for Boba is identical to compiling a contract for Ethereum mainchain. Notably, all standard solidity compiler versions can be used. For this ERC20, we will use `0.6.12`. Create a `truffle-config.js` and add the following to it:
 

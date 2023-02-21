@@ -18,7 +18,7 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (5) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (5) (1).png" alt=""><figcaption></figcaption></figure>
 
 The token-claiming process takes place in five steps:
 
@@ -108,7 +108,7 @@ On the contract level, we decode the result from the Turing request and release 
 
 <figure><img src="../../.gitbook/assets/client-geth-aws.png" alt=""><figcaption></figcaption></figure>
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (4) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (4).png" alt=""><figcaption></figcaption></figure>
 
 #### Step 1: Creating API endpoints
 

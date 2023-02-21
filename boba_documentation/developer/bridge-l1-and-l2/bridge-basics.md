@@ -16,6 +16,6 @@ Beside the Standard Token Bridge, we created the Fast Token Bridge to allow you 
 
 ## Sending BOBA tokens between L1s
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
 
 The Boba instances are deployed on Ethereum, Avalanche, Moonbeam, BNB and Fantom. To bridge BOBA tokens between these L1s, you can use our cross chain bridge powder by [LayerZero Protocol](https://layerzero.network).

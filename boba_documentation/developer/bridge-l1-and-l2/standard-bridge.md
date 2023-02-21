@@ -12,7 +12,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
 
 > Note: **We currently block smart contract wallets from calling the `depositETH` and `depositERC20` functions for security reasons**. If you want to deposit not using an EOA accounts and you know what are doing, you can use `depositETHTo` and `depositERC20To` functions instead.
 
@@ -95,7 +95,7 @@ await depositToTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
 
 ### Withdraw tokens (ERC20s and ETH)
 
@@ -173,7 +173,7 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 4 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 4 (14).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 
