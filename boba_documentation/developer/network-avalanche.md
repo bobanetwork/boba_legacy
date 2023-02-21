@@ -17,7 +17,7 @@ description: A collection of links and addresses to get started on Boba-Avalanch
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (9) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (9).png" alt=""><figcaption></figcaption></figure>
 
 ### Testnet Fountain for Developers on Boba Avalanche Testnet L2
 

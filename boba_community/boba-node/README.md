@@ -14,7 +14,7 @@ The [boba\_community/boba-node](./) repo runs a replica of the Boba L2geth, whic
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1) (2).png" alt=""><figcaption></figcaption></figure>
 
 \- docker - docker-compose
 

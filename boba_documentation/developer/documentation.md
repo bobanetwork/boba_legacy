@@ -20,7 +20,7 @@ The GitBook TOC and navigation, including order, is completely defined by the `S
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
 
 For all `.md` files, please a description header to the file:
 
@@ -38,7 +38,7 @@ Note that the header must be right at the top of the file to work.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (2).png" alt=""><figcaption></figcaption></figure>
 
 In general, please use 'full' paths to various files, like this:
 
@@ -54,7 +54,7 @@ Note the use of `../../` - this is shorthand for the repo root, and will, remark
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (6).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
 
 Generally, all images for the documentation live in `./boba_documentation/.gitbook/assets`. To show an image in a documentation file, access it like this:
 

@@ -184,7 +184,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (16).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (3).png" alt=""><figcaption></figcaption></figure>
 
 ### CASE 1 - Native L1 NFT - Bridge NFTs from Ethereum to Boba
 
@@ -280,7 +280,7 @@ await tx.wait()
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (15).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (3).png" alt=""><figcaption></figcaption></figure>
 
 Attempting to categorize ERC721s on the basis of metadata, we have:
 

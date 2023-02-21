@@ -132,7 +132,7 @@ contract L2StandardERC1155 is IL2StandardERC1155, ERC1155 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
 
 Deploy your ERC115 token on Boba and then deploy [L1StandardERC1155](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/standards/L1StandardERC1155.sol) on Ethereum. The `L1_ERC1155_TOKEN_CONTRACT_ADDRESS` is the address of your token on Boba.
 

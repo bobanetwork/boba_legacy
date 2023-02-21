@@ -117,7 +117,7 @@ These methods are described [here](boba\_documentation/developer/xdomain-tx-stat
 * Transactions
 * Hybrid Compute
 
-<figure><img src=".gitbook/assets/Artboard 3 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Can't I Deploy My 100kb Copy/Paste Contract?
 

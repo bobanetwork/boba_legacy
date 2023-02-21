@@ -22,7 +22,7 @@ If you do not have Opera FTM, you can get some from [FTM Faucet](https://faucet.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (1) (2).png" alt=""><figcaption></figcaption></figure>
 
 If you do not have testnet BNB, you can get some from [BNB Faucet](https://testnet.binance.org/faucet-smart). For testnet BOBA, use the [BOBA faucet](https://gateway.testnet.bnb.boba.network/wallet).
 
