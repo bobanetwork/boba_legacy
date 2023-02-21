@@ -37,10 +37,15 @@ export const BobaLinkPairs = {
   },
   31338: {
     // local hardhat
-    '0x4631BCAbD6dF18D94796344963cB60d44a4136b6': {
+    '0x5067457698Fd6Fa1C6964e416b3f42713513B3dD': {
       pair: 'ETH / USD',
       decimals: 8,
-      l2ContractAddress: '0xA4899D35897033b927acFCf422bc745916139776',
+      l2ContractAddress: '0x4b6aB5F819A515382B0dEB6935D793817bB4af28',
+    },
+    '0xffa7CA1AEEEbBc30C874d32C7e22F052BbEa0429': {
+      pair: 'BTC / USD',
+      decimals: 8,
+      l2ContractAddress: '0xab16A69A5a8c12C732e0DEFF4BE56A70bb64c926',
     },
     // local moonbeam
     '0xC530e4cD4933357da902577E78cC7C65C5759e0C': {
