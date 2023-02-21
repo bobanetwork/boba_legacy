@@ -123,7 +123,7 @@ To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (2).png" alt=""><figcaption></figcaption></figure>
 
 The Witnet multichain decentralized oracle enables smart contracts to realize their true potential by giving them access to all sorts of valuable data sets, and by attesting and delivering that information securely thanks to its strong cryptoeconomic guarantees.
 

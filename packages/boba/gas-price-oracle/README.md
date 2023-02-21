@@ -4,7 +4,7 @@ This service is responsible for updating the `gasPrice` in the `OVM_GasPriceOrac
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (18).png" alt=""><figcaption></figcaption></figure>
 
 All configuration is done via environment variables. See all variables at [.env.example](.env.example); copy into a `.env` file before running.
 
@@ -25,7 +25,7 @@ All configuration is done via environment variables. See all variables at [.env.
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (18).png" alt=""><figcaption></figcaption></figure>
 
 1. Make sure dependencies are installed - run `yarn` in the base directory
 2. Build `yarn build`
@@ -33,7 +33,7 @@ All configuration is done via environment variables. See all variables at [.env.
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 3 (15).png" alt=""><figcaption></figcaption></figure>
 
 The L2 gas fee is
 
@@ -55,7 +55,7 @@ The `L1SecurityFee` changes gradually to reflect our service cost, primarily, th
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 4 (16).png" alt=""><figcaption></figcaption></figure>
 
 The L1 security fee is for the cost of submitting the state roots and tx roots to L1. It's calculated via
 

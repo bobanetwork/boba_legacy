@@ -24,7 +24,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 {% embed url="https://drive.google.com/file/d/1Lf-X1xwP9M-ZZM6HiQ1qRhV-0yaBKitA/view?usp=share_link" %}
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (3) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (3).png" alt=""><figcaption></figcaption></figure>
 
 {% embed url="https://drive.google.com/file/d/1IyXQNTFLEfJ7Sfyqh7iqMM6tWis26Jg3/view?usp=share_link" %}
 

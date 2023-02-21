@@ -4,7 +4,7 @@ description: Introduction to Boba network for Developers
 
 # Welcome to Boba
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (2) (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 Welcome to Boba. Boba is a compute-focused L2. We believe that L2s can play a unique role in augmenting the base _compute_ capabilities of the Ethereum ecosystem. You can learn more about Turing hybrid compute [here](broken-reference). Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Aside from its main focus, augmenting compute, Boba differs from Optimism by:
 

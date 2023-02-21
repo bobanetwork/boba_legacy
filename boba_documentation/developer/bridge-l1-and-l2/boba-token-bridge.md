@@ -14,7 +14,7 @@ Here we'll go over the basics of using this bridge to move BOBA tokens between L
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (19).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (19) (1).png" alt=""><figcaption></figcaption></figure>
 
 For normal users, you can go to [Ethereum Gateway](https://gateway.boba.network) first, then head to [wallet](https://gateway.boba.network/wallet) page. After connecting to it on Ethereum, you can click the `Bridge To Alt L1` button to bridge your BOBA tokens from Ethereum to Alt L1s.
 
@@ -160,7 +160,7 @@ console.log(`-> Sent ${DEPOSIT_AMOUNT} BOBA tokens to the bridge contract....`);
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 3 (15).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 3 (15) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 

@@ -25,7 +25,7 @@ This means, that smart contracts that implement this KYC gatekeeper, will actual
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (3).png" alt=""><figcaption></figcaption></figure>
 
 This example basically consists just like all other Turing use cases, of a `TuringHelper.sol` and its corresponding interface called `ITuringHelper.sol`. The TuringHelper is just as usual needed, to actually be charged for your off-chain calls and to limit unauthorized access (refer to `permittedCallers` etc.). Please refer to the appendix of this ReadMe or to the general Turing documentation.
 

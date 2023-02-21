@@ -108,6 +108,8 @@ There are 4 different mechanisms for following the status of a transaction.
 
 These methods are described [here](boba\_documentation/developer/xdomain-tx-status.md).
 
+
+
 <figure><img src=".gitbook/assets/Artboard 2 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 **Categories:**
@@ -117,7 +119,9 @@ These methods are described [here](boba\_documentation/developer/xdomain-tx-stat
 * Transactions
 * Hybrid Compute
 
-<figure><img src=".gitbook/assets/Artboard 3 (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
+
+
+<figure><img src=".gitbook/assets/Artboard 3 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 #### Q1: Why Can't I Deploy My 100kb Copy/Paste Contract?
 
@@ -142,6 +146,8 @@ Unfortunately no, not at the moment.
 #### Q6: I’m Trying to Deploy a Smart Contract to Boba Rinkeby With Remix But Get This Error - "creation of SCContract errored: \[ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"\}}}'
 
 See Q2 of Transactions
+
+
 
 <figure><img src=".gitbook/assets/Artboard 4 (4).png" alt=""><figcaption></figcaption></figure>
 
@@ -192,6 +198,8 @@ Please be sure to attach logs of output of `docker-compose logs` and integration
 #### Q3: I’ve Started Deploying Boba Testnet, But It Seems as Though the Testnet Subgraph Is Private
 
 We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
+
+
 
 <figure><img src=".gitbook/assets/Artboard 5 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -247,6 +255,8 @@ Actually, there are multiple bridges available. You can check it out on our ecos
 
 
 [Simply follow this link](https://gateway.boba.network/) and navigate to the Ecosystem tab.
+
+
 
 <figure><img src=".gitbook/assets/Artboard 6 (1) (1).png" alt=""><figcaption></figcaption></figure>
 

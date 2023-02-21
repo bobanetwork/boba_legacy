@@ -55,7 +55,7 @@ await depositETHTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (20).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (20) (1).png" alt=""><figcaption></figcaption></figure>
 
 > Please check the liquidity balance of the L1 Liquidity Pool first before depositing tokens on the L2 Liquidity Pool. If the L1 Liquidty Pool doesn't have enough balance to complete your swap, your funds would be returned back to you from L1 and the L2 Liquidity Pool would charge a certain percentage of the exit amount.
 
@@ -98,7 +98,7 @@ await depositETHTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 3 (14).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 3 (14) (1).png" alt=""><figcaption></figcaption></figure>
 
 The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
@@ -109,7 +109,7 @@ The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 4 (13).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 4 (13) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 

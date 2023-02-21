@@ -8,7 +8,7 @@ description: >-
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (3).png" alt=""><figcaption></figcaption></figure>
 
 Although Boba Network is an L2 (and therefore fundamentally connected to Ethereum), it's also a separate blockchain. App developers commonly need to move data and assets between Boba Network and Ethereum. We call the process of moving data and assets between the two networks "bridging".
 

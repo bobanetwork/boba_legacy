@@ -12,7 +12,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 > Note: **We currently block smart contract wallets from calling the `depositETH` and `depositERC20` functions for security reasons**. If you want to deposit not using an EOA accounts and you know what are doing, you can use `depositETHTo` and `depositERC20To` functions instead.
 
@@ -162,7 +162,7 @@ await withdrawToTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 3 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meaning that there can be many Boba implementations of an L1 token. However there is always a one-to-one mapping between L1 and L2 tokens in the Boba token list.
 
