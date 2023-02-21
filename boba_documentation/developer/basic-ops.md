@@ -109,7 +109,7 @@ NOTE: To protect users, _overpaying by more than a 10% percent will also revert 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (2) (2).png" alt=""><figcaption></figcaption></figure>
 
 ```javascript
 //Transfer funds from one account to another, on the L2

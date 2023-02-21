@@ -51,7 +51,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (5) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (5).png" alt=""><figcaption></figcaption></figure>
 
 To run unit tests for a specific package:
 

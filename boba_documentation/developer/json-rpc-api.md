@@ -1,7 +1,10 @@
+# JSON-RPC API
 
 Boba Network shares the same [JSON-RPC API (opens new window)](https://eth.wiki/json-rpc/API) as Ethereum. Some new custom methods have been introduced and some other have been made unsupported for operation.
 
-### Debug JSON-RPC methods
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
 
 You can use the lightning replica node to debug your transactions.
 
@@ -12,9 +15,10 @@ curl https://lightning-replica.boba.network/ -X POST --header 'Content-type: app
 ```
 
 
-### Custom JSON-RPC methods
 
-#### `eth_getBlockRange`
+<figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
+
+**`eth_getBlockRange`**
 
 DEPRECATION NOTICE
 
@@ -91,7 +95,7 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 }
 ```
 
-#### `rollup_getInfo`
+**`rollup_getInfo`**
 
 Returns useful L2-specific information about the current node.
 
@@ -140,7 +144,7 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 }
 ```
 
-#### `rollup_gasPrices`
+**`rollup_gasPrices`**
 
 Returns the L1 and L2 gas prices that are being used by the Sequencer to calculate fees.
 
@@ -173,14 +177,14 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 }
 ```
 
-#### `eth_getProof`
+**`eth_getProof`**
 
 Returns the account and storage values of the specified account including the Merkle-proof. This call can be used to verify that the data you are pulling from is not tampered with.
 
 **Parameters**
 
 1. `DATA` - address of the account.
-2. `ARRAY` - array of storage-keys which should be proofed and included. See [eth_getStorageAt (opens new window)](https://eth.wiki/json-rpc/API#eth_getStorageAt).
+2. `ARRAY` - array of storage-keys which should be proofed and included. See [eth\_getStorageAt (opens new window)](https://eth.wiki/json-rpc/API#eth\_getStorageAt).
 3. `QUANTITY|TAG` - integer of the ending block number for the range, or the string `"earliest"`, `"latest"` or `"pending"`, as in the [default block parameter (opens new window)](https://eth.wiki/json-rpc/API#the-default-block-parameter).
 
 **Returns**
@@ -232,7 +236,8 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 }
 ```
 
-#### `eth_estimateGas`
+**`eth_estimateGas`**
+
 Generates and returns an estimate of how much gas is necessary to allow the transaction to complete. The transaction will not be added to the blockchain.
 
 **Parameters**
@@ -245,6 +250,7 @@ Generates and returns an estimate of how much gas is necessary to allow the tran
 `QUANTITY` - the amount of gas used.
 
 **Example**
+
 ```
 // Request
 curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_getProof","params":[{see above}],"id":1}' <node url>
@@ -257,12 +263,14 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 }
 ```
 
-### Unsupported JSON-RPC methods
 
-#### `eth_getAccounts`
+
+<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
+
+**`eth_getAccounts`**
 
 This method is used to retrieve a list of addresses owned by a user. Boba Network nodes do not expose internal wallets for security reasons and therefore block the `eth_getAccounts` method by default. You should use external wallet software as an alternative.
 
-#### `eth_sendTransaction`
+**`eth_sendTransaction`**
 
 Boba Network nodes also block the `eth_sendTransaction` method for the same reasons as `eth_getAccounts`. You should use external wallet software as an alternative. Please note that this is not the same as the `eth_sendRawTransaction` method, which accepts a signed transaction as an input. `eth_sendRawTransaction` _is_ supported by Boba Network.

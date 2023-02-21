@@ -8,7 +8,7 @@ The Boba Explorers support verifying smart contracts via the [hardhat-etherscan]
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
 
 ### Installation
 
