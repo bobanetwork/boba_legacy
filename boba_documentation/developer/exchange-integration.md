@@ -20,7 +20,7 @@ Beside the Standard Token Bridge, we created the Fast Token Bridge to allow you 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1) (2) (2).png" alt=""><figcaption></figcaption></figure>
 
 The standard bridge functionality provides a method for an ERC20 token to be deposited and locked on L1 in exchange of the same amount of an equivalent token on L2. This process is known as "bridging a token", e.g. depositing 100 BOBA on L1 in exchange for 100 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the same amount on L1. In addition to bridging tokens the standard bridge is also used for ETH.
 
