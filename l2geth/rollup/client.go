@@ -246,7 +246,7 @@ func enqueueToTransaction(enqueue *Enqueue) (*types.Transaction, error) {
 
 	turing := hexutil.Bytes([]byte{0})
 	if enqueue.Turing == nil {
-		log.Info("TURING: rollup/client.go Enqueue tx with nil Turing")
+		log.Trace("TURING: rollup/client.go Enqueue tx with nil Turing")
 	} else {
 		log.Info("TURING: rollup/client.go Enqueue tx with non-nil Turing", "enqueue_turing", enqueue.Turing)
 		turing = *enqueue.Turing

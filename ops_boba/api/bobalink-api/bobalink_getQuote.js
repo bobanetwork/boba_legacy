@@ -49,7 +49,7 @@ const getResponse = (statusCode, result) => {
   return {
     headers,
     statusCode,
-    result,
+    body: JSON.stringify({ result }),
   }
 }
 
