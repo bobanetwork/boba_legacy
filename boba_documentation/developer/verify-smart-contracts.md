@@ -8,7 +8,7 @@ The Boba Explorers support verifying smart contracts via the [hardhat-etherscan]
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (4) (2).png" alt=""><figcaption></figcaption></figure>
 
 ### Installation
 
@@ -114,7 +114,7 @@ npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS "Constructor argu
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (14).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (14) (3).png" alt=""><figcaption></figcaption></figure>
 
 On contract creation, you will receive an address to check a pending transaction. If it does not redirect you to block explorer, verify you are on the chain where the contract was deployed, and type the contract's address into the search bar. Your contract details should come up.
 

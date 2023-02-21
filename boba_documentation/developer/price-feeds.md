@@ -9,7 +9,7 @@ Price Feed oracles allow smart contracts to work with external data and open the
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (1) (3).png" alt=""><figcaption></figcaption></figure>
 
 Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. The price data is submitted based on the 0.25% price change threshold, but the maximal frequency is once every 10 minutes per market. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
 

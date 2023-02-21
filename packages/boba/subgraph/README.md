@@ -4,7 +4,7 @@ These subgraphs index the **StandardBridge**, the **LiquidityPool**, the **Boba 
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (8).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (8) (2).png" alt=""><figcaption></figcaption></figure>
 
 The global `graph` is required to deploy to **The Graph**. Make sure that you have various packages installed.
 
@@ -81,7 +81,7 @@ Here is some example queries to get you started:
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 4 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 4 (12) (2).png" alt=""><figcaption></figcaption></figure>
 
 * The Mainnet Graph Node is hosted by **The Graph**. Visit https://thegraph.com/hosted-service/ to deploy your subgraphs. You can experiment here: [bobanetwork/boba-l2-subgraph](https://thegraph.com/hosted-service/subgraph/bobanetwork/boba-l2-subgraph?query=Example%20query).
 * Rinkeby endpoint: https://graph.rinkeby.boba.network. You can experiment here: [boba/Bridges/graphql](https://graph.rinkeby.boba.network/subgraphs/name/boba/Bridges/graphql)
