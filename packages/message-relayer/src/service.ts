@@ -83,6 +83,9 @@ interface MessageRelayerOptions {
   isFastRelayer: boolean
 
   enableRelayerFilter: boolean
+
+  // extra relayer filter
+  relayerFilterWhitelist: string
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -536,6 +539,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             filter.Proxy__L1StandardBridge,
             filter.Proxy__L1NFTBridge,
             filter.Proxy__L1ERC1155Bridge,
+            ...this.options.relayerFilterWhitelist.split(','),
           ]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()

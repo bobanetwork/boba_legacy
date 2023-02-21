@@ -480,7 +480,7 @@ export const waitForAndExecute = async (
   repeat: number,
   intervalMs?: number
 ) => {
-  while (repeat >= 0) {
+  while (repeat > 0) {
     try {
       await fn()
       break

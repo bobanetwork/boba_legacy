@@ -163,7 +163,7 @@ describe('BobaLink Test\n', async () => {
             const response = await asyncBobaLinkGetQuote({
               body: JSON.stringify({params: [input]}
             )}, null)
-            res.end(JSON.stringify(response))
+            res.end(response.body)
             server.emit('success', body)
           }
           if (req.url === '/invalidapi') {
@@ -176,9 +176,9 @@ describe('BobaLink Test\n', async () => {
         res.writeHead(400, { 'Content-Type': 'text/plain' })
         res.end('Expected content-type: application/json')
       }
-      }).listen(apiPort)
-      URL = `http://${ip.address()}:${apiPort}`
-      /* eslint-enable */
+    }).listen(apiPort)
+    URL = `http://${ip.address()}:${apiPort}`
+    /* eslint-enable */
   })
 
   it('test of local compute endpoint: should return price', async () => {
@@ -204,7 +204,7 @@ describe('BobaLink Test\n', async () => {
     })
     const res = await resp.json()
     const result = utils.defaultAbiCoder.decode(
-      ['uint256', 'uint256', 'int256', 'uint80'],
+      ['uint256', 'uint256', 'int256', 'uint256'],
       res.result
     )
 
