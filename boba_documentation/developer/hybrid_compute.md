@@ -17,7 +17,7 @@ A typical Hybrid Compute system for gaming or Web3 social networking<>blockchain
 3. Some BOBA. Each Hybrid Compute call costs 0.01 BOBA, equivalent to about 1 cent at the moment. This fee covers the cost of writing all input calldata and responses from your servers to Ethereum Mainnet.
 4. A server which accepts POST requests from Boba's Geth and returns data to it in the right format.
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (1) (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 Hybrid Compute is a general purpose pipe between computers and this pipe does not have a native feature set (e.g. storage, cron jobs, cryptographic operations, gaming engines, blockchain history lookups, ...). Rather, _it's up to you_ to deploy servers or endpoints to perform those functions and then expose the right functionality/data to external callers. For many situations, serverless endpoints such as AWS Lambda or Google Cloud Services allow you to build complex logic in just a few lines of code, so if you have not done that before, it's surprisingly easy and we provide many examples for you to use and copy.
 

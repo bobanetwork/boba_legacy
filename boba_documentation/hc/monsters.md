@@ -76,7 +76,7 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (10).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (10) (1).png" alt=""><figcaption></figcaption></figure>
 
 To deploy run:
 

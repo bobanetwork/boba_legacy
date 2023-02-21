@@ -388,7 +388,7 @@ Bobalink is available on Boba Mainnet L2, Boba Goerli L2, Bobabeam. It will be a
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (11).png" alt=""><figcaption></figcaption></figure>
 
 Hybrid Compute is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Hybrid Compute gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Hybrid Compute works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Hybrid Compute [here](hybrid\_compute.md).
 

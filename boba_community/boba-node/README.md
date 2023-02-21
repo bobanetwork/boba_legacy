@@ -80,7 +80,7 @@ replica    | DEBUG[04-22|20:38:45.941] Total fee                                
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (11) (2).png" alt=""><figcaption></figcaption></figure>
 
 There will be occasional updates to both services. You can update them by updating `RELEASE_VERSION` in the `.env` file first, then running:
 
