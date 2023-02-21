@@ -128,7 +128,7 @@ You should lock down your off-chain endpoint to only accept queries from your sm
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided in `./packages/boba/turing/AWS_code`. Specific instructions for setting up AWS lambda endpoints are [here](AWS\_code/AWS\_lambda\_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 

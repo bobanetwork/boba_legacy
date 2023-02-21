@@ -14,7 +14,7 @@ The [boba\_community/boba-node](./) repo runs a replica of the Boba L2geth, whic
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 \- docker - docker-compose
 
@@ -80,7 +80,7 @@ replica    | DEBUG[04-22|20:38:45.941] Total fee                                
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (11).png" alt=""><figcaption></figcaption></figure>
 
 There will be occasional updates to both services. You can update them by updating `RELEASE_VERSION` in the `.env` file first, then running:
 

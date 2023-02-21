@@ -17,7 +17,7 @@ description: A collection of links and addresses to get started on Boba-Fantom
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (1) (3).png" alt=""><figcaption></figcaption></figure>
 
 ### Testnet Fountain for Developers on Bobaopera Testnet L2
 
