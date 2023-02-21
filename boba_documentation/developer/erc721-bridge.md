@@ -9,7 +9,7 @@ Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 Assuming you have already deployed an NFT contract on L1, and you wish to transfer those NFTs to L2, please make sure that your L1 NFT contract is [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) compatible. Your contract must implement `ERC165` and `ERC721` interfaces. We will check the interface before registering your NFT contracts to our bridges.
 
@@ -99,7 +99,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (14).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
 
 Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L1StandardERC721.sol) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
@@ -184,7 +184,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (4).png" alt=""><figcaption></figcaption></figure>
 
 ### CASE 1 - Native L1 NFT - Bridge NFTs from Ethereum to Boba
 
@@ -280,7 +280,7 @@ await tx.wait()
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (12).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 4 (2).png" alt=""><figcaption></figcaption></figure>
 
 Attempting to categorize ERC721s on the basis of metadata, we have:
 

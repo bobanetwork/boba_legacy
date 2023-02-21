@@ -33,7 +33,7 @@ To obtain ETH and BOBA on Boba Network you can deposit ETH via[ https://gateway.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2 (3) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 * We recommend displaying an estimated fee to users using `eth_estimateGas`
 

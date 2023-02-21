@@ -1,6 +1,5 @@
 ---
 description: Learn more about the Fast Token Bridge
-
 ---
 
 # Using the Fast Token Bridge
@@ -11,13 +10,15 @@ The Fast Bridge is composed of two main contracts the [`L1LiquidityPool` (opens 
 
 Here we'll go over the basics of using this bridge to move ERC20 and ETH assets between Layer 1 and Layer 2.
 
-## Deposits
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 > Please check the liquidity balance of the L2 Liquidity Pool first before depositing tokens on the L1 Liquidity Pool. If the L2 Liquidty Pool doesn't have enough balance to complete your swap, your funds would be returned back to you from L2 and the L1 Liquidity Pool would charge a certain percentage of the deposit amount.
 
 ### Deposit ERC20s or ETH
 
-ERC20 and ETH deposits into L2 can triggered via the `clientDepositL1`  functions on the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
+ERC20 and ETH deposits into L2 can triggered via the `clientDepositL1` functions on the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
 ```js
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_LIQUIDITY_POOL_ADDRESS
@@ -52,7 +53,9 @@ const depositETHTx = await Proxy__L1LiquidityPool.clientDepositL1(
 await depositETHTx.wait()
 ```
 
-## Withdraws
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
 
 > Please check the liquidity balance of the L1 Liquidity Pool first before depositing tokens on the L2 Liquidity Pool. If the L1 Liquidty Pool doesn't have enough balance to complete your swap, your funds would be returned back to you from L1 and the L2 Liquidity Pool would charge a certain percentage of the exit amount.
 
@@ -93,28 +96,31 @@ const depositETHTx = await Proxy__L2LiquidityPool.clientDepositL2(
 await depositETHTx.wait()
 ```
 
-## The Boba token list
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
 The Fast bridge allows a one-to-one mapping between L1 and L2 tokens.
 
-| Network | URL                                                          |
-| ------- | ------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
+| Network | URL                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Goerli  | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli\_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json)   |
 
-## Links
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 4.png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 
-| Contract Name          | Contract Address                           |
-| ---------------------- | ------------------------------------------ |
-| Proxy__L1LiquidityPool | 0x1A26ef6575B7BBB864d984D9255C069F6c361a14 |
-| Proxy__L2LiquidityPool | 0x3A92cA39476fF84Dc579C868D4D7dE125513B034 |
+| Contract Name            | Contract Address                           |
+| ------------------------ | ------------------------------------------ |
+| Proxy\_\_L1LiquidityPool | 0x1A26ef6575B7BBB864d984D9255C069F6c361a14 |
+| Proxy\_\_L2LiquidityPool | 0x3A92cA39476fF84Dc579C868D4D7dE125513B034 |
 
 ### Goerli
 
-| Contract Name          | Contract Address                           |
-| ---------------------- | ------------------------------------------ |
-| Proxy__L1LiquidityPool | 0x1F32017A84dE07A524b9C6993D35B4bF70e8Dc93 |
-| Proxy__L2LiquidityPool | 0xF121Fd008A17c8C76DF1f003f19523130060B5BA |
-
+| Contract Name            | Contract Address                           |
+| ------------------------ | ------------------------------------------ |
+| Proxy\_\_L1LiquidityPool | 0x1F32017A84dE07A524b9C6993D35B4bF70e8Dc93 |
+| Proxy\_\_L2LiquidityPool | 0xF121Fd008A17c8C76DF1f003f19523130060B5BA |
