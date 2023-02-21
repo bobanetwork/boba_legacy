@@ -23,7 +23,7 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`BobaDepositPaymaster is located at: ${bobaDepositPaymaster.address}`)
   const bobaToken = await (hre as any).deployConfig.addressManager.getAddress('TK_L2BOBA')
   console.log(`Boba is located at: ${bobaToken}`)
-  const entryPointFromAM = await (hre as any).deployConfig.addressManager.getAddress('Boba_EntryPoint')
+  const entryPointFromAM = await (hre as any).deployConfig.addressManager.getAddress('L2_Boba_EntryPoint')
   if (entryPoint.address.toLowerCase() === entryPointFromAM.toLowerCase()) {
     const bobaVerifyingPaymasterConstructorArgs = ethers.utils.defaultAbiCoder.encode(
       ["address", "address","address", "address"],
@@ -43,7 +43,7 @@ const deployFn: DeployFunction = async (hre) => {
     }
     await hre.deployments.save('BobaVerifyingPaymaster', BobaVerifyingPaymasterDeploymentSubmission)
 
-    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'BobaVerifyingPaymaster', BobaVerifyingPaymasterAddress )
+    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_BobaVerifyingPaymaster', BobaVerifyingPaymasterAddress )
   }
 }
 

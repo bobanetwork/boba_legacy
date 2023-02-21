@@ -22,7 +22,7 @@ const deployFn: DeployFunction = async (hre) => {
     abi: EntryPointJson.abi
   }
   await hre.deployments.save('EntryPoint', EntryPointDeploymentSubmission)
-  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'Boba_EntryPoint', EntryPointAddress )
+  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_Boba_EntryPoint', EntryPointAddress )
 }
 
 export default deployFn
