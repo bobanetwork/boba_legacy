@@ -4,7 +4,7 @@ description: Faucets
 
 # Testnet faucets for developers
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (15).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (15) (1).png" alt=""><figcaption></figcaption></figure>
 
 If you do not have Goerli ETH, you can get some from [Goerli Authenticated Faucet](https://faucetlink.to/goerli). For Goerli BOBA, use the [BOBA faucet](https://gateway.goerli.boba.network/wallet).
 

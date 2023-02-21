@@ -57,7 +57,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
   * [`register`](packages/boba/register/): Code for registering addresses in the AddressManager
   * [`subgraph`](packages/boba/subgraph/): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
 
-<figure><img src=".gitbook/assets/Artboard 3 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/Artboard 3 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 Follow these instructions to set up your local development environment.
 

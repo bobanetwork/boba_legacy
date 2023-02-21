@@ -14,7 +14,7 @@ We'll work though one of those examples in more detail.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (5) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
 
 Welcome to our ERC20 Truffle example. If you're interested in writing your first L2 smart contract using Truffle as your smart contract testing framework, then you've come to the right place. This repo serves as an example for how go through and compile/test/deploy your contracts on Ethereum and the Boba L2.
 

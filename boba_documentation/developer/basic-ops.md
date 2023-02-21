@@ -12,7 +12,7 @@ To see examples of how to perform dozens of basic operations on Boba, you can al
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1) (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (1) (2).png" alt=""><figcaption></figcaption></figure>
 
 The Gas Price on L2 changes every **30 seconds**, with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change of the L2 gas price is 5% in the gas price oracle. Like on mainchain, the current gas price can be obtained via `.getGasPrice()`:
 

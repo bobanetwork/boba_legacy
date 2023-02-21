@@ -9,7 +9,7 @@ Bridging a token to Boba takes several minutes, and bridging a token from Boba t
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 1 (14).png" alt=""><figcaption></figcaption></figure>
 
 Assuming you have already deployed an ERC1155 token contract on L1, and you wish to transfer those tokens to L2, please make sure that your L1 ERC1155 token contract is [ERC1155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md) compatible. Your contract must implement `ERC165` and `ERC721` interfaces. We will check the interface before registering your token contracts to our bridges.
 
@@ -132,7 +132,7 @@ contract L2StandardERC1155 is IL2StandardERC1155, ERC1155 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
 
 Deploy your ERC115 token on Boba and then deploy [L1StandardERC1155](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/standards/L1StandardERC1155.sol) on Ethereum. The `L1_ERC1155_TOKEN_CONTRACT_ADDRESS` is the address of your token on Boba.
 
@@ -248,7 +248,7 @@ contract L1StandardERC1155 is IL1StandardERC1155, ERC1155 {
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 3 (12).png" alt=""><figcaption></figcaption></figure>
 
 ### CASE 1 - Native L1 token - Bridge tokens from Ethereum to Boba
 
@@ -369,7 +369,7 @@ await tx.wait()
 
 ## ERC1155 bridge addresses
 
-<figure><img src="../../.gitbook/assets/Artboard 5.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Artboard 5 (10).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 
