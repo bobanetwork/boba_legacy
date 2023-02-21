@@ -12,7 +12,9 @@ Aside from normal users, the pools offer additional functionality to other parti
 
 Finally, the pools are controlled by an **admin** (`OnlyAdmin`) and/or the **Boba DAO** (OnlyDAO), which is able to set the fees users must pay to use the fast bridges. These fees are the source of the rewards for the liquidity providers.
 
-## Reward Calculation and Updating
+
+
+<figure><img src="../../../../../.gitbook/assets/Artboard 1 (5).png" alt=""><figcaption></figcaption></figure>
 
 *   A deposits 100
 
