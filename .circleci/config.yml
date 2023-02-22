@@ -200,6 +200,11 @@ jobs:
           working_directory: ops
 
       - run:
+          name: Print all images
+          command: docker images
+          working_directory: ops
+
+      - run:
           name: Bring up the stack
           command: |
             docker images
