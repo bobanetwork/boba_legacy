@@ -52,9 +52,7 @@ export async function connectContractsViaAddressManager (
   providerL1: BaseProvider,
   providerL2: BaseProvider,
   addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
-
   const addressManager = getAddressManager(providerL1, addressManagerAddress)
-  //console.log(addressManager)
 
   const bundlerHelperAddress = await addressManager.getAddress('L2_Boba_BundlerHelper')
   const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
@@ -145,7 +143,7 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
       ethers.getDefaultProvider(config.network)
 
-  const providerL1: BaseProvider = ethers.getDefaultProvider(config.l1NodeWeb3Url)
+  const providerL1: BaseProvider = new ethers.providers.JsonRpcProvider(config.l1NodeWeb3Url)
   let mnemonic: string
   let wallet: Wallet
   try {
