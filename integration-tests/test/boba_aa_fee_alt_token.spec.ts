@@ -99,7 +99,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       value: utils.parseEther('1')
     })
   })
-  it('should be able to send a userOperation to a wallet through the bundler', async () => {
+  it('A user without native token pays for a tx using an alt token through a paymaster', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     SimpleWallet__factory = new ContractFactory(
       SimpleWalletJson.abi,

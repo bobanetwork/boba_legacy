@@ -98,7 +98,7 @@ describe('AA Boba as Fee token Test\n', async () => {
       value: utils.parseEther('1')
     })
   })
-  it('should be able to send a userOperation to a wallet through the bundler', async () => {
+  it('A user without ETH pays for a tx using $BOBA through a paymaster', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     SimpleWallet__factory = new ContractFactory(
       SimpleWalletJson.abi,

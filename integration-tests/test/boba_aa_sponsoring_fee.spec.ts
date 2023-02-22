@@ -69,78 +69,90 @@ describe('Sponsoring Tx\n', async () => {
       EntryPointJson.abi,
       env.l2Wallet
     )
-
-    await VerifyingPaymaster.addStake(1, { value: utils.parseEther('2') })
-    await EntryPoint.depositTo(VerifyingPaymaster.address, {
-      value: utils.parseEther('1')
-    })
   })
-  it('should be able to send a userOperation to a wallet through the bundler', async () => {
-    // deploy a 4337 Wallet and send operation to this wallet
-    const account = await SimpleWallet__factory.deploy(
-      entryPointAddress,
-      env.l2Wallet_3.address
-    )
-    await account.deployed()
+  describe('A user has no fee token, but pays for a transaction through a willing paymaster\n', async () => {
+    let walletAPI: SimpleWalletAPI
+    let signedOp
+    let account
 
-    const walletAPI = new SimpleWalletAPI({
-      provider: env.l2Provider,
-      entryPointAddress,
-      owner: env.l2Wallet_3,
-      walletAddress: account.address,
+    it('should be able to add paymaster stake ', async () => {
+      await VerifyingPaymaster.addStake(1, { value: utils.parseEther('2') })
+      await EntryPoint.depositTo(VerifyingPaymaster.address, {
+        value: utils.parseEther('1')
+      })
+
+      expect(await VerifyingPaymaster.getDeposit()).to.be.eq(utils.parseEther('1'))
     })
-
-    const op = await walletAPI.createSignedUserOp({
-      target: recipient.address,
-      data: recipient.interface.encodeFunctionData('something', ['hello']),
-    })
-    // add preverificaiton gas to account for paymaster signature
-    op.preVerificationGas = BigNumber.from(await op.preVerificationGas).add(3000)
-
-    const hash = await VerifyingPaymaster.getHash(op)
-    const sig = await offchainSigner.signMessage(utils.arrayify(hash))
-
-
-    op.paymasterAndData = hexConcat([VerifyingPaymaster.address, sig])
-
-    const signedOp = await walletAPI.signUserOp(op)
-
-    const preUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
-    const prePaymasterDeposit = await VerifyingPaymaster.getDeposit()
-
-    try {
-      const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
-      const txid = await walletAPI.getUserOpReceipt(requestId)
-      console.log('reqId', requestId, 'txid=', txid)
-      const receipt = await env.l2Provider.getTransactionReceipt(txid)
-      const returnedlogIndex = await getFilteredLogIndex(
-        receipt,
-        SampleRecipient__factory.abi,
-        recipient.address,
-        'Sender'
-      )
-      const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the bundler
-      expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
-      // msg.sender is the 4337 wallet
-      expect(log.args.msgSender).to.eq(account.address)
-      // message is received and emitted
-      expect(log.args.message).to.eq('hello')
-
-      const returnedEPlogIndex = await getFilteredLogIndex(
-        receipt,
-        EntryPointJson.abi,
+    it('should be able to generate and sign an userOp', async () => {
+      // deploy a 4337 Wallet and send operation to this wallet
+      account = await SimpleWallet__factory.deploy(
         entryPointAddress,
-        'UserOperationEvent'
+        env.l2Wallet_3.address
       )
-      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
-      const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
-      const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
+      await account.deployed()
 
-      expect(postUserBalance).to.eq(preUserBalance)
-      expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
-    } catch (e) {
-      throw new Error('Submission to Bundler Failed: ' + e)
-    }
+      walletAPI = new SimpleWalletAPI({
+        provider: env.l2Provider,
+        entryPointAddress,
+        owner: env.l2Wallet_3,
+        walletAddress: account.address,
+      })
+
+      const op = await walletAPI.createSignedUserOp({
+        target: recipient.address,
+        data: recipient.interface.encodeFunctionData('something', ['hello']),
+      })
+      // add preverificaiton gas to account for paymaster signature
+      op.preVerificationGas = BigNumber.from(await op.preVerificationGas).add(3000)
+
+      const hash = await VerifyingPaymaster.getHash(op)
+      const sig = await offchainSigner.signMessage(utils.arrayify(hash))
+
+
+      op.paymasterAndData = hexConcat([VerifyingPaymaster.address, sig])
+
+      signedOp = await walletAPI.signUserOp(op)
+
+      expect(await signedOp.sender).to.be.eq(account.address)
+    })
+    it('should be able to submit the userOp to the bundler and trigger tx', async () => {
+      const preUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
+      const prePaymasterDeposit = await VerifyingPaymaster.getDeposit()
+
+      try {
+        const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
+        const txid = await walletAPI.getUserOpReceipt(requestId)
+        console.log('reqId', requestId, 'txid=', txid)
+        const receipt = await env.l2Provider.getTransactionReceipt(txid)
+        const returnedlogIndex = await getFilteredLogIndex(
+          receipt,
+          SampleRecipient__factory.abi,
+          recipient.address,
+          'Sender'
+        )
+        const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+        // tx.origin is the bundler
+        expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+        // msg.sender is the 4337 wallet
+        expect(log.args.msgSender).to.eq(account.address)
+        // message is received and emitted
+        expect(log.args.message).to.eq('hello')
+
+        const returnedEPlogIndex = await getFilteredLogIndex(
+          receipt,
+          EntryPointJson.abi,
+          entryPointAddress,
+          'UserOperationEvent'
+        )
+        const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+        const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
+        const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
+
+        expect(postUserBalance).to.eq(preUserBalance)
+        expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
+      } catch (e) {
+        throw new Error('Submission to Bundler Failed: ' + e)
+      }
+    })
   })
 })
