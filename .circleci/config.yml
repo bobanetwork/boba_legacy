@@ -64,7 +64,7 @@ commands:
           name: Bring up the stack
           command: |
             docker images
-            BUILD=2 DAEMON=1 ./up_local.sh
+            BUILD=2 DAEMON=1 DOCKER_FILE=<<parameters.docker_compose_file>> ./up_local.sh
           working_directory: ops
       - run:
           name: Bring up services
