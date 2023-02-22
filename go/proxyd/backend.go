@@ -78,13 +78,26 @@ var (
 		Message:       "over rate limit",
 		HTTPErrorCode: 429,
 	}
+	ErrOverSenderRateLimit = &RPCErr{
+		Code:          JSONRPCErrorInternal - 17,
+		Message:       "sender is over rate limit",
+		HTTPErrorCode: 429,
+	}
 
 	ErrBackendUnexpectedJSONRPC = errors.New("backend returned an unexpected JSON-RPC response")
 )
 
 func ErrInvalidRequest(msg string) *RPCErr {
 	return &RPCErr{
-		Code:          -32601,
+		Code:          -32600,
+		Message:       msg,
+		HTTPErrorCode: 400,
+	}
+}
+
+func ErrInvalidParams(msg string) *RPCErr {
+	return &RPCErr{
+		Code:          -32602,
 		Message:       msg,
 		HTTPErrorCode: 400,
 	}
@@ -243,7 +256,7 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 		// callers so failover can occur if needed.
 		case ErrBackendUnexpectedJSONRPC:
 			log.Debug(
-				"Received unexpected JSON-RPC response",
+				"Recived unexpected JSON-RPC response",
 				"name", b.Name,
 				"req_id", GetReqID(ctx),
 				"err", err,
@@ -582,16 +595,16 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 	}
 }
 
-func (w *WSProxier) Proxy(ctx context.Context) error {
+func (w *WSProxier) Proxy(ctx context.Context /*,isLimit func(method string) bool*/) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx, errC)
-	go w.backendPump(ctx, errC)
+	go w.clientPump(ctx /*isLimit, */, errC)
+	go w.backendPump(ctx /*isLimit, */, errC)
 	err := <-errC
 	w.close()
 	return err
 }
 
-func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
+func (w *WSProxier) clientPump(ctx context.Context /*isLimit func(method string) bool, */, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
@@ -604,6 +617,11 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 		}
 
 		RecordWSMessage(ctx, w.backend.Name, SourceClient)
+
+		// if isLimit("") {
+		// 	errC <- ErrOverRateLimit
+		// 	return
+		// }
 
 		// Route control messages to the backend. These don't
 		// count towards the total RPC requests count.
@@ -674,7 +692,7 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 	}
 }
 
-func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
+func (w *WSProxier) backendPump(ctx context.Context /*isLimit func(method string) bool, */, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.backendConn.ReadMessage()
@@ -687,6 +705,11 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 		}
 
 		RecordWSMessage(ctx, w.backend.Name, SourceBackend)
+
+		// if isLimit("") {
+		// 	errC <- ErrOverRateLimit
+		// 	return
+		// }
 
 		// Route control messages directly to the client.
 		if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
