@@ -11,6 +11,7 @@ export interface BundlerConfig {
   network: string
   port: string
   addressManager: string
+  l1NodeWeb3Url: string
 }
 
 // TODO: implement merging config (args -> config.js -> default) and runtime shape validation
@@ -23,7 +24,8 @@ export const BundlerConfigShape = {
   mnemonic: ow.string,
   network: ow.string,
   port: ow.string,
-  addressManager: ow.string
+  addressManager: ow.string,
+  l1NodeWeb3Url: ow.string
 }
 
 // TODO: consider if we want any default fields at all

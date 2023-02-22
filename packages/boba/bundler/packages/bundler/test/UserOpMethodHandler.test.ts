@@ -56,7 +56,8 @@ describe('UserOpMethodHandler', function () {
       mnemonic: '',
       network: '',
       port: '3000',
-      addressManager: addressManager.address
+      addressManager: addressManager.address,
+      l1NodeWeb3Url: ''
     }
 
     methodHandler = new UserOpMethodHandler(

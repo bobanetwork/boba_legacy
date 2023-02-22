@@ -68,7 +68,8 @@ describe('Flow', function () {
       mnemonic: mnemonicFile,
       network: 'http://localhost:8545/',
       port: '5555',
-      addressManager: addressManager.address
+      addressManager: addressManager.address,
+      l1NodeWeb3Url: 'http://localhost:8545/'
     })
   })
 
