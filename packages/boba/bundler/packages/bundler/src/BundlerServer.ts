@@ -46,7 +46,6 @@ export class BundlerServer {
   }
 
   async _preflightCheck (): Promise<void> {
-
     if (await this.provider.getCode(this.config.entryPoint) === '0x') {
       this.fatal(`entrypoint not deployed at ${this.config.entryPoint}`)
     }
