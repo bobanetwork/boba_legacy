@@ -49,13 +49,20 @@ function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
 }
 
 export async function connectContractsViaAddressManager (
-  wallet: Wallet,
+  providerL1: BaseProvider,
+  providerL2: BaseProvider,
   addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
-  const addressManager = getAddressManager(wallet.provider, addressManagerAddress)
-  const bundlerHelperAddress = await addressManager.getAddress('Boba_BundlerHelper')
-  const entryPointAddress = await addressManager.getAddress('Boba_EntryPoint')
-  const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, wallet)
+
+  const addressManager = getAddressManager(providerL1, addressManagerAddress)
+  //console.log(addressManager)
+
+  const bundlerHelperAddress = await addressManager.getAddress('L2_Boba_BundlerHelper')
+  const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
+
+  const entryPoint = EntryPoint__factory.connect(entryPointAddress, providerL2)
+
+  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, providerL2)
+
   return {
     entryPoint,
     bundlerHelper
@@ -75,7 +82,9 @@ export async function connectContracts (
 }
 
 function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
-  return getContractFactory('Lib_AddressManager').connect(provider).attach(addressManagerAddress)
+  return getContractFactory('Lib_AddressManager')
+    .attach(addressManagerAddress)
+    .connect(provider)
 }
 
 /**
@@ -112,11 +121,12 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
     .option('--addressManager <string>', 'address of the Address Manager', '')
+    .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
 
-  console.log('command-line arguments: ', program.opts())
+  //console.log('command-line arguments: ', program.opts())
 
   const config = resolveConfiguration(programOpts)
   if (programOpts.createMnemonic != null) {
@@ -134,6 +144,8 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     // eslint-disable-next-line
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
       ethers.getDefaultProvider(config.network)
+
+  const providerL1: BaseProvider = ethers.getDefaultProvider(config.l1NodeWeb3Url)
   let mnemonic: string
   let wallet: Wallet
   try {
@@ -141,20 +153,21 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
       mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
       wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
     } else {
-      wallet = new Wallet(config.mnemonic).connect(provider)
+      wallet = new Wallet(config.mnemonic, provider)
     }
   } catch (e: any) {
     throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)
   }
   let methodHandler: UserOpMethodHandler
   if (config.addressManager.length > 0) {
-    const { entryPoint } = await connectContractsViaAddressManager(wallet, config.addressManager)
+    const { entryPoint } = await connectContractsViaAddressManager(providerL1, provider, config.addressManager)
+    config.entryPoint = entryPoint.address
     methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
   } else {
     const { entryPoint } = await connectContracts(wallet, config.entryPoint, config.helper)
     methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
   }
-
+console.log('here')
   const bundlerServer = new BundlerServer(
     methodHandler,
     config,
