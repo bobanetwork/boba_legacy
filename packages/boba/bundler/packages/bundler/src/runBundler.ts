@@ -32,7 +32,6 @@ export function resolveConfiguration (programOpts: any): BundlerConfig {
     fileConfig = JSON.parse(fs.readFileSync(configFileName, 'ascii'))
   }
   const mergedConfig = Object.assign({}, bundlerConfigDefault, fileConfig, commandLineParams)
-  console.log('Merged configuration:', JSON.stringify(mergedConfig))
   ow(mergedConfig, ow.object.exactShape(BundlerConfigShape))
   return mergedConfig
 }
@@ -124,8 +123,6 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
 
-  //console.log('command-line arguments: ', program.opts())
-
   const config = resolveConfiguration(programOpts)
   if (programOpts.createMnemonic != null) {
     const mnemonicFile = config.mnemonic
@@ -165,7 +162,6 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     const { entryPoint } = await connectContracts(wallet, config.entryPoint, config.helper)
     methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
   }
-console.log('here')
   const bundlerServer = new BundlerServer(
     methodHandler,
     config,
