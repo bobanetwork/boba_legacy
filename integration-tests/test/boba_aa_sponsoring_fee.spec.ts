@@ -75,7 +75,7 @@ describe('Sponsoring Tx\n', async () => {
       value: utils.parseEther('1')
     })
   })
-  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
+  it('should be able to send a userOperation to a wallet through the bundler', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     const account = await SimpleWallet__factory.deploy(
       entryPointAddress,
@@ -140,8 +140,7 @@ describe('Sponsoring Tx\n', async () => {
       expect(postUserBalance).to.eq(preUserBalance)
       expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
     } catch (e) {
-      console.log(e)
-      throw new Error('Submission to Bundler Failed')
+      throw new Error('Submission to Bundler Failed: ' + e)
     }
   })
 })

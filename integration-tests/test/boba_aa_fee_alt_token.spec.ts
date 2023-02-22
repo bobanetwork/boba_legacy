@@ -99,7 +99,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       value: utils.parseEther('1')
     })
   })
-  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
+  it('should be able to send a userOperation to a wallet through the bundler', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     SimpleWallet__factory = new ContractFactory(
       SimpleWalletJson.abi,
@@ -143,8 +143,7 @@ describe('AA Alt Fee Token Test\n', async () => {
         const txid = await walletAPI.getUserOpReceipt(requestId)
         console.log('reqId', requestId, 'txid=', txid)
     } catch (e) {
-        console.log(e)
-        throw new Error('Submission to Bundler Failed')
+        throw new Error('Submission to Bundler Failed: ' + e)
     }
 
     const postApproveTokenBalance = await L2ERC20Token.balanceOf(account.address)
@@ -202,8 +201,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
       expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.0001'))
     } catch (e) {
-      console.log(e)
-      throw new Error('Submission to Bundler Failed')
+      throw new Error('Submission to Bundler Failed: ' + e)
     }
   })
 })

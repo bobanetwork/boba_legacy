@@ -43,7 +43,7 @@ describe('AA Wallet Test\n', async () => {
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
   })
-  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
+  it('should be able to send a userOperation to a wallet through the bundler', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     const account = await SimpleWallet__factory.deploy(
       entryPointAddress,
@@ -88,11 +88,10 @@ describe('AA Wallet Test\n', async () => {
       // message is received and emitted
       expect(log.args.message).to.eq('hello')
     } catch (e) {
-      console.log(e)
-      throw new Error('Submission to Bundler Failed')
+      throw new Error('Submission to Bundler Failed: ' + e)
     }
   })
-  it('{tag:other} should deploy a wallet if it doesnt exist through initCode', async () => {
+  it('should deploy a wallet if it doesnt exist through initCode', async () => {
     // Deploy WalletDeployer
     const SimpleWalletDeployer__factory = new ContractFactory(
       SimpleWalletDeployerJson.abi,
