@@ -10,9 +10,9 @@ const deployFn: DeployFunction = async (hre) => {
   for (const key in deployments) {
     if (deployments.hasOwnProperty(key)) {
         if (key == 'EntryPoint' || key == 'BundlerHelper') {
-          contracts['BOBA_'+key] = deployments[key].address
+          contracts['L2_BOBA_'+key] = deployments[key].address
         } else {
-          contracts[key] = deployments[key].address
+          contracts['L2_'+key] = deployments[key].address
         }
     }
   }

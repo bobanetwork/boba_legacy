@@ -92,7 +92,7 @@ const deployFn: DeployFunction = async (hre) => {
   }
   await hre.deployments.save('BundlerHelper', BundlerHelperDeploymentSubmission)
 
-  await registerBobaAddress((hre as any).deployConfig.addressManager, 'Boba_BundlerHelper', BundlerHelperAddress )
+  await registerBobaAddress((hre as any).deployConfig.addressManager, 'L2_Boba_BundlerHelper', BundlerHelperAddress )
 }
 
 export default deployFn
