@@ -595,16 +595,16 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 	}
 }
 
-func (w *WSProxier) Proxy(ctx context.Context /*,isLimit func(method string) bool*/) error {
+func (w *WSProxier) Proxy(ctx context.Context, isLimit func(method string) bool) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx /*isLimit, */, errC)
-	go w.backendPump(ctx /*isLimit, */, errC)
+	go w.clientPump(ctx, isLimit, errC)
+	go w.backendPump(ctx, isLimit, errC)
 	err := <-errC
 	w.close()
 	return err
 }
 
-func (w *WSProxier) clientPump(ctx context.Context /*isLimit func(method string) bool, */, errC chan error) {
+func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) bool, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
@@ -618,10 +618,10 @@ func (w *WSProxier) clientPump(ctx context.Context /*isLimit func(method string)
 
 		RecordWSMessage(ctx, w.backend.Name, SourceClient)
 
-		// if isLimit("") {
-		// 	errC <- ErrOverRateLimit
-		// 	return
-		// }
+		if isLimit("") {
+			errC <- ErrOverRateLimit
+			return
+		}
 
 		// Route control messages to the backend. These don't
 		// count towards the total RPC requests count.
@@ -692,7 +692,7 @@ func (w *WSProxier) clientPump(ctx context.Context /*isLimit func(method string)
 	}
 }
 
-func (w *WSProxier) backendPump(ctx context.Context /*isLimit func(method string) bool, */, errC chan error) {
+func (w *WSProxier) backendPump(ctx context.Context, isLimit func(method string) bool, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.backendConn.ReadMessage()
@@ -706,10 +706,10 @@ func (w *WSProxier) backendPump(ctx context.Context /*isLimit func(method string
 
 		RecordWSMessage(ctx, w.backend.Name, SourceBackend)
 
-		// if isLimit("") {
-		// 	errC <- ErrOverRateLimit
-		// 	return
-		// }
+		if isLimit("") {
+			errC <- ErrOverRateLimit
+			return
+		}
 
 		// Route control messages directly to the client.
 		if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
