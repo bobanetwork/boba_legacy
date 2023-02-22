@@ -190,11 +190,15 @@ jobs:
           command: yarn && yarn build
           working_directory: ./
       - run:
-          name: Build everything
-          command: |
-            docker-compose build --progress=plain
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml build bobalink aa_deployer
+          name: Build the core services
+          command: docker-compose build
           working_directory: ops
+
+      - run:
+          name: Build the side services
+          command: docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+          working_directory: ops
+
       - run:
           name: Bring up the stack
           command: |

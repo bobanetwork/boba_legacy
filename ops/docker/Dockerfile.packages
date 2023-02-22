@@ -26,7 +26,8 @@ RUN  if echo $BUILDPLATFORM | grep -i "amd64" ; then \
           apt-get update -y && apt-get install -y git curl bash jq ; \
      elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
           echo "Building for Mac ($BUILDPLATFORM)" ; \
-          apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config libc6-amd64-cross ; \
+          apt-get update -y && apt-get install -y git curl bash jq python3.7 make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config libc6-amd64-cross ; \
+          update-alternatives --install /usr/bin/python python /usr/bin/python3.7 10  ; \
      elif echo "\"`uname -a`\"" | grep -q -E -i "aarch" ; then \
           apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
           echo "Building for aarch64 GNU/Linux" ; \
