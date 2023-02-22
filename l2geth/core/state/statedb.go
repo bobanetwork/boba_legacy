@@ -436,7 +436,7 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
 	balOwner := valueOwner.Big()
 
-	log.Debug("TURING-CREDIT:Before", "balUser", balUser, "price", price)
+	log.Trace("TURING-CREDIT:Before", "balUser", balUser, "price", price)
 
 	if balUser.Cmp(price) < 0 {
 		log.Warn("TURING-CREDIT:Insufficient credit", "balUser", balUser, "price", price)
@@ -469,11 +469,11 @@ func (s *StateDB) TuringCheck(userID common.Address) error {
 	price := value.Big()
 
 	if balUser.Cmp(price) < 0 {
-		log.Warn("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
+		log.Trace("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
 
-	log.Debug("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
+	log.Trace("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
 
 	return nil
 }
