@@ -11,7 +11,7 @@ executors:
       DOCKER_BUILDKIT: 1
 
 commands:
-  store-solidity-cache:
+  download-solidity-compilers:
     steps:
       - checkout
       - run:
@@ -252,7 +252,7 @@ jobs:
     executor: intergration-tests-executor
     parallelism: 4
     steps:
-      - store-solidity-cache
+      - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose.yml"
           test_folder: "eth-l2"
@@ -262,7 +262,7 @@ jobs:
     executor: intergration-tests-executor
     parallelism: 4
     steps:
-      - store-solidity-cache
+      - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-moonbeam.yml"
           test_folder: "alt-l2"
@@ -272,7 +272,7 @@ jobs:
     executor: intergration-tests-executor
     parallelism: 4
     steps:
-      - store-solidity-cache
+      - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-avalanche.yml"
           test_folder: "alt-l2"
@@ -282,7 +282,7 @@ jobs:
     executor: intergration-tests-executor
     parallelism: 4
     steps:
-      - store-solidity-cache
+      - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-bnb.yml"
           test_folder: "alt-l2"
@@ -292,7 +292,7 @@ jobs:
     executor: intergration-tests-executor
     parallelism: 4
     steps:
-      - store-solidity-cache
+      - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-fantom.yml"
           test_folder: "alt-l2"
