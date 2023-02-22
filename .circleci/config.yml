@@ -89,20 +89,21 @@ commands:
           command: docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
     report-integration-tests:
-      - run:
-          name: Rewrite test name for next run
-          command: |
-            mkdir -p result
-            cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
-          working_directory: ops
-      - run:
-          name: Stop docker
-          command: docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml down -v
-          working_directory: ops
-      - store_test_results:
-          path: /home/circleci/project/ops/result
-      - store_artifacts:
-          path: /home/circleci/project/ops/result
+      steps:
+        - run:
+            name: Rewrite test name for next run
+            command: |
+              mkdir -p result
+              cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
+            working_directory: ops
+        - run:
+            name: Stop docker
+            command: docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml down -v
+            working_directory: ops
+        - store_test_results:
+            path: /home/circleci/project/ops/result
+        - store_artifacts:
+            path: /home/circleci/project/ops/result
 
 jobs:
   go-lint-test-build:
