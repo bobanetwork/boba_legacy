@@ -88,22 +88,22 @@ commands:
           name: Run integration tests
           command: docker-compose run integration_tests $(cat splits.txt)
           working_directory: ops
-    report-integration-tests:
-      steps:
-        - run:
-            name: Rewrite test name for next run
-            command: |
-              mkdir -p result
-              cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
-            working_directory: ops
-        - run:
-            name: Stop docker
-            command: docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml down -v
-            working_directory: ops
-        - store_test_results:
-            path: /home/circleci/project/ops/result
-        - store_artifacts:
-            path: /home/circleci/project/ops/result
+  report-integration-tests:
+    steps:
+      - run:
+          name: Rewrite test name for next run
+          command: |
+            mkdir -p result
+            cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
+          working_directory: ops
+      - run:
+          name: Stop docker
+          command: docker-compose -f docker-compose-moonbeam.yml -f docker-compose-side.yml down -v
+          working_directory: ops
+      - store_test_results:
+          path: /home/circleci/project/ops/result
+      - store_artifacts:
+          path: /home/circleci/project/ops/result
 
 jobs:
   go-lint-test-build:
@@ -254,8 +254,8 @@ jobs:
     steps:
       - store-solidity-cache
       - run-integration-tests:
-          docker_compose_file: docker-compose.yml
-          test_folder: eth-l2
+          docker_compose_file: "docker-compose.yml"
+          test_folder: "eth-l2"
       - report-integration-tests
 
   integration-tests-moonbeam:
@@ -264,8 +264,8 @@ jobs:
     steps:
       - store-solidity-cache
       - run-integration-tests:
-          docker_compose_file: docker-compose-moonbeam.yml
-          test_folder: alt-l2
+          docker_compose_file: "docker-compose-moonbeam.yml"
+          test_folder: "alt-l2"
       - report-integration-tests
 
   integration-tests-avalanche:
@@ -274,8 +274,8 @@ jobs:
     steps:
       - store-solidity-cache
       - run-integration-tests:
-          docker_compose_file: docker-compose-avalanche.yml
-          test_folder: alt-l2
+          docker_compose_file: "docker-compose-avalanche.yml"
+          test_folder: "alt-l2"
       - report-integration-tests
 
   integration-tests-bnb:
@@ -284,8 +284,8 @@ jobs:
     steps:
       - store-solidity-cache
       - run-integration-tests:
-          docker_compose_file: docker-compose-bnb.yml
-          test_folder: alt-l2
+          docker_compose_file: "docker-compose-bnb.yml"
+          test_folder: "alt-l2"
       - report-integration-tests
 
   integration-tests-fantom:
@@ -294,8 +294,8 @@ jobs:
     steps:
       - store-solidity-cache
       - run-integration-tests:
-          docker_compose_file: docker-compose-fantom.yml
-          test_folder: alt-l2
+          docker_compose_file: "docker-compose-fantom.yml"
+          test_folder: "alt-l2"
       - report-integration-tests
 
 workflows:
