@@ -17,7 +17,7 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`EntryPoint is located at: ${entryPoint.address}`)
   const ethPriceOracle = await (hre as any).deployConfig.addressManager.getAddress('FeedRegistry')
   console.log(`Eth Price Oracle is located at: ${ethPriceOracle}`)
-  const entryPointFromAM = await (hre as any).deployConfig.addressManager.getAddress('Boba_EntryPoint')
+  const entryPointFromAM = await (hre as any).deployConfig.addressManager.getAddress('L2_Boba_EntryPoint')
   if (entryPoint.address.toLowerCase() === entryPointFromAM.toLowerCase()) {
     const bobaDepositPaymasterConstructorArgs = ethers.utils.defaultAbiCoder.encode(
       ["address", "address"],
@@ -38,7 +38,7 @@ const deployFn: DeployFunction = async (hre) => {
     }
     await hre.deployments.save('BobaDepositPaymaster', BobaDepositPaymasterDeploymentSubmission)
 
-    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'BobaDepositPaymaster', BobaDepositPaymasterAddress )
+    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_BobaDepositPaymaster', BobaDepositPaymasterAddress )
   }
 }
 
