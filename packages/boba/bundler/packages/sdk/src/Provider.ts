@@ -1,5 +1,4 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
-import { Wallet } from 'ethers'
 
 import { EntryPoint__factory, SimpleWalletDeployer__factory } from '@account-abstraction/contracts'
 
@@ -22,25 +21,16 @@ const debug = Debug('aa.wrapProvider')
 export async function wrapProvider (
   originalProvider: JsonRpcProvider,
   config: ClientConfig,
-  originalSigner: Signer = originalProvider.getSigner(),
-  wallet?: Wallet,
-  senderCreatorAddress?: string
+  originalSigner: Signer = originalProvider.getSigner()
 ): Promise<ERC4337EthersProvider> {
   const entryPoint = EntryPoint__factory.connect(config.entryPointAddress, originalProvider)
   // Initial SimpleWallet instance is not deployed and exists just for the interface
-  const detDeployer = new DeterministicDeployer(originalProvider, wallet)
+  const detDeployer = new DeterministicDeployer(originalProvider)
   const simpleWalletDeployer = await detDeployer.deterministicDeploy(SimpleWalletDeployer__factory.bytecode)
-  let smartWalletAPIOwner
-  if (wallet != null) {
-    smartWalletAPIOwner = wallet
-  } else {
-    smartWalletAPIOwner = originalSigner
-  }
   const smartWalletAPI = new SimpleWalletAPI({
     provider: originalProvider,
     entryPointAddress: entryPoint.address,
-    senderCreatorAddress: senderCreatorAddress,
-    owner: smartWalletAPIOwner,
+    owner: originalSigner,
     factoryAddress: simpleWalletDeployer,
     paymasterAPI: config.paymasterAPI
   })

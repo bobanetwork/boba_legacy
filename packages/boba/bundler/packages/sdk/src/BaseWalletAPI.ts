@@ -1,11 +1,9 @@
-import { ethers, BigNumber, BigNumberish, Contract } from 'ethers'
+import { ethers, BigNumber, BigNumberish } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import {
   EntryPoint, EntryPoint__factory,
   UserOperationStruct
 } from '@account-abstraction/contracts'
-
-import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp'
 import { resolveProperties } from 'ethers/lib/utils'
@@ -16,7 +14,6 @@ import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas'
 export interface BaseApiParams {
   provider: Provider
   entryPointAddress: string
-  senderCreatorAddress?: string
   walletAddress?: string
   overheads?: Partial<GasOverheads>
   paymasterAPI?: PaymasterAPI
@@ -49,7 +46,6 @@ export abstract class BaseWalletAPI {
   provider: Provider
   overheads?: Partial<GasOverheads>
   entryPointAddress: string
-  senderCreatorAddress?: string
   walletAddress?: string
   paymasterAPI?: PaymasterAPI
 
@@ -61,7 +57,6 @@ export abstract class BaseWalletAPI {
     this.provider = params.provider
     this.overheads = params.overheads
     this.entryPointAddress = params.entryPointAddress
-    this.senderCreatorAddress = params.senderCreatorAddress
     this.walletAddress = params.walletAddress
     this.paymasterAPI = params.paymasterAPI
 
@@ -128,12 +123,7 @@ export abstract class BaseWalletAPI {
     const initCode = this.getWalletInitCode()
     // use entryPoint to query wallet address (factory can provide a helper method to do the same, but
     // this method attempts to be generic
-    if (this.senderCreatorAddress != null) {
-      const senderCreator = new Contract(this.senderCreatorAddress, SenderCreatorJson.abi, this.provider)
-      return await senderCreator.callStatic.createSender(initCode)
-    } else {
-      return await this.entryPointView.callStatic.getSenderAddress(initCode)
-    }
+    return await this.entryPointView.callStatic.getSenderAddress(initCode)
   }
 
   /**
@@ -244,12 +234,12 @@ export abstract class BaseWalletAPI {
       maxPriorityFeePerGas
     } = info
     if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
-      const feeData = await this.provider.getFeeData()
+      const feeData = await this.provider.getGasPrice()
       if (maxFeePerGas == null) {
-        maxFeePerGas = feeData.maxFeePerGas ?? undefined
+        maxFeePerGas = feeData ?? undefined
       }
       if (maxPriorityFeePerGas == null) {
-        maxPriorityFeePerGas = feeData.maxPriorityFeePerGas ?? undefined
+        maxPriorityFeePerGas = feeData.lt(ethers.utils.parseUnits('1', 'gwei')) ? feeData : ethers.utils.parseUnits('1', 'gwei') ?? undefined
       }
     }
 

@@ -10,7 +10,7 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleWalletAPI } from '@account-abstraction/sdk'
+import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import SimpleWalletDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWalletDeployer.sol/SimpleWalletDeployer.json'
 import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
 import FeedRegistryJson from '@boba/contracts/artifacts/contracts/oracle/FeedRegistry.sol/FeedRegistry.json'
@@ -35,7 +35,10 @@ describe('AA Boba as Fee token Test\n', async () => {
   let BobaDepositPaymaster__factory: ContractFactory
   let BobaDepositPaymaster: Contract
 
-  let EntryPoint
+  let PriceOracle__factory: ContractFactory
+  let PriceOracle: Contract
+
+  let EntryPoint: Contract
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -54,33 +57,32 @@ describe('AA Boba as Fee token Test\n', async () => {
       entryPointAddress,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
-  })
-  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
+
     BobaDepositPaymaster__factory = new ContractFactory(
-        BobaDepositPaymasterJson.abi,
-        BobaDepositPaymasterJson.bytecode,
-        env.l2Wallet
-      )
+      BobaDepositPaymasterJson.abi,
+      BobaDepositPaymasterJson.bytecode,
+      env.l2Wallet
+    )
 
-      const OracleContract__factory = new ContractFactory(
-        MockFeedRegistryJson.abi,
-        MockFeedRegistryJson.bytecode,
-        env.l2Wallet
-      )
+    PriceOracle__factory = new ContractFactory(
+      MockFeedRegistryJson.abi,
+      MockFeedRegistryJson.bytecode,
+      env.l2Wallet
+    )
 
-      const oracleContract = await OracleContract__factory.deploy()
+    PriceOracle = await PriceOracle__factory.deploy()
 
-      BobaDepositPaymaster = await BobaDepositPaymaster__factory.deploy(
-        entryPointAddress,
-        // ethPrice oracle
-        oracleContract.address
-      )
+    BobaDepositPaymaster = await BobaDepositPaymaster__factory.deploy(
+      entryPointAddress,
+      // ethPrice oracle
+      PriceOracle.address
+    )
 
     // add boba token
     await BobaDepositPaymaster.addToken(
         L2BOBAToken.address,
         // tokenPrice oracle
-        oracleContract.address,
+        PriceOracle.address,
         L2BOBAToken.address,
         18
     )
@@ -95,6 +97,8 @@ describe('AA Boba as Fee token Test\n', async () => {
     await EntryPoint.depositTo(BobaDepositPaymaster.address, {
       value: utils.parseEther('1')
     })
+  })
+  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     SimpleWallet__factory = new ContractFactory(
       SimpleWalletJson.abi,
@@ -127,8 +131,6 @@ describe('AA Boba as Fee token Test\n', async () => {
     const approveOp = await walletAPI.createSignedUserOp({
         target: L2BOBAToken.address,
         data: L2BOBAToken.interface.encodeFunctionData('approve', [BobaDepositPaymaster.address, constants.MaxUint256]),
-        maxFeePerGas: '0x59682F00',
-        maxPriorityFeePerGas: '0x59682F00',
     })
 
     const preApproveTokenBalance = await L2BOBAToken.balanceOf(account.address)
@@ -150,8 +152,6 @@ describe('AA Boba as Fee token Test\n', async () => {
     const op = await walletAPI.createUnsignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
-      maxFeePerGas: '0x59682F00',
-      maxPriorityFeePerGas: '0x59682F00',
     })
 
 
@@ -172,7 +172,7 @@ describe('AA Boba as Fee token Test\n', async () => {
         'Sender'
       )
       const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the owner of the wallet
+      // tx.origin is the bundler
       expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
       // msg.sender is the 4337 wallet
       expect(log.args.msgSender).to.eq(account.address)

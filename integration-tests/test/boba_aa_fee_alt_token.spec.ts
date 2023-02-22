@@ -10,7 +10,7 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleWalletAPI } from '@account-abstraction/sdk'
+import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import SimpleWalletDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWalletDeployer.sol/SimpleWalletDeployer.json'
 import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
 import FeedRegistryJson from '@boba/contracts/artifacts/contracts/oracle/FeedRegistry.sol/FeedRegistry.json'
@@ -37,7 +37,12 @@ describe('AA Alt Fee Token Test\n', async () => {
   let ManualDepositPaymaster__factory: ContractFactory
   let ManualDepositPaymaster: Contract
 
-  let EntryPoint
+  let EntryPoint: Contract
+
+  const priceRatio = 100
+  const priceRatioDecimals = 2
+  const minRatio = 1
+  const maxRatio = 500
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -46,15 +51,14 @@ describe('AA Alt Fee Token Test\n', async () => {
     recipient = await new SampleRecipient__factory(env.l2Wallet).deploy()
 
     L2ERC20Token__factory = new ContractFactory(
-        L2StandardERC20Json.abi,
-        L2StandardERC20Json.bytecode,
-        env.l2Wallet
+      L2StandardERC20Json.abi,
+      L2StandardERC20Json.bytecode,
+      env.l2Wallet
     )
 
     // set bridge as wallet_2 to easily mint
     L2ERC20Token = await L2ERC20Token__factory.deploy(env.l2Wallet_2.address, env.l2Wallet_2.address, 'PEARL', 'PEARL', 18)
     // mint tokens to wallet
-    console.log(L2ERC20Token.address)
     await L2ERC20Token.connect(env.l2Wallet_2).mint(env.l2Wallet.address, utils.parseEther('500'))
 
     bundlerProvider = new HttpRpcClient(
@@ -62,38 +66,26 @@ describe('AA Alt Fee Token Test\n', async () => {
       entryPointAddress,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
-  })
-  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
+
     ManualDepositPaymaster__factory = new ContractFactory(
-        ManualDepositPaymasterJson.abi,
-        ManualDepositPaymasterJson.bytecode,
-        env.l2Wallet
-      )
+      ManualDepositPaymasterJson.abi,
+      ManualDepositPaymasterJson.bytecode,
+      env.l2Wallet
+    )
 
-      const OracleContract__factory = new ContractFactory(
-        MockFeedRegistryJson.abi,
-        MockFeedRegistryJson.bytecode,
-        env.l2Wallet
-      )
-
-      ManualDepositPaymaster = await ManualDepositPaymaster__factory.deploy(
-        entryPointAddress,
-      )
-
-    const priceRatio = 100
-    const priceRatioDecimals = 2
-    const minRatio = 1
-    const maxRatio = 500
+    ManualDepositPaymaster = await ManualDepositPaymaster__factory.deploy(
+      entryPointAddress,
+    )
 
     // add alt erc20 token
     await ManualDepositPaymaster.addToken(
-        L2ERC20Token.address,
-        // token decimals
-        await L2ERC20Token.decimals(),
-        priceRatio,
-        priceRatioDecimals,
-        minRatio,
-        maxRatio
+      L2ERC20Token.address,
+      // token decimals
+      await L2ERC20Token.decimals(),
+      priceRatio,
+      priceRatioDecimals,
+      minRatio,
+      maxRatio
     )
 
     EntryPoint = new Contract(
@@ -106,6 +98,8 @@ describe('AA Alt Fee Token Test\n', async () => {
     await EntryPoint.depositTo(ManualDepositPaymaster.address, {
       value: utils.parseEther('1')
     })
+  })
+  it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     SimpleWallet__factory = new ContractFactory(
       SimpleWalletJson.abi,
@@ -138,8 +132,6 @@ describe('AA Alt Fee Token Test\n', async () => {
     const approveOp = await walletAPI.createSignedUserOp({
         target: L2ERC20Token.address,
         data: L2ERC20Token.interface.encodeFunctionData('approve', [ManualDepositPaymaster.address, constants.MaxUint256]),
-        maxFeePerGas: '0x59682F00',
-        maxPriorityFeePerGas: '0x59682F00',
     })
 
     const preApproveTokenBalance = await L2ERC20Token.balanceOf(account.address)
@@ -161,8 +153,6 @@ describe('AA Alt Fee Token Test\n', async () => {
     const op = await walletAPI.createUnsignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
-      maxFeePerGas: '0x59682F00',
-      maxPriorityFeePerGas: '0x59682F00',
     })
 
 
@@ -183,7 +173,7 @@ describe('AA Alt Fee Token Test\n', async () => {
         'Sender'
       )
       const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the owner of the wallet
+      // tx.origin is the bundler
       expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
       // msg.sender is the 4337 wallet
       expect(log.args.msgSender).to.eq(account.address)
@@ -210,6 +200,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       // no ether is used when calling the recipient with the help of the paymaster, users boba token is used to pay
       expect(postApproveEtherBalance).to.eq(postCallEtherBalance)
       expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
+      expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.0001'))
     } catch (e) {
       console.log(e)
       throw new Error('Submission to Bundler Failed')

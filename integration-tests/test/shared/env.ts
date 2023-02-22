@@ -36,6 +36,7 @@ import {
   //IS_LIVE_NETWORK,
   getBASEDeployerAddresses,
   getBOBADeployerAddresses,
+  getAABOBADeployerAddresses,
   envConfig,
 } from './utils'
 
@@ -52,6 +53,7 @@ export class OptimismEnv {
   //addressManager: Contract
   addressesBASE
   addressesBOBA
+  addressesAABOBA
   l1Bridge: Contract
   //l1Messenger: Contract
   //l1BlockNumber: Contract
@@ -91,6 +93,7 @@ export class OptimismEnv {
   constructor(args: any) {
     this.addressesBASE = args.addressesBASE
     this.addressesBOBA = args.addressesBOBA
+    this.addressesAABOBA = args.addressesAABOBA
     this.l1Bridge = args.l1Bridge
     //this.l1Messenger = args.l1Messenger
     //this.l1BlockNumber = args.l1BlockNumber
@@ -123,6 +126,7 @@ export class OptimismEnv {
   static async new(): Promise<OptimismEnv> {
     const addressesBASE = await getBASEDeployerAddresses()
     const addressesBOBA = await getBOBADeployerAddresses()
+    const addressesAABOBA = await getAABOBADeployerAddresses()
 
     const l1Bridge = await getL1Bridge(
       l1Wallet,
@@ -158,6 +162,7 @@ export class OptimismEnv {
     return new OptimismEnv({
       addressesBASE,
       addressesBOBA,
+      addressesAABOBA,
       messenger,
       messengerFast,
       ovmEth,

@@ -197,6 +197,16 @@ if (!process.env.BASE_URL) {
 export const BASE_URL =
   process.env.BASE_URL || 'http://127.0.0.1:8080/addresses.json'
 
+if (!process.env.AA_BOBA_URL) {
+  console.log(`!!You did not set process.env.AA_BOBA_URL!!`)
+  console.log(`Setting to default value of http://127.0.0.1:8080/aa-addr.json`)
+} else {
+  console.log(`process.env.AA_BOBA_URL set to:`, process.env.AA_BOBA_URL)
+}
+
+export const AA_BOBA_URL =
+  process.env.AA_BOBA_URL || 'http://127.0.0.1:8080/aa-addr.json'
+
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
   const l1BridgeInterface = getContractInterface('L1StandardBridge')
@@ -342,6 +352,14 @@ export const getBASEDeployerAddresses = async () => {
 export const getBOBADeployerAddresses = async () => {
   const options = {
     uri: BOBA_URL,
+  }
+  const result = await request.get(options)
+  return JSON.parse(result)
+}
+
+export const getAABOBADeployerAddresses = async () => {
+  const options = {
+    uri: AA_BOBA_URL,
   }
   const result = await request.get(options)
   return JSON.parse(result)

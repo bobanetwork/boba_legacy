@@ -9,12 +9,10 @@ import { getFilteredLogIndex } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
 // use local sdk
-import { SimpleWalletAPI } from '@account-abstraction/sdk'
+import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import { wrapProvider } from '@account-abstraction/sdk/src/Provider'
-import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
 import SimpleWalletDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWalletDeployer.sol/SimpleWalletDeployer.json'
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
-import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import { SampleRecipient, SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
@@ -30,6 +28,12 @@ describe('AA Wallet Test\n', async () => {
     env = await OptimismEnv.new()
     entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
 
+    SimpleWallet__factory = new ContractFactory(
+      SimpleWalletJson.abi,
+      SimpleWalletJson.bytecode,
+      env.l2Wallet
+    )
+
     recipient = await new SampleRecipient__factory(env.l2Wallet).deploy()
     console.log('recipient', recipient.address)
 
@@ -41,11 +45,6 @@ describe('AA Wallet Test\n', async () => {
   })
   it('{tag:other} should be able to send a userOperation to a wallet through the bundler', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
-    SimpleWallet__factory = new ContractFactory(
-      SimpleWalletJson.abi,
-      SimpleWalletJson.bytecode,
-      env.l2Wallet
-    )
     const account = await SimpleWallet__factory.deploy(
       entryPointAddress,
       env.l2Wallet.address
@@ -68,8 +67,6 @@ describe('AA Wallet Test\n', async () => {
     const op = await walletAPI.createSignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
-      maxFeePerGas: '0x59682F00',
-      maxPriorityFeePerGas: '0x59682F00',
     })
 
     try {
@@ -84,7 +81,7 @@ describe('AA Wallet Test\n', async () => {
         'Sender'
       )
       const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the owner of the wallet
+      // tx.origin is the bundler
       expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
       // msg.sender is the 4337 wallet
       expect(log.args.msgSender).to.eq(account.address)
@@ -111,28 +108,6 @@ describe('AA Wallet Test\n', async () => {
       owner: env.l2Wallet_2,
       factoryAddress: SimpleWalletDeployer.address,
     })
-
-    // deploy a senderCreator contract to get the create2 address on the provide
-    const SenderCreator__factory = new ContractFactory(
-        SenderCreatorJson.abi,
-        SenderCreatorJson.bytecode,
-        env.l2Wallet
-    )
-
-    const senderCreator = await SenderCreator__factory.deploy()
-
-    const aasigner = env.l2Provider.getSigner()
-    const config = {
-    chainId: await env.l2Provider.getNetwork().then(net => net.chainId),
-    entryPointAddress,
-    bundlerUrl: 'http://localhost:3000/rpc'
-    }
-
-    const dep = new DeterministicDeployer(env.l2Provider, env.l2Wallet)
-
-
-    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet, senderCreator.address)
-    // const walletAddress = await aaProvider.getSigner().getAddress()
 
     // `createUnsignedUserOp()` on the sdk failes only for boba:
     // Fails getting sender address from initCode at - `getCounterFactualAddress`
