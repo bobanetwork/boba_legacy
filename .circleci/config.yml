@@ -88,6 +88,10 @@ commands:
           name: Run integration tests
           command: docker-compose -f <<parameters.docker_compose_file>> run integration_tests $(cat splits.txt)
           working_directory: ops
+      - run:
+          name: Stop docker
+          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml down -v
+          working_directory: ops
   report-integration-tests:
     steps:
       - run:
@@ -95,10 +99,6 @@ commands:
           command: |
             mkdir -p result
             cat /home/circleci/result/output.xml | sed 's/\/opt\/optimism/../g' | tee result/result.xml
-          working_directory: ops
-      - run:
-          name: Stop docker
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml down -v
           working_directory: ops
       - store_test_results:
           path: /home/circleci/project/ops/result
