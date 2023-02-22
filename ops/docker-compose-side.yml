@@ -123,12 +123,12 @@ services:
       replicas: 0
 
   bundler:
-    # depends_on:
-    #   - l1_chain
-    #   - dtl
-    #   - l2geth
-    #   - boba_deployer
-    #   - aa_deployer
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - boba_deployer
+      - aa_deployer
     image: bobanetwork/bundler:latest
     build:
       context: ..
