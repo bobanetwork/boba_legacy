@@ -17,8 +17,8 @@ contract AuthenticatedFaucet is Ownable {
     uint256 lastEpochStart;
     uint256 amountClaimsInLastEpoch;
     uint256 maxClaimsPerEpoch;
-    uint256 testnetETHPerClaim;
-    uint256 bobaTokenPerClaim;
+    uint256 public testnetETHPerClaim;
+    uint256 public bobaTokenPerClaim;
 
     event GasClaimed(uint256 authorId);
 

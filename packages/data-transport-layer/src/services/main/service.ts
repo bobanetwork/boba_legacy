@@ -230,11 +230,34 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
            })
          }
        })
+       this.state.addressRegistry['get']("/aa-addr.json", async (req, res) => {
+        try {
+          let aList
+          try {
+            aList = JSON.parse(await this.state.db.get("aa-addr"))
+          } catch(e) {
+            if (e.notFound) {
+              this.logger.warn("Address Registry is not yet ready to serve AA addresses (db notFound)")
+              return res.status(503).json({error: "Address Registry is not yet populated"})
+            } else { throw e }
+          }
+
+          return res.json(aList)
+        } catch (e) {
+          return res.status(500).json({
+            error: e.toString(),
+          })
+        }
+      })
        this.state.addressRegistry['put']("/addresses.json", async (req, res) => {
          try {
            const rb = req.body
 
            this.logger.info("addressRegistry PUT request for base addresses", {rb})
+
+           if (!("content-type" in req.headers) || req.headers['content-type'] !== "application/json") {
+             return res.status(400).json({error:"Request header must include content-type: application/json"})
+           }
 
            let addrList = {}
 
@@ -256,6 +279,10 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
              } else { throw e; }
            }
 
+           if (Object.keys(rb).length === 0) {
+             return res.status(400).json({error:"List is empty"})
+           }
+
            this.logger.info("Will store new addresses.json", rb)
            await this.state.db.put("address-list", JSON.stringify(rb))
            this.logger.info("Stored addresses.json")
@@ -272,8 +299,16 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
 
            this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
 
+           if (!("content-type" in req.headers) || req.headers['content-type'] !== "application/json") {
+             return res.status(400).json({error:"Request header must include content-type: application/json"})
+           }
+
            // As with the base list, we could add future restrictions on changing
            // certain critical addresses. For now we allow anything.
+
+           if (Object.keys(rb).length === 0) {
+             return res.status(400).json({error:"List is empty"})
+           }
 
            this.logger.info("Will store new boba-addr.json", rb)
            await this.state.db.put("boba-addr", JSON.stringify(rb))
@@ -285,6 +320,25 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
            })
          }
        })
+       this.state.addressRegistry['put']("/aa-addr.json", async (req, res) => {
+        try {
+          const rb = req.body
+
+          this.logger.info("addressRegistry PUT request for BOBA addresses", {rb})
+
+          // As with the base list, we could add future restrictions on changing
+          // certain critical addresses. For now we allow anything.
+
+          this.logger.info("Will store new aa-addr.json", rb)
+          await this.state.db.put("aa-addr", JSON.stringify(rb))
+          this.logger.info("Stored aa-addr.json")
+          return res.sendStatus(201).end()
+        } catch (e) {
+          return res.status(500).json({
+            error: e.toString(),
+          })
+        }
+      })
 
        this.state.addressRegistry['get']("/state-dump.latest.json", async (req, res) => {
          try {

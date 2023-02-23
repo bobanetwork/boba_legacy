@@ -17,6 +17,14 @@ const config: HardhatUserConfig = {
       url: 'https://goerli.boba.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    boba_bnb_testnet: {
+      url: 'https://testnet.bnb.boba.network',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    boba_avax_testnet: {
+      url: 'https://testnet.avax.boba.network/',
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
     boba_rinkeby: {
       url: 'https://rinkeby.boba.network',
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
