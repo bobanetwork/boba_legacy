@@ -385,10 +385,10 @@ func spamWSReqs(t *testing.T, clientHdlr *clientHandler, client *ProxydWSClient,
 			clientHdlr.SetMsgCB(func(msgType int, data []byte) {
 				resCh <- string(data)
 			})
-			client.WriteMessage(
+			require.NoError(t, client.WriteMessage(
 				websocket.TextMessage,
 				[]byte(WSRequest),
-			)
+			))
 		}()
 	}
 
