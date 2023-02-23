@@ -1,6 +1,7 @@
 package integration_tests
 
 import (
+	"net/http"
 	"os"
 	"sync"
 	"sync/atomic"
@@ -40,7 +41,7 @@ func TestConcurrentWSPanic(t *testing.T) {
 	config := ReadConfig("ws")
 	shutdown, err := proxyd.Start(config)
 	require.NoError(t, err)
-	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, nil)
+	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, nil, nil)
 	require.NoError(t, err)
 	defer shutdown()
 
@@ -149,7 +150,7 @@ func TestWS(t *testing.T) {
 	config := ReadConfig("ws")
 	shutdown, err := proxyd.Start(config)
 	require.NoError(t, err)
-	client, err := NewProxydWSClient("ws://127.0.0.1:8546", func(msgType int, data []byte) {
+	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
 		clientHdlr.MsgCB(msgType, data)
 	}, nil)
 	defer client.HardClose()
@@ -244,7 +245,7 @@ func TestWSClientClosure(t *testing.T) {
 
 	for _, closeType := range []string{"soft", "hard"} {
 		t.Run(closeType, func(t *testing.T) {
-			client, err := NewProxydWSClient("ws://127.0.0.1:8546", func(msgType int, data []byte) {
+			client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
 				clientHdlr.MsgCB(msgType, data)
 			}, nil)
 			require.NoError(t, err)
@@ -283,9 +284,9 @@ func TestWSClientMaxConns(t *testing.T) {
 	defer shutdown()
 
 	doneCh := make(chan struct{}, 1)
-	_, err = NewProxydWSClient("ws://127.0.0.1:8546", nil, nil)
+	_, err = NewProxydWSClient("ws://127.0.0.1:8546", nil, nil, nil)
 	require.NoError(t, err)
-	_, err = NewProxydWSClient("ws://127.0.0.1:8546", nil, func(err error) {
+	_, err = NewProxydWSClient("ws://127.0.0.1:8546", nil, nil, func(err error) {
 		require.Contains(t, err.Error(), "unexpected EOF")
 		doneCh <- struct{}{}
 	})
@@ -298,4 +299,105 @@ func TestWSClientMaxConns(t *testing.T) {
 	case <-doneCh:
 		return
 	}
+}
+
+var (
+	WSRequest             = "{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}"
+	rateLimitErrorMessage = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"no backends available for method\"},\"id\":1}"
+)
+
+func TestWSClientMaxRPSLimit(t *testing.T) {
+	backendHdlr := new(backendHandler)
+	clientHdlr := new(clientHandler)
+
+	backend := NewMockWSBackend(nil, func(conn *websocket.Conn, msgType int, data []byte) {
+		backendHdlr.MsgCB(conn, msgType, data)
+	}, func(conn *websocket.Conn, err error) {
+		backendHdlr.CloseCB(conn, err)
+	})
+	defer backend.Close()
+
+	require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", backend.URL()))
+
+	config := ReadConfig("ws_frontend_rate_limit")
+	shutdown, err := proxyd.Start(config)
+	require.NoError(t, err)
+	defer shutdown()
+
+	t.Run("non-exempt over limit", func(t *testing.T) {
+		client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
+			clientHdlr.MsgCB(msgType, data)
+		}, nil)
+		defer client.HardClose()
+		require.NoError(t, err)
+		WSResponse := spamWSReqs(t, clientHdlr, client, 4)
+		require.Equal(t, 3, WSResponse[rateLimitErrorMessage])
+	})
+
+	t.Run("exempt user agent over limit", func(t *testing.T) {
+		h := make(http.Header)
+		h.Set("User-Agent", "exempt_agent")
+		client, err := NewProxydWSClient("ws://127.0.0.1:8546", h, func(msgType int, data []byte) {
+			clientHdlr.MsgCB(msgType, data)
+		}, nil)
+		defer client.HardClose()
+		require.NoError(t, err)
+		WSResponse := spamWSReqs(t, clientHdlr, client, 4)
+		require.Equal(t, 0, WSResponse[rateLimitErrorMessage])
+	})
+
+	t.Run("exempt over limit", func(t *testing.T) {
+		h := make(http.Header)
+		h.Set("User-Agent", "exempt_agent")
+		client, err := NewProxydWSClient("ws://127.0.0.1:8546", h, func(msgType int, data []byte) {
+			clientHdlr.MsgCB(msgType, data)
+		}, nil)
+		defer client.HardClose()
+		require.NoError(t, err)
+		WSResponse := spamWSReqs(t, clientHdlr, client, 4)
+		require.Equal(t, 0, WSResponse[rateLimitErrorMessage])
+	})
+
+	t.Run("multiple xff", func(t *testing.T) {
+		h1 := make(http.Header)
+		h1.Set("X-Forwarded-For", "1.1.1.1")
+		h2 := make(http.Header)
+		h2.Set("X-Forwarded-For", "2.2.2.2")
+		client1, _ := NewProxydWSClient("ws://127.0.0.1:8546", h1, func(msgType int, data []byte) {
+			clientHdlr.MsgCB(msgType, data)
+		}, nil)
+		defer client1.HardClose()
+		client2, _ := NewProxydWSClient("ws://127.0.0.1:8546", h2, func(msgType int, data []byte) {
+			clientHdlr.MsgCB(msgType, data)
+		}, nil)
+		defer client2.HardClose()
+		WSResponse1 := spamWSReqs(t, clientHdlr, client1, 4)
+		WSResponse2 := spamWSReqs(t, clientHdlr, client2, 4)
+		require.Equal(t, 3, WSResponse1[rateLimitErrorMessage])
+		require.Equal(t, 3, WSResponse2[rateLimitErrorMessage])
+	})
+}
+
+func spamWSReqs(t *testing.T, clientHdlr *clientHandler, client *ProxydWSClient, n int) map[string]int {
+	resCh := make(chan string)
+	for i := 0; i < n; i++ {
+		go func() {
+			clientHdlr.SetMsgCB(func(msgType int, data []byte) {
+				resCh <- string(data)
+			})
+			client.WriteMessage(
+				websocket.TextMessage,
+				[]byte(WSRequest),
+			)
+		}()
+	}
+
+	WSResponse := make(map[string]int)
+	for i := 0; i < n; i++ {
+		res := <-resCh
+		response := res
+		WSResponse[response]++
+	}
+
+	return WSResponse
 }

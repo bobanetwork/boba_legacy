@@ -256,7 +256,7 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 		// callers so failover can occur if needed.
 		case ErrBackendUnexpectedJSONRPC:
 			log.Debug(
-				"Recived unexpected JSON-RPC response",
+				"Received unexpected JSON-RPC response",
 				"name", b.Name,
 				"req_id", GetReqID(ctx),
 				"err", err,
@@ -618,11 +618,6 @@ func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) 
 
 		RecordWSMessage(ctx, w.backend.Name, SourceClient)
 
-		if isLimit("") {
-			errC <- ErrOverRateLimit
-			return
-		}
-
 		// Route control messages to the backend. These don't
 		// count towards the total RPC requests count.
 		if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
@@ -639,12 +634,16 @@ func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) 
 		// Don't bother sending invalid requests to the backend,
 		// just handle them here.
 		req, err := w.prepareClientMsg(msg)
-		if err != nil {
+		isRateLimit := isLimit("")
+		if err != nil || isRateLimit {
 			var id json.RawMessage
 			method := MethodUnknown
 			if req != nil {
 				id = req.ID
 				method = req.Method
+			}
+			if err == nil {
+				err = errors.New(ErrNoBackends.Message)
 			}
 			log.Info(
 				"error preparing client message",
@@ -705,11 +704,6 @@ func (w *WSProxier) backendPump(ctx context.Context, isLimit func(method string)
 		}
 
 		RecordWSMessage(ctx, w.backend.Name, SourceBackend)
-
-		if isLimit("") {
-			errC <- ErrOverRateLimit
-			return
-		}
 
 		// Route control messages directly to the client.
 		if msgType != websocket.TextMessage && msgType != websocket.BinaryMessage {
