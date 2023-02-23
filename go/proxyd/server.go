@@ -575,7 +575,7 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 	activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Inc()
 	go func() {
 		// Below call blocks so run it in a goroutine.
-		if err := proxier.Proxy(ctx, isLimited); err != nil {
+		if err := proxier.Proxy(ctx, isLimited, s.rateLimitSender); err != nil {
 			log.Error("error proxying websocket", "auth", GetAuthCtx(ctx), "req_id", GetReqID(ctx), "err", err)
 		}
 		activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Dec()

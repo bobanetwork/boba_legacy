@@ -1,0 +1,8 @@
+name|body|responseBody
+not json|not json|{"jsonrpc":"2.0","error":{"code":-32700,"message":"parse error"},"id":null}
+not json-rpc|{"foo":"bar"}|{"jsonrpc":"2.0","error":{"code":-32600,"message":"invalid JSON-RPC version"},"id":null}
+missing fields json-rpc|{"jsonrpc":"2.0"}|{"jsonrpc":"2.0","error":{"code":-32600,"message":"no method specified"},"id":null}
+bad method json-rpc|{"jsonrpc":"2.0","method":"eth_notSendRawTransaction","id":1}|{"jsonrpc":"2.0","error":{"code":-32001,"message":"rpc method is not whitelisted"},"id":1}
+no transaction data|{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":[],"id":1}|{"jsonrpc":"2.0","error":{"code":-32602,"message":"missing value for required argument 0"},"id":1}
+invalid transaction data|{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0xf6806872fcc650ad4e77e0629206426cd183d751e9ddcc8d5e77"],"id":1}|{"jsonrpc":"2.0","error":{"code":-32602,"message":"rlp: value size exceeds available input length"},"id":1}
+invalid transaction data|{"jsonrpc":"2.0","method":"eth_sendRawTransaction","params":["0x1234"],"id":1}|{"jsonrpc":"2.0","error":{"code":-32602,"message":"transaction type not supported"},"id":1}

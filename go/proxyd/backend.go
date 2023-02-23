@@ -595,16 +595,24 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 	}
 }
 
-func (w *WSProxier) Proxy(ctx context.Context, isLimit func(method string) bool) error {
+func (w *WSProxier) Proxy(
+	ctx context.Context,
+	isLimited func(method string) bool,
+	rateLimitSender func(ctx context.Context, req *RPCReq) error,
+) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx, isLimit, errC)
-	go w.backendPump(ctx, isLimit, errC)
+	go w.clientPump(ctx, isLimited, rateLimitSender, errC)
+	go w.backendPump(ctx, errC)
 	err := <-errC
 	w.close()
 	return err
 }
 
-func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) bool, errC chan error) {
+func (w *WSProxier) clientPump(
+	ctx context.Context,
+	isLimited func(method string) bool,
+	rateLimitSender func(ctx context.Context, req *RPCReq) error, errC chan error,
+) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
@@ -634,7 +642,7 @@ func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) 
 		// Don't bother sending invalid requests to the backend,
 		// just handle them here.
 		req, err := w.prepareClientMsg(msg)
-		isRateLimit := isLimit("")
+		isRateLimit := isLimited("")
 		if err != nil || isRateLimit {
 			var id json.RawMessage
 			method := MethodUnknown
@@ -675,6 +683,19 @@ func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) 
 			continue
 		}
 
+		if req.Method == "eth_sendRawTransaction" {
+			if err := rateLimitSender(ctx, req); err != nil {
+				RecordRPCError(ctx, BackendProxyd, "eth_sendRawTransaction", err)
+				msg = mustMarshalJSON(NewRPCErrorRes(req.ID, err))
+				err = w.writeClientConn(msgType, msg)
+				if err != nil {
+					errC <- err
+					return
+				}
+				continue
+			}
+		}
+
 		RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
 		log.Info(
 			"forwarded WS message to backend",
@@ -691,7 +712,7 @@ func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) 
 	}
 }
 
-func (w *WSProxier) backendPump(ctx context.Context, isLimit func(method string) bool, errC chan error) {
+func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.backendConn.ReadMessage()
@@ -763,6 +784,10 @@ func (w *WSProxier) close() {
 func (w *WSProxier) prepareClientMsg(msg []byte) (*RPCReq, error) {
 	req, err := ParseRPCReq(msg)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = ValidateRPCReq(req); err != nil {
 		return nil, err
 	}
 

@@ -1,8 +1,10 @@
 package integration_tests
 
 import (
+	"bufio"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -302,8 +304,9 @@ func TestWSClientMaxConns(t *testing.T) {
 }
 
 var (
-	WSRequest             = "{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}"
-	rateLimitErrorMessage = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"over rate limit with special message\"},\"id\":1}"
+	sampleRequest        = []byte("{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}")
+	rateLimitError       = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"over rate limit with special message\"},\"id\":1}"
+	senderRateLimitError = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32017,\"message\":\"sender is over rate limit\"},\"id\":1}"
 )
 
 func TestWSClientMaxRPSLimit(t *testing.T) {
@@ -330,8 +333,8 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		}, nil)
 		defer client.HardClose()
 		require.NoError(t, err)
-		WSResponse := spamWSReqs(t, clientHdlr, client, 4)
-		require.Equal(t, 3, WSResponse[rateLimitErrorMessage])
+		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
+		require.Equal(t, 3, res[rateLimitError])
 	})
 
 	t.Run("exempt user agent over limit", func(t *testing.T) {
@@ -342,8 +345,8 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		}, nil)
 		defer client.HardClose()
 		require.NoError(t, err)
-		WSResponse := spamWSReqs(t, clientHdlr, client, 4)
-		require.Equal(t, 0, WSResponse[rateLimitErrorMessage])
+		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
+		require.Equal(t, 0, res[rateLimitError])
 	})
 
 	t.Run("exempt over limit", func(t *testing.T) {
@@ -354,8 +357,8 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		}, nil)
 		defer client.HardClose()
 		require.NoError(t, err)
-		WSResponse := spamWSReqs(t, clientHdlr, client, 4)
-		require.Equal(t, 0, WSResponse[rateLimitErrorMessage])
+		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
+		require.Equal(t, 0, res[rateLimitError])
 	})
 
 	t.Run("multiple xff", func(t *testing.T) {
@@ -371,33 +374,117 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 			clientHdlr.MsgCB(msgType, data)
 		}, nil)
 		defer client2.HardClose()
-		WSResponse1 := spamWSReqs(t, clientHdlr, client1, 4)
-		WSResponse2 := spamWSReqs(t, clientHdlr, client2, 4)
-		require.Equal(t, 3, WSResponse1[rateLimitErrorMessage])
-		require.Equal(t, 3, WSResponse2[rateLimitErrorMessage])
+		res1 := spamWSReqs(t, clientHdlr, backendHdlr, client1, sampleRequest, 4)
+		res2 := spamWSReqs(t, clientHdlr, backendHdlr, client2, sampleRequest, 4)
+		require.Equal(t, 3, res1[rateLimitError])
+		require.Equal(t, 3, res2[rateLimitError])
 	})
 }
 
-func spamWSReqs(t *testing.T, clientHdlr *clientHandler, client *ProxydWSClient, n int) map[string]int {
+func TestWSSenderRateLimitValidation(t *testing.T) {
+	backendHdlr := new(backendHandler)
+	clientHdlr := new(clientHandler)
+
+	backend := NewMockWSBackend(nil, func(conn *websocket.Conn, msgType int, data []byte) {
+		backendHdlr.MsgCB(conn, msgType, data)
+	}, func(conn *websocket.Conn, err error) {
+		backendHdlr.CloseCB(conn, err)
+	})
+	defer backend.Close()
+
+	require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", backend.URL()))
+
+	config := ReadConfig("ws_sender_rate_limit")
+	shutdown, err := proxyd.Start(config)
+	require.NoError(t, err)
+	defer shutdown()
+
+	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
+		clientHdlr.MsgCB(msgType, data)
+	}, nil)
+	defer client.HardClose()
+	require.NoError(t, err)
+
+	f, err := os.Open("testdata/ws_testdata.txt")
+	require.NoError(t, err)
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	scanner.Scan() // skip header
+	for scanner.Scan() {
+		record := strings.Split(scanner.Text(), "|")
+		name, body, expResponseBody := record[0], record[1], record[2]
+		require.NoError(t, err)
+		t.Run(name, func(t *testing.T) {
+			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), 1)
+			require.NoError(t, err)
+			require.Equal(t, 1, res[expResponseBody])
+		})
+	}
+}
+
+func TestWSSenderRateLimitLimiting(t *testing.T) {
+	backendHdlr := new(backendHandler)
+	clientHdlr := new(clientHandler)
+
+	backend := NewMockWSBackend(nil, func(conn *websocket.Conn, msgType int, data []byte) {
+		backendHdlr.MsgCB(conn, msgType, data)
+	}, func(conn *websocket.Conn, err error) {
+		backendHdlr.CloseCB(conn, err)
+	})
+	defer backend.Close()
+
+	require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", backend.URL()))
+
+	config := ReadConfig("ws_sender_rate_limit")
+	shutdown, err := proxyd.Start(config)
+	require.NoError(t, err)
+	defer shutdown()
+
+	// Two separate requests from the same sender
+	// should be rate limited.
+	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
+		clientHdlr.MsgCB(msgType, data)
+	}, nil)
+	defer client.HardClose()
+	require.NoError(t, err)
+	res := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), 4)
+	require.Equal(t, 3, res[senderRateLimitError])
+
+	// Clear the limiter.
+	time.Sleep(1100 * time.Millisecond)
+
+	// Two separate requests from different senders
+	// should not be rate limited.
+	res1 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), 4)
+	res2 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex2), 4)
+	require.Equal(t, 3, res1[senderRateLimitError])
+	require.Equal(t, 3, res2[senderRateLimitError])
+}
+
+func spamWSReqs(t *testing.T, clientHdlr *clientHandler, backendHdlr *backendHandler, client *ProxydWSClient, request []byte, n int) map[string]int {
 	resCh := make(chan string)
 	for i := 0; i < n; i++ {
 		go func() {
+			backendHdlr.SetMsgCB(func(conn *websocket.Conn, msgType int, data []byte) {
+				require.NoError(t, conn.WriteMessage(websocket.TextMessage, []byte("")))
+			})
 			clientHdlr.SetMsgCB(func(msgType int, data []byte) {
 				resCh <- string(data)
 			})
 			require.NoError(t, client.WriteMessage(
 				websocket.TextMessage,
-				[]byte(WSRequest),
+				[]byte(request),
 			))
 		}()
 	}
 
-	WSResponse := make(map[string]int)
+	resMapping := make(map[string]int)
 	for i := 0; i < n; i++ {
 		res := <-resCh
 		response := res
-		WSResponse[response]++
+		resMapping[response]++
 	}
 
-	return WSResponse
+	return resMapping
 }
