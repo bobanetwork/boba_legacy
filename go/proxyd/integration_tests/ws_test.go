@@ -303,11 +303,7 @@ func TestWSClientMaxConns(t *testing.T) {
 	}
 }
 
-var (
-	sampleRequest        = []byte("{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}")
-	rateLimitError       = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"over rate limit with special message\"},\"id\":1}"
-	senderRateLimitError = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32017,\"message\":\"sender is over rate limit\"},\"id\":1}"
-)
+var sampleRequest = []byte("{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}")
 
 func TestWSClientMaxRPSLimit(t *testing.T) {
 	backendHdlr := new(backendHandler)
@@ -334,7 +330,7 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		defer client.HardClose()
 		require.NoError(t, err)
 		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
-		require.Equal(t, 3, res[rateLimitError])
+		require.Equal(t, 3, res[invalidRateLimitResponse])
 	})
 
 	t.Run("exempt user agent over limit", func(t *testing.T) {
@@ -346,7 +342,7 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		defer client.HardClose()
 		require.NoError(t, err)
 		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
-		require.Equal(t, 0, res[rateLimitError])
+		require.Equal(t, 0, res[invalidRateLimitResponse])
 	})
 
 	t.Run("exempt over limit", func(t *testing.T) {
@@ -358,7 +354,7 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		defer client.HardClose()
 		require.NoError(t, err)
 		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
-		require.Equal(t, 0, res[rateLimitError])
+		require.Equal(t, 0, res[invalidRateLimitResponse])
 	})
 
 	t.Run("multiple xff", func(t *testing.T) {
@@ -376,8 +372,8 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		defer client2.HardClose()
 		res1 := spamWSReqs(t, clientHdlr, backendHdlr, client1, sampleRequest, 4)
 		res2 := spamWSReqs(t, clientHdlr, backendHdlr, client2, sampleRequest, 4)
-		require.Equal(t, 3, res1[rateLimitError])
-		require.Equal(t, 3, res2[rateLimitError])
+		require.Equal(t, 3, res1[invalidRateLimitResponse])
+		require.Equal(t, 3, res2[invalidRateLimitResponse])
 	})
 }
 
@@ -449,7 +445,7 @@ func TestWSSenderRateLimitLimiting(t *testing.T) {
 	defer client.HardClose()
 	require.NoError(t, err)
 	res := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), 4)
-	require.Equal(t, 3, res[senderRateLimitError])
+	require.Equal(t, 3, res[invalidSenderRateLimitResponse])
 
 	// Clear the limiter.
 	time.Sleep(1100 * time.Millisecond)
@@ -458,8 +454,8 @@ func TestWSSenderRateLimitLimiting(t *testing.T) {
 	// should not be rate limited.
 	res1 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), 4)
 	res2 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex2), 4)
-	require.Equal(t, 3, res1[senderRateLimitError])
-	require.Equal(t, 3, res2[senderRateLimitError])
+	require.Equal(t, 3, res1[invalidSenderRateLimitResponse])
+	require.Equal(t, 3, res2[invalidSenderRateLimitResponse])
 }
 
 func spamWSReqs(t *testing.T, clientHdlr *clientHandler, backendHdlr *backendHandler, client *ProxydWSClient, request []byte, n int) map[string]int {
