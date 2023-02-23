@@ -643,7 +643,7 @@ func (w *WSProxier) clientPump(ctx context.Context, isLimit func(method string) 
 				method = req.Method
 			}
 			if err == nil {
-				err = errors.New(ErrNoBackends.Message)
+				err = errors.New(ErrOverRateLimit.Message)
 			}
 			log.Info(
 				"error preparing client message",

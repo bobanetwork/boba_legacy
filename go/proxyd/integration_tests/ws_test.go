@@ -303,7 +303,7 @@ func TestWSClientMaxConns(t *testing.T) {
 
 var (
 	WSRequest             = "{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}"
-	rateLimitErrorMessage = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"no backends available for method\"},\"id\":1}"
+	rateLimitErrorMessage = "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"over rate limit with special message\"},\"id\":1}"
 )
 
 func TestWSClientMaxRPSLimit(t *testing.T) {
