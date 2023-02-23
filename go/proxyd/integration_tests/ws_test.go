@@ -152,77 +152,28 @@ func TestWS(t *testing.T) {
 	config := ReadConfig("ws")
 	shutdown, err := proxyd.Start(config)
 	require.NoError(t, err)
+	defer shutdown()
+
 	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
 		clientHdlr.MsgCB(msgType, data)
 	}, nil)
 	defer client.HardClose()
 	require.NoError(t, err)
-	defer shutdown()
 
-	tests := []struct {
-		name       string
-		backendRes string
-		expRes     string
-		clientReq  string
-	}{
-		{
-			"ok response",
-			"{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0xcd0c3e8af590364c09d0fa6a1210faf5\"}",
-			"{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":\"0xcd0c3e8af590364c09d0fa6a1210faf5\"}",
-			"{\"id\": 1, \"method\": \"eth_subscribe\", \"params\": [\"newHeads\"]}",
-		},
-		{
-			"garbage backend response",
-			"gibblegabble",
-			"{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32013,\"message\":\"backend returned an invalid response\"},\"id\":null}",
-			"{\"id\": 1, \"method\": \"eth_subscribe\", \"params\": [\"newHeads\"]}",
-		},
-		{
-			"blacklisted RPC",
-			"}",
-			"{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32001,\"message\":\"rpc method is not whitelisted\"},\"id\":1}",
-			"{\"id\": 1, \"method\": \"eth_whatever\", \"params\": []}",
-		},
-		{
-			"garbage client request",
-			"{}",
-			"{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32700,\"message\":\"parse error\"},\"id\":null}",
-			"barf",
-		},
-		{
-			"invalid client request",
-			"{}",
-			"{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32700,\"message\":\"parse error\"},\"id\":null}",
-			"{\"jsonrpc\": \"2.0\", \"method\": true}",
-		},
-		{
-			"eth_accounts",
-			"{}",
-			"{\"jsonrpc\":\"2.0\",\"result\":[],\"id\":1}",
-			"{\"jsonrpc\": \"2.0\", \"method\": \"eth_accounts\", \"id\": 1}",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			timeout := time.NewTicker(30 * time.Second)
-			doneCh := make(chan struct{}, 1)
-			backendHdlr.SetMsgCB(func(conn *websocket.Conn, msgType int, data []byte) {
-				require.NoError(t, conn.WriteMessage(websocket.TextMessage, []byte(tt.backendRes)))
-			})
-			clientHdlr.SetMsgCB(func(msgType int, data []byte) {
-				require.Equal(t, tt.expRes, string(data))
-				doneCh <- struct{}{}
-			})
-			require.NoError(t, client.WriteMessage(
-				websocket.TextMessage,
-				[]byte(tt.clientReq),
-			))
-			select {
-			case <-timeout.C:
-				t.Fatalf("timed out")
-			case <-doneCh:
-				return
-			}
+	f, err := os.Open("testdata/ws_testdata.txt")
+	require.NoError(t, err)
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	scanner.Scan() // skip header
+	for scanner.Scan() {
+		record := strings.Split(scanner.Text(), "|")
+		name, body, expResponseBody := record[0], record[1], record[2]
+		require.NoError(t, err)
+		t.Run(name, func(t *testing.T) {
+			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), 1)
+			require.NoError(t, err)
+			require.Equal(t, 1, res[expResponseBody])
 		})
 	}
 }
@@ -375,48 +326,6 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		require.Equal(t, 3, res1[invalidRateLimitResponse])
 		require.Equal(t, 3, res2[invalidRateLimitResponse])
 	})
-}
-
-func TestWSSenderRateLimitValidation(t *testing.T) {
-	backendHdlr := new(backendHandler)
-	clientHdlr := new(clientHandler)
-
-	backend := NewMockWSBackend(nil, func(conn *websocket.Conn, msgType int, data []byte) {
-		backendHdlr.MsgCB(conn, msgType, data)
-	}, func(conn *websocket.Conn, err error) {
-		backendHdlr.CloseCB(conn, err)
-	})
-	defer backend.Close()
-
-	require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", backend.URL()))
-
-	config := ReadConfig("ws_sender_rate_limit")
-	shutdown, err := proxyd.Start(config)
-	require.NoError(t, err)
-	defer shutdown()
-
-	client, err := NewProxydWSClient("ws://127.0.0.1:8546", nil, func(msgType int, data []byte) {
-		clientHdlr.MsgCB(msgType, data)
-	}, nil)
-	defer client.HardClose()
-	require.NoError(t, err)
-
-	f, err := os.Open("testdata/ws_testdata.txt")
-	require.NoError(t, err)
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	scanner.Scan() // skip header
-	for scanner.Scan() {
-		record := strings.Split(scanner.Text(), "|")
-		name, body, expResponseBody := record[0], record[1], record[2]
-		require.NoError(t, err)
-		t.Run(name, func(t *testing.T) {
-			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), 1)
-			require.NoError(t, err)
-			require.Equal(t, 1, res[expResponseBody])
-		})
-	}
 }
 
 func TestWSSenderRateLimitLimiting(t *testing.T) {
