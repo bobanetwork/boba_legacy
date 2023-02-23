@@ -171,7 +171,7 @@ func TestWS(t *testing.T) {
 		name, body, expResponseBody := record[0], record[1], record[2]
 		require.NoError(t, err)
 		t.Run(name, func(t *testing.T) {
-			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), 1)
+			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), []byte(expResponseBody), 1)
 			require.NoError(t, err)
 			require.Equal(t, 1, res[expResponseBody])
 		})
@@ -280,7 +280,7 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		}, nil)
 		defer client.HardClose()
 		require.NoError(t, err)
-		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
+		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, []byte(""), 4)
 		require.Equal(t, 3, res[invalidRateLimitResponse])
 	})
 
@@ -292,7 +292,7 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		}, nil)
 		defer client.HardClose()
 		require.NoError(t, err)
-		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
+		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, []byte(""), 4)
 		require.Equal(t, 0, res[invalidRateLimitResponse])
 	})
 
@@ -304,7 +304,7 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		}, nil)
 		defer client.HardClose()
 		require.NoError(t, err)
-		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, 4)
+		res := spamWSReqs(t, clientHdlr, backendHdlr, client, sampleRequest, []byte(""), 4)
 		require.Equal(t, 0, res[invalidRateLimitResponse])
 	})
 
@@ -321,8 +321,8 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 			clientHdlr.MsgCB(msgType, data)
 		}, nil)
 		defer client2.HardClose()
-		res1 := spamWSReqs(t, clientHdlr, backendHdlr, client1, sampleRequest, 4)
-		res2 := spamWSReqs(t, clientHdlr, backendHdlr, client2, sampleRequest, 4)
+		res1 := spamWSReqs(t, clientHdlr, backendHdlr, client1, sampleRequest, []byte(""), 4)
+		res2 := spamWSReqs(t, clientHdlr, backendHdlr, client2, sampleRequest, []byte(""), 4)
 		require.Equal(t, 3, res1[invalidRateLimitResponse])
 		require.Equal(t, 3, res2[invalidRateLimitResponse])
 	})
@@ -353,7 +353,7 @@ func TestWSSenderRateLimitLimiting(t *testing.T) {
 	}, nil)
 	defer client.HardClose()
 	require.NoError(t, err)
-	res := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), 4)
+	res := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), []byte(""), 4)
 	require.Equal(t, 3, res[invalidSenderRateLimitResponse])
 
 	// Clear the limiter.
@@ -361,18 +361,18 @@ func TestWSSenderRateLimitLimiting(t *testing.T) {
 
 	// Two separate requests from different senders
 	// should not be rate limited.
-	res1 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), 4)
-	res2 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex2), 4)
+	res1 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex1), []byte(""), 4)
+	res2 := spamWSReqs(t, clientHdlr, backendHdlr, client, makeSendRawTransaction(txHex2), []byte(""), 4)
 	require.Equal(t, 3, res1[invalidSenderRateLimitResponse])
 	require.Equal(t, 3, res2[invalidSenderRateLimitResponse])
 }
 
-func spamWSReqs(t *testing.T, clientHdlr *clientHandler, backendHdlr *backendHandler, client *ProxydWSClient, request []byte, n int) map[string]int {
+func spamWSReqs(t *testing.T, clientHdlr *clientHandler, backendHdlr *backendHandler, client *ProxydWSClient, request []byte, response []byte, n int) map[string]int {
 	resCh := make(chan string)
 	for i := 0; i < n; i++ {
 		go func() {
 			backendHdlr.SetMsgCB(func(conn *websocket.Conn, msgType int, data []byte) {
-				require.NoError(t, conn.WriteMessage(websocket.TextMessage, []byte("")))
+				require.NoError(t, conn.WriteMessage(websocket.TextMessage, response))
 			})
 			clientHdlr.SetMsgCB(func(msgType int, data []byte) {
 				resCh <- string(data)

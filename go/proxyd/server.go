@@ -562,6 +562,14 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 		return !ok
 	}
 
+	isRateLimitSender := func(ctx context.Context, req *RPCReq) error {
+		if s.senderLim != nil {
+			return s.rateLimitSender(ctx, req)
+		} else {
+			return nil
+		}
+	}
+
 	proxier, err := s.wsBackendGroup.ProxyWS(ctx, clientConn, s.wsMethodWhitelist)
 	if err != nil {
 		if errors.Is(err, ErrNoBackends) {
@@ -575,7 +583,7 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 	activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Inc()
 	go func() {
 		// Below call blocks so run it in a goroutine.
-		if err := proxier.Proxy(ctx, isLimited, s.rateLimitSender); err != nil {
+		if err := proxier.Proxy(ctx, isLimited, isRateLimitSender); err != nil {
 			log.Error("error proxying websocket", "auth", GetAuthCtx(ctx), "req_id", GetReqID(ctx), "err", err)
 		}
 		activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Dec()
@@ -680,7 +688,6 @@ func (s *Server) rateLimitSender(ctx context.Context, req *RPCReq) error {
 		log.Debug("could not get message from transaction", "err", err, "req_id", GetReqID(ctx))
 		return ErrInvalidParams(err.Error())
 	}
-
 	ok, err := s.senderLim.Take(ctx, fmt.Sprintf("%s:%d", msg.From().Hex(), tx.Nonce()))
 	if err != nil {
 		log.Error("error taking from sender limiter", "err", err, "req_id", GetReqID(ctx))

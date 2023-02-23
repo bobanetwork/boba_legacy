@@ -598,10 +598,10 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 func (w *WSProxier) Proxy(
 	ctx context.Context,
 	isLimited func(method string) bool,
-	rateLimitSender func(ctx context.Context, req *RPCReq) error,
+	isRateLimitSender func(ctx context.Context, req *RPCReq) error,
 ) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx, isLimited, rateLimitSender, errC)
+	go w.clientPump(ctx, isLimited, isRateLimitSender, errC)
 	go w.backendPump(ctx, errC)
 	err := <-errC
 	w.close()
@@ -611,7 +611,7 @@ func (w *WSProxier) Proxy(
 func (w *WSProxier) clientPump(
 	ctx context.Context,
 	isLimited func(method string) bool,
-	rateLimitSender func(ctx context.Context, req *RPCReq) error, errC chan error,
+	isRateLimitSender func(ctx context.Context, req *RPCReq) error, errC chan error,
 ) {
 	for {
 		// Block until we get a message.
@@ -684,7 +684,7 @@ func (w *WSProxier) clientPump(
 		}
 
 		if req.Method == "eth_sendRawTransaction" {
-			if err := rateLimitSender(ctx, req); err != nil {
+			if err := isRateLimitSender(ctx, req); err != nil {
 				RecordRPCError(ctx, BackendProxyd, "eth_sendRawTransaction", err)
 				msg = mustMarshalJSON(NewRPCErrorRes(req.ID, err))
 				err = w.writeClientConn(msgType, msg)

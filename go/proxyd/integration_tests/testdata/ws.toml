@@ -30,3 +30,8 @@ eth_chainId = "main"
 
 [rate_limit]
 enable_backend_rate_limiter = true
+
+[sender_rate_limit]
+enabled = true
+limit = 10000
+interval = "1s"
