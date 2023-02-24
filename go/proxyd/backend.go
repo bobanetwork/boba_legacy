@@ -597,22 +597,17 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 
 func (w *WSProxier) Proxy(
 	ctx context.Context,
-	isLimited func(method string) bool,
-	isRateLimitSender func(ctx context.Context, req *RPCReq) error,
+	proxyServerLimiter *WSServerLimiter,
 ) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx, isLimited, isRateLimitSender, errC)
+	go w.clientPump(ctx, proxyServerLimiter, errC)
 	go w.backendPump(ctx, errC)
 	err := <-errC
 	w.close()
 	return err
 }
 
-func (w *WSProxier) clientPump(
-	ctx context.Context,
-	isLimited func(method string) bool,
-	isRateLimitSender func(ctx context.Context, req *RPCReq) error, errC chan error,
-) {
+func (w *WSProxier) clientPump(ctx context.Context, proxyServerLimiter *WSServerLimiter, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
@@ -639,10 +634,15 @@ func (w *WSProxier) clientPump(
 
 		rpcRequestsTotal.Inc()
 
+		// truncate message if it's too big
+		if len(msg) > int(proxyServerLimiter.maxBodySize) {
+			msg = msg[:proxyServerLimiter.maxBodySize]
+		}
+
 		// Don't bother sending invalid requests to the backend,
 		// just handle them here.
 		req, err := w.prepareClientMsg(msg)
-		isRateLimit := isLimited("")
+		isRateLimit := proxyServerLimiter.isLimited("")
 		if err != nil || isRateLimit {
 			var id json.RawMessage
 			method := MethodUnknown
@@ -684,7 +684,7 @@ func (w *WSProxier) clientPump(
 		}
 
 		if req.Method == "eth_sendRawTransaction" {
-			if err := isRateLimitSender(ctx, req); err != nil {
+			if err := proxyServerLimiter.isRateLimitSender(ctx, req); err != nil {
 				RecordRPCError(ctx, BackendProxyd, "eth_sendRawTransaction", err)
 				msg = mustMarshalJSON(NewRPCErrorRes(req.ID, err))
 				err = w.writeClientConn(msgType, msg)
@@ -734,6 +734,11 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 				return
 			}
 			continue
+		}
+
+		// truncate message if it's too big
+		if len(msg) > int(w.backend.maxResponseSize) {
+			msg = msg[:w.backend.maxResponseSize]
 		}
 
 		res, err := w.parseBackendMsg(msg)

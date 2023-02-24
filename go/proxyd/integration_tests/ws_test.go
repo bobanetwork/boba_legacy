@@ -168,10 +168,13 @@ func TestWS(t *testing.T) {
 	scanner.Scan() // skip header
 	for scanner.Scan() {
 		record := strings.Split(scanner.Text(), "|")
-		name, body, expResponseBody := record[0], record[1], record[2]
+		name, body, responseBody, expResponseBody := record[0], record[1], record[2], record[3]
+		if expResponseBody == "" {
+			expResponseBody = responseBody
+		}
 		require.NoError(t, err)
 		t.Run(name, func(t *testing.T) {
-			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), []byte(expResponseBody), 1)
+			res := spamWSReqs(t, clientHdlr, backendHdlr, client, []byte(body), []byte(responseBody), 1)
 			require.NoError(t, err)
 			require.Equal(t, 1, res[expResponseBody])
 		})

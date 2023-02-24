@@ -65,6 +65,12 @@ type Server struct {
 
 type limiterFunc func(method string) bool
 
+type WSServerLimiter struct {
+	isLimited         limiterFunc
+	isRateLimitSender func(ctx context.Context, req *RPCReq) error
+	maxBodySize       int64
+}
+
 func NewServer(
 	backendGroups map[string]*BackendGroup,
 	wsBackendGroup *BackendGroup,
@@ -582,8 +588,9 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 
 	activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Inc()
 	go func() {
+		proxyWSServerLimiter := WSServerLimiter{isLimited: isLimited, isRateLimitSender: isRateLimitSender, maxBodySize: s.maxBodySize}
 		// Below call blocks so run it in a goroutine.
-		if err := proxier.Proxy(ctx, isLimited, isRateLimitSender); err != nil {
+		if err := proxier.Proxy(ctx, &proxyWSServerLimiter); err != nil {
 			log.Error("error proxying websocket", "auth", GetAuthCtx(ctx), "req_id", GetReqID(ctx), "err", err)
 		}
 		activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Dec()

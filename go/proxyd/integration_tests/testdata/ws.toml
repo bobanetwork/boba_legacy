@@ -11,9 +11,11 @@ ws_method_whitelist = [
 [server]
 rpc_port = 8545
 ws_port = 8546
+max_body_size_bytes = 10000
 
 [backend]
 response_timeout_seconds = 1
+max_response_size_bytes = 10000
 
 [backends]
 [backends.good]
