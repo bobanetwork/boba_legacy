@@ -1,3 +1,4 @@
+
 /*
 Copyright 2021-present Boba Network.
 
@@ -85,6 +86,7 @@ function LayerSwitcher({ visisble = true }) {
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
 
   const dispatchBootAccount = useCallback(() => {
+
     if (!accountEnabled) initializeAccount()
 
     async function initializeAccount() {
@@ -257,7 +259,7 @@ function LayerSwitcher({ visisble = true }) {
   }
 
   return (
-    <S.LayerSwitcherWrapper>
+    <S.LayerSwitcherWrapper >
       <ToggleButtonGroup
         value={layer}
         exclusive

@@ -81,6 +81,7 @@ export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.secondary,
   borderRadius: theme.palette.primary.borderRadius,
+  border: theme.palette.primary.border,
   width: '100%',
   maxWidth: '600px',
   padding: '20px',

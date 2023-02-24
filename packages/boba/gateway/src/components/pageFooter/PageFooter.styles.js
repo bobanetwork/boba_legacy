@@ -15,12 +15,11 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   //height: '184px',
   background: theme.palette.background.footer,
   [theme.breakpoints.down('md')]: {
-    marginTop: 0,
-    height: '450px',
+    marginTop: '10px',
+    maxHeight: '400px',
     justifyContent: 'flex-start',
     padding: '0 20px',
   },
-  [theme.breakpoints.up('md')]: {},
 }))
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
@@ -119,6 +118,7 @@ export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
     justifyContent: 'space-around',
     flexDirection: 'column',
     margin: '0',
+    marginTop: '20px',
     alignItems: 'flex-start',
   },
 }))
@@ -131,11 +131,15 @@ export const LinkWrapper = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    margin: '20px 0',
+    margin: '10px 0',
+    width: '100%',
+    gap: 0
   },
   [theme.breakpoints.down('sm')]: {
     width: '100%',
   },
+
+  }
 }))
 
 export const SocialWrapper = styled(Box)(({ theme }) => ({
@@ -147,8 +151,9 @@ export const SocialWrapper = styled(Box)(({ theme }) => ({
     cursor: 'pointer',
   },
   [theme.breakpoints.down('md')]: {
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     margin: '10px 0',
+    width: '100%',
   },
   [theme.breakpoints.down('sm')]: {
     width: '100%',

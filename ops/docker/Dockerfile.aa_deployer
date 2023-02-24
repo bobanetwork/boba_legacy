@@ -6,6 +6,7 @@ WORKDIR /opt/optimism/
 
 COPY --from=builder /optimism/*.json /optimism/yarn.lock ./
 COPY --from=builder /optimism/node_modules ./node_modules
+COPY --from=builder /optimism/packages/boba/bundler/packages/sdk ./packages/boba/bundler/packages/sdk
 
 WORKDIR /opt/optimism/packages/contracts
 COPY --from=builder /optimism/packages/contracts/dist ./dist

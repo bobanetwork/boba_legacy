@@ -7,7 +7,7 @@
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
-    "start": "npm run buildenv-dev && react-scripts start",
+    "start": "npm run buildenv-dev && REACT_APP_WALLET_VERSION=$npm_package_version react-scripts start",
     "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod react-scripts build",
     "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=dev react-scripts build",
     "audit-check": "audit-ci --moderate",

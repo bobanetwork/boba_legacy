@@ -23,8 +23,14 @@ import { useNavigate } from 'react-router-dom'
 
 import { Box, Typography, Switch, useTheme } from "@mui/material"
 
+import BobaIcon from 'components/icons/BobaIcon.js'
+import EthereumIcon from 'components/icons/EthereumIcon.js'
 import Button from 'components/button/Button.js'
 import AvailableBridges from 'components/availableBridges/availableBridges.js'
+
+import * as S from './bobaBridge.styles'
+
+import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
 
 import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectBridgeTokens, selectMultiBridgeMode } from "selectors/bridgeSelector"

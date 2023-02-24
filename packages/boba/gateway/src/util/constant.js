@@ -1,5 +1,6 @@
 import moment from 'moment'
 
+
 /**************
  * Env Params *
  **************/
@@ -71,7 +72,6 @@ export const ROUTES_PATH = {
   DEV_TOOLS: '/devtools',
 }
 export const PER_PAGE = 8
-
 
 export const PAGES_BY_NETWORK = {
   ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO', 'Monster'],

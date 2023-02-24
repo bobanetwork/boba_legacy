@@ -50,6 +50,7 @@ import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function History() {
+
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 

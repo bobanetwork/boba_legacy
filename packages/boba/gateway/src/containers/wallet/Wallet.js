@@ -13,6 +13,7 @@ import { fetchTransactions } from 'actions/networkAction'
 import Tabs from 'components/tabs/Tabs'
 import Nft from 'containers/wallet/nft/Nft'
 import Token from './token/Token'
+import Connect from 'containers/connect/Connect'
 
 import * as S from './wallet.styles'
 import * as G from '../Global.styles'
