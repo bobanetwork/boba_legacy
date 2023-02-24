@@ -5,7 +5,7 @@ ws_backend_group = "main"
 ws_method_whitelist = [
   "eth_subscribe",
   "eth_accounts",
-    "eth_sendRawTransaction"
+  "eth_sendRawTransaction"
 ]
 
 [server]
