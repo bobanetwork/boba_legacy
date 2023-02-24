@@ -13,7 +13,7 @@ import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
-import "@eth-optimism/contracts/contracts/L2/messaging/L2StandardBridge.sol";
+import "@eth-optimism/contracts/contracts/L2/messaging/L2StandardBridgeAltL1.sol";
 
 /* External Imports */
 import "../standards/xL2GovernanceERC20.sol";
@@ -746,7 +746,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
 
         if (_tokenAddress == Lib_PredeployAddresses.L2_BOBA_ALT_L1) {
             require(_amount <= address(this).balance, "Requested BOBA exceeds pool balance");
-            L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
+            L2StandardBridgeAltL1(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
                 _tokenAddress,
                 L1LiquidityPoolAddress,
                 _amount,
@@ -755,7 +755,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
             );
         } else {
             require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Requested ERC20 exceeds pool balance");
-            L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
+            L2StandardBridgeAltL1(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo(
                 _tokenAddress,
                 L1LiquidityPoolAddress,
                 _amount,

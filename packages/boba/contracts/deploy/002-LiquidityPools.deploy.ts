@@ -42,7 +42,9 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`Deploying L1LP...`)
   L1LiquidityPool = await deployBobaContract(
     hre,
-    'L1LiquidityPool',
+    (hre as any).deployConfig.isLocalAltL1
+      ? 'L1LiquidityPoolAltL1'
+      : 'L1LiquidityPool',
     [],
     (hre as any).deployConfig.deployer_l1
   )
