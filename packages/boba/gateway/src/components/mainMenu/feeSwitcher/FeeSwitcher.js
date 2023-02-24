@@ -1,4 +1,3 @@
-
 /*
 Copyright 2021-present Boba Network.
 
@@ -42,10 +41,8 @@ import {
   selectActiveNetworkName,
 } from 'selectors/networkSelector.js'
 import { NETWORK } from 'util/network/network.util.js'
-import { HelpOutline } from '@mui/icons-material'
 
 function FeeSwitcher() {
-
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
@@ -173,7 +170,6 @@ function FeeSwitcher() {
       />
     </S.FeeSwitcherWrapper>
   )
-
 }
 
 export default FeeSwitcher

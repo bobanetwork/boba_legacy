@@ -133,13 +133,11 @@ export const LinkWrapper = styled(Box)(({ theme }) => ({
     alignItems: 'flex-start',
     margin: '10px 0',
     width: '100%',
-    gap: 0
+    gap: 0,
   },
   [theme.breakpoints.down('sm')]: {
     width: '100%',
   },
-
-  }
 }))
 
 export const SocialWrapper = styled(Box)(({ theme }) => ({
