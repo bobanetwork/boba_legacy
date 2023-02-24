@@ -13,7 +13,7 @@ import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import { wrapProvider } from '@account-abstraction/sdk/src/Provider'
 import SimpleWalletDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWalletDeployer.sol/SimpleWalletDeployer.json'
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
-import { SampleRecipient, SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
+import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
 describe('AA Wallet Test\n', async () => {
@@ -23,6 +23,8 @@ describe('AA Wallet Test\n', async () => {
 
   let bundlerProvider: HttpRpcClient
   let entryPointAddress: string
+
+  let SampleRecipient__factory: ContractFactory
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -34,7 +36,13 @@ describe('AA Wallet Test\n', async () => {
       env.l2Wallet
     )
 
-    recipient = await new SampleRecipient__factory(env.l2Wallet).deploy()
+    SampleRecipient__factory = new ContractFactory(
+      SampleRecipientJson.abi,
+      SampleRecipientJson.bytecode,
+      env.l2Wallet
+    )
+
+    recipient = await SampleRecipient__factory.deploy()
     console.log('recipient', recipient.address)
 
     bundlerProvider = new HttpRpcClient(

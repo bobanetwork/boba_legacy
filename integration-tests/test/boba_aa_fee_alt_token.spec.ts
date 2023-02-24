@@ -14,7 +14,7 @@ import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
 import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
-import { SampleRecipient, SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
+import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
 import ManualDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/ManualDepositPaymaster.sol/ManualDepositPaymaster.json'
@@ -33,6 +33,8 @@ describe('AA Alt Fee Token Test\n', async () => {
   let ManualDepositPaymaster__factory: ContractFactory
   let ManualDepositPaymaster: Contract
 
+  let SampleRecipient__factory: ContractFactory
+
   let EntryPoint: Contract
 
   const priceRatio = 100
@@ -44,7 +46,13 @@ describe('AA Alt Fee Token Test\n', async () => {
     env = await OptimismEnv.new()
     entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
 
-    recipient = await new SampleRecipient__factory(env.l2Wallet).deploy()
+    SampleRecipient__factory = new ContractFactory(
+      SampleRecipientJson.abi,
+      SampleRecipientJson.bytecode,
+      env.l2Wallet
+    )
+
+    recipient = await SampleRecipient__factory.deploy()
 
     L2ERC20Token__factory = new ContractFactory(
       L2StandardERC20Json.abi,

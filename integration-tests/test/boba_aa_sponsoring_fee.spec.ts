@@ -14,6 +14,7 @@ import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import { SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
+import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
 import VerifyingPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/VerifyingPaymaster.sol/VerifyingPaymaster.json'
@@ -29,6 +30,8 @@ describe('Sponsoring Tx\n', async () => {
   let VerifyingPaymaster__factory: ContractFactory
   let VerifyingPaymaster: Contract
 
+  let SampleRecipient__factory: ContractFactory
+
   let EntryPoint: Contract
 
   let offchainSigner: Wallet
@@ -37,7 +40,13 @@ describe('Sponsoring Tx\n', async () => {
     env = await OptimismEnv.new()
     entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
 
-    recipient = await new SampleRecipient__factory(env.l2Wallet).deploy()
+    SampleRecipient__factory = new ContractFactory(
+      SampleRecipientJson.abi,
+      SampleRecipientJson.bytecode,
+      env.l2Wallet
+    )
+
+    recipient = await SampleRecipient__factory.deploy()
 
     bundlerProvider = new HttpRpcClient(
       'http://localhost:3000/rpc',

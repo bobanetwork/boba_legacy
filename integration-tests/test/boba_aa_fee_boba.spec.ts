@@ -15,7 +15,7 @@ import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/t
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
-import { SampleRecipient, SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
+import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
 import BobaDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
@@ -36,13 +36,21 @@ describe('AA Boba as Fee token Test\n', async () => {
   let PriceOracle__factory: ContractFactory
   let PriceOracle: Contract
 
+  let SampleRecipient__factory: ContractFactory
+
   let EntryPoint: Contract
 
   before(async () => {
     env = await OptimismEnv.new()
     entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
 
-    recipient = await new SampleRecipient__factory(env.l2Wallet).deploy()
+    SampleRecipient__factory = new ContractFactory(
+      SampleRecipientJson.abi,
+      SampleRecipientJson.bytecode,
+      env.l2Wallet
+    )
+
+    recipient = await SampleRecipient__factory.deploy()
 
     L2BOBAToken = new Contract(
         env.addressesBOBA.TOKENS.BOBA.L2,
