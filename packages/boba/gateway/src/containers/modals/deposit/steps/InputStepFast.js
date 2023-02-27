@@ -99,11 +99,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     const tooSmall = new BN(value).lte(new BN(0.0))
     const tooBig = new BN(value).gt(new BN(maxValue))
 
-    // console.log("ETH fees:",Number(cost))
-    // console.log("Transaction token value:",Number(value))
-    // console.log("ETH available for paying fees:",Number(feeBalance))
-    // console.log("LPRatio:",Number(LPRatio))
-    // console.log("LPBalance:",Number(balanceSubPending))
 
     if (tooSmall || tooBig) {
       setValidValue(false)
@@ -164,9 +159,9 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
         dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
         dispatch(
           openAlert(
-            `ETH was bridged. You will receive approximately
-            ${((Number(value) * (100 - Number(feeRateN))) / 100).toFixed(3)}
-            ETH on L2`
+            `${token.symbol} was bridged. You will receive approximately
+            ${((Number(value) * (100 - Number(feeRateN)))/100).toFixed(3)}
+            ${token.symbol} on L2`
           )
         )
         handleClose()

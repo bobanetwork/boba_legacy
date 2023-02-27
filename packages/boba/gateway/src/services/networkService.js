@@ -2411,7 +2411,7 @@ class NetworkService {
       return acc
     }, [{
       L1: this.addresses.L1_ETH_Address,
-      L2: this.addresses.L2_ETH_Address
+      L2: this.addresses[`TK_L2${this.L1NativeTokenSymbol}`]
     }])
 
     const L2LPContract = new ethers.Contract(
