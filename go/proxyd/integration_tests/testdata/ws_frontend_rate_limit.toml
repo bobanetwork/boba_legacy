@@ -30,6 +30,6 @@ eth_chainId = "main"
 enable_backend_rate_limiter = true
 base_rate = 1
 base_interval = "1s"
-exempt_origins = ["exempt_origin"]
+exempt_origins = ["wss://127.0.0.1:8546"]
 exempt_user_agents = ["exempt_agent"]
 error_message = "over rate limit with special message"

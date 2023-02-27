@@ -299,9 +299,9 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 		require.Equal(t, 0, res[invalidRateLimitResponse])
 	})
 
-	t.Run("exempt over limit", func(t *testing.T) {
+	t.Run("exempt origin over limit", func(t *testing.T) {
 		h := make(http.Header)
-		h.Set("User-Agent", "exempt_agent")
+		h.Set("Origin", "wss://127.0.0.1:8546")
 		client, err := NewProxydWSClient("ws://127.0.0.1:8546", h, func(msgType int, data []byte) {
 			clientHdlr.MsgCB(msgType, data)
 		}, nil)
