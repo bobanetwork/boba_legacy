@@ -2183,13 +2183,17 @@ class NetworkService {
       this.L2Provider,
     )
     const exitFee = await L2BillingContract.exitFee()
+    let value = utils.parseEther('0.00001').add(exitFee)
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      value = utils.parseEther('0.00001')
+    }
 
     const tx2 = await DiscretionaryExitFeeContract.populateTransaction.payAndWithdraw(
       this.addresses.L2_ETH_Address,
       utils.parseEther('0.00001'),
       this.L1GasLimit,
       ethers.utils.formatBytes32String(new Date().getTime().toString()),
-      { value: utils.parseEther('0.00001').add(exitFee) }
+      { value }
     )
 
     const gas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
@@ -2952,6 +2956,13 @@ class NetworkService {
 
     const approvalAmount = await L2BillingContract.exitFee()
 
+    let value;
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      value = currencyAddress === this.addresses.L2_ETH_Address ? { value: '1' } : {};
+    } else {
+      value = currencyAddress === this.addresses.L2_ETH_Address ? { value: approvalAmount.add('1') } : { value: approvalAmount };
+    }
+
     //in some cases zero not allowed
     const tx2 = await this.L2LPContract
       .connect(this.provider.getSigner())
@@ -2959,7 +2970,7 @@ class NetworkService {
       .clientDepositL2(
         currencyAddress === this.addresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
         currencyAddress,
-        currencyAddress === this.addresses.L2_ETH_Address ? { value : approvalAmount.add('1')} : {value: approvalAmount}
+        value
       )
 
     const depositGas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
