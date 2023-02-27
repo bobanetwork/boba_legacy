@@ -181,7 +181,7 @@ function Wallet() {
             >
               <circle cx="4" cy="4" r="4" fill="#BAE21A" />
             </svg>
-            Connecting
+            Connected
           </Typography>
         </S.WalletActionContainer>
       ) : (
@@ -196,7 +196,7 @@ function Wallet() {
           >
             <circle cx="4" cy="4" r="4" fill="#FF6A55" />
           </svg>
-          Disconnect
+          Disconnected
         </Typography>
       )}
 
