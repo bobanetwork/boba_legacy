@@ -80,7 +80,7 @@
 
 <figure><img src="../../.gitbook/assets/Artboard 2 (18) (1).png" alt=""><figcaption></figcaption></figure>
 
-### Ethereum <> BOBA L2
+### Ethereum Goerli <> BOBA Goerli L2
 
 |      | L1                                         | L2                                         |
 | ---- | ------------------------------------------ | ------------------------------------------ |
@@ -88,7 +88,7 @@
 | BOBA | 0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1 | 0x4200000000000000000000000000000000000023 |
 | WETH |                                            | 0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000 |
 
-### Avalanche <> BOBA Avalache L2
+### Avalanche Testnet <> BOBA Avalache Testnet L2
 
 |       | L1                                         | L2                                         |
 | ----- | ------------------------------------------ | ------------------------------------------ |
@@ -96,7 +96,7 @@
 | BOBA  | 0xEaE78E78cC22690719361F65a50734A15aaE698C | 0x4200000000000000000000000000000000000006 |
 | WBOBA |                                            | 0xf2a8ECB0f68C64430403bB9Aa42E6D5E787E438B |
 
-### BNB <> BOBA BNB L2
+### BNB Testnet <> BOBA BNB Testnet L2
 
 |       | L1                                         | L2                                         |
 | ----- | ------------------------------------------ | ------------------------------------------ |
@@ -112,7 +112,7 @@
 | BOBA  | 0x1365fd7BcEE84686DBCA71e1571C0d9ad9E64945 | 0x4200000000000000000000000000000000000006 |
 | WBOBA |                                            | 0x29Bf093b0696db8EdDB7BeA3d7628E573E9ECedD |
 
-### Fantom <> BOBA FTM L2
+### Fantom Testnet <> BOBA FTM Testnet L2
 
 |       | L1                                         | L2                                         |
 | ----- | ------------------------------------------ | ------------------------------------------ |
