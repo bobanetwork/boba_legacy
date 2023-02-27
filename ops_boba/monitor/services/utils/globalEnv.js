@@ -235,7 +235,7 @@ class GlobalEnv {
     )
     // Load L2 Standard Bridge
     this.OVM_L2StandardBridgeContract = getContractFactory(
-      this.isAltL1Network ? 'L2StandardBridgeAltL1' : 'L2StandardBridge',
+      this.isAltL1Network ? 'L2StandardBridgeAltL1' : 'L2StandardBridge'
     )
       .attach(this.OVM_L2StandardBridge)
       .connect(this.L2Provider)
