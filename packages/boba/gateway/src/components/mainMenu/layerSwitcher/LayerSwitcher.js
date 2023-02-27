@@ -135,19 +135,6 @@ function LayerSwitcher({ visisble = true }) {
   }, [ dispatchBootAccount ])
 
 
-  useEffect(() => {
-    if (connectETHRequest) {
-      connectToETH()
-    }
-  }, [ connectETHRequest, connectToETH ])
-
-  useEffect(() => {
-    if (connectBOBARequest) {
-      connectToBOBA()
-    }
-  }, [ connectBOBARequest, connectToBOBA ])
-
-
   const dispatchSwitchLayer = useCallback((targetLayer) => {
 
     if (targetLayer === 'L1') {
@@ -164,7 +151,9 @@ function LayerSwitcher({ visisble = true }) {
 
   useEffect(() => {
     // detect mismatch and correct the mismatch
-    if (wantChain !== layer) {
+    if (wantChain === 'L1' && layer === 'L2') {
+      dispatchBootAccount()
+    } else if (wantChain === 'L2' && layer === 'L1') {
       dispatchBootAccount()
     }
   }, [wantChain, layer, dispatchBootAccount])
@@ -186,6 +175,22 @@ function LayerSwitcher({ visisble = true }) {
       localStorage.setItem('chainChangedFromMM', false)
     }
   }, [chainChangedFromMM, dispatchBootAccount])
+
+  useEffect(() => {
+    if (connectETHRequest) {
+      localStorage.setItem('wantChain', JSON.stringify('L1'))
+      networkService.switchChain('L1')
+      dispatchBootAccount()
+    }
+  }, [ connectETHRequest, dispatchBootAccount ])
+
+  useEffect(() => {
+    if (connectBOBARequest) {
+      localStorage.setItem('wantChain', JSON.stringify('L2'))
+      networkService.switchChain('L2')
+      dispatchBootAccount()
+    }
+  }, [ connectBOBARequest, dispatchBootAccount ])
 
   useEffect(() => {
     if (connectRequest) {
