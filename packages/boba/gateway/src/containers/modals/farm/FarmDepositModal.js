@@ -39,6 +39,7 @@ class FarmDepositModal extends React.Component {
       loading: false,
       bobaFeeChoice,
       netLayer,
+      netLayerNativeToken: netLayer === 'L1' ? networkService.L1NativeTokenSymbol: 'BOBA',
       bobaFeePriceRatio,
       max_Wei_String: '0',
       max_Float_String: '0.0',
@@ -70,7 +71,7 @@ class FarmDepositModal extends React.Component {
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
 
-      if ( stakeToken.symbol !== 'ETH' ) {
+      if ( stakeToken.symbol !== this.state.netLayerNativeToken ) {
         this.props.dispatch(fetchAllowance(
           stakeToken.currency,
           stakeToken.LPAddress
@@ -261,7 +262,8 @@ class FarmDepositModal extends React.Component {
       max_Float_String,
       netLayer,
       bobaFeeChoice,
-      fee
+      fee,
+      netLayerNativeToken
     } = this.state
 
     const { approvedAllowance } = this.props.farm
@@ -274,7 +276,7 @@ class FarmDepositModal extends React.Component {
     ) {
       allowanceGTstake = true
     } else if (Number(stakeValue) > 0 &&
-      stakeToken.symbol === 'ETH'
+      stakeToken.symbol === netLayerNativeToken
     ) {
       //do not need to approve ETH
       allowanceGTstake = true
@@ -321,7 +323,7 @@ class FarmDepositModal extends React.Component {
           }
         </Box>
 
-        {!allowanceGTstake && stakeToken.symbol !== 'ETH' &&
+        {!allowanceGTstake && stakeToken.symbol !== netLayerNativeToken &&
           <>
             {stakeValueValid &&
               <Typography variant="body2" sx={{ mt: 2 }}>
@@ -354,7 +356,7 @@ class FarmDepositModal extends React.Component {
 
         {stakeValueValid && allowanceGTstake &&
           <>
-            {stakeToken.symbol !== 'ETH' &&
+            {stakeToken.symbol !== netLayerNativeToken &&
               <Typography variant="body2" sx={{ mt: 2 }}>
                 Your allowance has been approved. You can now stake your funds.
               </Typography>
