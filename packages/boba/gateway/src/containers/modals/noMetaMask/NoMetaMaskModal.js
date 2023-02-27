@@ -3,15 +3,22 @@ import { useDispatch } from 'react-redux';
 
 import { Box } from '@mui/material';
 
-import { closeModal } from 'actions/uiAction';
+import { closeModal, openModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
+import { MM_EXTENTION_URL } from 'util/constant';
 
 function NoMetaMaskModal({open}) {
 
   const dispatch = useDispatch();
 
-  function handleClose() {
+  const handleClose = () => {
+    dispatch(closeModal('noMetaMaskModal'));
+  }
+
+  const handleAddMetaMask = () => {
+    window.open(MM_EXTENTION_URL, '_blank');
+    dispatch(openModal('installMetaMaskModal'));
     dispatch(closeModal('noMetaMaskModal'));
   }
 
@@ -29,7 +36,7 @@ function NoMetaMaskModal({open}) {
           type="primary"
           variant="contained"
           size="large"
-          href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en"
+          onClick={()=> handleAddMetaMask()}
         >
           Add MetaMask to Chrome
         </Button>

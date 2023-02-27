@@ -90,6 +90,7 @@ import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
 import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
+import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 
 
 function Home() {
@@ -114,6 +115,7 @@ function Home() {
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
   const noMetaMaskModalState = useSelector(selectModalState('noMetaMaskModal'));
+  const installMetaMaskModalState = useSelector(selectModalState('installMetaMaskModal'));
   const manageLockModalState = useSelector(selectModalState('manageLock'));
 
   const fast = useSelector(selectModalState('fast'))
@@ -238,6 +240,7 @@ function Home() {
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
       {!!noMetaMaskModalState && <NoMetaMaskModal open={noMetaMaskModalState} />}
+      {!!installMetaMaskModalState && <InstallMetaMaskModal open={installMetaMaskModalState} />}
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
 
       <Alert

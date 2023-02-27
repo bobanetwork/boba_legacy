@@ -97,3 +97,6 @@ export const DEFAULT_NETWORK = {
     L2: 'boba'
   }
 }
+
+
+export const MM_EXTENTION_URL = 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en'

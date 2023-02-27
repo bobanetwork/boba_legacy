@@ -31,8 +31,7 @@ function Button ({
   tooltip = '',
   size,
   className,
-  triggerTime,
-  href
+  triggerTime
 }) {
 
   if(disabled || loading)
@@ -58,7 +57,6 @@ function Button ({
   waitTime = Math.round(waitTime)
 
   const muiProps = {
-    href,
     color,
     variant,
     fullWidth,
