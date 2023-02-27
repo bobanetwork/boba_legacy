@@ -695,6 +695,7 @@ func (s *Server) rateLimitSender(ctx context.Context, req *RPCReq) error {
 		log.Debug("could not get message from transaction", "err", err, "req_id", GetReqID(ctx))
 		return ErrInvalidParams(err.Error())
 	}
+
 	ok, err := s.senderLim.Take(ctx, fmt.Sprintf("%s:%d", msg.From().Hex(), tx.Nonce()))
 	if err != nil {
 		log.Error("error taking from sender limiter", "err", err, "req_id", GetReqID(ctx))

@@ -595,10 +595,7 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 	}
 }
 
-func (w *WSProxier) Proxy(
-	ctx context.Context,
-	proxyServerLimiter *WSServerLimiter,
-) error {
+func (w *WSProxier) Proxy(ctx context.Context, proxyServerLimiter *WSServerLimiter) error {
 	errC := make(chan error, 2)
 	go w.clientPump(ctx, proxyServerLimiter, errC)
 	go w.backendPump(ctx, errC)
