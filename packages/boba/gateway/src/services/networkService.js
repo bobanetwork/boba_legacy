@@ -1796,7 +1796,8 @@ class NetworkService {
         set to actual amount, unless current approval amount is equal to, or
         bigger than, the current approval value
         */
-        if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
+        if (this.networkGateway === NETWORK.ETHEREUM
+          && allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
             (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
         )
         {
@@ -1849,7 +1850,6 @@ class NetworkService {
     approveContractAddress = this.addresses.L1StandardBridgeAddress,
     contractABI = L1ERC20Json.abi
   ) {
-
     try {
 
       const ERC20Contract = new ethers.Contract(
@@ -1871,7 +1871,8 @@ class NetworkService {
       set to actual amount, unless current approval amount is equal to, or
       bigger than, the current approval value
       */
-      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
+      if (  this.networkGateway === NETWORK.ETHEREUM &&
+        allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
@@ -1951,7 +1952,8 @@ class NetworkService {
       set to actual amount, unless current approval amount is equal to, or
       bigger than, the current approval value
       */
-      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
+      if (this.networkGateway === NETWORK.ETHEREUM &&
+          allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
@@ -2662,35 +2664,36 @@ class NetworkService {
 
       // TODO: Below part is disabled
 
-      const opts = {
-        fromBlock: -4000
-      }
-      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+      /*
+        const opts = {
+            fromBlock: -4000
+          }
+          const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+          console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
+          const time_stop = new Date().getTime()
+          console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+          const data = {
+            "key": SPEED_CHECK,
+            "hash": depositTX.hash,
+            "l1Tol2": true,
+            "startTime": time_start,
+            "endTime": time_stop,
+            "block": block.blockNumber,
+            "cdmHash": receipt.transactionHash,
+            "cdmBlock": receipt.blockNumber
+          }
 
-      console.log("Speed checker data payload:", data)
+          console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
+          const speed = await omgxWatcherAxiosInstance(
+            this.networkConfig
+          ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
-
-      return receipt
+          console.log("Speed checker:", speed)
+    */
+      return true
 
     } catch (error) {
       console.log("NS: depositL1LP error:", error)

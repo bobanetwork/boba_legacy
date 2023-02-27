@@ -59,6 +59,7 @@ import {
   selectL1FeeBalance,
   selectL2LPLiquidity,
 } from 'selectors/balanceSelector'
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const dispatch = useDispatch()
@@ -78,7 +79,9 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
-  const [validValue, setValidValue] = useState(false)
+  const networkName = useSelector(selectActiveNetworkName())
+
+  const [ validValue, setValidValue ] = useState(false)
 
   const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
   const approvalLoading = useSelector(selectLoading(['APPROVE/CREATE']))
@@ -151,13 +154,14 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
     let res
 
-    if (token.symbol === 'ETH') {
-      console.log('ETH Fast Bridge')
+    if(token.symbol === networkService.L1NativeTokenSymbol) {
+
+      console.log("L1 Native token Fast Bridge")
 
       res = await dispatch(depositL1LP(token.address, value_Wei_String))
 
       if (res) {
-        dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+        dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
         dispatch(
           openAlert(
             `ETH was bridged. You will receive approximately
@@ -186,7 +190,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     res = await dispatch(depositL1LP(token.address, value_Wei_String))
 
     if (res) {
-      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
       dispatch(
         openAlert(
           `${
