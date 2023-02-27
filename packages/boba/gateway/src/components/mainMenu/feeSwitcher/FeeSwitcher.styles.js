@@ -15,6 +15,5 @@ export const FeeSwitcherWrapper = styled(Box)(({ theme }) => ({
 
 export const FeeSwitcherLabel = styled(Typography)(({ theme }) => ({
   whiteSpace: 'nowrap',
-  textDecoration: 'underline',
   opacity: 0.65,
 }))
