@@ -301,6 +301,8 @@ func TestWSClientMaxRPSLimit(t *testing.T) {
 
 	t.Run("exempt origin over limit", func(t *testing.T) {
 		h := make(http.Header)
+		// In gorilla/websocket, the Origin header must be the same as the URL.
+		// Otherwise, it will be rejected
 		h.Set("Origin", "wss://127.0.0.1:8546")
 		client, err := NewProxydWSClient("ws://127.0.0.1:8546", h, func(msgType int, data []byte) {
 			clientHdlr.MsgCB(msgType, data)
