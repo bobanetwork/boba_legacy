@@ -13,7 +13,6 @@ import { hexConcat } from 'ethers/lib/utils'
 import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
 import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
-import { SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
 import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
 
