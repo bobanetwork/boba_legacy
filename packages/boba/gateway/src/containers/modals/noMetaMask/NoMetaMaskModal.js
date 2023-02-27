@@ -7,6 +7,7 @@ import { closeModal, openModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
 import { MM_EXTENTION_URL } from 'util/constant';
+import { setConnect } from 'actions/setupAction';
 
 function NoMetaMaskModal({open}) {
 
@@ -14,12 +15,13 @@ function NoMetaMaskModal({open}) {
 
   const handleClose = () => {
     dispatch(closeModal('noMetaMaskModal'));
+    dispatch(setConnect(false));
   }
 
   const handleAddMetaMask = () => {
     window.open(MM_EXTENTION_URL, '_blank');
     dispatch(openModal('installMetaMaskModal'));
-    dispatch(closeModal('noMetaMaskModal'));
+    handleClose()
   }
 
   return (

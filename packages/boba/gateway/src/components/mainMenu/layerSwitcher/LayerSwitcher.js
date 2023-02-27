@@ -92,7 +92,6 @@ function LayerSwitcher({
       })
 
       if (initialized === 'nometamask') {
-        console.log(['No Meta Mask Installed!'])
         dispatch(openModal('noMetaMaskModal'));
         return false;
       } else if (initialized === 'wrongnetwork') {

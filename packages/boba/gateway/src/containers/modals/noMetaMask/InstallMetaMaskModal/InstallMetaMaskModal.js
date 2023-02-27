@@ -5,6 +5,8 @@ import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
 
 import { closeModal } from 'actions/uiAction';
+import { setConnect } from 'actions/setupAction';
+
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
 
@@ -14,10 +16,11 @@ function InstallMetaMaskModal({open}) {
 
   const handleClose = () => {
     dispatch(closeModal('installMetaMaskModal'));
+    dispatch(setConnect(false));
   }
 
   const handleRefresh = () => {
-    dispatch(closeModal('installMetaMaskModal'));
+    handleClose();
     window.location.reload();
   }
 
