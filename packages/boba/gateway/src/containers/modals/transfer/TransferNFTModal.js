@@ -93,6 +93,7 @@ function TransferNFTModal ({ open, token, minHeight }) {
             onClick={handleClose}
             color='primary'
             size='large'
+            variant='outlined'
           >
             Cancel
           </Button>
