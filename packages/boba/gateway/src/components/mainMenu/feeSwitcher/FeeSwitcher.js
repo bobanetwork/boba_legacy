@@ -62,7 +62,7 @@ function FeeSwitcher() {
   const dispatchSwitchFee = useCallback(
     async (targetFee) => {
       let tooSmallL1NativeToken = false
-      let minL1NativeBalance = network === NETWORK.ETHEREUM ? 0.0002 : 0.5
+      let minL1NativeBalance = network === NETWORK.ETHEREUM ? 0.0002 : 0.002
       let tooSmallBOBA = false
 
       if (typeof balanceBOBA === 'undefined') {
