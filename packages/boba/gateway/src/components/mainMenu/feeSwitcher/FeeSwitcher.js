@@ -54,8 +54,8 @@ function FeeSwitcher() {
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
-  const balanceETH = l2BalanceETH[0]
+  const l2BalanceNativeToken = l2Balances.filter((i) => i.symbol === networkService.L1NativeTokenSymbol)
+  const balanceETH = l2BalanceNativeToken[ 0 ]
   const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')
   const balanceBOBA = l2BalanceBOBA[0]
 

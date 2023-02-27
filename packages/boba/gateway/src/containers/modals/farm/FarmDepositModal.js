@@ -102,7 +102,8 @@ class FarmDepositModal extends React.Component {
       stakeToken,
       bobaFeeChoice,
       bobaFeePriceRatio,
-      netLayer
+      netLayer,
+      netLayerNativeToken
     } = this.state
 
     let max_BN = BigNumber.from(stakeToken.balance.toString())
@@ -116,7 +117,7 @@ class FarmDepositModal extends React.Component {
       let fee = '0'
 
       // both ETH and BOBA have 18 decimals so this is safe
-      if (stakeToken.symbol === 'ETH') {
+      if (stakeToken.symbol === netLayerNativeToken) {
         // we are staking ETH
         // since MetaMask does not know about BOBA, we need to subtract the ETH fee
         // regardless of how we are paying, otherwise will get an error in MetaMask

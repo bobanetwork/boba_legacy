@@ -2562,7 +2562,7 @@ class NetworkService {
         .addLiquidity(
           utils.parseEther('1.0'),
           this.tokenAddresses['BOBA'].L2,
-          otherField
+          {...otherField, value: utils.parseEther('1.0') }
         )
       const stakeGas_BN = await this.provider.estimateGas(tx2)
       stakeCost_BN = stakeGas_BN.mul(gasPrice_BN)
