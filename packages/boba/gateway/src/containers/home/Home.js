@@ -73,6 +73,7 @@ import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
+import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -112,6 +113,7 @@ function Home() {
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
+  const noMetaMaskModalState = useSelector(selectModalState('noMetaMaskModal'));
   const manageLockModalState = useSelector(selectModalState('manageLock'));
 
   const fast = useSelector(selectModalState('fast'))
@@ -235,6 +237,7 @@ function Home() {
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
+      {!!noMetaMaskModalState && <NoMetaMaskModal open={noMetaMaskModalState} />}
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
 
       <Alert

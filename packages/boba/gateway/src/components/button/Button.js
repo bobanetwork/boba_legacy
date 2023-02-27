@@ -32,6 +32,7 @@ function Button ({
   size,
   className,
   triggerTime,
+  href
 }) {
 
   if(disabled || loading)
@@ -57,6 +58,7 @@ function Button ({
   waitTime = Math.round(waitTime)
 
   const muiProps = {
+    href,
     color,
     variant,
     fullWidth,

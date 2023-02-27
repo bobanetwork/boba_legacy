@@ -52,8 +52,9 @@ function _Modal({
       open={open}
       onClose={onClose}
       ismobile={isMobile ? 1 : 0}
-      // closeAfterTransition
-      slots={S.Backdrop}
+      slots={{
+        backdrop:S.Backdrop
+      }}
       disableAutoFocus={true}
     >
       <Fade in={open}>
