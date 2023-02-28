@@ -16,9 +16,9 @@ Here we'll go over the basics of using this bridge to move ERC20 and L1 native a
 
 > Please check the liquidity balance of the L2 Liquidity Pool first before depositing tokens on the L1 Liquidity Pool. If the L2 Liquidty Pool doesn't have enough balance to complete your swap, your funds would be returned back to you from L2 and the L1 Liquidity Pool would charge a certain percentage of the deposit amount.
 
-## Ethereum
+### Ethereum
 
-### Deposit ERC20s or ETH
+#### Deposit ERC20s or ETH
 
 ERC20 and ETH deposits into L2 can triggered via the `clientDepositL1` functions on the [`L1LiquidityPool`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the **L1 Liquidity Pool** to use the amount of tokens that you want to deposit or the deposit will fail.
 
@@ -55,9 +55,9 @@ const depositETHTx = await Proxy__L1LiquidityPool.clientDepositL1(
 await depositETHTx.wait()
 ```
 
-## Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
+### Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
 
-### Deposit ERC20s or L1 native token
+#### Deposit ERC20s or L1 native token
 
 ERC20 and L1 native token deposits into L2 can triggered via the `clientDepositL1` functions on the [`L1LiquidityPoolAltL1`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPoolAltL1.sol). You **must** approve the **L1 Liquidity Pool** to use the amount of tokens that you want to deposit or the deposit will fail.
 
@@ -102,9 +102,9 @@ await depositL1NativeTokenTx.wait()
 
 > The L2LiquidityPool contract utilizes the BOBA token to collect an additional exit fee. This fee is then employed to facilitate the transfer of cross-chain messages on L1. The configuration for this fee can be found in the Boba_GasPriceOracle contract, which is available at [L2BillingContract](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/L2BillingContract.sol) for **Ethereum L2** and [L2BillingContractAltL1](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/L2BillingContractAltL1.sol) for **Alt L2s**.
 
-## Ethereum
+### Ethereum
 
-### Withdraw ERC20s or ETH
+#### Withdraw ERC20s or ETH
 
 ERC20 and ETH withdrawals can be triggered via the `clientDepositL2` functions on the [`L2LiquidityPool`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPool.sol).
 
@@ -152,9 +152,9 @@ const withdrawETHTx = await Proxy__L2LiquidityPool.clientDepositL2(
 await withdrawETHTx.wait()
 ```
 
-## Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
+### Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
 
-### Withdraw ERC20s or L1 native token
+#### Withdraw ERC20s or L1 native token
 
 ERC20 and BOBA withdrawals can be triggered via the `clientDepositL2` functions on the [`L2LiquidityPoolAltL1` ](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPoolAltL1.sol). 
 

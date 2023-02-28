@@ -1,11 +1,11 @@
 # ERC721 NFT Bridging
 
-BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1 and the [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on L2. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth. **These two contracts have not been audited, exercise caution when using this on mainnet.**
+BOBA NFT bridges consists of two bridge contracts. The [L1NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L1NFTBridge.sol) contract is deployed on L1. The [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) contract is deployed on **Ethereum L2** and the [L2NFTBridgeAltL1](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/ERC721Bridges/L2NFTBridgeAltL1.sol) contract is deployed on **other L2s **. It supports **native L1 NFTs** and **native L2 NFTs** to be moved back and forth. **These two contracts have not been audited, exercise caution when using this on mainnet.**
 
 * Native L1 NFT: the original NFT contract was deployed on L1
 * Native L2 NFT: the original NFT contract was deployed on L2
 
-Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to Ethereum takes 7 days. **Not all NFTs are bridgeable - developers must use specialized NFT contracts (e.g. L2StandardERC721.sol) to enable this functionality.**
+Bridging an NFT to Boba takes several minutes, and bridging an NFT from Boba to Layer 1 takes 7 days. **Not all NFTs are bridgeable - developers must use specialized NFT contracts (e.g. L2StandardERC721.sol) to enable this functionality.**
 
 
 
@@ -18,7 +18,7 @@ bytes4 erc721 = 0x80ac58cd;
 require(ERC165Checker.supportsInterface(_l1Contract, erc721), "L1 NFT is not ERC721 compatible");
 ```
 
-After verifying the interface, please deploy [L2StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L2StandardERC721.sol) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Ethereum.
+After verifying the interface, please deploy [L2StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L2StandardERC721.sol) on Boba. The `L1_NFT_CONTRACT_ADDRESS` is the address of your NFT on Layer 1.
 
 ```js
 const Factory__L2StandardERC721 = new ethers.ContractFactory(
@@ -101,7 +101,7 @@ contract L2StandardERC721 is IL2StandardERC721, ERC721 {
 
 <figure><img src="../../.gitbook/assets/Artboard 2 (16).png" alt=""><figcaption></figcaption></figure>
 
-Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L1StandardERC721.sol) on Ethereum. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
+Deploy your NFT on Boba and then deploy [L1StandardERC721](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/standards/L1StandardERC721.sol) on Layer 1. The `L2_NFT_CONTRACT_ADDRESS` is the address of your NFT on Boba.
 
 ```js
 const Factory__L1StandardERC721 = new ethers.ContractFactory(
@@ -186,7 +186,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
 
 <figure><img src="../../.gitbook/assets/Artboard 3.png" alt=""><figcaption></figcaption></figure>
 
-### CASE 1 - Native L1 NFT - Bridge NFTs from Ethereum to Boba
+### CASE 1 - Native L1 NFT - Bridge NFTs from Layer 1 to Boba
 
 First, users transfer their NFT to the L1 NFT Bridge, starting with an approval.
 
@@ -206,7 +206,7 @@ const tx = await L1NFTBrige.depositNFT(
 await tx.wait()
 ```
 
-### CASE 2 - Native L1 NFT - Bridge NFTs from Boba to Ethereum
+### CASE 2 - Native L1 NFT - Bridge NFTs from Boba to Layer 1
 
 Prior to the exit, the L2 NFT Bridge burns the L2 NFT, so the first step is for the user to approve the transaction.
 
@@ -215,9 +215,12 @@ const approveTx = await L2NFT.approve(L2_NFT_BRIDGE_ADDRESS, TOKEN_ID)
 await approveTx.wait()
 ```
 
-Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Ethereum. The NFT will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the NFT from Boba to Layer 1. The NFT will arrive on L1 after the seven days.
+
+> The difference between [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) and [L2NFTBridgeAltL1](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/ERC721Bridges/L2NFTBridgeAltL1.sol) is the how the exit fee is paid in the bridge contract. The BOBA token is the native token on other L2s, so the exit fee is collected via bypassing the value just like ETH.
 
 ```js
+// Ethereum L2
 const exitFee = await BOBABillingContract.exitFee()
 const approveBOBATx = await L2BOBAToken.approve(
   L2NFTBrige.address,
@@ -230,9 +233,19 @@ const tx = await L2NFTBrige.withdraw(
   9999999 // L2 gas
 )
 await tx.wait()
+
+// Other L2s
+const exitFee = await BOBABillingContract.exitFee()
+const tx = await L2NFTBrige.withdraw(
+  L2_NFT_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  9999999, // L2 gas
+  { value: exitFee }
+)
+await tx.wait()
 ```
 
-### CASE 3 - Native L2 NFT - Bridge NFTs from Boba to Ethereum
+### CASE 3 - Native L2 NFT - Bridge NFTs from Boba to Layer 1
 
 Users have to transfer their NFTs to the L2 NFT Bridge, so they start by approving the transaction.
 
@@ -243,7 +256,10 @@ await approveTx.wait()
 
 Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit NFT from L2. The NFT will arrive on L1 after the seven days.
 
+> The difference between [L2NFTBridge](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/boba/contracts/contracts/bridges/L2NFTBridge.sol) and [L2NFTBridgeAltL1](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/ERC721Bridges/L2NFTBridgeAltL1.sol) is the how the exit fee is paid in the bridge contract. The BOBA token is the native token on other L2s, so the exit fee is collected via bypassing the value just like ETH.
+
 ```js
+// Ethereum L2
 const exitFee = await BOBABillingContract.exitFee()
 const approveBOBATx = await L2BOBAToken.approve(
   L2NFTBrige.address,
@@ -256,9 +272,19 @@ const tx = await L2NFTBrige.withdraw(
   9999999 // L2 gas
 )
 await tx.wait()
+
+// Other L2s
+const exitFee = await BOBABillingContract.exitFee()
+const tx = await L2NFTBrige.withdraw(
+  L2_NFT_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  9999999, // L2 gas
+  { value: exitFee }
+)
+await tx.wait()
 ```
 
-### CASE 4 - Native L2 NFT - Bridge NFTs from Ethereum to Boba
+### CASE 4 - Native L2 NFT - Bridge NFTs from Layer 1 to Boba
 
 The L1 NFT Bridge has to burn the L1 NFT, so the user needs to approve the transaction first.
 
@@ -396,74 +422,86 @@ await withdrawToTx.wait()
 
 ### Mainnet
 
-#### Ethereum
+#### Ethereum Mainnet
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0xC891F466e53f40603250837282eAE4e22aD5b088 |
-| L2    | Proxy\_\_L2NFTBridge | 0xFB823b65D0Dc219fdC0d759172D1E098dA32f9eb |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0xC891F466e53f40603250837282eAE4e22aD5b088 |
+| L2    | Proxy\_\_L2NFTBridge     | 0xFB823b65D0Dc219fdC0d759172D1E098dA32f9eb |
+| L2    | Proxy__L2BillingContract | 0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7 |
+| L2    | L2BOBA                   | 0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7 |
 
 #### Avalanche
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x328eb74673Eaa1D2d90A48E8137b015F1B6Ed35d |
-| L2    | Proxy\_\_L2NFTBridge | 0x1A0245f23056132fEcC7098bB011C5C303aE0625 |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x328eb74673Eaa1D2d90A48E8137b015F1B6Ed35d |
+| L2    | Proxy\_\_L2NFTBridge     | 0x1A0245f23056132fEcC7098bB011C5C303aE0625 |
+| L2    | Proxy__L2BillingContract | 0xc4243ecE585B843c7cf92E65617A4211FA580dDb |
 
 #### Moonbeam
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x7f61EB6FFe966E8c14AFb8754Bf0825eb6f54bd7 |
-| L2    | Proxy\_\_L2NFTBridge | 0x9182A0AA011f97633d44383F446A5951bDD3f5bf |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x7f61EB6FFe966E8c14AFb8754Bf0825eb6f54bd7 |
+| L2    | Proxy\_\_L2NFTBridge     | 0x9182A0AA011f97633d44383F446A5951bDD3f5bf |
+| L2    | Proxy__L2BillingContract | 0xb210a4BB024196dC8c5f6f407220cA83e65e45FE |
 
 #### BNB Mainnet
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x76bD545C03391d4e6E3d5cC2B5617c94C6038c86 |
-| L2    | Proxy\_\_L2NFTBridge | 0xA774C3f4572C5BA93F75D802ea7Dc6F93228e5cc |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x76bD545C03391d4e6E3d5cC2B5617c94C6038c86 |
+| L2    | Proxy\_\_L2NFTBridge     | 0xA774C3f4572C5BA93F75D802ea7Dc6F93228e5cc |
+| L2    | Proxy__L2BillingContract | 0xf626b0d7C028E6b89c15ca417f21080E376de65b |
 
 #### Fantom
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x58bfe4D8108f0657585c9e4C106B3FB8b469eeB9 |
-| L2    | Proxy\_\_L2NFTBridge | 0xd0223931513E72C4cbBE97662C07825C7E71DD9C |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x58bfe4D8108f0657585c9e4C106B3FB8b469eeB9 |
+| L2    | Proxy\_\_L2NFTBridge     | 0xd0223931513E72C4cbBE97662C07825C7E71DD9C |
+| L2    | Proxy__L2BillingContract | 0xD5b0E66566FEe76d6c550e7190385703Bcf11354 |
 
 ### Testnet
 
-#### Goerli
+#### Ethereum Goerli
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0xa2232D3c81EFd46815c1adf48Ed86C5C377cb6e2 |
-| L2    | Proxy\_\_L2NFTBridge | 0xF84979ADeb8D2Dd25f54cF8cBbB05C08eC188e11 |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0xa2232D3c81EFd46815c1adf48Ed86C5C377cb6e2 |
+| L2    | Proxy\_\_L2NFTBridge     | 0xF84979ADeb8D2Dd25f54cF8cBbB05C08eC188e11 |
+| L2    | Proxy__L2BillingContract | 0x04A6e2AB38BB53bD82ae1Aa0521633D640304ab9 |
+| L2    | BOBA                     | 0x4200000000000000000000000000000000000023 |
 
 #### Avalanche Testnet (Fuji)
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0xA7A1415eC63Bf410b27AcDAF42fC3c63756E2bFc |
-| L2    | Proxy\_\_L2NFTBridge | 0x2e59D69cA439b3ab0c1AD8b2762377Afb5C71C7B |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0xA7A1415eC63Bf410b27AcDAF42fC3c63756E2bFc |
+| L2    | Proxy\_\_L2NFTBridge     | 0x2e59D69cA439b3ab0c1AD8b2762377Afb5C71C7B |
+| L2    | Proxy__L2BillingContract | 0xB7E29AB7FB9b6406BAb33Cf6f868fE25B9Ad0160 |
 
 #### Moonbase
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x1E12Ba552Ac35351563091737910d9E5d1DaD17a |
-| L2    | Proxy\_\_L2NFTBridge | 0x8E65834B52c3aCc79206a0F09c4b627BC588f09e |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x1E12Ba552Ac35351563091737910d9E5d1DaD17a |
+| L2    | Proxy\_\_L2NFTBridge     | 0x8E65834B52c3aCc79206a0F09c4b627BC588f09e |
+| L2    | Proxy__L2BillingContract | 0x05C9f36D901594D220311B211fA26DbD58B87717 |
 
 #### BNB Testnet
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x4c3f621d01c22658F711c70a12662ECDfCA5916A |
-| L2    | Proxy\_\_L2NFTBridge | 0x6fA80303E479Ea2d705F4f241Ef162aA2F793e71 |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x4c3f621d01c22658F711c70a12662ECDfCA5916A |
+| L2    | Proxy\_\_L2NFTBridge     | 0x6fA80303E479Ea2d705F4f241Ef162aA2F793e71 |
+| L2    | Proxy__L2BillingContract | 0xe43Ff19D561EA6DB84Dd2Ec3754027fAFDa79499 |
 
 #### Fantom Testnet
 
-| Layer | Contract Name        | Contract Address                           |
-| ----- | -------------------- | ------------------------------------------ |
-| L1    | Proxy\_\_L1NFTBridge | 0x5E52f340D43Ee819dd8a38D55Cc27293603Ac5fb |
-| L2    | Proxy\_\_L2NFTBridge | 0x310FA48450dF21fBC99b937a7AafBc3B7Af6f6D1 |
+| Layer | Contract Name            | Contract Address                           |
+| ----- | ------------------------ | ------------------------------------------ |
+| L1    | Proxy\_\_L1NFTBridge     | 0x5E52f340D43Ee819dd8a38D55Cc27293603Ac5fb |
+| L2    | Proxy\_\_L2NFTBridge     | 0x310FA48450dF21fBC99b937a7AafBc3B7Af6f6D1 |
+| L2    | Proxy__L2BillingContract | 0x675Ea342D2a85D7db0Cc79AE64196ad628Ce8187 |

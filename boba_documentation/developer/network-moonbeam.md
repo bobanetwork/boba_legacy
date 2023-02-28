@@ -33,13 +33,13 @@ If you have unusual `getLogs` needs, especially calls from `0 to latest`, the ma
 
 * clone the `boba` repo
 * switch to `alt-l1` branch.
-*   Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba\_community/boba-node) folder
+*   Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/develop/boba\_community/boba-node) folder
 
     ```
     RELEASE_VERSION=v0.X.X
     ```
 
-The bobabase's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabase.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba\_community/boba-node)
+The bobabase's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabase.yml`](https://github.com/bobanetwork/boba/tree/develop/boba\_community/boba-node)
 
 ```bash
 $ docker compose -f docker-compose-bobabase.yml pull
@@ -77,13 +77,13 @@ To access these images:
 
 * clone the `boba` repo
 * switch to `alt-l1` branch.
-*   Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/alt-l1/boba\_community/boba-node) folder
+*   Add `.env` in [boba-node](https://github.com/bobanetwork/boba/tree/develop/boba\_community/boba-node) folder
 
     ```
     RELEASE_VERSION=v0.X.X
     ```
 
-The bobabeam's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabeam.yml`](https://github.com/bobanetwork/boba/tree/alt-l1/boba\_community/boba-node)
+The bobabeam's docker-compose file is in [`boba-community/boba-node/docker-compose-bobabeam.yml`](https://github.com/bobanetwork/boba/tree/develop/boba\_community/boba-node)
 
 ```bash
 $ docker compose -f docker-compose-bobabeam.yml pull

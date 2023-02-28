@@ -16,9 +16,9 @@ Here we'll go over the basics of using this bridge to move ERC20 and L1 native a
 
 > Note: **We currently block smart contract wallets from calling the `depositETH` and `depositERC20` functions for security reasons**. If you want to deposit not using an EOA accounts and you know what are doing, you can use `depositETHTo` and `depositERC20To` functions instead.
 
-## Ethereum
+### Ethereum
 
-### Deposit ERC20s
+#### Deposit ERC20s
 
 ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the [`L1StandardBridge`](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). You **must** approve the **Standard Token Bridge** to use the amount of tokens that you want to deposit or the deposit will fail.
 
@@ -60,7 +60,7 @@ const depositToTx = await Proxy__L1StandardBridge.depositERC20To(
 await depositToTx.wait()
 ```
 
-### Deposit ETH
+#### Deposit ETH
 
 ETH deposits into L2 can be triggered via the `depositETH` and `depositETHTo` functions on the [`L1StandardBridge`](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). ETH deposits can alternatively be triggered by sending ETH directly to the `L1StandardBridge`. Once your deposit is detected and finalized on Boba Network, your account will be funded with the corresponding amount of ETH on L2.
 
@@ -95,9 +95,9 @@ const depositToTx = await Proxy__L1StandardBridge.depositETHTo(
 await depositToTx.wait()
 ```
 
-## Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
+### Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
 
-### Deposit ERC20s
+#### Deposit ERC20s
 
 ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the [`L1StandardBridgeAltL1`](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridgeAltL1.sol). You **must** approve the **Standard Token Bridge** to use the amount of tokens that you want to deposit or the deposit will fail.
 
@@ -139,7 +139,7 @@ const depositToTx = await Proxy__L1StandardBridge.depositERC20To(
 await depositToTx.wait()
 ```
 
-### Deposit L1 native token
+#### Deposit L1 native token
 
 L1 native token deposits into L2 can be triggered via the `depositNativeToken` and `depositNativeTokenTo` functions on the [`L1StandardBridgeAltL1`](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridgeAltL1.sol). L1 native token deposits can alternatively be triggered by sending L1 native token directly to the `L1StandardBridgeAltL1`. Once your deposit is detected and finalized on Boba Network, your account will be funded with the corresponding amount of L1 native token on L2.
 
@@ -178,9 +178,9 @@ await depositToTx.wait()
 
 <figure><img src="../../../.gitbook/assets/Artboard 2 (13).png" alt=""><figcaption></figcaption></figure>
 
-## Ethereum 
+### Ethereum 
 
-### Withdraw tokens (ERC20s and ETH)
+#### Withdraw tokens (ERC20s and ETH)
 
 ERC20 withdrawals can be triggered via the `payAndWithdraw` function on the [`DiscretionaryExitFee`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/DiscretionaryExitFee.sol).
 
@@ -239,9 +239,9 @@ const withdrawTx = await DiscretionaryExitFee.payAndWithdraw(
 await withdrawTx.wait()
 ```
 
-## Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
+### Other L1s (Moonbeam, Bnb, Avalanche, Fantom)
 
-### Withdraw tokens (ERC20s and ETH)
+#### Withdraw tokens (ERC20s and L1 native token)
 
 ERC20 withdrawals can be triggered via the `payAndWithdraw` function on the [`DiscretionaryExitFee`](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/DiscretionaryExitFee.sol).
 

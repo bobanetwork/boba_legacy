@@ -1,11 +1,11 @@
 # ERC1155 NFT Bridging
 
-BOBA ERC1155 bridges consists of two bridge contracts. The [L1ERC1155Bridge](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L1ERC1155Bridge.sol) contract is deployed on L1 and the [L2ERC1155Bridge](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol) contract is deployed on L2. It supports **native L1 ERC1155 tokens** and **native L2 ERC1155 tokens** to be moved back and forth. **These two contracts have not been audited, exercise caution when using this on mainnet.**
+BOBA ERC1155 bridges consists of two bridge contracts. The [L1ERC1155Bridge](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L1ERC1155Bridge.sol) contract is deployed on L1. The [L2ERC1155Bridge](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol) contract is deployed on **Ethereum L2** and the [L2ERC1155BridgeAltL1](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155BridgeAltL1.sol) contract is deployed on **Other L2s**. It supports **native L1 ERC1155 tokens** and **native L2 ERC1155 tokens** to be moved back and forth. **These two contracts have not been audited, exercise caution when using this on mainnet.**
 
 * Native L1 ERC1155 token: the original token contract was deployed on L1
 * Native L2 ERC1155 token: the original token contract was deployed on L2
 
-Bridging a token to Boba takes several minutes, and bridging a token from Boba to Ethereum takes 7 days. **Not all tokens are bridgeable - developers must use specialized token contracts (e.g. L2StandardERC1155.sol) to enable this functionality.**
+Bridging a token to Boba takes several minutes, and bridging a token from Boba to Layer 1 takes 7 days. **Not all tokens are bridgeable - developers must use specialized token contracts (e.g. L2StandardERC1155.sol) to enable this functionality.**
 
 
 
@@ -18,7 +18,7 @@ bytes4 erc1155 = 0xd9b67a26;
 require(ERC165Checker.supportsInterface(_l1Contract, erc1155), "L1 token is not ERC1155 compatible");
 ```
 
-After verifying the interface, please deploy [L2StandardERC1155](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/standards/L2StandardERC1155.sol) on Boba. The `L1_ERC1155_TOKEN_CONTRACT_ADDRESS` is the address of your token on Ethereum.
+After verifying the interface, please deploy [L2StandardERC1155](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/standards/L2StandardERC1155.sol) on Boba. The `L1_ERC1155_TOKEN_CONTRACT_ADDRESS` is the address of your token on Layer 1.
 
 ```js
 const Factory__L2StandardERC1155 = new ethers.ContractFactory(
@@ -44,17 +44,17 @@ If you want to deploy your own L2 ERC1155 token contract, please follow requirem
       _mint(_to, _tokenId, _amount, _data);
       emit Mint(_to, _tokenId, _amount);
     }
-
+    
     function mintBatch(address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data) public virtual override onlyL2Bridge {
       _mintBatch(_to, _tokenIds, _amounts, _data);
       emit MintBatch(_to, _tokenIds, _amounts);
     }
-
+    
     function burn(address _from, uint256 _tokenId, uint256 _amount) public virtual override onlyL2Bridge {
       _burn(_from, _tokenId, _amount);
       emit Burn(_from, _tokenId, _amount);
     }
-
+    
     function burnBatch(address _from, uint256[] memory _tokenIds, uint256[] memory _amounts) public virtual override onlyL2Bridge {
       _burnBatch(_from, _tokenIds, _amounts);
       emit BurnBatch(_from, _tokenIds, _amounts);
@@ -134,7 +134,7 @@ contract L2StandardERC1155 is IL2StandardERC1155, ERC1155 {
 
 <figure><img src="../../.gitbook/assets/Artboard 2.png" alt=""><figcaption></figcaption></figure>
 
-Deploy your ERC115 token on Boba and then deploy [L1StandardERC1155](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/standards/L1StandardERC1155.sol) on Ethereum. The `L1_ERC1155_TOKEN_CONTRACT_ADDRESS` is the address of your token on Boba.
+Deploy your ERC115 token on Boba and then deploy [L1StandardERC1155](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/standards/L1StandardERC1155.sol) on Layer 1. The `L1_ERC1155_TOKEN_CONTRACT_ADDRESS` is the address of your token on Boba.
 
 ```js
 const Factory__L1StandardERC1155 = new ethers.ContractFactory(
@@ -160,17 +160,17 @@ If you want to deploy your own L1 ERC1155 token contract, please follow requirem
       _mint(_to, _tokenId, _amount, _data);
       emit Mint(_to, _tokenId, _amount);
     }
-
+    
     function mintBatch(address _to, uint256[] memory _tokenIds, uint256[] memory _amounts, bytes memory _data) public virtual override onlyL1Bridge {
       _mintBatch(_to, _tokenIds, _amounts, _data);
       emit MintBatch(_to, _tokenIds, _amounts);
     }
-
+    
     function burn(address _from, uint256 _tokenId, uint256 _amount) public virtual override onlyL1Bridge {
       _burn(_from, _tokenId, _amount);
       emit Burn(_from, _tokenId, _amount);
     }
-
+    
     function burnBatch(address _from, uint256[] memory _tokenIds, uint256[] memory _amounts) public virtual override onlyL1Bridge {
       _burnBatch(_from, _tokenIds, _amounts);
       emit BurnBatch(_from, _tokenIds, _amounts);
@@ -250,7 +250,7 @@ contract L1StandardERC1155 is IL1StandardERC1155, ERC1155 {
 
 <figure><img src="../../.gitbook/assets/Artboard 3 (12).png" alt=""><figcaption></figcaption></figure>
 
-### CASE 1 - Native L1 token - Bridge tokens from Ethereum to Boba
+### CASE 1 - Native L1 token - Bridge tokens from Layer 1 to Boba
 
 First, users transfer their token to the L1 Bridge, starting with an approval.
 
@@ -272,7 +272,7 @@ const tx = await L1ERC1155Brige.deposit(
 await tx.wait()
 ```
 
-### CASE 2 - Native L1 token - Bridge tokens from Boba to Ethereum
+### CASE 2 - Native L1 token - Bridge tokens from Boba to Layer 1
 
 Prior to the exit, the L2 Bridge burns the L2 tokens, so the first step is for the user to approve the transaction.
 
@@ -281,37 +281,12 @@ const approveTx = await L2Token.setApprovalForAll(L1_ERC1155_BRIDGE_ADDRESS, tru
 await approveTx.wait()
 ```
 
-Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the tokens from Boba to Ethereum. The token will arrive on L1 after the seven days.
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit the tokens from Boba to Layer 1. The token will arrive on L1 after the seven days.
+
+> The difference between [L2ERC1155Bridge](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol) and [L2ERC1155BridgeAltL1](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155BridgeAltL1.sol) is the how the exit fee is paid in the bridge contract. The BOBA token is the native token on other L2s, so the exit fee is collected via bypassing the value just like ETH.
 
 ```js
-const exitFee = await BOBABillingContract.exitFee()
-const approveBOBATx = await L2BOBAToken.approve(
-  L2ERC1155Brige.address,
-  exitFee
-)
-await approveBOBATx.wait()
-const tx = await L1ERC1155Brige.withdraw(
-  L2_ERC1155_TOKEN_CONTRACT_ADDRESS,
-  TOKEN_ID,
-  TOKEN_AMOUNT,
-  DATA, // event data - you can pass `0x` if you don't want to emit any data in the events
-  9999999 // L2 gas
-)
-await tx.wait()
-```
-
-### CASE 3 - Native L2 token - Bridge tokens from Boba to Ethereum
-
-Users have to transfer their tokens to the L2 Bridge, so they start by approving the transaction.
-
-```js
-const approveTx = await L2Token.setApprovalForAll(L2_ERC1155_BRIDGE_ADDRESS, TOKEN_ID)
-await approveTx.wait()
-```
-
-Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit tokens from L2. The token will arrive on L1 after the seven days.
-
-```js
+// Ethereum L2
 const exitFee = await BOBABillingContract.exitFee()
 const approveBOBATx = await L2BOBAToken.approve(
   L2ERC1155Brige.address,
@@ -326,9 +301,64 @@ const tx = await L2ERC1155Brige.withdraw(
   9999999 // L2 gas
 )
 await tx.wait()
+
+// Other L2s
+const exitFee = await BOBABillingContract.exitFee()
+const tx = await L2ERC1155Brige.withdraw(
+  L2_ERC1155_TOKEN_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  TOKEN_AMOUNT,
+  DATA, // event data - you can pass `0x` if you don't want to emit any data in the events
+  9999999, // L2 gas
+  { value: exitFee }
+)
+await tx.wait()
 ```
 
-### CASE 4 - Native L2 token - Bridge tokens from Ethereum to Boba
+### CASE 3 - Native L2 token - Bridge tokens from Boba to Layer 1
+
+Users have to transfer their tokens to the L2 Bridge, so they start by approving the transaction.
+
+```js
+const approveTx = await L2Token.setApprovalForAll(L2_ERC1155_BRIDGE_ADDRESS, TOKEN_ID)
+await approveTx.wait()
+```
+
+Users have to approve the Boba for the exit fee next. They then call the `withdraw` or `withdrawTo` function to exit tokens from L2. The token will arrive on L1 after the seven days.
+
+> The difference between [L2ERC1155Bridge](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol) and [L2ERC1155BridgeAltL1](https://github.com/bobanetwork/boba/blob/add-ERC1155-bridge/packages/boba/contracts/contracts/ERC1155Bridges/L2ERC1155BridgeAltL1.sol) is the how the exit fee is paid in the bridge contract. The BOBA token is the native token on other L2s, so the exit fee is collected via bypassing the value just like ETH.
+
+```js
+// Ethereum L2
+const exitFee = await BOBABillingContract.exitFee()
+const approveBOBATx = await L2BOBAToken.approve(
+  L2ERC1155Brige.address,
+  exitFee
+)
+await approveBOBATx.wait()
+const tx = await L2ERC1155Brige.withdraw(
+  L2_ERC1155_TOKEN_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  TOKEN_AMOUNT,
+  DATA, // event data - you can pass `0x` if you don't want to emit any data in the events
+  9999999 // L2 gas
+)
+await tx.wait()
+
+// Other L2s
+const exitFee = await BOBABillingContract.exitFee()
+const tx = await L2ERC1155Brige.withdraw(
+  L2_ERC1155_TOKEN_CONTRACT_ADDRESS,
+  TOKEN_ID,
+  TOKEN_AMOUNT,
+  DATA, // event data - you can pass `0x` if you don't want to emit any data in the events
+  9999999, // L2 gas
+  { value: exitFee }
+)
+await tx.wait()
+```
+
+### CASE 4 - Native L2 token - Bridge tokens from Layer 1 to Boba
 
 The L1 Bridge has to burn the L1 tokens, so the user needs to approve the transaction first.
 
@@ -352,7 +382,7 @@ await tx.wait()
 
 ### NOTE
 
-To bridge tokens from Alt L2s to Alt L1, you need to add the BOBA as the value to cover the exit fee.
+To bridge tokens from Alt L2s to Alt L1s, you need to add the BOBA as the value to cover the exit fee.
 
 ```javascript
 const exitFee = await BOBABillingContract.exitFee()
@@ -362,12 +392,12 @@ const tx = await L2ERC1155Brige.withdraw(
   TOKEN_AMOUNT,
   DATA, // event data - you can pass `0x` if you don't want to emit any data in the events
   9999999, // L2 gas
-  {value: exitFee} // exit fee
+  { value: exitFee } // exit fee
 )
 await tx.wait()
 ```
 
-## ERC1155 bridge addresses
+
 
 <figure><img src="../../.gitbook/assets/Artboard 5 (10).png" alt=""><figcaption></figcaption></figure>
 
@@ -379,6 +409,8 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7 |
+| L2    | L2BOBA                   | 0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7 |
 
 #### Avalanche
 
@@ -386,6 +418,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xc4243ecE585B843c7cf92E65617A4211FA580dDb |
 
 #### Moonbeam
 
@@ -393,6 +426,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xb210a4BB024196dC8c5f6f407220cA83e65e45FE |
 
 #### BNB Mainnet
 
@@ -400,6 +434,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xf626b0d7C028E6b89c15ca417f21080E376de65b |
 
 #### Fantom
 
@@ -407,6 +442,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xD5b0E66566FEe76d6c550e7190385703Bcf11354 |
 
 ### Testnet
 
@@ -416,6 +452,8 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0x04A6e2AB38BB53bD82ae1Aa0521633D640304ab9 |
+| L2    | BOBA                     | 0x4200000000000000000000000000000000000023 |
 
 #### Avalanche Testnet (Fuji)
 
@@ -423,6 +461,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xB7E29AB7FB9b6406BAb33Cf6f868fE25B9Ad0160 |
 
 #### Moonbase
 
@@ -430,6 +469,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0x05C9f36D901594D220311B211fA26DbD58B87717 |
 
 #### BNB Testnet
 
@@ -437,6 +477,7 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0xe43Ff19D561EA6DB84Dd2Ec3754027fAFDa79499 |
 
 #### Fantom Testnet
 
@@ -444,3 +485,4 @@ await tx.wait()
 | ----- | ------------------------ | ------------------------------------------ |
 | L1    | Proxy\_\_L1ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
 | L2    | Proxy\_\_L2ERC1155Bridge | 0x1dF39152AC0e81aB100341cACC4dE4c372A550cb |
+| L2    | Proxy__L2BillingContract | 0x675Ea342D2a85D7db0Cc79AE64196ad628Ce8187 |
