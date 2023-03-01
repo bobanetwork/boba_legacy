@@ -288,14 +288,14 @@ export const getBlockExplorerUrl = ({
 }
 
 export const pingRpcUrl = async (
-  networkURL,
+  rpcUrl,
 ) => {
-  const provider = new providers.JsonRpcProvider(networkURL)
+  const provider = new providers.JsonRpcProvider(rpcUrl)
   try {
     await provider.getBlockNumber()
     return true
   } catch (e) {
-    console.log(`Error pinging Rpc Url: ${networkURL}`)
+    console.log(`Error pinging Rpc Url: ${rpcUrl}`)
     return false
   }
 }
