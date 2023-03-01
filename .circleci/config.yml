@@ -53,64 +53,16 @@ jobs:
                 command: make <<parameters.binary_name>>
                 working_directory: <<parameters.working_directory>>
 
-  build_bundler: # runs not using Workflows must have a `build` job as entry point
+  test_flow_bundler_and_depcheck:
     docker: # run the steps with Docker
       - image: cimg/node:16.6.2
-
     steps: # a collection of executable commands
-      - checkout # special step to check out source code to working directory
-
-      - run:
-          name: package-json-all-deps
+      - checkout
+      - attach_workspace:
+          at: .
+      - run: # run hardhat-node as standalone process fork
           command: yarn && yarn build
           working_directory: ./
-
-      - restore_cache: # special step to restore the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
-
-      - run:
-          name: yarn-install-if-no-cache
-          command:  test -d node_modules/truffle || yarn
-          working_directory: ./packages/boba/bundler
-
-      - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
-          paths:
-            - ./packages/boba/bundler/node_modules
-            - ./packages/boba/bundler/packages/node_modules
-            # - ./packages/boba/bundler/packages/client/node_modules
-            # - ./packages/boba/bundler/packages/common/node_modules
-            # - ./packages/boba/bundler/packages/contracts/node_modules
-
-      - run:
-          name: yarn-preprocess
-          command: yarn preprocess
-          working_directory: ./packages/boba/bundler
-
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./packages/boba/bundler
-
-  test_bundler:
-    working_directory: ~/aa # directory where steps will run
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - attach_workspace:
-          at: .
-      - run: # run tests
-          name: test
-          command: yarn lerna-test | tee /tmp/test-dev-results.log
-          working_directory: ./packages/boba/bundler
-      - store_test_results: # special step to upload test results for display in Test Summary
-          path: /tmp/test-dev-results.log
-  test_flow_bundler:
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - attach_workspace:
-          at: .
       - run: # run hardhat-node as standalone process fork
           name: hardhat-node-process
           command: yarn hardhat-node
@@ -118,31 +70,14 @@ jobs:
           working_directory: ./packages/boba/bundler
       - run: # run tests
           name: test
-          command: yarn lerna-test-flows | tee /tmp/test-flows-results.log
+          command: yarn test-flows | tee /tmp/test-flows-results.log
           working_directory: ./packages/boba/bundler
-      - store_test_results: # special step to upload test results for display in Test Summary
-          path: /tmp/test-flow-results.log
-
-  lint_bundler:
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - attach_workspace:
-          at: .
-      - run: # run tests
-          name: lint
-          command: yarn lerna-lint
-          working_directory: ./packages/boba/bundler
-  depcheck_bundler:
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - attach_workspace:
-          at: .
-      - run: # run tests
+      - run:
           name: depcheck
           command: yarn depcheck
           working_directory: ./packages/boba/bundler
+      - store_test_results: # special step to upload test results for display in Test Summary
+          path: /tmp/test-flow-results.log
   integration-tests:
     resource_class: xlarge
     machine:
@@ -213,7 +148,7 @@ jobs:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink aa_deployer
+            docker-compose -f docker-compose.yml -f docker-compose-side.yml up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
@@ -251,17 +186,5 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      - build_bundler
-      - test_bundler:
-          requires:
-            - build_bundler
-      - test_flow_bundler:
-          requires:
-            - build_bundler
-      - lint_bundler:
-          requires:
-            - build_bundler
-      - depcheck_bundler:
-          requires:
-            - build_bundler
+      - test_flow_bundler_and_depcheck
 

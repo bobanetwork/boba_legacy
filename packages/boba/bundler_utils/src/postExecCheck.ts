@@ -1,6 +1,6 @@
 import { resolveProperties } from 'ethers/lib/utils'
 import { NotPromise } from './ERC4337Utils'
-import { EntryPoint, UserOperationStruct } from '@account-abstraction/contracts'
+import { EntryPoint, UserOperationStruct } from '@boba/accountabstraction'
 
 export async function postExecutionDump (entryPoint: EntryPoint, requestId: string): Promise<void> {
   const { gasPaid, gasUsed, success, userOp } = await postExecutionCheck(entryPoint, requestId)

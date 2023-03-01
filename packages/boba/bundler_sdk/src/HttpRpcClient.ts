@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { ethers } from 'ethers'
 import { hexValue, resolveProperties } from 'ethers/lib/utils'
-import { UserOperationStruct } from '@account-abstraction/contracts'
+import { UserOperationStruct } from '@boba/accountabstraction'
 import Debug from 'debug'
 
 const debug = Debug('aa.rpc')

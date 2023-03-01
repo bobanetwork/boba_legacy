@@ -4,15 +4,15 @@ import hre, { ethers } from 'hardhat'
 import sinon from 'sinon'
 
 import * as SampleRecipientArtifact
-  from '@account-abstraction/utils/artifacts/contracts/test/SampleRecipient.sol/SampleRecipient.json'
+  from '@boba/bundler_utils/artifacts/contracts/test/SampleRecipient.sol/SampleRecipient.json'
 
 import { BundlerConfig } from '../src/BundlerConfig'
-import { ERC4337EthersProvider, ERC4337EthersSigner, ClientConfig, wrapProvider } from '@account-abstraction/sdk'
+import { ERC4337EthersProvider, ERC4337EthersSigner, ClientConfig, wrapProvider } from '@boba/bundler_sdk'
 import { Signer, Wallet } from 'ethers'
 import { runBundler } from '../src/runBundler'
 import { BundlerServer } from '../src/BundlerServer'
 import fs from 'fs'
-
+import { getContractFactory } from '@eth-optimism/contracts'
 const { expect } = chai.use(chaiAsPromised)
 
 export async function startBundler (options: BundlerConfig): Promise<BundlerServer> {
@@ -38,12 +38,15 @@ describe('Flow', function () {
     signer = await hre.ethers.provider.getSigner()
     const beneficiary = await signer.getAddress()
 
+    const addressManagerFactory = await getContractFactory('Lib_AddressManager', signer)
+    const addressManager = await addressManagerFactory.deploy()
+
     const sampleRecipientFactory = await ethers.getContractFactory('SampleRecipient')
     const sampleRecipient = await sampleRecipientFactory.deploy()
     sampleRecipientAddress = sampleRecipient.address
 
     const EntryPointFactory = await ethers.getContractFactory('EntryPoint')
-    const entryPoint = await EntryPointFactory.deploy(1, 1)
+    const entryPoint = await EntryPointFactory.deploy()
     entryPointAddress = entryPoint.address
 
     const bundleHelperFactory = await ethers.getContractFactory('BundlerHelper')
@@ -64,7 +67,9 @@ describe('Flow', function () {
       minBalance: '0',
       mnemonic: mnemonicFile,
       network: 'http://localhost:8545/',
-      port: '5555'
+      port: '5555',
+      addressManager: addressManager.address,
+      l1NodeWeb3Url: 'http://localhost:8545/'
     })
   })
 

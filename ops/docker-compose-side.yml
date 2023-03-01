@@ -132,7 +132,8 @@ services:
     image: bobanetwork/bundler:latest
     build:
       context: ..
-      dockerfile: ./ops/docker/Dockerfile.bundler
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: bundler
     deploy:
       replicas: 1
     ports: [ '3000:3000' ]

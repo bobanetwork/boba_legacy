@@ -1,23 +1,25 @@
+
 import 'source-map-support/register'
 import { BaseProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { assert, expect } from 'chai'
 import { ethers } from 'hardhat'
 import { parseEther } from 'ethers/lib/utils'
 
+import { getContractFactory } from '@eth-optimism/contracts'
 import { UserOpMethodHandler } from '../src/UserOpMethodHandler'
 
 import { BundlerConfig } from '../src/BundlerConfig'
-import { BundlerHelper, SampleRecipient } from '../src/types'
 import {
   EntryPoint,
-  SimpleWalletDeployer__factory,
+  SimpleAccountDeployer__factory,
   UserOperationStruct
-} from '@account-abstraction/contracts'
+} from '@boba/accountabstraction'
 
-import { SimpleWalletAPI } from '@account-abstraction/sdk'
-import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
+import { DeterministicDeployer } from '@boba/bundler_sdk/src/DeterministicDeployer'
 import { Wallet } from 'ethers'
-import { postExecutionDump } from '@account-abstraction/utils/dist/src/postExecCheck'
+import { SimpleAccountAPI } from '@boba/bundler_sdk'
+import { postExecutionDump } from '@boba/bundler_utils/dist/src/postExecCheck'
+import { BundlerHelper, SampleRecipient } from '../src/types'
 
 describe('UserOpMethodHandler', function () {
   const helloWorld = 'hello world'
@@ -35,8 +37,10 @@ describe('UserOpMethodHandler', function () {
     provider = ethers.provider
     signer = ethers.provider.getSigner()
 
+    const addressManagerFactory = await getContractFactory('Lib_AddressManager', signer)
+    const addressManager = await addressManagerFactory.deploy()
     const EntryPointFactory = await ethers.getContractFactory('EntryPoint')
-    entryPoint = await EntryPointFactory.deploy(1, 1)
+    entryPoint = await EntryPointFactory.deploy()
 
     const bundleHelperFactory = await ethers.getContractFactory('BundlerHelper')
     bundleHelper = await bundleHelperFactory.deploy()
@@ -52,7 +56,9 @@ describe('UserOpMethodHandler', function () {
       minBalance: '0',
       mnemonic: '',
       network: '',
-      port: '3000'
+      port: '3000',
+      addressManager: addressManager.address,
+      l1NodeWeb3Url: ''
     }
 
     methodHandler = new UserOpMethodHandler(
@@ -76,9 +82,9 @@ describe('UserOpMethodHandler', function () {
     let walletDeployerAddress: string
     before(async function () {
       DeterministicDeployer.init(ethers.provider)
-      walletDeployerAddress = await DeterministicDeployer.deploy(SimpleWalletDeployer__factory.bytecode)
+      walletDeployerAddress = await DeterministicDeployer.deploy(SimpleAccountDeployer__factory.bytecode)
 
-      const smartWalletAPI = new SimpleWalletAPI({
+      const smartWalletAPI = new SimpleAccountAPI({
         provider,
         entryPointAddress: entryPoint.address,
         owner: walletSigner,
@@ -97,8 +103,8 @@ describe('UserOpMethodHandler', function () {
     })
 
     it('should send UserOperation transaction to BundlerHelper', async function () {
-      const requestId = await methodHandler.sendUserOperation(userOperation, entryPoint.address)
-      const req = await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(requestId))
+      const userOpHash = await methodHandler.sendUserOperation(userOperation, entryPoint.address)
+      const req = await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(userOpHash))
       const transactionReceipt = await req[0].getTransactionReceipt()
 
       assert.isNotNull(transactionReceipt)
@@ -117,7 +123,7 @@ describe('UserOpMethodHandler', function () {
     })
 
     it('should expose FailedOp errors as text messages', async () => {
-      const smartWalletAPI = new SimpleWalletAPI({
+      const smartWalletAPI = new SimpleAccountAPI({
         provider,
         entryPointAddress: entryPoint.address,
         owner: walletSigner,
@@ -133,13 +139,13 @@ describe('UserOpMethodHandler', function () {
         await methodHandler.sendUserOperation(op, entryPoint.address)
         throw Error('expected fail')
       } catch (e: any) {
-        expect(e.message).to.match(/FailedOp.*wallet didn't pay prefund/)
+        expect(e.message).to.match(/account didn't pay prefund/)
       }
     })
 
     describe('validate get paid enough', function () {
       it('should pay just enough', async () => {
-        const api = new SimpleWalletAPI({
+        const api = new SimpleAccountAPI({
           provider,
           entryPointAddress: entryPoint.address,
           walletAddress,
@@ -176,7 +182,7 @@ describe('UserOpMethodHandler', function () {
         await postExecutionDump(entryPoint, id)
       })
       it('should reject if doesn\'t pay enough', async () => {
-        const api = new SimpleWalletAPI({
+        const api = new SimpleAccountAPI({
           provider,
           entryPointAddress: entryPoint.address,
           walletAddress,
