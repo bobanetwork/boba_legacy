@@ -42,6 +42,7 @@ import {
   selectActiveNetworkName,
 } from 'selectors/networkSelector.js'
 import { NETWORK } from 'util/network/network.util.js'
+import { MIN_NATIVE_L1_BALANCE } from 'util/constant.js'
 
 function FeeSwitcher() {
   const dispatch = useDispatch()
@@ -62,7 +63,8 @@ function FeeSwitcher() {
   const dispatchSwitchFee = useCallback(
     async (targetFee) => {
       let tooSmallL1NativeToken = false
-      let minL1NativeBalance = network === NETWORK.ETHEREUM ? 0.0002 : 0.002
+      // mini balance required for token to use as bridge fee
+      let minL1NativeBalance = MIN_NATIVE_L1_BALANCE; //0.002
       let tooSmallBOBA = false
 
       if (typeof balanceBOBA === 'undefined') {

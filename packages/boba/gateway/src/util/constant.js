@@ -100,3 +100,5 @@ export const DEFAULT_NETWORK = {
 
 
 export const MM_EXTENTION_URL = 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en'
+
+export const MIN_NATIVE_L1_BALANCE = 0.002
