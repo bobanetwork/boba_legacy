@@ -92,7 +92,7 @@ import GraphQLService from "./graphql.service"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { SPEED_CHECK } from 'util/constant'
+import { MIN_NATIVE_L1_BALANCE, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
@@ -256,6 +256,27 @@ class NetworkService {
       console.log(error)
       return error
     }
+  }
+
+  async estimateMinL1NativeTokenForFee() {
+    if(this.L1orL2 !== 'L2' ) return 0;
+
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      // for ethereum l1 fee is always const to 0.002.
+      return MIN_NATIVE_L1_BALANCE
+    } else {
+      // for alt l1 this fee can change
+      const bobaFeeContract = new ethers.Contract(
+        this.addresses.Boba_GasPriceOracle,
+        BobaGasPriceOracleABI,
+        this.provider.getSigner()
+      )
+
+      const minTokenForFee = await bobaFeeContract.secondaryFeeTokenMinimum();
+
+      return logAmount(minTokenForFee.toString(), 18)
+    }
+
   }
 
   async switchFee( targetFee ) {

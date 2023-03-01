@@ -1,4 +1,5 @@
 const BobaGasPriceOracleABI = [
+  'function secondaryFeeTokenMinimum() public view returns (uint256)',
   'function priceRatio() public view returns (uint256)',
   'function bobaFeeTokenUsers(address) public view returns (bool user)',
   'function secondaryFeeTokenUsers(address) public view returns (bool user)',
