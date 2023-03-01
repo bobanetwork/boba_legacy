@@ -2571,6 +2571,12 @@ class NetworkService {
         console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
       }
 
+      if (this.networkGateway !== NETWORK.ETHEREUM) {
+        otherField = {
+          ...otherField,
+          value: utils.parseEther('1.0')
+        }
+      }
       // Second, we need the addLiquidity cost
       // all ERC20s will be the same, so use the BOBA contract
       const tx2 = await this.L2LPContract
@@ -2579,7 +2585,7 @@ class NetworkService {
         .addLiquidity(
           utils.parseEther('1.0'),
           this.tokenAddresses['BOBA'].L2,
-          {...otherField, value: utils.parseEther('1.0') }
+          otherField
         )
       const stakeGas_BN = await this.provider.estimateGas(tx2)
       stakeCost_BN = stakeGas_BN.mul(gasPrice_BN)
