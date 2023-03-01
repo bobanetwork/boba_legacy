@@ -1,5 +1,6 @@
 import moment from 'moment'
 
+
 /**************
  * Env Params *
  **************/
@@ -72,7 +73,6 @@ export const ROUTES_PATH = {
 }
 export const PER_PAGE = 8
 
-
 export const PAGES_BY_NETWORK = {
   ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO', 'Monster'],
   bnb: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
@@ -89,11 +89,11 @@ export const LAYER = {
 
 export const DEFAULT_NETWORK = {
   NAME: {
-    L1: 'Etheruem',
+    L1: 'Ethereum',
     L2: 'Boba'
   },
   ICON: {
-    L1: 'etheruem',
+    L1: 'ethereum',
     L2: 'boba'
   }
 }

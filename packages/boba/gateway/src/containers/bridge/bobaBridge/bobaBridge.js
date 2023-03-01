@@ -1,4 +1,3 @@
-
 /*
   Utility Functions for OMG Plasma
   Copyright (C) 2021 Enya Inc. Palo Alto, CA
@@ -18,29 +17,35 @@
 */
 
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
-import { Box, Typography, Switch, useTheme } from "@mui/material"
-
+import { Box, Typography, Switch, useTheme } from '@mui/material'
 import Button from 'components/button/Button.js'
 import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectBridgeTokens, selectMultiBridgeMode } from "selectors/bridgeSelector"
-import { selectActiveNetworkIcon, selectActiveNetworkName } from 'selectors/networkSelector'
+import * as S from './bobaBridge.styles'
 
-import { resetToken, setMultiBridgeMode } from "actions/bridgeAction"
+import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
+
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import {
+  selectBridgeTokens,
+  selectMultiBridgeMode,
+} from 'selectors/bridgeSelector'
+import {
+  selectActiveNetworkIcon,
+  selectActiveNetworkName,
+} from 'selectors/networkSelector'
+
+import { resetToken, setMultiBridgeMode } from 'actions/bridgeAction'
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 
-import * as S from './bobaBridge.styles'
-import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
 import { DEFAULT_NETWORK, LAYER } from 'util/constant'
 
 function BobaBridge() {
-
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
@@ -48,11 +53,11 @@ function BobaBridge() {
   const networkName = useSelector(selectActiveNetworkName())
   const icon = useSelector(selectActiveNetworkIcon())
 
-  const L1Icon = L1_ICONS[ icon ];
-  const L2Icon = L2_ICONS[ icon ];
+  const L1Icon = L1_ICONS[icon]
+  const L2Icon = L2_ICONS[icon]
 
   const dispatch = useDispatch()
-  const [ toL2, setToL2 ] = useState(true)
+  const [toL2, setToL2] = useState(true)
   const theme = useTheme()
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
@@ -68,10 +73,8 @@ function BobaBridge() {
 
   async function switchDirection() {
     if (accountEnabled) {
-      if (layer === LAYER.L1)
-        dispatch(setConnectBOBA(true))
-      else
-        dispatch(setConnectETH(true))
+      if (layer === LAYER.L1) dispatch(setConnectBOBA(true))
+      else dispatch(setConnectETH(true))
     } else {
       setToL2(!toL2)
     }
@@ -81,29 +84,74 @@ function BobaBridge() {
     return (
       <S.BobaBridgeWrapper>
         <Box sx={{ my: 1 }}>
-          <Typography variant="h3">Bridge</Typography>
+          <Typography variant="h3" pb="12px">
+            Bridge
+          </Typography>
           <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
+        <S.BobaDivider></S.BobaDivider>
         <S.BobaContent>
-          <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
-            <Box width="100%">
+          <S.BobaContentWrapper
+            flexDirection="column"
+            fullWidth={true}
+            gap="5px"
+            alignItems="flex-start"
+            my={1}
+          >
+            <Box width="100%" mb="38px">
+              <Typography variant="body2" pb="10px">
+                From
+              </Typography>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> From {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body">
+                  <L1Icon selected />
+                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
+                </S.ChainLabel>
               </S.ChainInput>
             </Box>
-            <S.IconSwitcher onClick={() => { switchDirection() }}>
-              <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
+            <S.IconSwitcher
+              onClick={() => {
+                switchDirection()
+              }}
+            >
+              <svg
+                transform="rotate(90)"
+                width="19"
+                height="20"
+                viewBox="0 0 19 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
+                  fill={iconColor}
+                  fillOpacity="0.85"
+                />
               </svg>
             </S.IconSwitcher>
             <Box width="100%">
+              <Typography variant="body2" mt="10px" pb="10px">
+                To
+              </Typography>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> To {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body">
+                  <L2Icon selected />
+                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
+                </S.ChainLabel>
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
-            <Button sx={{ marginTop: '13px' }} onClick={() => { connectToETH() }} color='primary' variant='outlined'>Connect to {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</Button>
+            <Button
+              sx={{ marginTop: '38px' }}
+              onClick={() => {
+                connectToETH()
+              }}
+              color="primary"
+              variant="contained"
+            >
+              Connect
+            </Button>
           </Box>
         </S.BobaContent>
       </S.BobaBridgeWrapper>
@@ -112,29 +160,74 @@ function BobaBridge() {
     return (
       <S.BobaBridgeWrapper>
         <Box sx={{ my: 1 }}>
-          <Typography variant="h3">Bridge</Typography>
+          <Typography variant="h3" pb="12px">
+            Bridge
+          </Typography>
           <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
+        <S.BobaDivider></S.BobaDivider>
         <S.BobaContent>
-          <S.BobaContentWrapper flexDirection="column" fullWidth={true} gap="5px" alignItems="flex-start" my={1}>
-            <Box width="100%">
+          <S.BobaContentWrapper
+            flexDirection="column"
+            fullWidth={true}
+            gap="5px"
+            alignItems="flex-start"
+            my={1}
+          >
+            <Box width="100%" mb="38px">
+              <Typography variant="body2" pb="10px">
+                From
+              </Typography>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> From {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body">
+                  <L2Icon selected />
+                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
+                </S.ChainLabel>
               </S.ChainInput>
             </Box>
-            <S.IconSwitcher onClick={() => { switchDirection() }}>
-              <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
+            <S.IconSwitcher
+              onClick={() => {
+                switchDirection()
+              }}
+            >
+              <svg
+                transform="rotate(90)"
+                width="19"
+                height="20"
+                viewBox="0 0 19 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
+                  fill={iconColor}
+                  fillOpacity="0.85"
+                />
               </svg>
             </S.IconSwitcher>
             <Box width="100%">
+              <Typography variant="body2" mt="10px" pb="10px">
+                To
+              </Typography>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> To {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
+                <S.ChainLabel component="p" variant="body">
+                  <L1Icon selected />
+                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
+                </S.ChainLabel>
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
-            <Button sx={{ marginTop: '13px' }} onClick={() => { connectToBOBA() }} color='primary' variant='outlined'>Connect to {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</Button>
+            <Button
+              sx={{ marginTop: '38px' }}
+              onClick={() => {
+                connectToBOBA()
+              }}
+              color="primary"
+              variant="contained"
+            >
+              Connect
+            </Button>
           </Box>
         </S.BobaContent>
       </S.BobaBridgeWrapper>
@@ -144,39 +237,79 @@ function BobaBridge() {
   return (
     <>
       <S.BobaBridgeWrapper>
-        <S.BobaContentWrapper flexDirection="row" fullWidth={true} gap="10px" alignItems="center">
+        <S.BobaContentWrapper
+          flexDirection="row"
+          fullWidth={true}
+          gap="10px"
+          alignItems="center"
+        >
           <Box width="100%">
-            <S.ChainInput
-            >
-              {layer === 'L1' ?
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> From {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
-                :
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> From {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
-              }
+            <Typography variant="body2" pb="10px">
+              From
+            </Typography>
+            <S.ChainInput>
+              {layer === 'L1' ? (
+                <S.ChainLabel component="p" variant="body">
+                  <L1Icon selected />
+                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
+                </S.ChainLabel>
+              ) : (
+                <S.ChainLabel component="p" variant="body">
+                  <L2Icon selected />
+                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
+                </S.ChainLabel>
+              )}
             </S.ChainInput>
           </Box>
-          <Box display="flex" flexDirection="column" alignItems="center">
-            <S.IconSwitcher onClick={() => { switchDirection() }}>
-              <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z" fill={iconColor} fillOpacity="0.85" />
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mt="26px"
+          >
+            <S.IconSwitcher
+              onClick={() => {
+                switchDirection()
+              }}
+            >
+              <svg
+                width="19"
+                height="20"
+                viewBox="0 0 19 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
+                  fill={iconColor}
+                  fillOpacity="0.85"
+                />
               </svg>
             </S.IconSwitcher>
           </Box>
           <Box width="100%">
+            <Typography variant="body2" pb="10px">
+              To
+            </Typography>
             <S.ChainInput>
-              {layer === 'L2' ?
-                <S.ChainLabel component="p" variant="body"><L1Icon selected /> To {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}</S.ChainLabel>
-                :
-                <S.ChainLabel component="p" variant="body"><L2Icon selected /> To {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}</S.ChainLabel>
-              }
+              {layer === 'L2' ? (
+                <S.ChainLabel component="p" variant="body">
+                  <L1Icon selected />
+                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
+                </S.ChainLabel>
+              ) : (
+                <S.ChainLabel component="p" variant="body">
+                  <L2Icon selected />
+                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
+                </S.ChainLabel>
+              )}
             </S.ChainInput>
           </Box>
         </S.BobaContentWrapper>
       </S.BobaBridgeWrapper>
 
       <S.BobaBridgeWrapper>
-
-        {layer === 'L1' && !multibridgeMode && tokens.length < 1 &&
+        {layer === 'L1' && !multibridgeMode && tokens.length < 1 && (
           <Box display="flex" my={1} justifyContent="space-between">
             <Typography variant="body2">
               Bridge multiple tokens at once?
@@ -209,28 +342,22 @@ function BobaBridge() {
               }}
             />
           </Box>
-        }
+        )}
 
         <BridgeTransfer />
-
       </S.BobaBridgeWrapper>
 
-
-      {tokens.length === 1 &&
-        <AvailableBridges token={tokens[ 0 ]} />
-      }
-
+      {tokens.length === 1 && <AvailableBridges token={tokens[0]} />}
 
       <S.HistoryLink
         onClick={() => {
           navigate('/history')
         }}
-        display="flex" justifyContent="center">
-        <Typography
-          sx={{ cursor: 'pointer' }}
-          variant="body2"
-          component="span">
-          {"Transaction History >"}
+        display="flex"
+        justifyContent="center"
+      >
+        <Typography sx={{ cursor: 'pointer' }} variant="body2" component="span">
+          {'Transaction History >'}
         </Typography>
       </S.HistoryLink>
     </>

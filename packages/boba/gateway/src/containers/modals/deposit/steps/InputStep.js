@@ -118,7 +118,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
         <Button
           onClick={handleClose}
           disabled={false}
-          variant='outlined'
+          variant='contained'
           color='primary'
           size='large'
         >

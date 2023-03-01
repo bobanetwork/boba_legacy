@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
-import { CircularProgress, Tooltip } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import { Button as ButtonMUI } from '@mui/material'
+import Tooltip from '../tooltip/Tooltip'
 
-function Button ({
+function Button({
   children,
   style,
   onClick,
@@ -33,12 +34,10 @@ function Button ({
   className,
   triggerTime
 }) {
-
-  if(disabled || loading)
-    pulsate = false
+  if (disabled || loading) pulsate = false
 
   let timeDefined = false
-  if(typeof triggerTime !== 'undefined') {
+  if (typeof triggerTime !== 'undefined') {
     timeDefined = true
   }
 
@@ -47,13 +46,17 @@ function Button ({
 
   React.useEffect(() => {
     if (loading) {
-      const timer = setInterval(()=>{setTime(new Date())}, 1000)
-      return () => {clearInterval(timer)}
+      const timer = setInterval(() => {
+        setTime(new Date())
+      }, 1000)
+      return () => {
+        clearInterval(timer)
+      }
     }
   }, [loading])
 
-  let waitTime = (now-triggerTime) / 1000
-  if(waitTime < 0) waitTime = 0
+  let waitTime = (now - triggerTime) / 1000
+  if (waitTime < 0) waitTime = 0
   waitTime = Math.round(waitTime)
 
   const muiProps = {
@@ -77,19 +80,17 @@ function Button ({
       <span>
         <ButtonMUI {...muiProps} style={styleCombo}>
           {children}
-          {(disabled || loading) && timeDefined && (waitTime > 3) &&
-            <div style={{ marginLeft: '10px' }}>
-              {waitTime}s ago
-            </div>
-          }
-          {loading &&
+          {(disabled || loading) && timeDefined && waitTime > 3 && (
+            <div style={{ marginLeft: '10px' }}>{waitTime}s ago</div>
+          )}
+          {loading && (
             <div style={{ paddingTop: '4px', marginLeft: '10px' }}>
-              <CircularProgress size={14} color='inherit' />
+              <CircularProgress size={14} color="inherit" />
             </div>
-          }
+          )}
         </ButtonMUI>
       </span>
-  </Tooltip>
+    </Tooltip>
   )
 }
 

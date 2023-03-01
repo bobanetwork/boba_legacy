@@ -21,13 +21,13 @@ function BridgeContainer() {
           isMobile && accountEnabled ?
             null
             : <S.TitleContainer>
-              <Typography variant="h2"
+              <Typography variant="h1"
               > Transfer
                 <br />
                 tokens between {activeNetwork} and
                 <br />
                 <Typography
-                  variant="h2"
+                  variant="h1"
                   component="span"
                   sx={{
                     background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',

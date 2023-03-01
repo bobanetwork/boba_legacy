@@ -1,9 +1,16 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
+import {
+  selectlayer1Balance,
+  selectlayer2Balance,
+} from 'selectors/balanceSelector'
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectBaseEnabled, selectLayer } from 'selectors/setupSelector'
+import {
+  selectAccountEnabled,
+  selectBaseEnabled,
+  selectLayer,
+} from 'selectors/setupSelector'
 import { selectNetwork } from 'selectors/networkSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
@@ -13,7 +20,6 @@ import { setActiveHistoryTab } from 'actions/uiAction'
 
 import * as S from './Token.styles'
 import * as G from '../../Global.styles'
-
 
 import { Box, Typography, CircularProgress } from '@mui/material'
 import { tokenTableHeads } from './token.tableHeads'
@@ -32,7 +38,6 @@ import { useNavigate } from 'react-router-dom'
 import Faucet from 'components/faucet/Faucet'
 
 function TokenPage() {
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -45,23 +50,28 @@ function TokenPage() {
   const layer = useSelector(selectLayer())
   const network = useSelector(selectNetwork())
 
-  const [ debug, setDebug ] = useState(false)
+  const [debug, setDebug] = useState(false)
 
-  const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
-  const exitLoading = useSelector(selectLoading([ 'EXIT/CREATE' ]))
-  const balanceLoading = useSelector(selectLoading([ 'BALANCE/GET' ]))
+  const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
+  const exitLoading = useSelector(selectLoading(['EXIT/CREATE']))
+  const balanceLoading = useSelector(selectLoading(['BALANCE/GET']))
 
   const disabled = depositLoading || exitLoading
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+  const orderedTransactions = orderBy(
+    unorderedTransactions,
+    (i) => i.timeStamp,
+    'desc'
+  )
 
   const pendingL1 = orderedTransactions.filter((i) => {
-    if (i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+    if (
+      i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
       i.crossDomainMessage &&
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending"
+      i.action.status === 'pending'
     ) {
       return true
     }
@@ -69,24 +79,26 @@ function TokenPage() {
   })
 
   const pendingL2 = orderedTransactions.filter((i) => {
-    if (i.chain === 'L2' &&
+    if (
+      i.chain === 'L2' &&
       i.crossDomainMessage &&
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === "pending"
+      i.action.status === 'pending'
     ) {
       return true
     }
     return false
   })
 
-  const pending = [
-    ...pendingL1,
-    ...pendingL2
-  ]
+  const pending = [...pendingL1, ...pendingL2]
 
   const inflight = pending.filter((i) => {
-    if (pending && i.hasOwnProperty('stateRoot') && i.stateRoot.stateRootHash === null) {
+    if (
+      pending &&
+      i.hasOwnProperty('stateRoot') &&
+      i.stateRoot.stateRootHash === null
+    ) {
       return true
     }
     return false
@@ -99,12 +111,13 @@ function TokenPage() {
     if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
       setDebug(true)
     }
-  }, [ accountEnabled ])
+  }, [accountEnabled])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
     // only run once all the tokens have been added to the tokenList
-    if (Object.keys(tokenList).length < networkService.tokenAddresses.length) return;
+    if (Object.keys(tokenList).length < networkService.tokenAddresses.length)
+      return
 
     const symbolList = Object.values(tokenList).map((i) => {
       if (i.symbolL1 === 'ETH') {
@@ -130,21 +143,19 @@ function TokenPage() {
       }
     })
     dispatch(fetchLookUpPrice(symbolList))
-  }, [ tokenList, dispatch, accountEnabled ])
+  }, [tokenList, dispatch, accountEnabled])
 
   useEffect(() => {
     if (!baseEnabled) return
     getLookupPrice()
-  }, [ getLookupPrice, baseEnabled ])
+  }, [getLookupPrice, baseEnabled])
 
   const GasEstimateApprove = () => {
     let approval = networkService.estimateApprove()
     console.log(['Gas Estimate Approval', approval])
   }
 
-
   if (!accountEnabled) {
-
     return (
       <G.Container>
         <G.ContentEmpty>
@@ -152,7 +163,7 @@ function TokenPage() {
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -165,53 +176,69 @@ function TokenPage() {
         </G.ContentEmpty>
       </G.Container>
     )
-
   } else {
-
     return (
       <>
-        {layer === 'L2' && network === 'mainnet' &&
+        {layer === 'L2' && network === 'mainnet' && (
           <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
             <Typography variant="body2">
-              <span style={{ opacity: '0.9' }}>Need ETH or BOBA</span>{'? '}
-              <span style={{ opacity: '0.6' }}>You can swap one for the other at </span>
+              <span style={{ opacity: '0.9' }}>Need ETH or BOBA</span>
+              {'? '}
+              <span style={{ opacity: '0.6' }}>
+                You can swap one for the other at{' '}
+              </span>
               <G.footerLink
-                target='_blank'
+                target="_blank"
                 href={'https://www.sushi.com/swap'}
                 aria-label="link"
-                style={{ fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px' }}
-              >Sushiswap<Link />
+                style={{
+                  fontSize: '1.0em',
+                  opacity: '0.9',
+                  paddingLeft: '3px',
+                }}
+              >
+                Sushiswap
+                <Link />
               </G.footerLink>
               <span style={{ opacity: '0.6' }}>and </span>
               <G.footerLink
-                target='_blank'
+                target="_blank"
                 href={'https://oolongswap.com/'}
                 aria-label="link"
-                style={{ fontSize: '1.0em', opacity: '0.9', paddingLeft: '3px' }}
-              >Oolongswap <Link />
+                style={{
+                  fontSize: '1.0em',
+                  opacity: '0.9',
+                  paddingLeft: '3px',
+                }}
+              >
+                Oolongswap <Link />
               </G.footerLink>
             </Typography>
-            {debug &&
+            {debug && (
               <Button
-                onClick={() => { GasEstimateApprove() }}
-                color='primary'
+                onClick={() => {
+                  GasEstimateApprove()
+                }}
+                color="primary"
                 variant="contained"
               >
                 GasEstimateApprove
               </Button>
-            }
+            )}
           </Box>
-        }
+        )}
 
         <Faucet />
 
-        {!!accountEnabled && inflight.length > 0 &&
-          <Box sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}>
+        {!!accountEnabled && inflight.length > 0 && (
+          <Box
+            sx={{ padding: '10px 0px', display: 'flex', flexDirection: 'row' }}
+          >
             <Typography
               variant="body2"
               sx={{ cursor: 'pointer' }}
               onClick={() => {
-                dispatch(setActiveHistoryTab("Pending"));
+                dispatch(setActiveHistoryTab('Pending'))
                 navigate('/history')
               }}
             >
@@ -220,7 +247,7 @@ function TokenPage() {
               <Pulse variant="success" />
             </Typography>
           </Box>
-        }
+        )}
 
         <G.Container>
           <G.Content>
@@ -231,45 +258,60 @@ function TokenPage() {
                     sx={{
                       width: item.size,
                       flex: item.flex,
-                      ...item.sx
+                      ...item.sx,
                     }}
-                    key={item.label} variant="body2" component="div">{item.label}</S.TableHeadingItem>
+                    key={item.label}
+                    variant="body2"
+                    component="div"
+                  >
+                    {item.label}
+                  </S.TableHeadingItem>
                 )
               })}
             </S.TableHeading>
-            {layer === 'L2' ? !balanceLoading || !!l2Balance.length ? l2Balance.map((i) => {
-              return (
-                <ListToken
-                  key={i.currency}
-                  token={i}
-                  chain={'L2'}
-                  networkLayer={layer}
-                  disabled={disabled}
-                />
+            {layer === 'L2' ? (
+              !balanceLoading || !!l2Balance.length ? (
+                l2Balance.map((i) => {
+                  return (
+                    <ListToken
+                      key={i.currency}
+                      token={i}
+                      chain={'L2'}
+                      networkLayer={layer}
+                      disabled={disabled}
+                    />
+                  )
+                })
+              ) : (
+                <S.LoaderContainer>
+                  <CircularProgress color="secondary" />
+                </S.LoaderContainer>
               )
-            }) :
-              <S.LoaderContainer>
-                <CircularProgress color="secondary" />
-              </S.LoaderContainer> : null}
-            {layer === 'L1' ? !balanceLoading || !!l1Balance.length ? l1Balance.map((i) => {
-              return (
-                <ListToken
-                  key={i.currency}
-                  token={i}
-                  chain={'L1'}
-                  networkLayer={layer}
-                  disabled={disabled}
-                />
+            ) : null}
+            {layer === 'L1' ? (
+              !balanceLoading || !!l1Balance.length ? (
+                l1Balance.map((i) => {
+                  return (
+                    <ListToken
+                      key={i.currency}
+                      token={i}
+                      chain={'L1'}
+                      networkLayer={layer}
+                      disabled={disabled}
+                    />
+                  )
+                })
+              ) : (
+                <S.LoaderContainer>
+                  <CircularProgress color="secondary" />
+                </S.LoaderContainer>
               )
-            }) :
-              <S.LoaderContainer>
-                <CircularProgress color="secondary" />
-              </S.LoaderContainer> : null}
+            ) : null}
           </G.Content>
         </G.Container>
-      </>)
+      </>
+    )
   }
-
 }
 
 export default React.memo(TokenPage)
