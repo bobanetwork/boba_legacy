@@ -1,9 +1,12 @@
 {
   "name": "@boba/accountabstraction",
-  "version": "1.0.0",
-  "description": "BOBA Account Abstraction",
+  "version": "0.2.0",
+  "description": "BOBA Account Abstraction (EIP 4337) contracts",
+  "main": "./dist/index.js",
   "scripts": {
-    "build": "yarn install && yarn compile",
+    "build": "yarn install && yarn prepack",
+    "prepack": "./scripts/prepack-contracts-package.sh",
+    "postpack": "./scripts/postpack-contracts-package.sh",
     "clean": "rm -rf cache artifacts typechain typechain-types",
     "compile": "./scripts/hh-wrapper compile",
     "tsc": "tsc",
@@ -24,6 +27,14 @@
     "runop-goerli": "AA_URL=https://account-abstraction-goerli.nethermind.io yarn runop --network goerli",
     "runop3": "hardhat run src/runop3.ts "
   },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "accipt-abstraction",
+    "eip-4337"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.11",
