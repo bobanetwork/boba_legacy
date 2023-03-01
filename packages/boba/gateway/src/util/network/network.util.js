@@ -1,3 +1,5 @@
+import { providers } from 'ethers';
+
 import EthereumIcon from 'components/icons/chain/L1/EthereumIcon';
 import BNBIcon from 'components/icons/chain/L1/BNBIcon';
 import AvalancheIcon from 'components/icons/chain/L1/AvalancheIcon';
@@ -283,4 +285,17 @@ export const getBlockExplorerUrl = ({
   layer
 }) => {
   return networkConfig[network][networkType][layer]?.blockExplorerUrl
+}
+
+export const pingRpcUrl = async (
+  networkURL,
+) => {
+  const provider = new providers.JsonRpcProvider(networkURL)
+  try {
+    await provider.getBlockNumber()
+    return true
+  } catch (e) {
+    console.log(`Error pinging Rpc Url: ${networkURL}`)
+    return false
+  }
 }

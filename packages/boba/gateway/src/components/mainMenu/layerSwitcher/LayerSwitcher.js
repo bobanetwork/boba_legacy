@@ -29,6 +29,7 @@ import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  selectBaseEnabled,
   selectAccountEnabled,
   selectLayer,
   selectConnectETH,
@@ -58,6 +59,7 @@ import { LAYER } from 'util/constant.js'
 function LayerSwitcher({ visisble = true }) {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
 
   let layer = useSelector(selectLayer())
   const network = useSelector(selectActiveNetwork())
@@ -87,7 +89,7 @@ function LayerSwitcher({ visisble = true }) {
 
   const dispatchBootAccount = useCallback(() => {
 
-    if (!accountEnabled) initializeAccount()
+    if (!accountEnabled && baseEnabled) initializeAccount()
 
     async function initializeAccount() {
 
@@ -117,7 +119,7 @@ function LayerSwitcher({ visisble = true }) {
         return false
       }
     }
-  }, [dispatch, accountEnabled, network, networkType])
+  }, [dispatch, accountEnabled, network, networkType, baseEnabled])
 
   const doConnectToLayer = useCallback((layer) => {
     async function doConnect() {

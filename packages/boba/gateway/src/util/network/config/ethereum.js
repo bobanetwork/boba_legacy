@@ -11,7 +11,10 @@ export const ethereumConfig = {
       name: "Goerli",
       chainId: 5,
       chainIdHex: '0x5',
-      rpcUrl: `https://goerli.infura.io/v3/${INFURA_ID}`,
+      rpcUrl: [
+        `https://goerli.infura.io/v3/${INFURA_ID}`,
+        `https://rpc.ankr.com/eth_goerli`,
+      ],
       transaction: `https://goerli.etherscan.io/tx/`,
       blockExplorerUrl: `https://goerli.etherscan.io/`,
       symbol: 'ETH',
@@ -25,14 +28,6 @@ export const ethereumConfig = {
       blockExplorer: `https://testnet.bobascan.com/`,
       transaction: `https://testnet.bobascan.com/tx/`,
       blockExplorerUrl: `https://testnet.bobascan.com/`
-    },
-    ALTL1: {
-      name: "Alt L1s",
-      // chainId: 28,
-      // chainIdHex: '0x1C',
-      rpcUrl: ``,
-      // blockExplorer: `https://testnet.bobascan.com/`,
-      // transaction: `https://testnet.bobascan.com/tx/`
     },
     payloadForL1SecurityFee: {
       from: '0x122816e7A7AeB40601d0aC0DCAA8402F7aa4cDfA',
@@ -61,7 +56,11 @@ export const ethereumConfig = {
       name: "Mainnet",
       chainId: 1,
       chainIdHex: '0x1',
-      rpcUrl: `https://mainnet.infura.io/v3/${INFURA_ID}`,
+      rpcUrl: [
+        `https://mainnet.infura.io/v3/${INFURA_ID}`,
+        `https://rpc.ankr.com/eth`,
+        `https://cloudflare-eth.com`,
+      ],
       transaction: ` https://etherscan.io/tx/`,
       blockExplorerUrl: `https://etherscan.io/`,
       symbol: 'ETH',
