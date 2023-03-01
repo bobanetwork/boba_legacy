@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
-import { Box, Typography, Grid } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { Circle } from '@mui/icons-material'
 
 import { closeModal } from 'actions/uiAction';

@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setLayer } from 'actions/setupAction.js'
+import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
@@ -95,7 +95,6 @@ function LayerSwitcher({ visisble = true }) {
         networkGateway: network,
         networkType,
       })
-
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'));
         return false;
@@ -120,34 +119,20 @@ function LayerSwitcher({ visisble = true }) {
     }
   }, [dispatch, accountEnabled, network, networkType])
 
-  // this will switch chain, if needed, and then connect to Boba
-  const connectToBOBA = useCallback(async () => {
-    localStorage.setItem('wantChain', JSON.stringify('L2'))
-    await networkService.switchChain('L2')
-    dispatchBootAccount()
-  }, [dispatchBootAccount])
-
-   // this will switch chain, if needed, and then connect to Ethereum
-  const connectToETH = useCallback(async () => {
-    localStorage.setItem('wantChain', JSON.stringify('L1'))
-    await networkService.switchChain('L1')
-    dispatchBootAccount()
-  }, [ dispatchBootAccount ])
-
-
-  const dispatchSwitchLayer = useCallback((targetLayer) => {
-
-    if (targetLayer === 'L1') {
-       connectToETH()
+  const doConnectToLayer = useCallback((layer) => {
+    async function doConnect() {
+      try {
+        localStorage.setItem('wantChain', JSON.stringify(layer))
+        await networkService.switchChain(layer)
+        dispatchBootAccount()
+      } catch (err) {
+        console.log('ERROR', err)
+        dispatch(setConnectETH(false));
+        dispatch(setConnectBOBA(false));
+      }
     }
-    else if (targetLayer === 'L2') {
-      connectToBOBA()
-    } else {
-      // handles the strange targetLayer === null when people click on ETH icon a second time
-      connectToETH()
-    }
-
-  }, [ connectToBOBA, connectToETH ])
+    doConnect();
+  }, [dispatch, dispatchBootAccount])
 
   useEffect(() => {
     // detect mismatch and correct the mismatch
@@ -176,21 +161,19 @@ function LayerSwitcher({ visisble = true }) {
     }
   }, [chainChangedFromMM, dispatchBootAccount])
 
+  // listening for l1 connection request
   useEffect(() => {
     if (connectETHRequest) {
-      localStorage.setItem('wantChain', JSON.stringify('L1'))
-      networkService.switchChain('L1')
-      dispatchBootAccount()
+      doConnectToLayer('L1')
     }
-  }, [ connectETHRequest, dispatchBootAccount ])
+  }, [ connectETHRequest, doConnectToLayer ])
 
+  // listening for l2 connection request
   useEffect(() => {
     if (connectBOBARequest) {
-      localStorage.setItem('wantChain', JSON.stringify('L2'))
-      networkService.switchChain('L2')
-      dispatchBootAccount()
+      doConnectToLayer('L2')
     }
-  }, [ connectBOBARequest, dispatchBootAccount ])
+  }, [ connectBOBARequest, doConnectToLayer ])
 
   useEffect(() => {
     if (connectRequest) {
@@ -268,7 +251,7 @@ function LayerSwitcher({ visisble = true }) {
       <ToggleButtonGroup
         value={layer}
         exclusive
-        onChange={(e, n) => dispatchSwitchLayer(n)}
+        onChange={(e, n) => doConnectToLayer(n)}
         aria-label="text alignment"
       >
         <ToggleButton

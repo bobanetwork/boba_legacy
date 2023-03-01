@@ -735,11 +735,11 @@ class NetworkService {
           return true
         } catch (addError) {
           console.log("MetaMask - Error adding new RPC: ", addError)
-          return addError
+          throw new Error(addError.code)
         }
       } else { //some other error code
         console.log("MetaMask - Switch Error: ", error.code)
-        return error
+        throw new Error(error.code)
       }
     }
   }
