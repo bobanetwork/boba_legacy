@@ -326,7 +326,11 @@ class l1BridgeMonitorService extends GlobalEnv {
           // we pick the target address is L2StandardBridge
           resolved = messages.filter(
             (i) => i.target === '0x4200000000000000000000000000000000000010'
-          )[0]
+          )
+          if (resolved.length === 0) {
+            continue
+          }
+          resolved = resolved[0]
         } else {
           // drop the message if we can't resolve it
           continue
