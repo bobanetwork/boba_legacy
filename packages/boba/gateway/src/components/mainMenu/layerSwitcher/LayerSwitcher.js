@@ -231,7 +231,7 @@ function LayerSwitcher({ visisble = true }) {
           title="Ethereum"
           layer={layer}
           icon={<EthereumIcon />}
-          onConnect={() => connectToETH()}
+          onConnect={() => doConnectToLayer(LAYER.L1)}
           isConnected={layer === LAYER.L1}
         />
         <S.LayerDivider />
@@ -239,7 +239,7 @@ function LayerSwitcher({ visisble = true }) {
           title="Boba Network"
           layer={layer}
           icon={<BobaIcon />}
-          onConnect={() => connectToBOBA()}
+          onConnect={() => doConnectToLayer(LAYER.L1)}
           isConnected={layer === LAYER.L2}
         />
       </S.LayerSwitcherWrapperMobile>

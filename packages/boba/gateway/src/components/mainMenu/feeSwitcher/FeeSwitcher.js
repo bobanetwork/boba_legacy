@@ -38,7 +38,6 @@ import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 import networkService from 'services/networkService.js'
 import {
-  selectActiveNetwork,
   selectActiveNetworkName,
 } from 'selectors/networkSelector.js'
 
@@ -49,7 +48,7 @@ function FeeSwitcher() {
   const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const networkName = useSelector(selectActiveNetworkName())
-  const network = useSelector(selectActiveNetwork())
+
   const layer = useSelector(selectLayer())
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
@@ -127,7 +126,7 @@ function FeeSwitcher() {
         dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
       }
     },
-    [dispatch, feeUseBoba, balanceETH, balanceBOBA, network]
+    [dispatch, feeUseBoba, balanceETH, balanceBOBA]
   )
 
   if (!accountEnabled && layer !== 'L2') {
