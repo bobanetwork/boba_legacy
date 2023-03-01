@@ -90,12 +90,16 @@ function LayerSwitcher({ visisble = true }) {
     if (!accountEnabled) initializeAccount()
 
     async function initializeAccount() {
+
       const initialized = await networkService.initializeAccount({
         networkGateway: network,
         networkType,
       })
 
-      if (initialized === 'wrongnetwork') {
+      if (initialized === 'nometamask') {
+        dispatch(openModal('noMetaMaskModal'));
+        return false;
+      } else if (initialized === 'wrongnetwork') {
         dispatch(openModal('wrongNetworkModal'))
         return false
       } else if (initialized === false) {
@@ -117,18 +121,18 @@ function LayerSwitcher({ visisble = true }) {
   }, [dispatch, accountEnabled, network, networkType])
 
   // this will switch chain, if needed, and then connect to Boba
-  const connectToBOBA = useCallback(() => {
+  const connectToBOBA = useCallback(async () => {
     localStorage.setItem('wantChain', JSON.stringify('L2'))
-    networkService.switchChain('L2')
+    await networkService.switchChain('L2')
     dispatchBootAccount()
   }, [dispatchBootAccount])
 
-  // this will switch chain, if needed, and then connect to Ethereum
-  const connectToETH = useCallback(() => {
+   // this will switch chain, if needed, and then connect to Ethereum
+  const connectToETH = useCallback(async () => {
     localStorage.setItem('wantChain', JSON.stringify('L1'))
-    networkService.switchChain('L1')
+    await networkService.switchChain('L1')
     dispatchBootAccount()
-  }, [dispatchBootAccount])
+  }, [ dispatchBootAccount ])
 
   const dispatchSwitchLayer = useCallback(
     (targetLayer) => {

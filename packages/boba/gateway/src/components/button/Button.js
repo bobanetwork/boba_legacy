@@ -32,7 +32,7 @@ function Button({
   tooltip = '',
   size,
   className,
-  triggerTime,
+  triggerTime
 }) {
   if (disabled || loading) pulsate = false
 

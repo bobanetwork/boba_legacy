@@ -624,6 +624,10 @@ class NetworkService {
 
     try {
 
+      if (!window.ethereum) {
+        return 'nometamask'
+      }
+
       // connect to the wallet
       await window.ethereum.request({method: 'eth_requestAccounts'})
       this.provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -673,7 +677,6 @@ class NetworkService {
       } else if(!!NETWORK[ network ] && networkMM.chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
-        console.log("ERROR: network does not match actual network.chainId")
         this.bindProviderListeners()
         return 'wrongnetwork'
       }
@@ -691,7 +694,7 @@ class NetworkService {
   }
 
 
-  async switchChain( targetLayer ) {
+  async switchChain(targetLayer) {
 
     const networkDetail = getNetworkDetail({
       network: this.networkGateway,
@@ -700,9 +703,9 @@ class NetworkService {
 
     const targetIDHex = networkDetail[targetLayer].chainIdHex
 
-    this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
     try {
+
+      this.provider = new ethers.providers.Web3Provider(window.ethereum)
 
       await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
       window.ethereum.on('chainChanged', handleChangeChainOnce)
