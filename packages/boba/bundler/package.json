@@ -1,37 +1,21 @@
 {
   "private": true,
-  "name": "@boba/aa-bundler",
+  "name": "@boba/bundler",
   "version": "0.2.0",
   "author": "Dror Tirosh",
   "license": "MIT",
   "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
     "nohoist": [
       "**eslint**"
     ]
   },
   "scripts": {
-    "build": "yarn create-all-deps && yarn && yarn preprocess",
-    "clean": "rm -rf cache artifacts node_modules",
+    "build": "tsc -p ./tsconfig.json",
+    "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
     "bundler": "lerna run --no-prefix --stream bundler --",
     "runop": "lerna run --no-prefix --stream runop --",
     "runop-goerli": "yarn runop --network goerli --entryPoint \"0x1b98F08dB8F12392EAE339674e568fe29929bC47\"",
-    "create-all-deps": "jq '.dependencies,.devDependencies' packages/*/package.json |sort  -u > all.deps",
-    "depcheck": "lerna exec --no-bail --stream --parallel -- npx depcheck",
-    "hardhat-node": "lerna run hardhat-node --stream --no-prefix --",
-    "hardhat-deploy": "lerna run hardhat-deploy --stream --no-prefix --",
-    "lerna-clear": "lerna run clear",
-    "lerna-lint": "lerna run lint --stream --parallel",
-    "lerna-test": "lerna run hardhat-test --stream",
-    "lerna-test-flows": "lerna run hardhat-test-flows --stream --no-prefix",
-    "lerna-tsc": "lerna run tsc",
-    "lerna-watch-tsc": "lerna run --parallel watch-tsc",
-    "lint-fix": "lerna run lint-fix --parallel",
-    "clear": "lerna run clear",
-    "hardhat-compile": "lerna run hardhat-compile",
-    "preprocess": "yarn lerna-clear && yarn hardhat-compile && yarn lerna-tsc"
+    "clear": "lerna run clear"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.33.0",
@@ -43,11 +27,12 @@
     "eslint-plugin-n": "^15.2.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "lerna": "^5.4.0",
+    "ow": "^0.28.1",
     "typescript": "^4.3.5",
     "webpack": "^5.74.0"
   },
   "devDependencies": {
+    "ow": "^0.28.1",
     "webpack-cli": "^5.0.1"
   }
 }
