@@ -4,7 +4,7 @@
   "description": "BOBA Account Abstraction (EIP 4337) contracts",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "yarn install && yarn prepack",
+    "build": "yarn prepack",
     "prepack": "./scripts/prepack-contracts-package.sh",
     "postpack": "./scripts/postpack-contracts-package.sh",
     "clean": "rm -rf cache artifacts typechain typechain-types",
