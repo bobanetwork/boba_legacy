@@ -19,6 +19,7 @@ import { farmL1, farmL2 } from 'actions/networkAction'
 import { fetchAllowance } from 'actions/farmAction'
 import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
+import { NETWORK } from 'util/network/network.util'
 
 class FarmDepositModal extends React.Component {
 
@@ -39,7 +40,7 @@ class FarmDepositModal extends React.Component {
       loading: false,
       bobaFeeChoice,
       netLayer,
-      netLayerNativeToken: netLayer === 'L1' ? networkService.L1NativeTokenSymbol: 'BOBA',
+      netLayerNativeToken: networkService.networkGateway === NETWORK.ETHEREUM ? 'ETH' : netLayer === 'L1' ? networkService.L1NativeTokenSymbol : 'BOBA',
       bobaFeePriceRatio,
       max_Wei_String: '0',
       max_Float_String: '0.0',
@@ -107,6 +108,7 @@ class FarmDepositModal extends React.Component {
     } = this.state
 
     let max_BN = BigNumber.from(stakeToken.balance.toString())
+
     if (netLayer === 'L2') {
 
       let cost_BN = await networkService
@@ -140,10 +142,12 @@ class FarmDepositModal extends React.Component {
         // do not adjust max_BN
       }
 
-      if(bobaFeeChoice)
+      if (bobaFeeChoice && networkService.networkGateway === NETWORK.ETHEREUM) {
         fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
-      else
+      }
+      else {
         fee = utils.formatUnits(cost_BN, stakeToken.decimals)
+      }
 
       // if the max amount is less than the gas,
       // set the max amount to zero
