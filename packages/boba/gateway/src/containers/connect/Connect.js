@@ -17,6 +17,16 @@ const Connect = ({
 
   if (!accountEnabled && !connectToBoba) {
     return (
+    <G.LayerAlert style={{padding: '20px'}}>
+      <G.AlertInfo>
+        <AlertIcon />
+        <G.AlertText
+          variant="body2"
+          component="p"
+        >
+          {userPrompt}
+        </G.AlertText>
+      </G.AlertInfo>
       <Button
         type="primary"
         variant="contained"
@@ -26,6 +36,7 @@ const Connect = ({
       >
         Connect
       </Button>
+    </G.LayerAlert>
     )
   } else if (layer !== 'L2' && connectToBoba) {
     return (

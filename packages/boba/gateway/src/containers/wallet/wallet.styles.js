@@ -39,7 +39,7 @@ export const WalletActionContainer = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: '20px',
   marginBottom: '10px',
-  marginTop: '20px',
+  marginTop: '10px',
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
     alignItems: 'flex-start',

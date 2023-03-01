@@ -58,6 +58,7 @@ function App() {
         tabBorderBottom: light
           ? `solid 2px ${buttonColor}`
           : `solid 2px ${buttonColor}`,
+        alert: light ? 'black' : '#FFD88D',
       },
       secondary: {
         main: light ? buttonColor : buttonColor,
@@ -79,6 +80,7 @@ function App() {
         footer: light ? '#fff' : '#1A1D1F',
         glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
         tooltip: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)',
+        alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
       neutral: {
         main: '#fff',

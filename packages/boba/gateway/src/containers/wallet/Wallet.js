@@ -36,6 +36,8 @@ import {
 } from 'selectors/networkSelector'
 import networkService from 'services/networkService'
 import { NETWORK } from 'util/network/network.util'
+import Connect from "../connect/Connect";
+import PageTitle from "../../components/pageTitle/PageTitle";
 
 function Wallet() {
   const [page, setPage] = useState('Token')
@@ -111,10 +113,15 @@ function Wallet() {
 
   return (
     <S.PageContainer>
+      <PageTitle title={'Wallet'} />
+      <Connect
+        userPrompt={'Connect to MetaMask to see your balances, transfer, and bridge'}
+        accountEnabled={accountEnabled}
+      />
       {layer === 'L2' && tooSmallSec && (
         <G.LayerAlert style={{ padding: '20px' }}>
           <G.AlertInfo>
-            <Icon as={Info} sx={{ color: '#BAE21A' }} />
+            <Icon as={Info} sx={{ color: '#FFD88D' }} />
             <Typography
               flex={4}
               variant="body2"
@@ -200,21 +207,27 @@ function Wallet() {
         </Typography>
       )}
 
-      {network === NETWORK.ETHEREUM ? (
+      {accountEnabled ? (
         <>
-          <Box sx={{ mt: 2 }}>
-            <Tabs
-              activeTab={page}
-              onClick={(t) => setPage(t)}
-              aria-label="Page Tab"
-              tabs={['Token', 'NFT']}
-            />
-          </Box>
-          {page === 'Token' ? <Token /> : <Nft />}
+        {network === NETWORK.ETHEREUM ? (
+          <>
+            <Box sx={{ mt: 2 }}>
+              <Tabs
+                activeTab={page}
+                onClick={(t) => setPage(t)}
+                aria-label="Page Tab"
+                tabs={['Token', 'NFT']}
+              />
+            </Box>
+            {page === 'Token' ? <Token /> : <Nft />}
+          </>
+        ) : (
+          <Token />
+        )}
         </>
-      ) : (
-        <Token />
-      )}
+      ) : ('')}
+
+
     </S.PageContainer>
   )
 }
