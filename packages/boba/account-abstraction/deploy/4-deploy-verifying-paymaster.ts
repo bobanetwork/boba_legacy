@@ -2,7 +2,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
-import BobaVerifyingPaymasterJson from '../artifacts/BobaVerifyingPaymaster.json'
+import BobaVerifyingPaymasterJson from '../artifacts/contracts/samples/BobaVerifyingPaymaster.sol/BobaVerifyingPaymaster.json'
 import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
 
 let Factory__BobaVerifyingPaymaster: ContractFactory

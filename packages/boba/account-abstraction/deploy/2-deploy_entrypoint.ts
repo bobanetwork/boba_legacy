@@ -2,7 +2,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
-import EntryPointJson from '../artifacts/EntryPoint.json'
+import EntryPointJson from '../artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
 
 let Factory__EntryPoint: ContractFactory
