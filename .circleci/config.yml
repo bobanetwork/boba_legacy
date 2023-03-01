@@ -62,11 +62,11 @@ jobs:
 
       - run:
           name: package-json-all-deps
-          command: yarn create-all-deps
-          working_directory: ./packages/boba/bundler
+          command: yarn && yarn build
+          working_directory: ./
 
       - restore_cache: # special step to restore the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}-{{ .Environment.CACHE_VERSION }}
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
 
       - run:
           name: yarn-install-if-no-cache
@@ -74,7 +74,7 @@ jobs:
           working_directory: ./packages/boba/bundler
 
       - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/all.deps" }}-{{ .Environment.CACHE_VERSION }}
+          key: dependency-cache-{{ checksum "yarn.lock" }}-{{ checksum "./packages/boba/bundler/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
           paths:
             - ./packages/boba/bundler/node_modules
             - ./packages/boba/bundler/packages/node_modules
