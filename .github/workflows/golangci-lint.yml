@@ -1,18 +1,20 @@
 name: golangci-lint
 on:
   push:
-    paths:
-      - 'go/gas-oracle/**'
-      - 'go/batch-submitter/**'
+#     paths:
+#       - 'go/gas-oracle/**'
+#       - 'go/batch-submitter/**'
     branches:
-      - 'master'
-      - 'develop'
-      - '*rc'
-      - 'regenesis/*'
-  pull_request:
-    paths:
-      - 'go/gas-oracle/**'
-      - 'go/batch-submitter/**'
+      - '*'
+#       - 'master'
+#       - 'develop'
+#       - '*rc'
+#       - 'regenesis/*'
+#   pull_request:
+#     paths:
+#       - 'go/gas-oracle/**'
+#       - 'go/batch-submitter/**'
+
 jobs:
   golangci:
     name: lint
