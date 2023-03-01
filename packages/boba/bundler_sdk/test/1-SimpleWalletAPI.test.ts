@@ -3,16 +3,19 @@ import {
   EntryPoint__factory,
   SimpleWalletDeployer__factory,
   UserOperationStruct
-} from '@account-abstraction/contracts'
+} from '@boba/accountabstraction'
 import { Wallet } from 'ethers'
 import { parseEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
 import { ethers } from 'hardhat'
 import { SimpleWalletAPI } from '../src'
-import { SampleRecipient, SampleRecipient__factory } from '@account-abstraction/utils/dist/src/types'
+import {
+  SampleRecipient,
+  SampleRecipient__factory,
+} from '@boba/bundler_utils/dist/src/types'
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
-import { rethrowError } from '@account-abstraction/utils'
+import { rethrowError } from '@boba/bundler_utils'
 
 const provider = ethers.provider
 const signer = provider.getSigner()

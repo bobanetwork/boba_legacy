@@ -8,18 +8,18 @@
     "README.md"
   ],
   "scripts": {
-    "clear": "rm -rf dist artifacts cache",
+    "build": "tsc -p ./tsconfig.json",
+    "clean": "rimraf  dist/ ./tsconfig.tsbuildinfo",
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
     "test": "hardhat test",
     "hardhat-test": "hardhat test",
     "tsc": "tsc",
-    "watch-tsc": "tsc -w --preserveWatchOutput",
-    "build": "tsc -p ./tsconfig.json"
+    "watch-tsc": "tsc -w --preserveWatchOutput"
   },
   "dependencies": {
-    "@account-abstraction/contracts": "^0.2.0",
-    "@account-abstraction/utils": "^0.2.3",
+    "@boba/accountabstraction": "^1.0.0",
+    "@boba/bundler_utils": "^0.2.3",
     "@ethersproject/abstract-provider": "^5.5.0",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@ethersproject/networks": "^5.5.0",

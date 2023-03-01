@@ -14,10 +14,11 @@
     "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
     "bundler": "lerna run --no-prefix --stream bundler --",
     "runop": "lerna run --no-prefix --stream runop --",
-    "runop-goerli": "yarn runop --network goerli --entryPoint \"0x1b98F08dB8F12392EAE339674e568fe29929bC47\"",
-    "clear": "lerna run clear"
+    "runop-goerli": "yarn runop --network goerli --entryPoint \"0x1b98F08dB8F12392EAE339674e568fe29929bC47\""
   },
   "dependencies": {
+    "@boba/bundler_utils": "^0.2.3",
+    "@boba/bundler_sdk": "^0.2.3",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "depcheck": "^1.4.3",

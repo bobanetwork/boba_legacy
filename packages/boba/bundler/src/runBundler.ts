@@ -2,16 +2,15 @@ import ow from 'ow'
 import fs from 'fs'
 
 import { Command } from 'commander'
-import { erc4337RuntimeVersion } from '@account-abstraction/utils'
+import { erc4337RuntimeVersion } from '@boba/bundler_utils'
 import { ethers, Wallet } from 'ethers'
 import { BaseProvider } from '@ethersproject/providers'
 
 import { BundlerConfig, bundlerConfigDefault, BundlerConfigShape } from './BundlerConfig'
 import { BundlerServer } from './BundlerServer'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
-import { EntryPoint, EntryPoint__factory } from '@account-abstraction/contracts'
+import { BundlerHelper, BundlerHelper__factory, EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
 
-import { BundlerHelper, BundlerHelper__factory } from './types'
 
 // this is done so that console.log outputs BigNumber as hex string instead of unreadable object
 export const inspectCustomSymbol = Symbol.for('nodejs.util.inspect.custom')

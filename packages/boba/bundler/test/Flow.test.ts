@@ -4,10 +4,10 @@ import hre, { ethers } from 'hardhat'
 import sinon from 'sinon'
 
 import * as SampleRecipientArtifact
-  from '@account-abstraction/utils/artifacts/contracts/test/SampleRecipient.sol/SampleRecipient.json'
+  from '@boba/bundler_utils/artifacts/contracts/test/SampleRecipient.sol/SampleRecipient.json'
 
 import { BundlerConfig } from '../src/BundlerConfig'
-import { ERC4337EthersProvider, ERC4337EthersSigner, ClientConfig, wrapProvider } from '@account-abstraction/sdk'
+import { ERC4337EthersProvider, ERC4337EthersSigner, ClientConfig, wrapProvider } from '@boba/bundler_sdk'
 import { Signer, Wallet } from 'ethers'
 import { runBundler } from '../src/runBundler'
 import { BundlerServer } from '../src/BundlerServer'

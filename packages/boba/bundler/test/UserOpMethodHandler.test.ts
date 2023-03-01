@@ -12,12 +12,12 @@ import {
   EntryPoint,
   SimpleWalletDeployer__factory,
   UserOperationStruct
-} from '@account-abstraction/contracts'
+} from '@boba/accountabstraction'
 
-import { SimpleWalletAPI } from '@account-abstraction/sdk'
-import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
+import { SimpleWalletAPI } from '@boba/bundler_sdk'
+import { DeterministicDeployer } from '@boba/bundler_sdk/src/DeterministicDeployer'
 import { Wallet } from 'ethers'
-import { postExecutionDump } from '@account-abstraction/utils/dist/src/postExecCheck'
+import { postExecutionDump } from '@boba/bundler_utils/dist/src/postExecCheck'
 
 describe('UserOpMethodHandler', function () {
   const helloWorld = 'hello world'
