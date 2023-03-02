@@ -745,18 +745,19 @@ class NetworkService {
       // 4902 = the chain has not been added to MetaMask.
       // So, lets add it
       if (error.code === 4902) {
+        const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcURL
         try {
           //the chainParams are only needed for the L2s
           const chainParam = {
             chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
             chainName: networkDetail[targetLayer].name,
-            rpcUrls: this.L1Provider.connection.url,
+            rpcUrls: rpcURL,
             nativeCurrency: {
-              name: 'BOBA TOKEN',
-              symbol: 'BOBA',
+              name: networkDetail[targetLayer].tokenName,
+              symbol: networkDetail[targetLayer].symbol,
               decimals: 18,
             },
-            blockExplorerUrls: [networkDetail['L2']?.blockExplorer?.slice(0, -1)]
+            blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorer?.slice(0, -1)]
           }
 
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
