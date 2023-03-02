@@ -2113,14 +2113,29 @@ class NetworkService {
         this.addresses.DiscretionaryExitFee
       )
 
-      // Should approve BOBA
-      if ( BobaAllowance.lt(BobaApprovalAmount) ) {
-        const res = await this.approveERC20(
-          BobaApprovalAmount,
-          this.addresses.TK_L2BOBA,
-          this.addresses.DiscretionaryExitFee
-        )
-        if (!res) return false
+      if (this.networkGateway === NETWORK.ETHEREUM) {
+          // Should approve BOBA
+          if (utils.getAddress(currencyAddress) === utils.getAddress(this.addresses.TK_L2BOBA)) {
+            BobaApprovalAmount = BobaApprovalAmount.add(value)
+          }
+
+          if ( BobaAllowance.lt(BobaApprovalAmount) ) {
+            const res = await this.approveERC20(
+              BobaApprovalAmount,
+              this.addresses.TK_L2BOBA,
+              this.addresses.DiscretionaryExitFee
+            )
+            if (!res) return false
+          }
+
+      }
+
+      let otherField;
+      if (this.networkGateway === NETWORK.ETHEREUM) {
+        otherField = currencyAddress === this.addresses.L2_ETH_Address ? { value: value } : {}
+      } else {
+        otherField = currencyAddress === this.addresses.L2_ETH_Address ?
+          { value: value.add(BobaApprovalAmount) } : { value: BobaApprovalAmount }
       }
 
       // Should approve other tokens
@@ -2148,8 +2163,7 @@ class NetworkService {
         value_Wei_String,
         this.L1GasLimit,
         utils.formatBytes32String(new Date().getTime().toString()),
-        currencyAddress === this.addresses.L2_ETH_Address ?
-          { value: value.add(BobaApprovalAmount) } : { value: BobaApprovalAmount }
+        otherField
       )
 
       //everything submitted... waiting
@@ -2157,12 +2171,6 @@ class NetworkService {
 
       //can close window now
       updateSignatureStatus_exitTRAD(true)
-
-      const opts = {
-        fromBlock: -4000
-      }
-      const receipt = await this.watcher.waitForMessageReceipt(tx, opts)
-      console.log(' got L2->L1 receipt', receipt)
 
       return tx
     } catch (error) {
@@ -3323,7 +3331,28 @@ class NetworkService {
     )
     let BobaApprovalAmount = await L2BillingContract.exitFee()
 
+    const BobaAllowance = await this.checkAllowance(
+      this.addresses.TK_L2BOBA,
+      this.addresses.L2LPAddress,
+    )
+
     try {
+
+      if (this.networkGateway === NETWORK.ETHEREUM) {
+         // Approve BOBA first only when the Boba is not native token.
+        if (utils.getAddress(currencyAddress) === utils.getAddress(this.addresses.TK_L2BOBA)) {
+          BobaApprovalAmount = BobaApprovalAmount.add(BigNumber.from(value_Wei_String))
+        }
+        if (BobaAllowance.lt(BobaApprovalAmount)) {
+          const approveStatus = await this.approveERC20(
+            BobaApprovalAmount,
+            this.addresses.TK_L2BOBA,
+            this.addresses.L2LPAddress
+          )
+          if (!approveStatus) return false
+        }
+
+      }
 
       // Approve other tokens
       if( currencyAddress !== this.addresses.L2_ETH_Address &&
