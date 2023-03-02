@@ -1,6 +1,6 @@
 {
   "name": "@boba/accountabstraction",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "BOBA Account Abstraction (EIP 4337) contracts",
   "main": "./dist/index.js",
   "scripts": {
