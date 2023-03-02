@@ -3323,24 +3323,7 @@ class NetworkService {
     )
     let BobaApprovalAmount = await L2BillingContract.exitFee()
 
-    const BobaAllowance = await this.checkAllowance(
-      this.addresses.TK_L2BOBA,
-      this.addresses.L2LPAddress,
-    )
-
     try {
-      // Approve BOBA first
-      if (utils.getAddress(currencyAddress) === utils.getAddress(this.addresses.TK_L2BOBA)) {
-        BobaApprovalAmount = BobaApprovalAmount.add(BigNumber.from(value_Wei_String))
-      }
-      if (BobaAllowance.lt(BobaApprovalAmount)) {
-        const approveStatus = await this.approveERC20(
-          BobaApprovalAmount,
-          this.addresses.TK_L2BOBA,
-          this.addresses.L2LPAddress
-        )
-        if (!approveStatus) return false
-      }
 
       // Approve other tokens
       if( currencyAddress !== this.addresses.L2_ETH_Address &&
@@ -3373,11 +3356,18 @@ class NetworkService {
       const time_start = new Date().getTime()
       console.log("TX start time:", time_start)
 
+      let otherField;
+      if (this.networkGateway === NETWORK.ETHEREUM) {
+        otherField= currencyAddress === this.addresses.L2_ETH_Address ? { value: value_Wei_String } : {}
+      } else {
+        otherField= currencyAddress === this.addresses.L2_ETH_Address ? { value: BobaApprovalAmount.add(value_Wei_String) } : {value: BobaApprovalAmount}
+      }
+
       const depositTX = await this.L2LPContract
         .connect(this.provider.getSigner()).clientDepositL2(
           value_Wei_String,
           currencyAddress,
-          currencyAddress === this.addresses.L2_ETH_Address ? { value: value_Wei_String } : {value: BobaApprovalAmount}
+          otherField,
         )
 
       //at this point the tx has been submitted, and we are waiting...
