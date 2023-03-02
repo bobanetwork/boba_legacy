@@ -1,2 +1,2 @@
-export { UserOperationStruct } from './types/ethers-contracts/EntryPoint'
-export * from './types/ethers-contracts'
+export { UserOperationStruct } from './types/EntryPoint'
+export * from './types'
