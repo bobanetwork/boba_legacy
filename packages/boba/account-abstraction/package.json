@@ -32,7 +32,7 @@
     "ethereum",
     "smart",
     "contracts",
-    "accipt-abstraction",
+    "account-abstraction",
     "eip-4337"
   ],
   "license": "ISC",
