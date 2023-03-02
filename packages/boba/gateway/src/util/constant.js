@@ -16,8 +16,6 @@ export const INFURA_ID = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG = process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION
 export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
-export const SELLER_OPTIMISM_API_URL = process.env.REACT_APP_SELLER_OPTIMISM_API_URL
-export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_API_URL
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 // VE DAO FLAG

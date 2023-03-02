@@ -94,7 +94,7 @@ import tokenInfo from "@boba/register/addresses/tokenInfo"
 import { bobaBridges } from 'util/bobaBridges'
 import { MIN_NATIVE_L1_BALANCE, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
-import { getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
+import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
@@ -443,8 +443,16 @@ class NetworkService {
         this.gasEstimateAccount = networkDetail.gasEstimateAccount
       }
 
+      let activeL1RpcURL = networkDetail['L1']['rpcUrl'][0]
+      for (const rpcURL of networkDetail['L1']['rpcUrl']) {
+        if (await pingRpcUrl(rpcURL)) {
+          activeL1RpcURL = rpcURL
+          break
+        }
+      }
+
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
-        networkDetail['L1']['rpcUrl']
+        activeL1RpcURL
       )
 
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
@@ -742,7 +750,7 @@ class NetworkService {
           const chainParam = {
             chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
             chainName: networkDetail[targetLayer].name,
-            rpcUrls: [networkDetail[targetLayer].rpcUrl],
+            rpcUrls: this.L1Provider.connection.url,
             nativeCurrency: {
               name: 'BOBA TOKEN',
               symbol: 'BOBA',
