@@ -224,8 +224,9 @@ function TransferModal ({ open, token, minHeight }) {
         {!isMobile ? (
           <Button
             onClick={handleClose}
-            color="neutral"
-            size="large"
+            variant='outlined'
+            color='primary'
+            size='large'
           >
             Cancel
           </Button>

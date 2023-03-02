@@ -41,8 +41,7 @@ import {
 import {
   updateSignatureStatus_exitLP,
   updateSignatureStatus_exitTRAD,
-  updateSignatureStatus_depositLP,
-  updateSignatureStatus_depositTRAD
+  updateSignatureStatus_depositLP
 } from 'actions/signAction'
 
 // Base contracts
@@ -93,9 +92,9 @@ import GraphQLService from "./graphql.service"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { SPEED_CHECK } from 'util/constant'
+import { MIN_NATIVE_L1_BALANCE, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
-import { getNetworkDetail, NETWORK } from 'util/network/network.util'
+import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
@@ -257,6 +256,27 @@ class NetworkService {
       console.log(error)
       return error
     }
+  }
+
+  async estimateMinL1NativeTokenForFee() {
+    if(this.L1orL2 !== 'L2' ) return 0;
+
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      // for ethereum l1 fee is always const to 0.002.
+      return MIN_NATIVE_L1_BALANCE
+    } else {
+      // for alt l1 this fee can change
+      const bobaFeeContract = new ethers.Contract(
+        this.addresses.Boba_GasPriceOracle,
+        BobaGasPriceOracleABI,
+        this.provider.getSigner()
+      )
+
+      const minTokenForFee = await bobaFeeContract.secondaryFeeTokenMinimum();
+
+      return logAmount(minTokenForFee.toString(), 18)
+    }
+
   }
 
   async switchFee( targetFee ) {
@@ -423,8 +443,16 @@ class NetworkService {
         this.gasEstimateAccount = networkDetail.gasEstimateAccount
       }
 
+      let activeL1RpcURL = networkDetail['L1']['rpcUrl'][0]
+      for (const rpcURL of networkDetail['L1']['rpcUrl']) {
+        if (await pingRpcUrl(rpcURL)) {
+          activeL1RpcURL = rpcURL
+          break
+        }
+      }
+
       this.L1Provider = new ethers.providers.StaticJsonRpcProvider(
-        networkDetail['L1']['rpcUrl']
+        activeL1RpcURL
       )
 
       this.L2Provider = new ethers.providers.StaticJsonRpcProvider(
@@ -442,6 +470,27 @@ class NetworkService {
       // get the tokens based on l1ChainId
       const chainId = (await this.L1Provider.getNetwork()).chainId
       this.tokenInfo = tokenInfo[chainId]
+
+      // fetch supported tokens, addresses, assets for network selected.
+      const tokenAsset = appService.fetchSupportedAssets({
+        network,
+        networkType
+      })
+
+      this.supportedTokens = tokenAsset.tokens;
+      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
+      this.supportedAltL1Chains = tokenAsset.altL1Chains;
+
+      let addresses = {};
+      // setting up all address;
+      if (!!NETWORK[ network ]) {
+        addresses = appService.fetchAddresses({
+          network,
+          networkType
+        });
+      }
+
+      this.addresses = addresses
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
@@ -645,27 +694,6 @@ class NetworkService {
         networkType
       })
 
-      // fetch supported tokens, addresses, assets for network selected.
-      const tokenAsset = appService.fetchSupportedAssets({
-        network,
-        networkType
-      })
-
-      this.supportedTokens = tokenAsset.tokens;
-      this.supportedTokenAddresses = tokenAsset.tokenAddresses;
-      this.supportedAltL1Chains = tokenAsset.altL1Chains;
-
-      let addresses;
-      // setting up all address;
-      if (!!NETWORK[ network ]) {
-        addresses = appService.fetchAddresses({
-          network,
-          networkType
-        });
-      }
-
-      this.addresses = addresses
-
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
@@ -683,7 +711,9 @@ class NetworkService {
 
       this.bindProviderListeners()
       // this should not do anything unless we changed chains
-      await this.getBobaFeeChoice()
+      if (this.L1orL2 === 'L2') {
+        await this.getBobaFeeChoice()
+      }
 
       return this.L1orL2 // return the layer we are actually on
 
@@ -720,7 +750,7 @@ class NetworkService {
           const chainParam = {
             chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
             chainName: networkDetail[targetLayer].name,
-            rpcUrls: [networkDetail[targetLayer].rpcUrl],
+            rpcUrls: this.L1Provider.connection.url,
             nativeCurrency: {
               name: 'BOBA TOKEN',
               symbol: 'BOBA',
@@ -729,17 +759,16 @@ class NetworkService {
             blockExplorerUrls: [networkDetail['L2']?.blockExplorer?.slice(0, -1)]
           }
 
-          console.log([ 'Adding ethereum Chain', chainParam, targetIDHex ]);
           await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
           window.ethereum.on('chainChanged', handleChangeChainOnce)
           return true
         } catch (addError) {
           console.log("MetaMask - Error adding new RPC: ", addError)
-          return addError
+          throw new Error(addError.code)
         }
       } else { //some other error code
         console.log("MetaMask - Switch Error: ", error.code)
-        return error
+        throw new Error(error.code)
       }
     }
   }
@@ -1161,8 +1190,6 @@ class NetworkService {
     value_Wei_String
   }) {
 
-    updateSignatureStatus_depositTRAD(false)
-
     try {
 
       const time_start = new Date().getTime()
@@ -1219,9 +1246,6 @@ class NetworkService {
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
-
-
-      updateSignatureStatus_depositTRAD(true)
 
       const opts = {
         fromBlock: -4000
@@ -1801,7 +1825,8 @@ class NetworkService {
         set to actual amount, unless current approval amount is equal to, or
         bigger than, the current approval value
         */
-        if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
+        if (this.networkGateway === NETWORK.ETHEREUM
+          && allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
             (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
         )
         {
@@ -1854,7 +1879,6 @@ class NetworkService {
     approveContractAddress = this.addresses.L1StandardBridgeAddress,
     contractABI = L1ERC20Json.abi
   ) {
-
     try {
 
       const ERC20Contract = new ethers.Contract(
@@ -1876,7 +1900,8 @@ class NetworkService {
       set to actual amount, unless current approval amount is equal to, or
       bigger than, the current approval value
       */
-      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
+      if (  this.networkGateway === NETWORK.ETHEREUM &&
+        allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
@@ -1943,8 +1968,6 @@ class NetworkService {
     currency,
     currencyL2 }) {
 
-    updateSignatureStatus_depositTRAD(false)
-
     const L1_TEST_Contract = this.L1_TEST_Contract.attach(currency)
 
     let allowance_BN = await L1_TEST_Contract.allowance(
@@ -1958,7 +1981,8 @@ class NetworkService {
       set to actual amount, unless current approval amount is equal to, or
       bigger than, the current approval value
       */
-      if( allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
+      if (this.networkGateway === NETWORK.ETHEREUM &&
+          allowance_BN.lt(BigNumber.from(value_Wei_String)) &&
           (currency.toLowerCase() === allTokens.OMG.L1.toLowerCase())
       )
       {
@@ -2021,27 +2045,19 @@ class NetworkService {
         )
       }
 
-      console.log("depositTxStatus:",depositTX)
-
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
-
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
-      console.log(' block:', block)
-
-      //closes the Deposit modal
-      updateSignatureStatus_depositTRAD(true)
 
       const opts = {
         fromBlock: -4000
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
-      console.log('completed ERC20 Deposit! L2 tx hash:', txReceipt.transactionHash)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
+      // const block = await this.L1Provider.getTransaction(depositTX.hash)
       // const data = {
       //   "key": SPEED_CHECK,
       //   "hash": depositTX.hash,
@@ -2159,6 +2175,8 @@ class NetworkService {
   /* Estimate cost of Classical Exit to L1 */
   async getExitCost(currencyAddress) {
 
+    try {
+
     let approvalCost_BN = BigNumber.from('0')
 
     const gasPrice = await this.L2Provider.getGasPrice()
@@ -2188,12 +2206,23 @@ class NetworkService {
       this.provider.getSigner()
     )
 
+    const L2BillingContract = new ethers.Contract(
+      this.addresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+    const exitFee = await L2BillingContract.exitFee()
+    let value = utils.parseEther('0.00001').add(exitFee)
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      value = utils.parseEther('0.00001')
+    }
+
     const tx2 = await DiscretionaryExitFeeContract.populateTransaction.payAndWithdraw(
       this.addresses.L2_ETH_Address,
       utils.parseEther('0.00001'),
       this.L1GasLimit,
       ethers.utils.formatBytes32String(new Date().getTime().toString()),
-      { value: utils.parseEther('0.00001') }
+      { value }
     )
 
     const gas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
@@ -2205,8 +2234,12 @@ class NetworkService {
     const totalCost = utils.formatEther(cost_BN.add(approvalCost_BN))
     console.log("Classical exit total cost (ETH):", totalCost)
 
-    //returns total cost in ETH
-    return totalCost
+      //returns total cost in ETH
+      return totalCost
+    } catch (error) {
+      console.log(error);
+      return 0;
+    }
   }
 
   /***********************************************/
@@ -2424,7 +2457,7 @@ class NetworkService {
       return acc
     }, [{
       L1: this.addresses.L1_ETH_Address,
-      L2: this.addresses.L2_ETH_Address
+      L2: this.addresses[`TK_L2${this.L1NativeTokenSymbol}`]
     }])
 
     const L2LPContract = new ethers.Contract(
@@ -2567,6 +2600,12 @@ class NetworkService {
         console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
       }
 
+      if (this.networkGateway !== NETWORK.ETHEREUM) {
+        otherField = {
+          ...otherField,
+          value: utils.parseEther('1.0')
+        }
+      }
       // Second, we need the addLiquidity cost
       // all ERC20s will be the same, so use the BOBA contract
       const tx2 = await this.L2LPContract
@@ -2677,35 +2716,36 @@ class NetworkService {
 
       // TODO: Below part is disabled
 
-      const opts = {
-        fromBlock: -4000
-      }
-      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+      /*
+        const opts = {
+            fromBlock: -4000
+          }
+          const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+          console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
 
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
+          const time_stop = new Date().getTime()
+          console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
+          const data = {
+            "key": SPEED_CHECK,
+            "hash": depositTX.hash,
+            "l1Tol2": true,
+            "startTime": time_start,
+            "endTime": time_stop,
+            "block": block.blockNumber,
+            "cdmHash": receipt.transactionHash,
+            "cdmBlock": receipt.blockNumber
+          }
 
-      console.log("Speed checker data payload:", data)
+          console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
+          const speed = await omgxWatcherAxiosInstance(
+            this.networkConfig
+          ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
-
-      return receipt
+          console.log("Speed checker:", speed)
+    */
+      return true
 
     } catch (error) {
       console.log("NS: depositL1LP error:", error)
@@ -2943,6 +2983,21 @@ class NetworkService {
       console.log("Approve cost in ETH:", utils.formatEther(approvalCost_BN))
     }
 
+    const L2BillingContract = new ethers.Contract(
+      this.addresses.Proxy__BobaBillingContract,
+      L2BillingContractJson.abi,
+      this.L2Provider,
+    )
+
+    const approvalAmount = await L2BillingContract.exitFee()
+
+    let value;
+    if (this.networkGateway === NETWORK.ETHEREUM) {
+      value = currencyAddress === this.addresses.L2_ETH_Address ? { value: '1' } : {};
+    } else {
+      value = currencyAddress === this.addresses.L2_ETH_Address ? { value: approvalAmount.add('1') } : { value: approvalAmount };
+    }
+
     //in some cases zero not allowed
     const tx2 = await this.L2LPContract
       .connect(this.provider.getSigner())
@@ -2950,13 +3005,13 @@ class NetworkService {
       .clientDepositL2(
         currencyAddress === this.addresses.L2_ETH_Address ? '1' : '0', //ETH does not allow zero
         currencyAddress,
-        currencyAddress === this.addresses.L2_ETH_Address ? { value : '1'} : {}
+        value
       )
 
     const depositGas_BN = await this.L2Provider.estimateGas({...tx2, from: this.gasEstimateAccount})
 
     let l1SecurityFee = BigNumber.from('0')
-    if (this.networkGateway === 'mainnet') {
+    if (this.networkType === NETWORK_TYPE.MAINNET) {
       delete tx2.from
       l1SecurityFee = await this.gasOracleContract.getL1Fee(
         utils.serializeTransaction(tx2)
@@ -3322,7 +3377,7 @@ class NetworkService {
         .connect(this.provider.getSigner()).clientDepositL2(
           value_Wei_String,
           currencyAddress,
-          currencyAddress === this.addresses.L2_ETH_Address ? { value: value_Wei_String } : {}
+          currencyAddress === this.addresses.L2_ETH_Address ? { value: value_Wei_String } : {value: BobaApprovalAmount}
         )
 
       //at this point the tx has been submitted, and we are waiting...
@@ -3334,36 +3389,36 @@ class NetworkService {
       //closes the modal
       updateSignatureStatus_exitLP(true)
 
-      const opts = {
-        fromBlock: -4000
-      }
-      const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-      const txReceipt = receipt.transactionReceipt;
-      console.log(' completed Deposit! L1 tx hash:', txReceipt.transactionHash)
+      // const opts = {
+      //   fromBlock: -4000
+      // }
+      // const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
+      // const txReceipt = receipt.transactionReceipt;
+      // console.log(' completed Deposit! L1 tx hash:', txReceipt.transactionHash)
 
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
+      // const time_stop = new Date().getTime()
+      // console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": false, //since we are going L2->L1
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": txReceipt.transactionHash,
-        "cdmBlock": txReceipt.blockNumber
-      }
+      // const data = {
+      //   "key": SPEED_CHECK,
+      //   "hash": depositTX.hash,
+      //   "l1Tol2": false, //since we are going L2->L1
+      //   "startTime": time_start,
+      //   "endTime": time_stop,
+      //   "block": block.blockNumber,
+      //   "cdmHash": txReceipt.transactionHash,
+      //   "cdmBlock": txReceipt.blockNumber
+      // }
 
-      console.log("Speed checker data payload:", data)
+      // console.log("Speed checker data payload:", data)
 
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
+      // const speed = await omgxWatcherAxiosInstance(
+      //   this.networkConfig
+      // ).post('send.crossdomainmessage', data)
 
-      console.log("Speed checker:", speed)
+      // console.log("Speed checker:", speed)
 
-      return txReceipt
+      return true
     } catch (error) {
       console.log("NS: depositL2LP error:", error)
       return error

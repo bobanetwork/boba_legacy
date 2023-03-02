@@ -32,7 +32,7 @@ const Connect = ({
         variant="contained"
         size="large"
         onClick={() => dispatch(setConnect(true))}
-        sx="font-weight: 500;"
+        sx={{fontWeight: '500;'}}
       >
         Connect
       </Button>

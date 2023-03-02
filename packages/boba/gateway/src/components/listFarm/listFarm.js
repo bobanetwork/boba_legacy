@@ -476,10 +476,10 @@ class ListFarm extends React.Component {
                     <Typography variant="body2" component="div">Staked</Typography>
                     <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                      <Button variant="contained" onClick={() => { !disabled && this.handleWithdrawToken() }}>
+                      <Button variant="contained" disabled={disabled} onClick={() => { !disabled && this.handleWithdrawToken() }}>
                         Unstake
                       </Button>
-                      <Button variant="contained" onClick={() => { !disabled && this.handleStakeToken() }}>
+                      <Button variant="contained" disabled={disabled} onClick={() => { !disabled && this.handleStakeToken() }}>
                         Stake More
                       </Button>
                     </Box>

@@ -38,10 +38,9 @@ import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 import networkService from 'services/networkService.js'
 import {
-  selectActiveNetwork,
   selectActiveNetworkName,
 } from 'selectors/networkSelector.js'
-import { NETWORK } from 'util/network/network.util.js'
+
 
 function FeeSwitcher() {
   const dispatch = useDispatch()
@@ -49,20 +48,21 @@ function FeeSwitcher() {
   const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   const networkName = useSelector(selectActiveNetworkName())
-  const network = useSelector(selectActiveNetwork())
+
   const layer = useSelector(selectLayer())
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
-  const balanceETH = l2BalanceETH[0]
+  const l2BalanceNativeToken = l2Balances.filter((i) => i.symbol === networkService.L1NativeTokenSymbol)
+  const balanceETH = l2BalanceNativeToken[ 0 ]
   const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')
   const balanceBOBA = l2BalanceBOBA[0]
 
   const dispatchSwitchFee = useCallback(
     async (targetFee) => {
       let tooSmallL1NativeToken = false
-      let minL1NativeBalance = network === NETWORK.ETHEREUM ? 0.0002 : 0.5
+      // mini balance required for token to use as bridge fee
+      let minL1NativeBalance = await networkService.estimateMinL1NativeTokenForFee() //0.002
       let tooSmallBOBA = false
 
       if (typeof balanceBOBA === 'undefined') {
@@ -126,7 +126,7 @@ function FeeSwitcher() {
         dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
       }
     },
-    [dispatch, feeUseBoba, balanceETH, balanceBOBA, network]
+    [dispatch, feeUseBoba, balanceETH, balanceBOBA]
   )
 
   if (!accountEnabled && layer !== 'L2') {

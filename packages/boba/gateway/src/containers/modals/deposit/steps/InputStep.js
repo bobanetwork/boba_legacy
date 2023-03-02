@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositErc20, depositETHL2 } from 'actions/networkAction'
@@ -9,7 +9,6 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { useTheme } from '@emotion/react'
@@ -23,7 +22,10 @@ import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
+  const theme = useTheme()
   const dispatch = useDispatch()
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [ enableToL2Account, setEnableToL2Account ] = useState(false);
   const [ recipient, setRecipient ] = useState('');
   const [ value, setValue ] = useState('')
@@ -33,7 +35,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
   const networkName = useSelector(selectActiveNetworkName())
-  const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
   const lookupPrice = useSelector(selectLookupPrice)
 
   const maxValue = logAmount(token.balance, token.decimals)
@@ -82,18 +83,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     }
 
   }
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
-  useEffect(() => {
-    if (signatureStatus && depositLoading) {
-      //we are all set - can close the window
-      //transaction has been sent and signed
-      handleClose()
-    }
-  }, [ signatureStatus, depositLoading, handleClose ])
-
 
   let buttonLabel_1 = 'Cancel'
   if (depositLoading) buttonLabel_1 = 'Close'
@@ -200,7 +189,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          disabled={false}
+          disabled={depositLoading}
           variant='outlined'
           color='primary'
           size='large'

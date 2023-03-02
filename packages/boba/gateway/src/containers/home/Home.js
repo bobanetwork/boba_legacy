@@ -182,18 +182,21 @@ function Home() {
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
+
+      if (activeNetwork === NETWORK.ETHEREUM) {
+        dispatch(fetchDaoBalance())      // account specific
+        dispatch(fetchDaoVotes())        // account specific
+        dispatch(fetchDaoBalanceX())     // account specific
+        dispatch(fetchDaoVotesX())       // account specific
+        dispatch(getMonsterInfo()) // account specific
+        dispatch(getFS_Info())   // account specific
+        dispatch(getFS_Saves()) // account specific
+      }
     }
     /*== we only have have Base L1 and L2 providers*/
     if (baseEnabled && activeNetwork === NETWORK.ETHEREUM) {
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
-      dispatch(getFS_Info())   // account specific
-      dispatch(getFS_Saves()) // account specific
-      dispatch(getMonsterInfo()) // account specific
     }
   }, POLL_INTERVAL)
 
