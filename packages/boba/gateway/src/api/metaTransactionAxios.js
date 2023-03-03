@@ -1,23 +1,11 @@
 import axios from 'axios'
-import { getBaseServices } from 'util/masterConfig'
 
-export default function metaTransactionAxiosInstance(networkGateway){
+export default function metaTransactionAxiosInstance(networkConfig) {
+  const url = networkConfig['META_TRANSACTION']
 
-  let axiosInstance = null;
-
-  if(networkGateway === 'local') {
-    return null //does not make sense on local
-  }
-  else if (networkGateway === 'goerli') {
-    axiosInstance = axios.create({
-      baseURL: getBaseServices().GOERLI_META_TRANSACTION,
-    })
-  }
-  else if (networkGateway === 'mainnet') {
-    axiosInstance = axios.create({
-      baseURL: getBaseServices().MAINNET_META_TRANSACTION,
-    })
-  }
+  let axiosInstance = axios.create({
+    baseURL: url,
+  })
 
   axiosInstance.interceptors.request.use((config) => {
     config.headers['Accept'] = 'application/json'

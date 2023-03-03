@@ -1,31 +1,19 @@
 import axios from 'axios'
-import { getNetwork } from 'util/masterConfig'
-const nw = getNetwork()
 
-export default function verifierWatcherAxiosInstance(networkGateway){
+export default function verifierWatcherAxiosInstance(networkConfig) {
+  const url = networkConfig[ 'VERIFIER_WATCHER_URL' ]
 
-  let axiosInstance = null
-
-  if(networkGateway === 'local') {
-    return null //does not make sense on local
+  if (!url) {
+    return null;
   }
-  else if (networkGateway === 'goerli') {
-    if(nw.goerli.VERIFIER_WATCHER_URL === null) return
-    axiosInstance = axios.create({
-      baseURL: nw.goerli.VERIFIER_WATCHER_URL,
-    })
-  }
-  else if (networkGateway === 'mainnet') {
 
-    if(nw.mainnet.VERIFIER_WATCHER_URL === null) return
-    axiosInstance = axios.create({
-      baseURL: nw.mainnet.VERIFIER_WATCHER_URL,
-    })
-  }
+  let axiosInstance = axios.create({
+    baseURL: url
+  })
 
   axiosInstance.interceptors.request.use((config) => {
-    config.headers['Accept'] = 'application/json'
-    config.headers['Content-Type'] = 'application/json'
+    config.headers[ 'Accept' ] = 'application/json'
+    config.headers[ 'Content-Type' ] = 'application/json'
     return config
   })
 

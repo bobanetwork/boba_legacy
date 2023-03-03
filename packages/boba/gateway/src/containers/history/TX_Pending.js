@@ -17,9 +17,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
-
 import { orderBy } from 'lodash'
-
 import moment from 'moment'
 
 import { selectLoading } from 'selectors/loadingSelector'

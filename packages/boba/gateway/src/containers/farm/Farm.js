@@ -59,6 +59,10 @@ class Farm extends React.Component {
       layer
     } = this.props.setup
 
+    const {
+      activeNetworkName
+    } = this.props.network
+
     let initialViewLayer = 'Ethereum Pool'
     let initialLayer = 'L1LP'
 
@@ -81,7 +85,8 @@ class Farm extends React.Component {
       dropDownBoxInit: true,
       // provider status
       baseEnabled,
-      accountEnabled
+      accountEnabled,
+      activeNetworkName
     }
 
   }
@@ -109,6 +114,14 @@ class Farm extends React.Component {
       accountEnabled,
       layer
     } = this.props.setup
+
+    const {
+      activeNetworkName
+    } =  this.props.network
+
+    if (!isEqual(prevState.network.activeNetworkName, activeNetworkName)) {
+      this.setState({ activeNetworkName })
+    }
 
     if (!isEqual(prevState.farm.poolInfo, poolInfo)) {
       this.setState({ poolInfo })
@@ -196,6 +209,7 @@ class Farm extends React.Component {
     })
   }
 
+
   render() {
 
     const {
@@ -207,6 +221,7 @@ class Farm extends React.Component {
       showMSO,
       accountEnabled,
       layer,
+      activeNetworkName
     } = this.state
 
     const { isMobile } = this.props
@@ -216,7 +231,7 @@ class Farm extends React.Component {
 
         <PageTitle title={'Earn'} />
 
-        <Connect 
+        <Connect
           userPrompt={'Connect to MetaMask to see your balances and contribute to the liquidity pool '}
           accountEnabled={accountEnabled}
         />
@@ -229,14 +244,14 @@ class Farm extends React.Component {
                 onClick={() => this.handleChange(null, 'Ethereum Pool')}
                 variant="body2"
                 component="span">
-                Ethereum Pools
+                {activeNetworkName['l1']} Pools
               </Typography>
               <Typography
                 className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
                 onClick={() => this.handleChange(null, 'Boba L2 Pool')}
                 variant="body2"
                 component="span">
-                Boba Pools
+                {activeNetworkName['l2']} Pools
               </Typography>
             </S.PageSwitcher>
 
@@ -270,9 +285,9 @@ class Farm extends React.Component {
           </S.EarnActionContainer>
 
           <S.Help>
-            
+
             <Typography variant="body3">
-              Bridging fees are proportionally distributed to stakers. The bridges are not farms. 
+              Bridging fees are proportionally distributed to stakers. The bridges are not farms.
               Your earnings only increase when someone uses the bridge you have staked into.
             </Typography>
 
@@ -289,7 +304,7 @@ class Farm extends React.Component {
                   <br /><br />
                   <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
                   bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
-                  rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another. Rebalancing takes 7 days, due to the 
+                  rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another. Rebalancing takes 7 days, due to the
                   7 day fraud proof window, which also applies to the operator.
                   <br /><br />
                   <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an automatic supply-and-demand approach to setting the fees.
@@ -442,6 +457,7 @@ const mapStateToProps = state => ({
   farm: state.farm,
   balance: state.balance,
   setup: state.setup,
+  network: state.network
 })
 
 export default connect(mapStateToProps)(Farm)

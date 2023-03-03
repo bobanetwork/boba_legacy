@@ -30,6 +30,7 @@ import DoExitStep from 'containers/modals/exit/steps/DoExitStep'
 import InputStep from 'containers/modals/deposit/steps/InputStep'
 import InputStepBatch from 'containers/modals/deposit/steps/InputStepBatch'
 import { fetchLookUpPrice } from 'actions/networkAction'
+import { LAYER } from 'util/constant'
 
 function BridgeTransfer() {
 
@@ -43,7 +44,6 @@ function BridgeTransfer() {
   const dispatch = useDispatch()
 
   const onReset = () => {
-    console.log([`RESET TOKEN onReset`])
     dispatch(resetToken())
   }
 
@@ -101,10 +101,10 @@ function BridgeTransfer() {
       }
 
       {tokens.length > 0 && !multibridgeMode && <>
-        {layer === 'L1' &&
+        {layer === LAYER.L1 &&
           <InputStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
         }
-        {layer === 'L2' &&
+        {layer === LAYER.L2 &&
           <DoExitStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]}/>
         }
         </>

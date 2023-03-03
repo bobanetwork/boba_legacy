@@ -91,8 +91,9 @@ function TransferNFTModal ({ open, token, minHeight }) {
         {!isMobile ? (
           <Button
             onClick={handleClose}
-            color="neutral"
-            size="large"
+            color='primary'
+            size='large'
+            variant='outlined'
           >
             Cancel
           </Button>

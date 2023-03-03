@@ -2,11 +2,11 @@ import * as React from "react"
 import { useTheme } from "@mui/material/styles";
 
 function WalletIcon() {
-  
+
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
   const color = theme.palette.common[ isLight ? 'black' : 'white' ];
-  
+
   return (
     <svg
       width="32"

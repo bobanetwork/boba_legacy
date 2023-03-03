@@ -235,8 +235,9 @@ class FarmWithdrawModal extends React.Component {
         <WrapperActionsModal>
           <Button
             onClick={()=>{this.handleClose()}}
-            color="neutral"
-            size="large"
+            variant="outlined"
+            color='primary'
+            size='large'
           >
             Cancel
           </Button>

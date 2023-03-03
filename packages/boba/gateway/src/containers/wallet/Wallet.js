@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Button from 'components/button/Button'
 
-import { Info } from "@mui/icons-material"
+import { Info } from '@mui/icons-material'
 import { Box, Icon, Typography } from '@mui/material'
 
 import { getETHMetaTransaction } from 'actions/setupAction'
@@ -13,80 +13,49 @@ import { fetchTransactions } from 'actions/networkAction'
 import Tabs from 'components/tabs/Tabs'
 import Nft from 'containers/wallet/nft/Nft'
 import Token from './token/Token'
-import Connect from 'containers/connect/Connect'
 
 import * as S from './wallet.styles'
 import * as G from '../Global.styles'
 
-import {
-  setConnectETH,
-  setConnectBOBA
-} from 'actions/setupAction'
+import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 
-import {
-  selectAccountEnabled,
-  selectLayer,
-} from "selectors/setupSelector"
+import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
-import PageTitle from 'components/pageTitle/PageTitle'
 import { isEqual } from 'lodash'
 
-import { POLL_INTERVAL } from "util/constant"
-import useInterval from "hooks/useInterval"
+import { DEFAULT_NETWORK, LAYER, POLL_INTERVAL } from 'util/constant'
+import useInterval from 'hooks/useInterval'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
+import {
+  selectActiveNetwork,
+  selectActiveNetworkName,
+} from 'selectors/networkSelector'
+import networkService from 'services/networkService'
+import { NETWORK } from 'util/network/network.util'
+import Connect from "../connect/Connect";
+import PageTitle from "../../components/pageTitle/PageTitle";
 
 function Wallet() {
-
-  const [ page, setPage ] = useState('Token')
-  const [ chain, setChain ] = useState('')
-  const [ tooSmallETH, setTooSmallETH ] = useState(false)
-  const [ tooSmallBOBA, setTooSmallBOBA ] = useState(false)
+  const [page, setPage] = useState('Token')
+  const [tooSmallSec, setTooSmallSec] = useState(false)
+  const [tooSmallBOBA, setTooSmallBOBA] = useState(false)
 
   const dispatch = useDispatch()
-
+  const network = useSelector(selectActiveNetwork())
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
-
+  const networkName = useSelector(selectActiveNetworkName())
   // low balance warnings
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  useEffect(()=>{
-    if (accountEnabled)
-      dispatch(fetchTransactions())
-  },[ dispatch, accountEnabled ])
-
-  useEffect(()=>{
-    if (accountEnabled && l2Balances.length > 0)  {
-
-      const l2BalanceETH = l2Balances.find((i) => i.symbol === 'ETH')
-      const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
-
-      if (l2BalanceETH && l2BalanceETH.balance) {
-        setTooSmallETH(new BN(logAmount(l2BalanceETH.balance, 18)).lt(new BN(0.003)))
-      } else {
-        // in case of zero ETH balance we are setting tooSmallETH
-        setTooSmallETH(true)
-      }
-      if (l2BalanceBOBA && l2BalanceBOBA.balance) {
-        setTooSmallBOBA(new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(4.0)))
-      } else {
-        // in case of zero BOBA balance we are setting tooSmallBOBA
-        setTooSmallBOBA(true)
-      }
-    }
-  },[ l2Balances, accountEnabled ])
-
+  // fetching transactions
   useEffect(() => {
-    if (layer === 'L2') {
-      if (tooSmallBOBA && tooSmallETH) {
-        dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
-      }
-    }
-  },[tooSmallETH, tooSmallBOBA, layer, dispatch])
+    if (accountEnabled) dispatch(fetchTransactions())
+  }, [dispatch, accountEnabled])
 
   useInterval(() => {
     if (accountEnabled) {
@@ -95,41 +64,64 @@ function Wallet() {
   }, POLL_INTERVAL)
 
   useEffect(() => {
+    if (accountEnabled && l2Balances.length > 0) {
+      const l2BalanceSec = l2Balances.find(
+        (i) => i.symbol === networkService.L1NativeTokenSymbol
+      )
+      const l2BalanceBOBA = l2Balances.find((i) => i.symbol === 'BOBA')
+
+      if (l2BalanceSec && l2BalanceSec.balance) {
+        // FOR ETH MIN BALANCE 0.003ETH for other sec tokens 1
+        const minBalance = network === NETWORK.ETHEREUM ? 0.003 : 1
+        setTooSmallSec(
+          new BN(logAmount(l2BalanceSec.balance, 18)).lt(new BN(minBalance))
+        )
+      } else {
+        // in case of zero ETH balance we are setting tooSmallSec
+        setTooSmallSec(true)
+      }
+      if (l2BalanceBOBA && l2BalanceBOBA.balance) {
+        // FOR BOBA MIN BALANCE of 1
+        setTooSmallBOBA(
+          new BN(logAmount(l2BalanceBOBA.balance, 18)).lt(new BN(1))
+        )
+      } else {
+        // in case of zero BOBA balance we are setting tooSmallBOBA
+        setTooSmallBOBA(true)
+      }
+    }
+  }, [l2Balances, accountEnabled, network])
+
+  useEffect(() => {
     if (layer === 'L2') {
-      setChain('Boba Wallet')
-    } else if (layer === 'L1') {
-      setChain('Ethereum Wallet')
+      if (tooSmallBOBA && tooSmallSec) {
+        dispatch(
+          openError(
+            `Wallet empty - please bridge in ${networkService.L1NativeTokenSymbol} or BOBA from L1`
+          )
+        )
+      }
     }
-  }, [ layer ])
+  }, [tooSmallSec, tooSmallBOBA, layer, dispatch])
 
-  const handleSwitch = (l) => {
-    if (l === 'Token') {
-      setPage('Token')
-    } else if (l === 'NFT') {
-      setPage('NFT')
-    }
-  }
-
-  async function emergencySwap () {
+  async function emergencySwap() {
     const res = await dispatch(getETHMetaTransaction())
-    console.log("emergencySwap - res:",res)
-    if (res) dispatch(openAlert('Emergency Swap submitted'))
+    if (res) {
+      dispatch(openAlert('Emergency Swap submitted'))
+    }
   }
 
   return (
     <S.PageContainer>
-
       <PageTitle title={'Wallet'} />
-
       <Connect
         userPrompt={'Connect to MetaMask to see your balances, transfer, and bridge'}
         accountEnabled={accountEnabled}
       />
-
-      {layer === 'L2' && tooSmallETH &&
-        <G.LayerAlert style={{padding: '20px'}}>
+      {layer === 'L2' && tooSmallSec && (
+        <G.LayerAlert style={{ padding: '20px' }}>
           <G.AlertInfo>
-            <Icon as={Info} sx={{color:"#BAE21A"}}/>
+            <Icon as={Info} sx={{ color: '#FFD88D' }} />
             <Typography
               flex={4}
               variant="body2"
@@ -137,57 +129,105 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-              Using Boba requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
-              otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use
-              EMERGENCY SWAP to swap BOBA for 0.005 ETH at market rates.
+              Using {networkService.L1NativeTokenSymbol} requires a minimum BOBA
+              balance (of 1 BOBA) regardless of your fee setting, otherwise
+              MetaMask may incorrectly reject transactions. If you ran out of
+              BOBA, use EMERGENCY SWAP to swap{' '}
+              {networkService.L1NativeTokenSymbol} for 1 BOBA at market rates.
             </Typography>
           </G.AlertInfo>
+
           <Button
-            onClick={()=>{emergencySwap()}}
-            color='primary'
-            variant='outlined'
+            onClick={() => {
+              emergencySwap()
+            }}
+            color="primary"
+            variant="outlined"
           >
             EMERGENCY SWAP
           </Button>
         </G.LayerAlert>
-      }
+      )}
 
-      <S.WalletActionContainer>
-        <G.PageSwitcher>
-          <Typography
-            className={chain === 'Ethereum Wallet' ? 'active' : ''}
-            onClick={() => {
-              if (!!accountEnabled) {
-                dispatch(setConnectETH(true))
-              }
-            }}
-            variant="body2"
-            component="span">
-            Ethereum Wallet
+      {accountEnabled ? (
+        <S.WalletActionContainer>
+          <G.PageSwitcher>
+            <Typography
+              className={layer === LAYER.L1 ? 'active' : ''}
+              onClick={() => {
+                if (!!accountEnabled) {
+                  dispatch(setConnectETH(true))
+                }
+              }}
+              variant="body2"
+              component="span"
+            >
+              {networkName['l1'] || DEFAULT_NETWORK.NAME.L1} Wallet
+            </Typography>
+            <Typography
+              className={layer === LAYER.L2 ? 'active' : ''}
+              onClick={() => {
+                if (!!accountEnabled) {
+                  dispatch(setConnectBOBA(true))
+                }
+              }}
+              variant="body2"
+              component="span"
+            >
+              {networkName['l2'] || DEFAULT_NETWORK.NAME.L2} Wallet
+            </Typography>
+          </G.PageSwitcher>
+          <Typography variant="body2" component="span">
+            <svg
+              width="8"
+              height="8"
+              viewBox="0 0 8 8"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ marginRight: '6px' }}
+            >
+              <circle cx="4" cy="4" r="4" fill="#BAE21A" />
+            </svg>
+            Connected
           </Typography>
-          <Typography
-            className={chain === 'Boba Wallet' ? 'active' : ''}
-            onClick={() => {
-              if (!!accountEnabled) {
-                dispatch(setConnectBOBA(true))
-              }
-            }}
-            variant="body2"
-            component="span">
-            Boba Wallet
-          </Typography>
-        </G.PageSwitcher>
-      </S.WalletActionContainer>
+        </S.WalletActionContainer>
+      ) : (
+        <Typography variant="body2" component="span" margin={'40px 0 20px 0'}>
+          <svg
+            width="8"
+            height="8"
+            viewBox="0 0 8 8"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ marginRight: '6px' }}
+          >
+            <circle cx="4" cy="4" r="4" fill="#FF6A55" />
+          </svg>
+          Disconnected
+        </Typography>
+      )}
 
-      <Box sx={{ mt: 2 }}>
-        <Tabs
-          activeTab={page}
-          onClick={(t) => handleSwitch(t)}
-          aria-label="Page Tab"
-          tabs={[ "Token", "NFT" ]}
-        />
-      </Box>
-      {page === 'Token' ? <Token /> : <Nft />}
+      {accountEnabled ? (
+        <>
+        {network === NETWORK.ETHEREUM ? (
+          <>
+            <Box sx={{ mt: 2 }}>
+              <Tabs
+                activeTab={page}
+                onClick={(t) => setPage(t)}
+                aria-label="Page Tab"
+                tabs={['Token', 'NFT']}
+              />
+            </Box>
+            {page === 'Token' ? <Token /> : <Nft />}
+          </>
+        ) : (
+          <Token />
+        )}
+        </>
+      ) : ('')}
+
+
     </S.PageContainer>
   )
 }

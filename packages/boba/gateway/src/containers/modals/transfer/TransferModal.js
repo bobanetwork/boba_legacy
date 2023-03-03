@@ -197,7 +197,7 @@ function TransferModal ({ open, token, minHeight }) {
 
         {fee && !feeUseBoba && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
-            Fee: {fee} ETH
+            Fee: {fee} {networkService.L1NativeTokenSymbol}
           </Typography>
         )}
 
@@ -224,8 +224,9 @@ function TransferModal ({ open, token, minHeight }) {
         {!isMobile ? (
           <Button
             onClick={handleClose}
-            color="neutral"
-            size="large"
+            variant='outlined'
+            color='primary'
+            size='large'
           >
             Cancel
           </Button>
