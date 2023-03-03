@@ -13,7 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import gasService from 'services/gas.service'
 import networkService from 'services/networkService'
+import transctionService from 'services/transaction.service'
 import { createAction } from './createAction'
 
 export function fetchBalances() {
@@ -21,17 +23,16 @@ export function fetchBalances() {
 }
 
 export function fetchGas() {
-  return createAction('GAS/GET', () => networkService.getGas())
+  return createAction('GAS/GET', () => gasService.getGas())
 }
 
 export function addTokenList() {
-  console.log("addTokenList")
   return createAction('TOKENLIST/GET', () => networkService.addTokenList())
 }
 
 export function fetchTransactions() {
   return createAction('TRANSACTION/GETALL', () =>
-    networkService.getTransactions()
+    transctionService.getTransactions()
   )
 }
 
@@ -45,10 +46,6 @@ export function fetchFastExits() {
   return createAction('FASTEXITS/GETALL', () =>
     networkService.getFastExits()
   )
-}
-
-export function fetchExits() {
-  return createAction('EXIT/GETALL', () => networkService.getExits())
 }
 
 export function exitBOBA(token, value) {
@@ -242,4 +239,26 @@ export function enableBrowserWallet(network) {
 
 export function getAllAddresses() {
   return createAction('GET/ALL/ADDRESS', () => networkService.getAllAddresses())
+}
+
+
+/********************************/
+/******ONE GATEWAY ACTIONS *****/
+/********************************/
+/**
+ * @params
+ *  network - ethereum, bnb, fantom, avax, moonbase, moonbeam
+ *  networkType -  MAINNET, TESTNET
+*/
+export function setNetwork(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'NETWORK/SET', payload: payload })
+  }
+}
+
+// to update the active network.
+export function setActiveNetwork(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'NETWORK/SET/ACTIVE' })
+  }
 }

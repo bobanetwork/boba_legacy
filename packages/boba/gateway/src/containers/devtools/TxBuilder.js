@@ -9,11 +9,9 @@ import Button from 'components/button/Button'
 import { openError } from 'actions/uiAction'
 
 import { selectTxBuilder } from 'selectors/devToolsSelector'
-import { selectNetwork, selectLayer } from 'selectors/setupSelector'
+import { selectLayer } from 'selectors/setupSelector'
 
 import { submitTxBuilder, resetTxBuilder } from 'actions/devToolsAction'
-
-import { getNetwork } from 'util/masterConfig'
 
 import networkService from 'services/networkService'
 
@@ -25,10 +23,7 @@ const TxBuilder = () => {
   const TxBuilderResult = useSelector(selectTxBuilder, shallowEqual)
   const networkLayer = useSelector(selectLayer())
 
-  const nw = getNetwork()
-  const masterConfig = useSelector(selectNetwork())
-  const blockexploerUrl = nw[masterConfig].L2.blockExplorer
-
+  const blockExplorerUrl = networkService.networkConfig.L2.blockExplorer
   const [ contractAddress, setContractAddress ] = useState('')
   const [ contractABI, setContractABI ] = useState('')
   const [ contractMethos, setContractMethods ] = useState([])
@@ -214,7 +209,7 @@ const TxBuilder = () => {
                             <S.TxSuccessWrapper>
                               <Typography variant="body1" sx={{color: 'green', wordBreak: 'break-all', marginRight: '10px'}}>Succeeded!</Typography>
                               <Button
-                                onClick={() => openInNewTab(`${blockexploerUrl}tx/${TxResult.transactionHash}`)}
+                                onClick={() => openInNewTab(`${blockExplorerUrl}tx/${TxResult.transactionHash}`)}
                                 color='primary'
                                 variant="outlined"
                               >

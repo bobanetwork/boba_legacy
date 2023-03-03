@@ -1,15 +1,14 @@
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositErc20, depositETHL2 } from 'actions/networkAction'
-import { setActiveHistoryTab } from 'actions/uiAction'
+import { setActiveHistoryTab, openAlert } from 'actions/uiAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_depositTRAD } from 'selectors/signatureSelector'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { useTheme } from '@emotion/react'
@@ -18,10 +17,15 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import { selectLookupPrice } from 'selectors/lookupSelector'
 
 import BN from 'bignumber.js'
+import { ethers } from 'ethers'
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
+  const theme = useTheme()
   const dispatch = useDispatch()
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [ enableToL2Account, setEnableToL2Account ] = useState(false);
   const [ recipient, setRecipient ] = useState('');
   const [ value, setValue ] = useState('')
@@ -30,7 +34,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const [ validValue, setValidValue ] = useState(false)
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
-  const signatureStatus = useSelector(selectSignatureStatus_depositTRAD)
+  const networkName = useSelector(selectActiveNetworkName())
   const lookupPrice = useSelector(selectLookupPrice)
 
   const maxValue = logAmount(token.balance, token.decimals)
@@ -52,18 +56,20 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   async function doDeposit() {
 
     let res
+    let toL2Account = enableToL2Account ? recipient : '';
 
-    if (token.symbol === 'ETH') {
+    // TO check for ETH
+    if (token.address === ethers.constants.AddressZero) {
       res = await dispatch(
         depositETHL2({
-          recipient,
+          recipient: toL2Account,
           value_Wei_String
         })
       )
     } else {
       res = await dispatch(
         depositErc20({
-          recipient,
+          recipient: toL2Account,
           value_Wei_String,
           currency: token.address,
           currencyL2: token.addressL2,
@@ -71,24 +77,12 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       )
     }
     if (res) {
-      dispatch(setActiveHistoryTab('Ethereum to Boba Ethereum L2'))
+      dispatch(openAlert(`Your funds were bridged to ${networkName[ 'l2' ]}`))
+      dispatch(setActiveHistoryTab(`${networkName[ 'l1' ]} to ${networkName[ 'l2' ]}`))
       handleClose()
     }
 
   }
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
-  useEffect(() => {
-    if (signatureStatus && depositLoading) {
-      //we are all set - can close the window
-      //transaction has been sent and signed
-      handleClose()
-    }
-  }, [ signatureStatus, depositLoading, handleClose ])
-
-  console.log("Loading:", depositLoading)
 
   let buttonLabel_1 = 'Cancel'
   if (depositLoading) buttonLabel_1 = 'Close'
@@ -113,7 +107,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
         <Button
           onClick={handleClose}
           disabled={false}
-          variant='outlined'
+          variant='contained'
           color='primary'
           size='large'
         >
@@ -195,7 +189,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       <WrapperActionsModal>
         <Button
           onClick={handleClose}
-          disabled={false}
+          disabled={depositLoading}
           variant='outlined'
           color='primary'
           size='large'

@@ -19,6 +19,7 @@ import { farmL1, farmL2 } from 'actions/networkAction'
 import { fetchAllowance } from 'actions/farmAction'
 import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
+import { NETWORK } from 'util/network/network.util'
 
 class FarmDepositModal extends React.Component {
 
@@ -39,6 +40,7 @@ class FarmDepositModal extends React.Component {
       loading: false,
       bobaFeeChoice,
       netLayer,
+      netLayerNativeToken: networkService.networkGateway === NETWORK.ETHEREUM ? 'ETH' : netLayer === 'L1' ? networkService.L1NativeTokenSymbol : 'BOBA',
       bobaFeePriceRatio,
       max_Wei_String: '0',
       max_Float_String: '0.0',
@@ -70,7 +72,7 @@ class FarmDepositModal extends React.Component {
 
     if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
 
-      if ( stakeToken.symbol !== 'ETH' ) {
+      if ( stakeToken.symbol !== this.state.netLayerNativeToken ) {
         this.props.dispatch(fetchAllowance(
           stakeToken.currency,
           stakeToken.LPAddress
@@ -101,10 +103,12 @@ class FarmDepositModal extends React.Component {
       stakeToken,
       bobaFeeChoice,
       bobaFeePriceRatio,
-      netLayer
+      netLayer,
+      netLayerNativeToken
     } = this.state
 
     let max_BN = BigNumber.from(stakeToken.balance.toString())
+
     if (netLayer === 'L2') {
 
       let cost_BN = await networkService
@@ -115,7 +119,7 @@ class FarmDepositModal extends React.Component {
       let fee = '0'
 
       // both ETH and BOBA have 18 decimals so this is safe
-      if (stakeToken.symbol === 'ETH') {
+      if (stakeToken.symbol === netLayerNativeToken) {
         // we are staking ETH
         // since MetaMask does not know about BOBA, we need to subtract the ETH fee
         // regardless of how we are paying, otherwise will get an error in MetaMask
@@ -138,10 +142,12 @@ class FarmDepositModal extends React.Component {
         // do not adjust max_BN
       }
 
-      if(bobaFeeChoice)
+      if (bobaFeeChoice && networkService.networkGateway === NETWORK.ETHEREUM) {
         fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
-      else
+      }
+      else {
         fee = utils.formatUnits(cost_BN, stakeToken.decimals)
+      }
 
       // if the max amount is less than the gas,
       // set the max amount to zero
@@ -261,7 +267,8 @@ class FarmDepositModal extends React.Component {
       max_Float_String,
       netLayer,
       bobaFeeChoice,
-      fee
+      fee,
+      netLayerNativeToken
     } = this.state
 
     const { approvedAllowance } = this.props.farm
@@ -274,7 +281,7 @@ class FarmDepositModal extends React.Component {
     ) {
       allowanceGTstake = true
     } else if (Number(stakeValue) > 0 &&
-      stakeToken.symbol === 'ETH'
+      stakeToken.symbol === netLayerNativeToken
     ) {
       //do not need to approve ETH
       allowanceGTstake = true
@@ -321,7 +328,7 @@ class FarmDepositModal extends React.Component {
           }
         </Box>
 
-        {!allowanceGTstake && stakeToken.symbol !== 'ETH' &&
+        {!allowanceGTstake && stakeToken.symbol !== netLayerNativeToken &&
           <>
             {stakeValueValid &&
               <Typography variant="body2" sx={{ mt: 2 }}>
@@ -332,8 +339,9 @@ class FarmDepositModal extends React.Component {
             <WrapperActionsModal>
               <Button
                 onClick={() => { this.handleClose() }}
-                color="neutral"
-                size="large"
+                variant='outlined'
+                color='primary'
+                size='large'
               >
                 Cancel
               </Button>
@@ -353,7 +361,7 @@ class FarmDepositModal extends React.Component {
 
         {stakeValueValid && allowanceGTstake &&
           <>
-            {stakeToken.symbol !== 'ETH' &&
+            {stakeToken.symbol !== netLayerNativeToken &&
               <Typography variant="body2" sx={{ mt: 2 }}>
                 Your allowance has been approved. You can now stake your funds.
               </Typography>
@@ -361,8 +369,9 @@ class FarmDepositModal extends React.Component {
             <WrapperActionsModal>
               <Button
                 onClick={() => { this.handleClose() }}
-                color="neutral"
-                size="large"
+                variant='outlined'
+                color='primary'
+                size='large'
               >
                 Cancel
               </Button>

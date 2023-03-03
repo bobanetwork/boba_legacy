@@ -52,8 +52,9 @@ function _Modal({
       open={open}
       onClose={onClose}
       ismobile={isMobile ? 1 : 0}
-      // closeAfterTransition
-      BackdropComponent={S.Backdrop}
+      slots={{
+        backdrop:S.Backdrop
+      }}
       disableAutoFocus={true}
     >
       <Fade in={open}>
@@ -61,7 +62,7 @@ function _Modal({
         {
           !!newStyle ?
             <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative' }}>
-              <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={transparent || isMobile}>
+              <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={!!transparent || !!isMobile}>
                 <Box display="flex" flexDirection="column" gap="10px">
                   <S.ModalHead>
                     <Box display="flex" alignItems="center" gap="10px">

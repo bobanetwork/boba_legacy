@@ -27,6 +27,7 @@ import Pager from 'components/pager/Pager'
 import Transaction from 'components/transaction/Transaction'
 
 import * as S from './History.styles';
+import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 const PER_PAGE = 10
 
@@ -36,6 +37,7 @@ function TX_Deposits({ searchHistory, transactions }) {
 
   const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))
   const tokenList = useSelector(selectTokens)
+  const networkName = useSelector(selectActiveNetworkName())
 
   useEffect(() => {
     setPage(1)
@@ -125,7 +127,7 @@ function TX_Deposits({ searchHistory, transactions }) {
                     title={`Hash: ${i.hash}`}
                     time={moment.unix(i.timeStamp).format('lll')}
                     blockNumber={`Block ${i.blockNumber}`}
-                    chain={`Ethereum to Boba Ethereum L2 ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
+                    chain={`${networkName['l1']} to ${networkName['l2']} ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
                     typeTX={`TX Type: ${metaData}`}
                     detail={details}
                     oriChain={chain}

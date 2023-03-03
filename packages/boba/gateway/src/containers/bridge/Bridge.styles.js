@@ -1,8 +1,7 @@
 import styled from '@emotion/styled'
 import { Box } from "@mui/material"
-import bobaGlassBg from 'images/boba2/boba_glass_bg.svg'
 import bobaGlassIcon from 'images/boba2/boba_glass.svg'
-
+import bobaBridgeBg from 'images/boba2/bridge_bg.svg'
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '20px auto',
   display: 'flex',
@@ -22,6 +21,17 @@ export const PageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '0px',
   },
+  '::after': {
+    content: '" "',
+    position: 'absolute',
+    left: '-5%',
+    bottom: '10%',
+    width: '130%',
+    height: '100%',
+    background: `url(${bobaBridgeBg}) no-repeat`,
+    backgroundSize: '85%',
+    zIndex: '-1',
+  }
 }));
 
 
@@ -63,22 +73,11 @@ export const TitleContainer = styled(Box)(({ theme }) => ({
     position: 'absolute',
     top: '5%',
     right: '25%',
-    width: '50px',
-    height: '50px',
+    width: '80px',
+    height: '80px',
     background: `url(${bobaGlassIcon}) no-repeat`,
     backgroundSize: '100% 90%',
   },
-  '::after': {
-    content: '" "',
-    position: 'absolute',
-    bottom: '20%',
-    left: 0,
-    width: '90%',
-    height: '100%',
-    background: `url(${bobaGlassBg}) no-repeat`,
-    backgroundSize: '100%',
-    zIndex: '-1'
-  }
 }))
 
 export const Content = styled(Box)(({ theme }) => ({
