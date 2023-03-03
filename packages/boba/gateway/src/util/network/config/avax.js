@@ -26,6 +26,8 @@ export const avaxConfig = {
       blockExplorer: `https://blockexplorer.testnet.avax.boba.network/`,
       transaction: `https://blockexplorer.testnet.avax.boba.network/tx/`,
       blockExplorerUrl: `https://blockexplorer.testnet.avax.boba.network/`,
+      symbol: "BOBA",
+      tokenName: "Boba Token",
     },
     gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
     twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`
@@ -57,6 +59,8 @@ export const avaxConfig = {
       blockExplorer: `https://blockexplorer.avax.boba.network/`,
       transaction: `https://blockexplorer.avax.boba.network/tx/`,
       blockExplorerUrl: `https://blockexplorer.avax.boba.network`,
+      symbol: "BOBA",
+      tokenName: "Boba Token",
     },
     gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
     twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Boba%20Avalanche%20Testnet%20for%20Avalanche%20`

@@ -27,7 +27,9 @@ export const ethereumConfig = {
       rpcUrl: `https://goerli.boba.network`,
       blockExplorer: `https://testnet.bobascan.com/`,
       transaction: `https://testnet.bobascan.com/tx/`,
-      blockExplorerUrl: `https://testnet.bobascan.com/`
+      blockExplorerUrl: `https://testnet.bobascan.com/`,
+      symbol: 'ETH',
+      tokenName: 'ETH',
     },
     payloadForL1SecurityFee: {
       from: '0x122816e7A7AeB40601d0aC0DCAA8402F7aa4cDfA',
@@ -73,7 +75,9 @@ export const ethereumConfig = {
       rpcUrl: `https://mainnet.boba.network`,
       blockExplorer: `https://bobascan.com/`,
       transaction: `https://bobascan.com/tx/`,
-      blockExplorerUrl: `https://bobascan.com/`
+      blockExplorerUrl: `https://bobascan.com/`,
+      symbol: 'ETH',
+      tokenName: 'ETH',
     },
     payloadForL1SecurityFee: {
       from: '0x5E7a06025892d8Eef0b5fa263fA0d4d2E5C3B549',

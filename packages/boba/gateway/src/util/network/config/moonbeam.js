@@ -26,6 +26,8 @@ export const moonbeamConfig = {
       blockExplorer: `https://blockexplorer.bobabase.boba.network/`,
       transaction: `https://blockexplorer.bobabase.boba.network/tx/`,
       blockExplorerUrl: `https://blockexplorer.bobabase.boba.network`,
+      symbol: "BOBA",
+      tokenName: "Boba Token",
     },
     gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
     twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabase%20for%20Moonbeam%20`
@@ -57,6 +59,8 @@ export const moonbeamConfig = {
       blockExplorer: `https://blockexplorer.bobabeam.boba.network/`,
       transaction: `https://blockexplorer.bobabeam.boba.network/tx/`,
       blockExplorerUrl: `https://blockexplorer.bobabeam.boba.network/`,
+      symbol: "BOBA",
+      tokenName: "Boba Token",
     },
     gasEstimateAccount: `0xdb5a187FED81c735ddB1F6E47F28f2A5F74639b2`,
     twitterFaucetPromotionText: `https://twitter.com/intent/tweet?text=I%27m%20developing%20on%20Bobabeam%20for%20Moonbeam%20`
