@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
+import { ReactComponent as BobaIcon } from '../../../images/boba2/boba2Icon.svg'
 
 export const Nav = styled('nav')(({ theme }) => ({
   width: '100%',
@@ -8,33 +9,45 @@ export const Nav = styled('nav')(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: '10px',
+  gap: '24px',
   flexWrap: 'wrap',
   [theme.breakpoints.down('md')]: {
     width: '100%',
-    gap: '20px',
+    gap: '10px',
     height: '250px',
     marginTop: '20px',
     flexWrap: 'nowrap',
     alignItems: 'flex-start',
     backgroundColor: theme.palette.background.default,
     flexDirection: 'column',
-  }
+  },
 }))
 
-export const MenuItem = styled(NavLink)(({ selected, theme }) => ({
-  fontSize: '0.8em',
+export const MenuListItem = styled(NavLink)(({ theme }) => ({
+  fontSize: '0.9em',
   fontWeight: 'normal',
   cursor: 'pointer',
   height: '22px',
   textDecoration: 'none',
-  [ theme.breakpoints.down('md') ]: {
+  [theme.breakpoints.down('md')]: {
     fontSize: '20px',
     fontWeight: '400',
-    marginLeft: '20px'
+    marginLeft: '20px',
+    padding: '0 24px',
   },
+  color: 'inherit',
   '&:hover': {
     color: `${theme.palette.secondary.main}`,
   },
+  '&.active': {
+    color: `${theme.palette.secondary.main}`,
+  },
+}))
 
+export const MenuIcon = styled(BobaIcon)(({ theme }) => ({
+  // display: 'none',
+  margin: '0 4px -2px 4px',
+  '&.active': {
+    display: 'inline',
+  },
 }))
