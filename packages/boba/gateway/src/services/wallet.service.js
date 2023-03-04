@@ -24,7 +24,6 @@ class WalletService {
     this.account = null
 
     this.walletConnectProvider = null
-
     this.walletType = null
   }
 
@@ -121,7 +120,6 @@ class WalletService {
         params: [{ chainId }],
       })
     } catch (error) {
-      console.log(`switchChain: ${error}`)
       await provider.request({
         method: "wallet_addEthereumChain",
         params: [chainInfo, this.account],
@@ -143,7 +141,7 @@ class WalletService {
       }
     }
   }
-
+  
   bindProviderListeners() {
     if (this.walletType === 'metamask') {
       this.listenMetaMask()
