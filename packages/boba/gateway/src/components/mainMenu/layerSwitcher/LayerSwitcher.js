@@ -35,6 +35,7 @@ import {
   selectConnectETH,
   selectConnectBOBA,
   selectConnect,
+  selectWalletConnected,
 } from 'selectors/setupSelector'
 
 import {
@@ -73,6 +74,7 @@ function LayerSwitcher({ visisble = true }) {
   const connectETHRequest = useSelector(selectConnectETH())
   const connectBOBARequest = useSelector(selectConnectBOBA())
   const connectRequest = useSelector(selectConnect())
+  const walletConnected = useSelector(selectWalletConnected())
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -125,8 +127,11 @@ function LayerSwitcher({ visisble = true }) {
     async function doConnect() {
       try {
         localStorage.setItem('wantChain', JSON.stringify(layer))
-        await networkService.switchChain(layer)
-        dispatchBootAccount()
+        if (networkService.provider) {
+          await networkService.switchChain(layer)
+        } else {
+          dispatch(openModal('walletSelectorModal'))
+        }
       } catch (err) {
         console.log('ERROR', err)
         dispatch(setConnectETH(false));
@@ -134,7 +139,13 @@ function LayerSwitcher({ visisble = true }) {
       }
     }
     doConnect();
-  }, [dispatch, dispatchBootAccount])
+  }, [dispatch])
+
+  useEffect(() => {
+    if (walletConnected) {
+      dispatchBootAccount()
+    }
+  }, [walletConnected, dispatchBootAccount])
 
   useEffect(() => {
     // detect mismatch and correct the mismatch
@@ -179,9 +190,9 @@ function LayerSwitcher({ visisble = true }) {
 
   useEffect(() => {
     if (connectRequest) {
-      dispatchBootAccount()
+      dispatch(openModal('walletSelectorModal'))
     }
-  }, [connectRequest, dispatchBootAccount])
+  }, [dispatch, connectRequest])
 
   if (!visisble) {
     return null

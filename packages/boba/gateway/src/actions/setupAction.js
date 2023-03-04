@@ -75,3 +75,9 @@ export function setConnect( state ) {
     return dispatch({ type: 'SETUP/CONNECT', payload: state })
   }
 }
+
+export function setWalletConnected( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/WALLET_CONNECTED', payload: state })
+  }
+}

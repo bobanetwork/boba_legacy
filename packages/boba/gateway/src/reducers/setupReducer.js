@@ -29,7 +29,8 @@ const initialState = {
   bobaFeeChoice: null,
   connectETH: false,
   connectBOBA: false,
-  connect: false
+  connect: false,
+  walletConnected: false,
 }
 
 function setupReducer(state = initialState, action) {
@@ -70,6 +71,11 @@ function setupReducer(state = initialState, action) {
       return {
         ...state,
         connect: action.payload
+      }
+    case 'SETUP/WALLET_CONNECTED':
+      return {
+        ...state,
+        walletConnected: action.payload
       }
     case 'SETUP/SWITCH/REQUEST':
       localStorage.setItem("justSwitchedChain", JSON.stringify(true))

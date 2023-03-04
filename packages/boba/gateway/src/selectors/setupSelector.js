@@ -87,3 +87,8 @@ export function selectMonsterInfo () {
   }
 }
 
+export function selectWalletConnected () {
+  return function (state) {
+    return state.setup['walletConnected']
+  }
+}

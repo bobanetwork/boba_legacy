@@ -96,6 +96,8 @@ import { MIN_NATIVE_L1_BALANCE, SPEED_CHECK } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
+import walletService from './wallet.service'
+
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
 
@@ -108,15 +110,6 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 const L2_SECONDARYFEETOKEN_ADDRESS = '0x4200000000000000000000000000000000000023'
 
 let allTokens = {}
-
-function handleChangeChainOnce(chainID_hex_string) {
-
-  localStorage.setItem('chainChangedInit', true)
-
-  localStorage.setItem('newChain', Number(chainID_hex_string))
-  // and remove the listner
-  window.ethereum.removeListener('chainChanged', handleChangeChainOnce)
-}
 
 class NetworkService {
 
@@ -197,27 +190,10 @@ class NetworkService {
     this.addresses = {}
     this.network = null;
     this.networkConfig = null
-  }
 
-  bindProviderListeners() {
-    window.ethereum.on('accountsChanged', () => {
-      window.location.reload()
-    })
-    window.ethereum.on('chainChanged', () => {
-      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
-      // changed chains AND conncted at the same time
-      // otherwise the user gets confused about why they are going through
-      // two window reloads
-      if(chainChangedInit) {
-        localStorage.setItem('chainChangedInit', false)
-      } else {
-        localStorage.setItem('chainChangedFromMM', true)
-        window.location.reload()
-      }
-    })
+    // wallet service
+    this.walletService = walletService
   }
-
 
   async getBobaFeeChoice() {
 
@@ -620,8 +596,12 @@ class NetworkService {
         fastRelayer: true,
       })
 
+      let l2SecondaryFeeTokenAddress = L2_SECONDARYFEETOKEN_ADDRESS
+      if (NETWORK.ETHEREUM === network && chainId === 1) {
+        l2SecondaryFeeTokenAddress = allTokens.BOBA.L2
+      }
       this.BobaContract = new ethers.Contract(
-        L2_SECONDARYFEETOKEN_ADDRESS,
+        l2SecondaryFeeTokenAddress,
         Boba.abi,
         this.L2Provider
       )
@@ -678,8 +658,7 @@ class NetworkService {
       }
 
       // connect to the wallet
-      await window.ethereum.request({method: 'eth_requestAccounts'})
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
+      this.provider = this.walletService.provider
       this.account = await this.provider.getSigner().getAddress()
 
       const networkMM = await this.provider.getNetwork()
@@ -705,11 +684,11 @@ class NetworkService {
       } else if(!!NETWORK[ network ] && networkMM.chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
-        this.bindProviderListeners()
+        this.walletService.bindProviderListeners()
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners()
+      this.walletService.bindProviderListeners()
       // this should not do anything unless we changed chains
       if (this.L1orL2 === 'L2') {
         await this.getBobaFeeChoice()
@@ -725,53 +704,26 @@ class NetworkService {
 
 
   async switchChain(targetLayer) {
-
     const networkDetail = getNetworkDetail({
       network: this.networkGateway,
       networkType: this.networkType
     })
 
     const targetIDHex = networkDetail[targetLayer].chainIdHex
-
-    try {
-
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
-      await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
-      window.ethereum.on('chainChanged', handleChangeChainOnce)
-
-      return true
-    } catch (error) {
-      // 4902 = the chain has not been added to MetaMask.
-      // So, lets add it
-      if (error.code === 4902) {
-        const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcURL
-        try {
-          //the chainParams are only needed for the L2s
-          const chainParam = {
-            chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
-            chainName: networkDetail[targetLayer].name,
-            rpcUrls: rpcURL,
-            nativeCurrency: {
-              name: networkDetail[targetLayer].tokenName,
-              symbol: networkDetail[targetLayer].symbol,
-              decimals: 18,
-            },
-            blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorer?.slice(0, -1)]
-          }
-
-          await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          window.ethereum.on('chainChanged', handleChangeChainOnce)
-          return true
-        } catch (addError) {
-          console.log("MetaMask - Error adding new RPC: ", addError)
-          throw new Error(addError.code)
-        }
-      } else { //some other error code
-        console.log("MetaMask - Switch Error: ", error.code)
-        throw new Error(error.code)
-      }
+    const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcUrl
+    const chainParam = {
+      chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
+      chainName: networkDetail[targetLayer].name,
+      rpcUrls: [rpcURL],
+      nativeCurrency: {
+        name: networkDetail[targetLayer].tokenName,
+        symbol: networkDetail[targetLayer].symbol,
+        decimals: 18,
+      },
+      blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorer?.slice(0, -1)]
     }
+
+    await this.walletService.switchChain(targetIDHex, chainParam)
   }
 
   async getSevens() {
