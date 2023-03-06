@@ -2671,6 +2671,16 @@ class NetworkService {
   async withdrawLiquidity(currency, value_Wei_String, L1orL2Pool) {
 
     try {
+      const estimateGas = await (L1orL2Pool === 'L1LP'
+        ? this.L1LPContract
+        : this.L2LPContract
+      ).estimateGas.withdrawLiquidity(
+        value_Wei_String,
+        currency,
+        this.account,
+        { from: this.account }
+      )
+      const blockGasLimit = (await this.provider.getBlock('latest')).gasLimit
       const TX = await (L1orL2Pool === 'L1LP'
         ? this.L1LPContract
         : this.L2LPContract
@@ -2679,7 +2689,8 @@ class NetworkService {
       .withdrawLiquidity(
         value_Wei_String,
         currency,
-        this.account
+        this.account,
+        { gasLimit: estimateGas.mul(2).gt(blockGasLimit) ? blockGasLimit : estimateGas.mul(2) }
       )
       await TX.wait()
       return TX
