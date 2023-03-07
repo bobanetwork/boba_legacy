@@ -22,16 +22,16 @@ import { useTheme } from '@emotion/react';
 import { Box, FormControlLabel, Checkbox, Typography, useMediaQuery } from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
 
-import { selectUserInfo, selectPoolInfo } from 'selectors/farmSelector'
+import { selectUserInfo, selectPoolInfo } from 'selectors/earnSelector'
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
 import { selectBaseEnabled, selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 import { selectActiveNetworkName } from 'selectors/networkSelector'
 
-import { getFarmInfo } from 'actions/farmAction'
+import { getEarnInfo } from 'actions/earnAction'
 
 import Connect from 'containers/connect/Connect'
 
-import ListFarm from 'components/listFarm/listFarm'
+import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
@@ -65,7 +65,7 @@ function Earn() {
 
   useEffect(() => {
     if (baseEnabled) {
-      dispatch(getFarmInfo())
+      dispatch(getEarnInfo())
     }
   }, [dispatch, baseEnabled])
 
@@ -126,7 +126,7 @@ function Earn() {
             </Typography>
           </S.PageSwitcher>
 
-          <S.FarmAction>
+          <S.EarnAction>
             <FormControlLabel
               control={
                 <Checkbox
@@ -151,7 +151,7 @@ function Earn() {
               }
               label="My Stakes Only"
             />
-          </S.FarmAction>
+          </S.EarnAction>
 
         </S.EarnActionContainer>
 
@@ -282,7 +282,7 @@ function Earn() {
               const ret = getBalance(v, 'L1')
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
-                <ListFarm
+                <ListEarn
                   key={i}
                   poolInfo={poolInfo.L1LP[ v ]}
                   userInfo={userInfo.L1LP[ v ]}
@@ -303,7 +303,7 @@ function Earn() {
               const ret = getBalance(v, 'L2')
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
-                <ListFarm
+                <ListEarn
                   key={i}
                   poolInfo={poolInfo.L2LP[ v ]}
                   userInfo={userInfo.L2LP[ v ]}

@@ -15,12 +15,12 @@ limitations under the License. */
 
 export function selectPoolInfo () {
   return function (state) {
-    return state.farm.poolInfo
+    return state.earn.poolInfo
   }
 }
 
 export function selectUserInfo () {
   return function (state) {
-    return state.farm.userInfo
+    return state.earn.userInfo
   }
 }

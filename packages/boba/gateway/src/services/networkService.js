@@ -2346,7 +2346,7 @@ class NetworkService {
   }
 
   /*****************************************************/
-  /***** Pool, User Info, to populate the Farm tab *****/
+  /***** Pool, User Info, to populate the Earn tab *****/
   /*****************************************************/
   async getL1LPInfo() {
 

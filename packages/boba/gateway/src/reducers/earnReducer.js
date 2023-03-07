@@ -55,11 +55,11 @@ const initialState = {
   allAddresses: {},
 };
 
-function farmReducer (state = initialState, action) {
+function earnReducer (state = initialState, action) {
   switch (action.type) {
-    case 'GET_FARMINFO':
+    case 'GET_EARNINFO':
       return state;
-    case 'GET_FARMINFO_SUCCESS':
+    case 'GET_EARNINFO_SUCCESS':
       return {
         ...state,
         poolInfo: {
@@ -139,4 +139,4 @@ function farmReducer (state = initialState, action) {
   }
 }
 
-export default farmReducer;
+export default earnReducer;

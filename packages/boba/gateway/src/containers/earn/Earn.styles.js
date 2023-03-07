@@ -104,7 +104,7 @@ export const GridItemTag = styled(Grid)`
   gap:5px;
 `;
 
-export const FarmAction = styled(Box)(({theme})=>({
+export const EarnAction = styled(Box)(({theme})=>({
   display: 'flex',
   justifyContent: 'space-around',
   alignItems: 'center',

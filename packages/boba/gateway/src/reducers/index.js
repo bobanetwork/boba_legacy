@@ -28,7 +28,7 @@ import feeReducer from './feeReducer'
 import uiReducer from './uiReducer'
 import setupReducer from './setupReducer'
 import notificationReducer from './notificationReducer'
-import farmReduer from './farmReducer'
+import earnReduer from './earnReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
@@ -54,7 +54,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   setup: setupReducer,
   notification: notificationReducer,
-  farm: farmReduer,
+  earn: earnReduer,
   lookup: lookupReducer,
   dao: daoReducer,
   fixed: fixedReducer,
