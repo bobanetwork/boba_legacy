@@ -5,17 +5,16 @@ pragma solidity ^0.8.12;
 /* solhint-disable no-inline-assembly */
 /* solhint-disable reason-string */
 
-import "../core/BaseWallet.sol";
+import "../core/BaseAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
-  * minimal wallet.
-  *  this is sample minimal wallet.
+  * minimal account.
+  *  this is sample minimal account.
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract SimpleWalletUpgradeable is BaseWallet, Initializable {
+contract SimpleAccount is BaseAccount {
     using ECDSA for bytes32;
 
     //explicit sizes of nonce, to fit a single storage cell with "owner"
@@ -37,8 +36,7 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    function initialize(IEntryPoint anEntryPoint, address anOwner) public initializer {
-        require(anOwner != address(0), "Owner cannot be zero address");
+    constructor(IEntryPoint anEntryPoint, address anOwner) {
         _entryPoint = anEntryPoint;
         owner = anOwner;
     }
@@ -51,11 +49,6 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
     function _onlyOwner() internal view {
         //directly from EOA owner, or through the entryPoint (which gets redirected through execFromEntryPoint)
         require(msg.sender == owner || msg.sender == address(this), "only owner");
-    }
-
-    function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0), "New owner cannot be the zero address");
-        owner = newOwner;
     }
 
     /**
@@ -84,7 +77,7 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
 
     /**
      * change entry-point:
-     * a wallet must have a method for replacing the entryPoint, in case the the entryPoint is
+     * an account must have a method for replacing the entryPoint, in case the the entryPoint is
      * upgraded to a newer version.
      */
     function _updateEntryPoint(address newEntryPoint) internal override {
@@ -105,7 +98,7 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
      * - pay prefund, in case current deposit is not enough
      */
     function _requireFromEntryPoint() internal override view {
-        require(msg.sender == address(entryPoint()), "wallet: not from EntryPoint");
+        require(msg.sender == address(entryPoint()), "account: not from EntryPoint");
     }
 
     // called by entryPoint, only after validateUserOp succeeded.
@@ -114,16 +107,18 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
         _call(dest, value, func);
     }
 
-    /// implement template method of BaseWallet
+    /// implement template method of BaseAccount
     function _validateAndUpdateNonce(UserOperation calldata userOp) internal override {
-        require(_nonce++ == userOp.nonce, "wallet: invalid nonce");
+        require(_nonce++ == userOp.nonce, "account: invalid nonce");
     }
 
-    /// implement template method of BaseWallet
-    function _validateSignature(UserOperation calldata userOp, bytes32 requestId, address)
+    /// implement template method of BaseAccount
+    function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash, address)
     internal override virtual returns (uint256 deadline) {
-        bytes32 hash = requestId.toEthSignedMessageHash();
-        require(owner == hash.recover(userOp.signature), "wallet: wrong signature");
+        bytes32 hash = userOpHash.toEthSignedMessageHash();
+        //ignore signature mismatch of from==ZERO_ADDRESS (for eth_callUserOp validation purposes)
+        // solhint-disable-next-line avoid-tx-origin
+        require(owner == hash.recover(userOp.signature) || tx.origin == address(0), "account: wrong signature");
         return 0;
     }
 
@@ -137,14 +132,14 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
     }
 
     /**
-     * check current wallet deposit in the entryPoint
+     * check current account deposit in the entryPoint
      */
     function getDeposit() public view returns (uint256) {
         return entryPoint().balanceOf(address(this));
     }
 
     /**
-     * deposit more funds for this wallet in the entryPoint
+     * deposit more funds for this account in the entryPoint
      */
     function addDeposit() public payable {
 
@@ -153,7 +148,7 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
     }
 
     /**
-     * withdraw value from the wallet's deposit
+     * withdraw value from the account's deposit
      * @param withdrawAddress target to send to
      * @param amount to withdraw
      */
@@ -161,3 +156,4 @@ contract SimpleWalletUpgradeable is BaseWallet, Initializable {
         entryPoint().withdrawTo(withdrawAddress, amount);
     }
 }
+
