@@ -18,7 +18,8 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositL2LP } from 'actions/networkAction'
-import { openAlert } from 'actions/uiAction'
+import { openModal } from 'actions/uiAction'
+import { setCDMCompletion } from 'actions/transactionAction'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector'
@@ -217,20 +218,23 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   async function doExit() {
 
-    let res = await dispatch(
+    let receipt = await dispatch(
       depositL2LP(
         token.address,
         value_Wei_String
       )
     )
 
-    if (res) {
-      dispatch(
-          openAlert(
-            `${token.symbol} was bridged to L1. You will receive approximately
-            ${receivableAmount(value)} ${token.symbol} on L1.`
-          )
-        )
+    if (receipt) {
+      dispatch(setCDMCompletion({
+        CDMType: 'L1FastBridge',
+        CDMMessage: {
+          token: `${token.symbol}`,
+          receivedToken: `${receivableAmount(Number(value))} ${token.symbol}`
+        },
+        CDMTransaction: { transactionHash: receipt.hash }
+      }))
+      dispatch(openModal('CDMCompletionModal'))
       handleClose()
     }
 
