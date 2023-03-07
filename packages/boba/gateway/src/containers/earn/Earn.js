@@ -39,9 +39,9 @@ import PageTitle from 'components/pageTitle/PageTitle'
 
 import networkService from 'services/networkService'
 
-import * as S from './Farm.styles'
+import * as S from './Earn.styles'
 
-function Farm() {
+function Earn() {
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
   const [lpChoice, setLpChoice] = useState(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
@@ -277,7 +277,7 @@ function Farm() {
         ) : (null)}
 
         {lpChoice === 'L1LP' &&
-          <S.FarmListContainer>
+          <S.EarnListContainer>
             {Object.keys(poolInfo.L1LP).map((v, i) => {
               const ret = getBalance(v, 'L1')
               if (showMDO && Number(ret[ 0 ]) === 0) return null
@@ -295,10 +295,10 @@ function Farm() {
                 />
               )
             })}
-          </S.FarmListContainer>}
+          </S.EarnListContainer>}
 
         {lpChoice === 'L2LP' &&
-          <S.FarmListContainer>
+          <S.EarnListContainer>
             {Object.keys(poolInfo.L2LP).map((v, i) => {
               const ret = getBalance(v, 'L2')
               if (showMDO && Number(ret[ 0 ]) === 0) return null
@@ -316,11 +316,11 @@ function Farm() {
                 />
               )
             })}
-          </S.FarmListContainer>
+          </S.EarnListContainer>
         }
       </Box>
     </S.EarnPageContainer>
   )
 }
 
-export default React.memo(Farm);
+export default React.memo(Earn);

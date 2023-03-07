@@ -122,7 +122,7 @@ export const EarnActionContainer = styled(Box)(({ theme }) => ({
   }
 }))
 
-export const FarmListContainer = styled(Box)(({theme})=>({
+export const EarnListContainer = styled(Box)(({theme})=>({
   [theme.breakpoints.down('md')]: {
     display: 'flex',
     flexDirection: 'column',
