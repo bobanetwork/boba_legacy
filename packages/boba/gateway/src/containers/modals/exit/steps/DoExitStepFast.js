@@ -227,7 +227,7 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
     if (receipt) {
       dispatch(setCDMCompletion({
-        CDMType: 'L1FastBridge',
+        CDMType: 'L2FastBridge',
         CDMMessage: {
           token: `${token.symbol}`,
           receivedToken: `${receivableAmount(Number(value))} ${token.symbol}`
