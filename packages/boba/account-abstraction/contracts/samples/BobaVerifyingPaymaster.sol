@@ -64,7 +64,7 @@ contract BobaVerifyingPaymaster is BasePaymaster {
      * verify our external signer signed this request.
      * the "paymasterAndData" is expected to be the paymaster and a signature over the entire request params
      */
-    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 /*requestId*/, uint256 requiredPreFund)
+    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 /*userOpHash*/, uint256 requiredPreFund)
     external view override returns (bytes memory context, uint256 deadline) {
         (requiredPreFund);
 
@@ -74,7 +74,10 @@ contract BobaVerifyingPaymaster is BasePaymaster {
         //ECDSA library supports both 64 and 65-byte long signatures.
         // we only "require" it here so that the revert reason on invalid signature will be of "VerifyingPaymaster", and not "ECDSA"
         require(sigLength == 64 || sigLength == 65, "VerifyingPaymaster: invalid signature length in paymasterAndData");
-        require(verifyingSigner == hash.toEthSignedMessageHash().recover(paymasterAndData[20 :]), "VerifyingPaymaster: wrong signature");
+
+        //ignore signature mismatch of from==ZERO_ADDRESS (for eth_callUserOp validation purposes)
+        // solhint-disable-next-line avoid-tx-origin
+        require(verifyingSigner == hash.toEthSignedMessageHash().recover(paymasterAndData[20 :]) || tx.origin == address(0), "VerifyingPaymaster: wrong signature");
 
         require(_validateCallDataApprove(userOp.callData) || _validateCallDataDeposit(userOp.callData), "VerifyingPaymaster: invalid operation");
         //no need for other on-chain validation: entire UserOp should have been checked
