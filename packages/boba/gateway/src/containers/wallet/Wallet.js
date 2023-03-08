@@ -150,80 +150,50 @@ function Wallet() {
       )}
 
       {accountEnabled ? (
-        <S.WalletActionContainer>
-          <G.PageSwitcher>
-            <Typography
-              className={layer === LAYER.L1 ? 'active' : ''}
-              onClick={() => {
-                if (!!accountEnabled) {
-                  dispatch(setConnectETH(true))
-                }
-              }}
-              variant="body2"
-              component="span"
-            >
-              {networkName['l1'] || DEFAULT_NETWORK.NAME.L1} Wallet
-            </Typography>
-            <Typography
-              className={layer === LAYER.L2 ? 'active' : ''}
-              onClick={() => {
-                if (!!accountEnabled) {
-                  dispatch(setConnectBOBA(true))
-                }
-              }}
-              variant="body2"
-              component="span"
-            >
-              {networkName['l2'] || DEFAULT_NETWORK.NAME.L2} Wallet
-            </Typography>
-          </G.PageSwitcher>
-          <Typography variant="body2" component="span">
-            <svg
-              width="8"
-              height="8"
-              viewBox="0 0 8 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ marginRight: '6px' }}
-            >
-              <circle cx="4" cy="4" r="4" fill="#BAE21A" />
-            </svg>
-            Connected
-          </Typography>
-        </S.WalletActionContainer>
-      ) : (
-        <Typography variant="body2" component="span" margin={'40px 0 20px 0'}>
-          <svg
-            width="8"
-            height="8"
-            viewBox="0 0 8 8"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ marginRight: '6px' }}
-          >
-            <circle cx="4" cy="4" r="4" fill="#FF6A55" />
-          </svg>
-          Disconnected
-        </Typography>
-      )}
-
-      {accountEnabled ? (
         <>
-        {network === NETWORK.ETHEREUM ? (
-          <>
-            <Box sx={{ mt: 2 }}>
-              <Tabs
-                activeTab={page}
-                onClick={(t) => setPage(t)}
-                aria-label="Page Tab"
-                tabs={['Token', 'NFT']}
-              />
-            </Box>
-            {page === 'Token' ? <Token /> : <Nft />}
-          </>
-        ) : (
-          <Token />
-        )}
+          <S.WalletActionContainer>
+            <G.PageSwitcher>
+              <Typography
+                className={layer === LAYER.L1 ? 'active' : ''}
+                onClick={() => {
+                  if (!!accountEnabled) {
+                    dispatch(setConnectETH(true))
+                  }
+                }}
+                variant="body2"
+                component="span"
+              >
+                {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1} Wallet
+              </Typography>
+              <Typography
+                className={layer === LAYER.L2 ? 'active' : ''}
+                onClick={() => {
+                  if (!!accountEnabled) {
+                    dispatch(setConnectBOBA(true))
+                  }
+                }}
+                variant="body2"
+                component="span"
+              >
+                {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2} Wallet
+              </Typography>
+            </G.PageSwitcher>
+          </S.WalletActionContainer>
+          {network === NETWORK.ETHEREUM ? (
+            <>
+              <Box sx={{ mt: 2 }}>
+                <Tabs
+                  activeTab={page}
+                  onClick={(t) => setPage(t)}
+                  aria-label="Page Tab"
+                  tabs={[ 'Token', 'NFT' ]}
+                />
+              </Box>
+              {page === 'Token' ? <Token /> : <Nft />}
+            </>
+          ) : (
+            <Token />
+          )}
         </>
       ) : ('')}
 
