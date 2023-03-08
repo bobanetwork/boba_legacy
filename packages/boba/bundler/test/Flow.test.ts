@@ -4,10 +4,10 @@ import hre, { ethers } from 'hardhat'
 import sinon from 'sinon'
 
 import * as SampleRecipientArtifact
-  from '@boba/bundler_utils/artifacts/contracts/test/SampleRecipient.sol/SampleRecipient.json'
+  from '@boba/accountabstraction/utils/artifacts/contracts/test/SampleRecipient.sol/SampleRecipient.json'
 
 import { BundlerConfig } from '../src/BundlerConfig'
-import { ERC4337EthersProvider, ERC4337EthersSigner, ClientConfig, wrapProvider } from '@boba/bundler_sdk'
+import { ERC4337EthersProvider, ERC4337EthersSigner, ClientConfig, wrapProvider } from '@account-abstraction/sdk'
 import { Signer, Wallet } from 'ethers'
 import { runBundler } from '../src/runBundler'
 import { BundlerServer } from '../src/BundlerServer'
@@ -43,7 +43,7 @@ describe('Flow', function () {
     sampleRecipientAddress = sampleRecipient.address
 
     const EntryPointFactory = await ethers.getContractFactory('EntryPoint')
-    const entryPoint = await EntryPointFactory.deploy(1, 1)
+    const entryPoint = await EntryPointFactory.deploy()
     entryPointAddress = entryPoint.address
 
     const bundleHelperFactory = await ethers.getContractFactory('BundlerHelper')

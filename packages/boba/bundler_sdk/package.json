@@ -20,17 +20,18 @@
   "dependencies": {
     "@boba/accountabstraction": "^1.0.0",
     "@boba/bundler_utils": "^0.2.3",
-    "@ethersproject/abstract-provider": "^5.5.0",
-    "@ethersproject/abstract-signer": "^5.5.0",
-    "@ethersproject/networks": "^5.5.0",
-    "@ethersproject/properties": "^5.5.0",
-    "@ethersproject/providers": "^5.5.0",
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/networks": "^5.7.0",
+    "@ethersproject/properties": "^5.7.0",
+    "@ethersproject/providers": "^5.7.0",
     "@types/debug": "^4.1.7",
     "debug": "^4.3.4",
-    "ethers": "^5.5.4"
+    "ethers": "^5.7.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "chai": "^4.3.6",
