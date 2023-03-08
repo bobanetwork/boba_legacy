@@ -10,8 +10,8 @@
     ]
   },
   "scripts": {
-    "build": "tsc -p ./tsconfig.json",
-    "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
+    "build": "tsc -p ./tsconfig.json && hardhat compile",
+    "clean": "rimraf artifacts cache node_modules dist ./tsconfig.tsbuildinfo",
     "test": "hardhat test --grep '/^((?!Flow).)*$/'",
     "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'"
   },

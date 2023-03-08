@@ -30,7 +30,7 @@ function getInfuraNetwork (name: string): NetworkUserConfig {
 
 const config: HardhatUserConfig = {
   typechain: {
-    outDir: 'src/types',
+    outDir: 'dist/src/types',
     target: 'ethers-v5'
   },
   networks: {
