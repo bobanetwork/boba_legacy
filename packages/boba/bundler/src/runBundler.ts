@@ -141,7 +141,7 @@ export async function runBundler(
   const provider: BaseProvider =
     // eslint-disable-next-line
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
-      : ethers.getDefaultProvider(config.network)
+      ethers.getDefaultProvider(config.network)
   let mnemonic: string
   let wallet: Wallet
   try {
