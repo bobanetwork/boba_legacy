@@ -53,19 +53,6 @@ jobs:
                 command: make <<parameters.binary_name>>
                 working_directory: <<parameters.working_directory>>
 
-  test_bundler:
-    working_directory: ~/aa # directory where steps will run
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - attach_workspace:
-          at: .
-      - run: # run tests
-          name: test
-          command: yarn lerna-test | tee /tmp/test-dev-results.log
-          working_directory: ./packages/boba/bundler
-      - store_test_results: # special step to upload test results for display in Test Summary
-          path: /tmp/test-dev-results.log
   test_flow_bundler:
     docker: # run the steps with Docker
       - image: cimg/node:16.6.2
@@ -79,7 +66,7 @@ jobs:
           working_directory: ./packages/boba/bundler
       - run: # run tests
           name: test
-          command: yarn lerna-test-flows | tee /tmp/test-flows-results.log
+          command: yarn test-flows | tee /tmp/test-flows-results.log
           working_directory: ./packages/boba/bundler
       - store_test_results: # special step to upload test results for display in Test Summary
           path: /tmp/test-flow-results.log
@@ -212,17 +199,7 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      - build_bundler
-      - test_bundler:
-          requires:
-            - build_bundler
       - test_flow_bundler:
-          requires:
-            - build_bundler
       - lint_bundler:
-          requires:
-            - build_bundler
       - depcheck_bundler:
-          requires:
-            - build_bundler
 

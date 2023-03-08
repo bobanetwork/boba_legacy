@@ -13,7 +13,9 @@
     "build": "tsc -p ./tsconfig.json && hardhat compile",
     "clean": "rimraf artifacts cache node_modules dist ./tsconfig.tsbuildinfo",
     "test": "hardhat test --grep '/^((?!Flow).)*$/'",
-    "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'"
+    "test-flows": "npx hardhat test --network localhost --grep \"Flow\"",
+    "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'",
+    "hardhat-node": "npx hardhat node --no-deploy"
   },
   "dependencies": {
     "@boba/bundler_utils": "^0.2.3",
