@@ -38,8 +38,7 @@ class Runner {
     readonly walletOwner: Signer,
     readonly entryPointAddress = ENTRY_POINT,
     readonly index = 0
-  ) {
-  }
+  ) {}
 
   async getAddress (): Promise<string> {
     return await this.walletApi.getCounterFactualAddress()
@@ -49,17 +48,25 @@ class Runner {
     const net = await this.provider.getNetwork()
     const chainId = net.chainId
     const dep = new DeterministicDeployer(this.provider)
-    const walletDeployer = await dep.getDeterministicDeployAddress(SimpleAccountDeployer__factory.bytecode)
+    const walletDeployer = await dep.getDeterministicDeployAddress(
+      SimpleAccountDeployer__factory.bytecode
+    )
     // const walletDeployer = await new SimpleAccountDeployer__factory(this.provider.getSigner()).deploy().then(d=>d.address)
-    if (!await dep.isContractDeployed(walletDeployer)) {
+    if (!(await dep.isContractDeployed(walletDeployer))) {
       if (deploymentSigner == null) {
-        console.log(`WalletDeployer not deployed at ${walletDeployer}. run with --deployDeployer`)
+        console.log(
+          `WalletDeployer not deployed at ${walletDeployer}. run with --deployDeployer`
+        )
         process.exit(1)
       }
       const dep1 = new DeterministicDeployer(deploymentSigner.provider as any)
       await dep1.deterministicDeploy(SimpleAccountDeployer__factory.bytecode)
     }
-    this.bundlerProvider = new HttpRpcClient(this.bundlerUrl, this.entryPointAddress, chainId)
+    this.bundlerProvider = new HttpRpcClient(
+      this.bundlerUrl,
+      this.entryPointAddress,
+      chainId
+    )
     this.walletApi = new SimpleAccountAPI({
       provider: this.provider,
       entryPointAddress: this.entryPointAddress,
@@ -79,7 +86,11 @@ class Runner {
     if (match != null) {
       const paid = Math.floor(parseInt(match[1]) / 1e9)
       const expected = Math.floor(parseInt(match[2]) / 1e9)
-      return new Error(`Error: Paid ${paid}, expected ${expected} . Paid ${Math.floor(paid / expected * 100)}%, missing ${expected - paid} `)
+      return new Error(
+        `Error: Paid ${paid}, expected ${expected} . Paid ${Math.floor(
+          (paid / expected) * 100
+        )}%, missing ${expected - paid} `
+      )
     }
     return e
   }
@@ -102,13 +113,30 @@ class Runner {
 async function main (): Promise<void> {
   const program = new Command()
     .version(erc4337RuntimeVersion)
-    .option('--network <string>', 'network name or url', 'http://localhost:8545')
-    .option('--mnemonic <file>', 'mnemonic/private-key file of signer account (to fund wallet)')
+    .option(
+      '--network <string>',
+      'network name or url',
+      'http://localhost:8545'
+    )
+    .option(
+      '--mnemonic <file>',
+      'mnemonic/private-key file of signer account (to fund wallet)'
+    )
     .option('--bundlerUrl <url>', 'bundler URL', 'http://localhost:3000/rpc')
-    .option('--entryPoint <string>', 'address of the supported EntryPoint contract', ENTRY_POINT)
-    .option('--deployDeployer', 'Deploy the "wallet deployer" on this network (default for testnet)')
+    .option(
+      '--entryPoint <string>',
+      'address of the supported EntryPoint contract',
+      ENTRY_POINT
+    )
+    .option(
+      '--deployDeployer',
+      'Deploy the "wallet deployer" on this network (default for testnet)'
+    )
     .option('--show-stack-traces', 'Show stack traces.')
-    .option('--selfBundler', 'run bundler in-process (for debugging the bundler)')
+    .option(
+      '--selfBundler',
+      'run bundler in-process (for debugging the bundler)'
+    )
 
   const opts = program.parse().opts()
   const provider = getDefaultProvider(opts.network) as JsonRpcProvider
@@ -131,7 +159,12 @@ async function main (): Promise<void> {
       })
     }
 
-    const argv = ['node', 'exec', '--config', './localconfig/bundler.config.json']
+    const argv = [
+      'node',
+      'exec',
+      '--config',
+      './localconfig/bundler.config.json'
+    ]
     if (opts.entryPoint != null) {
       argv.push('--entryPoint', opts.entryPoint)
     }
@@ -139,7 +172,9 @@ async function main (): Promise<void> {
     await bundler.asyncStart()
   }
   if (opts.mnemonic != null) {
-    signer = Wallet.fromMnemonic(fs.readFileSync(opts.mnemonic, 'ascii').trim()).connect(provider)
+    signer = Wallet.fromMnemonic(
+      fs.readFileSync(opts.mnemonic, 'ascii').trim()
+    ).connect(provider)
   } else {
     try {
       const accounts = await provider.listAccounts()
@@ -157,12 +192,18 @@ async function main (): Promise<void> {
   const walletOwner = new Wallet('0x'.padEnd(66, '7'))
 
   const index = Date.now()
-  const client = await new Runner(provider, opts.bundlerUrl, walletOwner, opts.entryPoint, index).init(deployDeployer ? signer : undefined)
+  const client = await new Runner(
+    provider,
+    opts.bundlerUrl,
+    walletOwner,
+    opts.entryPoint,
+    index
+  ).init(deployDeployer ? signer : undefined)
 
   const addr = await client.getAddress()
 
   async function isDeployed (addr: string): Promise<boolean> {
-    return await provider.getCode(addr).then(code => code !== '0x')
+    return await provider.getCode(addr).then((code) => code !== '0x')
   }
 
   async function getBalance (addr: string): Promise<BigNumber> {
@@ -170,7 +211,14 @@ async function main (): Promise<void> {
   }
 
   const bal = await getBalance(addr)
-  console.log('wallet address', addr, 'deployed=', await isDeployed(addr), 'bal=', formatEther(bal))
+  console.log(
+    'wallet address',
+    addr,
+    'deployed=',
+    await isDeployed(addr),
+    'bal=',
+    formatEther(bal)
+  )
   // TODO: actual required val
   const requiredBalance = parseEther('0.5')
   if (bal.lt(requiredBalance.div(2))) {

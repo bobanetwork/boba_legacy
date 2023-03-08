@@ -2,6 +2,7 @@ import { hexlify } from 'ethers/lib/utils'
 
 /**
  * hexlify all members of object, recursively
+ *
  * @param obj
  */
 export function deepHexlify (obj: any): any {
@@ -14,21 +15,32 @@ export function deepHexlify (obj: any): any {
     return hexlify(obj)
   }
   if (Array.isArray(obj)) {
-    return obj.map(member => deepHexlify(member))
+    return obj.map((member) => deepHexlify(member))
   }
-  return Object.keys(obj)
-    .reduce((set, key) => ({
+  return Object.keys(obj).reduce(
+    (set, key) => ({
       ...set,
       [key]: deepHexlify(obj[key])
-    }), {})
+    }),
+    {}
+  )
 }
 
 export class RpcError extends Error {
-  constructor (msg: string, readonly code?: number, readonly data: any = undefined) {
+  constructor (
+    msg: string,
+    readonly code?: number,
+    readonly data: any = undefined
+  ) {
     super(msg)
   }
 }
 
-export function requireCond (cond: boolean, msg: string, code?: number, data: any = undefined): void {
+export function requireCond (
+  cond: boolean,
+  msg: string,
+  code?: number,
+  data: any = undefined
+): void {
   if (!cond) throw new RpcError(msg, code, data)
 }

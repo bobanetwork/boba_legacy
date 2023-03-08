@@ -3,7 +3,14 @@
 // should NOT "require" anything, or use logs.
 // see LogTrace for valid types (but alas, this one must be javascript, not typescript..
 
-import { LogCallFrame, LogContext, LogDb, LogFrameResult, LogStep, LogTracer } from './GethTracer'
+import {
+  LogCallFrame,
+  LogContext,
+  LogDb,
+  LogFrameResult,
+  LogStep,
+  LogTracer
+} from './GethTracer'
 
 // toHex is available in a context of geth tracer
 declare function toHex (a: any): string
@@ -89,7 +96,14 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
     },
 
     enter (frame: LogCallFrame): void {
-      this.debug.push(['enter ' + frame.getType() + ' ' + toHex(frame.getTo()) + ' ' + toHex(frame.getInput()).slice(0, 100)])
+      this.debug.push([
+        'enter ' +
+          frame.getType() +
+          ' ' +
+          toHex(frame.getTo()) +
+          ' ' +
+          toHex(frame.getInput()).slice(0, 100)
+      ])
       this.calls.push({
         type: frame.getType(),
         from: toHex(frame.getFrom()),
@@ -98,7 +112,9 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
       })
     },
     exit (frame: LogFrameResult): void {
-      this.debug.push(`exit err=${frame.getError() as string}, gas=${frame.getGasUsed()}`)
+      this.debug.push(
+        `exit err=${frame.getError() as string}, gas=${frame.getGasUsed()}`
+      )
     },
 
     // increment the "key" in the list. if the key is not defined yet, then set it to "1"
@@ -126,7 +142,11 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
       }
       if (opcode !== 'GAS') {
         // ignore "unimportant" opcodes:
-        if (opcode.match(/^(DUP\d+|PUSH\d+|SWAP\d+|POP|ADD|SUB|MUL|DIV|EQ|LTE?|S?GTE?|SLT|SH[LR]|AND|OR|NOT|ISZERO)$/) == null) {
+        if (
+          opcode.match(
+            /^(DUP\d+|PUSH\d+|SWAP\d+|POP|ADD|SUB|MUL|DIV|EQ|LTE?|S?GTE?|SLT|SH[LR]|AND|OR|NOT|ISZERO)$/
+          ) == null
+        ) {
           this.countSlot(this.currentLevel.opcodes, opcode)
         }
       }
@@ -148,7 +168,9 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
       if (opcode === 'REVERT' || opcode === 'RETURN') {
         const ofs = parseInt(log.stack.peek(0).toString())
         const len = parseInt(log.stack.peek(1).toString())
-        this.debug.push(opcode + ' ' + toHex(log.memory.slice(ofs, ofs + len)).slice(0, 100))
+        this.debug.push(
+          opcode + ' ' + toHex(log.memory.slice(ofs, ofs + len)).slice(0, 100)
+        )
       } else if (opcode === 'KECCAK256') {
         // collect keccak on 64-byte blocks
         const ofs = parseInt(log.stack.peek(0).toString())

@@ -15,22 +15,41 @@ import { resolveProperties } from 'ethers/lib/utils'
 type LogTracerFunc = () => LogTracer
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export async function debug_traceCall (provider: JsonRpcProvider, tx: Deferrable<TransactionRequest>, options: TraceOptions): Promise<TraceResult | any> {
+export async function debug_traceCall (
+  provider: JsonRpcProvider,
+  tx: Deferrable<TransactionRequest>,
+  options: TraceOptions
+): Promise<TraceResult | any> {
   const tx1 = await resolveProperties(tx)
-  const ret = await provider.send('debug_traceCall', [tx1, 'latest', tracer2string(options)])
+  const ret = await provider.send('debug_traceCall', [
+    tx1,
+    'latest',
+    tracer2string(options)
+  ])
   // return applyTracer(ret, options)
   return ret
 }
 
 // a hack for network that doesn't have traceCall: mine the transaction, and use debug_traceTransaction
-export async function execAndTrace (provider: JsonRpcProvider, tx: Deferrable<TransactionRequest>, options: TraceOptions): Promise<TraceResult | any> {
+export async function execAndTrace (
+  provider: JsonRpcProvider,
+  tx: Deferrable<TransactionRequest>,
+  options: TraceOptions
+): Promise<TraceResult | any> {
   const hash = await provider.getSigner().sendUncheckedTransaction(tx)
   return await debug_traceTransaction(provider, hash, options)
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export async function debug_traceTransaction (provider: JsonRpcProvider, hash: string, options: TraceOptions): Promise<TraceResult | any> {
-  const ret = await provider.send('debug_traceTransaction', [hash, tracer2string(options)])
+export async function debug_traceTransaction (
+  provider: JsonRpcProvider,
+  hash: string,
+  options: TraceOptions
+): Promise<TraceResult | any> {
+  const ret = await provider.send('debug_traceTransaction', [
+    hash,
+    tracer2string(options)
+  ])
   // const tx = await provider.getTransaction(hash)
   // return applyTracer(tx, ret, options)
   return ret
@@ -39,13 +58,15 @@ export async function debug_traceTransaction (provider: JsonRpcProvider, hash: s
 /**
  * extract the body of "LogTracerFunc".
  * note that we extract the javascript body, even if the function was created as typescript
+ *
  * @param func
  */
 export function getTracerBodyString (func: LogTracerFunc): string {
   const tracerFunc = func.toString()
   // function must return a plain object:
   //  function xyz() { return {...}; }
-  const regexp = /function \w+\s*\(\s*\)\s*{\s*return\s*(\{[\s\S]+\});?\s*\}\s*$/ // (\{[\s\S]+\}); \} $/
+  const regexp =
+    /function \w+\s*\(\s*\)\s*{\s*return\s*(\{[\s\S]+\});?\s*\}\s*$/ // (\{[\s\S]+\}); \} $/
   const match = tracerFunc.match(regexp)
   if (match == null) {
     throw new Error('Not a simple method returning value')
@@ -136,14 +157,14 @@ export interface LogTracer {
 }
 
 export class LogCallFrame {
-  constructor (readonly type: string,
+  constructor (
+    readonly type: string,
     readonly caller: string,
     readonly address: string,
     readonly value: BigNumber,
     readonly input: string,
     readonly gas: BigNumber
-  ) {
-  }
+  ) {}
 
   getType (): string {
     return this.type
@@ -155,7 +176,7 @@ export class LogCallFrame {
 
   getTo (): string {
     return this.address
-  }// - returns the address of the call frame target
+  } // - returns the address of the call frame target
 
   getInput (): string {
     return this.input

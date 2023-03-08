@@ -46,16 +46,24 @@ export class BundlerServer {
   }
 
   async _preflightCheck (): Promise<void> {
-    if (await this.provider.getCode(this.config.entryPoint) === '0x') {
+    if ((await this.provider.getCode(this.config.entryPoint)) === '0x') {
       this.fatal(`entrypoint not deployed at ${this.config.entryPoint}`)
     }
 
     const bal = await this.provider.getBalance(this.wallet.address)
-    console.log('signer', this.wallet.address, 'balance', utils.formatEther(bal))
+    console.log(
+      'signer',
+      this.wallet.address,
+      'balance',
+      utils.formatEther(bal)
+    )
     if (bal.eq(0)) {
       this.fatal('cannot run with zero balance')
     } else if (bal.lt(parseEther(this.config.minBalance))) {
-      console.log('WARNING: initial balance below --minBalance ', this.config.minBalance)
+      console.log(
+        'WARNING: initial balance below --minBalance ',
+        this.config.minBalance
+      )
     }
   }
 
@@ -65,16 +73,13 @@ export class BundlerServer {
   }
 
   intro (req: Request, res: Response): void {
-    res.send(`Account-Abstraction Bundler v.${erc4337RuntimeVersion}. please use "/rpc"`)
+    res.send(
+      `Account-Abstraction Bundler v.${erc4337RuntimeVersion}. please use "/rpc"`
+    )
   }
 
   async rpc (req: Request, res: Response): Promise<void> {
-    const {
-      method,
-      params,
-      jsonrpc,
-      id
-    } = req.body
+    const { method, params, jsonrpc, id } = req.body
     try {
       const result = await this.handleMethod(method, params)
       console.log('sent', method, '-', result)
@@ -110,7 +115,10 @@ export class BundlerServer {
         result = await this.methodHandler.getSupportedEntryPoints()
         break
       case 'eth_sendUserOperation':
-        result = await this.methodHandler.sendUserOperation(params[0], params[1])
+        result = await this.methodHandler.sendUserOperation(
+          params[0],
+          params[1]
+        )
         break
       default:
         throw new Error(`Method ${method} is not supported`)

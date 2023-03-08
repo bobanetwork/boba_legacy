@@ -78,7 +78,7 @@ jobs:
           at: .
       - run: # run tests
           name: lint
-          command: yarn lerna-lint
+          command: yarn lint
           working_directory: ./packages/boba/bundler
   depcheck_bundler:
     docker: # run the steps with Docker

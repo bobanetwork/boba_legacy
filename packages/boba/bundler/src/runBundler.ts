@@ -6,11 +6,19 @@ import { erc4337RuntimeVersion } from '@boba/bundler_utils'
 import { ethers, Wallet } from 'ethers'
 import { BaseProvider } from '@ethersproject/providers'
 
-import { BundlerConfig, bundlerConfigDefault, BundlerConfigShape } from './BundlerConfig'
+import {
+  BundlerConfig,
+  bundlerConfigDefault,
+  BundlerConfigShape,
+} from './BundlerConfig'
 import { BundlerServer } from './BundlerServer'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
-import { BundlerHelper, BundlerHelper__factory, EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
-
+import {
+  BundlerHelper,
+  BundlerHelper__factory,
+  EntryPoint,
+  EntryPoint__factory,
+} from '@boba/accountabstraction'
 
 // this is done so that console.log outputs BigNumber as hex string instead of unreadable object
 export const inspectCustomSymbol = Symbol.for('nodejs.util.inspect.custom')
@@ -22,7 +30,7 @@ ethers.BigNumber.prototype[inspectCustomSymbol] = function () {
 const CONFIG_FILE_NAME = 'workdir/bundler.config.json'
 
 export let showStackTraces = false
-export function resolveConfiguration (programOpts: any): BundlerConfig {
+export function resolveConfiguration(programOpts: any): BundlerConfig {
   let fileConfig: Partial<BundlerConfig> = {}
 
   const commandLineParams = getCommandLineParams(programOpts)
@@ -30,13 +38,13 @@ export function resolveConfiguration (programOpts: any): BundlerConfig {
   if (fs.existsSync(configFileName)) {
     fileConfig = JSON.parse(fs.readFileSync(configFileName, 'ascii'))
   }
-  const mergedConfig = Object.assign({}, bundlerConfigDefault, fileConfig, commandLineParams)
+  const mergedConfig = { ...bundlerConfigDefault, ...fileConfig, ...commandLineParams}
   console.log('Merged configuration:', JSON.stringify(mergedConfig))
   ow(mergedConfig, ow.object.exactShape(BundlerConfigShape))
   return mergedConfig
 }
 
-function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
+function getCommandLineParams(programOpts: any): Partial<BundlerConfig> {
   const params: any = {}
   for (const bundlerConfigShapeKey in BundlerConfigShape) {
     const optionValue = programOpts[bundlerConfigShapeKey]
@@ -47,31 +55,43 @@ function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
   return params as BundlerConfig
 }
 
-export async function connectContracts (
+export async function connectContracts(
   wallet: Wallet,
   entryPointAddress: string,
-  bundlerHelperAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
+  bundlerHelperAddress: string
+): Promise<{ entryPoint: EntryPoint; bundlerHelper: BundlerHelper }> {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, wallet)
+  const bundlerHelper = BundlerHelper__factory.connect(
+    bundlerHelperAddress,
+    wallet
+  )
   return {
     entryPoint,
-    bundlerHelper
+    bundlerHelper,
   }
 }
 
 /**
  * start the bundler server.
  * this is an async method, but only to resolve configuration. after it returns, the server is only active after asyncInit()
+ *
  * @param argv
  * @param overrideExit
  */
-export async function runBundler (argv: string[], overrideExit = true): Promise<BundlerServer> {
+export async function runBundler(
+  argv: string[],
+  overrideExit = true
+): Promise<BundlerServer> {
   const program = new Command()
 
   if (overrideExit) {
-    (program as any)._exit = (exitCode: any, code: any, message: any) => {
+    ;(program as any)._exit = (exitCode: any, code: any, message: any) => {
       class CommandError extends Error {
-        constructor (message: string, readonly code: any, readonly exitCode: any) {
+        constructor(
+          message: string,
+          readonly code: any,
+          readonly exitCode: any
+        ) {
           super(message)
         }
       }
@@ -83,11 +103,17 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .version(erc4337RuntimeVersion)
     .option('--beneficiary <string>', 'address to receive funds')
     .option('--gasFactor <number>', '', '1')
-    .option('--minBalance <number>', 'below this signer balance, keep fee for itself, ignoring "beneficiary" address ')
+    .option(
+      '--minBalance <number>',
+      'below this signer balance, keep fee for itself, ignoring "beneficiary" address '
+    )
     .option('--network <string>', 'network name or url')
     .option('--mnemonic <file>', 'mnemonic/private-key file of signer account')
     .option('--helper <string>', 'address of the BundlerHelper contract')
-    .option('--entryPoint <string>', 'address of the supported EntryPoint contract')
+    .option(
+      '--entryPoint <string>',
+      'address of the supported EntryPoint contract'
+    )
     .option('--port <number>', 'server listening port', '3000')
     .option('--config <string>', 'path to config file)', CONFIG_FILE_NAME)
     .option('--show-stack-traces', 'Show stack traces.')
@@ -103,7 +129,9 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     const mnemonicFile = config.mnemonic
     console.log('Creating mnemonic in file', mnemonicFile)
     if (fs.existsSync(mnemonicFile)) {
-      throw new Error(`Can't --createMnemonic: out file ${mnemonicFile} already exists`)
+      throw new Error(
+        `Can't --createMnemonic: out file ${mnemonicFile} already exists`
+      )
     }
     const newMnemonic = Wallet.createRandom().mnemonic.phrase
     fs.writeFileSync(mnemonicFile, newMnemonic)
@@ -113,18 +141,20 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
   const provider: BaseProvider =
     // eslint-disable-next-line
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
-      ethers.getDefaultProvider(config.network)
+      : ethers.getDefaultProvider(config.network)
   let mnemonic: string
   let wallet: Wallet
   try {
     mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
     wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
   } catch (e: any) {
-    throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)
+    throw new Error(
+      `Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`
+    )
   }
 
   const {
-    entryPoint
+    entryPoint,
     // bundlerHelper
   } = await connectContracts(wallet, config.entryPoint, config.helper)
 
@@ -143,12 +173,15 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
   )
 
   void bundlerServer.asyncStart().then(async () => {
-    console.log('connected to network', await provider.getNetwork().then(net => {
-      return {
-        name: net.name,
-        chainId: net.chainId
-      }
-    }))
+    console.log(
+      'connected to network',
+      await provider.getNetwork().then((net) => {
+        return {
+          name: net.name,
+          chainId: net.chainId,
+        }
+      })
+    )
     console.log(`running on http://localhost:${config.port}/rpc`)
   })
 
