@@ -716,7 +716,7 @@ class NetworkService {
         symbol: networkDetail[targetLayer].symbol,
         decimals: 18,
       },
-      blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorer?.slice(0, -1)]
+      blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorerUrl?.slice(0, -1)]
     }
 
     await this.walletService.switchChain(targetIDHex, chainParam)
