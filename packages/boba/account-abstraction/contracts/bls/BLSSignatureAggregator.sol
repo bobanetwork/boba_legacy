@@ -5,12 +5,12 @@ pragma abicoder v2;
 import "../interfaces/IAggregator.sol";
 import "../interfaces/IEntryPoint.sol";
 import {BLSOpen} from  "./lib/BLSOpen.sol";
-import "./IBLSWallet.sol";
+import "./IBLSAccount.sol";
 import "./BLSHelper.sol";
 import "hardhat/console.sol";
 
 /**
- * A BLS-based signature aggregator, to validate aggregated signature of multiple UserOps if BLSWallet
+ * A BLS-based signature aggregator, to validate aggregated signature of multiple UserOps if BLSAccount
  */
 contract BLSSignatureAggregator is IAggregator {
     using UserOperationLib for UserOperation;
@@ -22,7 +22,7 @@ contract BLSSignatureAggregator is IAggregator {
         if (initCode.length > 0) {
             publicKey = getTrailingPublicKey(initCode);
         } else {
-            return IBLSWallet(userOp.sender).getBlsPublicKey();
+            return IBLSAccount(userOp.sender).getBlsPublicKey();
         }
     }
 
@@ -55,9 +55,9 @@ contract BLSSignatureAggregator is IAggregator {
         for (uint256 i = 0; i < userOpsLen; i++) {
 
             UserOperation memory userOp = userOps[i];
-            IBLSWallet blsWallet = IBLSWallet(userOp.sender);
+            IBLSAccount blsAccount = IBLSAccount(userOp.sender);
 
-            blsPublicKeys[i] = blsWallet.getBlsPublicKey{gas : 30000}();
+            blsPublicKeys[i] = blsAccount.getBlsPublicKey{gas : 30000}();
 
             messages[i] = _userOpToMessage(userOp, keccak256(abi.encode(blsPublicKeys[i])));
         }
@@ -69,7 +69,7 @@ contract BLSSignatureAggregator is IAggregator {
      * NOTE: this hash is not the same as UserOperation.hash()
      *  (slightly less efficient, since it uses memory userOp)
      */
-    function getUserOpHash(UserOperation memory userOp) internal pure returns (bytes32) {
+    function internalUserOpHash(UserOperation memory userOp) internal pure returns (bytes32) {
         return keccak256(abi.encode(
                 userOp.sender,
                 userOp.nonce,
@@ -86,7 +86,7 @@ contract BLSSignatureAggregator is IAggregator {
 
     /**
      * return the BLS "message" for the given UserOp.
-     * the wallet should sign this value using its public-key
+     * the account checks the signature over this value  using its public-key
      */
     function userOpToMessage(UserOperation memory userOp) public view returns (uint256[2] memory) {
         bytes32 hashPublicKey = _getUserOpPubkeyHash(userOp);
@@ -94,8 +94,8 @@ contract BLSSignatureAggregator is IAggregator {
     }
 
     function _userOpToMessage(UserOperation memory userOp, bytes32 publicKeyHash) internal view returns (uint256[2] memory) {
-        bytes32 requestId = _getRequestId(userOp, publicKeyHash);
-        return BLSOpen.hashToPoint(BLS_DOMAIN, abi.encodePacked(requestId));
+        bytes32 userOpHash = _getUserOpHash(userOp, publicKeyHash);
+        return BLSOpen.hashToPoint(BLS_DOMAIN, abi.encodePacked(userOpHash));
     }
 
     //return the public-key hash of a userOp.
@@ -103,13 +103,13 @@ contract BLSSignatureAggregator is IAggregator {
         return keccak256(abi.encode(getUserOpPublicKey(userOp)));
     }
 
-    function getRequestId(UserOperation memory userOp) public view returns (bytes32) {
+    function getUserOpHash(UserOperation memory userOp) public view returns (bytes32) {
         bytes32 hashPublicKey = _getUserOpPubkeyHash(userOp);
-        return _getRequestId(userOp, hashPublicKey);
+        return _getUserOpHash(userOp, hashPublicKey);
     }
 
-    function _getRequestId(UserOperation memory userOp, bytes32 hashPublicKey) internal view returns (bytes32) {
-        return keccak256(abi.encode(getUserOpHash(userOp), hashPublicKey, address(this), block.chainid));
+    function _getUserOpHash(UserOperation memory userOp, bytes32 hashPublicKey) internal view returns (bytes32) {
+        return keccak256(abi.encode(internalUserOpHash(userOp), hashPublicKey, address(this), block.chainid));
     }
 
     /**
@@ -118,7 +118,7 @@ contract BLSSignatureAggregator is IAggregator {
      * First it validates the signature over the userOp. then it return data to be used when creating the handleOps:
      * @param userOp the userOperation received from the user.
      * @return sigForUserOp the value to put into the signature field of the userOp when calling handleOps.
-     *    (usually empty, unless wallet and aggregator support some kind of "multisig"
+     *    (usually empty, unless account and aggregator support some kind of "multisig"
      */
     function validateUserOpSignature(UserOperation calldata userOp)
     external view returns (bytes memory sigForUserOp) {
