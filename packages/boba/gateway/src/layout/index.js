@@ -81,7 +81,7 @@ function App() {
         modal: light ? '#fff' : '#1A1D1F',
         modalTransparent: light ? '#fff' : 'transparent',
         input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
-        footer: light ? '#fff' : '#1A1D1F',
+        footer: light ? '#1A1D1F' : '#1A1D1F',
         glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
         tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
         alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
