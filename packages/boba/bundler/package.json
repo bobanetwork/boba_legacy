@@ -12,10 +12,8 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "clean": "rimraf dist/ ./tsconfig.tsbuildinfo",
-    "bundler": "lerna run --no-prefix --stream bundler --",
-    "runop": "lerna run --no-prefix --stream runop --",
-    "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'",
-    "hardhat-test-flows": "npx hardhat test --network localhost --grep \"Flow\""
+    "test": "hardhat test --grep '/^((?!Flow).)*$/'",
+    "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'"
   },
   "dependencies": {
     "@boba/bundler_utils": "^0.2.3",
