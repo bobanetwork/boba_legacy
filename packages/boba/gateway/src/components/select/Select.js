@@ -63,9 +63,9 @@ function Select({
   }
 
   const renderLoading = (
-    <div className={[ styles.selected, styles.loading ].join(' ')}>
+    <S.SelectedContainer className={[ styles.selected, styles.loading ].join(' ')}>
       Loading...
-    </div>
+    </S.SelectedContainer>
   );
 
   const renderSelect = (
@@ -80,8 +80,8 @@ function Select({
           sx: {
             '&& .Mui-selected': {
               backgroundColor: 'transparent !important',
-              color: '#BAE21A'
-            }
+              color: theme.palette.secondary.main,
+            },
           }
         }}
       >
@@ -103,7 +103,7 @@ function Select({
           </MenuItem>
         ))}
       </MuiSelect>
-      <div className={styles.selected}>
+      <S.SelectedContainer>
         <div className={styles.details}>
           <div className={styles.title}>{selected ? selected.title : error}</div>
           <div className={styles.subTitle}>{selected ? selected.subTitle : ''}</div>
@@ -113,7 +113,7 @@ function Select({
             fill={theme.palette.text.primary}
             fillOpacity="0.45" />
         </svg>
-      </div>
+      </S.SelectedContainer>
     </>
   );
 
@@ -149,7 +149,7 @@ function Select({
           }),
           singleValue: (base) => ({
             ...base,
-            background: 'transperant',
+            background: 'transparent',
             color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
             padding: '5px'
           }),

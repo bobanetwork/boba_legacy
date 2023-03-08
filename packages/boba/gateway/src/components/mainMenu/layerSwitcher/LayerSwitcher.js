@@ -258,7 +258,7 @@ function LayerSwitcher({ visisble = true }) {
       >
         <ToggleButton
           sx={{
-            p: '7px 3.5px 7px 7px',
+            p: '7px',
             borderRadius: '12px',
             border: 'none',
             '&:hover': {
@@ -297,7 +297,7 @@ function LayerSwitcher({ visisble = true }) {
       ) : null}
       {!layer ? (
         <S.LayerContent>
-          <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+          <Typography variant="body2" sx={{ whiteSpace: 'nowrap', fontWeight: '500' }}>
             Connect
           </Typography>
           <Typography

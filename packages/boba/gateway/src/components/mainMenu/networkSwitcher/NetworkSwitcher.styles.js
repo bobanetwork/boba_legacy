@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import {Box} from '@mui/material';
 
 export const LayerSwitcherContainer = styled(Box)(({ theme }) => ({
   display: 'flex',

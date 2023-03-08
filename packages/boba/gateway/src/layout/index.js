@@ -39,9 +39,11 @@ function App() {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const darkGrey = '#1b1c1f'
+  // const darkGrey = '#1b1c1f'
+  // const cyan = '#1CD6D1'
 
   const buttonColor = '#BAE21A' //radioGreen
+  const buttonColorLightmode = '#1CD6D1' //cyan
 
   let MUItheme = createTheme({
     palette: {
@@ -59,9 +61,11 @@ function App() {
           ? `solid 2px ${buttonColor}`
           : `solid 2px ${buttonColor}`,
         alert: light ? 'black' : '#FFD88D',
+        tooltip: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        info: light ? 'rgba(3, 19, 19, 0.65)' : 'rgba(255, 255, 255, 0.65)',
       },
       secondary: {
-        main: light ? buttonColor : buttonColor,
+        main: light ? buttonColorLightmode : buttonColor,
         borderRadius: '20px',
         border: light
           ? 'solid 1px rgba(0, 0, 0, 0.12)'
@@ -69,17 +73,17 @@ function App() {
       },
       background: {
         default: light ? '#FFFFFF' : '#111315',
-        secondary: light ? 'rgba(0, 0, 0, 0.04)' : darkGrey,
+        secondary: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.06)',
         secondaryLight: light
           ? 'rgba(0, 0, 0, 0.08)'
           : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? '#fff' : '#1A1D1F',
         modalTransparent: light ? '#fff' : 'transparent',
-        input: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)',
+        input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
         footer: light ? '#fff' : '#1A1D1F',
         glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
-        tooltip: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)',
+        tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
         alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
       neutral: {
@@ -130,7 +134,13 @@ function App() {
           elevation: 0,
         },
         styleOverrides: {
-          root: {},
+          root: {
+            borderRadius: '12px',
+            minWidth: '96px',
+            boxShadow: 'none',
+            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+          },
         },
       },
       MuiTooltip: {
