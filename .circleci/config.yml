@@ -70,7 +70,6 @@ jobs:
           working_directory: ./packages/boba/bundler
       - store_test_results: # special step to upload test results for display in Test Summary
           path: /tmp/test-flow-results.log
-
   lint_bundler:
     docker: # run the steps with Docker
       - image: cimg/node:16.6.2
@@ -199,7 +198,7 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      - test_flow_bundler:
-      - lint_bundler:
-      - depcheck_bundler:
+      - test_flow_bundler
+      - lint_bundler
+      - depcheck_bundler
 
