@@ -36,6 +36,8 @@ describe('UserOpMethodHandler', function () {
     provider = ethers.provider
     signer = ethers.provider.getSigner()
 
+    const addressManagerFactory = await getContractFactory('Lib_AddressManager', signer)
+    const addressManager = await addressManagerFactory.deploy()
     const EntryPointFactory = await ethers.getContractFactory('EntryPoint')
     entryPoint = await EntryPointFactory.deploy()
 
@@ -53,7 +55,9 @@ describe('UserOpMethodHandler', function () {
       minBalance: '0',
       mnemonic: '',
       network: '',
-      port: '3000'
+      port: '3000',
+      addressManager: addressManager.address,
+      l1NodeWeb3Url: ''
     }
 
     methodHandler = new UserOpMethodHandler(

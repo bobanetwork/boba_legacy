@@ -39,7 +39,7 @@ export function resolveConfiguration(programOpts: any): BundlerConfig {
     fileConfig = JSON.parse(fs.readFileSync(configFileName, 'ascii'))
   }
   const mergedConfig = { ...bundlerConfigDefault, ...fileConfig, ...commandLineParams}
-  console.log('Merged configuration:', JSON.stringify(mergedConfig))
+  //console.log('Merged configuration:', JSON.stringify(mergedConfig))
   ow(mergedConfig, ow.object.exactShape(BundlerConfigShape))
   return mergedConfig
 }
@@ -55,7 +55,26 @@ function getCommandLineParams(programOpts: any): Partial<BundlerConfig> {
   return params as BundlerConfig
 }
 
-export async function connectContracts(
+export async function connectContractsViaAddressManager (
+  providerL1: BaseProvider,
+  providerL2: BaseProvider,
+  addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
+  const addressManager = getAddressManager(providerL1, addressManagerAddress)
+
+  const bundlerHelperAddress = await addressManager.getAddress('L2_Boba_BundlerHelper')
+  const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
+
+  const entryPoint = EntryPoint__factory.connect(entryPointAddress, providerL2)
+
+  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, providerL2)
+
+  return {
+    entryPoint,
+    bundlerHelper
+  }
+}
+
+export async function connectContracts (
   wallet: Wallet,
   entryPointAddress: string,
   bundlerHelperAddress: string
@@ -69,6 +88,12 @@ export async function connectContracts(
     entryPoint,
     bundlerHelper,
   }
+}
+
+function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
+  return getContractFactory('Lib_AddressManager')
+    .attach(addressManagerAddress)
+    .connect(provider)
 }
 
 /**
@@ -108,7 +133,7 @@ export async function runBundler(
       'below this signer balance, keep fee for itself, ignoring "beneficiary" address '
     )
     .option('--network <string>', 'network name or url')
-    .option('--mnemonic <file>', 'mnemonic/private-key file of signer account')
+    .option('--mnemonic <string or file>', 'mnemonic/private-key file of signer account')
     .option('--helper <string>', 'address of the BundlerHelper contract')
     .option(
       '--entryPoint <string>',
@@ -118,11 +143,11 @@ export async function runBundler(
     .option('--config <string>', 'path to config file)', CONFIG_FILE_NAME)
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
+    .option('--addressManager <string>', 'address of the Address Manager', '')
+    .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
-
-  console.log('command-line arguments: ', program.opts())
 
   const config = resolveConfiguration(programOpts)
   if (programOpts.createMnemonic != null) {
@@ -142,29 +167,31 @@ export async function runBundler(
     // eslint-disable-next-line
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
       ethers.getDefaultProvider(config.network)
+
+  const providerL1: BaseProvider = new ethers.providers.JsonRpcProvider(config.l1NodeWeb3Url)
   let mnemonic: string
   let wallet: Wallet
   try {
-    mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
-    wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
+    if (fs.existsSync(config.mnemonic)) {
+      mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
+      wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
+    } else {
+      wallet = new Wallet(config.mnemonic, provider)
+    }
   } catch (e: any) {
     throw new Error(
       `Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`
     )
   }
-
-  const {
-    entryPoint,
-    // bundlerHelper
-  } = await connectContracts(wallet, config.entryPoint, config.helper)
-
-  const methodHandler = new UserOpMethodHandler(
-    provider,
-    wallet,
-    config,
-    entryPoint
-  )
-
+  let methodHandler: UserOpMethodHandler
+  if (config.addressManager.length > 0) {
+    const { entryPoint } = await connectContractsViaAddressManager(providerL1, provider, config.addressManager)
+    config.entryPoint = entryPoint.address
+    methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
+  } else {
+    const { entryPoint } = await connectContracts(wallet, config.entryPoint, config.helper)
+    methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
+  }
   const bundlerServer = new BundlerServer(
     methodHandler,
     config,
