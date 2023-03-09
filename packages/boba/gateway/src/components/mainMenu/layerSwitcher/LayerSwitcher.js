@@ -85,12 +85,6 @@ function LayerSwitcher({ visisble = true }) {
     ? truncate(networkService.account, 6, 4, '...')
     : ''
 
-  const chainChangedFromMM = JSON.parse(
-    localStorage.getItem('chainChangedFromMM')
-  )
-  const wantChain = JSON.parse(localStorage.getItem('wantChain'))
-  const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-
   const dispatchBootAccount = useCallback(() => {
     if ((!accountEnabled && baseEnabled) || chainIdChanged) initializeAccount()
 
@@ -128,7 +122,6 @@ function LayerSwitcher({ visisble = true }) {
   const doConnectToLayer = useCallback((layer) => {
     async function doConnect() {
       try {
-        localStorage.setItem('wantChain', JSON.stringify(layer))
         if (networkService.walletService.provider) {
           const response = await networkService.switchChain(layer)
           if (response) {
@@ -157,30 +150,10 @@ function LayerSwitcher({ visisble = true }) {
 
   useEffect(() => {
     // detect mismatch and correct the mismatch
-    if (wantChain === 'L1' && layer === 'L2') {
-      dispatchBootAccount()
-    } else if (wantChain === 'L2' && layer === 'L1') {
+    if (layer === 'L1' || layer === 'L2') {
       dispatchBootAccount()
     }
-  }, [wantChain, layer, dispatchBootAccount])
-
-  useEffect(() => {
-    // auto reconnect to MM if we just switched chains from
-    // with the chain switcher, and then unset the flag.
-    if (chainChangedInit) {
-      dispatchBootAccount()
-      localStorage.setItem('chainChangedInit', false)
-    }
-  }, [chainChangedInit, dispatchBootAccount])
-
-  useEffect(() => {
-    // auto reconnect to MM if we just switched chains from
-    // inside MM, and then unset the flag.
-    if (chainChangedFromMM) {
-      dispatchBootAccount()
-      localStorage.setItem('chainChangedFromMM', false)
-    }
-  }, [chainChangedFromMM, dispatchBootAccount])
+  }, [layer, dispatchBootAccount])
 
   // listening for l1 connection request
   useEffect(() => {

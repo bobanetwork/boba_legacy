@@ -53,17 +53,9 @@ class WalletService {
     window.ethereum.on('accountsChanged', () => {
       window.location.reload()
     })
+
     window.ethereum.on('chainChanged', (chainId) => {
-      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
-      // changed chains AND conncted at the same time
-      // otherwise the user gets confused about why they are going through
-      // two window reloads
-      if(chainChangedInit) {
-        localStorage.setItem('chainChangedInit', false)
-      } else {
-        localStorage.setItem('chainChangedFromMM', true)
-      }
+      console.log(`MetaMask chain changed to ${chainId}`)
       store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
     })
   }
@@ -93,20 +85,10 @@ class WalletService {
       if (this.account !== accounts[0]) {
         window.location.reload()
       }
-      // console.log(`walletConnectProvider accountsChanged: ${accounts}`)
     });
 
     this.walletConnectProvider.on("chainChanged", (chainId) => {
-      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
-      // changed chains AND conncted at the same time
-      // otherwise the user gets confused about why they are going through
-      // two window reloads
-      if(chainChangedInit) {
-        localStorage.setItem('chainChangedInit', false)
-      } else {
-        localStorage.setItem('chainChangedFromMM', true)
-      }
+      console.log(`walletconnect chain changed to: ${chainId}`)
       store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
     });
   }
@@ -143,7 +125,7 @@ class WalletService {
           return false
         }
       } else {
-        console.log(`Error switching chain: ${JSON.stringify(error)}`)
+        console.log(`Error switching chain: ${error?.message}`)
         return false
       }
     }
