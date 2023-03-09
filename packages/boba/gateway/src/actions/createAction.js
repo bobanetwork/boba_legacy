@@ -89,7 +89,7 @@ export function createAction (key, asyncAction) {
       }
 
       dispatch({ type: `${key}/SUCCESS`, payload: response })
-      return true
+      return response || true
 
     } catch (error) {
       console.log("Unhandled error RAW:", {error, key, asyncAction})

@@ -18,7 +18,7 @@ import React, { useState } from 'react'
 import { Typography, Fade, useMediaQuery } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import * as S from './ListFarm.styles'
+import * as S from './ListEarn.styles'
 
 import { useTheme } from '@emotion/react'
 

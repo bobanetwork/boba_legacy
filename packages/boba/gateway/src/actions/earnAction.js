@@ -20,12 +20,12 @@
 import networkService from 'services/networkService'
 import { createAction } from './createAction'
 
-const getFarmInfoBegin = () => ({
-  type: 'GET_FARMINFO',
+const getEarnInfoBegin = () => ({
+  type: 'GET_EARNINFO',
 })
 
-const getFarmInfoSuccess = (L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo) => ({
-  type: 'GET_FARMINFO_SUCCESS',
+const getEarnInfoSuccess = (L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo) => ({
+  type: 'GET_EARNINFO_SUCCESS',
   payload: { L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo }
 })
 
@@ -47,13 +47,13 @@ const getFarmInfoSuccess = (L1PoolInfo, L1UserInfo, L2PoolInfo, L2UserInfo) => (
 //   payload: { totalFeeRate, userRewardFeeRate },
 // })
 
-export const getFarmInfo = () => async (dispatch) => {
-  dispatch(getFarmInfoBegin())
+export const getEarnInfo = () => async (dispatch) => {
+  dispatch(getEarnInfoBegin())
    const [L1LPInfo, L2LPInfo] = await Promise.all([
     networkService.getL1LPInfo(),
     networkService.getL2LPInfo(),
    ])
-  dispatch(getFarmInfoSuccess(
+  dispatch(getEarnInfoSuccess(
     L1LPInfo.poolInfo,
     L1LPInfo.userInfo,
     L2LPInfo.poolInfo,

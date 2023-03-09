@@ -42,6 +42,7 @@ import {
 import {
   selectActiveNetwork,
   selectActiveNetworkIcon,
+  selectActiveNetworkName,
   selectActiveNetworkType,
 } from 'selectors/networkSelector'
 import * as S from './LayerSwitcher.styles.js'
@@ -58,7 +59,7 @@ import Button from 'components/button/Button.js'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
 import { LAYER } from 'util/constant.js'
 
-function LayerSwitcher({ visisble = true }) {
+function LayerSwitcher({ visisble = true, isButton = false }) {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const baseEnabled = useSelector(selectBaseEnabled())
@@ -66,7 +67,7 @@ function LayerSwitcher({ visisble = true }) {
   let layer = useSelector(selectLayer())
   const network = useSelector(selectActiveNetwork())
   const networkType = useSelector(selectActiveNetworkType())
-
+  const networkName = useSelector(selectActiveNetworkName())
   const networkIcon = useSelector(selectActiveNetworkIcon())
 
   const L1Icon = L1_ICONS[networkIcon]
@@ -215,6 +216,21 @@ function LayerSwitcher({ visisble = true }) {
           </Button>
         ) : null}
       </S.LayerWrapper>
+    )
+  }
+
+  if (isButton && layer) {
+    return (
+      <Button
+        type="primary"
+        variant="contained"
+        size="small"
+        newStyle
+        onClick={() => (layer === 'L1') ?  dispatch(setConnectBOBA(true)) : dispatch(setConnectETH(true))}
+        sx={{ fontWeight: '500;' }}
+      >
+        Connect to {networkName[ layer === 'L1' ? 'l2': 'l1' ]}
+      </Button>
     )
   }
 

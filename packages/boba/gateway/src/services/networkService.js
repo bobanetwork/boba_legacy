@@ -92,7 +92,7 @@ import GraphQLService from "./graphql.service"
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import { bobaBridges } from 'util/bobaBridges'
-import { MIN_NATIVE_L1_BALANCE, SPEED_CHECK } from 'util/constant'
+import { MIN_NATIVE_L1_BALANCE } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
@@ -1205,33 +1205,10 @@ class NetworkService {
 
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
-      console.log('completed Deposit! L2 tx hash:', receipt.transactionHash)
+      console.log('completed Deposit! L2 tx hash:', receipt.transactionReceipt)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
-
-      /*
-      // TODO: Investigate api-watcher failing with 502
-
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true, //since we are going L1->L2
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": txReceipt.transactionHash,
-        "cdmBlock": txReceipt.blockNumber
-      }
-
-      console.log("Speed checker data payload:", data)
-
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
-
-      console.log("Speed checker:", speed) */
 
       return txReceipt
     } catch(error) {
@@ -2009,26 +1986,6 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      // const block = await this.L1Provider.getTransaction(depositTX.hash)
-      // const data = {
-      //   "key": SPEED_CHECK,
-      //   "hash": depositTX.hash,
-      //   "l1Tol2": true,
-      //   "startTime": time_start,
-      //   "endTime": time_stop,
-      //   "block": block.blockNumber,
-      //   "cdmHash": txReceipt.transactionHash,
-      //   "cdmBlock": txReceipt.blockNumber
-      // }
-
-      // console.log("Speed checker data payload:", data)
-
-      // const speed = await omgxWatcherAxiosInstance(
-      //   this.networkConfig
-      // ).post('send.crossdomainmessage', data)
-
-      // console.log("Speed checker:", speed)
-
       this.getBalances()
 
       return txReceipt
@@ -2108,7 +2065,6 @@ class NetworkService {
         DiscretionaryExitFeeJson.abi,
         this.provider.getSigner()
       )
-      console.log("DiscretionaryExitFeeContract",DiscretionaryExitFeeContract)
 
       const tx = await DiscretionaryExitFeeContract.payAndWithdraw(
         currencyAddress,
@@ -2297,7 +2253,7 @@ class NetworkService {
   }
 
   /*****************************************************/
-  /***** Pool, User Info, to populate the Farm tab *****/
+  /***** Pool, User Info, to populate the Earn tab *****/
   /*****************************************************/
   async getL1LPInfo() {
 
@@ -2674,37 +2630,14 @@ class NetworkService {
 
       updateSignatureStatus_depositLP(true)
 
-      // TODO: Below part is disabled
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      const txReceipt = receipt.transactionReceipt;
+      console.log(' completed swap-on ! L2 tx hash:', txReceipt)
 
-      /*
-        const opts = {
-            fromBlock: -4000
-          }
-          const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-          console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
-
-          const time_stop = new Date().getTime()
-          console.log("TX finish time:", time_stop)
-
-          const data = {
-            "key": SPEED_CHECK,
-            "hash": depositTX.hash,
-            "l1Tol2": true,
-            "startTime": time_start,
-            "endTime": time_stop,
-            "block": block.blockNumber,
-            "cdmHash": receipt.transactionHash,
-            "cdmBlock": receipt.blockNumber
-          }
-          console.log("Speed checker data payload:", data)
-
-          const speed = await omgxWatcherAxiosInstance(
-            this.networkConfig
-          ).post('send.crossdomainmessage', data)
-
-          console.log("Speed checker:", speed)
-    */
-      return true
+      return txReceipt
 
     } catch (error) {
       console.log("NS: depositL1LP error:", error)
@@ -2757,31 +2690,13 @@ class NetworkService {
         fromBlock: -4000
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
-      console.log(' completed swap-on ! L2 tx hash:', receipt.transactionHash)
+      const txReceipt = receipt.transactionReceipt;
+      console.log(' completed swap-on ! L2 tx hash:', txReceipt)
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": true,
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": receipt.transactionHash,
-        "cdmBlock": receipt.blockNumber
-      }
-
-      console.log("Speed checker data payload:", data)
-
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
-
-      console.log("Speed checker:", speed)
-
-      return receipt
+      return txReceipt
 
     } catch (error) {
       console.log("NS: depositL1LPBatch error:", error)
@@ -3240,25 +3155,6 @@ class NetworkService {
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
 
-      const data = {
-        "key": SPEED_CHECK,
-        "hash": depositTX.hash,
-        "l1Tol2": false, //since we are going L2->L1
-        "startTime": time_start,
-        "endTime": time_stop,
-        "block": block.blockNumber,
-        "cdmHash": txReceipt.transactionHash,
-        "cdmBlock": txReceipt.blockNumber
-      }
-
-      console.log("Speed checker data payload:", data)
-
-      const speed = await omgxWatcherAxiosInstance(
-        this.networkConfig
-      ).post('send.crossdomainmessage', data)
-
-      console.log("Speed checker:", speed)
-
       return receipt
     } catch (error) {
       console.log("NS: fastExitAll error:", error)
@@ -3359,36 +3255,7 @@ class NetworkService {
       //closes the modal
       updateSignatureStatus_exitLP(true)
 
-      // const opts = {
-      //   fromBlock: -4000
-      // }
-      // const receipt = await this.fastWatcher.waitForMessageReceipt(depositTX, opts)
-      // const txReceipt = receipt.transactionReceipt;
-      // console.log(' completed Deposit! L1 tx hash:', txReceipt.transactionHash)
-
-      // const time_stop = new Date().getTime()
-      // console.log("TX finish time:", time_stop)
-
-      // const data = {
-      //   "key": SPEED_CHECK,
-      //   "hash": depositTX.hash,
-      //   "l1Tol2": false, //since we are going L2->L1
-      //   "startTime": time_start,
-      //   "endTime": time_stop,
-      //   "block": block.blockNumber,
-      //   "cdmHash": txReceipt.transactionHash,
-      //   "cdmBlock": txReceipt.blockNumber
-      // }
-
-      // console.log("Speed checker data payload:", data)
-
-      // const speed = await omgxWatcherAxiosInstance(
-      //   this.networkConfig
-      // ).post('send.crossdomainmessage', data)
-
-      // console.log("Speed checker:", speed)
-
-      return true
+      return depositTX
     } catch (error) {
       console.log("NS: depositL2LP error:", error)
       return error
