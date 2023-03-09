@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { addLiquidity, getFarmInfo } from 'actions/farmAction'
+import { addLiquidity, getEarnInfo } from 'actions/earnAction'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
@@ -15,20 +15,20 @@ import BN from 'bignumber.js'
 import { Box, Typography } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import { farmL1, farmL2 } from 'actions/networkAction'
-import { fetchAllowance } from 'actions/farmAction'
+import { earnL1, earnL2 } from 'actions/networkAction'
+import { fetchAllowance } from 'actions/earnAction'
 import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
 import { NETWORK } from 'util/network/network.util'
 
-class FarmDepositModal extends React.Component {
+class EarnDepositModal extends React.Component {
 
   constructor(props) {
 
     super(props)
 
     const { open } = this.props
-    const { stakeToken } = this.props.farm
+    const { stakeToken } = this.props.earn
     const { bobaFeeChoice, netLayer, bobaFeePriceRatio } = this.props.setup
 
     this.state = {
@@ -55,7 +55,7 @@ class FarmDepositModal extends React.Component {
   async componentDidUpdate(prevState) {
 
     const { open } = this.props
-    const { stakeToken } = this.props.farm
+    const { stakeToken } = this.props.earn
     const { bobaFeeChoice, netLayer } = this.props.setup
 
     if (prevState.open !== open) {
@@ -70,7 +70,7 @@ class FarmDepositModal extends React.Component {
       this.setState({ bobaFeeChoice })
     }
 
-    if (!isEqual(prevState.farm.stakeToken, stakeToken)) {
+    if (!isEqual(prevState.earn.stakeToken, stakeToken)) {
 
       if ( stakeToken.symbol !== this.state.netLayerNativeToken ) {
         this.props.dispatch(fetchAllowance(
@@ -169,7 +169,7 @@ class FarmDepositModal extends React.Component {
   }
 
   handleClose() {
-    this.props.dispatch(closeModal("farmDepositModal"))
+    this.props.dispatch(closeModal("EarnDepositModal"))
   }
 
   handleStakeValue( value ) {
@@ -209,13 +209,13 @@ class FarmDepositModal extends React.Component {
     let approveTX
 
     if (stakeToken.L1orL2Pool === 'L2LP') {
-      approveTX = await this.props.dispatch(farmL2(
+      approveTX = await this.props.dispatch(earnL2(
         value_Wei_String,
         stakeToken.currency,
       ))
     }
     else if (stakeToken.L1orL2Pool === 'L1LP') {
-      approveTX = await this.props.dispatch(farmL1(
+      approveTX = await this.props.dispatch(earnL1(
         value_Wei_String,
         stakeToken.currency,
       ))
@@ -249,11 +249,11 @@ class FarmDepositModal extends React.Component {
 
     if (addLiquidityTX) {
       this.props.dispatch(openAlert("Your liquidity was added"))
-      this.props.dispatch(getFarmInfo())
+      this.props.dispatch(getEarnInfo())
     }
 
     this.setState({ loading: false, stakeValue: '', value_Wei_String: '' })
-    this.props.dispatch(closeModal("farmDepositModal"))
+    this.props.dispatch(closeModal("EarnDepositModal"))
   }
 
   render() {
@@ -271,7 +271,7 @@ class FarmDepositModal extends React.Component {
       netLayerNativeToken
     } = this.state
 
-    const { approvedAllowance } = this.props.farm
+    const { approvedAllowance } = this.props.earn
 
     let allowanceGTstake = false
 
@@ -396,9 +396,9 @@ class FarmDepositModal extends React.Component {
 
 const mapStateToProps = state => ({
   ui: state.ui,
-  farm: state.farm,
+  earn: state.earn,
   balance: state.balance,
   setup: state.setup,
 })
 
-export default connect(mapStateToProps)(FarmDepositModal)
+export default connect(mapStateToProps)(EarnDepositModal)
