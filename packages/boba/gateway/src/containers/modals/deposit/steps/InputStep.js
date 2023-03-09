@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositErc20, depositETHL2 } from 'actions/networkAction'
-import { setActiveHistoryTab, openAlert } from 'actions/uiAction'
+import { setActiveHistoryTab, openModal } from 'actions/uiAction'
+import { setCDMCompletion } from 'actions/transactionAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -55,19 +56,19 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   async function doDeposit() {
 
-    let res
+    let receipt
     let toL2Account = enableToL2Account ? recipient : '';
 
     // TO check for ETH
     if (token.address === ethers.constants.AddressZero) {
-      res = await dispatch(
+      receipt = await dispatch(
         depositETHL2({
           recipient: toL2Account,
           value_Wei_String
         })
       )
     } else {
-      res = await dispatch(
+      receipt = await dispatch(
         depositErc20({
           recipient: toL2Account,
           value_Wei_String,
@@ -76,8 +77,13 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
         })
       )
     }
-    if (res) {
-      dispatch(openAlert(`Your funds were bridged to ${networkName[ 'l2' ]}`))
+    if (receipt) {
+      dispatch(setCDMCompletion({
+        CDMType: 'L1StandardBridge',
+        CDMMessage: { token: `${ethers.utils.formatUnits(value_Wei_String, token.decimals)} ${token.symbol}` },
+        CDMTransaction: receipt
+      }))
+      dispatch(openModal('CDMCompletionModal'))
       dispatch(setActiveHistoryTab(`${networkName[ 'l1' ]} to ${networkName[ 'l2' ]}`))
       handleClose()
     }
