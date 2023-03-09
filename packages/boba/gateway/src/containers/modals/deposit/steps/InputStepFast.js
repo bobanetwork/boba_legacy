@@ -19,7 +19,8 @@ import { Box, Typography, useMediaQuery } from '@mui/material'
 
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 
-import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'
+import { openModal, openError, setActiveHistoryTab } from 'actions/uiAction'
+import { setCDMCompletion } from 'actions/transactionAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -147,23 +148,25 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   async function doDeposit() {
     console.log(`${token.symbol} Amount to bridge to L2: ${value_Wei_String}`)
 
-    let res
+    let receipt = ''
 
     if(token.symbol === networkService.L1NativeTokenSymbol) {
 
       console.log("L1 Native token Fast Bridge")
 
-      res = await dispatch(depositL1LP(token.address, value_Wei_String))
+      receipt = await dispatch(depositL1LP(token.address, value_Wei_String))
 
-      if (res) {
+      if (receipt) {
+        dispatch(setCDMCompletion({
+          CDMType: 'L1FastBridge',
+          CDMMessage: {
+            token: `${token.symbol}`,
+            receivedToken: `${receivableAmount(Number(value))} ${token.symbol}`
+          },
+          CDMTransaction: receipt
+        }))
+        dispatch(openModal('CDMCompletionModal'))
         dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
-        dispatch(
-          openAlert(
-            `${token.symbol} was bridged. You will receive approximately
-            ${((Number(value) * (100 - Number(feeRateN)))/100).toFixed(3)}
-            ${token.symbol} on L2`
-          )
-        )
         handleClose()
         return
       }
@@ -172,28 +175,29 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     //at this point we know it's not ETH
     console.log('ERC20 Fast Bridge')
 
-    res = await dispatch(
+    receipt = await dispatch(
       approveERC20(value_Wei_String, token.address, allAddresses.L1LPAddress)
     )
 
-    if (res === false) {
+    if (receipt === false) {
       dispatch(openError('Failed to approve amount or user rejected signature'))
       handleClose()
       return
     }
 
-    res = await dispatch(depositL1LP(token.address, value_Wei_String))
+    receipt = await dispatch(depositL1LP(token.address, value_Wei_String))
 
-    if (res) {
+    if (receipt) {
       dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
-      dispatch(
-        openAlert(
-          `${
-            token.symbol
-          } was bridged to the L1LP. You will receive approximately
-           ${receivableAmount(value)} ${token.symbol} on L2`
-        )
-      )
+      dispatch(setCDMCompletion({
+        CDMType: 'L1FastBridge',
+        CDMMessage: {
+          token: `${token.symbol}`,
+          receivedToken: `${receivableAmount(Number(value))} ${token.symbol}`
+        },
+        CDMTransaction: receipt
+      }))
+      dispatch(openModal('CDMCompletionModal'))
       handleClose()
     }
   }

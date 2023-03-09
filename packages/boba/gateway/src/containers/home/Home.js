@@ -74,6 +74,7 @@ import TransferPendingModal from 'containers/modals/transferPending/TransferPend
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
+import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionModal'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -117,6 +118,7 @@ function Home() {
   const noMetaMaskModalState = useSelector(selectModalState('noMetaMaskModal'));
   const installMetaMaskModalState = useSelector(selectModalState('installMetaMaskModal'));
   const manageLockModalState = useSelector(selectModalState('manageLock'));
+  const CDMCompletionModalState = useSelector(selectModalState('CDMCompletionModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -245,6 +247,7 @@ function Home() {
       {!!noMetaMaskModalState && <NoMetaMaskModal open={noMetaMaskModalState} />}
       {!!installMetaMaskModalState && <InstallMetaMaskModal open={installMetaMaskModalState} />}
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
+      {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
 
       <Alert
         type='error'
