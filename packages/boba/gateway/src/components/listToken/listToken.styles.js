@@ -31,10 +31,10 @@ export const TableCell = styled(Box)(({ theme, isMobile }) => ({
   },
 }))
 
-export const TextTableCell = styled(Typography)`
-  opacity: ${(props) => (!props.enabled ? '0.4' : '1.0')};
-  font-weight: 700;
-`
+export const TextTableCell = styled(Typography)(({ theme }) => ({
+  opacity: (props) => (!props.enabled ? '0.4' : '1.0'),
+  fontWeight: '700',
+}))
 
 export const DropdownWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',

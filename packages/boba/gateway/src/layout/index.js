@@ -162,7 +162,7 @@ function App() {
           root: {
             borderRadius: '8px',
             textTransform: 'none',
-            boxShadow: 'none',
+            boxShadow: 'none !important',
             minWidth: '0',
             color: '#031313',
             '&.Mui-disabled': {
@@ -199,7 +199,6 @@ function App() {
               background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
-              filter: 'drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))',
               '&:hover': {
                 color: '#000',
                 borderColor: buttonColor,
@@ -247,6 +246,21 @@ function App() {
             },
           },
           {
+            props: { variant: 'outlined', color: 'secondary' },
+            style: {
+              color: light ? buttonColor : buttonColor,
+              borderWidth: '1.4px',
+              borderColor: light ? buttonColor : 'rgba(255, 255, 255, 0.25)',
+              '&:hover': {
+                opacity: 0.9,
+                borderWidth: '1.4px',
+                transition: 'opacity 0.3s ease-in-out',
+                borderColor: light ? buttonColor : buttonColor,
+                boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              },
+            },
+          },
+          {
             props: { variant: 'contained', color: 'neutral' },
             style: {
               '&:hover': {
@@ -258,9 +272,9 @@ function App() {
           {
             props: { variant: 'outlined', color: 'neutral' },
             style: {
-              color: light ? '#000' : buttonColor,
+              color: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               borderWidth: '1.4px',
-              borderColor: light ? '#000' : 'rgba(255, 255, 255, 0.25)',
+              borderColor: light ?  'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',

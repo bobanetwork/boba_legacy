@@ -38,7 +38,7 @@ export const Content = styled(Box)(({ theme }) => ({
   height: 'fit-content',
   border: theme.palette.primary.border,
   borderRadius: theme.palette.primary.borderRadius,
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
   [ theme.breakpoints.down('sm') ]: {
     width: 'fit-content',
     minWidth: '100%'
