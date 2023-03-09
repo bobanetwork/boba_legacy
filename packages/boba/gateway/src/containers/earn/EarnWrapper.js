@@ -2,10 +2,10 @@
 import { useTheme } from '@emotion/react';
 import { useMediaQuery } from '@mui/material';
 import React from 'react';
-import Farm from './Farm';
+import Earn from './Earn';
 
-export default function FarmWrapper({ ...rest }) {
+export default function EarnWrapper({ ...rest }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  return <Farm {...rest} isMobile={isMobile} />;
+  return <Earn {...rest} isMobile={isMobile} />;
 }
