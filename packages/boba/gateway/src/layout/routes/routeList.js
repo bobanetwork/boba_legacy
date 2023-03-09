@@ -9,7 +9,7 @@ import Ecosystem from 'containers/ecosystem/Ecosystem';
 import Wallet from 'containers/wallet/Wallet';
 import OldDao from 'containers/dao/OldDao';
 import History from 'containers/history/History';
-import FarmWrapper from 'containers/farm/FarmWrapper';
+import EarnWrapper from 'containers/earn/EarnWrapper';
 import SaveWrapper from 'containers/save/SaveWrapper';
 import MonsterWrapper from 'containers/monster/MonsterWrapper';
 import { Navigate } from 'react-router-dom';
@@ -64,7 +64,7 @@ export const ROUTE_LIST = [
       },
       {
         path: ROUTES_PATH.EARN,
-        element: <FarmWrapper />,
+        element: <EarnWrapper />,
         key: 'Earn',
       },
       {

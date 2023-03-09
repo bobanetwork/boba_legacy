@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { fetchL1LPBalance, fetchL2LPBalance, getFarmInfo } from 'actions/farmAction'
+import { fetchL1LPBalance, fetchL2LPBalance, getEarnInfo } from 'actions/earnAction'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
@@ -16,7 +16,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import BN from 'bignumber.js'
 import { withdrawLiquidity } from 'actions/networkAction'
 
-class FarmWithdrawModal extends React.Component {
+class EarnWithdrawModal extends React.Component {
 
   constructor(props) {
     super(props)
@@ -28,7 +28,7 @@ class FarmWithdrawModal extends React.Component {
     const {
       withdrawToken,
       userInfo
-    } = this.props.farm
+    } = this.props.earn
 
     this.state = {
       open,
@@ -48,7 +48,7 @@ class FarmWithdrawModal extends React.Component {
 
   async componentDidMount() {
 
-    const { withdrawToken } = this.props.farm
+    const { withdrawToken } = this.props.earn
 
     let LPBalance_Wei_String = ''
 
@@ -71,21 +71,21 @@ class FarmWithdrawModal extends React.Component {
 
     const { open } = this.props
 
-    const { withdrawToken, userInfo , lpBalanceWeiString} = this.props.farm
+    const { withdrawToken, userInfo , lpBalanceWeiString} = this.props.earn
 
     if (prevState.open !== open) {
       this.setState({ open })
     }
 
-    if (!isEqual(prevState.farm.withdrawToken, withdrawToken)) {
+    if (!isEqual(prevState.earn.withdrawToken, withdrawToken)) {
       this.setState({ withdrawToken })
     }
 
-    if (!isEqual(prevState.farm.userInfo, userInfo)) {
+    if (!isEqual(prevState.earn.userInfo, userInfo)) {
       this.setState({ userInfo })
     }
 
-    if (!isEqual(prevState.farm.lpBalanceWeiString, lpBalanceWeiString)) {
+    if (!isEqual(prevState.earn.lpBalanceWeiString, lpBalanceWeiString)) {
       this.setState({
         LPBalance: logAmount(lpBalanceWeiString, withdrawToken.decimals),
         LPBalance_Wei_String: lpBalanceWeiString
@@ -150,7 +150,7 @@ class FarmWithdrawModal extends React.Component {
   }
 
   handleClose() {
-    this.props.dispatch(closeModal("farmWithdrawModal"))
+    this.props.dispatch(closeModal("EarnWithdrawModal"))
   }
 
   async handleConfirm() {
@@ -169,14 +169,14 @@ class FarmWithdrawModal extends React.Component {
 
     if (withdrawLiquidityTX) {
       this.props.dispatch(openAlert("Your liquidity was withdrawn."))
-      this.props.dispatch(getFarmInfo())
+      this.props.dispatch(getEarnInfo())
     }
     this.setState({
       loading: false,
       value: '',
       value_Wei_String: ''
     })
-    this.props.dispatch(closeModal("farmWithdrawModal"))
+    this.props.dispatch(closeModal("EarnWithdrawModal"))
 
   }
 
@@ -259,8 +259,8 @@ class FarmWithdrawModal extends React.Component {
 
 const mapStateToProps = state => ({
   ui: state.ui,
-  farm: state.farm,
+  earn: state.earn,
   balance: state.balance,
 });
 
-export default connect(mapStateToProps)(FarmWithdrawModal)
+export default connect(mapStateToProps)(EarnWithdrawModal)
