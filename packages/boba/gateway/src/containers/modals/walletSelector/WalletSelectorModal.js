@@ -21,12 +21,7 @@ function WalletSelectorModal ({ open }) {
 
   const connectToWallet = async (type) => {
     try {
-      if (type === 'metamask') {
-        await networkService.walletService.connectMetaMask()
-      }
-      if (type === 'walletconnect') {
-        await networkService.walletService.connectWalletConnect()
-      }
+      await networkService.walletService.connectWallet(type)
       dispatch(closeModal('walletSelectorModal'))
       dispatch(setWalletConnected(true))
     } catch (error) {
@@ -43,21 +38,25 @@ function WalletSelectorModal ({ open }) {
   }
 
   return (
-    <Modal open={open} onClose={handleClose} maxWidth="sm" minHeight="200px">
+    <Modal
+      open={open}
+      onClose={handleClose}
+      newStyle={true}
+      maxWidth="450px"
+      minHeight="200px"
+      title="Connect to Wallet"
+    >
       <Box>
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 2}}>
-          Connect to Wallet
-        </Typography>
         <Content>
           <BoxCenter onClick={() => connectToWallet('metamask')}>
             <img src={metaMaskLogo} alt='metamask' height="100"/>
-            <Typography variant="h3" sx={{fontWeight: 700, mb: 2}}>
+            <Typography variant="body" sx={{fontWeight: 700, mb: 2}}>
               MetaMask
             </Typography>
           </BoxCenter>
           <BoxCenter onClick={() => connectToWallet('walletconnect')}>
             <img src={walletConnectLogo} alt='walletconnect' height="100"/>
-            <Typography variant="h3" sx={{fontWeight: 700, mb: 2}}>
+            <Typography variant="body" sx={{fontWeight: 700, mb: 2}}>
               WalletConnect
             </Typography>
           </BoxCenter>

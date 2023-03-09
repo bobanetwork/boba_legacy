@@ -36,6 +36,7 @@ import {
   selectConnectBOBA,
   selectConnect,
   selectWalletConnected,
+  selectChainIdChanged,
 } from 'selectors/setupSelector'
 
 import {
@@ -52,7 +53,7 @@ import { setEnableAccount, setWalletAddress } from 'actions/setupAction'
 
 import { fetchTransactions, fetchBalances } from 'actions/networkAction'
 
-import { openModal } from 'actions/uiAction'
+import { closeModal, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
 import { LAYER } from 'util/constant.js'
@@ -75,6 +76,7 @@ function LayerSwitcher({ visisble = true }) {
   const connectBOBARequest = useSelector(selectConnectBOBA())
   const connectRequest = useSelector(selectConnect())
   const walletConnected = useSelector(selectWalletConnected())
+  const chainIdChanged = useSelector(selectChainIdChanged())
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -90,8 +92,7 @@ function LayerSwitcher({ visisble = true }) {
   const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
 
   const dispatchBootAccount = useCallback(() => {
-
-    if (!accountEnabled && baseEnabled) initializeAccount()
+    if ((!accountEnabled && baseEnabled) || chainIdChanged) initializeAccount()
 
     async function initializeAccount() {
 
@@ -111,6 +112,7 @@ function LayerSwitcher({ visisble = true }) {
         return false
       }
       else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
+        dispatch(closeModal('wrongNetworkModal'))
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
@@ -121,25 +123,31 @@ function LayerSwitcher({ visisble = true }) {
         return false
       }
     }
-  }, [dispatch, accountEnabled, network, networkType, baseEnabled])
+  }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged])
 
   const doConnectToLayer = useCallback((layer) => {
     async function doConnect() {
       try {
         localStorage.setItem('wantChain', JSON.stringify(layer))
-        if (networkService.provider) {
-          await networkService.switchChain(layer)
+        if (networkService.walletService.provider) {
+          const response = await networkService.switchChain(layer)
+          if (response) {
+            dispatchBootAccount()
+          } else {
+            dispatch(setConnectETH(false))
+            dispatch(setConnectBOBA(false))
+          }
         } else {
           dispatch(openModal('walletSelectorModal'))
         }
       } catch (err) {
         console.log('ERROR', err)
-        dispatch(setConnectETH(false));
-        dispatch(setConnectBOBA(false));
+        dispatch(setConnectETH(false))
+        dispatch(setConnectBOBA(false))
       }
     }
     doConnect();
-  }, [dispatch])
+  }, [dispatch, dispatchBootAccount])
 
   useEffect(() => {
     if (walletConnected) {

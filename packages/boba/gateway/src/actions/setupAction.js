@@ -81,3 +81,15 @@ export function setWalletConnected( state ) {
     return dispatch({ type: 'SETUP/WALLET_CONNECTED', payload: state })
   }
 }
+
+export function setChainIdChanged() {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
+  }
+}
+
+export function resetChainIdChanged() {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CHAINIDCHANGED/RESET' })
+  }
+}
