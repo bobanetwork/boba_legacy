@@ -63,8 +63,8 @@ import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
 import TransferModal from 'containers/modals/transfer/TransferModal'
 import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
 import ExitModal from 'containers/modals/exit/ExitModal'
-import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
-import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
+import EarnDepositModal from 'containers/modals/earn/EarnDepositModal'
+import EarnWithdrawModal from 'containers/modals/earn/EarnWithdrawModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/old/NewProposalModalOldDao'
@@ -75,6 +75,7 @@ import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal'
 import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
 import WalletSelectorModal from 'containers/modals/walletSelector/WalletSelectorModal'
+import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionModal'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -119,6 +120,7 @@ function Home() {
   const installMetaMaskModalState = useSelector(selectModalState('installMetaMaskModal'));
   const manageLockModalState = useSelector(selectModalState('manageLock'));
   const walletSelectorModalState = useSelector(selectModalState('walletSelectorModal'));
+  const CDMCompletionModalState = useSelector(selectModalState('CDMCompletionModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -126,8 +128,8 @@ function Home() {
   const lock = useSelector(selectModalState('lock'))
   const proposalId = useSelector(selectModalState('proposalId'))
 
-  const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
-  const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
+  const EarnDepositModalState = useSelector(selectModalState('EarnDepositModal'))
+  const EarnWithdrawModalState = useSelector(selectModalState('EarnWithdrawModal'))
 
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
   const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
@@ -234,8 +236,8 @@ function Home() {
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
-      {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
+      {!!EarnDepositModalState && <EarnDepositModal open={EarnDepositModalState} />}
+      {!!EarnWithdrawModalState && <EarnWithdrawModal open={EarnWithdrawModalState} />}
 
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
@@ -248,6 +250,7 @@ function Home() {
       {!!installMetaMaskModalState && <InstallMetaMaskModal open={installMetaMaskModalState} />}
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
       {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
+      {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
 
       <Alert
         type='error'
