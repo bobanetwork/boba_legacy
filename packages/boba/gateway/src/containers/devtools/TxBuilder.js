@@ -94,13 +94,13 @@ const TxBuilder = () => {
     const inputs = contractInputs[methodIndex] || []
 
     for (let i = 0; i < methodInputs.length; i++) {
-      if (typeof inputs[i] === undefined) {
+      if (typeof inputs[i] === 'undefined') {
         dispatch(openError('Please fill all inputs'))
         return
       }
     }
     if (stateMutability === 'payable') {
-      if (typeof inputs[methodInputs.length] === undefined) {
+      if (typeof inputs[methodInputs.length] === 'undefined') {
         dispatch(openError('Please fill all inputs'))
         return
       }
