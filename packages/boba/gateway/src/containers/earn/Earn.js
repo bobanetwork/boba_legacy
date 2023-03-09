@@ -101,6 +101,36 @@ function Earn() {
         accountEnabled={accountEnabled}
       />
 
+      {layer === 'L2' && lpChoice === 'L1LP' &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon sx={{ flex: 1 }} />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You are on L2. To transact on L1, SWITCH LAYER to L1
+            </S.AlertText>
+          </S.AlertInfo>
+          <LayerSwitcher isButton={true}/>
+        </S.LayerAlert>
+      }
+
+      {layer === 'L1' && lpChoice === 'L2LP' &&
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+              You are on L1. To transact on L2, SWITCH LAYER to L2
+            </S.AlertText>
+          </S.AlertInfo>
+          <LayerSwitcher isButton={true} />
+        </S.LayerAlert>
+      }
+
       <Box sx={{ my: 1, width: '100%' }}>
         <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
           <S.PageSwitcher>
@@ -187,35 +217,6 @@ function Earn() {
           </Tooltip>
         </S.Help>
 
-        {layer === 'L2' && lpChoice === 'L1LP' &&
-          <S.LayerAlert>
-            <S.AlertInfo>
-              <AlertIcon sx={{ flex: 1 }} />
-              <S.AlertText
-                variant="body1"
-                component="p"
-              >
-                You are on L2. To transact on L1, SWITCH LAYER to L1
-              </S.AlertText>
-            </S.AlertInfo>
-            <LayerSwitcher isButton={true} size={isMobile ? "small" : "medium"} />
-          </S.LayerAlert>
-        }
-
-        {layer === 'L1' && lpChoice === 'L2LP' &&
-          <S.LayerAlert>
-            <S.AlertInfo>
-              <AlertIcon />
-              <S.AlertText
-                variant="body2"
-                component="p"
-              >
-                You are on L1. To transact on L2, SWITCH LAYER to L2
-              </S.AlertText>
-            </S.AlertInfo>
-            <LayerSwitcher isButton={true} />
-          </S.LayerAlert>
-        }
 
         {!isMobile ? (
           <S.TableHeading>

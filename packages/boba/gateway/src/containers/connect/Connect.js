@@ -30,7 +30,8 @@ const Connect = ({
       <Button
         type="primary"
         variant="contained"
-        size="large"
+          size="small"
+          newStyle
         onClick={() => dispatch(setConnect(true))}
         sx={{fontWeight: '500;'}}
       >
@@ -51,6 +52,7 @@ const Connect = ({
           type="primary"
           variant="contained"
           size="small"
+          newStyle
           onClick={() => dispatch(setConnectBOBA(true))}
         >
           Connect to Boba
