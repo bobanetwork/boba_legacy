@@ -102,26 +102,26 @@ export function depositErc20ToL1(payload) {
   return createAction('DEPOSIT_ALTL1/CREATE', () => networkService.depositErc20ToL1(payload))
 }
 
-//FARM
-export function farmL1(value_Wei_String, currencyAddress) {
-  return createAction('FARM/CREATE', () =>
+//EARN
+export function earnL1(value_Wei_String, currencyAddress) {
+  return createAction('EARN/CREATE', () =>
     networkService.approveERC20_L1LP(value_Wei_String, currencyAddress)
   )
 }
-export function farmL2(value_Wei_String, currencyAddress) {
-  return createAction('FARM/CREATE', () =>
+export function earnL2(value_Wei_String, currencyAddress) {
+  return createAction('EARN/CREATE', () =>
     networkService.approveERC20_L2LP(value_Wei_String, currencyAddress)
   )
 }
 export function getReward(currencyAddress, value_Wei_String, L1orL2Pool) {
-  return createAction('FARM/HARVEST', () =>
+  return createAction('EARN/HARVEST', () =>
     networkService.getReward(currencyAddress, value_Wei_String, L1orL2Pool)
   )
 }
 
 export function withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool) {
 
-  return createAction('FARM/WITHDRAW', () =>
+  return createAction('EARN/WITHDRAW', () =>
     networkService.withdrawLiquidity(currencyAddress, value_Wei_String, L1orL2Pool)
   )
 }

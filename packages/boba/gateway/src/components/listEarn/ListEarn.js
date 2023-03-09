@@ -5,7 +5,7 @@ import { logAmount, powAmount } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
 import { openAlert, openModal } from 'actions/uiAction';
-import { getFarmInfo, updateStakeToken, updateWithdrawToken } from 'actions/farmAction';
+import { getEarnInfo, updateStakeToken, updateWithdrawToken } from 'actions/earnAction';
 
 import Button from 'components/button/Button';
 
@@ -16,12 +16,12 @@ import networkService from 'services/networkService'
 import { getCoinImage } from 'util/coinImage';
 
 import { Box, Typography, Fade, CircularProgress } from '@mui/material';
-import * as S from "./ListFarm.styles"
+import * as S from "./ListEarn.styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
 import Tooltip from 'components/tooltip/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
 
-class ListFarm extends React.Component {
+class ListEarn extends React.Component {
 
   constructor(props) {
 
@@ -93,7 +93,7 @@ class ListFarm extends React.Component {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const { allAddresses } = this.props.farm
+    const { allAddresses } = this.props.earn
 
     this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,
@@ -104,14 +104,14 @@ class ListFarm extends React.Component {
       decimals: poolInfo.decimals
     }))
 
-    this.props.dispatch(openModal('farmDepositModal'))
+    this.props.dispatch(openModal('EarnDepositModal'))
   }
 
   async handleWithdrawToken() {
 
     const { poolInfo, L1orL2Pool, balance } = this.state
 
-    const { allAddresses } = this.props.farm
+    const { allAddresses } = this.props.earn
 
     this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,
@@ -122,7 +122,7 @@ class ListFarm extends React.Component {
       decimals: poolInfo.decimals
     }))
 
-    this.props.dispatch(openModal('farmWithdrawModal'))
+    this.props.dispatch(openModal('EarnWithdrawModal'))
   }
 
   async handleHarvest() {
@@ -146,7 +146,7 @@ class ListFarm extends React.Component {
 
     if (getRewardTX) {
       this.props.dispatch(openAlert(`${logAmount(userReward, poolInfo.decimals, 2)} ${poolInfo.symbol} was added to your account`))
-      this.props.dispatch(getFarmInfo())
+      this.props.dispatch(getEarnInfo())
       this.setState({ loading: false })
     } else {
       this.setState({ loading: false })
@@ -496,7 +496,7 @@ class ListFarm extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  farm: state.farm,
+  earn: state.earn,
 })
 
-export default connect(mapStateToProps)(ListFarm)
+export default connect(mapStateToProps)(ListEarn)
