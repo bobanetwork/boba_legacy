@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "tsc -p ./tsconfig.json && hardhat compile",
-    "clean": "rimraf artifacts cache node_modules dist ./tsconfig.tsbuildinfo",
+    "clean": "rimraf artifacts cache node_modules dist dockers/bundler ./tsconfig.tsbuildinfo",
     "test": "hardhat test --grep '/^((?!Flow).)*$/'",
     "test-flows": "npx hardhat test --network localhost --grep \"Flow\"",
     "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'",

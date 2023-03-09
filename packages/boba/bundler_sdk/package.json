@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "clean": "rimraf  dist/ ./tsconfig.tsbuildinfo",
+    "clean": "rimraf  dist/ cache node_modules ./tsconfig.tsbuildinfo",
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
     "test": "hardhat test",
