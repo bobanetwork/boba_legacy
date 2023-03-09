@@ -68,7 +68,7 @@ function App() {
         main: light ? buttonColorLightmode : buttonColor,
         borderRadius: '20px',
         border: light
-          ? 'solid 1px rgba(0, 0, 0, 0.12)'
+          ? 'solid 1px rgba(3, 19, 19, 0.06)'
           : 'solid 1px rgba(255, 255, 255, 0.06)',
       },
       background: {
@@ -82,7 +82,7 @@ function App() {
         modalTransparent: light ? '#fff' : 'transparent',
         input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
         footer: light ? '#1A1D1F' : '#1A1D1F',
-        glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
+        glassy: light ? '#FFFFFF' : 'rgba(255, 255, 255, 0.04)',
         tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
         alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
@@ -162,7 +162,7 @@ function App() {
           root: {
             borderRadius: '8px',
             textTransform: 'none',
-            boxShadow: 'box-shadow: 0px 0px 7px rgba(73, 107, 239, 0.35)',
+            boxShadow: 'none',
             minWidth: '0',
             color: '#031313',
             '&.Mui-disabled': {
@@ -226,6 +226,23 @@ function App() {
                 boxShadow: light
                   ? 'none'
                   : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              },
+            },
+          },
+          {
+            props: { variant: 'standard', color: 'secondary' },
+            style: {
+              color: light
+                ? 'rgba(0, 0, 0, 0.45)'
+                : 'rgba(255, 255, 255, 0.45)',
+              background: light
+                ? 'rgba(0, 0, 0, 0.06)'
+                : 'rgba(255, 255, 255, 0.06)',
+              borderWidth: '1.4px',
+              borderColor: buttonColor,
+              '&:hover': {
+                color: light ? buttonColorLightmode : buttonColor,
+                boxShadow: 'none',
               },
             },
           },

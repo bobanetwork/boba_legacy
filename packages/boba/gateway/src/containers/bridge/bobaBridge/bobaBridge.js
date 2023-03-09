@@ -99,9 +99,9 @@ function BobaBridge() {
             my={1}
           >
             <Box width="100%" mb="38px">
-              <Typography variant="body2" pb="10px">
+              <S.ChainDirectionLabel variant="body2" pb="10px">
                 From
-              </Typography>
+              </S.ChainDirectionLabel>
               <S.ChainInput>
                 <S.ChainLabel component="p" variant="body">
                   <L1Icon selected />
@@ -130,9 +130,9 @@ function BobaBridge() {
               </svg>
             </S.IconSwitcher>
             <Box width="100%">
-              <Typography variant="body2" mt="10px" pb="10px">
+              <S.ChainDirectionLabel variant="body2" mt="10px" pb="10px">
                 To
-              </Typography>
+              </S.ChainDirectionLabel>
               <S.ChainInput>
                 <S.ChainLabel component="p" variant="body">
                   <L2Icon selected />
@@ -143,7 +143,7 @@ function BobaBridge() {
           </S.BobaContentWrapper>
           <Box alignSelf="flex-start">
             <Button
-              sx={{ marginTop: '38px' }}
+              sx={{ marginTop: '35px', padding: '10px 28px' }}
               onClick={() => {
                 connectToETH()
               }}
@@ -175,9 +175,9 @@ function BobaBridge() {
             my={1}
           >
             <Box width="100%" mb="38px">
-              <Typography variant="body2" pb="10px">
+              <S.ChainDirectionLabel variant="body2" pb="10px">
                 From
-              </Typography>
+              </S.ChainDirectionLabel>
               <S.ChainInput>
                 <S.ChainLabel component="p" variant="body">
                   <L2Icon selected />
@@ -206,9 +206,9 @@ function BobaBridge() {
               </svg>
             </S.IconSwitcher>
             <Box width="100%">
-              <Typography variant="body2" mt="10px" pb="10px">
+              <S.ChainDirectionLabel variant="body2" mt="10px" pb="10px">
                 To
-              </Typography>
+              </S.ChainDirectionLabel>
               <S.ChainInput>
                 <S.ChainLabel component="p" variant="body">
                   <L1Icon selected />
@@ -244,9 +244,9 @@ function BobaBridge() {
           alignItems="center"
         >
           <Box width="100%">
-            <Typography variant="body2" pb="10px">
+            <S.ChainDirectionLabel variant="body2" pb="10px" sx={{color: theme.palette.primary.info}}>
               From
-            </Typography>
+            </S.ChainDirectionLabel>
             <S.ChainInput>
               {layer === 'L1' ? (
                 <S.ChainLabel component="p" variant="body">
@@ -288,9 +288,9 @@ function BobaBridge() {
             </S.IconSwitcher>
           </Box>
           <Box width="100%">
-            <Typography variant="body2" pb="10px">
+            <S.ChainDirectionLabel variant="body2" pb="10px">
               To
-            </Typography>
+            </S.ChainDirectionLabel>
             <S.ChainInput>
               {layer === 'L2' ? (
                 <S.ChainLabel component="p" variant="body">

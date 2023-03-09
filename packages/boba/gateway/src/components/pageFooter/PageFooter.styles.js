@@ -149,12 +149,21 @@ export const SocialWrapper = styled(Box)(({ theme }) => ({
 }))
 
 export const SocialButton = styled(IconButton)(({ theme }) => ({
+  svg: {
+    path: {
+      fill: 'rgba(255, 255, 255, 0.65)',
+      fillOpacity: 1,
+    },
+  },
   color: 'rgba(255, 255, 255, 1)',
   opacity: 0.65,
   '&:hover': {
     background: 'none',
-    fill: theme.palette.secondary.main,
-    color: theme.palette.secondary.main,
-    opacity: 1,
+    svg: {
+      path: {
+        fill: theme.palette.secondary.main,
+        fillOpacity: 1,
+      },
+    },
   },
 }))

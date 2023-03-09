@@ -57,9 +57,11 @@ export const ProjectContainer = styled(Box)(({ theme }) => ({
 }))
 
 export const ProjectContent = styled(Box)(({ theme }) => ({
-  borderTopLeftRadius: '8px',
-  borderTopRightRadius: '8px',
-  background: theme.palette.background.glassy, //'rgba(255, 255, 255, 0.06)',
+  borderTopLeftRadius: '12px',
+  borderTopRightRadius: '12px',
+  background: theme.palette.background.glassy,
+  backdropFilter: 'blur(50px)',
+  filter: 'drop-shadow(0px 4px 20px rgba(35, 92, 41, 0.06))',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',
@@ -81,6 +83,7 @@ export const ImageContainer = styled(Box)(({ theme, ...props }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
+  zIndex: 1,
   width: '70px',
   height: '70px',
   borderRadius: '50%',
@@ -97,14 +100,11 @@ export const ImageContainer = styled(Box)(({ theme, ...props }) => ({
 
 export const DividerLine = styled(Divider)(({ theme }) => ({
   background: `${
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.04)'
-      : 'rgba(3, 19, 19, 0.04)'
+    theme.palette.mode === 'light'
+      ? 'rgba(3, 19, 19, 0.01)'
+      : 'rgba(255, 255, 255, 0.04)'
   }`,
   boxSizing: 'border-box',
-  boxShadow: `${
-    theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'
-  }`,
   width: '100%',
 }))
 
@@ -129,17 +129,24 @@ export const TileFooter = styled(Box)(({ theme, ...props }) => ({
   width: '100%',
   borderBottomLeftRadius: '8px',
   borderBottomRightRadius: '8px',
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
+  filter: 'drop-shadow(0px 4px 20px rgba(35, 92, 41, 0.06))',
   justifyContent: 'space-around',
   padding: '1rem',
   gap: 1,
 }))
 
 export const footerLink = styled(IconButton)(({ theme }) => ({
+  svg: {
+    path: {
+      fill: theme.palette.primary.info,
+      fillOpacity: 1,
+    },
+  },
   '&:hover ': {
     svg: {
       path: {
-        fill: theme.palette.primary.main,
+        fill: theme.palette.secondary.main,
         fillOpacity: 1,
       },
     },

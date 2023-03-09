@@ -30,7 +30,7 @@ function BridgeContainer() {
                   variant="h1"
                   component="span"
                   sx={{
-                    background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
+                    background: '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
                     'WebkitBackgroundClip': 'text',
                     'WebkitTextFillColor': 'transparent'
                   }}
