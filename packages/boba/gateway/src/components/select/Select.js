@@ -81,8 +81,7 @@ function Select({
             '&& .Mui-selected': {
               backgroundColor: 'transparent !important',
               color: theme.palette.secondary.main,
-            },
-          }
+            },}
         }}
       >
         {options.map((i, index) => (
@@ -141,28 +140,28 @@ function Select({
           }),
           indicatorSeparator: (base) => ({
             ...base,
-            display: 'none'
+            display: 'none',
           }),
           container: (base) => ({
             ...base,
-            background: theme.palette.background.default
+            background: 'none'
           }),
           singleValue: (base) => ({
             ...base,
             background: 'transparent',
-            color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
+            color: theme.palette.secondary.text,
             padding: '5px'
           }),
           multiValue: (base) => ({
             ...base,
             background: theme.palette.background.secondary,
-            color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
+            color: theme.palette.secondary.text,
             marginRight: '5px',
             paddingRight: '5px',
           }),
           valueContainer: (base) => ({
             ...base,
-            background: theme.palette.background.default
+            background: 'none',
           })
         }}
         theme={theme}

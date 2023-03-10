@@ -70,6 +70,8 @@ function App() {
         border: light
           ? 'solid 1px rgba(3, 19, 19, 0.06)'
           : 'solid 1px rgba(255, 255, 255, 0.06)',
+        gradient: light ? '#1CD6D1' : '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
+        text: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       },
       background: {
         default: light ? '#FFFFFF' : '#111315',
@@ -140,6 +142,7 @@ function App() {
             boxShadow: 'none',
             backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
             border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
           },
         },
       },
