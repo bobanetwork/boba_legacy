@@ -80,11 +80,48 @@ function BobaBridge() {
     }
   }
 
-  if (!accountEnabled && toL2) {
+
+  const L1ChainLabel = () => {
+    return (<S.ChainLabel component="p" variant="body">
+      <L1Icon selected />
+      {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}
+    </S.ChainLabel>)
+  }
+  const L2ChainLabel = () => {
+    return (<S.ChainLabel component="p" variant="body">
+      <L2Icon selected />
+      {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}
+    </S.ChainLabel>)
+  }
+
+  const ChainSwitchIcon = () => {
+    return <S.IconSwitcher
+      onClick={() => {
+        switchDirection()
+      }}
+    >
+      <svg
+        transform="rotate(90)"
+        width="19"
+        height="20"
+        viewBox="0 0 19 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
+          fill={iconColor}
+          fillOpacity="0.85"
+        />
+      </svg>
+    </S.IconSwitcher>
+  }
+
+  if (!accountEnabled) {
     return (
       <S.BobaBridgeWrapper>
-        <Box sx={{ my: 1 }}>
-          <Typography variant="h3" pb="12px">
+        <Box>
+          <Typography variant="h3">
             Bridge
           </Typography>
           <Typography variant="body2">Select the bridge direction</Typography>
@@ -94,142 +131,46 @@ function BobaBridge() {
           <S.BobaContentWrapper
             flexDirection="column"
             fullWidth={true}
-            gap="5px"
+            gap={2}
             alignItems="flex-start"
             my={1}
           >
-            <Box width="100%" mb="38px">
+            <Box width="100%">
               <Typography variant="body2" pb="10px">
                 From
               </Typography>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body">
-                  <L1Icon selected />
-                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
-                </S.ChainLabel>
+                {toL2? <L1ChainLabel/> : <L2ChainLabel/>}
               </S.ChainInput>
             </Box>
-            <S.IconSwitcher
-              onClick={() => {
-                switchDirection()
-              }}
-            >
-              <svg
-                transform="rotate(90)"
-                width="19"
-                height="20"
-                viewBox="0 0 19 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
-                  fill={iconColor}
-                  fillOpacity="0.85"
-                />
-              </svg>
-            </S.IconSwitcher>
+            <ChainSwitchIcon />
             <Box width="100%">
               <Typography variant="body2" mt="10px" pb="10px">
                 To
               </Typography>
               <S.ChainInput>
-                <S.ChainLabel component="p" variant="body">
-                  <L2Icon selected />
-                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
-                </S.ChainLabel>
+                {toL2? <L2ChainLabel/> : <L1ChainLabel/>}
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
-          <Box alignSelf="flex-start">
-            <Button
-              sx={{ marginTop: '38px' }}
-              onClick={() => {
+        </S.BobaContent>
+        <Box alignSelf="center">
+          <Button
+            fullWidth={true}
+            sx={{ marginTop: '38px' }}
+            onClick={() => {
+              if(toL2){
                 connectToETH()
-              }}
-              color="primary"
-              variant="contained"
-            >
-              Connect
-            </Button>
-          </Box>
-        </S.BobaContent>
-      </S.BobaBridgeWrapper>
-    )
-  } else if (!accountEnabled && !toL2) {
-    return (
-      <S.BobaBridgeWrapper>
-        <Box sx={{ my: 1 }}>
-          <Typography variant="h3" pb="12px">
-            Bridge
-          </Typography>
-          <Typography variant="body2">Select the bridge direction</Typography>
-        </Box>
-        <S.BobaDivider></S.BobaDivider>
-        <S.BobaContent>
-          <S.BobaContentWrapper
-            flexDirection="column"
-            fullWidth={true}
-            gap="5px"
-            alignItems="flex-start"
-            my={1}
-          >
-            <Box width="100%" mb="38px">
-              <Typography variant="body2" pb="10px">
-                From
-              </Typography>
-              <S.ChainInput>
-                <S.ChainLabel component="p" variant="body">
-                  <L2Icon selected />
-                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
-                </S.ChainLabel>
-              </S.ChainInput>
-            </Box>
-            <S.IconSwitcher
-              onClick={() => {
-                switchDirection()
-              }}
-            >
-              <svg
-                transform="rotate(90)"
-                width="19"
-                height="20"
-                viewBox="0 0 19 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
-                  fill={iconColor}
-                  fillOpacity="0.85"
-                />
-              </svg>
-            </S.IconSwitcher>
-            <Box width="100%">
-              <Typography variant="body2" mt="10px" pb="10px">
-                To
-              </Typography>
-              <S.ChainInput>
-                <S.ChainLabel component="p" variant="body">
-                  <L1Icon selected />
-                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
-                </S.ChainLabel>
-              </S.ChainInput>
-            </Box>
-          </S.BobaContentWrapper>
-          <Box alignSelf="flex-start">
-            <Button
-              sx={{ marginTop: '38px' }}
-              onClick={() => {
+              } else {
                 connectToBOBA()
-              }}
-              color="primary"
-              variant="contained"
-            >
-              Connect
-            </Button>
-          </Box>
-        </S.BobaContent>
+              }
+            }}
+            color="primary"
+            variant="contained"
+          >
+            Connect
+          </Button>
+        </Box>
       </S.BobaBridgeWrapper>
     )
   }
@@ -248,17 +189,7 @@ function BobaBridge() {
               From
             </Typography>
             <S.ChainInput>
-              {layer === 'L1' ? (
-                <S.ChainLabel component="p" variant="body">
-                  <L1Icon selected />
-                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
-                </S.ChainLabel>
-              ) : (
-                <S.ChainLabel component="p" variant="body">
-                  <L2Icon selected />
-                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
-                </S.ChainLabel>
-              )}
+              {layer === 'L1' ? <L1ChainLabel /> : <L2ChainLabel />}
             </S.ChainInput>
           </Box>
           <Box
@@ -267,42 +198,14 @@ function BobaBridge() {
             alignItems="center"
             mt="26px"
           >
-            <S.IconSwitcher
-              onClick={() => {
-                switchDirection()
-              }}
-            >
-              <svg
-                width="19"
-                height="20"
-                viewBox="0 0 19 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9.13029 20L4.47765 15.3474L9.13029 10.6947L9.13029 13.3732L11.1035 13.3732C15.4911 13.3723 18.1237 12.0569 19 9.425C18.1231 14.6886 15.4902 17.3215 11.1046 17.3206L9.13051 17.3215C9.13029 17.3215 9.13029 20 9.13029 20ZM10.5061 7.42559e-07L15.1588 4.65264L10.507 9.3044L10.5052 6.62743L8.53266 6.62654C4.14506 6.62743 1.51245 7.94285 0.635512 10.5757C1.51334 5.31113 4.14617 2.67853 8.53199 2.67919L10.5061 2.6783L10.5061 7.42559e-07Z"
-                  fill={iconColor}
-                  fillOpacity="0.85"
-                />
-              </svg>
-            </S.IconSwitcher>
+            <ChainSwitchIcon />
           </Box>
           <Box width="100%">
             <Typography variant="body2" pb="10px">
               To
             </Typography>
             <S.ChainInput>
-              {layer === 'L2' ? (
-                <S.ChainLabel component="p" variant="body">
-                  <L1Icon selected />
-                  {networkName['l1'] || DEFAULT_NETWORK.NAME.L1}
-                </S.ChainLabel>
-              ) : (
-                <S.ChainLabel component="p" variant="body">
-                  <L2Icon selected />
-                  {networkName['l2'] || DEFAULT_NETWORK.NAME.L2}
-                </S.ChainLabel>
-              )}
+              {layer === 'L2' ? <L1ChainLabel /> : <L2ChainLabel />}
             </S.ChainInput>
           </Box>
         </S.BobaContentWrapper>
