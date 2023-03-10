@@ -11,7 +11,6 @@ export const GAS_POLL_INTERVAL = process.env.REACT_APP_GAS_POLL_INTERVAL || 4000
 export const GA4_MEASUREMENT_ID = process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV = process.env.REACT_APP_ENV || 'dev'
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN || null
-export const APP_ZENDESK_KEY = process.env.REACT_APP_ZENDESK_KEY || null
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG = process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION

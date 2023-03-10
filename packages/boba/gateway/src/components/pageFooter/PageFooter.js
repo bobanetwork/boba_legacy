@@ -5,7 +5,7 @@ import BobaLogo from '../../images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
-import { LAYER, ROUTES_PATH } from 'util/constant'
+import { LAYER, ROUTES_PATH, WALLET_VERSION } from 'util/constant'
 import { useSelector } from 'react-redux'
 import { selectLayer } from 'selectors/setupSelector'
 import {
@@ -13,6 +13,7 @@ import {
   selectActiveNetworkType,
 } from 'selectors/networkSelector'
 import { getBlockExplorerUrl } from 'util/network/network.util'
+
 
 const PageFooter = ({ maintenance }) => {
   const theme = useTheme()
@@ -83,7 +84,7 @@ const PageFooter = ({ maintenance }) => {
   }
   return (
     <S.Wrapper>
-      <S.FooterLinkWrapper>
+      <S.FooterLinkWrapper my={1} mx="auto">
         <S.SocialWrapper>
           <S.SocialButton
             href="https://boba.eco/twitter"
@@ -113,7 +114,7 @@ const PageFooter = ({ maintenance }) => {
       </S.FooterLinkWrapper>
 
       <S.FooterDivider />
-      <S.FooterLinkWrapper>
+      <S.FooterLinkWrapper my={1} mx="auto">
         <S.FooterLinkWrapperLeft>
           <S.LinkWrapper>
             <S.FooterLinkExt
@@ -154,15 +155,20 @@ const PageFooter = ({ maintenance }) => {
           </S.LinkWrapper>
         </S.FooterLinkWrapperLeft>
         <S.FooterDividerMobile />
-        <S.FooterLinkExt
-          href="https://boba.network"
-          component="a"
-          target="_blank"
-          sx={{ whiteSpace: 'nowrap' }}
-        >
-          Boba Website
-        </S.FooterLinkExt>
+          <S.FooterLinkExt
+            href="https://boba.network"
+            component="a"
+            target="_blank"
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            Boba Website
+          </S.FooterLinkExt>
       </S.FooterLinkWrapper>
+      <S.FooterLinkExt
+            sx={{ whiteSpace: 'nowrap' }}
+        >
+        v{WALLET_VERSION}
+      </S.FooterLinkExt>
     </S.Wrapper>
   )
 }
