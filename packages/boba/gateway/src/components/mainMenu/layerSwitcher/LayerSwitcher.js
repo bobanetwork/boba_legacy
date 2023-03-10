@@ -176,7 +176,7 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
   }, [ connectBOBARequest, doConnectToLayer ])
 
   useEffect(() => {
-    if (connectRequest) {
+    if (connectRequest && !networkService.walletService.provider) {
       dispatch(openModal('walletSelectorModal'))
     }
   }, [dispatch, connectRequest])
