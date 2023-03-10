@@ -131,6 +131,18 @@ function App() {
       },
     },
     components: {
+      ReactSelect : {
+        styleOverrides: {
+          root: {
+            borderRadius: '12px',
+            minWidth: '96px',
+            boxShadow: 'none',
+            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+          },
+        },
+      },
       MuiPaper: {
         defaultProps: {
           elevation: 0,

@@ -24,7 +24,7 @@ export const SelectedContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'space-around',
   height: '40px',
   borderRadius: '10px',
   background: theme.palette.background.secondary,
