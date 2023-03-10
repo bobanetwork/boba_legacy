@@ -116,7 +116,14 @@ const PageFooter = ({ maintenance }) => {
       <S.FooterLinkWrapper>
         <S.FooterLinkWrapperLeft>
           <S.LinkWrapper>
-            <S.FooterLink to={ROUTES_PATH.HELP}>FAQs</S.FooterLink>
+            <S.FooterLinkExt
+              href="https://docs.boba.network/faq"
+              component="a"
+              target="_blank"
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              FAQs
+            </S.FooterLinkExt>
             <S.FooterLink
               to={ROUTES_PATH.DEV_TOOLS}
               sx={{ whiteSpace: 'nowrap' }}
