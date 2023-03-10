@@ -672,6 +672,8 @@ class NetworkService {
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
+      this.walletService.bindProviderListeners()
+
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
@@ -680,11 +682,9 @@ class NetworkService {
       } else if(!!NETWORK[ network ] && networkMM.chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
-        this.walletService.bindProviderListeners()
         return 'wrongnetwork'
       }
 
-      this.walletService.bindProviderListeners()
       // this should not do anything unless we changed chains
       if (this.L1orL2 === 'L2') {
         await this.getBobaFeeChoice()
@@ -700,6 +700,9 @@ class NetworkService {
 
 
   async switchChain(targetLayer) {
+    // ignore request if we are already on the target layer
+    if (!targetLayer) { return false }
+
     const networkDetail = getNetworkDetail({
       network: this.networkGateway,
       networkType: this.networkType
@@ -719,7 +722,7 @@ class NetworkService {
       blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorerUrl?.slice(0, -1)]
     }
 
-    await this.walletService.switchChain(targetIDHex, chainParam)
+    return await this.walletService.switchChain(targetIDHex, chainParam)
   }
 
   async getSevens() {
@@ -4016,9 +4019,13 @@ class NetworkService {
   /*****                L2 Fee              *****/
   /***********************************************/
   async estimateL2Fee(payload=this.payloadForL1SecurityFee) {
-    const l2GasPrice = await this.L2Provider.getGasPrice()
-    const l2GasEstimate = await this.L2Provider.estimateGas(payload)
-    return l2GasPrice.mul(l2GasEstimate).toNumber()
+    try {
+      const l2GasPrice = await this.L2Provider.getGasPrice()
+      const l2GasEstimate = await this.L2Provider.estimateGas(payload)
+      return l2GasPrice.mul(l2GasEstimate).toNumber()
+    } catch {
+      return 0
+    }
   }
 
   /***********************************************/

@@ -17,6 +17,7 @@ limitations under the License. */
 import { providers } from "ethers"
 import WalletConnectProvider from "@walletconnect/web3-provider"
 import { rpcUrls } from 'util/network/network.util'
+import store from 'store'
 
 class WalletService {
   constructor() {
@@ -41,11 +42,10 @@ class WalletService {
   async disconnectMetaMask() {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts", params: [{ eth_accounts: {} }] })
-      this.provider = null
-      this.account = null
-      this.walletType = null
+      return true
     } catch (e) {
       console.log(`Error disconnecting wallet: ${e}`)
+      return false
     }
   }
 
@@ -53,95 +53,105 @@ class WalletService {
     window.ethereum.on('accountsChanged', () => {
       window.location.reload()
     })
-    window.ethereum.on('chainChanged', () => {
-      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
-      // changed chains AND conncted at the same time
-      // otherwise the user gets confused about why they are going through
-      // two window reloads
-      if(chainChangedInit) {
-        localStorage.setItem('chainChangedInit', false)
-      } else {
-        localStorage.setItem('chainChangedFromMM', true)
-        window.location.reload()
-      }
+
+    window.ethereum.on('chainChanged', (chainId) => {
+      console.log(`MetaMask chain changed to ${chainId}`)
+      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
     })
   }
 
   async connectWalletConnect() {
-    console.log(rpcUrls)
     this.walletConnectProvider = new WalletConnectProvider({
       rpc: rpcUrls
     })
-    await this.walletConnectProvider.enable();
+    await this.walletConnectProvider.enable()
     this.provider = new providers.Web3Provider(this.walletConnectProvider)
     this.account = await this.provider.getSigner().getAddress()
     this.walletType = 'walletconnect'
   }
 
+  async disconnectWalletConnect() {
+    try {
+      await this.walletConnectProvider.disconnect()
+      return true
+    } catch (e) {
+      console.log(`Error disconnecting wallet: ${e}`)
+      return false
+    }
+  }
+
   async listenWalletConnect() {
     this.walletConnectProvider.on("accountsChanged", (accounts) => {
-      window.location.reload()
-    });
-
-    this.walletConnectProvider.on("chainChanged", (chainId) => {
-      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
-      // changed chains AND conncted at the same time
-      // otherwise the user gets confused about why they are going through
-      // two window reloads
-      if(chainChangedInit) {
-        localStorage.setItem('chainChangedInit', false)
-      } else {
-        localStorage.setItem('chainChangedFromMM', true)
+      if (this.account !== accounts[0]) {
         window.location.reload()
       }
     });
 
-    this.walletConnectProvider.on("disconnect", (code, reason) => {
-      console.log("WalletConnect disconnect: ", code, reason)
-      window.location.reload()
+    this.walletConnectProvider.on("chainChanged", (chainId) => {
+      console.log(`walletconnect chain changed to: ${chainId}`)
+      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
     });
   }
 
   async switchChain(chainId, chainInfo) {
     const provider = this.walletType === 'metamask' ? window.ethereum : this.walletConnectProvider
     try {
-      if (this.walletType === 'walletconnect') {
+      await provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId }],
+      })
+      const chainIdChanged = await provider.request({ method: 'eth_chainId' })
+      // walletconnect does not return error code 4902 if the chain is not exist
+      // so we need to add the code of adding chain.
+      if (this.walletType === 'walletconnect' && chainIdChanged !== chainId) {
         await provider.request({
           method: "wallet_addEthereumChain",
           params: [chainInfo, this.account],
         })
       }
-      // walletconnect does not return error code 4902 if the chain is not exist
-      // so we need to add the code of adding chain.
-      await provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId }],
-      })
+      await this.connectWallet(this.walletType)
+      return true
     } catch (error) {
-      await provider.request({
-        method: "wallet_addEthereumChain",
-        params: [chainInfo, this.account],
-      })
       if (error.code === 4902) {
         try {
           await provider.request({
             method: "wallet_addEthereumChain",
             params: [chainInfo, this.account],
           })
-          provider.on('chainChanged', this.handleChangeChainOnce)
+          await this.connectWallet(this.walletType)
+          return true
         } catch (addError) {
           console.log(`Error adding chain: ${addError}`)
-          throw new Error(addError.code)
+          return false
         }
       } else {
-        console.log(`Error switching chain: ${JSON.stringify(error)}`)
-        throw new Error(error.code)
+        console.log(`Error switching chain: ${error?.message}`)
+        return false
       }
     }
   }
-  
+
+  async connectWallet(type) {
+    if (type === 'metamask') {
+      await this.connectMetaMask()
+    }
+    if (type === 'walletconnect') {
+      await this.connectWalletConnect()
+    }
+  }
+
+  async disconnectWallet() {
+    let result = false
+    if (this.walletType === 'metamask') {
+      result = await this.disconnectMetaMask()
+    }
+    if (this.walletType === 'walletconnect') {
+      result = await this.disconnectWalletConnect()
+    }
+    this.resetValues()
+    return result
+  }
+
   bindProviderListeners() {
     if (this.walletType === 'metamask') {
       this.listenMetaMask()
@@ -151,13 +161,12 @@ class WalletService {
     }
   }
 
-  handleChangeChainOnce(chainID_hex_string) {
-
-    localStorage.setItem('chainChangedInit', true)
-
-    localStorage.setItem('newChain', Number(chainID_hex_string))
-    // and remove the listner
-    window.ethereum.removeListener('chainChanged', this.handleChangeChainOnce)
+  resetValues() {
+    this.walletConnectProvider = null
+    this.provider = null
+    this.account = null
+    this.walletType = null
+    store.dispatch({ type: 'SETUP/CHAINIDCHANGED/RESET' })
   }
 }
 

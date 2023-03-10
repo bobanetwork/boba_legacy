@@ -92,3 +92,9 @@ export function selectWalletConnected () {
     return state.setup['walletConnected']
   }
 }
+
+export function selectChainIdChanged () {
+  return function (state) {
+    return state.setup['chainIdChanged']
+  }
+}
