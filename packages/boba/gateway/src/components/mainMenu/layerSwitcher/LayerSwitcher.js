@@ -23,8 +23,6 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/styles'
 import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
-import BobaIcon from 'components/icons/BobaIcon.js'
-import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -209,7 +207,10 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
             type="primary"
             variant="contained"
             size="small"
-            onClick={() => dispatch(setConnect(true))}
+            onClick={(e) => {
+              dispatch(setConnect(true))
+              e.stopPropagation()
+            }}
           >
             Connect
           </Button>
@@ -218,7 +219,10 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
             type="primary"
             variant="contained"
             size="small"
-            onClick={onConnect}
+              onClick={(e) => {
+                onConnect()
+                e.stopPropagation()
+              }}
           >
             Switch
           </Button>
@@ -246,17 +250,17 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
     return (
       <S.LayerSwitcherWrapperMobile>
         <MobileLayer
-          title="Ethereum"
+          title={networkName['l1']}
           layer={layer}
-          icon={<EthereumIcon />}
+          icon={<L1Icon />}
           onConnect={() => doConnectToLayer(LAYER.L1)}
           isConnected={layer === LAYER.L1}
         />
         <S.LayerDivider />
         <MobileLayer
-          title="Boba Network"
+          title={networkName['l2']}
           layer={layer}
-          icon={<BobaIcon />}
+          icon={<L2Icon />}
           onConnect={() => doConnectToLayer(LAYER.L1)}
           isConnected={layer === LAYER.L2}
         />
@@ -269,7 +273,10 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
       <ToggleButtonGroup
         value={layer}
         exclusive
-        onChange={(e, n) => doConnectToLayer(n)}
+        onChange={(e, n) => {
+          doConnectToLayer(n)
+          e.stopPropagation();
+        }}
         aria-label="text alignment"
       >
         <ToggleButton
