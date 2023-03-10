@@ -13,7 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-const initialState = {}
+const initialState = {
+  CDMType: '',
+  CDMMessage: '',
+  CDMTransaction: '',
+}
 
 function transactionReducer (state = initialState, action) {
   switch (action.type) {
@@ -53,6 +57,18 @@ function transactionReducer (state = initialState, action) {
     case 'MONSTER/CREATE/SUCCESS':
       return {
         ...state
+      }
+    case 'CDM/COMPLETE/SET':
+      return {
+        ...state,
+        ...action.payload
+      }
+    case 'CDM/COMPLETE/RESET':
+      return {
+        ...state,
+        CDMType: '',
+        CDMMessage: '',
+        CDMTransaction: ''
       }
     default:
       return state;
