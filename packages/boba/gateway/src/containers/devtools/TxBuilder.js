@@ -23,7 +23,7 @@ const TxBuilder = () => {
   const TxBuilderResult = useSelector(selectTxBuilder, shallowEqual)
   const networkLayer = useSelector(selectLayer())
 
-  const blockExplorerUrl = networkService.networkConfig.L2.blockExplorer
+  const blockExplorerUrl = networkService?.networkConfig?.L2?.blockExplorer
   const [ contractAddress, setContractAddress ] = useState('')
   const [ contractABI, setContractABI ] = useState('')
   const [ contractMethos, setContractMethods ] = useState([])
