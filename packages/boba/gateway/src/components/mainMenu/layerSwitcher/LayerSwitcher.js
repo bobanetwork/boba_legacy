@@ -126,6 +126,11 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
         if (networkService.walletService.provider) {
           const response = await networkService.switchChain(layer)
           if (response) {
+            if (layer === 'L1') {
+              dispatch(setConnectBOBA(false))
+            } else {
+              dispatch(setConnectETH(false))
+            }
             dispatchBootAccount()
           } else {
             dispatch(setConnectETH(false))
