@@ -105,7 +105,7 @@ function setupReducer(state = initialState, action) {
     case 'SETUP/CHAINIDCHANGED/SET':
       return {
         ...state,
-        chainIdChanged: true
+        chainIdChanged: action.payload
       }
     case 'SETUP/CHAINIDCHANGED/RESET':
       return {

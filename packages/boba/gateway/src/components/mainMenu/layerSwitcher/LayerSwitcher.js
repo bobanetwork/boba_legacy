@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
+import { setConnect, setWalletConnected, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
@@ -57,7 +57,7 @@ import { fetchTransactions, fetchBalances } from 'actions/networkAction'
 import { closeModal, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
-import { LAYER } from 'util/constant.js'
+import { LAYER, DISABLE_WALLETCONNECT } from 'util/constant.js'
 
 function LayerSwitcher({ visisble = true, isButton = false }) {
   const dispatch = useDispatch()
@@ -94,6 +94,7 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
       const initialized = await networkService.initializeAccount({
         networkGateway: network,
         networkType,
+        chainIdChanged,
       })
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'));
@@ -121,11 +122,15 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
   }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged])
 
   const doConnectToLayer = useCallback((layer) => {
+    function resetConnectChain() {
+      dispatch(setConnect(false))
+      dispatch(setConnectETH(false))
+    }
+
     async function doConnect() {
       try {
         if (networkService.walletService.provider) {
-          const response = await networkService.switchChain(layer)
-          if (response) {
+          if (await networkService.switchChain(layer)) {
             if (layer === 'L1') {
               dispatch(setConnectBOBA(false))
             } else {
@@ -133,16 +138,24 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
             }
             dispatchBootAccount()
           } else {
-            dispatch(setConnectETH(false))
-            dispatch(setConnectBOBA(false))
+            resetConnectChain()
           }
         } else {
-          dispatch(openModal('walletSelectorModal'))
+          // bypass walletSelectorModal
+          if (DISABLE_WALLETCONNECT) {
+            if (await networkService.walletService.connectWallet('metamask')) {
+              dispatch(setWalletConnected(true))
+            } else {
+              resetConnectChain()
+            }
+          } else {
+            resetConnectChain()
+            dispatch(openModal('walletSelectorModal'))
+          }
         }
       } catch (err) {
         console.log('ERROR', err)
-        dispatch(setConnectETH(false))
-        dispatch(setConnectBOBA(false))
+        resetConnectChain()
       }
     }
     doConnect();
@@ -177,9 +190,14 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
 
   useEffect(() => {
     if (connectRequest && !networkService.walletService.provider) {
-      dispatch(openModal('walletSelectorModal'))
+      // bypass walletSelectorModal
+      if (DISABLE_WALLETCONNECT) {
+        dispatchBootAccount()
+      } else {
+        dispatch(openModal('walletSelectorModal'))
+      }
     }
-  }, [dispatch, connectRequest])
+  }, [dispatch, connectRequest, dispatchBootAccount])
 
   if (!visisble) {
     return null

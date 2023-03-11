@@ -149,10 +149,6 @@ class NetworkService {
 
     this.tokenAddresses = null
 
-    // chain ID
-    this.chainID = null
-    this.networkName = null
-
     // gas
     this.L1GasLimit = 9999999
     // setting of this value not important since it's not connected to anything in the contracts
@@ -645,7 +641,7 @@ class NetworkService {
     }
   }
 
-  async initializeAccount({ networkGateway: network, networkType }) {
+  async initializeAccount({ networkGateway: network, networkType, chainIdChanged }) {
 
     try {
 
@@ -653,13 +649,16 @@ class NetworkService {
         return 'nometamask'
       }
 
+      this.walletService.bindProviderListeners()
+
       // connect to the wallet
       this.provider = this.walletService.provider
       this.account = await this.provider.getSigner().getAddress()
 
-      const networkMM = await this.provider.getNetwork()
-      this.chainID = networkMM.chainId
-      this.networkName = networkMM.name
+      let chainId = chainIdChanged
+      if (!chainId) {
+        chainId = await this.provider.getNetwork().then(network => network.chainId)
+      }
       this.networkGateway = network
       this.networkType = networkType
 
@@ -668,18 +667,15 @@ class NetworkService {
         network,
         networkType
       })
-
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
-
-      this.walletService.bindProviderListeners()
 
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
-      if (!!NETWORK[ network ] && networkMM.chainId === L2ChainId) {
+      if (!!NETWORK[ network ] && chainId === L2ChainId) {
         this.L1orL2 = 'L2';
-      } else if(!!NETWORK[ network ] && networkMM.chainId === L1ChainId) {
+      } else if(!!NETWORK[ network ] && chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
         return 'wrongnetwork'

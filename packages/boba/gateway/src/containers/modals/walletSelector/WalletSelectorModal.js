@@ -20,14 +20,21 @@ function WalletSelectorModal ({ open }) {
   const dispatch = useDispatch()
 
   const connectToWallet = async (type) => {
-    try {
-      await networkService.walletService.connectWallet(type)
-      dispatch(closeModal('walletSelectorModal'))
-      dispatch(setWalletConnected(true))
-    } catch (error) {
-      console.log(`Error connecting wallet: ${error}`)
+    function resetConnectChain() {
       dispatch(setConnectETH(false))
       dispatch(setConnectBOBA(false))
+    }
+
+    try {
+      if (await networkService.walletService.connectWallet(type)) {
+        dispatch(closeModal('walletSelectorModal'))
+        dispatch(setWalletConnected(true))
+      } else {
+        resetConnectChain()
+      }
+    } catch (error) {
+      console.log(`Error connecting wallet: ${error}`)
+      resetConnectChain()
     }
   }
 

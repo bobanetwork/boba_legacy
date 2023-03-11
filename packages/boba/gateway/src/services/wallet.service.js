@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { providers } from "ethers"
+import { providers, utils } from "ethers"
 import WalletConnectProvider from "@walletconnect/web3-provider"
 import { rpcUrls } from 'util/network/network.util'
 import store from 'store'
@@ -31,11 +31,13 @@ class WalletService {
   async connectMetaMask() {
     try {
       await window.ethereum.request({ method: 'eth_requestAccounts' })
-      this.provider = new providers.Web3Provider(window.ethereum)
+      this.provider = new providers.Web3Provider(window.ethereum, 'any')
       this.account = await this.provider.getSigner().getAddress()
       this.walletType = 'metamask'
+      return true
     } catch (e) {
       console.log(`Error connecting wallet: ${e}`)
+      return false
     }
   }
 
@@ -55,19 +57,25 @@ class WalletService {
     })
 
     window.ethereum.on('chainChanged', (chainId) => {
-      console.log(`MetaMask chain changed to ${chainId}`)
-      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
+      console.log(`MetaMask chain changed to ${Number(chainId)}`)
+      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
     })
   }
 
   async connectWalletConnect() {
-    this.walletConnectProvider = new WalletConnectProvider({
-      rpc: rpcUrls
-    })
-    await this.walletConnectProvider.enable()
-    this.provider = new providers.Web3Provider(this.walletConnectProvider)
-    this.account = await this.provider.getSigner().getAddress()
-    this.walletType = 'walletconnect'
+    try {
+      this.walletConnectProvider = new WalletConnectProvider({
+        rpc: rpcUrls
+      })
+      await this.walletConnectProvider.enable()
+      this.provider = new providers.Web3Provider(this.walletConnectProvider, 'any')
+      this.account = await this.provider.getSigner().getAddress()
+      this.walletType = 'walletconnect'
+      return true
+    } catch (e) {
+      console.log(`Error connecting WalletConnect: ${e}`)
+      return false
+    }
   }
 
   async disconnectWalletConnect() {
@@ -75,21 +83,21 @@ class WalletService {
       await this.walletConnectProvider.disconnect()
       return true
     } catch (e) {
-      console.log(`Error disconnecting wallet: ${e}`)
+      console.log(`Error disconnecting WalletConnect: ${e}`)
       return false
     }
   }
 
   async listenWalletConnect() {
     this.walletConnectProvider.on("accountsChanged", (accounts) => {
-      if (this.account !== accounts[0]) {
+      if (utils.getAddress(this.account) !== utils.getAddress(accounts[0])) {
         window.location.reload()
       }
     });
 
     this.walletConnectProvider.on("chainChanged", (chainId) => {
-      console.log(`walletconnect chain changed to: ${chainId}`)
-      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
+      console.log(`WalletConnect chain changed to: ${chainId}`)
+      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: chainId })
     });
   }
 
@@ -100,25 +108,21 @@ class WalletService {
         method: "wallet_switchEthereumChain",
         params: [{ chainId }],
       })
-      const chainIdChanged = await provider.request({ method: 'eth_chainId' })
-      // walletconnect does not return error code 4902 if the chain is not exist
-      // so we need to add the code of adding chain.
-      if (this.walletType === 'walletconnect' && chainIdChanged !== chainId) {
-        await provider.request({
-          method: "wallet_addEthereumChain",
-          params: [chainInfo, this.account],
-        })
-      }
-      await this.connectWallet(this.walletType)
       return true
     } catch (error) {
-      if (error.code === 4902) {
+      if (error.code === 4902 || this.walletType === 'walletconnect') {
         try {
           await provider.request({
             method: "wallet_addEthereumChain",
             params: [chainInfo, this.account],
           })
-          await this.connectWallet(this.walletType)
+          // After adding the chain, we need to call switchEthereumChain again to finish the process for WalletConnect
+          if (this.walletType === 'walletconnect') {
+            await provider.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId }],
+            })
+          }
           return true
         } catch (addError) {
           console.log(`Error adding chain: ${addError}`)
@@ -133,10 +137,10 @@ class WalletService {
 
   async connectWallet(type) {
     if (type === 'metamask') {
-      await this.connectMetaMask()
+      return await this.connectMetaMask()
     }
     if (type === 'walletconnect') {
-      await this.connectWalletConnect()
+      return await this.connectWalletConnect()
     }
   }
 
