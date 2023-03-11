@@ -17,7 +17,7 @@
     "gas-calc": "./scripts/gascalc",
     "mocha-gascalc": "TS_NODE_TRANSPILE_ONLY=1 npx ts-mocha --bail gascalc/*",
     "test": "yarn run ci",
-    "coverage": "COVERAGE=1 hardhat coverage",
+    "test:coverage": "COVERAGE=1 hardhat coverage",
     "deploy": "ts-node \"./bin/deploy.ts\"",
     "test-dev": "hardhat test --network dev",
     "ci": "yarn compile && hardhat test && yarn run runop",

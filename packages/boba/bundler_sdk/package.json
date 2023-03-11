@@ -13,6 +13,7 @@
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
     "test": "hardhat test",
+    "test:coverage": "COVERAGE=1 hardhat coverage",
     "hardhat-test": "hardhat test",
     "tsc": "tsc",
     "watch-tsc": "tsc -w --preserveWatchOutput"
