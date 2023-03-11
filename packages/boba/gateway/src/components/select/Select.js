@@ -17,6 +17,11 @@ import React from 'react';
 import {Select as MuiSelect, MenuItem, useTheme, Typography, Box} from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
+import {
+  Option,
+  MultiValue,
+  SingleValue
+} from './Custom.select';
 
 function Select({
                   label,
