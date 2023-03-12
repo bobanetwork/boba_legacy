@@ -104,7 +104,6 @@ services:
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       # DO NOT use in production
@@ -123,6 +122,39 @@ services:
     deploy:
       replicas: 0
 
+  bundler:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - boba_deployer
+      - aa_deployer
+    image: bobanetwork/bundler:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: bundler
+    deploy:
+      replicas: 1
+    ports: [ '3000:3000' ]
+    restart: on-failure
+    environment:
+      MIN_BALANCE: 0
+      URL: http://dtl:8081/addresses.json
+      AA_DEPLOYER: http://dtl:8081/aa-addr.json
+      MNEMONIC_OR_PK: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ENTRYPOINT: "0x"
+      BENEFICIARY: "0xcd3b766ccdd6ae721141f452c550ca635964ce71"
+      HELPER: "0x"
+    mem_limit: 300M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "10"
+        
 networks:
   default:
     name: local-network

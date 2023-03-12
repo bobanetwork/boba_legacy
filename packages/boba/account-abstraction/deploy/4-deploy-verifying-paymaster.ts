@@ -3,7 +3,7 @@ import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
 import BobaVerifyingPaymasterJson from '../artifacts/contracts/samples/BobaVerifyingPaymaster.sol/BobaVerifyingPaymaster.json'
-import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
+import { DeterministicDeployer } from '../src/DeterministicDeployer'
 
 let Factory__BobaVerifyingPaymaster: ContractFactory
 
@@ -34,6 +34,7 @@ const deployFn: DeployFunction = async (hre) => {
       [Factory__BobaVerifyingPaymaster.bytecode, bobaVerifyingPaymasterConstructorArgs]
     )
     const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
+
     const BobaVerifyingPaymasterAddress = await dep.deterministicDeploy(bobaVerifyingPaymasterCreationCode)
     console.log('Boba Verifying Paymaster at', BobaVerifyingPaymasterAddress)
 

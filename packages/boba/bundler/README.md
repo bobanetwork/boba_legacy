@@ -9,7 +9,7 @@ A basic eip4337 "bundler"
   - eth_supportedEntryPoints to report the bundler's supported entry points
   - eth_chainId
 
-### Usage: 
+### Usage:
 1. run `yarn && yarn preprocess`
 2. start hardhat-node with `yarn hardhat-node` (or local `geth`)
 
@@ -33,7 +33,7 @@ To run a simple test, do `yarn run runop --deployDeployer --network localhost`
 
 NOTE: if running on a testnet, you need to supply the bundler (and runop) the network and mnemonic file, e.g.
 
-`yarn run bundler --network localhost --mnemonic file.txt` 
+`yarn run bundler --network localhost --mnemonic file.txt`
 
 ## sdk
 
@@ -43,3 +43,9 @@ see [SDK Readme](./packages/sdk/README.md)
 ## utils
 
 internal utility methods/test contracts, used by other packages.
+
+## Linting
+Package.json
+"lint": "yarn lint:fix && yarn lint:check",
+"lint:check": "eslint . --max-warnings=0",
+"lint:fix": "yarn lint:check --fix"
