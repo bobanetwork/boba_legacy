@@ -11,6 +11,7 @@
     "start": "ts-node ./src/exec/run.ts",
     "build": "tsc -p ./tsconfig.json",
     "test": "hardhat test --show-stack-traces",
+    "test:coverage": "hardhat test --show-stack-traces",
     "clean": "rimraf  dist/ ./tsconfig.tsbuildinfo",
     "lint": "yarn lint:fix && yarn lint:check",
     "pre-commit": "lint-staged",
