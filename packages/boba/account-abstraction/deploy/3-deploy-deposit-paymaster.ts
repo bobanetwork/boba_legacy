@@ -3,7 +3,7 @@ import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
 import BobaDepositPaymasterJson from '../artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
-import { DeterministicDeployer } from '@account-abstraction/sdk/src/DeterministicDeployer'
+import { DeterministicDeployer } from '../src/DeterministicDeployer'
 
 let Factory__BobaDepositPaymaster: ContractFactory
 
@@ -27,7 +27,6 @@ const deployFn: DeployFunction = async (hre) => {
       ["bytes", "bytes"],
       [Factory__BobaDepositPaymaster.bytecode, bobaDepositPaymasterConstructorArgs]
     )
-
     const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
     const BobaDepositPaymasterAddress = await dep.deterministicDeploy(bobaDepositPaymasterCreationCode)
     console.log('Boba Deposit Paymaster at', BobaDepositPaymasterAddress)
