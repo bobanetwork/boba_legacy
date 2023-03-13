@@ -1,12 +1,14 @@
 /* Imports: External */
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, utils } from 'ethers'
+import { Contract, utils } from 'ethers'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+  getBobaContractAt,
+} from '../src/hardhat-deploy-ethers'
 
-import FluxAggregatorJson from '../artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
-
-let Factory__FluxAggregator: ContractFactory
 let FluxAggregator: Contract
 
 const address = (id: number) => {
@@ -29,19 +31,19 @@ const deployFn: DeployFunction = async (hre) => {
     },
     {
       name: 'BOBA',
-      address: (await hre.deployments.getOrNull('TK_L2BOBA')).address,
+      address: (await hre.deployments.getOrNull('TK_L2BOBA'))?.address,
       minSubmissionValue: 1,
       maxSubmissionValue: utils.parseUnits('500', 8),
     },
     {
       name: 'OMG',
-      address: (await hre.deployments.getOrNull('TK_L2OMG')).address,
+      address: (await hre.deployments.getOrNull('TK_L2OMG'))?.address,
       minSubmissionValue: 1,
       maxSubmissionValue: utils.parseUnits('500', 8),
     },
     {
       name: 'WBTC',
-      address: (await hre.deployments.getOrNull('TK_L2WBTC')).address,
+      address: (await hre.deployments.getOrNull('TK_L2WBTC'))?.address,
       minSubmissionValue: utils.parseUnits('100', 8),
       maxSubmissionValue: utils.parseUnits('500000', 8),
     },
@@ -49,44 +51,42 @@ const deployFn: DeployFunction = async (hre) => {
 
   const quotes = [{ name: 'USD', address: address(840) }]
 
-  Factory__FluxAggregator = new ContractFactory(
-    FluxAggregatorJson.abi,
-    FluxAggregatorJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
-
   const BobaL2 = await hre.deployments.getOrNull('TK_L2BOBA')
 
   const FeedRegistryDeployed = await (hre as any).deployments.get(
     'FeedRegistry'
   )
 
-  const FeedRegistry = new Contract(
+  const FeedRegistry = await getBobaContractAt(
+    'FeedRegistry',
     FeedRegistryDeployed.address,
-    FeedRegistryDeployed.abi,
     (hre as any).deployConfig.deployer_l2
   )
 
   // deploy FluxAggregator for each pair and register on FeedRegistry
   for (const token of tokens) {
+    // Only deploy oracle of BOBA on Alt L1
+    if ((hre as any).deployConfig.isLocalAltL1 && token.name !== 'BOBA') {
+      continue
+    }
     for (const quote of quotes) {
-      FluxAggregator = await Factory__FluxAggregator.deploy(
-        BobaL2.address, // boba L2 token
-        0, // starting payment amount
-        180, // timeout, 3 mins
-        '0x0000000000000000000000000000000000000000', // validator
-        token.minSubmissionValue, // min submission value
-        token.maxSubmissionValue, // max submission value
-        8, // decimals
-        `${token.name} ${quote.name}` // description
+      FluxAggregator = await deployBobaContract(
+        hre,
+        'FluxAggregator',
+        [
+          BobaL2.address, // boba L2 token
+          0, // starting payment amount
+          180, // timeout, 3 mins
+          '0x0000000000000000000000000000000000000000', // validator
+          token.minSubmissionValue, // min submission value
+          token.maxSubmissionValue, // max submission value
+          8, // decimals
+          `${token.name} ${quote.name}`, // description
+        ],
+        (hre as any).deployConfig.deployer_l2
       )
-      await FluxAggregator.deployTransaction.wait()
-      const FluxAggregatorDeploymentSubmission: DeploymentSubmission = {
-        ...FluxAggregator,
-        receipt: FluxAggregator.receipt,
-        address: FluxAggregator.address,
-        abi: FluxAggregatorJson.abi,
-      }
+      const FluxAggregatorDeploymentSubmission =
+        getDeploymentSubmission(FluxAggregator)
       await hre.deployments.save(
         token.name + quote.name + '_Aggregator',
         FluxAggregatorDeploymentSubmission

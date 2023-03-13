@@ -1,16 +1,14 @@
 /* Imports: External */
+import { Contract } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, utils, BigNumber, ethers } from 'ethers'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+} from '../src/hardhat-deploy-ethers'
 
-import BobaFixedSavingsJson from '../artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
-import Lib_ResolvedDelegateProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
-
-let Factory__BobaFixedSavings: ContractFactory
 let BobaFixedSavings: Contract
-
-let Factory__Proxy__BobaFixedSavings: ContractFactory
 let Proxy__BobaFixedSavings: Contract
 
 const deployFn: DeployFunction = async (hre) => {
@@ -18,22 +16,15 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__BobaFixedSavings = new ContractFactory(
-    BobaFixedSavingsJson.abi,
-    BobaFixedSavingsJson.bytecode,
+  BobaFixedSavings = await deployBobaContract(
+    hre,
+    'BobaFixedSavings',
+    [],
     (hre as any).deployConfig.deployer_l2
   )
-  BobaFixedSavings = await Factory__BobaFixedSavings.deploy()
-  await BobaFixedSavings.deployTransaction.wait()
   console.log(`BobaFixedSavings deployed to: ${BobaFixedSavings.address}`)
 
-  const BobaFixedSavingsSubmission: DeploymentSubmission = {
-    ...BobaFixedSavings,
-    receipt: BobaFixedSavings.receipt,
-    address: BobaFixedSavings.address,
-    abi: BobaFixedSavings.abi,
-  }
-
+  const BobaFixedSavingsSubmission = getDeploymentSubmission(BobaFixedSavings)
   await hre.deployments.save('BobaFixedSavings', BobaFixedSavingsSubmission)
   await registerBobaAddress(
     addressManager,
@@ -41,27 +32,19 @@ const deployFn: DeployFunction = async (hre) => {
     BobaFixedSavings.address
   )
 
-  Factory__Proxy__BobaFixedSavings = new ethers.ContractFactory(
-    Lib_ResolvedDelegateProxyJson.abi,
-    Lib_ResolvedDelegateProxyJson.bytecode,
+  Proxy__BobaFixedSavings = await deployBobaContract(
+    hre,
+    'Lib_ResolvedDelegateProxy',
+    [BobaFixedSavings.address],
     (hre as any).deployConfig.deployer_l2
   )
-
-  Proxy__BobaFixedSavings = await Factory__Proxy__BobaFixedSavings.deploy(
-    BobaFixedSavings.address
-  )
-  await Proxy__BobaFixedSavings.deployTransaction.wait()
   console.log(
     `Proxy__BobaFixedSavings deployed to: ${Proxy__BobaFixedSavings.address}`
   )
 
-  const Proxy__BobaFixedSavingsSubmission: DeploymentSubmission = {
-    ...Proxy__BobaFixedSavings,
-    receipt: Proxy__BobaFixedSavings.receipt,
-    address: Proxy__BobaFixedSavings.address,
-    abi: Proxy__BobaFixedSavings.abi,
-  }
-
+  const Proxy__BobaFixedSavingsSubmission = getDeploymentSubmission(
+    Proxy__BobaFixedSavings
+  )
   await hre.deployments.save(
     'Proxy__BobaFixedSavings',
     Proxy__BobaFixedSavingsSubmission

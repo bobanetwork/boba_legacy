@@ -1,11 +1,13 @@
 /* Imports: External */
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, utils } from 'ethers'
+import { Contract } from 'ethers'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+} from '../src/hardhat-deploy-ethers'
 
-import L2TokenPoolJson from '../artifacts/contracts/TokenPool.sol/TokenPool.json'
-let Factory__L2TokenPool: ContractFactory
 let L2TokenPool: Contract
 
 const deployFn: DeployFunction = async (hre) => {
@@ -13,26 +15,17 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__L2TokenPool = new ContractFactory(
-    L2TokenPoolJson.abi,
-    L2TokenPoolJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
-
   const TK_L2TEST = await hre.deployments.getOrNull('TK_L2TEST')
 
   //Deploy L2 token pool for the new token
-  L2TokenPool = await Factory__L2TokenPool.deploy()
+  L2TokenPool = await deployBobaContract(
+    hre,
+    'TokenPool',
+    [],
+    (hre as any).deployConfig.deployer_l2
+  )
 
-  await L2TokenPool.deployTransaction.wait()
-
-  const L2TokenPoolDeploymentSubmission: DeploymentSubmission = {
-    ...L2TokenPool,
-    receipt: L2TokenPool.receipt,
-    address: L2TokenPool.address,
-    abi: L2TokenPoolJson.abi,
-  }
-
+  const L2TokenPoolDeploymentSubmission = getDeploymentSubmission(L2TokenPool)
   await hre.deployments.save('L2TokenPool', L2TokenPoolDeploymentSubmission)
   await registerBobaAddress(addressManager, 'L2TokenPool', L2TokenPool.address)
   console.log(`L2 TokenPool deployed to: ${L2TokenPool.address}`)

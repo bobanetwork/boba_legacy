@@ -35,26 +35,32 @@ if [[ $BUILD == 1 ]]; then
   yarn build
 fi
 
+if [[ $DOCKER_FILE == "" ]] ; then
+  DOCKER_FILE="docker-compose.yml"
+  echo "Using default docker-compose file: $DOCKER_FILE"
+else
+  echo "Using docker-compose file: $DOCKER_FILE"
+fi
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
-DOCKERFILE="docker-compose.yml"
 
 if [[ $BUILD == 1 ]]; then
-  docker-compose build --parallel -- l2geth l1_chain
-  docker-compose build --parallel -- deployer dtl batch_submitter relayer integration_tests
-  docker-compose build --parallel -- boba_message-relayer-fast gas_oracle boba_deployer
-  docker-compose build --parallel -- fraud-detector monitor
-  docker-compose build --parallel -- verifier replica
+  docker-compose -f $DOCKER_FILE build --parallel -- l2geth l1_chain
+  docker-compose -f $DOCKER_FILE build --parallel -- deployer dtl batch_submitter relayer integration_tests
+  docker-compose -f $DOCKER_FILE build --parallel -- boba_message-relayer-fast gas_oracle boba_deployer
+  docker-compose -f $DOCKER_FILE build --parallel -- fraud-detector monitor
+  docker-compose -f $DOCKER_FILE build --parallel -- verifier replica
 elif [[ $BUILD == 0 ]]; then
-  docker-compose -f "$DIR/$DOCKERFILE" pull
+  docker-compose -f "$DIR/$DOCKER_FILE" pull
   echo 1
 fi
 
 if [[ $DAEMON == 1 ]]; then
   docker-compose \
-    -f "$DIR/$DOCKERFILE" \
+    -f "$DIR/$DOCKER_FILE" \
     up --no-build --detach -V
 else
   docker-compose \
-    -f "$DIR/$DOCKERFILE" \
+    -f "$DIR/$DOCKER_FILE" \
     up --no-build -V
 fi

@@ -1,0 +1,21 @@
+{
+  "network": "mbase",
+  "contracts": {
+    "L1CrossDomainMessenger": {
+      "address": "0x76DB375075F1d5Dcd1D70Fc07F69a5c7b40ab877",
+      "startBlock": 2798105
+    },
+    "L1CrossDomainMessengerFast": {
+      "address": "0xAE8885D3b7937af9480cd7301925a88Dfb0cE9f6",
+      "startBlock": 2798105
+    },
+    "StateCommitmentChain": {
+      "address": "0x5E41Eaac5319CDf336c51969E2F164A686138B28",
+      "startBlock": 2798105
+    },
+    "Lib_AddressManager": {
+      "address": "0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B",
+      "startBlock": 2103466
+    }
+  }
+}
