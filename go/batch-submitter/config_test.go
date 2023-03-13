@@ -116,6 +116,20 @@ var validateConfigTests = []struct {
 		},
 		expErr: nil,
 	},
+	{
+		name: "valid config with mnemonic, sentry and gas limit",
+		cfg: batchsubmitter.Config{
+			LogLevel:       "info",
+			SequencerKeyId: "a",
+			ProposerKeyId:  "b",
+			KmsEndpoint:    "c",
+			KmsRegion:      "d",
+			SentryEnable:   true,
+			SentryDsn:      "batch-submitter",
+			MaxGasLimit:    100000000,
+		},
+		expErr: nil,
+	},
 }
 
 // TestValidateConfig asserts the behavior of ValidateConfig by testing expected

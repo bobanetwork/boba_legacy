@@ -160,6 +160,12 @@ var (
 		Value:  0,
 		EnvVar: prefixEnvVar("MAX_L1_GAS_PRICE"),
 	}
+	MaxGasLimitFlag = cli.Uint64Flag{
+		Name:   "max-gas-limit",
+		Usage:  "Maximum gas limit that the batch submitter can accept",
+		Value:  0,
+		EnvVar: prefixEnvVar("MAX_GAS_LIMIT"),
+	}
 
 	LogLevelFlag = cli.StringFlag{
 		Name:   "log-level",
@@ -246,6 +252,7 @@ var requiredFlags = []cli.Flag{
 
 var optionalFlags = []cli.Flag{
 	MaxL1GasPriceFlag,
+	MaxGasLimitFlag,
 	LogLevelFlag,
 	LogTerminalFlag,
 	SentryEnableFlag,
