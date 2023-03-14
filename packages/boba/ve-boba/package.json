@@ -9,7 +9,8 @@
     "clean": "rm -rf ./artifacts ./cache",
     "build": "hardhat compile",
     "deploy": "hardhat run deploy/000-veBoba.ts ",
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "test:coverage": "COVERAGE=1 hardhat test"
   },
   "dependencies": {
     "@openzeppelin/contracts": "4.3.2",

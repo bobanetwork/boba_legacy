@@ -1,1 +1,0 @@
-ignores: ["solidity-string-utils", "hardhat-gas-reporter", "@nomicfoundation/hardhat-chai-matchers", "@nomicfoundation/hardhat-network-helpers","@nomiclabs/hardhat-etherscan", "@typechain/ethers-v5","@typechain/hardhat","@types/mocha","solidity-coverage","typechain"]

@@ -7,10 +7,8 @@ import path from 'path'
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
-
-/* Imports: Artifacts */
-import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
-import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
 import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
@@ -63,9 +61,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     })
 
     this.logger.info('Connecting to Teleportation contract...')
-    this.state.Teleportation = new Contract(
+    this.state.Teleportation = await getBobaContractAt(
+      'Teleportation',
       this.options.teleportationAddress,
-      TeleportationJson.abi,
       this.options.disburserWallet
     )
     this.logger.info('Connected to Teleportation', {
@@ -73,11 +71,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     })
 
     this.logger.info('Connecting to BOBAToken contract...')
-    this.state.BOBAToken = new Contract(
-      this.options.bobaTokenAddress,
-      L2StandardERC20Json.abi,
-      this.options.disburserWallet
-    )
+    this.state.BOBAToken = getContractFactory('L2StandardERC20')
+      .attach(this.options.bobaTokenAddress)
+      .connect(this.options.disburserWallet)
     this.logger.info('Connected to BOBAToken', {
       address: this.state.BOBAToken.address,
     })
@@ -106,9 +102,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         )
       } else {
         this.state.supportedChains = [...this.state.supportedChains, chain]
-        const depositTeleportation = new Contract(
+        const depositTeleportation = await getBobaContractAt(
+          'Teleportation',
           chain.teleportationAddress,
-          TeleportationJson.abi,
           chain.provider
         )
         const totalDisbursements =

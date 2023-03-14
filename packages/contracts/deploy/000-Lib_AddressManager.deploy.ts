@@ -8,6 +8,7 @@ import { predeploys } from '../src/predeploys'
 const deployFn: DeployFunction = async (hre) => {
   const { deploy } = hre.deployments
   const { deployer } = await hre.getNamedAccounts()
+  const networkConfig = (hre as any).deployConfig.networkConfig
 
   await deploy('Lib_AddressManager', {
     from: deployer,
@@ -61,7 +62,9 @@ const deployFn: DeployFunction = async (hre) => {
   await registerAddress({
     hre,
     name: 'TK_L2BOBA',
-    address: predeploys.L2GovernanceERC20,
+    address: networkConfig.isLocalAltL1
+      ? predeploys.L2_BOBA_ALT_L1
+      : predeploys.L2GovernanceERC20,
   })
 
   await registerAddress({
