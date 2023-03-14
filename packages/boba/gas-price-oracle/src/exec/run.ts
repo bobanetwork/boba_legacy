@@ -1,10 +1,9 @@
 import { Wallet, providers } from 'ethers'
 import { Bcfg } from '@eth-optimism/core-utils'
-import { predeploys } from '@eth-optimism/contracts'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
 
-import { GasPriceOracleService, GasPriceOracleAltL1Service } from '../service'
+import { GasPriceOracleService } from '../service'
 
 dotenv.config()
 
@@ -67,7 +66,7 @@ const main = async () => {
   )
   const MIN_OVERHEAD = config.uint(
     'min-overhead',
-    parseInt(env.MIN_OVERHEAD, 10) || 30000
+    parseInt(env.MIN, 10) || 30000
   )
 
   // minimum l1 base fee
@@ -91,26 +90,6 @@ const main = async () => {
   const BOBA_LOCAL_TESTNET_CHAINID = config.uint(
     'boba-local-testnet-chainid',
     parseInt(env.BOBA_LOCAL_TESTNET_CHAINID, 10) || 31338
-  )
-
-  // Data provided by CoinGecko
-  // Coin ID in CoinGecko
-  const L1_TOKEN_COINGECKO_ID = config.str(
-    'l1-token-coingecko-id',
-    env.L1_TOKEN_COINGECKO_ID
-  )
-
-  // Data provide by Coinmarketcap
-  // Coin ID in Coinmarketcap
-  const L1_TOKEN_COINMARKETCAP_ID = config.str(
-    'l1-token-coinmarketcap-id',
-    env.L1_TOKEN_COINMARKETCAP_ID
-  )
-
-  // API key for Coinmarketcap
-  const COINMARKETCAP_API_KEY = config.str(
-    'coinmarketcap-api-key',
-    env.COINMARKETCAP_API_KEY
   )
 
   if (!GAS_PRICE_ORACLE_ADDRESS) {
@@ -161,7 +140,7 @@ const main = async () => {
     ? FAST_RELAYER_ADDRESS
     : new Wallet(FAST_RELAYER_PRIVATE_KEY, l2Provider).address
 
-  const params = {
+  const service = new GasPriceOracleService({
     l1RpcProvider: l1Provider,
     l2RpcProvider: l2Provider,
     addressManagerAddress: ADDRESS_MANAGER_ADDRESS,
@@ -180,21 +159,9 @@ const main = async () => {
     maxL1BaseFee: MAX_L1_BASE_FEE,
     bobaFeeRatio100X: BOBA_FEE_RATIO_100X,
     bobaLocalTestnetChainId: BOBA_LOCAL_TESTNET_CHAINID,
-    l1TokenCoinGeckoId: L1_TOKEN_COINGECKO_ID,
-    l1TokenCoinMarketCapId: L1_TOKEN_COINMARKETCAP_ID,
-    coinMarketCapApiKey: COINMARKETCAP_API_KEY,
-    l2_L1NativeTokenAddress: predeploys.L2_L1NativeToken_ALT_L1,
-  }
+  })
 
-  const service = new GasPriceOracleService(params)
-  const serviceAltL1 = new GasPriceOracleAltL1Service(params)
-
-  const l1ChainId = (await l1Provider.getNetwork()).chainId
-  if (l1ChainId === 1 || l1ChainId === 5) {
-    await service.start()
-  } else {
-    await serviceAltL1.start()
-  }
+  await service.start()
 }
 
 if (require.main === module) {

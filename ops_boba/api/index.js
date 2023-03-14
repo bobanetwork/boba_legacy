@@ -1,8 +1,8 @@
 import {
+  rinkebySwapBOBAForETH,
   goerliSwapBOBAForETH,
   mainnetSwapBOBAForETH,
-  testnetSwapNativeTokenForBOBA,
-  mainnetSwapNativeTokenForBOBA,
+  rinkebyGetTestnetETH,
   goerliGetTestnetETH,
   mainnetGetTestnetETH,
 } from './metatransaction-api'
@@ -10,10 +10,10 @@ import {
 import { bobaLinkGetQuote } from './bobalink-api'
 
 export {
+  rinkebySwapBOBAForETH,
   goerliSwapBOBAForETH,
   mainnetSwapBOBAForETH,
-  testnetSwapNativeTokenForBOBA,
-  mainnetSwapNativeTokenForBOBA,
+  rinkebyGetTestnetETH,
   goerliGetTestnetETH,
   mainnetGetTestnetETH,
   bobaLinkGetQuote,

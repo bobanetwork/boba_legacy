@@ -1,5 +1,5 @@
 import { Wallet, providers } from 'ethers'
-import { getContractFactory, supportedLocalTestnet } from '@eth-optimism/contracts'
+import { getContractFactory } from '@eth-optimism/contracts'
 
 /* eslint-disable */
 require('dotenv').config()
@@ -25,9 +25,6 @@ const main = async () => {
     l1Provider
   )
   const fastRelayerAddress = fastRelayer.address
-
-  const l1ChainId = (await l1Provider.getNetwork()).chainId
-  const isLocalAltL1 = supportedLocalTestnet[l1ChainId]?.isLocalAltL1
 
   const getAddressManager = (provider: any, addressManagerAddress: any) => {
     return getContractFactory('Lib_AddressManager')
@@ -68,7 +65,6 @@ const main = async () => {
   )
 
   await hre.run('deploy', {
-    isLocalAltL1,
     l1MessengerAddress,
     l2MessengerAddress,
     L1StandardBridgeAddress,

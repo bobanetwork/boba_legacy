@@ -154,7 +154,5 @@ services:
       options:
         max-size: 10m
         max-file: "10"
-        
-networks:
-  default:
-    name: local-network
+
+
