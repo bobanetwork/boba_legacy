@@ -1,16 +1,15 @@
 /* Imports: External */
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, utils } from 'ethers'
+import { Contract, utils } from 'ethers'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+  getBobaContractAt,
+} from '../src/hardhat-deploy-ethers'
 
-import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
-import FluxAggregatorHCJson from '../artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
-
-let Factory__Proxy__FluxAggregatorHC: ContractFactory
 let Proxy__FluxAggregatorHC: Contract
-
-let Factory__FluxAggregatorHC: ContractFactory
 let FluxAggregatorHC: Contract
 
 const address = (id: number) => {
@@ -33,19 +32,19 @@ const deployFn: DeployFunction = async (hre) => {
     },
     {
       name: 'BOBA',
-      address: (await hre.deployments.getOrNull('TK_L2BOBA')).address,
+      address: (await hre.deployments.getOrNull('TK_L2BOBA'))?.address,
       minSubmissionValue: 1,
       maxSubmissionValue: utils.parseUnits('500', 8),
     },
     {
       name: 'OMG',
-      address: (await hre.deployments.getOrNull('TK_L2OMG')).address,
+      address: (await hre.deployments.getOrNull('TK_L2OMG'))?.address,
       minSubmissionValue: 1,
       maxSubmissionValue: utils.parseUnits('500', 8),
     },
     {
       name: 'WBTC',
-      address: (await hre.deployments.getOrNull('TK_L2WBTC')).address,
+      address: (await hre.deployments.getOrNull('TK_L2WBTC'))?.address,
       minSubmissionValue: utils.parseUnits('100', 8),
       maxSubmissionValue: utils.parseUnits('500000', 8),
     },
@@ -53,39 +52,31 @@ const deployFn: DeployFunction = async (hre) => {
 
   const quotes = [{ name: 'USD', address: address(840) }]
 
-  Factory__Proxy__FluxAggregatorHC = new ContractFactory(
-    ProxyJson.abi,
-    ProxyJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
-
-  Factory__FluxAggregatorHC = new ContractFactory(
-    FluxAggregatorHCJson.abi,
-    FluxAggregatorHCJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
-
   const FeedRegistryDeployed = await (hre as any).deployments.get(
     'FeedRegistry'
   )
 
-  const FeedRegistry = new Contract(
+  const FeedRegistry = await getBobaContractAt(
+    'FeedRegistry',
     FeedRegistryDeployed.address,
-    FeedRegistryDeployed.abi,
     (hre as any).deployConfig.deployer_l2
   )
 
   // deploy FluxAggregatorHC for each pair and register on FeedRegistry
   for (const token of tokens) {
+    // Only deploy oracle of BOBA on Alt L1
+    if ((hre as any).deployConfig.isLocalAltL1 && token.name !== 'BOBA') {
+      continue
+    }
     for (const quote of quotes) {
-      FluxAggregatorHC = await Factory__FluxAggregatorHC.deploy()
-      await FluxAggregatorHC.deployTransaction.wait()
-      const FluxAggregatorHCDeploymentSubmission: DeploymentSubmission = {
-        ...FluxAggregatorHC,
-        receipt: FluxAggregatorHC.receipt,
-        address: FluxAggregatorHC.address,
-        abi: FluxAggregatorHCJson.abi,
-      }
+      FluxAggregatorHC = await deployBobaContract(
+        hre,
+        'FluxAggregatorHC',
+        [],
+        (hre as any).deployConfig.deployer_l2
+      )
+      const FluxAggregatorHCDeploymentSubmission =
+        getDeploymentSubmission(FluxAggregatorHC)
       await hre.deployments.save(
         token.name + quote.name + '_AggregatorHC',
         FluxAggregatorHCDeploymentSubmission
@@ -105,14 +96,15 @@ const deployFn: DeployFunction = async (hre) => {
         `${token.name}${quote.name}_AggregatorHC deployed to: ${FluxAggregatorHC.address}`
       )
 
-      Proxy__FluxAggregatorHC = await Factory__Proxy__FluxAggregatorHC.deploy(
-        FluxAggregatorHC.address
+      Proxy__FluxAggregatorHC = await deployBobaContract(
+        hre,
+        'Lib_ResolvedDelegateProxy',
+        [FluxAggregatorHC.address],
+        (hre as any).deployConfig.deployer_l2
       )
-      await Proxy__FluxAggregatorHC.deployTransaction.wait()
-
-      Proxy__FluxAggregatorHC = new Contract(
+      Proxy__FluxAggregatorHC = await getBobaContractAt(
+        'FluxAggregatorHC',
         Proxy__FluxAggregatorHC.address,
-        FluxAggregatorHCJson.abi,
         (hre as any).deployConfig.deployer_l2
       )
       const initializeTx = await Proxy__FluxAggregatorHC.initialize(
@@ -128,13 +120,8 @@ const deployFn: DeployFunction = async (hre) => {
         `Initialized Proxy__${token.name}${quote.name}_AggregatorHC - ${initializeTx.hash}}`
       )
 
-      const Proxy__FluxAggregatorHCDeploymentSubmission: DeploymentSubmission =
-        {
-          ...Proxy__FluxAggregatorHC,
-          receipt: Proxy__FluxAggregatorHC.receipt,
-          address: Proxy__FluxAggregatorHC.address,
-          abi: FluxAggregatorHCJson.abi,
-        }
+      const Proxy__FluxAggregatorHCDeploymentSubmission =
+        getDeploymentSubmission(Proxy__FluxAggregatorHC)
       await hre.deployments.save(
         'Proxy__' + token.name + quote.name + '_AggregatorHC',
         Proxy__FluxAggregatorHCDeploymentSubmission

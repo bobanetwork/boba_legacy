@@ -5,6 +5,7 @@ const DatabaseService = require('./database.service')
 const GlobalEnv = require('./utils/globalEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
+const { getRelayedMessageEventsFromGraph } = require('@eth-optimism/sdk')
 const { orderBy } = require('lodash')
 
 class BlockMonitorService extends GlobalEnv {
@@ -308,19 +309,28 @@ class BlockMonitorService extends GlobalEnv {
   }
 
   async getL1TransactionReceipt(msgHash, fast = false) {
-    const blockNumber = await this.L1Provider.getBlockNumber()
-    const startingBlock = Math.max(blockNumber - this.numberBlockToFetch, 0)
+    let matches = []
+    if (this.isAltL1Network) {
+      matches = await getRelayedMessageEventsFromGraph(
+        this.L1Provider,
+        msgHash,
+        fast ? true : false
+      )
+    } else {
+      const blockNumber = await this.L1Provider.getBlockNumber()
+      const startingBlock = Math.max(blockNumber - this.numberBlockToFetch, 0)
 
-    const filter = {
-      address: fast
-        ? this.L1CrossDomainMessengerFast
-        : this.L1CrossDomainMessenger,
-      topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
-      fromBlock: startingBlock,
+      const filter = {
+        address: fast
+          ? this.L1CrossDomainMessengerFast
+          : this.L1CrossDomainMessenger,
+        topics: [ethers.utils.id(`RelayedMessage(bytes32)`)],
+        fromBlock: startingBlock,
+      }
+
+      const logs = await this.L1Provider.getLogs(filter)
+      matches = logs.filter((i) => i.topics[1] === msgHash)
     }
-
-    const logs = await this.L1Provider.getLogs(filter)
-    const matches = logs.filter((i) => i.topics[1] === msgHash)
 
     if (matches.length > 0) {
       if (matches.length > 1) {

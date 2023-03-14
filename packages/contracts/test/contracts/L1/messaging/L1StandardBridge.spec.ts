@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat'
+import hardhat, { ethers } from 'hardhat'
 import { Signer, Contract, constants } from 'ethers'
 import { smock, FakeContract, MockContract } from '@defi-wonderland/smock'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
@@ -25,6 +25,7 @@ describe('L1StandardBridge', () => {
   let alice: SignerWithAddress
   let bob: SignerWithAddress
   before(async () => {
+    await hardhat.network.provider.send('hardhat_reset')
     ;[l1MessengerImpersonator, alice, bob] = await ethers.getSigners()
   })
 

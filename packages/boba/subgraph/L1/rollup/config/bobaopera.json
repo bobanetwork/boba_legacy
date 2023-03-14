@@ -1,0 +1,21 @@
+{
+  "network": "fantom",
+  "contracts": {
+    "L1CrossDomainMessenger": {
+      "address": "0x64Fca36c52628e40de8684C4C3B5EdB22Fd2eFd9",
+      "startBlock": 47969835
+    },
+    "L1CrossDomainMessengerFast": {
+      "address": "0xC0597ED18446254E4dd0CA5D80eb07D3f2E462cF",
+      "startBlock": 47969835
+    },
+    "StateCommitmentChain": {
+      "address": "0xF764C4f8D2982432239A110Cf6B08e95631cE564",
+      "startBlock": 47969835
+    },
+    "Lib_AddressManager": {
+      "address": "0x4e7325bcf09e091Bb8119258B885D4ef687B7386",
+      "startBlock": 47969835
+    }
+  }
+}
