@@ -1,13 +1,12 @@
 /* Imports: External */
-import { Contract } from 'ethers'
-import { DeployFunction } from 'hardhat-deploy/dist/types'
+import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
+import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import {
-  deployBobaContract,
-  getDeploymentSubmission,
-  registerBobaAddress,
-} from '../src/hardhat-deploy-ethers'
+import { registerBobaAddress } from './000-Messenger.deploy'
 
+import FeedRegistryJson from '../artifacts/contracts/oracle/FeedRegistry.sol/FeedRegistry.json'
+
+let Factory__FeedRegistry: ContractFactory
 let FeedRegistry: Contract
 
 const deployFn: DeployFunction = async (hre) => {
@@ -15,13 +14,20 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  FeedRegistry = await deployBobaContract(
-    hre,
-    'FeedRegistry',
-    [],
+  Factory__FeedRegistry = new ContractFactory(
+    FeedRegistryJson.abi,
+    FeedRegistryJson.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
-  const FeedRegistryDeploymentSubmission = getDeploymentSubmission(FeedRegistry)
+
+  FeedRegistry = await Factory__FeedRegistry.deploy()
+  await FeedRegistry.deployTransaction.wait()
+  const FeedRegistryDeploymentSubmission: DeploymentSubmission = {
+    ...FeedRegistry,
+    receipt: FeedRegistry.receipt,
+    address: FeedRegistry.address,
+    abi: FeedRegistryJson.abi,
+  }
   await hre.deployments.save('FeedRegistry', FeedRegistryDeploymentSubmission)
   await registerBobaAddress(
     addressManager,

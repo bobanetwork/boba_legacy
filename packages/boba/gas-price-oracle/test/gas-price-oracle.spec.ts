@@ -4,7 +4,7 @@ import { expect } from './setup'
 import { ethers } from 'hardhat'
 import { ContractFactory, Contract, Signer, BigNumber, Wallet } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { GasPriceOracleService } from '../'
+import { GasPriceOracleService } from '../dist/service'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
 

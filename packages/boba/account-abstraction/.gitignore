@@ -10,7 +10,6 @@ artifacts
 /deployments/dev/
 /deployments/localhost/
 /deployments/proxy/
-/deployments/hardhat/
 /typechain-types/
 /types/
 /reports/gas-used-output.color

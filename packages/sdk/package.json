@@ -61,7 +61,6 @@
     "@eth-optimism/core-utils": "0.8.1",
     "lodash": "^4.17.21",
     "merkletreejs": "^0.2.27",
-    "node-fetch": "^2.6.7",
     "rlp": "^2.2.7"
   },
   "peerDependencies": {
