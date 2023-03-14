@@ -1,5 +1,6 @@
 import { Wallet, providers } from 'ethers'
-import { getContractFactory, supportedLocalTestnet } from '@eth-optimism/contracts'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { supportedLocalTestnet } from '@eth-optimism/contracts/src/local-network-config'
 
 /* eslint-disable */
 require('dotenv').config()
