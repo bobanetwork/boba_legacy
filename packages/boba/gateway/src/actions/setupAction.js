@@ -82,9 +82,9 @@ export function setWalletConnected( state ) {
   }
 }
 
-export function setChainIdChanged() {
+export function setChainIdChanged(state) {
   return function (dispatch) {
-    return dispatch({ type: 'SETUP/CHAINIDCHANGED/SET' })
+    return dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: state })
   }
 }
 
