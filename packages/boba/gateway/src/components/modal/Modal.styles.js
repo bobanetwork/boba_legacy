@@ -77,3 +77,10 @@ export const Content = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   gap:'10px',
 }));
+
+export const BoxCenter = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  cursor: 'pointer',
+}))

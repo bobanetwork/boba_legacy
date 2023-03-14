@@ -74,6 +74,7 @@ import TransferPendingModal from 'containers/modals/transferPending/TransferPend
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
+import WalletSelectorModal from 'containers/modals/walletSelector/WalletSelectorModal'
 import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionModal'
 
 /******** COMPONENTS ********/
@@ -118,6 +119,7 @@ function Home() {
   const noMetaMaskModalState = useSelector(selectModalState('noMetaMaskModal'));
   const installMetaMaskModalState = useSelector(selectModalState('installMetaMaskModal'));
   const manageLockModalState = useSelector(selectModalState('manageLock'));
+  const walletSelectorModalState = useSelector(selectModalState('walletSelectorModal'));
   const CDMCompletionModalState = useSelector(selectModalState('CDMCompletionModal'));
 
   const fast = useSelector(selectModalState('fast'))
@@ -247,6 +249,7 @@ function Home() {
       {!!noMetaMaskModalState && <NoMetaMaskModal open={noMetaMaskModalState} />}
       {!!installMetaMaskModalState && <InstallMetaMaskModal open={installMetaMaskModalState} />}
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
+      {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
 
       <Alert
