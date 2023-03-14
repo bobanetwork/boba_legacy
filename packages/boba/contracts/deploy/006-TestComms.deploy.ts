@@ -1,12 +1,14 @@
 /* Imports: External */
-import { Contract } from 'ethers'
-import { DeployFunction } from 'hardhat-deploy/dist/types'
+import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
+import { Contract, ContractFactory } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import {
-  deployBobaContract,
-  getDeploymentSubmission,
-  registerBobaAddress,
-} from '../src/hardhat-deploy-ethers'
+import { registerBobaAddress } from './000-Messenger.deploy'
+
+import L1MessageJson from '../artifacts/contracts/test-helpers/Message/L1Message.sol/L1Message.json'
+import L2MessageJson from '../artifacts/contracts/test-helpers/Message/L2Message.sol/L2Message.json'
+
+let Factory__L1Message: ContractFactory
+let Factory__L2Message: ContractFactory
 
 let L1Message: Contract
 let L2Message: Contract
@@ -16,32 +18,47 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
+  Factory__L1Message = new ContractFactory(
+    L1MessageJson.abi,
+    L1MessageJson.bytecode,
+    (hre as any).deployConfig.deployer_l1
+  )
+
+  Factory__L2Message = new ContractFactory(
+    L2MessageJson.abi,
+    L2MessageJson.bytecode,
+    (hre as any).deployConfig.deployer_l2
+  )
+
   const L1CrossDomainMessengerFastAddress = await (
     hre as any
   ).deployConfig.addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
 
-  L1Message = await deployBobaContract(
-    hre,
-    'L1Message',
-    [
-      (hre as any).deployConfig.l1MessengerAddress,
-      L1CrossDomainMessengerFastAddress,
-    ],
-    (hre as any).deployConfig.deployer_l1
+  L1Message = await Factory__L1Message.deploy(
+    (hre as any).deployConfig.l1MessengerAddress,
+    L1CrossDomainMessengerFastAddress
   )
-
-  const L1MessageDeploymentSubmission = getDeploymentSubmission(L1Message)
+  await L1Message.deployTransaction.wait()
+  const L1MessageDeploymentSubmission: DeploymentSubmission = {
+    ...L1Message,
+    receipt: L1Message.receipt,
+    address: L1Message.address,
+    abi: L1MessageJson.abi,
+  }
   await hre.deployments.save('L1Message', L1MessageDeploymentSubmission)
   console.log(`L1 Message deployed to: ${L1Message.address}`)
   await registerBobaAddress(addressManager, 'L1Message', L1Message.address)
 
-  L2Message = await deployBobaContract(
-    hre,
-    'L2Message',
-    [(hre as any).deployConfig.l2MessengerAddress],
-    (hre as any).deployConfig.deployer_l2
+  L2Message = await Factory__L2Message.deploy(
+    (hre as any).deployConfig.l2MessengerAddress
   )
-  const L2MessageDeploymentSubmission = getDeploymentSubmission(L2Message)
+  await L2Message.deployTransaction.wait()
+  const L2MessageDeploymentSubmission: DeploymentSubmission = {
+    ...L2Message,
+    receipt: L2Message.receipt,
+    address: L2Message.address,
+    abi: L2MessageJson.abi,
+  }
   await hre.deployments.save('L2Message', L2MessageDeploymentSubmission)
   console.log(`L2 Message deployed to: ${L2Message.address}`)
   await registerBobaAddress(addressManager, 'L2Message', L2Message.address)

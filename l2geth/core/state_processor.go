@@ -143,12 +143,6 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 	if feeTokenSelection.Cmp(common.Big1) == 0 {
 		bobaPriceRatio := statedb.GetBobaPriceRatio()
 		L2BobaFee = new(big.Int).Mul(big.NewInt(int64(gas)), new(big.Int).Mul(msg.GasPrice(), bobaPriceRatio))
-		if !config.IsEthereumL2() {
-			bobaPriceRatioDecimals := statedb.GetBobaPriceRatioDecimals()
-			bobaPriceRatioDivisor := new(big.Int).Exp(big.NewInt(10), bobaPriceRatioDecimals, nil)
-			preL2BobaFee := new(big.Int).Mul(big.NewInt(int64(gas)), new(big.Int).Mul(msg.GasPrice(), bobaPriceRatio))
-			L2BobaFee = new(big.Int).Div(preL2BobaFee, bobaPriceRatioDivisor)
-		}
 	}
 
 	// Update the state with pending changes

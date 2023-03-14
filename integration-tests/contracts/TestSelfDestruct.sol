@@ -17,21 +17,3 @@ contract Create2Deployer {
         t = new TestSelfDestruct{salt: bytes32(0)}();
     }
 }
-
-contract TestDeleteSlot {
-    uint256 public testInt;
-    uint256[5] public testArray;
-
-    function deleteIntSlot() public {
-        delete testInt;
-    }
-    function deleteArraySlot(uint256 _index) public {
-        delete testArray[_index];
-    }
-    function setArray(uint256[5] memory _array) public {
-        testArray = _array;
-    }
-    function setInt(uint256 _testInt) public {
-        testInt = _testInt;
-    }
-}
