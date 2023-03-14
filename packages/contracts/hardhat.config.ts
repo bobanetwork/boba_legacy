@@ -74,6 +74,9 @@ const config: HardhatUserConfig = {
     bobabeam: {
       url: 'https://bobabeam.boba.network',
     },
+    moonbase: {
+      url: 'https://rpc.testnet.moonbeam.network',
+    },
     bobabase: {
       url: 'https://bobabase.boba.network',
     },
@@ -83,6 +86,9 @@ const config: HardhatUserConfig = {
     bobaavax: {
       url: 'https://avax.boba.network',
     },
+    fuji: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+    },
     bobaavaxTestnet: {
       url: 'https://testnet.avax.boba.network',
     },
@@ -91,6 +97,9 @@ const config: HardhatUserConfig = {
     },
     bobabnb: {
       url: 'https://bnb.boba.network',
+    },
+    bnbTestnet: {
+      url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
     },
     bobabnbTestnet: {
       url: 'https://testnet.bnb.boba.network',
@@ -164,12 +173,15 @@ const config: HardhatUserConfig = {
       'boba-goerli': process.env.BOBA_MAINNET_KEY,
       moonbeam: process.env.MOONBEAM_KEY,
       bobabeam: 'DEFAULT_KEY',
+      moonbase: process.env.MOONBEAM_KEY,
       bobabase: 'DEFAULT_KEY',
       bnb: process.env.BSCSCAN_KEY,
       bobabnb: 'DEFAULT_KEY',
+      bnbTestnet: process.env.BSCSCAN_KEY,
       bobabnbTestnet: 'DEFAULT_KEY',
       snowtrace: process.env.SNOWTRACE_KEY,
       bobaavax: 'DEFAULT_KEY',
+      fuji: process.env.SNOWTRACE_KEY,
       bobaavaxTestnet: 'DEFAULT_KEY',
       fantom: process.env.FTMSCAN_KEY,
       bobaopera: 'DEFAULT_KEY',
@@ -209,6 +221,14 @@ const config: HardhatUserConfig = {
         },
       },
       {
+        network: 'moonbase',
+        chainId: 1287,
+        urls: {
+          apiURL: 'https://api-moonbase.moonscan.io/api',
+          browserURL: 'https://moonbase.moonscan.io',
+        },
+      },
+      {
         network: 'bobabase',
         chainId: 1297,
         urls: {
@@ -233,6 +253,14 @@ const config: HardhatUserConfig = {
         },
       },
       {
+        network: 'fuji',
+        chainId: 43113,
+        urls: {
+          apiURL: 'https://api-testnet.snowtrace.io/api',
+          browserURL: 'https://testnet.snowtrace.io',
+        },
+      },
+      {
         network: 'bobaavaxTestnet',
         chainId: 4328,
         urls: {
@@ -254,6 +282,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.bnb.boba.network/api',
           browserURL: 'https://blockexplorer.bnb.boba.network',
+        },
+      },
+      {
+        network: 'bnbTestnet',
+        chainId: 97,
+        urls: {
+          apiURL: 'https://api-testnet.bscscan.com/api',
+          browserURL: 'https://testnet.bscscan.com/',
         },
       },
       {
