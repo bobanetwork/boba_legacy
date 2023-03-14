@@ -87,3 +87,14 @@ export function selectMonsterInfo () {
   }
 }
 
+export function selectWalletConnected () {
+  return function (state) {
+    return state.setup['walletConnected']
+  }
+}
+
+export function selectChainIdChanged () {
+  return function (state) {
+    return state.setup['chainIdChanged']
+  }
+}

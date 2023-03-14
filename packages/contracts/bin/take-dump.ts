@@ -2,7 +2,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as mkdirp from 'mkdirp'
-import { utils, Wallet } from 'ethers'
+import { utils, Wallet, providers } from 'ethers'
 
 import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
@@ -21,6 +21,8 @@ import { makeL2GenesisFile } from '../src/make-genesis'
 
   const env = process.env
 
+  // The L1 node web3 URL
+  const l1NodeWeb3Url = env.L1_NODE_WEB3_URL
   // The deployer account address
   const deployer = new Wallet(process.env.DEPLOYER_PRIVATE_KEY)
   // An account that represents the owner of the whitelist
@@ -54,7 +56,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     env.GAS_PRICE_ORACLE_GAS_PRICE || '1',
     10
   )
-  // The L2 block gas limit, used in the L2 block headers as well to limit
+  // The L2 block gas limit, used in the L2 block heaBERLIN_BLOCKders as well to limit
   // the amount of execution for a single block.
   const l2BlockGasLimit = parseInt(env.L2_BLOCK_GAS_LIMIT, 10)
   // The L2 chain id, added to the chain config
@@ -75,7 +77,14 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   const berlinBlock = parseInt(env.BERLIN_BLOCK, 10) || 0
   // The L1 boba token address
   const l1BobaTokenAddress = env.L1_BOBA_TOKEN_ADDRESS
+  // The L1 native token - name
+  const l1NativeTokenName = env.L1_NATIVE_TOKEN_NAME || 'Ether'
+  // The L1 native token - symbol
+  const l1NativeTokenSymbol = env.L1_NATIVE_TOKEN_SYMBOL || 'ETH'
+  // The L1 native token - decimals
+  const l1NativeTokenDecimals = parseInt(env.L1_NATIVE_TOKEN_DECIMALS, 10) || 18
 
+  ensure(l1NodeWeb3Url, 'L1_NODE_WEB3_URL')
   ensure(whitelistOwner, 'WHITELIST_OWNER')
   ensure(gasPriceOracleOwner, 'GAS_PRICE_ORACLE_OWNER')
   ensure(l2BlockGasLimit, 'L2_BLOCK_GAS_LIMIT')
@@ -86,6 +95,9 @@ import { makeL2GenesisFile } from '../src/make-genesis'
   ensure(l1CrossDomainMessengerAddress, 'L1_CROSS_DOMAIN_MESSENGER_ADDRESS')
   ensure(berlinBlock, 'BERLIN_BLOCK')
   ensure(l1BobaTokenAddress, 'L1_BOBA_TOKEN_ADDRESS')
+
+  const l1Web3 = new providers.JsonRpcProvider(l1NodeWeb3Url)
+  const l1ChainId = (await l1Web3.getNetwork()).chainId
 
   // Basic warning so users know that the whitelist will be disabled if the owner is the zero address.
   if (env.WHITELIST_OWNER === '0x' + '00'.repeat(20)) {
@@ -104,6 +116,7 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     gasPriceOracleGasPrice,
     gasPriceOracleDecimals,
     l2BlockGasLimit,
+    l1ChainId,
     l2ChainId,
     blockSignerAddress,
     l1StandardBridgeAddress,
@@ -113,6 +126,9 @@ import { makeL2GenesisFile } from '../src/make-genesis'
     TuringHelperJson,
     berlinBlock,
     l1BobaTokenAddress,
+    l1NativeTokenName,
+    l1NativeTokenSymbol,
+    l1NativeTokenDecimals,
   })
 
   fs.writeFileSync(outfile, JSON.stringify(genesis, null, 4))

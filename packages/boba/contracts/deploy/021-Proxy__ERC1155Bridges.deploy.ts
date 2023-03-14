@@ -1,15 +1,13 @@
 /* Imports: External */
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory, ethers } from 'ethers'
+import { Contract } from 'ethers'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
-
-import ProxyJson from '../artifacts/contracts/libraries/Lib_ResolvedDelegateProxy.sol/Lib_ResolvedDelegateProxy.json'
-import L1ERC1155BridgeJson from '../artifacts/contracts/ERC1155Bridges/L1ERC1155Bridge.sol/L1ERC1155Bridge.json'
-import L2ERC1155BridgeJson from '../artifacts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol/L2ERC1155Bridge.json'
-
-let Factory__Proxy__L1ERC1155Bridge: ContractFactory
-let Factory__Proxy__L2ERC1155Bridge: ContractFactory
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+  getBobaContractAt,
+} from '../src/hardhat-deploy-ethers'
 
 let Proxy__L1ERC1155Bridge: Contract
 let Proxy__L2ERC1155Bridge: Contract
@@ -19,59 +17,42 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__Proxy__L1ERC1155Bridge = new ContractFactory(
-    ProxyJson.abi,
-    ProxyJson.bytecode,
-    (hre as any).deployConfig.deployer_l1
-  )
-
-  Factory__Proxy__L2ERC1155Bridge = new ContractFactory(
-    ProxyJson.abi,
-    ProxyJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
-
   // Deploy proxy contracts
   console.log(`'Deploying LP Proxy...`)
 
   const L1ERC1155Bridge = await (hre as any).deployments.get('L1ERC1155Bridge')
   const L2ERC1155Bridge = await (hre as any).deployments.get('L2ERC1155Bridge')
-  const L1CrossDomainMessengerFastAddress = await (
-    hre as any
-  ).deployConfig.addressManager.getAddress('Proxy__L1CrossDomainMessengerFast')
 
-  Proxy__L1ERC1155Bridge = await Factory__Proxy__L1ERC1155Bridge.deploy(
-    L1ERC1155Bridge.address
+  Proxy__L1ERC1155Bridge = await deployBobaContract(
+    hre,
+    'Lib_ResolvedDelegateProxy',
+    [L1ERC1155Bridge.address],
+    (hre as any).deployConfig.deployer_l1
   )
-  await Proxy__L1ERC1155Bridge.deployTransaction.wait()
-  const Proxy__L1ERC1155BridgeDeploymentSubmission: DeploymentSubmission = {
-    ...Proxy__L1ERC1155Bridge,
-    receipt: Proxy__L1ERC1155Bridge.receipt,
-    address: Proxy__L1ERC1155Bridge.address,
-    abi: Proxy__L1ERC1155Bridge.abi,
-  }
+  const Proxy__L1ERC1155BridgeDeploymentSubmission = getDeploymentSubmission(
+    Proxy__L1ERC1155Bridge
+  )
 
   console.log(
     `Proxy__L1ERC1155Bridge deployed to: ${Proxy__L1ERC1155Bridge.address}`
   )
 
-  Proxy__L2ERC1155Bridge = await Factory__Proxy__L2ERC1155Bridge.deploy(
-    L2ERC1155Bridge.address
+  Proxy__L2ERC1155Bridge = await deployBobaContract(
+    hre,
+    'Lib_ResolvedDelegateProxy',
+    [L2ERC1155Bridge.address],
+    (hre as any).deployConfig.deployer_l2
   )
-  await Proxy__L2ERC1155Bridge.deployTransaction.wait()
-  const Proxy__L2ERC1155BridgeDeploymentSubmission: DeploymentSubmission = {
-    ...Proxy__L2ERC1155Bridge,
-    receipt: Proxy__L2ERC1155Bridge.receipt,
-    address: Proxy__L2ERC1155Bridge.address,
-    abi: Proxy__L2ERC1155Bridge.abi,
-  }
+  const Proxy__L2ERC1155BridgeDeploymentSubmission = getDeploymentSubmission(
+    Proxy__L2ERC1155Bridge
+  )
   console.log(
     `Proxy__L2ERC1155Bridge deployed to: ${Proxy__L2ERC1155Bridge.address}`
   )
 
-  Proxy__L1ERC1155Bridge = new ethers.Contract(
+  Proxy__L1ERC1155Bridge = await getBobaContractAt(
+    'L1ERC1155Bridge',
     Proxy__L1ERC1155Bridge.address,
-    L1ERC1155BridgeJson.abi,
     (hre as any).deployConfig.deployer_l1
   )
 
@@ -82,9 +63,9 @@ const deployFn: DeployFunction = async (hre) => {
   await initL1BridgeTX.wait()
   console.log(`Proxy__L1ERC1155Bridge initialized: ${initL1BridgeTX.hash}`)
 
-  Proxy__L2ERC1155Bridge = new ethers.Contract(
+  Proxy__L2ERC1155Bridge = await getBobaContractAt(
+    'L2ERC1155Bridge',
     Proxy__L2ERC1155Bridge.address,
-    L2ERC1155BridgeJson.abi,
     (hre as any).deployConfig.deployer_l2
   )
 
