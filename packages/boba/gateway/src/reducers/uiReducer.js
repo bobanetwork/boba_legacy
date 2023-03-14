@@ -34,6 +34,7 @@ const initialState = {
   delegateDaoModal: false,
   delegateDaoXModal: false,
   newProposalModal: false,
+  walletSelectorModal: false,
   CDMCompletionModal: false,
   ledger: false,
   alert: null,

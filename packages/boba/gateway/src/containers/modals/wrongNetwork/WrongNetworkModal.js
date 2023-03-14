@@ -4,14 +4,22 @@ import { closeModal } from 'actions/uiAction';
 import Button from 'components/button/Button';
 
 import Modal from 'components/modal/Modal';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectNetwork } from 'selectors/networkSelector';
+import { restTokenList } from 'actions/tokenAction';
 
 function WrongNetworkModal({open}) {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
+
+  useEffect(() => {
+    if (open){
+      dispatch(restTokenList())
+    }
+  }, [dispatch, open])
+
 
   function handleClose() {
     dispatch(setConnect(false));
