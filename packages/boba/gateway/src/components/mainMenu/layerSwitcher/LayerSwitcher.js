@@ -113,7 +113,6 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
         dispatch(fetchTransactions())
-        dispatch(fetchBalances())
         return true
       } else {
         return false
