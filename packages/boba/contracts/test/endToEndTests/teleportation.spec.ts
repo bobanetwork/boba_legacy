@@ -27,7 +27,7 @@ const getGasFeeFromLastestBlock = async (provider: any): Promise<BigNumber> => {
   return gasUsed.mul(gasPrice)
 }
 
-describe('BOBA Teleportation', async () => {
+describe('BOBA Teleportation Tests', async () => {
   describe('Ethereum L2 - BOBA is not the native token', () => {
     before(async () => {
       signer = (await ethers.getSigners())[0]
