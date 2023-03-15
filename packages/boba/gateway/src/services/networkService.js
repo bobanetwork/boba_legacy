@@ -211,7 +211,6 @@ class NetworkService {
         // if it's false which means boba is getting used as tokenfee which is default value.
         feeChoice = !feeChoice;
       }
-      console.log('Fee used as boba', feeChoice)
       const bobaFee = {
         priceRatio: priceRatio.toString(),
         feeChoice

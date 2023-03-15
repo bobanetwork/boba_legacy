@@ -28,7 +28,7 @@ export function createAction (key, asyncAction) {
         return false
       }
 
-      if(response && typeof(response) === 'string' && response.includes('execution reverted: ERC20Permit')) {
+      if(response && typeof(response) === 'string' && response?.includes('execution reverted: ERC20Permit')) {
         let errorMessage = JSON.parse(response)
         dispatch({ type: `UI/ERROR/UPDATE`, payload: errorMessage.error.message })
         dispatch({ type: `${key}/ERROR` })
@@ -36,7 +36,7 @@ export function createAction (key, asyncAction) {
         return false
       }
 
-      if(response && typeof(response) === 'string' && response.includes('Insufficient balance')) {
+      if(response && typeof(response) === 'string' && response?.includes('Insufficient balance')) {
         //let errorMessage = JSON.parse(response)
         dispatch({ type: `UI/ERROR/UPDATE`, payload: "Insufficient BOBA balance for emergency swap" })
         dispatch({ type: `${key}/ERROR` })
@@ -59,24 +59,24 @@ export function createAction (key, asyncAction) {
           errorMessage = 'MetaMask: Transaction was rejected by user - signature denied'
         }
         // No internet case - throw up a banner
-        else if(response.hasOwnProperty('reason') && response.reason.includes('could not detect network')) {
+        else if(response.hasOwnProperty('reason') && response?.reason?.includes('could not detect network')) {
           console.log("Gateway error: No network")
           errorMessage = 'Gateway: No internet'
         }
         // ethers error
-        else if(response.hasOwnProperty('reason') && response.reason.includes('missing revert data in call exception')) {
+        else if(response.hasOwnProperty('reason') && response.reason?.includes('missing revert data in call exception')) {
           console.log("Slow network or rate throttling - code 1")
           // intercept error
           return false
         }
         // ethers error
-        else if(response.hasOwnProperty('reason') && response.reason.includes('resolver or addr is not configured for ENS name')) {
+        else if(response.hasOwnProperty('reason') && response.reason?.includes('resolver or addr is not configured for ENS name')) {
           console.log("Slow network or rate throttling - code 2")
           // intercept error
           return false
         }
         // ethers error
-        else if(response.hasOwnProperty('reason') && response.reason.includes('missing response')) {
+        else if(response.hasOwnProperty('reason') && response.reason?.includes('missing response')) {
           console.log("Slow network or rate throttling - code 3")
           // intercept error
           return false
@@ -92,7 +92,8 @@ export function createAction (key, asyncAction) {
       return response || true
 
     } catch (error) {
-      console.log("Unhandled error RAW:", {error, key, asyncAction})
+      console.log("Unhandled error RAW:", { error, key, asyncAction })
+
       Sentry.captureException(error);
       return false
     }
