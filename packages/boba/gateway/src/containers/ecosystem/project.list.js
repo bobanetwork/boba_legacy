@@ -1,5 +1,4 @@
 import { groupBy } from 'lodash'
-import acrossLogo from '../../images/ecosystem/across.webp'
 import apeBoardLogo from '../../images/ecosystem/apeBoard.webp'
 import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'
 import bobaApesLogo from '../../images/ecosystem/bobaapes.webp'
@@ -444,16 +443,6 @@ export const projectList = [
     "type": "wallet",
     "image": ontowalletLogo,
     "description": "Buy, store, swap, spend cryptocurrency and interact with DApps all in one gate."
-  },
-  {
-    "title": "Across",
-    "canLaunch": true,
-    "link": "https://across.to/",
-    "twitter": "https://twitter.com/AcrossProtocol",
-    "discord": "https://discord.gg/across",
-    "type": "bridge",
-    "image": acrossLogo,
-    "description": "Across is a fast, cheap, and secure bridge between L1 and L2s."
   },
   {
     "title": "UMA Protocol",

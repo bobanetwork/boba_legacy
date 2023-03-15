@@ -36,14 +36,18 @@ function GasSwitcher() {
   useEffect(() => {
     if (baseEnabled) {
       dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
+      if(networkService.networkGateway === NETWORK.ETHEREUM) {
+        dispatch(fetchVerifierStatus())
+      }
     }
   }, [ networkName, baseEnabled , dispatch])
 
   useInterval(() => {
     if (baseEnabled) {
       dispatch(fetchGas())
-      dispatch(fetchVerifierStatus())
+      if(networkService.networkGateway === NETWORK.ETHEREUM) {
+        dispatch(fetchVerifierStatus())
+      }
     }
   }, GAS_POLL_INTERVAL)
 

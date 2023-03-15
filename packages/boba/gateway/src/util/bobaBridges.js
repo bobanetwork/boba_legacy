@@ -28,18 +28,6 @@ export const bobaBridges = [
     ]
   },
   {
-    "name": "Across",
-    "type": "ACROSS",
-    "link": "https://across.to/",
-    "tokens": [
-      "ETH",
-      "BOBA",
-      "USDC",
-      "WBTC",
-      "UMA"
-    ]
-  },
-  {
     "name": "Celer",
     "type": "CELER",
     "link": "https://cbridge.celer.network/#/transfer",
