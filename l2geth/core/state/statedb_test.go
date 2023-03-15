@@ -914,19 +914,4 @@ func TestStateDBBobaAsFeeToken(t *testing.T) {
 	if isFeeTokenSelected.Cmp(common.Big1) != 0 {
 		t.Fatal("expect 1 fee token selection")
 	}
-
-	// Get Boba price ratio decimals
-	bobaPriceRatioDecimals := state.GetBobaPriceRatioDecimals()
-	if bobaPriceRatioDecimals.Cmp(common.Big0) != 0 {
-		t.Fatal("expect 0 boba price ratio decimals")
-	}
-
-	// Update boba price ratio decimals
-	state.SetBobaPriceRatioDecimals(big.NewInt(1))
-
-	// Get Boba price ratio
-	bobaPriceRatioDecimals = state.GetBobaPriceRatioDecimals()
-	if bobaPriceRatioDecimals.Cmp(common.Big1) != 0 {
-		t.Fatal("expect 1 boba price ratio decimals")
-	}
 }

@@ -21,6 +21,7 @@ import CloseIcon from 'components/icons/CloseIcon'
 import networkService from 'services/networkService'
 import { makeStyles } from '@mui/styles'
 import Copy from 'components/copy/Copy'
+import Disconnect from 'components/disconnect/Disconnect'
 import { useSelector } from 'react-redux'
 import {
   selectAccountEnabled,
@@ -169,7 +170,10 @@ const PageHeader = ({ maintenance }) => {
           <WalletSwitch />
           <NetworkSwitcher />
           {!!accountEnabled ? (
-            <Copy value={networkService.account} light={false} />
+            <>
+              <Copy value={networkService.account} light={false} />
+              <Disconnect light={false} />
+            </>
           ) : null}
           <ThemeSwitcher />
         </S.HeaderWrapper>

@@ -23,7 +23,6 @@ const TxBuilder = () => {
   const TxBuilderResult = useSelector(selectTxBuilder, shallowEqual)
   const networkLayer = useSelector(selectLayer())
 
-  const blockExplorerUrl = networkService?.networkConfig?.L2?.blockExplorer
   const [ contractAddress, setContractAddress ] = useState('')
   const [ contractABI, setContractABI ] = useState('')
   const [ contractMethos, setContractMethods ] = useState([])
@@ -86,6 +85,12 @@ const TxBuilder = () => {
     dispatch(resetTxBuilder())
   }
 
+  const viewTx = (txResult) => {
+    const blockExplorerUrl = networkService.networkConfig['L2'].blockExplorer
+    const url = `${blockExplorerUrl}tx/${txResult.transactionHash}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
   const submitTx = async (methodIndex) => {
     const method = contractMethos[methodIndex]
     const methodName = method.key
@@ -118,10 +123,6 @@ const TxBuilder = () => {
     )
     dispatch(submitTxBuilder(contract, methodIndex, methodName, inputs))
   }
-
-  const openInNewTab = url => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
 
   return (
     <S.TxBuilderWrapper>
@@ -209,7 +210,7 @@ const TxBuilder = () => {
                             <S.TxSuccessWrapper>
                               <Typography variant="body1" sx={{color: 'green', wordBreak: 'break-all', marginRight: '10px'}}>Succeeded!</Typography>
                               <Button
-                                onClick={() => openInNewTab(`${blockExplorerUrl}tx/${TxResult.transactionHash}`)}
+                                onClick={() => viewTx(TxResult)}
                                 color='primary'
                                 variant="outlined"
                               >

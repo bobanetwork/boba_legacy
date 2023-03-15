@@ -96,6 +96,8 @@ import { MIN_NATIVE_L1_BALANCE } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
+import walletService from './wallet.service'
+
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
 
@@ -108,15 +110,6 @@ const L2GasOracle = '0x420000000000000000000000000000000000000F'
 const L2_SECONDARYFEETOKEN_ADDRESS = '0x4200000000000000000000000000000000000023'
 
 let allTokens = {}
-
-function handleChangeChainOnce(chainID_hex_string) {
-
-  localStorage.setItem('chainChangedInit', true)
-
-  localStorage.setItem('newChain', Number(chainID_hex_string))
-  // and remove the listner
-  window.ethereum.removeListener('chainChanged', handleChangeChainOnce)
-}
 
 class NetworkService {
 
@@ -156,10 +149,6 @@ class NetworkService {
 
     this.tokenAddresses = null
 
-    // chain ID
-    this.chainID = null
-    this.networkName = null
-
     // gas
     this.L1GasLimit = 9999999
     // setting of this value not important since it's not connected to anything in the contracts
@@ -197,27 +186,10 @@ class NetworkService {
     this.addresses = {}
     this.network = null;
     this.networkConfig = null
-  }
 
-  bindProviderListeners() {
-    window.ethereum.on('accountsChanged', () => {
-      window.location.reload()
-    })
-    window.ethereum.on('chainChanged', () => {
-      const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-      // do not reload window in the special case where the user
-      // changed chains AND conncted at the same time
-      // otherwise the user gets confused about why they are going through
-      // two window reloads
-      if(chainChangedInit) {
-        localStorage.setItem('chainChangedInit', false)
-      } else {
-        localStorage.setItem('chainChangedFromMM', true)
-        window.location.reload()
-      }
-    })
+    // wallet service
+    this.walletService = walletService
   }
-
 
   async getBobaFeeChoice() {
 
@@ -238,12 +210,7 @@ class NetworkService {
         feeChoice = await bobaFeeContract.secondaryFeeTokenUsers(this.account)
         // if it's false which means boba is getting used as tokenfee which is default value.
         feeChoice = !feeChoice;
-
       }
-
-      console.log(
-        'Fee used as boba', feeChoice
-      )
       const bobaFee = {
         priceRatio: priceRatio.toString(),
         feeChoice
@@ -620,8 +587,12 @@ class NetworkService {
         fastRelayer: true,
       })
 
+      let l2SecondaryFeeTokenAddress = L2_SECONDARYFEETOKEN_ADDRESS
+      if (NETWORK.ETHEREUM === network && chainId === 1) {
+        l2SecondaryFeeTokenAddress = allTokens.BOBA.L2
+      }
       this.BobaContract = new ethers.Contract(
-        L2_SECONDARYFEETOKEN_ADDRESS,
+        l2SecondaryFeeTokenAddress,
         Boba.abi,
         this.L2Provider
       )
@@ -669,7 +640,7 @@ class NetworkService {
     }
   }
 
-  async initializeAccount({ networkGateway: network, networkType }) {
+  async initializeAccount({ networkGateway: network, networkType, chainIdChanged }) {
 
     try {
 
@@ -677,14 +648,16 @@ class NetworkService {
         return 'nometamask'
       }
 
+      this.walletService.bindProviderListeners()
+
       // connect to the wallet
-      await window.ethereum.request({method: 'eth_requestAccounts'})
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
+      this.provider = this.walletService.provider
       this.account = await this.provider.getSigner().getAddress()
 
-      const networkMM = await this.provider.getNetwork()
-      this.chainID = networkMM.chainId
-      this.networkName = networkMM.name
+      let chainId = chainIdChanged
+      if (!chainId) {
+        chainId = await this.provider.getNetwork().then(network => network.chainId)
+      }
       this.networkGateway = network
       this.networkType = networkType
 
@@ -693,23 +666,20 @@ class NetworkService {
         network,
         networkType
       })
-
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
-      if (!!NETWORK[ network ] && networkMM.chainId === L2ChainId) {
+      if (!!NETWORK[ network ] && chainId === L2ChainId) {
         this.L1orL2 = 'L2';
-      } else if(!!NETWORK[ network ] && networkMM.chainId === L1ChainId) {
+      } else if(!!NETWORK[ network ] && chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
-        this.bindProviderListeners()
         return 'wrongnetwork'
       }
 
-      this.bindProviderListeners()
       // this should not do anything unless we changed chains
       if (this.L1orL2 === 'L2') {
         await this.getBobaFeeChoice()
@@ -725,6 +695,8 @@ class NetworkService {
 
 
   async switchChain(targetLayer) {
+    // ignore request if we are already on the target layer
+    if (!targetLayer) { return false }
 
     const networkDetail = getNetworkDetail({
       network: this.networkGateway,
@@ -732,46 +704,20 @@ class NetworkService {
     })
 
     const targetIDHex = networkDetail[targetLayer].chainIdHex
-
-    try {
-
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
-
-      await this.provider.send('wallet_switchEthereumChain', [{ chainId: targetIDHex }])
-      window.ethereum.on('chainChanged', handleChangeChainOnce)
-
-      return true
-    } catch (error) {
-      // 4902 = the chain has not been added to MetaMask.
-      // So, lets add it
-      if (error.code === 4902) {
-        const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcURL
-        try {
-          //the chainParams are only needed for the L2s
-          const chainParam = {
-            chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
-            chainName: networkDetail[targetLayer].name,
-            rpcUrls: rpcURL,
-            nativeCurrency: {
-              name: networkDetail[targetLayer].tokenName,
-              symbol: networkDetail[targetLayer].symbol,
-              decimals: 18,
-            },
-            blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorer?.slice(0, -1)]
-          }
-
-          await this.provider.send('wallet_addEthereumChain', [chainParam, this.account])
-          window.ethereum.on('chainChanged', handleChangeChainOnce)
-          return true
-        } catch (addError) {
-          console.log("MetaMask - Error adding new RPC: ", addError)
-          throw new Error(addError.code)
-        }
-      } else { //some other error code
-        console.log("MetaMask - Switch Error: ", error.code)
-        throw new Error(error.code)
-      }
+    const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcUrl
+    const chainParam = {
+      chainId: '0x' + networkDetail[targetLayer].chainId.toString(16),
+      chainName: networkDetail[targetLayer].name,
+      rpcUrls: [rpcURL],
+      nativeCurrency: {
+        name: networkDetail[targetLayer].tokenName,
+        symbol: networkDetail[targetLayer].symbol,
+        decimals: 18,
+      },
+      blockExplorerUrls: [networkDetail[targetLayer]?.blockExplorerUrl?.slice(0, -1)]
     }
+
+    return await this.walletService.switchChain(targetIDHex, chainParam)
   }
 
   async getSevens() {
@@ -4079,9 +4025,13 @@ class NetworkService {
   /*****                L2 Fee              *****/
   /***********************************************/
   async estimateL2Fee(payload=this.payloadForL1SecurityFee) {
-    const l2GasPrice = await this.L2Provider.getGasPrice()
-    const l2GasEstimate = await this.L2Provider.estimateGas(payload)
-    return l2GasPrice.mul(l2GasEstimate).toNumber()
+    try {
+      const l2GasPrice = await this.L2Provider.getGasPrice()
+      const l2GasEstimate = await this.L2Provider.estimateGas(payload)
+      return l2GasPrice.mul(l2GasEstimate).toNumber()
+    } catch {
+      return 0
+    }
   }
 
   /***********************************************/

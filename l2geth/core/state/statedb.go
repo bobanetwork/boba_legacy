@@ -305,13 +305,6 @@ func (s *StateDB) GetBobaPriceRatio() *big.Int {
 	return value.Big()
 }
 
-// Retrieve the decimals of the price ratio
-func (s *StateDB) GetBobaPriceRatioDecimals() *big.Int {
-	keyPriceRatioDecimals := common.BigToHash(big.NewInt(11))
-	value := s.GetState(rcfg.OvmBobaGasPricOracle, keyPriceRatioDecimals)
-	return value.Big()
-}
-
 func (s *StateDB) GetNonce(addr common.Address) uint64 {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
@@ -550,14 +543,9 @@ func (s *StateDB) SetBobaAsFeeToken(addr common.Address) {
 	s.SetState(rcfg.OvmBobaGasPricOracle, key, common.BigToHash(common.Big1))
 }
 
-func (s *StateDB) SetBobaPriceRatio(priceRatio *big.Int) {
+func (s *StateDB) SetBobaPriceRatio(priceRation *big.Int) {
 	keyPriceRatio := common.BigToHash(big.NewInt(5))
-	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio, common.BigToHash(priceRatio))
-}
-
-func (s *StateDB) SetBobaPriceRatioDecimals(decimals *big.Int) {
-	keyPriceRatioDecimals := common.BigToHash(big.NewInt(11))
-	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatioDecimals, common.BigToHash(decimals))
+	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio, common.BigToHash(priceRation))
 }
 
 func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {

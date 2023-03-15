@@ -99,13 +99,10 @@ class stateRootMonitorService extends GlobalEnv {
         const receipt = await this.L1Provider.getTransactionReceipt(
           stateRootHash
         )
-        const l1GasPrice = receipt.effectiveGasPrice
-          ? ethers.BigNumber.from(receipt.effectiveGasPrice)
-          : ethers.BigNumber.from('0')
         const gasFee = ethers.utils
           .formatEther(
             ethers.BigNumber.from(receipt.cumulativeGasUsed.toString())
-              .mul(l1GasPrice)
+              .mul(ethers.BigNumber.from(receipt.effectiveGasPrice))
               .toString()
           )
           .toString()

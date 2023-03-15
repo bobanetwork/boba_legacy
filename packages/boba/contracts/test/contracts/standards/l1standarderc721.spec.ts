@@ -18,7 +18,7 @@ const deployL1StandardERC721 = async (
   )
 }
 
-describe('L1StandardERC721 Tests', () => {
+describe('L1 Standard ERC721 Tests', () => {
   it('should deploy and check supportsInterface', async () => {
     const l1Bridge: Signer = (await ethers.getSigners())[0]
     const l2ERC721: Signer = (await ethers.getSigners())[1]
