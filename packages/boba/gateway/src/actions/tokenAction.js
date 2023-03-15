@@ -225,3 +225,9 @@ export async function addToken ( tokenContractAddressL1 ) {
     return {currency: _tokenContractAddressL1, L1address: _tokenContractAddressL1, L2address: '', symbol: 'Not found', error: 'Not found'};
   }
 }
+
+export function restTokenList () {
+  return function (dispatch) {
+    return dispatch({ type: 'TOKEN/GET/RESET' });
+  }
+}

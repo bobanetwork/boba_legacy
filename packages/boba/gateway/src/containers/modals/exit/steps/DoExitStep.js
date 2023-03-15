@@ -15,13 +15,15 @@ limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { utils } from 'ethers'
 
 import { useTheme } from '@emotion/react'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
 
 import { exitBOBA } from 'actions/networkAction'
-import { openAlert } from 'actions/uiAction'
+import { openModal } from 'actions/uiAction'
+import { setCDMCompletion } from 'actions/transactionAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -56,6 +58,7 @@ import {
   selectL2BalanceBOBA,
   selectExitFee,
 } from 'selectors/balanceSelector'
+import networkService from 'services/networkService'
 
 function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -177,20 +180,20 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
 
   async function doExit() {
 
-    let res = await dispatch(
+    const receipt = await dispatch(
       exitBOBA(
         token.address,
         value_Wei_String
       )
     )
 
-    if (res) {
-      dispatch(
-        openAlert(
-          `${token.symbol} was bridged to L1. You will receive
-          ${Number(value).toFixed(3)} ${token.symbol} on L1 in 7 days.`
-        )
-      )
+    if (receipt) {
+      dispatch(setCDMCompletion({
+        CDMType: 'L2StandardBridge',
+        CDMMessage: { token: `${utils.formatUnits(value_Wei_String, token.decimals)} ${token.symbol}` },
+        CDMTransaction: { transactionHash: receipt.hash }
+      }))
+      dispatch(openModal('CDMCompletionModal'))
       handleClose()
     }
   }
@@ -230,7 +233,8 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
       const balance = Number(logAmount(token.balance, token.decimals))
 
       // because of MetaMask issue always have to limit ETH
-      if(token.symbol === 'ETH') {
+      // if(token.symbol === 'ETH') {
+      if(token.symbol === networkService.L1NativeTokenSymbol) {
         if(balance - safeCost > 0.0)
           setMax_Float(balance - safeCost)
         else
@@ -262,7 +266,7 @@ function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {
     if(feeUseBoba) {
       estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      estGas = `${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} ${networkService.L1NativeTokenSymbol}`
     }
   }
 

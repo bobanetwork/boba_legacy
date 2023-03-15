@@ -36,14 +36,12 @@ import {
   getProposalThreshold
 } from 'actions/daoAction'
 
-import { checkVersion } from 'actions/serviceAction'
 import { closeAlert, closeError } from 'actions/uiAction'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
 import {
   fetchBalances,
-  addTokenList,
-  fetchExits
+  addTokenList
 } from 'actions/networkAction'
 import {
   getMonsterInfo
@@ -53,8 +51,9 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-  selectNetwork
 } from 'selectors/setupSelector'
+
+
 import { selectAlert, selectError } from 'selectors/uiSelector'
 import { selectModalState } from 'selectors/uiSelector'
 
@@ -64,8 +63,8 @@ import DepositBatchModal from 'containers/modals/deposit/DepositBatchModal'
 import TransferModal from 'containers/modals/transfer/TransferModal'
 import TransferNFTModal from 'containers/modals/transfer/TransferNFTModal'
 import ExitModal from 'containers/modals/exit/ExitModal'
-import FarmDepositModal from 'containers/modals/farm/FarmDepositModal'
-import FarmWithdrawModal from 'containers/modals/farm/FarmWithdrawModal'
+import EarnDepositModal from 'containers/modals/earn/EarnDepositModal'
+import EarnWithdrawModal from 'containers/modals/earn/EarnWithdrawModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
 import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/old/NewProposalModalOldDao'
@@ -74,6 +73,9 @@ import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
 import TransferPendingModal from 'containers/modals/transferPending/TransferPending'
 import WrongNetworkModal from 'containers/modals/wrongNetwork/WrongNetworkModal';
 import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
+import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
+import WalletSelectorModal from 'containers/modals/walletSelector/WalletSelectorModal'
+import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionModal'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -87,6 +89,10 @@ import Zendesk from 'components/zendesk/Zendesk'
 import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
+import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
+import useNetwork from 'hooks/useNetwork'
+import { NETWORK } from 'util/network/network.util'
+import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 
 
 function Home() {
@@ -110,7 +116,11 @@ function Home() {
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'));
   const transferPendingModalState = useSelector(selectModalState('transferPending'));
   const wrongNetworkModalState = useSelector(selectModalState('wrongNetworkModal'));
+  const noMetaMaskModalState = useSelector(selectModalState('noMetaMaskModal'));
+  const installMetaMaskModalState = useSelector(selectModalState('installMetaMaskModal'));
   const manageLockModalState = useSelector(selectModalState('manageLock'));
+  const walletSelectorModalState = useSelector(selectModalState('walletSelectorModal'));
+  const CDMCompletionModalState = useSelector(selectModalState('CDMCompletionModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -118,15 +128,16 @@ function Home() {
   const lock = useSelector(selectModalState('lock'))
   const proposalId = useSelector(selectModalState('proposalId'))
 
-  const farmDepositModalState = useSelector(selectModalState('farmDepositModal'))
-  const farmWithdrawModalState = useSelector(selectModalState('farmWithdrawModal'))
+  const EarnDepositModalState = useSelector(selectModalState('EarnDepositModal'))
+  const EarnWithdrawModalState = useSelector(selectModalState('EarnWithdrawModal'))
 
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
   const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
   const castVoteModalState = useSelector(selectModalState('castVoteModal'))
 
-  const network = useSelector(selectNetwork())
+  const activeNetwork = useSelector(selectActiveNetwork())
+  const activeNetworkType = useSelector(selectActiveNetworkType())
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -142,7 +153,7 @@ function Home() {
       : body.style.overflow = 'auto'
   }, [ mobileMenuOpen ])
 
-  // calls only on boot
+
   useEffect(() => {
     window.scrollTo(0, 0)
 
@@ -151,37 +162,43 @@ function Home() {
     if (!baseEnabled) initializeBase()
 
     async function initializeBase() {
-      console.log("Calling initializeBase for", network)
-      const initialized = await networkService.initializeBase( network )
+      const initialized = await networkService.initializeBase({
+        networkGateway: activeNetwork,
+        networkType: activeNetworkType
+      })
+
       if (!initialized) {
-        console.log("Failed to boot L1 and L2 base providers for", network)
         dispatch(setBaseState(false))
         return false
       }
       if (initialized === 'enabled') {
-        console.log("Network Base Providers are up")
         dispatch(setBaseState(true))
         // load DAO to speed up the process
-        dispatch(fetchDaoProposals())
+        if (activeNetwork === NETWORK.ETHEREUM) {
+          dispatch(fetchDaoProposals())
+        }
         return true
       }
     }
 
-  }, [ dispatch, network, baseEnabled, maintenance ])
+  }, [ dispatch, activeNetwork, activeNetworkType, baseEnabled, maintenance ])
 
   useInterval(() => {
     if(accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
-      dispatch(fetchDaoBalance())      // account specific
-      dispatch(fetchDaoVotes())        // account specific
-      dispatch(fetchDaoBalanceX())     // account specific
-      dispatch(fetchDaoVotesX())       // account specific
-      dispatch(fetchExits())           // account specific
-      dispatch(getFS_Saves())          // account specific
-      dispatch(getFS_Info())           // account specific
-      dispatch(getMonsterInfo())       // account specific
+
+      if (activeNetwork === NETWORK.ETHEREUM) {
+        dispatch(fetchDaoBalance())      // account specific
+        dispatch(fetchDaoVotes())        // account specific
+        dispatch(fetchDaoBalanceX())     // account specific
+        dispatch(fetchDaoVotesX())       // account specific
+        dispatch(getMonsterInfo()) // account specific
+        dispatch(getFS_Info())   // account specific
+        dispatch(getFS_Saves()) // account specific
+      }
     }
-    if(baseEnabled /*== we only have have Base L1 and L2 providers*/) {
+    /*== we only have have Base L1 and L2 providers*/
+    if (baseEnabled && activeNetwork === NETWORK.ETHEREUM) {
       dispatch(getProposalThreshold())
       dispatch(fetchDaoProposals())
     }
@@ -190,7 +207,6 @@ function Home() {
   useEffect(() => {
     if (maintenance) return
     // load the following functions when the home page is open
-    checkVersion()
     dispatch(getProposalThreshold())
   }, [ dispatch, maintenance ])
 
@@ -198,12 +214,17 @@ function Home() {
     if (maintenance) return
     if (accountEnabled) {
       dispatch(addTokenList())
-      dispatch(getMonsterInfo())
+      // monster only availble for ETH
+      if (activeNetwork === NETWORK.ETHEREUM) {
+        dispatch(getMonsterInfo())
+      }
     }
-  }, [ dispatch, accountEnabled, maintenance ])
+  }, [ dispatch, accountEnabled, maintenance, activeNetwork ])
 
   // Invoking GA analysis page view hooks
   useGoogleAnalytics();
+
+  useNetwork()
 
   return (
     <>
@@ -215,8 +236,8 @@ function Home() {
 
       {!!exitModalState && <ExitModal open={exitModalState} token={token} fast={fast} />}
 
-      {!!farmDepositModalState && <FarmDepositModal open={farmDepositModalState} />}
-      {!!farmWithdrawModalState && <FarmWithdrawModal open={farmWithdrawModalState} />}
+      {!!EarnDepositModalState && <EarnDepositModal open={EarnDepositModalState} />}
+      {!!EarnWithdrawModalState && <EarnWithdrawModal open={EarnWithdrawModalState} />}
 
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
       {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
@@ -225,7 +246,11 @@ function Home() {
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
       {!!transferPendingModalState && <TransferPendingModal open={transferPendingModalState} />}
       {!!wrongNetworkModalState && <WrongNetworkModal open={wrongNetworkModalState} />}
+      {!!noMetaMaskModalState && <NoMetaMaskModal open={noMetaMaskModalState} />}
+      {!!installMetaMaskModalState && <InstallMetaMaskModal open={installMetaMaskModalState} />}
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
+      {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
+      {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
 
       <Alert
         type='error'
@@ -248,7 +273,6 @@ function Home() {
       </Alert>
       <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
-
       {!!maintenance &&
         <Box sx={{
           display: 'flex',

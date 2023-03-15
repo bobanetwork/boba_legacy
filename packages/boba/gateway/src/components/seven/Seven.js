@@ -18,9 +18,8 @@ import React from 'react'
 import { Typography } from '@mui/material'
 
 import * as S from './Transaction.styles'
-import { selectNetwork } from 'selectors/setupSelector'
-import { useSelector } from 'react-redux'
-import { getNetwork } from 'util/masterConfig'
+
+import networkService from 'services/networkService'
 
 function Seven({
   link,
@@ -33,13 +32,10 @@ function Seven({
   unixTime
 }) {
 
-  const currentNetwork = useSelector(selectNetwork())
-  const nw = getNetwork()
 
   const chainLink = ({hash}) => {
-    let network = nw[currentNetwork]
-    if (!!network && !!network['L2']) {
-          return `${network['L2'].transaction}${hash}`
+    if (networkService.networkConfig[ 'L2' ]) {
+      return `${networkService.networkConfig['L2'].transaction}${hash}`
     }
     return ''
   }

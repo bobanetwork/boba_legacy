@@ -21,7 +21,6 @@ import transactionReducer from './transactionReducer'
 import dataReducer from './dataReducer'
 import statusReducer from './statusReducer'
 import balanceReducer from './balanceReducer'
-import exitReducer from './exitReducer'
 import queueReducer from './queueReducer'
 import tokenReducer from './tokenReducer'
 import nftReducer from './nftReducer'
@@ -29,7 +28,7 @@ import feeReducer from './feeReducer'
 import uiReducer from './uiReducer'
 import setupReducer from './setupReducer'
 import notificationReducer from './notificationReducer'
-import farmReduer from './farmReducer'
+import earnReduer from './earnReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
 import daoReducer from './daoReducer'
@@ -38,6 +37,7 @@ import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
 import veBobaReducer from './veBobaReducer';
 import devToolsReducer from './devToolsReducer';
+import networkReducer from './networkReducer';
 
 const rootReducer = combineReducers({
   loading: loadingReducer,
@@ -47,7 +47,6 @@ const rootReducer = combineReducers({
   signature: signatureReducer,
   status: statusReducer,
   balance: balanceReducer,
-  exit: exitReducer,
   queue: queueReducer,
   tokenList: tokenReducer,
   nft: nftReducer,
@@ -55,7 +54,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   setup: setupReducer,
   notification: notificationReducer,
-  farm: farmReduer,
+  earn: earnReduer,
   lookup: lookupReducer,
   dao: daoReducer,
   fixed: fixedReducer,
@@ -63,6 +62,7 @@ const rootReducer = combineReducers({
   bridge: bridgeReducer,
   veboba: veBobaReducer,
   devTools: devToolsReducer,
+  network: networkReducer
 })
 
 export default rootReducer

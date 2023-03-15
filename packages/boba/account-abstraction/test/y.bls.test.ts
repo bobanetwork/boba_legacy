@@ -4,8 +4,8 @@ import {
   BLSOpen__factory,
   BLSSignatureAggregator,
   BLSSignatureAggregator__factory,
-  BLSWallet,
-  BLSWallet__factory,
+  BLSAccount,
+  BLSAccount__factory,
   EntryPoint
 } from '../typechain'
 import { ethers } from 'hardhat'
@@ -16,10 +16,10 @@ import { keccak256 } from 'ethereumjs-util'
 import { hashToPoint } from '@thehubbleproject/bls/dist/mcl'
 import { BigNumber } from 'ethers'
 import { BytesLike, hexValue } from '@ethersproject/bytes'
-import { BLSWalletDeployer } from '../typechain/contracts/bls/BLSWallet.sol'
-import { BLSWalletDeployer__factory } from '../typechain/factories/contracts/bls/BLSWallet.sol'
+import { BLSAccountDeployer } from '../typechain/contracts/bls/BLSAccount.sol'
+import { BLSAccountDeployer__factory } from '../typechain/factories/contracts/bls/BLSAccount.sol'
 
-describe('bls wallet', function () {
+describe('bls account', function () {
   this.timeout(20000)
   const BLS_DOMAIN = arrayify(keccak256(Buffer.from('eip4337.bls.domain')))
   const etherSigner = ethers.provider.getSigner()
@@ -28,9 +28,9 @@ describe('bls wallet', function () {
   let signer2: any
   let blsAgg: BLSSignatureAggregator
   let entrypoint: EntryPoint
-  let wallet1: BLSWallet
-  let wallet2: BLSWallet
-  let walletDeployer: BLSWalletDeployer
+  let account1: BLSAccount
+  let account2: BLSAccount
+  let accountDeployer: BLSAccountDeployer
   before(async () => {
     entrypoint = await deployEntryPoint()
     const BLSOpenLib = await new BLSOpen__factory(ethers.provider.getSigner()).deploy()
@@ -43,10 +43,10 @@ describe('bls wallet', function () {
     signer1 = fact.getSigner(arrayify(BLS_DOMAIN), '0x01')
     signer2 = fact.getSigner(arrayify(BLS_DOMAIN), '0x02')
 
-    walletDeployer = await new BLSWalletDeployer__factory(etherSigner).deploy()
+    accountDeployer = await new BLSAccountDeployer__factory(etherSigner).deploy()
 
-    wallet1 = await new BLSWallet__factory(etherSigner).deploy(entrypoint.address, blsAgg.address, signer1.pubkey)
-    wallet2 = await new BLSWallet__factory(etherSigner).deploy(entrypoint.address, blsAgg.address, signer2.pubkey)
+    account1 = await new BLSAccount__factory(etherSigner).deploy(entrypoint.address, blsAgg.address, signer1.pubkey)
+    account2 = await new BLSAccount__factory(etherSigner).deploy(entrypoint.address, blsAgg.address, signer2.pubkey)
   })
 
   it('#getTrailingPublicKey', async () => {
@@ -66,9 +66,9 @@ describe('bls wallet', function () {
 
   it('#userOpToMessage', async () => {
     const userOp1 = await fillUserOp({
-      sender: wallet1.address
+      sender: account1.address
     }, entrypoint)
-    const requestHash = await blsAgg.getRequestId(userOp1)
+    const requestHash = await blsAgg.getUserOpHash(userOp1)
     const solPoint: BigNumber[] = await blsAgg.userOpToMessage(userOp1)
     const messagePoint = hashToPoint(requestHash, BLS_DOMAIN)
     expect(`1 ${solPoint[0].toString()} ${solPoint[1].toString()}`).to.equal(messagePoint.getStr())
@@ -76,9 +76,9 @@ describe('bls wallet', function () {
 
   it('#validateUserOpSignature', async () => {
     const userOp1 = await fillUserOp({
-      sender: wallet1.address
+      sender: account1.address
     }, entrypoint)
-    const requestHash = await blsAgg.getRequestId(userOp1)
+    const requestHash = await blsAgg.getUserOpHash(userOp1)
 
     const sigParts = signer1.sign(requestHash)
     userOp1.signature = hexConcat(sigParts)
@@ -95,16 +95,16 @@ describe('bls wallet', function () {
     // yes, it does take long on hardhat, but quick on geth.
     this.timeout(30000)
     const userOp1 = await fillUserOp({
-      sender: wallet1.address
+      sender: account1.address
     }, entrypoint)
-    const requestHash = await blsAgg.getRequestId(userOp1)
+    const requestHash = await blsAgg.getUserOpHash(userOp1)
     const sig1 = signer1.sign(requestHash)
     userOp1.signature = hexConcat(sig1)
 
     const userOp2 = await fillUserOp({
-      sender: wallet2.address
+      sender: account2.address
     }, entrypoint)
-    const requestHash2 = await blsAgg.getRequestId(userOp2)
+    const requestHash2 = await blsAgg.getUserOpHash(userOp2)
     const sig2 = signer2.sign(requestHash2)
     userOp2.signature = hexConcat(sig2)
 
@@ -132,8 +132,8 @@ describe('bls wallet', function () {
     before(async () => {
       signer3 = fact.getSigner(arrayify(BLS_DOMAIN), '0x03')
       initCode = hexConcat([
-        walletDeployer.address,
-        walletDeployer.interface.encodeFunctionData('deployWallet', [entrypoint.address, blsAgg.address, 0, signer3.pubkey])
+        accountDeployer.address,
+        accountDeployer.interface.encodeFunctionData('deployAccount', [entrypoint.address, blsAgg.address, 0, signer3.pubkey])
       ])
     })
 
@@ -146,7 +146,7 @@ describe('bls wallet', function () {
         initCode,
         nonce: 2
       }, entrypoint)
-      const requestHash = await blsAgg.getRequestId(userOp)
+      const requestHash = await blsAgg.getUserOpHash(userOp)
       const sigParts = signer3.sign(requestHash)
       userOp.signature = hexConcat(sigParts)
 
@@ -157,7 +157,7 @@ describe('bls wallet', function () {
 
       const [signature] = defaultAbiCoder.decode(['bytes32[2]'], userOp.signature)
       const pubkey = (await blsAgg.getUserOpPublicKey(userOp)).map(n => hexValue(n)) // TODO: returns uint256[4], verify needs bytes32[4]
-      const requestHash1 = await blsAgg.getRequestId(userOp)
+      const requestHash1 = await blsAgg.getUserOpHash(userOp)
 
       // @ts-ignore
       expect(verifier.verify(signature, pubkey, requestHash1)).to.equal(true)

@@ -24,7 +24,3 @@ export function selectSignatureStatus_exitTRAD (state) {
 export function selectSignatureStatus_depositLP (state) {
   return state.signature.depositLPsigned
 }
-
-export function selectSignatureStatus_depositTRAD (state) {
-  return state.signature.depositTRADsigned
-}
