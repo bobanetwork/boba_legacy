@@ -52,7 +52,7 @@ import truncate from 'truncate-middle'
 
 import { setEnableAccount, setWalletAddress } from 'actions/setupAction'
 
-import { fetchTransactions, fetchBalances } from 'actions/networkAction'
+import { fetchTransactions } from 'actions/networkAction'
 
 import { closeModal, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
@@ -113,7 +113,6 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
         dispatch(fetchTransactions())
-        dispatch(fetchBalances())
         return true
       } else {
         return false
