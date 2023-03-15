@@ -599,7 +599,7 @@ export const projectList = [
     "twitter": "https://twitter.com/NOWPayments_io",
     "type": "tool",
     "image": nowpaymentsLogo,
-    "description": "NOWPayments is a non-custodial crypto payment gateway that lets you accept payments in 160+ cryptocurrencies, including BOBA, with auto coin conversion available.    "
+    "description": "NOWPayments is a non-custodial crypto payment gateway that lets you accept payments in 160+ cryptocurrencies, including BOBA, with auto coin conversion available."
   },
   {
     "title": "BlockVision",
