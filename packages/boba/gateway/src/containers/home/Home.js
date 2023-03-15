@@ -76,6 +76,7 @@ import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
 import WalletSelectorModal from 'containers/modals/walletSelector/WalletSelectorModal'
 import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionModal'
+import SwitchNetworkModal from 'containers/modals/switchNetwork/SwitchNetworkModal'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -121,6 +122,7 @@ function Home() {
   const manageLockModalState = useSelector(selectModalState('manageLock'));
   const walletSelectorModalState = useSelector(selectModalState('walletSelectorModal'));
   const CDMCompletionModalState = useSelector(selectModalState('CDMCompletionModal'));
+  const switchNetworkModalState = useSelector(selectModalState('switchNetworkModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -251,6 +253,7 @@ function Home() {
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
       {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
+      {!!switchNetworkModalState && <SwitchNetworkModal open={switchNetworkModalState} />}
 
       <Alert
         type='error'

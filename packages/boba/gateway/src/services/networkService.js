@@ -721,12 +721,6 @@ class NetworkService {
   }
 
   async getSevens() {
-
-    console.log("getSevens()")
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
     const response = await omgxWatcherAxiosInstance(
       this.networkConfig
     ).get('get.l2.pendingexits')
@@ -744,12 +738,6 @@ class NetworkService {
   }
 
   async getFastExits() {
-
-    console.log("getFastExits()")
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
     const response = await omgxWatcherAxiosInstance(
       this.networkConfig
     ).get('get.l2.pendingexits')
