@@ -40,6 +40,7 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import networkService from 'services/networkService'
 
 import * as S from './Earn.styles'
+import { fetchBalances } from 'actions/networkAction';
 
 function Earn() {
   const [showMDO, setShowMDO] = useState(false)
@@ -67,7 +68,11 @@ function Earn() {
     if (baseEnabled) {
       dispatch(getEarnInfo())
     }
-  }, [dispatch, baseEnabled])
+
+    if (accountEnabled) {
+      dispatch(fetchBalances())
+    }
+  }, [dispatch, baseEnabled, accountEnabled])
 
   function getBalance(address, chain) {
     if (typeof (layer1Balance) === 'undefined') return [ 0, 0 ]
