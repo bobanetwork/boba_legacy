@@ -19,7 +19,7 @@ import { useTheme } from '@emotion/react'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
 
-import { depositL1LPBatch, approveFastDepositBatch } from 'actions/networkAction'
+import { depositL1LPBatch, approveFastDepositBatch, fetchBalances } from 'actions/networkAction'
 import { utils } from 'ethers'
 
 import { openModal, openError, setActiveHistoryTab } from 'actions/uiAction'
@@ -125,6 +125,8 @@ function InputStepBatch({ isBridge, handleClose }) {
   useEffect(() => {
       dispatch(fetchL2TotalFeeRate())
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
+      dispatch(fetchBalances())
+
       return ()=>{
         dispatch({type: 'BALANCE/L2/RESET'})
       }
