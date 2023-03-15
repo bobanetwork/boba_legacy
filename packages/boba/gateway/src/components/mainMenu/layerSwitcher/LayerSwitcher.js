@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
+import { setConnect, setConnectBOBA, setConnectETH, setLayer, setWalletConnected } from 'actions/setupAction.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
