@@ -20,6 +20,8 @@ export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 // VE DAO FLAG
 export const DISABLE_VE_DAO = process.env.REACT_APP_DISABLE_VE_DAO
+// WalletConnect FLAG
+export const DISABLE_WALLETCONNECT = process.env.REACT_APP_DISABLE_WALLETCONNECT
 
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",

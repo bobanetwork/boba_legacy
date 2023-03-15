@@ -61,7 +61,7 @@ function _Modal({
 
         {
           !!newStyle ?
-            <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative' }}>
+            <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative', maxWidth }}>
               <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={!!transparent || !!isMobile}>
                 <Box display="flex" flexDirection="column" gap="10px">
                   <S.ModalHead>

@@ -15,7 +15,7 @@ import { selectNetwork } from 'selectors/networkSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
-import { fetchLookUpPrice } from 'actions/networkAction'
+import { fetchBalances, fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab } from 'actions/uiAction'
 
 import * as S from './Token.styles'
@@ -111,7 +111,10 @@ function TokenPage() {
     if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
       setDebug(true)
     }
-  }, [accountEnabled])
+    if (accountEnabled) {
+      dispatch(fetchBalances())
+    }
+  }, [dispatch ,accountEnabled])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return

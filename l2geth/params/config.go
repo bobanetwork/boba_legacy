@@ -20,7 +20,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"math/big"
-	"os"
 
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/crypto"
@@ -231,26 +230,26 @@ var (
 	// OpMainnetChainID is the ID of Boba's mainnet chain.
 	OpMainnetChainID = big.NewInt(288)
 
-	// OpGoerliChainID is the ID of Boba's Goerli testnet chain.
-	OpGoerliChainID = big.NewInt(2888)
+	// OpRinkebyChainID is the ID of Boba's Rinkeby testnet chain.
+	OpRinkebyChainID = big.NewInt(28)
 
 	// OpMainnetSDUpdateForkNum is the height at which the SD update fork activates on Mainnet.
 	OpMainnetSDUpdateForkNum = big.NewInt(310215)
 
-	// OpGoerliSDUpdateForkNum is the height at which the SD update fork activates on Goerli.
-	OpGoerliSDUpdateForkNum = big.NewInt(0)
+	// OpRinkebySDUpdateForkNum is the height at which the SD update fork activates on Rinkeby.
+	OpRinkebySDUpdateForkNum = big.NewInt(0)
 
 	// BobaMainnetGasUpdatedForkNum is the height at which the gas update fork activates on Mainnet.
 	BobaMainnetGasUpdatedForkNum = big.NewInt(400000)
 
-	// BobaGoerliGasUpdatedForkNum is the height at which the gas update fork activates on Goerli.
-	BobaGoerliGasUpdatedForkNum = big.NewInt(0)
+	// BobaRinkebyGasUpdatedForkNum is the height at which the gas update fork activates on Rinkeby.
+	BobaRinkebyGasUpdatedForkNum = big.NewInt(0)
 
 	// BobaMainnetFeeUpdatedForkNum is the height at which the fee update fork activates on Mainnet.
 	BobaMainnetFeeUpdatedForkNum = big.NewInt(485000)
 
-	// BobaGoerliFeeUpdatedForkNum is the height at which the fee update fork activates on Goerli.
-	BobaGoerliFeeUpdatedForkNum = big.NewInt(0)
+	// BobaRinkebyFeeUpdatedForkNum is the height at which the fee update fork activates on Rinkeby.
+	BobaRinkebyFeeUpdatedForkNum = big.NewInt(50000)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -444,8 +443,8 @@ func (c *ChainConfig) IsSDUpdate(num *big.Int) bool {
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(OpMainnetSDUpdateForkNum, num)
 	}
-	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
-		return isForked(OpGoerliSDUpdateForkNum, num)
+	if c.ChainID.Cmp(OpRinkebyChainID) == 0 {
+		return isForked(OpRinkebySDUpdateForkNum, num)
 	}
 	return true
 }
@@ -457,8 +456,8 @@ func (c *ChainConfig) IsGasUpdate(num *big.Int) bool {
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetGasUpdatedForkNum, num)
 	}
-	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
-		return isForked(BobaGoerliGasUpdatedForkNum, num)
+	if c.ChainID.Cmp(OpRinkebyChainID) == 0 {
+		return isForked(BobaRinkebyGasUpdatedForkNum, num)
 	}
 	return true
 }
@@ -470,26 +469,10 @@ func (c *ChainConfig) IsFeeTokenUpdate(num *big.Int) bool {
 	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
 		return isForked(BobaMainnetFeeUpdatedForkNum, num)
 	}
-	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
-		return isForked(BobaGoerliFeeUpdatedForkNum, num)
+	if c.ChainID.Cmp(OpRinkebyChainID) == 0 {
+		return isForked(BobaRinkebyFeeUpdatedForkNum, num)
 	}
 	return true
-}
-
-func (c *ChainConfig) IsEthereumL2() bool {
-	if os.Getenv("IS_ETHEREUM_L2") == "true" {
-		return true
-	}
-	if c.ChainID == nil {
-		return true
-	}
-	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
-		return true
-	}
-	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
-		return true
-	}
-	return false
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported

@@ -40,7 +40,6 @@ type StateDB interface {
 
 	GetFeeTokenSelection(common.Address) *big.Int
 	GetBobaPriceRatio() *big.Int
-	GetBobaPriceRatioDecimals() *big.Int
 
 	GetNonce(common.Address) uint64
 	SetNonce(common.Address, uint64)

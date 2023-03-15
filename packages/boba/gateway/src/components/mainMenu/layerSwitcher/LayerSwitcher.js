@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
+import { setConnect, setWalletConnected, setConnectBOBA, setConnectETH, setLayer } from 'actions/setupAction.js'
 import BobaIcon from 'components/icons/BobaIcon.js'
 import EthereumIcon from 'components/icons/EthereumIcon.js'
 import React, { useCallback, useEffect } from 'react'
@@ -35,6 +35,8 @@ import {
   selectConnectETH,
   selectConnectBOBA,
   selectConnect,
+  selectWalletConnected,
+  selectChainIdChanged,
 } from 'selectors/setupSelector'
 
 import {
@@ -50,12 +52,12 @@ import truncate from 'truncate-middle'
 
 import { setEnableAccount, setWalletAddress } from 'actions/setupAction'
 
-import { fetchTransactions, fetchBalances } from 'actions/networkAction'
+import { fetchTransactions } from 'actions/networkAction'
 
-import { openModal } from 'actions/uiAction'
+import { closeModal, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button.js'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
-import { LAYER } from 'util/constant.js'
+import { LAYER, DISABLE_WALLETCONNECT } from 'util/constant.js'
 
 function LayerSwitcher({ visisble = true, isButton = false }) {
   const dispatch = useDispatch()
@@ -74,6 +76,8 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
   const connectETHRequest = useSelector(selectConnectETH())
   const connectBOBARequest = useSelector(selectConnectBOBA())
   const connectRequest = useSelector(selectConnect())
+  const walletConnected = useSelector(selectWalletConnected())
+  const chainIdChanged = useSelector(selectChainIdChanged())
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -82,21 +86,15 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
     ? truncate(networkService.account, 6, 4, '...')
     : ''
 
-  const chainChangedFromMM = JSON.parse(
-    localStorage.getItem('chainChangedFromMM')
-  )
-  const wantChain = JSON.parse(localStorage.getItem('wantChain'))
-  const chainChangedInit = JSON.parse(localStorage.getItem('chainChangedInit'))
-
   const dispatchBootAccount = useCallback(() => {
-
-    if (!accountEnabled && baseEnabled) initializeAccount()
+    if ((!accountEnabled && baseEnabled) || chainIdChanged) initializeAccount()
 
     async function initializeAccount() {
 
       const initialized = await networkService.initializeAccount({
         networkGateway: network,
         networkType,
+        chainIdChanged,
       })
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'));
@@ -110,59 +108,70 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
         return false
       }
       else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
+        dispatch(closeModal('wrongNetworkModal'))
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
         dispatch(fetchTransactions())
-        dispatch(fetchBalances())
         return true
       } else {
         return false
       }
     }
-  }, [dispatch, accountEnabled, network, networkType, baseEnabled])
+  }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged])
 
   const doConnectToLayer = useCallback((layer) => {
+    function resetConnectChain() {
+      dispatch(setConnect(false))
+      dispatch(setConnectETH(false))
+    }
+
     async function doConnect() {
       try {
-        localStorage.setItem('wantChain', JSON.stringify(layer))
-        await networkService.switchChain(layer)
-        dispatchBootAccount()
+        if (networkService.walletService.provider) {
+          if (await networkService.switchChain(layer)) {
+            if (layer === 'L1') {
+              dispatch(setConnectBOBA(false))
+            } else {
+              dispatch(setConnectETH(false))
+            }
+            dispatchBootAccount()
+          } else {
+            resetConnectChain()
+          }
+        } else {
+          // bypass walletSelectorModal
+          if (DISABLE_WALLETCONNECT) {
+            if (await networkService.walletService.connectWallet('metamask')) {
+              dispatch(setWalletConnected(true))
+            } else {
+              resetConnectChain()
+            }
+          } else {
+            resetConnectChain()
+            dispatch(openModal('walletSelectorModal'))
+          }
+        }
       } catch (err) {
         console.log('ERROR', err)
-        dispatch(setConnectETH(false));
-        dispatch(setConnectBOBA(false));
+        resetConnectChain()
       }
     }
     doConnect();
   }, [dispatch, dispatchBootAccount])
 
   useEffect(() => {
+    if (walletConnected) {
+      dispatchBootAccount()
+    }
+  }, [walletConnected, dispatchBootAccount])
+
+  useEffect(() => {
     // detect mismatch and correct the mismatch
-    if (wantChain === 'L1' && layer === 'L2') {
-      dispatchBootAccount()
-    } else if (wantChain === 'L2' && layer === 'L1') {
+    if (layer === 'L1' || layer === 'L2') {
       dispatchBootAccount()
     }
-  }, [wantChain, layer, dispatchBootAccount])
-
-  useEffect(() => {
-    // auto reconnect to MM if we just switched chains from
-    // with the chain switcher, and then unset the flag.
-    if (chainChangedInit) {
-      dispatchBootAccount()
-      localStorage.setItem('chainChangedInit', false)
-    }
-  }, [chainChangedInit, dispatchBootAccount])
-
-  useEffect(() => {
-    // auto reconnect to MM if we just switched chains from
-    // inside MM, and then unset the flag.
-    if (chainChangedFromMM) {
-      dispatchBootAccount()
-      localStorage.setItem('chainChangedFromMM', false)
-    }
-  }, [chainChangedFromMM, dispatchBootAccount])
+  }, [layer, dispatchBootAccount])
 
   // listening for l1 connection request
   useEffect(() => {
@@ -179,10 +188,15 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
   }, [ connectBOBARequest, doConnectToLayer ])
 
   useEffect(() => {
-    if (connectRequest) {
-      dispatchBootAccount()
+    if (connectRequest && !networkService.walletService.provider) {
+      // bypass walletSelectorModal
+      if (DISABLE_WALLETCONNECT) {
+        dispatchBootAccount()
+      } else {
+        dispatch(openModal('walletSelectorModal'))
+      }
     }
-  }, [connectRequest, dispatchBootAccount])
+  }, [dispatch, connectRequest, dispatchBootAccount])
 
   if (!visisble) {
     return null

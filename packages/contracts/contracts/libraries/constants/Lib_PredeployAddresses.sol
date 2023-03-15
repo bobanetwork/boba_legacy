@@ -29,12 +29,4 @@ library Lib_PredeployAddresses {
     address internal constant PROXY__BOBA_GAS_PRICE_ORACLE =
         0x4200000000000000000000000000000000000024;
     address internal constant BOBA_GAS_PRICE_ORACLE = 0x4200000000000000000000000000000000000025;
-
-    // For Alt L1s
-    // BOBA is the L2 native token
-    address payable internal constant L2_BOBA_ALT_L1 =
-        payable(0x4200000000000000000000000000000000000006);
-    // L1 native token is a ERC20 token on L2
-    address internal constant L1_NATIVE_TOKEN_L2_ADDRESS_ALT_L1 =
-        0x4200000000000000000000000000000000000023;
 }

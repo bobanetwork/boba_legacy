@@ -1,11 +1,9 @@
-import { Wallet, providers } from 'ethers'
+import { Wallet } from 'ethers'
 import path from 'path'
 import dirtree from 'directory-tree'
 import fs from 'fs'
 import * as dotenv from 'dotenv'
 dotenv.config()
-
-import { supportedLocalTestnet } from '../src/local-network-config'
 
 // Ensures that all relevant environment vars are properly set. These lines *must* come before the
 // hardhat import because importing will load the config (which relies on these vars). Necessary
@@ -50,11 +48,6 @@ const parseEnv = () => {
 
 const main = async () => {
   const config = parseEnv()
-  const l1Provider = new providers.JsonRpcProvider(
-    process.env.CONTRACTS_RPC_URL
-  )
-  const { chainId } = await l1Provider.getNetwork()
-  const networkConfig = supportedLocalTestnet[chainId]
 
   await hre.run('deploy', {
     l1BlockTimeSeconds: config.l1BlockTimeSeconds,
@@ -68,7 +61,6 @@ const main = async () => {
     ovmRelayerAddress: relayer.address,
     ovmAddressManagerOwner: deployer.address,
     noCompile: process.env.NO_COMPILE ? true : false,
-    networkConfig,
   })
 
   // Stuff below this line is currently required for CI to work properly. We probably want to

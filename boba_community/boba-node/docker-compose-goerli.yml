@@ -1,9 +1,9 @@
 
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: https://rpc.ankr.com/eth_goerli
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: ${L1_NODE_WEB3_URL}
 
 x-l1_rpc_geth: &l1_rpc_geth
-  ETH1_HTTP: https://rpc.ankr.com/eth_goerli
+  ETH1_HTTP: ${L1_NODE_WEB3_URL}
 
 version: "3.9"
 
@@ -15,7 +15,7 @@ services:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
-      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://replica.goerli.boba.network
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://goerli.boba.network
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 2888

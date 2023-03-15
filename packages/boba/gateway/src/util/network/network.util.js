@@ -272,6 +272,14 @@ const networkConfig = {
   [NETWORK.MOONBEAM] : moonbeamConfig
 }
 
+export const rpcUrls = Object.values(networkConfig).reduce((networkConfigs, networkConfig) => {
+  networkConfigs[networkConfig.Mainnet.L1.chainId] = networkConfig.Mainnet.L1.rpcUrl[0]
+  networkConfigs[networkConfig.Mainnet.L2.chainId] = networkConfig.Mainnet.L2.rpcUrl
+  networkConfigs[networkConfig.Testnet.L1.chainId] = networkConfig.Testnet.L1.rpcUrl[0]
+  networkConfigs[networkConfig.Testnet.L2.chainId] = networkConfig.Testnet.L2.rpcUrl
+  return networkConfigs
+}, {})
+
 export const getNetworkDetail = ({
   network,
   networkType
