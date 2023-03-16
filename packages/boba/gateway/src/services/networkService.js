@@ -720,38 +720,6 @@ class NetworkService {
     return await this.walletService.switchChain(targetIDHex, chainParam)
   }
 
-  async getSevens() {
-    const response = await omgxWatcherAxiosInstance(
-      this.networkConfig
-    ).get('get.l2.pendingexits')
-
-    if (response.status === 201) {
-      const data = response.data
-      const filtered = data.filter(
-        (i) => (i.fastRelay === 0) && (i.status === 'pending')
-      )
-      return filtered
-    } else {
-      return []
-    }
-
-  }
-
-  async getFastExits() {
-    const response = await omgxWatcherAxiosInstance(
-      this.networkConfig
-    ).get('get.l2.pendingexits')
-
-    if (response.status === 201) {
-      const data = response.data
-      const filtered = data.filter(
-        (i) => (i.fastRelay === 1) && (i.status === 'pending')
-      )
-      return filtered
-    } else {
-      return []
-    }
-  }
 
   async fetchMyMonsters() {
 
