@@ -21664,13 +21664,6 @@ react-transition-group@^4.3.0, react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
-react-zendesk@^0.1.13:
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/react-zendesk/-/react-zendesk-0.1.13.tgz#0b8eb76ea6642f563c948f03e84f34286368036c"
-  integrity sha512-9UNzzgdgC8nr2nZ13PNudspUClZZgsnS3FofnuGK1I7+yDPNAP8iDFD2WSQRJmYDAzH+mTlVB4K+G8lY1/0B+w==
-  dependencies:
-    prop-types "^15.7.2"
-
 react@^17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react/-/react-17.0.2.tgz#d0b5cc516d29eb3eee383f75b62864cfb6800037"
