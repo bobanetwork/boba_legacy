@@ -4,6 +4,36 @@ import networkService from "./networkService";
 
 class TransactionService {
 
+  async getSevens() {
+    const response = await omgxWatcherAxiosInstance(networkService.networkConfig)
+      .get('get.l2.pendingexits')
+
+    if (response.status === 201) {
+      const data = response.data
+      const filtered = data.filter(
+        (i) => (i.fastRelay === 0) && (i.status === 'pending')
+      )
+      return filtered
+    } else {
+      return []
+    }
+
+  }
+
+  async getFastExits() {
+    const response = await omgxWatcherAxiosInstance(networkService.networkConfig).get('get.l2.pendingexits')
+
+    if (response.status === 201) {
+      const data = response.data
+      const filtered = data.filter(
+        (i) => (i.fastRelay === 1) && (i.status === 'pending')
+      )
+      return filtered
+    } else {
+      return []
+    }
+  }
+
   // fetch L2 transactions from omgxWatcherAxiosInstance
   async fetchL2Tx() {
     let L2Txs = [];

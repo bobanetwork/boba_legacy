@@ -32,6 +32,7 @@ const initialState = {
   connect: false,
   walletConnected: false,
   chainIdChanged: false,
+  networkChanged: false,
 }
 
 function setupReducer(state = initialState, action) {
