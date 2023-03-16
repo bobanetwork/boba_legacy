@@ -38,13 +38,13 @@ export function fetchTransactions() {
 
 export function fetchSevens() {
   return createAction('SEVENS/GETALL', () =>
-    networkService.getSevens()
+    transctionService.getSevens()
   )
 }
 
 export function fetchFastExits() {
   return createAction('FASTEXITS/GETALL', () =>
-    networkService.getFastExits()
+    transctionService.getFastExits()
   )
 }
 
