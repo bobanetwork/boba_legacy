@@ -16,7 +16,6 @@ import { Navigate } from 'react-router-dom';
 import Lock from 'containers/veboba/Lock';
 import Vote from 'containers/VoteAndDao/Vote/Vote';
 import BobaScope from 'containers/bobaScope/BobaScope';
-import Help from 'containers/help/Help';
 import DevTools from 'containers/devtools/DevTools';
 
 export const COMMON_ROUTES = [
@@ -35,11 +34,6 @@ export const COMMON_ROUTES = [
     element: <DevTools />,
     key: 'Devtool',
   },
-  {
-    path: ROUTES_PATH.HELP,
-    element: <Help />,
-    key: 'help',
-  }
 ]
 
 export const ROUTE_LIST = [

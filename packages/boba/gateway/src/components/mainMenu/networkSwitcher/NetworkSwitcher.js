@@ -52,9 +52,9 @@ function NetworkSwitcher() {
 
   return (
     <>
-      <S.LayerSwitcherContainer>
+      <S.LayerSwitcherContainer onClick={handleClick} >
         <LayerSwitcher />
-        <KeyboardArrowDown onClick={handleClick} />
+        <KeyboardArrowDown/>
       </S.LayerSwitcherContainer>
       <Menu
         id="basic-menu"
