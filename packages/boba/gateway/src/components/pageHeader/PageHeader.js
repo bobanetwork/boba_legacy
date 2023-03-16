@@ -130,7 +130,6 @@ const PageHeader = ({ maintenance }) => {
                 </S.DrawerHeader>
                 <S.HeaderDivider />
                 <NetworkSwitcher />
-                <WalletSwitch closeDialog={() => setWalletOpen(false)} />
               </S.StyleDrawer>
             </Drawer>
             <Drawer
