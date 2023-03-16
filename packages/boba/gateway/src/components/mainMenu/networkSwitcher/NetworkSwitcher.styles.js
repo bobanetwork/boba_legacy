@@ -9,6 +9,6 @@ export const LayerSwitcherContainer = styled(Box)(({ theme }) => ({
   padding: '0',
   cursor: 'pointer',
   [ theme.breakpoints.up('sm') ]: {
-    background: theme.palette.background.secondary,
+    background: theme.palette.background.glassy,
   }
 }));

@@ -65,12 +65,6 @@ function Transaction({
       <Fade in={dropDownBox}>
         <S.DropdownContent>
           <S.DropdownWrapper
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-            }}
           >
             <Typography
               variant="body3"

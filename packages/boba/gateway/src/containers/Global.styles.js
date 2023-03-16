@@ -56,7 +56,7 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   border: 'none',
   borderRadius: theme.palette.primary.borderRadius,
-  background: theme.palette.background.alert,
+  background: theme.palette.background.glassy,
   [ theme.breakpoints.up('md') ]: {
     width: '100%',
   },
