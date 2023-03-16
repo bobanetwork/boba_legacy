@@ -9,8 +9,12 @@ import Button from 'components/button/Button';
 import { FiberManualRecord } from '@mui/icons-material';
 import { selectBaseEnabled, selectLayer } from 'selectors/setupSelector';
 import { LAYER } from 'util/constant';
+import { useTheme } from '@mui/styles';
+import { Box, useMediaQuery } from '@mui/material';
 
-const WalletSwitch = () => {
+const WalletSwitch = ({
+  closeDialog /// usable incase of mobile
+}) => {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
@@ -19,6 +23,8 @@ const WalletSwitch = () => {
   const activeNetworkType = useSelector(selectActiveNetworkType());
   const layer = useSelector(selectLayer());
   const baseEnabled = useSelector(selectBaseEnabled());
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const [ reconnect, setReconnect ] = useState(false);
 
@@ -29,6 +35,9 @@ const WalletSwitch = () => {
     dispatch(setBaseState(false));
     dispatch(setEnableAccount(false));
     setReconnect(true);
+    if (isMobile) {
+      closeDialog()
+    }
   }
 
   useEffect(() => {
@@ -51,8 +60,9 @@ const WalletSwitch = () => {
     return null;
   }
 
-  return <>
+  return <Box p={isMobile ? 2 : 0}>
     <Button
+      fullWidth={isMobile}
       color="primary"
       size="medium"
       variant="outlined"
@@ -63,7 +73,7 @@ const WalletSwitch = () => {
     >
       Switch to <FiberManualRecord fontSize="small" htmlColor='#BAE21A' /> {` ${network}-${networkType}`}
     </Button>
-  </>
+  </Box>
 }
 
 export default WalletSwitch;

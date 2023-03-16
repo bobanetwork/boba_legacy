@@ -83,7 +83,6 @@ import PageHeader from 'components/pageHeader/PageHeader'
 import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import Zendesk from 'components/zendesk/Zendesk'
 
 /******** UTILS ********/
 import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
@@ -271,7 +270,6 @@ function Home() {
       >
         {alertMessage}
       </Alert>
-      <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
       {!!maintenance &&
         <Box sx={{

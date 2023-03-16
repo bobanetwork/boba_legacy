@@ -3,7 +3,6 @@ import * as S from './PageHeader.styles'
 import BobaLogo from "../icons/BobaLogo";
 import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
 import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
 import { useState } from 'react'
@@ -131,7 +130,8 @@ const PageHeader = ({ maintenance }) => {
                   </S.WrapperCloseIcon>
                 </S.DrawerHeader>
                 <S.HeaderDivider />
-                <LayerSwitcher />
+                <NetworkSwitcher />
+                <WalletSwitch closeDialog={() => setWalletOpen(false)} />
               </S.StyleDrawer>
             </Drawer>
             <Drawer

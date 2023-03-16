@@ -61,7 +61,7 @@ const Projects = ({projectType}) => {
                 }}
               >{project.description}</ShowMoreShowLess>
               : <Tooltip title={project.description}>
-                <S.ProjectDescription variant='body2'> {project.description}</S.ProjectDescription>
+                <S.ProjectDescription variant="body2" component="p"> {project.description}</S.ProjectDescription>
               </Tooltip>}
           </S.ProjectContent>
           <S.DividerLine />

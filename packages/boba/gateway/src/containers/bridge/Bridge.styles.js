@@ -13,28 +13,37 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   [ theme.breakpoints.between('md', 'lg') ]: {
     width: '90%',
     padding: '0px',
+    '::after': {
+      content: '" "',
+      position: 'absolute',
+      left: '-5%',
+      bottom: '10%',
+      width: '130%',
+      height: '100%',
+      background: `url(${bobaBridgeBg}) no-repeat`,
+      backgroundSize: '85%',
+      zIndex: '-1',
+    }
   },
   [ theme.breakpoints.between('sm', 'md') ]: {
     width: '90%',
     padding: '0px',
+    '::after': {
+      content: '" "',
+      position: 'absolute',
+      left: '-5%',
+      bottom: '10%',
+      width: '130%',
+      height: '100%',
+      background: `url(${bobaBridgeBg}) no-repeat`,
+      backgroundSize: '85%',
+      zIndex: '-1',
+    }
   },
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
     padding: '0px',
   },
-  '::after': {
-    content: '" "',
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    background: `url(${bobaBridgeBg}) no-repeat`,
-    backgroundSize: '100%',
-    backgroundPosition: 'center',
-    left: '0',
-    bottom: '0',
-    zIndex: '-1',
-  },
-
 }));
 
 
