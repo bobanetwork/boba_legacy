@@ -49,6 +49,8 @@ import pmc from '../../images/ecosystem/pmc.png'
 import cookbookLogo from '../../images/ecosystem/cookbook.png'
 import babylons from '../../images/ecosystem/babylons.png'
 import changenowLogo from '../../images/ecosystem/changenow.svg'
+import nowpaymentsLogo from '../../images/ecosystem/nowpayments.svg'
+
 import blockVisionLogo from '../../images/ecosystem/blockVisionLogo.svg'
 import bundlrNetworkLogo from '../../images/ecosystem/bundlrNetworkLogo.svg'
 import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
@@ -578,6 +580,15 @@ export const projectList = [
     "type": "tool",
     "image": changenowLogo,
     "description": "Non-custodial service created for simple and fast cryptocurrency exchanges: buy and swap BOBA."
+  },
+  {
+    "title": "NOWPayments",
+    "canLaunch": true,
+    "link": "https://nowpayments.io/?utm_source=boba_website&utm_medium=referral&utm_campaign=boba",
+    "twitter": "https://twitter.com/NOWPayments_io",
+    "type": "tool",
+    "image": nowpaymentsLogo,
+    "description": "NOWPayments is a non-custodial crypto payment gateway that lets you accept payments in 160+ cryptocurrencies, including BOBA, with auto coin conversion available."
   },
   {
     "title": "BlockVision",
