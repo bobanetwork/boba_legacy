@@ -3,6 +3,7 @@ import { Box } from "@mui/material"
 
 export const DaoPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',

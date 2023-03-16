@@ -1,4 +1,4 @@
-import { Typography, useMediaQuery, useTheme } from '@mui/material'
+import { useMediaQuery, useTheme } from '@mui/material'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectActiveNetwork } from 'selectors/networkSelector'
@@ -21,23 +21,24 @@ function BridgeContainer() {
           isMobile && accountEnabled ?
             null
             : <S.TitleContainer>
-              <Typography variant="h1"
-              > Transfer
+              <S.BridgeTypography variant="h1">
+                <S.BobaGlassIcon />
+                Transfer
                 <br />
                 tokens between {activeNetwork} and
                 <br />
-                <Typography
+                <S.BridgeTypography
                   variant="h1"
                   component="span"
                   sx={{
                     background: '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
                     'WebkitBackgroundClip': 'text',
-                    'WebkitTextFillColor': 'transparent'
+                    'WebkitTextFillColor': 'transparent',
                   }}
                 >
                   Boba network!
-                </Typography>
-              </Typography>
+                </S.BridgeTypography >
+              </S.BridgeTypography>
             </S.TitleContainer>
         }
         <S.Content>

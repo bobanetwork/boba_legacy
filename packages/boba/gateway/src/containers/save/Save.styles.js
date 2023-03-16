@@ -4,6 +4,7 @@ import stakeBg from 'images/boba2/stake-balance-bg.png'
 
 export const StakePageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',

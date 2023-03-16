@@ -325,13 +325,12 @@ function Home() {
       }
 
       {! maintenance &&
-        <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
+        <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
           <Container maxWidth={false} sx={{
-            height: 'calc(100% - 150px)',
-            minHeight: '500px',
-            marginLeft: 'unset',
+            minHeight: 'calc(100vh - 64px)',
             width: '100vw',
+            marginLeft: 'unset',
             marginRight: 'unset'
           }}>
             <Outlet />

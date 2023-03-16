@@ -49,7 +49,7 @@ const Projects = ({projectType}) => {
           </S.ImageContainer>
           <S.ProjectContent
           >
-            <Typography alignSelf="center" variant="h4">{project.title}</Typography>
+            <Typography alignSelf="center" variant="h4" sx={{ fontWeight: 'bold', fontSize: '18px !important' }}>{project.title}</Typography>
             {isMobile ?
               <ShowMoreShowLess
                 sx={{

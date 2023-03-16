@@ -9,6 +9,7 @@ export const HistoryContainer = styled.div`
 
 export const HistoryPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',

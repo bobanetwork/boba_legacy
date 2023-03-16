@@ -14,9 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import {Select as MuiSelect, MenuItem, useTheme, Typography, Box} from '@mui/material';
+import ReactSelect from 'react-select';
+import { Select as MuiSelect, MenuItem, useTheme, Typography, Box } from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
+import { ArrowDropDownOutlined } from '@mui/icons-material';
 import {
   Option,
   MultiValue,
@@ -24,17 +26,17 @@ import {
 } from './Custom.select';
 
 function Select({
-                  label,
-                  value,
-                  options,
-                  onSelect,
-                  loading,
-                  error = '',
-                  className,
-                  newSelect = false,
-                  isMulti,
-                  isLoading = false,
-                }) {
+  label,
+  value,
+  options,
+  onSelect,
+  loading,
+  error = '',
+  className,
+  newSelect = false,
+  isMulti,
+  isLoading = false,
+}) {
   const theme = useTheme();
   const selected = options.find(i => i.value === value);
 
@@ -61,16 +63,15 @@ function Select({
   }
 
   const renderLoading = (
-    <S.SelectedContainer className={[styles.selected, styles.loading].join(' ')}>
+    <S.SelectedContainer className={[ styles.selected, styles.loading ].join(' ')}>
       Loading...
     </S.SelectedContainer>
   );
 
-  console.log("VALUE", value);
-
   const renderSelect = (
     <>
       <MuiSelect
+        IconComponent={() => <ArrowDropDownOutlined />}
         className={styles.select}
         value={value}
         onChange={onSelect}
@@ -80,8 +81,7 @@ function Select({
             '&& .Mui-selected': {
               backgroundColor: 'transparent !important',
               color: theme.palette.secondary.main,
-            },
-          }
+            },}
         }}
       >
         {options.map((i, index) => (
@@ -94,7 +94,7 @@ function Select({
                 <Typography variant="body2">
                   {i.title}
                 </Typography>
-                <Typography variant="body3" sx={{opacity: 0.65, color: 'inherit'}}>
+                <Typography variant="body3" sx={{ opacity: 0.65, color: 'inherit' }}>
                   {i.description}
                 </Typography>
               </div>
@@ -108,10 +108,9 @@ function Select({
           <div className={styles.subTitle}>{selected ? selected.subTitle : ''}</div>
         </div>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M8.71038 12.4393C9.29616 13.0251 10.2459 13.0251 10.8317 12.4393L13.9814 9.28962C14.9264 8.34468 14.2571 6.72896 12.9208 6.72896L6.62132 6.72896C5.28496 6.72896 4.61571 8.34467 5.56066 9.28962L8.71038 12.4393Z"
+          <path d="M8.71038 12.4393C9.29616 13.0251 10.2459 13.0251 10.8317 12.4393L13.9814 9.28962C14.9264 8.34468 14.2571 6.72896 12.9208 6.72896L6.62132 6.72896C5.28496 6.72896 4.61571 8.34467 5.56066 9.28962L8.71038 12.4393Z"
             fill={theme.palette.text.primary}
-            fillOpacity="0.45"/>
+            fillOpacity="0.45" />
         </svg>
       </S.SelectedContainer>
     </>
@@ -124,17 +123,53 @@ function Select({
       className
     ].join(' ')}>
       {label && <Box className={styles.label}>{label}</Box>}
-      <Select
-        onSelect={(e) => {
-          onSelect({
-            value: e.target.value,
-            label: e.target.value,
+      <ReactSelect
+        value={value}
+        onChange={onSelect}
+        isMulti={isMulti}
+        options={options}
+        isLoading={isLoading}
+        styles={{
+          control: (base) => ({
+            ...base,
+            background: theme.palette.background.default,
+            borderRadius: theme.palette.primary.borderRadius,
+            padding: '5px 10px',
+            width: '100%',
+            border: '1px solid rgba(255, 255, 255, 0.14)'
+          }),
+          indicatorSeparator: (base) => ({
+            ...base,
+            display: 'none',
+          }),
+          container: (base) => ({
+            ...base,
+            background: 'none'
+          }),
+          singleValue: (base) => ({
+            ...base,
+            background: 'transparent',
+            color: theme.palette.secondary.text,
+            padding: '5px'
+          }),
+          multiValue: (base) => ({
+            ...base,
+            background: theme.palette.background.secondary,
+            color: theme.palette.secondary.text,
+            marginRight: '5px',
+            paddingRight: '5px',
+          }),
+          valueContainer: (base) => ({
+            ...base,
+            background: 'none',
           })
         }}
-        value={value.value}
-        options={options.map(i => ({value: i.value, title: i.label}))}
-        isLoading={isLoading}
-        multiple={isMulti}
+        theme={theme}
+        components={{
+          Option,
+          MultiValue,
+          SingleValue
+        }}
       />
     </Box>
   }

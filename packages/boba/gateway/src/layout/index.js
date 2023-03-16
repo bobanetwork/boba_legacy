@@ -92,6 +92,9 @@ function App() {
         main: '#fff',
         contrastText: buttonColor,
       },
+      spacing: {
+        toFooter: '80px',
+      },
     },
     typography: {
       fontFamily: ['MrEavesXL', 'Roboto'].join(','),

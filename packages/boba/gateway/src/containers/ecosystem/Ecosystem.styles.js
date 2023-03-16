@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles'
 
 export const EcoSystemPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
@@ -68,10 +69,10 @@ export const ProjectContent = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   padding: '16px',
   paddingTop: '50px',
-  gap: 1,
+  gap: '16px',
   marginTop: '50px',
   width: '100%',
-  height: '140px',
+  height: '165px',
   [theme.breakpoints.down('md')]: {
     minHeight: '140px',
     height: 'auto',
@@ -113,11 +114,13 @@ export const ProjectDescription = styled(Typography)(({ theme }) => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   opacity: 0.85,
-  fontSize: '0.7em',
+  fontSize: '13px',
   fontWeight: 400,
   display: '-webkit-box',
   WebkitLineClamp: 3,
   WebkitBoxOrient: 'vertical',
+  lineHeight: '20px',
+  textAlign: 'center',
 }))
 
 export const TileFooter = styled(Box)(({ theme, ...props }) => ({
