@@ -30,7 +30,6 @@ import {
   selectMonster,
 } from 'selectors/setupSelector'
 import NetworkSwitcher from 'components/mainMenu/networkSwitcher/NetworkSwitcher'
-import WalletSwitch from 'components/walletSwitch/WalletSwitch'
 import { LAYER } from 'util/constant'
 
 const useStyles = makeStyles({
@@ -167,7 +166,6 @@ const PageHeader = ({ maintenance }) => {
           />
           <MenuItems setOpen={setOpen} />
           {layer === LAYER.L2 ? <FeeSwitcher /> : null}
-          <WalletSwitch />
           <NetworkSwitcher />
           {!!accountEnabled ? (
             <>

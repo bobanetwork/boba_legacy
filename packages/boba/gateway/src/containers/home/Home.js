@@ -94,6 +94,7 @@ import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkS
 import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
+import useWalletSwitch from 'hooks/useWalletSwitch'
 
 
 function Home() {
@@ -225,7 +226,7 @@ function Home() {
 
   // Invoking GA analysis page view hooks
   useGoogleAnalytics();
-
+  useWalletSwitch()
   useNetwork()
 
   return (
