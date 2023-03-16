@@ -1,4 +1,4 @@
-import { useMediaQuery, useTheme } from '@mui/material'
+import { Typography, useMediaQuery, useTheme } from '@mui/material'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectAccountEnabled } from 'selectors/setupSelector'
