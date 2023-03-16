@@ -345,6 +345,24 @@ function App() {
           },
         ],
       },
+      MuiTypography: {
+        variants: [
+          {
+            props: { variant: 'body2', color: 'fade' },
+            style: {
+              lineHeight: '1.1em',
+              color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            },
+          },
+          {
+            props: { variant: 'body3', color: 'fade' },
+            style: {
+              lineHeight: '0.7em',
+              color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            },
+          }
+        ]
+      }
     },
   })
 
