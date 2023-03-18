@@ -2,17 +2,16 @@ import { Box, styled } from "@mui/material"
 
 export const BridgesContainer = styled(Box)(({ theme }) => ({
   background: theme.palette.background.glassy,
+  backdropFilter: 'blur(50px)',
   borderRadius: theme.palette.secondary.borderRadius,
-  backdropFilter: 'blur(100px)',
   flex: 1,
   minHeight: 'fit-content',
-  padding: '20px',
+  padding: '24px',
   width: '100%',
+    maxWidth: '600px',
 }))
 
 export const Wrapper = styled(Box)(({ theme }) => ({
-  maxHeight: '300px',
-  overflowY: 'scroll',
   display: 'flex',
   flexDirection: 'column',
   gap: '5px'

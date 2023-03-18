@@ -5,9 +5,24 @@ import { Link, Typography } from '@mui/material'
 
 import networkService from 'services/networkService'
 
-function AvailableBridges({ token = null }) {
+function AvailableBridges({ token = null, walletAddress = "" }) {
 
   const [ bridges, setBridges ] = useState([])
+
+  const banxaUrl = () => {
+    const banxaUrl = 'https://boba.banxa.com/iframe?';
+    const config = {
+      coinType:'ETH',
+      fiatType: 'USD',
+      fiatAmount: '35',
+      bloackChain: 'BOBA',
+      walletAddress:walletAddress
+    }
+    
+    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&fiatAmount=${config.fiatAmount}&blockchain=${config.bloackChain}&walletAddress=${walletAddress}`
+  }
+
+
 
   useEffect(() => {
     if (token) {
@@ -23,6 +38,18 @@ function AvailableBridges({ token = null }) {
         </Typography>
     </S.LabelContainer>
     <S.Wrapper>
+    <S.BridgeContent key={'banxa'}>
+          <Link color="inherit"
+            variant="body2"
+            href={banxaUrl()}
+
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ textDecoration: 'none' }}
+          >
+            <Typography variant="body1" component="span" my={1}> Banxa</Typography>
+          </Link>
+        </S.BridgeContent>
       {bridges.map((bridge) => {
         return <S.BridgeContent key={bridge.type}>
           <Link color="inherit"

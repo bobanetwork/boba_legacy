@@ -35,6 +35,7 @@ import { LAYER } from 'util/constant'
 function BridgeTransfer() {
 
   const accountEnabled = useSelector(selectAccountEnabled())
+
   const layer = useSelector(selectLayer())
   //const bridgeType = useSelector(selectBridgeType())
   const multibridgeMode = useSelector(selectMultiBridgeMode())

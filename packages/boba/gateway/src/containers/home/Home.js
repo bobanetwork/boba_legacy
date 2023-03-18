@@ -333,7 +333,7 @@ function Home() {
             height: 'calc(100% - 150px)',
             minHeight: '500px',
             marginLeft: 'unset',
-            width: '100vw',
+            width: '100%',
             marginRight: 'unset'
           }}>
             <Outlet />
