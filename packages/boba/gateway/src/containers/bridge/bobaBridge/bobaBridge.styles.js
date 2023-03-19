@@ -48,7 +48,7 @@ export const BobaDivider = styled(MuiDivider)(({ theme }) => ({
   background: theme.palette.background.secondary,
   boxSizing: 'border-box',
   width: '100%',
-  margin: '32px 0 32px 0',
+  margin: '16px 0 16px 0',
 }))
 
 export const ChainInput = styled(Box)(({ theme }) => ({
@@ -89,9 +89,9 @@ export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
 }))
 
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
+  backdropFilter: 'blur(50px)',
   borderRadius: theme.palette.primary.borderRadius,
-  border: theme.palette.primary.border,
   width: '100%',
   maxWidth: '600px',
   padding: '20px',

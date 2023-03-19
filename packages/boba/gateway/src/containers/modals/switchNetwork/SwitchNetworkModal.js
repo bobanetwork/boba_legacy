@@ -1,31 +1,33 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box } from '@mui/material';
 
 import Button from 'components/button/Button';
 import Modal from 'components/modal/Modal';
 
-import { restTokenList } from 'actions/tokenAction';
-import { setConnect, setConnectETH } from 'actions/setupAction';
+import { setActiveNetwork } from 'actions/networkAction';
 import { closeModal } from 'actions/uiAction';
+import { setBaseState, setConnect, setEnableAccount } from 'actions/setupAction';
 
 import { selectNetwork } from 'selectors/networkSelector';
 
-function WrongNetworkModal({open}) {
+function SwitchNetworkModal({open}) {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
 
-  useEffect(() => {
-    if (open){
-      dispatch(restTokenList())
-    }
-  }, [dispatch, open])
-
+  function onClick() {
+    dispatch(setActiveNetwork());
+    // reset baseState to false to trigger initialization on chain change.
+    // and trigger the connect to BOBA & ETH base on current chain.
+    dispatch(setBaseState(false));
+    dispatch(setEnableAccount(false));
+    dispatch(closeModal('switchNetworkModal'));
+  }
 
   function handleClose() {
     dispatch(setConnect(false));
-    dispatch(closeModal('wrongNetworkModal'));
+    dispatch(closeModal('switchNetworkModal'));
   }
 
   return (
@@ -34,7 +36,7 @@ function WrongNetworkModal({open}) {
       onClose={handleClose}
       maxWidth="xs"
       minHeight="180px"
-      title="Wrong Network"
+      title="Switch Network"
       newStyle={true}
     >
       <Box display="flex" alignItems="center" justifyContent="center">
@@ -42,13 +44,13 @@ function WrongNetworkModal({open}) {
           type="primary"
           variant="contained"
           size="large"
-          onClick={()=>dispatch(setConnectETH(true))}
+          onClick={()=>onClick()}
         >
-          Connect to the {network} network
+          Switch to the {network} network
         </Button>
       </Box>
     </Modal>
   )
 }
 
-export default React.memo(WrongNetworkModal);
+export default React.memo(SwitchNetworkModal);

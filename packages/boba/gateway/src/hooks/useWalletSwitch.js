@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setActiveNetwork } from 'actions/networkAction';
-import { setBaseState, setConnect, setConnectBOBA, setConnectETH, setEnableAccount } from 'actions/setupAction';
+import { openModal } from 'actions/uiAction';
+import { setConnect, setConnectBOBA, setConnectETH } from 'actions/setupAction';
 import { selectActiveNetwork, selectActiveNetworkType, selectNetwork, selectNetworkType } from 'selectors/networkSelector';
-
-import Button from 'components/button/Button';
-import { FiberManualRecord } from '@mui/icons-material';
 import { selectBaseEnabled, selectLayer } from 'selectors/setupSelector';
 import { LAYER } from 'util/constant';
 
-const WalletSwitch = () => {
+const useWalletSwitch = () => {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
@@ -21,15 +18,6 @@ const WalletSwitch = () => {
   const baseEnabled = useSelector(selectBaseEnabled());
 
   const [ reconnect, setReconnect ] = useState(false);
-
-  const onSwitch = () => {
-    dispatch(setActiveNetwork());
-    // reset baseState to false to trigger initialization on chain change.
-    // and trigger the connect to BOBA & ETH base on current chain.
-    dispatch(setBaseState(false));
-    dispatch(setEnableAccount(false));
-    setReconnect(true);
-  }
 
   useEffect(() => {
     if (!!reconnect && !!baseEnabled) {
@@ -46,24 +34,12 @@ const WalletSwitch = () => {
     }
   }, [ layer, reconnect, baseEnabled, dispatch ]);
 
-  if (activeNetwork === network
-    && activeNetworkType === networkType) {
-    return null;
-  }
+  useEffect(() => {
+    if (activeNetwork !== network || activeNetworkType !== networkType) {
+      dispatch(openModal('switchNetworkModal'))
+    }
+  }, [activeNetwork, activeNetworkType, network, networkType, dispatch])
 
-  return <>
-    <Button
-      color="primary"
-      size="medium"
-      variant="outlined"
-      onClick={onSwitch}
-      sx={{
-        whiteSpace: 'nowrap'
-      }}
-    >
-      Switch to <FiberManualRecord fontSize="small" htmlColor='#BAE21A' /> {` ${network}-${networkType}`}
-    </Button>
-  </>
 }
 
-export default WalletSwitch;
+export default useWalletSwitch;

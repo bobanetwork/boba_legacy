@@ -5,9 +5,10 @@ export const LayerSwitcherContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: theme.palette.background.secondary,
   borderRadius: '12px',
   padding: '0',
   cursor: 'pointer',
-
+  [ theme.breakpoints.up('sm') ]: {
+    background: theme.palette.background.secondary,
+  }
 }));

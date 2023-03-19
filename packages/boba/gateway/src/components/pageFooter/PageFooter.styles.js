@@ -112,7 +112,6 @@ export const FooterLinkWrapper = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   width: '70%',
-  margin: '32px auto',
   [theme.breakpoints.down('md')]: {
     width: '100%',
     justifyContent: 'space-around',
