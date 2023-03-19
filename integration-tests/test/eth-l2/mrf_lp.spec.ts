@@ -60,12 +60,14 @@ describe('Liquidity Pool Test', async () => {
       [initialSupply, tokenName, tokenSymbol, 18],
       env.l1Wallet,
     )
+    await L1ERC20.deployTransaction.wait()
 
     OMGLIkeToken = await deployBobaContractCore(
       'OMGLikeToken',
       [],
       env.l1Wallet,
     )
+    await OMGLIkeToken.deployTransaction.wait()
 
     const Factory__L2ERC20 = getContractFactory(
       'L2StandardERC20',
