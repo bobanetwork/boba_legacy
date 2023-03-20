@@ -5,20 +5,23 @@ const expect = chai.expect
 
 import { Contract, ContractFactory, utils } from 'ethers'
 
-import { getFilteredLogIndex } from './shared/utils'
+import { getFilteredLogIndex, l2Wallet } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
 // use local sdk
-import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
-import { wrapProvider } from '@account-abstraction/sdk/src/Provider'
-import SimpleWalletDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWalletDeployer.sol/SimpleWalletDeployer.json'
-import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
+import { SimpleAccountAPI } from '@boba/bundler_sdk'
+import { wrapProvider } from '@boba/bundler_sdk'
+// change this to using factory
+import SimpleAccountDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountDeployer.sol/SimpleAccountDeployer.json'
+import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
+import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
 
 describe('AA Wallet Test\n', async () => {
   let env: OptimismEnv
-  let SimpleWallet__factory: ContractFactory
+  let SimpleAccount__factory: ContractFactory
   let recipient: Contract
 
   let bundlerProvider: HttpRpcClient
@@ -28,11 +31,11 @@ describe('AA Wallet Test\n', async () => {
 
   before(async () => {
     env = await OptimismEnv.new()
-    entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
+    entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
-    SimpleWallet__factory = new ContractFactory(
-      SimpleWalletJson.abi,
-      SimpleWalletJson.bytecode,
+    SimpleAccount__factory = new ContractFactory(
+      SimpleAccountJson.abi,
+      SimpleAccountJson.bytecode,
       env.l2Wallet
     )
 
@@ -51,9 +54,9 @@ describe('AA Wallet Test\n', async () => {
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
   })
-  it('should be able to send a userOperation to a wallet through the bundler', async () => {
+  it('should be able to send a userOperation to a wallet through the bundler (low level api)', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
-    const account = await SimpleWallet__factory.deploy(
+    const account = await SimpleAccount__factory.deploy(
       entryPointAddress,
       env.l2Wallet.address
     )
@@ -65,26 +68,26 @@ describe('AA Wallet Test\n', async () => {
       to: account.address,
     })
 
-    const walletAPI = new SimpleWalletAPI({
+    const accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
       entryPointAddress,
       owner: env.l2Wallet,
       walletAddress: account.address,
     })
 
-    const op = await walletAPI.createSignedUserOp({
+    const op = await accountAPI.createSignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
     })
 
     try {
       const requestId = await bundlerProvider.sendUserOpToBundler(op)
-      const txid = await walletAPI.getUserOpReceipt(requestId)
+      const txid = await accountAPI.getUserOpReceipt(requestId)
       console.log('reqId', requestId, 'txid=', txid)
       const receipt = await env.l2Provider.getTransactionReceipt(txid)
       const returnedlogIndex = await getFilteredLogIndex(
         receipt,
-        SampleRecipient__factory.abi,
+        SampleRecipientJson.abi,
         recipient.address,
         'Sender'
       )
@@ -99,41 +102,116 @@ describe('AA Wallet Test\n', async () => {
       throw new Error('Submission to Bundler Failed: ' + e)
     }
   })
-  it('should deploy a wallet if it doesnt exist through initCode', async () => {
-    // Deploy WalletDeployer
-    const SimpleWalletDeployer__factory = new ContractFactory(
-      SimpleWalletDeployerJson.abi,
-      SimpleWalletDeployerJson.bytecode,
-      env.l2Wallet_2
+  it('should be able to send a userOperation to a wallet through the bundler (high level api)', async () => {
+    // deploy a senderCreator contract to get the create2 address on the provide
+    const SenderCreator__factory = new ContractFactory(
+        SenderCreatorJson.abi,
+        SenderCreatorJson.bytecode,
+        env.l2Wallet
     )
-    const SimpleWalletDeployer = await SimpleWalletDeployer__factory.deploy()
-    console.log('factory deployed to', SimpleWalletDeployer.address)
 
-    const walletAPI = new SimpleWalletAPI({
-      provider: env.l2Provider,
-      entryPointAddress,
-      owner: env.l2Wallet_2,
-      factoryAddress: SimpleWalletDeployer.address,
+    const senderCreator = await SenderCreator__factory.deploy()
+
+    const aasigner = env.l2Provider.getSigner()
+    const config = {
+    chainId: await env.l2Provider.getNetwork().then(net => net.chainId),
+    entryPointAddress,
+    bundlerUrl: 'http://localhost:3000/rpc'
+    }
+
+    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet_3, senderCreator.address)
+
+    const walletAddress = await aaProvider.getSigner().getAddress()
+    await env.l2Wallet.sendTransaction({
+        value: utils.parseEther('2'),
+        to: walletAddress,
     })
 
-    // `createUnsignedUserOp()` on the sdk failes only for boba:
-    // Fails getting sender address from initCode at - `getCounterFactualAddress`
-    // This is because `getSenderAddress()` method on EntryPoint returns the calcualted address(from intiCode)
-    // as a reverted error to not deploy the initCode, but get and return only the resultant address
+    recipient = recipient.connect(aaProvider.getSigner())
+    const tx = await recipient.something('hello')
+    const receipt = await tx.wait()
+    const returnedlogIndex = await getFilteredLogIndex(
+      receipt,
+      SampleRecipientJson.abi,
+      recipient.address,
+      'Sender'
+    )
+    const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+    // tx.origin is the bundler
+    expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+    // msg.sender is the 4337 wallet
+    expect(log.args.msgSender).to.eq(walletAddress)
+    // message is received and emitted
+    expect(log.args.message).to.eq('hello')
+  })
+  it('should deploy a wallet if it does not exist through initCode', async () => {
+    // Deploy WalletDeployer
+    const SimpleAccountDeployer__factory = new ContractFactory(
+      SimpleAccountDeployerJson.abi,
+      SimpleAccountDeployerJson.bytecode,
+      env.l2Wallet_2
+    )
+    const SimpleAccountDeployer = await SimpleAccountDeployer__factory.deploy()
+    console.log('factory deployed to', SimpleAccountDeployer.address)
 
-    // The sdk reads this resultant address from the errorArgs, which is of the form:
-    // [ See: https://links.ethers.org/v5-errors-CALL_EXCEPTION ] (method="getSenderAddress(bytes)",
-    // data="0x6ca7b8060000000000000000000000009179e5563d0fa43edde674281c8f6f76b956a3ce",
-    // errorArgs=["0x9179e5563d0FA43EDDE674281c8f6f76B956a3CE"], errorName="SenderAddressResult",
-    // errorSignature="SenderAddressResult(address)", reason=null, code=CALL_EXCEPTION, version=abi/5.7.0)
+    // deploy a senderCreator contract to get the create2 address on the provide
+    const SenderCreator__factory = new ContractFactory(
+        SenderCreatorJson.abi,
+        SenderCreatorJson.bytecode,
+        env.l2Wallet
+    )
 
-    // On Boba however, the revert data is not returned, resulting in
-    //  (missing revert data in call exception; Transaction reverted without a reason string)
-    // and the sdk is unable to calculate sender
+    const senderCreator = await SenderCreator__factory.deploy()
 
-    // const op = await walletAPI.createUnsignedUserOp({
-    //   target: recipient.address,
-    //   data: recipient.interface.encodeFunctionData('something', ['hello']),
-    // })
+    const accountAPI = new SimpleAccountAPI({
+      provider: env.l2Provider,
+      entryPointAddress,
+      senderCreatorAddress: senderCreator.address,
+      owner: env.l2Wallet_2,
+      factoryAddress: SimpleAccountDeployer.address,
+    })
+
+    const accountAddress = await accountAPI.getWalletAddress()
+    // computed address is correct
+    expect(accountAddress).to.be.eq(await SimpleAccountDeployer.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
+
+    await env.l2Wallet.sendTransaction({
+      value: utils.parseEther('2'),
+      to: accountAddress,
+    })
+
+    const op = await accountAPI.createSignedUserOp({
+      target: recipient.address,
+      data: recipient.interface.encodeFunctionData('something', ['hello']),
+    })
+
+    expect(await op.sender).to.be.eq(accountAddress)
+    const preAccountCode = await env.l2Provider.getCode(op.sender)
+    expect(preAccountCode).to.be.eq('0x')
+
+    try {
+      const requestId = await bundlerProvider.sendUserOpToBundler(op)
+      const txid = await accountAPI.getUserOpReceipt(requestId)
+      console.log('reqId', requestId, 'txid=', txid)
+      const receipt = await env.l2Provider.getTransactionReceipt(txid)
+      const returnedlogIndex = await getFilteredLogIndex(
+        receipt,
+        SampleRecipientJson.abi,
+        recipient.address,
+        'Sender'
+      )
+      const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+      // tx.origin is the bundler
+      expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+      // msg.sender is the 4337 wallet
+      expect(log.args.msgSender).to.eq(accountAddress)
+      // message is received and emitted
+      expect(log.args.message).to.eq('hello')
+    } catch (e) {
+      throw new Error('Submission to Bundler Failed: ' + e)
+    }
+
+    const postAccountCode = await env.l2Provider.getCode(op.sender)
+    expect(postAccountCode).to.be.not.eq('0x')
   })
 })

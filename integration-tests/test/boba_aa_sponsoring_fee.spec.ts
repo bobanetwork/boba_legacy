@@ -10,17 +10,17 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
-import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
+import { SimpleAccountAPI } from '@boba/bundler_sdk'
+import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
 
 import VerifyingPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/VerifyingPaymaster.sol/VerifyingPaymaster.json'
 
 describe('Sponsoring Tx\n', async () => {
   let env: OptimismEnv
-  let SimpleWallet__factory: ContractFactory
+  let SimpleAccount__factory: ContractFactory
   let recipient: Contract
 
   let bundlerProvider: HttpRpcClient
@@ -37,7 +37,7 @@ describe('Sponsoring Tx\n', async () => {
 
   before(async () => {
     env = await OptimismEnv.new()
-    entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
+    entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
     SampleRecipient__factory = new ContractFactory(
       SampleRecipientJson.abi,
@@ -53,9 +53,9 @@ describe('Sponsoring Tx\n', async () => {
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
 
-    SimpleWallet__factory = new ContractFactory(
-      SimpleWalletJson.abi,
-      SimpleWalletJson.bytecode,
+    SimpleAccount__factory = new ContractFactory(
+      SimpleAccountJson.abi,
+      SimpleAccountJson.bytecode,
       env.l2Wallet
     )
 
@@ -79,7 +79,7 @@ describe('Sponsoring Tx\n', async () => {
     )
   })
   describe('A user has no fee token, but pays for a transaction through a willing paymaster\n', async () => {
-    let walletAPI: SimpleWalletAPI
+    let accountAPI: SimpleAccountAPI
     let signedOp
     let account
 
@@ -93,20 +93,20 @@ describe('Sponsoring Tx\n', async () => {
     })
     it('should be able to generate and sign an userOp', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
-      account = await SimpleWallet__factory.deploy(
+      account = await SimpleAccount__factory.deploy(
         entryPointAddress,
         env.l2Wallet_3.address
       )
       await account.deployed()
 
-      walletAPI = new SimpleWalletAPI({
+      accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
         owner: env.l2Wallet_3,
         walletAddress: account.address,
       })
 
-      const op = await walletAPI.createSignedUserOp({
+      const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
@@ -119,7 +119,7 @@ describe('Sponsoring Tx\n', async () => {
 
       op.paymasterAndData = hexConcat([VerifyingPaymaster.address, sig])
 
-      signedOp = await walletAPI.signUserOp(op)
+      signedOp = await accountAPI.signUserOp(op)
 
       expect(await signedOp.sender).to.be.eq(account.address)
     })
@@ -129,12 +129,12 @@ describe('Sponsoring Tx\n', async () => {
 
       try {
         const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
-        const txid = await walletAPI.getUserOpReceipt(requestId)
+        const txid = await accountAPI.getUserOpReceipt(requestId)
         console.log('reqId', requestId, 'txid=', txid)
         const receipt = await env.l2Provider.getTransactionReceipt(txid)
         const returnedlogIndex = await getFilteredLogIndex(
           receipt,
-          SampleRecipient__factory.abi,
+          SampleRecipientJson.abi,
           recipient.address,
           'Sender'
         )
@@ -146,13 +146,13 @@ describe('Sponsoring Tx\n', async () => {
         // message is received and emitted
         expect(log.args.message).to.eq('hello')
 
-        const returnedEPlogIndex = await getFilteredLogIndex(
-          receipt,
-          EntryPointJson.abi,
-          entryPointAddress,
-          'UserOperationEvent'
-        )
-        const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+        // const returnedEPlogIndex = await getFilteredLogIndex(
+        //   receipt,
+        //   EntryPointJson.abi,
+        //   entryPointAddress,
+        //   'UserOperationEvent'
+        // )
+        const logEP = EntryPoint.interface.parseLog(receipt.logs[1])
         const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
         const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
 

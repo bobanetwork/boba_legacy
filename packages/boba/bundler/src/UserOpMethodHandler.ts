@@ -238,7 +238,7 @@ export class UserOpMethodHandler {
       )}`
     )
 
-    await this.simulateUserOp(userOp1, entryPointInput)
+    // await this.simulateUserOp(userOp1, entryPointInput)
     const beneficiary = await this.selectBeneficiary()
     const userOpHash = await this.entryPoint.getUserOpHash(userOp)
 

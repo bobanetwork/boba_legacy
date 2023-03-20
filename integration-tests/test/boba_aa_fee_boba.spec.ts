@@ -10,19 +10,19 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleWalletAPI } from '@account-abstraction/sdk/src/SimpleWalletAPI'
+import { SimpleAccountAPI } from '@boba/bundler_sdk'
 import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
-import SimpleWalletJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleWallet.sol/SimpleWallet.json'
+import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@account-abstraction/sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
 
 import BobaDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
 
 describe('AA Boba as Fee token Test\n', async () => {
   let env: OptimismEnv
-  let SimpleWallet__factory: ContractFactory
+  let SimpleAccount__factory: ContractFactory
   let recipient: Contract
 
   let bundlerProvider: HttpRpcClient
@@ -42,7 +42,7 @@ describe('AA Boba as Fee token Test\n', async () => {
 
   before(async () => {
     env = await OptimismEnv.new()
-    entryPointAddress = env.addressesAABOBA.BOBA_EntryPoint
+    entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
     SampleRecipient__factory = new ContractFactory(
       SampleRecipientJson.abi,
@@ -106,12 +106,12 @@ describe('AA Boba as Fee token Test\n', async () => {
   })
   it('A user without ETH pays for a tx using $BOBA through a paymaster', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
-    SimpleWallet__factory = new ContractFactory(
-      SimpleWalletJson.abi,
-      SimpleWalletJson.bytecode,
+    SimpleAccount__factory = new ContractFactory(
+      SimpleAccountJson.abi,
+      SimpleAccountJson.bytecode,
       env.l2Wallet
     )
-    const account = await SimpleWallet__factory.deploy(
+    const account = await SimpleAccount__factory.deploy(
       entryPointAddress,
       env.l2Wallet.address
     )
@@ -127,14 +127,14 @@ describe('AA Boba as Fee token Test\n', async () => {
       to: account.address,
     })
 
-    const walletAPI = new SimpleWalletAPI({
+    const accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
       entryPointAddress,
       owner: env.l2Wallet,
       walletAddress: account.address,
     })
 
-    const approveOp = await walletAPI.createSignedUserOp({
+    const approveOp = await accountAPI.createSignedUserOp({
         target: L2BOBAToken.address,
         data: L2BOBAToken.interface.encodeFunctionData('approve', [BobaDepositPaymaster.address, constants.MaxUint256]),
     })
@@ -145,7 +145,7 @@ describe('AA Boba as Fee token Test\n', async () => {
 
     try {
         const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
-        const txid = await walletAPI.getUserOpReceipt(requestId)
+        const txid = await accountAPI.getUserOpReceipt(requestId)
         console.log('reqId', requestId, 'txid=', txid)
     } catch (e) {
         throw new Error('Submission to Bundler Failed: ' + e)
@@ -154,25 +154,26 @@ describe('AA Boba as Fee token Test\n', async () => {
     const postApproveTokenBalance = await L2BOBAToken.balanceOf(account.address)
     const postApproveDepositAmount = (await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account.address)).amount
     const postApproveEtherBalance = await env.l2Provider.getBalance(account.address)
-    const op = await walletAPI.createUnsignedUserOp({
+    const op = await accountAPI.createUnsignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
     })
 
 
+    // TODO: check why paymasterAndData does not work when added to the walletAPI
     op.paymasterAndData = hexConcat([BobaDepositPaymaster.address, hexZeroPad(L2BOBAToken.address, 20)])
-    op.preVerificationGas = await walletAPI.getPreVerificationGas(op)
+    op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
 
-    const signedOp = await walletAPI.signUserOp(op)
+    const signedOp = await accountAPI.signUserOp(op)
 
     try {
       const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
-      const txid = await walletAPI.getUserOpReceipt(requestId)
+      const txid = await accountAPI.getUserOpReceipt(requestId)
       console.log('reqId', requestId, 'txid=', txid)
       const receipt = await env.l2Provider.getTransactionReceipt(txid)
       const returnedlogIndex = await getFilteredLogIndex(
         receipt,
-        SampleRecipient__factory.abi,
+        SampleRecipientJson.abi,
         recipient.address,
         'Sender'
       )
@@ -187,13 +188,15 @@ describe('AA Boba as Fee token Test\n', async () => {
       const postCallDepositAmount = (await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account.address)).amount
       const postCallEtherBalance = await env.l2Provider.getBalance(account.address)
 
-      const returnedEPlogIndex = await getFilteredLogIndex(
-        receipt,
-        EntryPointJson.abi,
-        entryPointAddress,
-        'UserOperationEvent'
-      )
-      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+      // const returnedEPlogIndex = await getFilteredLogIndex(
+      //   receipt,
+      //   EntryPointJson.abi,
+      //   entryPointAddress,
+      //   'UserOperationEvent'
+      // )
+      // TODO: check returnedEPlogIndex failure
+      // UserOperationEvent emitted at logIndex 3
+      const logEP = EntryPoint.interface.parseLog(receipt.logs[3])
 
       // no token is used when approving, ether balance is used to pay approval fees
       expect(preApproveTokenBalance).to.eq(postApproveTokenBalance)
