@@ -33,6 +33,7 @@ type Config struct {
 	L2Client    *l2ethclient.Client
 	BlockOffset uint64
 	MaxTxSize   uint64
+	MaxGasLimit uint64
 	CTCAddr     common.Address
 	ChainID     *big.Int
 	KeyId       string
@@ -235,6 +236,10 @@ func (d *Driver) CraftBatchTx(
 		opts.Nonce = nonce
 		opts.NoSend = true
 
+		if d.cfg.MaxGasLimit != 0 {
+			opts.GasLimit = d.cfg.MaxGasLimit
+		}
+
 		tx, err := d.rawCtcContract.RawTransact(opts, batchCallData)
 		switch {
 		case err == nil:
@@ -274,6 +279,10 @@ func (d *Driver) SubmitBatchTx(
 	}
 	opts.Context = ctx
 	opts.Nonce = new(big.Int).SetUint64(tx.Nonce())
+
+	if d.cfg.MaxGasLimit != 0 {
+		opts.GasLimit = d.cfg.MaxGasLimit
+	}
 
 	finalTx, err := d.rawCtcContract.RawTransact(opts, tx.Data())
 	switch {

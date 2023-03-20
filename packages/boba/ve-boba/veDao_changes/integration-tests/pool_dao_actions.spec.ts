@@ -13,8 +13,8 @@ import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1Liquid
 import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
 // use a mock contract only to adjust time params freely
-import GovernorBravoDelegateJson from '../artifacts/contracts/MockGovernorBravoDelegate.sol/MockGovernorBravoDelegate.json'
-import TimelockJson from '../artifacts/contracts/MockTimelock.sol/MockTimelock.json'
+import GovernorBravoDelegateJson from '../../artifacts/contracts/MockGovernorBravoDelegate.sol/MockGovernorBravoDelegate.json'
+import TimelockJson from '../../artifacts/contracts/MockTimelock.sol/MockTimelock.json'
 
 import GovernorBravoDelegatorJson from '@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 

@@ -210,7 +210,6 @@ class LayerZeroBridgeMonitor extends GlobalEnv {
         timestamp: block.timestamp,
         reference: url,
       }
-
       await this.databaseService.insertLayerZeroTx(eventData)
     }
   }

@@ -30,3 +30,4 @@ curl \
     $L2_URL
 
 npx hardhat test --network boba --no-compile --config ./hardhat.config.ts "$@"
+

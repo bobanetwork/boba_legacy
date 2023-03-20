@@ -228,7 +228,8 @@ class l1BridgeMonitorService extends GlobalEnv {
           this.OVM_L1StandardBridgeInterface.parseLog(eachL1StandardBridgeLog)
         if (
           L1StandardBridgeEvent.name === 'ERC20DepositInitiated' ||
-          L1StandardBridgeEvent.name === 'ETHDepositInitiated'
+          L1StandardBridgeEvent.name === 'ETHDepositInitiated' ||
+          L1StandardBridgeEvent.name === 'NativeTokenDepositInitiated'
         ) {
           const hash = eachL1StandardBridgeLog.transactionHash
           const blockHash = eachL1StandardBridgeLog.blockHash
@@ -251,7 +252,10 @@ class l1BridgeMonitorService extends GlobalEnv {
           const depositSender = L1StandardBridgeEvent.args._from
           const depositTo = L1StandardBridgeEvent.args._to
           let depositToken = null
-          if (L1StandardBridgeEvent.name === 'ETHDepositInitiated') {
+          if (
+            L1StandardBridgeEvent.name === 'ETHDepositInitiated' ||
+            L1StandardBridgeEvent.name === 'NativeTokenDepositInitiated'
+          ) {
             depositToken = '0x0000000000000000000000000000000000000000'
           } else {
             depositToken = L1StandardBridgeEvent.args._l1Token
@@ -314,18 +318,25 @@ class l1BridgeMonitorService extends GlobalEnv {
       let resolved
       try {
         resolved = await this.watcher.toCrossChainMessage(transaction)
-      } catch {
-        const messages = this.watcher.getMessagesByTransaction(transaction)
+        const messages = await this.watcher.getMessagesByTransaction(
+          transaction
+        )
         // we pick the target address is L2StandardBridge
         if (typeof messages !== 'undefined') {
           // we pick the target address is L2StandardBridge
           resolved = messages.filter(
             (i) => i.target === '0x4200000000000000000000000000000000000010'
           )
+          if (resolved.length === 0) {
+            continue
+          }
+          resolved = resolved[0]
         } else {
           // drop the message if we can't resolve it
           continue
         }
+      } catch {
+        continue
       }
       const latestL2Block = await this.L2Provider.getBlockNumber()
       let CDMReceipt = null
