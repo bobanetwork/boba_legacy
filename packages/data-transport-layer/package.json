@@ -39,6 +39,7 @@
     "@eth-optimism/common-ts": "0.2.2",
     "@eth-optimism/contracts": "0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
+    "@eth-optimism/sdk": "1.0.1",
     "@ethersproject/providers": "^5.5.0",
     "@ethersproject/transactions": "^5.5.0",
     "@sentry/node": "^7.30.0",
@@ -56,6 +57,7 @@
     "express-prom-bundle": "^6.3.6",
     "level": "^6.0.1",
     "levelup": "^4.4.0",
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {

@@ -13,12 +13,13 @@ interface DeploymentInfo {
   l1Explorer?: string
   l2Explorer?: string
   notice?: string
+  isAltL1?: boolean
 }
 
 const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
   {
     folder: 'mainnet',
-    name: 'Boba (mainnet)',
+    name: 'Boba (public mainnet)',
     chainid: 288,
     rpc: 'https://mainnet.boba.network',
     l1Explorer: 'https://etherscan.io',
@@ -31,6 +32,78 @@ const PUBLIC_DEPLOYMENTS: DeploymentInfo[] = [
     rpc: 'https://goerli.boba.netwokr',
     l1Explorer: 'https://goerli.etherscan.io',
     l2Explorer: 'https://testnet.bobascan.com',
+  },
+  {
+    folder: 'bobafuji',
+    name: 'Boba Avalanche (public testnet)',
+    chainid: 4328,
+    rpc: 'https://testnet.avax.boba.network',
+    l1Explorer: 'https://testnet.snowtrace.io',
+    l2Explorer: 'https://blockexplorer.testnet.avax.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobaavax',
+    name: 'Boba Avalanche (public mainnet)',
+    chainid: 43288,
+    rpc: 'https://avax.boba.network',
+    l1Explorer: 'https://snowtrace.io',
+    l2Explorer: 'https://blockexplorer.avax.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobabase',
+    name: 'Bobabase (public testnet)',
+    chainid: 1297,
+    rpc: 'https://bobabase.boba.network',
+    l1Explorer: 'https://moonbase.moonscan.io',
+    l2Explorer: 'https://blockexplorer.bobabase.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobaoperatestnet',
+    name: 'Bobaopera (public testnet)',
+    chainid: 4051,
+    rpc: 'https://testnet.bobaopera.boba.network',
+    l1Explorer: 'https://testnet.ftmscan.com/',
+    l2Explorer: 'https://blockexplorer.testnet.bobaopera.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobabnbtestnet',
+    name: 'Boba BNB (public testnet)',
+    chainid: 9728,
+    rpc: 'https://testnet.bnb.boba.network',
+    l1Explorer: 'https://testnet.bscscan.com/',
+    l2Explorer: 'https://blockexplorer.testnet.bnb.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobabnb',
+    name: 'Boba BNB (public mainnet)',
+    chainid: 56288,
+    rpc: 'https://bnb.boba.network',
+    l1Explorer: 'https://bscscan.com/',
+    l2Explorer: 'https://blockexplorer.bnb.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobabeam',
+    name: 'Bobabeam (public mainnet)',
+    chainid: 1294,
+    rpc: 'https://bobabase.boba.network',
+    l1Explorer: 'https://moonscan.io/',
+    l2Explorer: 'https://blockexplorer.bobabeam.boba.network',
+    isAltL1: true,
+  },
+  {
+    folder: 'bobaopera',
+    name: 'bobaopera (public mainnet)',
+    chainid: 301,
+    rpc: 'https://bobaopera.boba.network',
+    l1Explorer: 'https://ftmscan.com/',
+    l2Explorer: 'https://blockexplorer.bobaopera.boba.network',
+    isAltL1: true,
   },
 ]
 
@@ -48,6 +121,24 @@ const HIDDEN_CONTRACTS = [
   // Utility for modifying a ChugSplashProxy during an upgrade.
   'ChugSplashDictator',
 ]
+
+// Special contracts for Alt L1s
+const SPECIAL_CONTRACTS_FOR_ALT_L1 = [
+  // L2 BOBA contract for Alt L1s
+  'L2_BOBA_ALT_L1',
+  // L1 native token contract on L2 for Alt L1
+  'L2_L1NativeToken_ALT_L1',
+]
+
+// Rename contracts for Alt L1s
+const RENAME_SPECIAL_CONTRACTS = {
+  Lib_ResolvedDelegateBobaProxy: 'Proxy__BobaTuringCredit',
+  L2_BOBA_ALT_L1: 'L2_BOBA',
+  L2_L1NativeToken_ALT_L1: 'L2_L1NativeToken',
+}
+
+// ETH and WETH are not existed on Alt L1s
+const HIDDEN_CONTRACTS_FOR_ALT_L1 = ['OVM_ETH', 'WETH9', 'L2GovernanceERC20']
 
 interface ContractInfo {
   name: string
@@ -85,7 +176,8 @@ const addline = (str: string, line: string): string => {
  */
 const buildContractsTable = (
   contracts: ContractInfo[],
-  explorer?: string
+  explorer?: string,
+  isAltL1?: boolean
 ): string => {
   // Being very verbose within this function to make it clear what's going on.
   // We use HTML instead of markdown so we can get a table that displays well on GitHub.
@@ -106,8 +198,17 @@ const buildContractsTable = (
 
   for (const contract of contracts) {
     // Don't add records for contract addresses that aren't meant to be public-facing.
-    if (HIDDEN_CONTRACTS.includes(contract.name)) {
+    if (
+      HIDDEN_CONTRACTS.includes(contract.name) ||
+      (!isAltL1 && SPECIAL_CONTRACTS_FOR_ALT_L1.includes(contract.name)) ||
+      (isAltL1 && HIDDEN_CONTRACTS_FOR_ALT_L1.includes(contract.name))
+    ) {
       continue
+    }
+
+    // Rename contracts
+    if (RENAME_SPECIAL_CONTRACTS[contract.name]) {
+      contract.name = RENAME_SPECIAL_CONTRACTS[contract.name]
     }
 
     table = addline(table, '<tr>')
@@ -143,7 +244,7 @@ const getL1Contracts = (deployment: string): ContractInfo[] => {
   const l1ContractsFolder = getDeploymentFolderPath(deployment)
   return dirtree(l1ContractsFolder)
     .children.filter((child) => {
-      return child.extension === '.json'
+      return child.name.includes('.json')
     })
     .map((child) => {
       return {
@@ -196,7 +297,8 @@ const main = async () => {
       md,
       buildContractsTable(
         getL1Contracts(deployment.folder),
-        deployment.l1Explorer
+        deployment.l1Explorer,
+        deployment.isAltL1
       )
     )
     md = addline(md, `## Layer 2 Contracts`)
@@ -204,7 +306,8 @@ const main = async () => {
       md,
       buildContractsTable(
         getL2Contracts(deployment.folder),
-        deployment.l2Explorer
+        deployment.l2Explorer,
+        deployment.isAltL1
       )
     )
 

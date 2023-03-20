@@ -1,0 +1,48 @@
+type RelayedMessageEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
+}
+
+type RelayedMessageFastEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
+}
+
+type FailedRelayedMessageEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
+}
+
+type FailedRelayedMessageFastEntity @entity {
+  id: ID!
+  msgHash: Bytes! # bytes32
+  blockNumber: BigInt! # block number
+  transactionHash: Bytes! # transaction hash
+}
+
+type StateBatchAppendedEntity @entity {
+  id: ID!
+  _batchIndex: BigInt!
+  _batchRoot: Bytes!
+  _batchSize: BigInt!
+  _prevTotalElements: BigInt!
+  _extraData: Bytes!
+  blockNumber: BigInt!
+  transactionHash: Bytes! # transaction hash
+}
+
+type AddressSetEntity @entity {
+  id: ID!
+  _name: Bytes!
+  _newAddress: Bytes!
+  _oldAddress: Bytes
+  blockNumber: BigInt!
+  transactionHash: Bytes! # transaction hash
+}
+

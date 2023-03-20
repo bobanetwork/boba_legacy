@@ -404,6 +404,150 @@ export const BRIDGE_ADAPTER_DATA: {
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
+  1281: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x78D714e1b47Bb86FE15788B917C9CC7B77975529',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  1287: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xEcca5FEd8154420403549f5d8F123fcE69fae806',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xEcca5FEd8154420403549f5d8F123fcE69fae806',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  4003: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xAEa06C2B29edfac53a0538A9843D018348845Ebf',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xAEa06C2B29edfac53a0538A9843D018348845Ebf',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  4002: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x86FC7AeFcd69983A8d82eAB1E0EaFD38bB42fd3f',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  43112: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x4475A8FBeF5Cf4a92a484B6f5602A91F3abC72D8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  43113: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  43114: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xf188F1e92B2c78956D2859b84684BFD17103e22c',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xf188F1e92B2c78956D2859b84684BFD17103e22c',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  99: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  97: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xBf0939120b4F5E3196b9E12cAC291e03dD058e9a',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xBf0939120b4F5E3196b9E12cAC291e03dD058e9a',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  1284: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  56: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
+  250: {
+    Standard: {
+      Adapter: StandardBridgeAdapter,
+      l1Bridge: '0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+    ETH: {
+      Adapter: ETHBridgeAdapter,
+      l1Bridge: '0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8',
+      l2Bridge: predeploys.L2StandardBridge,
+    },
+  },
 }
 
 // TODO: PR is big enough as-is, will add support for SNX in another PR

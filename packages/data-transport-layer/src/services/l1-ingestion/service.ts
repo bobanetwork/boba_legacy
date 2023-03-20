@@ -4,8 +4,15 @@ import { BaseService, LegacyMetrics } from '@eth-optimism/common-ts'
 import { TypedEvent } from '@eth-optimism/contracts/dist/types/common'
 import { BaseProvider } from '@ethersproject/providers'
 import { LevelUp } from 'levelup'
-import { constants } from 'ethers'
+import { constants, Event } from 'ethers'
 import { Gauge, Counter } from 'prom-client'
+import {
+  getAddressSetEventsFromGraph,
+  isChainIDForGraph,
+  getLatestConfirmedBlock,
+  isMoonbeamL1,
+} from '@eth-optimism/sdk'
+import { orderBy } from 'lodash'
 
 /* Imports: Internal */
 import { handleEventsTransactionEnqueued } from './handlers/transaction-enqueued'
@@ -206,9 +213,18 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
           (await this.state.db.getHighestSyncedL1Block()) ||
           this.state.startingL1BlockNumber
         const currentL1Block = await this.state.l1RpcProvider.getBlockNumber()
+
+        // Add special case for Moonbeam
+        let latestConfirmedBlock = currentL1Block - this.options.confirmations
+        if (await isMoonbeamL1(this.options.l1RpcProvider)) {
+          latestConfirmedBlock = await getLatestConfirmedBlock(
+            this.options.l1RpcProvider
+          )
+        }
+
         const targetL1Block = Math.min(
           highestSyncedL1Block + this.options.logsPerPollingInterval,
-          currentL1Block - this.options.confirmations
+          latestConfirmedBlock
         )
 
         // We're already at the head, so no point in attempting to sync.
@@ -351,14 +367,24 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     // We need to figure out how to make this work without Infura. Mark and I think that infura is
     // doing some indexing of events beyond Geth's native capabilities, meaning some event logic
     // will only work on Infura and not on a local geth instance. Not great.
-    const addressSetEvents =
-      await this.state.contracts.Lib_AddressManager.queryFilter(
-        this.state.contracts.Lib_AddressManager.filters.AddressSet(
-          contractName
-        ),
+    let addressSetEvents: Event[]
+    if (await isChainIDForGraph(this.state.l1RpcProvider)) {
+      addressSetEvents = await getAddressSetEventsFromGraph(
+        this.state.l1RpcProvider,
+        contractName,
         fromL1Block,
         toL1Block
       )
+    } else {
+      addressSetEvents =
+        await this.state.contracts.Lib_AddressManager.queryFilter(
+          this.state.contracts.Lib_AddressManager.filters.AddressSet(
+            contractName
+          ),
+          fromL1Block,
+          toL1Block
+        )
+    }
 
     // We're going to parse things out in ranges because the address of a given contract may have
     // changed in the range provided by the user.
@@ -392,14 +418,24 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
 
     for (const eventRange of eventRanges) {
       // Find all relevant events within the range.
-      const events: TypedEvent[] = await this.state.contracts[contractName]
-        .attach(eventRange.address)
-        .queryFilter(
-          this.state.contracts[contractName].filters[eventName](),
-          eventRange.fromBlock,
-          eventRange.toBlock
-        )
-
+      // The events returned by Fantom is not in order, so we need to sort them.
+      const events: TypedEvent[] = orderBy(
+        await this.state.contracts[contractName]
+          .attach(eventRange.address)
+          .queryFilter(
+            this.state.contracts[contractName].filters[eventName](),
+            eventRange.fromBlock,
+            eventRange.toBlock
+          ),
+        [
+          'blockNumber',
+          (event) =>
+            typeof event.args._queueIndex === 'undefined'
+              ? true
+              : event.args._queueIndex.toNumber(),
+        ],
+        ['asc', 'asc']
+      )
       // Handle events, if any.
       if (events.length > 0) {
         const tick = Date.now()
@@ -441,12 +477,23 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     contractName: string,
     blockNumber: number
   ): Promise<string> {
-    const events = await this.state.contracts.Lib_AddressManager.queryFilter(
-      this.state.contracts.Lib_AddressManager.filters.AddressSet(contractName),
-      this.state.startingL1BlockNumber,
-      blockNumber
-    )
-
+    let events: Event[]
+    if (await isChainIDForGraph(this.state.l1RpcProvider)) {
+      events = await getAddressSetEventsFromGraph(
+        this.state.l1RpcProvider,
+        contractName,
+        this.state.startingL1BlockNumber,
+        blockNumber
+      )
+    } else {
+      events = await this.state.contracts.Lib_AddressManager.queryFilter(
+        this.state.contracts.Lib_AddressManager.filters.AddressSet(
+          contractName
+        ),
+        this.state.startingL1BlockNumber,
+        blockNumber
+      )
+    }
     if (events.length > 0) {
       return events[events.length - 1].args._newAddress
     } else {

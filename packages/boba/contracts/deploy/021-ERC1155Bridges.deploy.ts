@@ -1,47 +1,33 @@
 /* Imports: External */
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory } from 'ethers'
+import { Contract } from 'ethers'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
-
-import L1ERC1155BridgeJson from '../artifacts/contracts/ERC1155Bridges/L1ERC1155Bridge.sol/L1ERC1155Bridge.json'
-import L2ERC1155BridgeJson from '../artifacts/contracts/ERC1155Bridges/L2ERC1155Bridge.sol/L2ERC1155Bridge.json'
-
-let Factory__L1ERC1155Bridge: ContractFactory
-let Factory__L2ERC1155Bridge: ContractFactory
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+} from '../src/hardhat-deploy-ethers'
 
 let L1ERC1155Bridge: Contract
 let L2ERC1155Bridge: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  const isLocalAltL1 = (hre as any).deployConfig.isLocalAltL1
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__L1ERC1155Bridge = new ContractFactory(
-    L1ERC1155BridgeJson.abi,
-    L1ERC1155BridgeJson.bytecode,
-    (hre as any).deployConfig.deployer_l1
-  )
-
-  Factory__L2ERC1155Bridge = new ContractFactory(
-    L2ERC1155BridgeJson.abi,
-    L2ERC1155BridgeJson.bytecode,
-    (hre as any).deployConfig.deployer_l2
-  )
-
   console.log('Deploying...')
 
   // Deploy L1 token Bridge
-  L1ERC1155Bridge = await Factory__L1ERC1155Bridge.deploy()
-  await L1ERC1155Bridge.deployTransaction.wait()
-  const L1ERC1155BridgeDeploymentSubmission: DeploymentSubmission = {
-    ...L1ERC1155Bridge,
-    receipt: L1ERC1155Bridge.receipt,
-    address: L1ERC1155Bridge.address,
-    abi: L1ERC1155Bridge.abi,
-  }
-
+  L1ERC1155Bridge = await deployBobaContract(
+    hre,
+    'L1ERC1155Bridge',
+    [],
+    (hre as any).deployConfig.deployer_l1
+  )
+  const L1ERC1155BridgeDeploymentSubmission =
+    getDeploymentSubmission(L1ERC1155Bridge)
   await registerBobaAddress(
     addressManager,
     'L1ERC1155Bridge',
@@ -53,14 +39,14 @@ const deployFn: DeployFunction = async (hre) => {
   )
   console.log(`L1ERC1155Bridge deployed to: ${L1ERC1155Bridge.address}`)
 
-  L2ERC1155Bridge = await Factory__L2ERC1155Bridge.deploy()
-  await L2ERC1155Bridge.deployTransaction.wait()
-  const L2ERC1155BridgeDeploymentSubmission: DeploymentSubmission = {
-    ...L2ERC1155Bridge,
-    receipt: L2ERC1155Bridge.receipt,
-    address: L2ERC1155Bridge.address,
-    abi: L2ERC1155Bridge.abi,
-  }
+  L2ERC1155Bridge = await deployBobaContract(
+    hre,
+    isLocalAltL1 ? 'L2ERC1155BridgeAltL1' : 'L2ERC1155Bridge',
+    [],
+    (hre as any).deployConfig.deployer_l2
+  )
+  const L2ERC1155BridgeDeploymentSubmission =
+    getDeploymentSubmission(L2ERC1155Bridge)
   await registerBobaAddress(
     addressManager,
     'L2ERC1155Bridge',

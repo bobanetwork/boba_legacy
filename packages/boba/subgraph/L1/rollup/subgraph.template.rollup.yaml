@@ -1,0 +1,70 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: L1CrossDomainMessenger
+    network: {{network}}
+    source:
+      address: '{{contracts.L1CrossDomainMessenger.address}}'
+      abi: L1CrossDomainMessenger
+      startBlock: {{ contracts.L1CrossDomainMessenger.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FailedRelayedMessage
+        - RelayedMessage
+      abis:
+        - name: L1CrossDomainMessenger
+          file: ./abis/L1CrossDomainMessenger.json
+      eventHandlers:
+        - event: FailedRelayedMessage(indexed bytes32)
+          handler: handleFailedRelayedMessage
+        - event: RelayedMessage(indexed bytes32)
+          handler: handleRelayedMessage
+      file: ./src/L1CDMmapping.ts
+  - kind: ethereum
+    name: L1CrossDomainMessengerFast
+    network: {{network}}
+    source:
+      address: '{{contracts.L1CrossDomainMessengerFast.address}}'
+      abi: L1CrossDomainMessenger
+      startBlock: {{ contracts.L1CrossDomainMessengerFast.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FailedRelayedMessage
+        - RelayedMessage
+      abis:
+        - name: L1CrossDomainMessenger
+          file: ./abis/L1CrossDomainMessenger.json
+      eventHandlers:
+        - event: FailedRelayedMessage(indexed bytes32)
+          handler: handleFailedRelayedMessage
+        - event: RelayedMessage(indexed bytes32)
+          handler: handleRelayedMessage
+      file: ./src/L1CDMFastmapping.ts
+  - kind: ethereum
+    name: StateCommitmentChain
+    network: {{network}}
+    source:
+      address: '{{contracts.StateCommitmentChain.address}}'
+      abi: StateCommitmentChain
+      startBlock: {{ contracts.StateCommitmentChain.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - StateCommitmentChain
+      abis:
+        - name: StateCommitmentChain
+          file: ./abis/StateCommitmentChain.json
+      eventHandlers:
+        - event: StateBatchAppended(indexed uint256,bytes32,uint256,uint256,bytes)
+          handler: handleStateCommitmentChain
+      file: ./src/StateCommitmentChainmapping.ts
