@@ -17,6 +17,52 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
+
+const getCorrectResult = (type, num1, num2, result) => {
+    const operations = {
+        add: (num1, num2) => num1 + num2,
+        sub: (num1, num2) => num1 - num2,
+        div: (num1, num2) => num1 / num2,
+        mul: (num1, num2) => num1 * num2
+    };
+    
+    const temp_result = operations[type] ? operations[type](num1, num2) : result;
+    return Math.abs(result - temp_result) > 1 ? temp_result : result;
+};
+
+const countDecimals = (num) => {
+    const scientificRegex = /^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
+    const decimalRegex = /^-?\d+\.\d+$/;
+
+    if (isNaN(num) || num === '') return 0; // Check if it's a valid number
+
+    const str = num.toString(); // Convert number to String;
+
+
+    // We check if number are cientific notation
+    const scientificMatch = str.match(scientificRegex);
+    if (scientificMatch) {
+        const [, decimalPart, exponent] = scientificMatch[0].match(/^(-?\d+(?:\.\d+)?)(?:[eE]([+-]?\d+))?$/);
+        return Math.max((decimalPart.split('.')[1] || '').length - (exponent || 0), 0);
+    }
+
+    // We check if number are decimal 
+    const decimalMatch = str.match(decimalRegex);
+    if (decimalMatch) {
+        return (decimalMatch[0].split('.')[1] || '').length;
+    }
+
+    return 0;
+}
+
+const convertToInt = (num) => {
+    const isExponential = num.toString().toUpperCase().split('E').length === 2;
+    const decimalPlaces = isExponential ? countDecimals(num) : 0;
+    const numWithoutDecimals = isExponential ? Math.round(num * Math.pow(10, decimalPlaces)) : num;
+    return Number(numWithoutDecimals.toString().replace(".", ""));
+}
+
+
 var accAdd = function(num1, num2) {
     num1 = Number(num1);
     num2 = Number(num2);
@@ -60,77 +106,6 @@ var accMul = function(num1, num2) {
     var result = convertToInt(s1) * convertToInt(s2) / Math.pow(10, times);
     return getCorrectResult("mul", num1, num2, result);
 };
-
-var countDecimals = function(num) {
-    var len = 0;
-    try {
-        num = Number(num);
-        var str = num.toString().toUpperCase();
-        if (str.split('E').length === 2) { // scientific notation
-            var isDecimal = false;
-            if (str.split('.').length === 2) {
-                str = str.split('.')[1];
-                if (parseInt(str.split('E')[0]) !== 0) {
-                    isDecimal = true;
-                }
-            }
-            let x = str.split('E');
-            if (isDecimal) {
-                len = x[0].length;
-            }
-            len -= parseInt(x[1]);
-        } else if (str.split('.').length === 2) { // decimal
-            if (parseInt(str.split('.')[1]) !== 0) {
-                len = str.split('.')[1].length;
-            }
-        }
-    } catch(e) {
-        throw e;
-    } finally {
-        if (isNaN(len) || len < 0) {
-            len = 0;
-        }
-        return len;
-    }
-};
-
-var convertToInt = function(num) {
-    num = Number(num);
-    var newNum = num;
-    var times = countDecimals(num);
-    var temp_num = num.toString().toUpperCase();
-    if (temp_num.split('E').length === 2) {
-        newNum = Math.round(num * Math.pow(10, times));
-    } else {
-        newNum = Number(temp_num.replace(".", ""));
-    }
-    return newNum;
-};
-
-var getCorrectResult = function(type, num1, num2, result) {
-    var temp_result = 0;
-    switch (type) {
-        case "add":
-            temp_result = num1 + num2;
-            break;
-        case "sub":
-            temp_result = num1 - num2;
-            break;
-        case "div":
-            temp_result = num1 / num2;
-            break;
-        case "mul":
-            temp_result = num1 * num2;
-            break;
-        default:
-            break;
-    }
-    if (Math.abs(result - temp_result) > 1) {
-        return temp_result;
-    }
-    return result;
-};
-
 
 export {
   accAdd,

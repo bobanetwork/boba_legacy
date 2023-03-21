@@ -48,6 +48,13 @@ function Sevens({ searchData, sevens }) {
   //if totalNumberOfPages === 0, set to one so we don't get the strange "page 1 of 0" display
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
+  const handlePrevPage = () => {
+    setPage(page - 1)
+  }
+  const handleNextPage = () => {
+    setPage(page + 1)
+  }
+
   return (
     <div className={styles.transactionSection}>
       <S.HistoryContainer>
@@ -55,31 +62,30 @@ function Sevens({ searchData, sevens }) {
           currentPage={page}
           isLastPage={paginatedSevens.length < PER_PAGE}
           totalPages={totalNumberOfPages}
-          onClickNext={()=>setPage(page + 1)}
-          onClickBack={()=>setPage(page - 1)}
+          onClickNext={handlePrevPage}
+          onClickBack={handleNextPage}
         />
 
         <Grid item xs={12}>
           <Box>
             <S.Content>
-              {!paginatedSevens.length && !loading && (
-                <div className={styles.disclaimer}>Scanning for pending 7 day exits...</div>
+              {!paginatedSevens.length && (
+                <div className={styles.disclaimer}>
+                  {loading ?
+                    'Loading pending 7 day exits...'
+                    : 'Scanning for pending 7 day exits...'}
+                </div>
               )}
-              {!paginatedSevens.length && loading && (
-                <div className={styles.disclaimer}>Loading pending 7 day exits...</div>
-              )}
-              {paginatedSevens.map((i, index) => {
-                return (
-                  <Seven
-                    key={index}
-                    title={`Hash: ${i.hash}`}
-                    blockNumber={`Block ${i.blockNumber}`}
-                    oriHash={i.hash}
-                    age={formatDate(i.timestamp, 'lll')}
-                    unixTime={i.timestamp}
-                  />
-                )
-              })}
+              {paginatedSevens.map(({ hash, blockNumber, timestamp }, index) => (
+                <Seven
+                  key={index}
+                  title={`Hash: ${hash}`}
+                  blockNumber={`Block ${blockNumber}`}
+                  oriHash={hash}
+                  age={moment.unix(timestamp).format('lll')}
+                  unixTime={timestamp}
+                />
+              ))}
             </S.Content>
           </Box>
         </Grid>

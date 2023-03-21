@@ -102,35 +102,43 @@ class WalletService {
   }
 
   async switchChain(chainId, chainInfo) {
-    const provider = this.walletType === 'metamask' ? window.ethereum : this.walletConnectProvider
+    const provider = this.walletType === 'metamask' ? window.ethereum : this.walletConnectProvider;
+  
+    if (!provider) {
+      console.error('Provider is null');
+      return false;
+    }
+  
+    if (this.walletType === 'walletconnect') {
+      console.error('Cannot switch chain in WalletConnect');
+      return false;
+    }
+  
     try {
       await provider.request({
-        method: "wallet_switchEthereumChain",
+        method: 'wallet_switchEthereumChain',
         params: [{ chainId }],
-      })
-      return true
-    } catch (error) {
-      if (error.code === 4902 || this.walletType === 'walletconnect') {
-        try {
+      });
+      return true;
+    } catch (switchError) {
+      try {
+        await provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [chainInfo, this.account],
+        });
+  
+        // After adding the chain, we need to call switchEthereumChain again to finish the process for WalletConnect
+        if (this.walletType === 'walletconnect') {
           await provider.request({
-            method: "wallet_addEthereumChain",
-            params: [chainInfo, this.account],
-          })
-          // After adding the chain, we need to call switchEthereumChain again to finish the process for WalletConnect
-          if (this.walletType === 'walletconnect') {
-            await provider.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId }],
-            })
-          }
-          return true
-        } catch (addError) {
-          console.log(`Error adding chain: ${addError}`)
-          return false
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId }],
+          });
         }
-      } else {
-        console.log(`Error switching chain: ${error?.message}`)
-        return false
+  
+        return true;
+      } catch (addError) {
+        console.error(`Error adding chain: ${addError.message}`);
+        return false;
       }
     }
   }

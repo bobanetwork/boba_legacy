@@ -9,26 +9,27 @@ class GasService {
   /**
    * @getGas
   */
-
   async getGas() {
     try {
-      // get gas price
-      const gasPrice1 = await networkService.L1Provider.getGasPrice()
-      const gasPrice2 = await networkService.L2Provider.getGasPrice()
-      // get block count
-      const block1 = await networkService.L1Provider.getBlockNumber()
-      const block2 = await networkService.L2Provider.getBlockNumber()
-
-      const gasData = {
-        gasL1: Number(logAmount(gasPrice1.toString(),9)).toFixed(0),
-        gasL2: Number(logAmount(gasPrice2.toString(),9)).toFixed(0),
+      const { L1Provider, L2Provider } = networkService;
+      const [gasPrice1, gasPrice2, block1, block2] = await Promise.all([
+        L1Provider.getGasPrice(),
+        L2Provider.getGasPrice(),
+        L1Provider.getBlockNumber(),
+        L2Provider.getBlockNumber(),
+      ]);
+  
+      const formatGas = (gasPrice) => Number(logAmount(gasPrice.toString(), 9)).toFixed(0);
+  
+      return {
+        gasL1: formatGas(gasPrice1),
+        gasL2: formatGas(gasPrice2),
         blockL1: Number(block1),
         blockL2: Number(block2),
-      }
-      return gasData
+      };
     } catch (error) {
-      console.log("GS: getGas error:",error)
-      return error
+      console.log("GS: getGas error:", error);
+      return error;
     }
   }
 

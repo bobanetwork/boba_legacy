@@ -14,23 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 
-const comparator = (a, b) => {
-    if (a.tokenSymbol < b.tokenSymbol) {
-        return -1;
-    }
-
-    if (a.tokenSymbol > b.tokenSymbol) {
-        return 1;
-    }
-
-    return 0;
-}
+const sortTokens = (tokens, includeTokens, excludeTokens) => {
+    const filteredTokens = tokens.filter(token => includeTokens.includes(token.tokenSymbol) || !excludeTokens.includes(token.tokenSymbol));
+    return filteredTokens.sort((a, b) => a.tokenSymbol.localeCompare(b.tokenSymbol));
+  }
 
 export const sortRawTokens = (tokens) => {
-    let start = tokens.filter((d) => [ 'ETH', 'BOBA', 'OMG' ].includes(d.tokenSymbol)).sort(comparator);
-
-    let last = tokens.filter((d) => ![ 'ETH', 'BOBA', 'OMG' ].includes(d.tokenSymbol)).sort(comparator);
-
-    return [ ...start, ...last ]
+    const tokenList = ['ETH', 'BOBA', 'OMG'];
+    const start = sortTokens(tokens, tokenList, []);
+    const last = sortTokens(tokens, [], tokenList);
+    return [...start, ...last];
 }
-

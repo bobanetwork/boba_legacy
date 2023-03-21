@@ -75,29 +75,51 @@ function Earn() {
     }
   }, [dispatch, baseEnabled, accountEnabled])
 
-  function getBalance(address, chain) {
-    if (typeof (layer1Balance) === 'undefined') return [ 0, 0 ]
-    if (typeof (layer2Balance) === 'undefined') return [ 0, 0 ]
 
-    if (chain === 'L1') {
-      let tokens = Object.entries(layer1Balance)
-      for (let i = 0; i < tokens.length; i++) {
-        if (tokens[ i ][ 1 ].address.toLowerCase() === address.toLowerCase()) {
-          return [ tokens[ i ][ 1 ].balance, tokens[ i ][ 1 ].decimals ]
-        }
+  const getBalance = (address , chain) => {
+    const tokens = chain === 'L1' ? Object.entries(layer1Balance) : Object.entries(layer2Balance)
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i][1].address.toLowerCase() === address.toLowerCase()) {
+        return [tokens[i][1].balance, tokens[i][1].decimals]
       }
     }
-    else if (chain === 'L2') {
-      let tokens = Object.entries(layer2Balance)
-      for (let i = 0; i < tokens.length; i++) {
-        if (tokens[ i ][ 1 ].address.toLowerCase() === address.toLowerCase()) {
-          return [ tokens[ i ][ 1 ].balance, tokens[ i ][ 1 ].decimals ]
-        }
-      }
-    }
-
-    return [ 0, 0 ]
+    return [0, 0]
   }
+
+  const LayerAlert = () => {
+    const message = layer === 'L2' ? 
+      'You are on L2. To transact on L1, SWITCH LAYER to L1' : 
+      'You are on L1. To transact on L2, SWITCH LAYER to L2';
+
+      return (
+        <S.LayerAlert>
+          <S.AlertInfo>
+            <AlertIcon sx={{ flex: 1 }} />
+            <S.AlertText
+              variant="body2"
+              component="p"
+            >
+            {message}
+            </S.AlertText>
+          </S.AlertInfo>
+          <LayerSwitcher isButton={true}/>
+        </S.LayerAlert>
+      )
+    }
+
+ 
+const Column = ({ text, tooltip, xs = 4, md = 2 }) => {
+  return (
+    <S.GridItemTag item xs={xs} md={md}>
+      <Typography variant="body2" sx={{ opacity: 0.65 }} whiteSpace="nowrap">{text}</Typography>
+      {tooltip && (
+        <Tooltip title={tooltip}>
+          <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
+        </Tooltip>
+      )}
+    </S.GridItemTag>
+  );
+}
 
   return (
     <S.EarnPageContainer>
@@ -107,35 +129,7 @@ function Earn() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && lpChoice === 'L1LP' &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon sx={{ flex: 1 }} />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              You are on L2. To transact on L1, SWITCH LAYER to L1
-            </S.AlertText>
-          </S.AlertInfo>
-          <LayerSwitcher isButton={true}/>
-        </S.LayerAlert>
-      }
-
-      {layer === 'L1' && lpChoice === 'L2LP' &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              You are on L1. To transact on L2, SWITCH LAYER to L2
-            </S.AlertText>
-          </S.AlertInfo>
-          <LayerSwitcher isButton={true} />
-        </S.LayerAlert>
-      }
+      <LayerAlert/>
 
       <Box sx={{ my: 1, width: '100%' }}>
         <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
@@ -228,103 +222,40 @@ function Earn() {
           <S.TableHeading>
             <S.GridItemTagContainer
               container spacing={1} direction="row" alignItems="center"
-              sx={{
-                justifyContent: "space-around"
-              }}
+              sx={{ justifyContent: "space-around" }}
             >
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Token</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Available Balance
-                </Typography>
-                <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Total Staked
-                </Typography>
-                <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Past APR %
-                </Typography>
-                <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Your Stake</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={1}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Earned</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={1}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Actions</Typography>
-              </S.GridItemTag>
+              <Column text="Token"  />
+              <Column text="Available Balance" tooltip="Available Balance refers to the amount of funds currently in each pool." />
+              <Column text="Total Staked" tooltip="Total staked denotes the funds staked by liquidity providers." />
+              <Column text="Past APR %" tooltip="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool." />
+              <Column text="Your Stake" xs={3} md={2} />
+              <Column text="Earned" xs={3} md={1} />
+              <Column text="Actions" xs={3} md={1} />
             </S.GridItemTagContainer>
           </S.TableHeading>
+
         ) : (null)}
 
-        {lpChoice === 'L1LP' &&
-          <S.EarnListContainer>
-            {Object.keys(poolInfo.L1LP).map((v, i) => {
-              const ret = getBalance(v, 'L1')
-              if (showMDO && Number(ret[ 0 ]) === 0) return null
+        <S.EarnListContainer>
+          {Object.entries(poolInfo[lpChoice])
+            .map(([v, pool], i) => {
+              const ret = getBalance(v, lpChoice === 'L1LP' ? 'L1' : 'L2')
+              if (showMDO && Number(ret[0]) === 0) return null
               return (
                 <ListEarn
                   key={i}
-                  poolInfo={poolInfo.L1LP[ v ]}
-                  userInfo={userInfo.L1LP[ v ]}
+                  poolInfo={pool}
+                  userInfo={userInfo[lpChoice][v]}
                   L1orL2Pool={lpChoice}
-                  balance={ret[ 0 ]}
-                  decimals={ret[ 1 ]}
+                  balance={ret[0]}
+                  decimals={ret[1]}
                   isMobile={isMobile}
                   showStakesOnly={showMSO}
                   accountEnabled={accountEnabled}
                 />
               )
             })}
-          </S.EarnListContainer>}
-
-        {lpChoice === 'L2LP' &&
-          <S.EarnListContainer>
-            {Object.keys(poolInfo.L2LP).map((v, i) => {
-              const ret = getBalance(v, 'L2')
-              if (showMDO && Number(ret[ 0 ]) === 0) return null
-              return (
-                <ListEarn
-                  key={i}
-                  poolInfo={poolInfo.L2LP[ v ]}
-                  userInfo={userInfo.L2LP[ v ]}
-                  L1orL2Pool={lpChoice}
-                  balance={ret[ 0 ]}
-                  decimals={ret[ 1 ]}
-                  isMobile={isMobile}
-                  showStakesOnly={showMSO}
-                  accountEnabled={accountEnabled}
-                />
-              )
-            })}
-          </S.EarnListContainer>
-        }
+        </S.EarnListContainer>
       </Box>
     </S.EarnPageContainer>
   )

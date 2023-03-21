@@ -15,72 +15,50 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 import axios from 'axios';
 
-const isIpfsUrl = (url) =>{
-    return !!url.includes('ipfs://')
-}
-
-const getIpfsUrl = (url) => {
-    let payload = url.split('://')[1];
-    return `https://ipfs.io/ipfs/${payload}`
-}
-
-export const getNftImageUrl = async (url) => {
-
+const isIpfsUrl = (url) => {
+    return url.includes('ipfs://');
+  };
+  
+  const getIpfsUrl = (url) => {
+    const payload = url.split('://')[1];
+    return `https://ipfs.io/ipfs/${payload}`;
+  };
+  
+  export const getNftImageUrl = async (url) => {
     try {
-
-        if(url.substring(0,29) === 'data:application/json;base64,') { // we have an svg
-            const json = Buffer.from(url.substring(29), "base64").toString()
-            const resultSVG = JSON.parse(json)
-            return {
-                url: resultSVG.image_data,
-                meta: {
-                    attributes: resultSVG.attributes,
-                    traits: [],
-                    collection: resultSVG.description,
-                    rank: '',
-                    id: '',
-                    rarity_score: '',
-                    name: resultSVG.name,
-                }
-            }
-        }
-
-        let URL = !!isIpfsUrl(url) ? getIpfsUrl(url) : url
-        let res = await axios.get(URL)
-
-        if (res.headers && res.headers['content-type'].includes('application/json')) {
-
-            const {
-                image,
-                attributes = [],
-                traits = [],
-                collection = '',
-                rank = '',
-                id = '',
-                rarity_score = '',
-                name = ''
-            } = res.data
-
-            return {
-                url: !!isIpfsUrl(image) ? getIpfsUrl(image) : image,
-                meta: {
-                    attributes,
-                    traits,
-                    collection,
-                    rank,
-                    id,
-                    rarity_score,
-                    name
-                }
-            }
-
-        } else {
-            return { url }
-        }
+      if (url.startsWith('data:application/json;base64,')) { // we have an svg
+        const json = Buffer.from(url.substring(29), 'base64').toString();
+        const { image_data, attributes = [], description, name } = JSON.parse(json);
+        return {
+          url: image_data ? `data:image/svg+xml;base64,${Buffer.from(image_data, 'base64').toString()}` : null,
+          meta: {
+            attributes,
+            traits: [],
+            collection: description,
+            rank: '',
+            id: '',
+            rarity_score: '',
+            name,
+          },
+        };
+      }
+  
+      const URL = isIpfsUrl(url) ? getIpfsUrl(url) : url;
+      const { data, headers } = await axios.get(URL);
+      if (headers?.['content-type']?.includes('application/json')) {
+        const { image, ...meta } = data;
+        return {
+          url: isIpfsUrl(image) ? getIpfsUrl(image) : image,
+          meta: {
+            traits: [],
+            ...meta,
+          },
+        };
+      } else {
+        return { url };
+      }
     } catch (error) {
-        // In case of error returning same url
-        // As seems like some time it can be cors for images.
-        console.log('Error while loading NFT image url', error.message);
-        return { url }
+      console.log('Error while loading NFT image url', error.message);
+      return { url };
     }
-}
+  };

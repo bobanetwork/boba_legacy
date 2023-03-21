@@ -70,6 +70,8 @@ export const AlertText = styled(Typography)(({ theme }) => ({
   },
 }))
 
+
+
 export const AlertInfo = styled(Box)`
   display: flex;
   justify-content: space-around;

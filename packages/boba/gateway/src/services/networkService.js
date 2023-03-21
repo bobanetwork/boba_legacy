@@ -247,8 +247,11 @@ class NetworkService {
   }
 
   async switchFee( targetFee ) {
+    if (!['BOBA', 'ETH', this.L1NativeTokenSymbol].includes(targetFee)) {
+      throw new Error('Invalid targetFee')
+    }
 
-    if( this.L1orL2 !== 'L2' ) return
+    if (this.L1orL2 !== 'L2') return;
 
     const bobaFeeContract = new ethers.Contract(
       this.addresses.Boba_GasPriceOracle,
@@ -256,29 +259,35 @@ class NetworkService {
       this.provider.getSigner()
     )
 
-    try {
-
-      let tx = null
-
-      if( targetFee === 'BOBA' ) {
-        tx = await bobaFeeContract.useBobaAsFeeToken()
-        await tx.wait()
-
-      } else if (targetFee === 'ETH') {
-        tx = await bobaFeeContract.useETHAsFeeToken()
-        await tx.wait()
-      } else if (targetFee === this.L1NativeTokenSymbol) {
-        tx = await bobaFeeContract.useSecondaryFeeTokenAsFeeToken()
-        await tx.wait()
-      }
-
-      await this.getBobaFeeChoice()
-
-      return tx
-    } catch (error) {
-      console.log(error)
-      return error
+    const config = {
+      BOBA: {
+        method: bobaFeeContract.useBobaAsFeeToken,
+        wait: true,
+      },
+      ETH: {
+        method: bobaFeeContract.useETHAsFeeToken,
+        wait: true,
+      },
+      [this.L1NativeTokenSymbol]: {
+        method: bobaFeeContract.useSecondaryFeeTokenAsFeeToken,
+        wait: true,
+      },
     }
+
+    const feeConfig = config[targetFee]
+    
+    if (!feeConfig) {
+      throw new Error('Invalid targetFee')
+    }
+
+    let tx = await feeConfig.method()
+
+    if (feeConfig.wait) await tx.wait();
+
+    await this.getBobaFeeChoice()
+    
+    return tx
+
   }
 
   async getETHMetaTransaction() {
@@ -356,29 +365,21 @@ class NetworkService {
   }
 
   async getAddress(contractName, varToSet) {
-    const address = await this.AddressManager.getAddress(contractName)
-    if (address === ERROR_ADDRESS) {
-      return false
-    } else {
-      this.addresses = {
-        ...this.addresses,
-        [varToSet]: address
-      }
-      return true
+    const { address } = await this.AddressManager.getAddress(contractName);
+    const isSuccess = address !== ERROR_ADDRESS;
+    if (isSuccess) {
+      this.addresses = { ...this.addresses, [varToSet]: address };
     }
+    return isSuccess;
   }
 
   async getAddressCached(cache, contractName, varToSet) {
-    const address = cache[contractName]
-    if (typeof(address) === 'undefined') {
-      return false
-    } else {
-      this.addresses = {
-        ...this.addresses,
-        [varToSet]: address
-      }
-      return true
+    const address = cache[contractName] ?? null;
+    const isSuccess = address !== null;
+    if (isSuccess) {
+      this.addresses = { ...this.addresses, [varToSet]: address };
     }
+    return isSuccess;
   }
 
   getAllAddresses() {

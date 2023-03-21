@@ -43,41 +43,36 @@ function BridgeFee({
     </S.BridgeFeeItemLabel>
   }
 
-  return <Box py={1}>
-    {time ? <S.BridgeFeeItem>
-      <ItemLabel label="Est. time" info={timeInfo} />
-      <Typography variant='body2'>
-        {time}
-      </Typography>
-    </S.BridgeFeeItem> : null}
-
-    <S.BrigeFeeWrapper>
-      {estFee ? <S.BridgeFeeItem>
-        <ItemLabel label="Est. gas" info={estFeeInfo} />
-        <Typography variant='body2'>
-          {estFee}
-        </Typography>
-      </S.BridgeFeeItem> : null}
-      {lpFee ? <S.BridgeFeeItem>
-        <ItemLabel label="LP fee" info={lpFeeInfo} />
-        <Typography variant='body2'>
-          {lpFee}
-        </Typography>
-      </S.BridgeFeeItem> : null}
-      {exitFee ? <S.BridgeFeeItem>
-        <ItemLabel label="xChain Relay fee" info={exitFeeInfo} />
-        <Typography variant='body2'>
-          {exitFee}
-        </Typography>
-      </S.BridgeFeeItem> : null}
-      {estReceive ? <S.BridgeFeeItem>
-        <ItemLabel label="Est. receive" info={estReceiveInfo} />
-        <Typography variant='body2'>
-          {estReceive}
-        </Typography>
-      </S.BridgeFeeItem> : null}
-    </S.BrigeFeeWrapper>
-  </Box>
+  return (
+    <Box py={1}>
+      {time && (
+        <S.BridgeFeeItem>
+          <ItemLabel label="Est. time" info={timeInfo} />
+          <Typography variant='body2'>
+            {time}
+          </Typography>
+        </S.BridgeFeeItem>
+      )}
+  
+      <S.BrigeFeeWrapper>
+        {[
+          { fee: estFee, label: 'Est. gas', info: estFeeInfo },
+          { fee: lpFee, label: 'LP fee', info: lpFeeInfo },
+          { fee: exitFee, label: 'xChain Relay fee', info: exitFeeInfo },
+          { fee: estReceive, label: 'Est. receive', info: estReceiveInfo },
+        ].map(({ fee, label, info }) => (
+          fee && (
+            <S.BridgeFeeItem key={label}>
+              <ItemLabel label={label} info={info} />
+              <Typography variant='body2'>
+                {fee}
+              </Typography>
+            </S.BridgeFeeItem>
+          )
+        ))}
+      </S.BrigeFeeWrapper>
+    </Box>
+  );
 }
 
 export default BridgeFee;

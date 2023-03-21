@@ -7,6 +7,8 @@ import Button from 'components/button/Button.js'
 
 import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
+
+
 const Connect = ({
   userPrompt,
   accountEnabled,
@@ -14,9 +16,11 @@ const Connect = ({
   layer = '',
 }) => {
   const dispatch = useDispatch()
+  const handdleConnect = () => {
+    dispatch(!accountEnabled && !connectToBoba ? setConnect(true) : setConnectBOBA(true))
+  }
 
-  if (!accountEnabled && !connectToBoba) {
-    return (
+  return (!accountEnabled && !connectToBoba) || (layer !== 'L2' && connectToBoba) ? (
     <G.LayerAlert style={{padding: '20px'}}>
       <G.AlertInfo>
         <AlertIcon />
@@ -32,36 +36,15 @@ const Connect = ({
         variant="contained"
           size="small"
           newStyle
-        onClick={() => dispatch(setConnect(true))}
+        onClick={handdleConnect}
         sx={{fontWeight: '500;'}}
       >
-        Connect
+        { layer !== 'L2' && connectToBoba? 'Connect to Boba' : 'Connect' }
       </Button>
     </G.LayerAlert>
-    )
-  } else if (layer !== 'L2' && connectToBoba) {
-    return (
-      <G.LayerAlert style={{ padding: '20px' }}>
-        <G.AlertInfo>
-          <AlertIcon />
-          <G.AlertText variant="body2" component="p">
-            {userPrompt}
-          </G.AlertText>
-        </G.AlertInfo>
-        <Button
-          type="primary"
-          variant="contained"
-          size="small"
-          newStyle
-          onClick={() => dispatch(setConnectBOBA(true))}
-        >
-          Connect to Boba
-        </Button>
-      </G.LayerAlert>
-    )
+    ) : (null)
+  
   }
 
-  return null
-}
 
 export default Connect

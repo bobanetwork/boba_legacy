@@ -57,27 +57,25 @@ export function toWei_String(amount, decimals) {
 }
 
 export function amountToUsd(amount, lookupPrice, token) {
-  if (token.symbol === 'ETH' && !!lookupPrice[ 'ethereum' ]) {
-    return amount * lookupPrice[ 'ethereum' ].usd
-  } else if (token.symbol === 'BOBA' && !!lookupPrice[ 'boba-network' ]) {
-    return amount * lookupPrice[ 'boba-network' ].usd
-  } else if (token.symbol === 'OLO' && !!lookupPrice[ 'oolongswap' ]) {
-    return amount * lookupPrice[ 'oolongswap' ].usd
-  } else if (token.symbol === 'OMG' && !!lookupPrice[ 'omisego' ]) {
-    return amount * lookupPrice[ 'omisego' ].usd
-  } else if (token.symbol === 'USDC' && !!lookupPrice[ 'usd-coin' ]) {
-    return amount * lookupPrice[ 'usd-coin' ].usd
-  } else if (token.symbol === 'AVAX' && !!lookupPrice[ 'avalanche-2' ]) {
-    return amount * lookupPrice[ 'avalanche-2' ].usd
-  } else if (token.symbol === 'FTM' && !!lookupPrice[ 'fantom' ]) {
-    return amount * lookupPrice[ 'fantom' ].usd
-  } else if ([ 'BNB', 'tBNB' ].includes(token.symbol) && !!lookupPrice[ 'binancecoin' ]) {
-    return amount * lookupPrice[ 'binancecoin' ].usd
-  } else if ([ 'DEV', 'GLMR' ].includes(token.symbol) && !!lookupPrice[ 'moonbeam' ]) {
-    return amount * lookupPrice[ 'moonbeam' ].usd
-  } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
-    return amount * lookupPrice[ token.symbol.toLowerCase() ].usd
-  } else {
-    return 0
+  const tokenConfig = {
+    'ETH': 'ethereum',
+    'BOBA': 'boba-network',
+    'OLO': 'oolongswap',
+    'OMG': 'omisego',
+    'USDC': 'usd-coin',
+    'AVAX': 'avalanche-2',
+    'FTM': 'fantom',
+    'BNB': 'binancecoin',
+    'tBNB': 'binancecoin',
+    'DEV': 'moonbeam',
+    'GLMR': 'moonbeam'
+  };
+
+  const tokenPriceLookup = lookupPrice[tokenConfig[token.symbol] || token.symbol.toLowerCase()];
+
+  if (tokenPriceLookup) {
+    return amount * tokenPriceLookup.usd;
   }
+
+  return 0;
 }

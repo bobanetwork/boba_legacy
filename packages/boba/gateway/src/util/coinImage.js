@@ -30,137 +30,54 @@ import wagmiv3Logo from 'images/wagmiv3.png'
 import wagmiv2OLOLogo from 'images/wagmiv2olo.png'
 import oloLogo from 'images/olo.svg'
 import CGTLogo from 'images/CGT.svg'
-import avaxLog from 'images/avax.svg'
+import avaxLogo from 'images/avax.svg'
 import moonbase from 'images/moonbase.png'
 import glmrLogo from 'images/glmr.svg'
 import mttLogo from 'images/mtt.png'
 
+const logoMapping = {
+  "TEST": TESTLogo,
+  "USDT": usdtLogo,
+  "DAI": daiLogo,
+  "USDC": usdcLogo,
+  "WBTC": wbtcLogo,
+  "REP": repLogo,
+  "BAT": batLogo,
+  "ZRX": zrxLogo,
+  "SUSHI": sushiLogo,
+  "LINK": linkLogo,
+  "UNI": uniLogo,
+  "DODO": dodoLogo,
+  "ETH": ethLogo,
+  "JLKN": TESTLogo,
+  "OMG": omgLogo,
+  "FRAX": fraxLogo,
+  "FXS": fxsLogo,
+  "BOBA": bobaLogo,
+  "xBOBA": xBobaLogo,
+  "UST": terraLogo,
+  "BUSD": busdLogo,
+  "BNB": bnbLogo,
+  "tBNB": bnbLogo,
+  "FTM": ftmLogo,
+  "MATIC": maticLogo,
+  "UMA": umaLogo,
+  "WAGMIv0": wagmiv0Logo,
+  "WAGMIv1": wagmiv1Logo,
+  "WAGMIv2": wagmiv2Logo,
+  "WAGMIv2-Oolong": wagmiv2OLOLogo,
+  "WAGMIv3": wagmiv3Logo,
+  "WAGMIv3-Oolong": wagmiv3Logo,
+  "DOM": domLogo,
+  "OLO": oloLogo,
+  "CGT": CGTLogo,
+  "AVAX": avaxLogo,
+  "GLMR": glmrLogo,
+  "DEV": moonbase,
+  "MTT": mttLogo
+};
+
 export const getCoinImage = (symbol) => {
-
-  let logo = null
-
-  switch (symbol) {
-    case "TEST":
-      logo = TESTLogo;
-      break;
-    case "USDT":
-      logo = usdtLogo;
-      break;
-    case "DAI":
-      logo = daiLogo;
-      break;
-    case "USDC":
-      logo = usdcLogo;
-      break;
-    case "WBTC":
-      logo = wbtcLogo;
-      break;
-    case "REP":
-      logo = repLogo;
-      break;
-    case "BAT":
-      logo = batLogo;
-      break;
-    case "ZRX":
-      logo = zrxLogo;
-      break;
-    case "SUSHI":
-      logo = sushiLogo;
-      break;
-    case "LINK":
-      logo = linkLogo;
-      break;
-    case "UNI":
-      logo = uniLogo;
-      break;
-    case "DODO":
-      logo = dodoLogo;
-      break;
-    case "ETH":
-      logo = ethLogo;
-      break;
-    case "JLKN":
-      logo = TESTLogo;
-      break;
-    case "OMG":
-      logo = omgLogo;
-      break;
-    case "FRAX":
-      logo = fraxLogo;
-      break;
-    case "FXS":
-      logo = fxsLogo;
-      break;
-    case "BOBA":
-      logo = bobaLogo;
-      break;
-    case "xBOBA":
-      logo = xBobaLogo;
-      break;
-    case "UST":
-      logo = terraLogo;
-      break;
-    case "BUSD":
-      logo = busdLogo;
-      break;
-    case "BNB":
-      logo = bnbLogo;
-      break;
-    case "tBNB":
-      logo = bnbLogo;
-      break;
-    case "FTM":
-      logo = ftmLogo;
-      break;
-    case "MATIC":
-      logo = maticLogo;
-      break;
-    case "UMA":
-      logo = umaLogo;
-      break;
-    case "WAGMIv0":
-      logo = wagmiv0Logo;
-      break;
-    case "WAGMIv1":
-      logo = wagmiv1Logo;
-      break;
-    case "WAGMIv2":
-      logo = wagmiv2Logo;
-      break;
-    case "WAGMIv2-Oolong":
-      logo = wagmiv2OLOLogo;
-      break;
-    case "WAGMIv3":
-      logo = wagmiv3Logo;
-      break;
-    case "WAGMIv3-Oolong":
-      logo = wagmiv3Logo;
-      break;
-    case "DOM":
-      logo = domLogo;
-      break;
-    case "OLO":
-      logo = oloLogo;
-      break;
-    case "CGT":
-      logo = CGTLogo;
-      break;
-    case "AVAX":
-      logo = avaxLog;
-      break;
-    case "GLMR":
-      logo = glmrLogo;
-      break;
-    case "DEV":
-      logo = moonbase;
-      break;
-    case "MTT":
-      logo = mttLogo;
-      break;
-    default:
-      logo = ethLogo;
-      break;
-  }
-
+  const logo = logoMapping[symbol] || ethLogo;
   return logo;
 }
