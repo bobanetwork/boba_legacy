@@ -15,7 +15,7 @@ import { selectNetwork } from 'selectors/networkSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { selectTransactions } from 'selectors/transactionSelector'
 
-import { fetchLookUpPrice } from 'actions/networkAction'
+import { fetchBalances, fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab } from 'actions/uiAction'
 
 import * as S from './Token.styles'
@@ -111,7 +111,10 @@ function TokenPage() {
     if (wAddress.toLowerCase() === gasEstimateAccount.toLowerCase()) {
       setDebug(true)
     }
-  }, [accountEnabled])
+    if (accountEnabled) {
+      dispatch(fetchBalances())
+    }
+  }, [dispatch ,accountEnabled])
 
   const getLookupPrice = useCallback(() => {
     if (!accountEnabled) return
@@ -180,7 +183,7 @@ function TokenPage() {
     return (
       <>
         {layer === 'L2' && network === 'mainnet' && (
-          <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
+          <Box sx={{ padding: '10px 0px', lineHeight: '0.9em'}}>
             <Typography variant="body2">
               <span style={{ opacity: '0.9' }}>Need ETH or BOBA</span>
               {'? '}
@@ -250,7 +253,7 @@ function TokenPage() {
         )}
 
         <G.Container>
-          <G.Content>
+          <S.TokenContent>
             <S.TableHeading>
               {tokenTableHeads.map((item) => {
                 return (
@@ -307,7 +310,7 @@ function TokenPage() {
                 </S.LoaderContainer>
               )
             ) : null}
-          </G.Content>
+          </S.TokenContent>
         </G.Container>
       </>
     )

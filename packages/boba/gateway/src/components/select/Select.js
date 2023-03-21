@@ -18,6 +18,7 @@ import ReactSelect from 'react-select';
 import { Select as MuiSelect, MenuItem, useTheme, Typography, Box } from '@mui/material';
 import * as styles from './Select.module.scss';
 import * as S from './Select.style';
+import { ArrowDropDownOutlined } from '@mui/icons-material';
 import {
   Option,
   MultiValue,
@@ -62,14 +63,15 @@ function Select({
   }
 
   const renderLoading = (
-    <div className={[ styles.selected, styles.loading ].join(' ')}>
+    <S.SelectedContainer className={[ styles.selected, styles.loading ].join(' ')}>
       Loading...
-    </div>
+    </S.SelectedContainer>
   );
 
   const renderSelect = (
     <>
       <MuiSelect
+        IconComponent={() => <ArrowDropDownOutlined />}
         className={styles.select}
         value={value}
         onChange={onSelect}
@@ -78,9 +80,8 @@ function Select({
           sx: {
             '&& .Mui-selected': {
               backgroundColor: 'transparent !important',
-              color: '#BAE21A'
-            }
-          }
+              color: theme.palette.secondary.main,
+            },}
         }}
       >
         {options.map((i, index) => (
@@ -101,7 +102,7 @@ function Select({
           </MenuItem>
         ))}
       </MuiSelect>
-      <div className={styles.selected}>
+      <S.SelectedContainer>
         <div className={styles.details}>
           <div className={styles.title}>{selected ? selected.title : error}</div>
           <div className={styles.subTitle}>{selected ? selected.subTitle : ''}</div>
@@ -111,7 +112,7 @@ function Select({
             fill={theme.palette.text.primary}
             fillOpacity="0.45" />
         </svg>
-      </div>
+      </S.SelectedContainer>
     </>
   );
 
@@ -139,28 +140,28 @@ function Select({
           }),
           indicatorSeparator: (base) => ({
             ...base,
-            display: 'none'
+            display: 'none',
           }),
           container: (base) => ({
             ...base,
-            background: theme.palette.background.default
+            background: 'none'
           }),
           singleValue: (base) => ({
             ...base,
-            background: 'transperant',
-            color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
+            background: 'transparent',
+            color: theme.palette.secondary.text,
             padding: '5px'
           }),
           multiValue: (base) => ({
             ...base,
             background: theme.palette.background.secondary,
-            color: theme.palette.mode === 'light' ? theme.palette.background.default : '#fff',
+            color: theme.palette.secondary.text,
             marginRight: '5px',
             paddingRight: '5px',
           }),
           valueContainer: (base) => ({
             ...base,
-            background: theme.palette.background.default
+            background: 'none',
           })
         }}
         theme={theme}

@@ -7,7 +7,7 @@ export const BridgeTransferContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const TokenPicker = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
   border: theme.palette.primary.border,
   borderRadius: theme.palette.primary.borderRadius,
   height: '50px',

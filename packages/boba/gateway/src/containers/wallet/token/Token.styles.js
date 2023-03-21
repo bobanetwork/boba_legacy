@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import {Content} from "../../Global.styles";
 
 export const LoaderContainer = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -26,7 +27,16 @@ export const TableHeading = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const TableHeadingItem = styled(Typography)`
-  width: 20%;
-  gap: 5px;
-`;
+export const TableHeadingItem = styled(Typography)(({ theme }) => ({
+  width: '20%',
+  gap: '5px',
+  color: theme.palette.primary.info,
+  fontWeight: 'bold',
+}));
+
+
+export const TokenContent = styled(Content)(({ theme }) => ({
+  border: 'none !important',
+  boxShadow: theme.palette.mode === 'light' ? '0px 4px 20px rgba(35, 92, 41, 0.06)' : 'none',
+  borderRadius: '12px !important',
+}));

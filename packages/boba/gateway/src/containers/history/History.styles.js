@@ -2,13 +2,14 @@ import styled from '@emotion/styled'
 import { Box } from '@mui/material'
 
 export const HistoryContainer = styled.div`
-  background: ${props => props.theme.palette.background.secondary};
+  background: ${props => props.theme.palette.background.glassy};
   border-radius: 8px;
   margin-bottom: 20px;
 `;
 
 export const HistoryPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
@@ -34,14 +35,14 @@ export const Disclaimer = styled.div`
   margin-top: 20px;
 `;
 
-export const Content = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 10px;
-  padding: 10px 20px;
-  border-radius: 6px;
-`;
+export const Content = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '5px',
+  marginBottom: '10px',
+  padding: '10px 20px',
+  borderRadius: '6px'
+}));
 
 export const Header = styled(Box)(({ theme }) => ({
   display: 'flex',

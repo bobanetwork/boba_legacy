@@ -1,13 +1,15 @@
-import { Box } from '@mui/material';
-import { setConnect, setConnectETH } from 'actions/setupAction';
-import { closeModal } from 'actions/uiAction';
-import Button from 'components/button/Button';
-
-import Modal from 'components/modal/Modal';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectNetwork } from 'selectors/networkSelector';
+import { Box } from '@mui/material';
+
+import Button from 'components/button/Button';
+import Modal from 'components/modal/Modal';
+
 import { restTokenList } from 'actions/tokenAction';
+import { setConnect, setConnectETH } from 'actions/setupAction';
+import { closeModal } from 'actions/uiAction';
+
+import { selectNetwork } from 'selectors/networkSelector';
 
 function WrongNetworkModal({open}) {
 

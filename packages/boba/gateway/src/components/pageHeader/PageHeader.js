@@ -1,9 +1,8 @@
 import React from 'react'
 import * as S from './PageHeader.styles'
-import { ReactComponent as BobaLogo } from '../../images/boba2/logo-boba2.svg'
+import BobaLogo from "../icons/BobaLogo";
 import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
 import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
 import { useState } from 'react'
@@ -30,7 +29,6 @@ import {
   selectMonster,
 } from 'selectors/setupSelector'
 import NetworkSwitcher from 'components/mainMenu/networkSwitcher/NetworkSwitcher'
-import WalletSwitch from 'components/walletSwitch/WalletSwitch'
 import { LAYER } from 'util/constant'
 
 const useStyles = makeStyles({
@@ -131,7 +129,7 @@ const PageHeader = ({ maintenance }) => {
                   </S.WrapperCloseIcon>
                 </S.DrawerHeader>
                 <S.HeaderDivider />
-                <LayerSwitcher />
+                <NetworkSwitcher />
               </S.StyleDrawer>
             </Drawer>
             <Drawer
@@ -167,7 +165,6 @@ const PageHeader = ({ maintenance }) => {
           />
           <MenuItems setOpen={setOpen} />
           {layer === LAYER.L2 ? <FeeSwitcher /> : null}
-          <WalletSwitch />
           <NetworkSwitcher />
           {!!accountEnabled ? (
             <>

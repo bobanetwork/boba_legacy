@@ -49,7 +49,7 @@ const Projects = ({projectType}) => {
           </S.ImageContainer>
           <S.ProjectContent
           >
-            <Typography alignSelf="center" variant="h4">{project.title}</Typography>
+            <Typography alignSelf="center" variant="h4" sx={{ fontWeight: 'bold', fontSize: '18px !important' }}>{project.title}</Typography>
             {isMobile ?
               <ShowMoreShowLess
                 sx={{
@@ -61,7 +61,7 @@ const Projects = ({projectType}) => {
                 }}
               >{project.description}</ShowMoreShowLess>
               : <Tooltip title={project.description}>
-                <S.ProjectDescription variant='body2'> {project.description}</S.ProjectDescription>
+                <S.ProjectDescription variant="body2" component="p"> {project.description}</S.ProjectDescription>
               </Tooltip>}
           </S.ProjectContent>
           <S.DividerLine />

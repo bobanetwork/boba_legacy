@@ -16,7 +16,6 @@ limitations under the License. */
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { openError, openAlert } from 'actions/uiAction'
-import { HelpOutline } from '@mui/icons-material'
 
 import {
   selectAccountEnabled,
@@ -27,7 +26,6 @@ import {
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
 import { switchFee } from 'actions/setupAction.js'
-import { Typography } from '@mui/material'
 
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
@@ -40,6 +38,7 @@ import networkService from 'services/networkService.js'
 import {
   selectActiveNetworkName,
 } from 'selectors/networkSelector.js'
+import {FeeSwitcherIcon, FeeSwitcherLabel} from "./FeeSwitcher.styles.js";
 
 
 function FeeSwitcher() {
@@ -135,9 +134,9 @@ function FeeSwitcher() {
         <Tooltip
           title={`After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ${networkService.L1NativeTokenSymbol} as the gas fee token according to your choice.`}
         >
-          <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+          <FeeSwitcherIcon fontSize="small" />
         </Tooltip>
-        <Typography variant="body2">Fee</Typography>
+        <FeeSwitcherLabel variant="body2">Fee</FeeSwitcherLabel>
       </S.FeeSwitcherWrapper>
     )
   }
@@ -147,9 +146,9 @@ function FeeSwitcher() {
       <Tooltip
         title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across ${networkName['l2']} according to your choice.`}
       >
-        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+        <FeeSwitcherIcon fontSize="small" />
       </Tooltip>
-      <Typography variant="body2">Fee</Typography>
+      <FeeSwitcherLabel variant="body2">Fee</FeeSwitcherLabel>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)

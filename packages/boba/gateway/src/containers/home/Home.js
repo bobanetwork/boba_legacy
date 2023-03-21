@@ -76,6 +76,7 @@ import ManageLockModal from 'containers/modals/veBoba/ManageLockModal';
 import NoMetaMaskModal from 'containers/modals/noMetaMask/NoMetaMaskModal'
 import WalletSelectorModal from 'containers/modals/walletSelector/WalletSelectorModal'
 import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionModal'
+import SwitchNetworkModal from 'containers/modals/switchNetwork/SwitchNetworkModal'
 
 /******** COMPONENTS ********/
 import PageTitle from 'components/pageTitle/PageTitle'
@@ -83,7 +84,6 @@ import PageHeader from 'components/pageHeader/PageHeader'
 import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import Zendesk from 'components/zendesk/Zendesk'
 
 /******** UTILS ********/
 import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
@@ -93,6 +93,7 @@ import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkS
 import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
+import useWalletSwitch from 'hooks/useWalletSwitch'
 
 
 function Home() {
@@ -121,6 +122,7 @@ function Home() {
   const manageLockModalState = useSelector(selectModalState('manageLock'));
   const walletSelectorModalState = useSelector(selectModalState('walletSelectorModal'));
   const CDMCompletionModalState = useSelector(selectModalState('CDMCompletionModal'));
+  const switchNetworkModalState = useSelector(selectModalState('switchNetworkModal'));
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -223,7 +225,7 @@ function Home() {
 
   // Invoking GA analysis page view hooks
   useGoogleAnalytics();
-
+  useWalletSwitch()
   useNetwork()
 
   return (
@@ -251,6 +253,7 @@ function Home() {
       {!!manageLockModalState && <ManageLockModal open={manageLockModalState} lock={lock} />}
       {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
+      {!!switchNetworkModalState && <SwitchNetworkModal open={switchNetworkModalState} />}
 
       <Alert
         type='error'
@@ -271,7 +274,6 @@ function Home() {
       >
         {alertMessage}
       </Alert>
-      <Zendesk />
       { isMobile ? <LayerSwitcher visisble={false} /> : null }
       {!!maintenance &&
         <Box sx={{
@@ -325,13 +327,12 @@ function Home() {
       }
 
       {! maintenance &&
-        <Box sx={{ display: 'flex',height: '100%', flexDirection: 'column', width: '100%' }}>
+        <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
           <Container maxWidth={false} sx={{
-            height: 'calc(100% - 150px)',
-            minHeight: '500px',
-            marginLeft: 'unset',
+            minHeight: 'calc(100vh - 64px)',
             width: '100vw',
+            marginLeft: 'unset',
             marginRight: 'unset'
           }}>
             <Outlet />

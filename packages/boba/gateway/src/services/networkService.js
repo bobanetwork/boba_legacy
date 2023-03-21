@@ -211,7 +211,6 @@ class NetworkService {
         // if it's false which means boba is getting used as tokenfee which is default value.
         feeChoice = !feeChoice;
       }
-      console.log('Fee used as boba', feeChoice)
       const bobaFee = {
         priceRatio: priceRatio.toString(),
         feeChoice
@@ -721,50 +720,6 @@ class NetworkService {
     return await this.walletService.switchChain(targetIDHex, chainParam)
   }
 
-  async getSevens() {
-
-    console.log("getSevens()")
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkConfig
-    ).get('get.l2.pendingexits')
-
-    if (response.status === 201) {
-      const data = response.data
-      const filtered = data.filter(
-        (i) => (i.fastRelay === 0) && (i.status === 'pending')
-      )
-      return filtered
-    } else {
-      return []
-    }
-
-  }
-
-  async getFastExits() {
-
-    console.log("getFastExits()")
-
-    // NOT SUPPORTED on LOCAL
-    if (this.networkGateway === 'local') return
-
-    const response = await omgxWatcherAxiosInstance(
-      this.networkConfig
-    ).get('get.l2.pendingexits')
-
-    if (response.status === 201) {
-      const data = response.data
-      const filtered = data.filter(
-        (i) => (i.fastRelay === 1) && (i.status === 'pending')
-      )
-      return filtered
-    } else {
-      return []
-    }
-  }
 
   async fetchMyMonsters() {
 
