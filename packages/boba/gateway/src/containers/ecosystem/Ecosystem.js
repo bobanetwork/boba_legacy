@@ -29,7 +29,7 @@ function ECOSYSTEM({ ecosystemType }) {
             }}
             sx={{ textTransform: 'uppercase' }}
             variant={params.category === cat ? "contained" : "standard"}
-            color="primary"
+            color="secondary"
             size="small"
           >{cat}</Button>
         })}

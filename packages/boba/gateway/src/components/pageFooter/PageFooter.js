@@ -91,7 +91,7 @@ const PageFooter = ({ maintenance }) => {
             target="_blank"
             aria-label="twitter"
           >
-            <Twitter sx={{ opacity: 0.65 }} />
+            <Twitter />
           </S.SocialButton>
           <S.SocialButton
             href="https://boba.eco/discord"
@@ -107,7 +107,7 @@ const PageFooter = ({ maintenance }) => {
             target="_blank"
             aria-label="telegram"
           >
-            <Telegram sx={{ opacity: 0.65 }} />
+            <Telegram />
           </S.SocialButton>
         </S.SocialWrapper>
         {!isMobile && <GasSwitcher />}

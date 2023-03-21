@@ -10,7 +10,8 @@ import {
 export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.glassy,
   backdropFilter: 'blur(50px)',
-  borderRadius: theme.palette.secondary.borderRadius,
+  borderRadius: '20px',
+  filter: 'drop-shadow(0px 4px 20px rgba(35, 92, 41, 0.06))',
   flex: 1,
   minHeight: 'fit-content',
   padding: '24px',
@@ -91,6 +92,8 @@ export const ChainSwitcherIcon = styled(Button)(({ theme }) => ({
 export const HistoryLink = styled(Box)(({ theme, width }) => ({
   background: theme.palette.background.glassy,
   backdropFilter: 'blur(50px)',
+  filter: 'drop-shadow(0px 4px 20px rgba(35, 92, 41, 0.06))',
+  border: 'none',
   borderRadius: theme.palette.primary.borderRadius,
   width: '100%',
   maxWidth: '600px',
@@ -137,4 +140,8 @@ export const IconSwitcher = styled(IconButton)(({ theme }) => ({
   alignSelf: 'center',
   justifyContent: 'center',
   alignItems: 'center',
+}))
+
+export const ChainDirectionLabel = styled(Typography)(({ theme }) => ({
+  color: theme.palette.primary.tooltip,
 }))

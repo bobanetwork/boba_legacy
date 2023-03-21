@@ -125,7 +125,7 @@ function History() {
                 </div>
               ) : null}
               <DatePicker
-                wrapperClassName={styles.datePickerInput}
+                wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
                 popperClassName={styles.popperStyle}
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
@@ -139,7 +139,7 @@ function History() {
                 <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
               ) : null}
               <DatePicker
-                wrapperClassName={styles.datePickerInput}
+                wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
                 popperClassName={styles.popperStyle}
                 selected={endDate}
                 onChange={(date) => setEndDate(date)}

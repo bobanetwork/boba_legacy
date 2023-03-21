@@ -4,6 +4,7 @@ import stakeBg from 'images/boba2/stake-balance-bg.png'
 
 export const StakePageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
@@ -31,13 +32,13 @@ export const StakeEarnContainer = styled(Box)(({ theme }) => ({
   marginBottom: '10px',
   width: '100%',
   backdropFilter: 'blur(10px)',
-  background: `url(${stakeBg})  ${theme.palette.mode === 'light' ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)'} no-repeat`,
+  background: `url(${stakeBg})  ${theme.palette.background.glassy} no-repeat`,
   backgroundPosition: '100% 0%',
   backgroundSize: '40%'
 }))
 
 export const StakeInputContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.mode === 'light' ? '#F5F6F6' : 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.background.glassy,
   backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   padding: '32px 24px',
@@ -49,7 +50,7 @@ export const StakeInputContainer = styled(Box)(({ theme }) => ({
 }))
 
 export const StakeHeadContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.mode === 'light' ? '#F5F6F6' : 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.background.glassy,
   backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   padding: '10px 20px',
@@ -61,7 +62,7 @@ export const StakeContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: theme.palette.mode === 'light' ? '#F5F6F6' : 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.background.glassy,
   //backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   padding: '24px',
@@ -70,7 +71,7 @@ export const StakeContainer = styled(Box)(({ theme }) => ({
 }))
 
 export const StakeItemContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.mode === 'light' ? '#F5F6F6' : 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.background.glassy,
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',

@@ -140,7 +140,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                         BRIDGE_TYPE.CLASSIC_BRIDGE
                       )
                     }}
-                    color="neutral"
+                    color="secondary"
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -156,7 +156,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                         BRIDGE_TYPE.FAST_BRIDGE
                       )
                     }}
-                    color="neutral"
+                    color="secondary"
                     disabled={disabled}
                     variant="contained"
                     tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
@@ -173,7 +173,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                           BRIDGE_TYPE.MULTI_CHAIN_BRIDGE
                         )
                       }}
-                      color="neutral"
+                      color="secondary"
                       disabled={disabled}
                       variant="contained"
                       tooltip="A multi-chain bridge to Alt L1."
@@ -201,7 +201,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                         handleModalClick('exitModal', token, false)
                       }}
                       variant="outlined"
-                      color="neutral"
+                      color="secondary"
                       disabled={disabled}
                       tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
                       fullWidth
@@ -214,7 +214,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                         handleModalClick('exitModal', token, true)
                       }}
                       variant="outlined"
-                      color="neutral"
+                      color="secondary"
                       disabled={disabled}
                       tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
                       fullWidth
@@ -458,7 +458,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                     BRIDGE_TYPE.CLASSIC_BRIDGE
                   )
                 }}
-                color="neutral"
+                color="secondary"
                 variant="outlined"
                 disabled={disabled}
                 tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -475,7 +475,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                     BRIDGE_TYPE.FAST_BRIDGE
                   )
                 }}
-                color="neutral"
+                color="secondary"
                 disabled={disabled}
                 variant="outlined"
                 tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
@@ -492,7 +492,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                       BRIDGE_TYPE.MULTI_CHAIN_BRIDGE
                     )
                   }}
-                  color="neutral"
+                  color="secondary"
                   disabled={disabled}
                   variant="contained"
                   fullWidth
@@ -518,7 +518,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                     handleModalClick('exitModal', token, false)
                   }}
                   variant="outlined"
-                  color="neutral"
+                  color="secondary"
                   disabled={disabled}
                   tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
                   fullWidth
@@ -530,7 +530,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                     handleModalClick('exitModal', token, true)
                   }}
                   variant="outlined"
-                  color="neutral"
+                  color="secondary"
                   disabled={disabled}
                   tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
                   fullWidth
@@ -543,7 +543,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                     handleModalClick('transferModal', token, false)
                   }}
                   variant="outlined"
-                  color="neutral"
+                  color="secondary"
                   disabled={disabled}
                   tooltip="Transfer funds from one L2 account to another L2 account."
                   fullWidth

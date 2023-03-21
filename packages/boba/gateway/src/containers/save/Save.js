@@ -15,7 +15,6 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
 import React from 'react'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
@@ -254,11 +253,13 @@ class Save extends React.Component {
               <Box sx={{ my: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <Typography variant="body2" sx={{ opacity: 0.65 }}> Stake BOBA Earn BOBA </Typography>
                 <Typography variant="h1"
-                  sx={{
-                    background: '-webkit-linear-gradient(269deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
+                  sx={[
+                  (theme) => ({
+                    background: theme.palette.secondary.gradient,
                     'WebkitBackgroundClip': 'text',
                     'WebkitTextFillColor': 'transparent'
-                  }}
+                  }),
+                    ]}
                 > 5% Fixed APY </Typography>
                 <S.DividerLine sx={{ width: '60%' }} />
               </Box>
@@ -312,7 +313,7 @@ class Save extends React.Component {
               { netLayer === 'L2' &&
                   <Button
                     color="primary"
-                    variant="outlined"
+                    variant="contained"
                     onClick={() => {this.handleConfirm()}}
                     loading={loading}
                     disabled={!accountEnabled}

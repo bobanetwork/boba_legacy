@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { NavLink } from 'react-router-dom'
-import { ReactComponent as BobaIcon } from '../../../images/boba2/boba2Icon.svg'
+import Boba2Icon from "../../icons/Boba2Icon";
 
 export const Nav = styled('nav')(({ theme }) => ({
   width: '100%',
@@ -24,6 +24,8 @@ export const Nav = styled('nav')(({ theme }) => ({
 }))
 
 export const MenuListItem = styled(NavLink)(({ theme }) => ({
+  display: 'flex',
+  gap: '4px',
   fontSize: '0.9em',
   fontWeight: 'normal',
   cursor: 'pointer',
@@ -44,7 +46,7 @@ export const MenuListItem = styled(NavLink)(({ theme }) => ({
   },
 }))
 
-export const MenuIcon = styled(BobaIcon)(({ theme }) => ({
+export const MenuIcon = styled(Boba2Icon)(({ theme }) => ({
   // display: 'none',
   margin: '0 4px -2px 4px',
   '&.active': {

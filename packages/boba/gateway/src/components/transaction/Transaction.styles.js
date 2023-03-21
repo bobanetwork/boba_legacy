@@ -29,8 +29,9 @@ export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
 
 export const DropdownWrapper = styled(Box)`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   gap: 5px;
   width: 100%;
   margin-top: 10px;

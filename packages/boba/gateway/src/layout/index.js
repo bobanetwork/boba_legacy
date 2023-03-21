@@ -39,9 +39,11 @@ function App() {
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const darkGrey = '#1b1c1f'
+  // const darkGrey = '#1b1c1f'
+  // const cyan = '#1CD6D1'
 
   const buttonColor = '#BAE21A' //radioGreen
+  const buttonColorLightmode = '#1CD6D1' //cyan
 
   let MUItheme = createTheme({
     palette: {
@@ -59,32 +61,39 @@ function App() {
           ? `solid 2px ${buttonColor}`
           : `solid 2px ${buttonColor}`,
         alert: light ? 'black' : '#FFD88D',
+        tooltip: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        info: light ? 'rgba(3, 19, 19, 0.65)' : 'rgba(255, 255, 255, 0.65)',
       },
       secondary: {
-        main: light ? buttonColor : buttonColor,
+        main: light ? buttonColorLightmode : buttonColor,
         borderRadius: '20px',
         border: light
-          ? 'solid 1px rgba(0, 0, 0, 0.12)'
+          ? 'solid 1px rgba(3, 19, 19, 0.06)'
           : 'solid 1px rgba(255, 255, 255, 0.06)',
+        gradient: light ? '#1CD6D1' : '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
+        text: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       },
       background: {
         default: light ? '#FFFFFF' : '#111315',
-        secondary: light ? 'rgba(0, 0, 0, 0.04)' : darkGrey,
+        secondary: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.06)',
         secondaryLight: light
           ? 'rgba(0, 0, 0, 0.08)'
           : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
         modal: light ? '#fff' : '#1A1D1F',
         modalTransparent: light ? '#fff' : 'transparent',
-        input: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)',
-        footer: light ? '#fff' : '#1A1D1F',
-        glassy: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.04)',
-        tooltip: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)',
+        input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+        footer: light ? '#1A1D1F' : '#1A1D1F',
+        glassy: light ? 'rgba(0,0,0, 0.09)' : 'rgba(255, 255, 255, 0.04)',
+        tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
         alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
       neutral: {
         main: '#fff',
         contrastText: buttonColor,
+      },
+      spacing: {
+        toFooter: '80px',
       },
     },
     typography: {
@@ -125,12 +134,31 @@ function App() {
       },
     },
     components: {
+      ReactSelect : {
+        styleOverrides: {
+          root: {
+            borderRadius: '12px',
+            minWidth: '96px',
+            boxShadow: 'none',
+            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+          },
+        },
+      },
       MuiPaper: {
         defaultProps: {
           elevation: 0,
         },
         styleOverrides: {
-          root: {},
+          root: {
+            borderRadius: '12px',
+            minWidth: '96px',
+            boxShadow: 'none',
+            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+          },
         },
       },
       MuiTooltip: {
@@ -152,7 +180,7 @@ function App() {
           root: {
             borderRadius: '8px',
             textTransform: 'none',
-            boxShadow: 'box-shadow: 0px 0px 7px rgba(73, 107, 239, 0.35)',
+            boxShadow: 'none !important',
             minWidth: '0',
             color: '#031313',
             '&.Mui-disabled': {
@@ -189,7 +217,6 @@ function App() {
               background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
-              filter: 'drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))',
               '&:hover': {
                 color: '#000',
                 borderColor: buttonColor,
@@ -220,6 +247,38 @@ function App() {
             },
           },
           {
+            props: { variant: 'standard', color: 'secondary' },
+            style: {
+              color: light
+                ? 'rgba(0, 0, 0, 0.45)'
+                : 'rgba(255, 255, 255, 0.45)',
+              background: light
+                ? 'rgba(0, 0, 0, 0.06)'
+                : 'rgba(255, 255, 255, 0.06)',
+              borderWidth: '1.4px',
+              borderColor: buttonColor,
+              '&:hover': {
+                color: light ? buttonColorLightmode : buttonColor,
+                boxShadow: 'none',
+              },
+            },
+          },
+          {
+            props: { variant: 'outlined', color: 'secondary' },
+            style: {
+              color: light ? buttonColor : buttonColor,
+              borderWidth: '1.4px',
+              borderColor: light ? buttonColor : 'rgba(255, 255, 255, 0.25)',
+              '&:hover': {
+                opacity: 0.9,
+                borderWidth: '1.4px',
+                transition: 'opacity 0.3s ease-in-out',
+                borderColor: light ? buttonColor : buttonColor,
+                boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              },
+            },
+          },
+          {
             props: { variant: 'contained', color: 'neutral' },
             style: {
               '&:hover': {
@@ -231,9 +290,9 @@ function App() {
           {
             props: { variant: 'outlined', color: 'neutral' },
             style: {
-              color: light ? '#000' : buttonColor,
+              color: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               borderWidth: '1.4px',
-              borderColor: light ? '#000' : 'rgba(255, 255, 255, 0.25)',
+              borderColor: light ?  'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',
@@ -286,6 +345,24 @@ function App() {
           },
         ],
       },
+      MuiTypography: {
+        variants: [
+          {
+            props: { variant: 'body2', color: 'fade' },
+            style: {
+              lineHeight: '1.1em',
+              color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            },
+          },
+          {
+            props: { variant: 'body3', color: 'fade' },
+            style: {
+              lineHeight: '0.7em',
+              color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            },
+          }
+        ]
+      }
     },
   })
 

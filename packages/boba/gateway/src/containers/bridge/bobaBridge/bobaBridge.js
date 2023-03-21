@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { Box, Typography, Switch, useTheme } from '@mui/material'
+
 import Button from 'components/button/Button.js'
 import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
@@ -80,7 +81,6 @@ function BobaBridge() {
     }
   }
 
-
   const L1ChainLabel = () => {
     return (<S.ChainLabel component="p" variant="body">
       <L1Icon selected />
@@ -136,44 +136,40 @@ function BobaBridge() {
             my={1}
           >
             <Box width="100%">
-              <Typography variant="body2" pb="10px">
+              <S.ChainDirectionLabel variant="body2" pb="10px">
                 From
-              </Typography>
+              </S.ChainDirectionLabel>
               <S.ChainInput>
                 {toL2? <L1ChainLabel/> : <L2ChainLabel/>}
               </S.ChainInput>
             </Box>
             <ChainSwitchIcon />
             <Box width="100%">
-              <Typography variant="body2" mt="10px" pb="10px">
+              <S.ChainDirectionLabel variant="body2" mt="10px" pb="10px">
                 To
-              </Typography>
+              </S.ChainDirectionLabel>
               <S.ChainInput>
                 {toL2? <L2ChainLabel/> : <L1ChainLabel/>}
               </S.ChainInput>
             </Box>
           </S.BobaContentWrapper>
-        </S.BobaContent>
-        <Box alignSelf="center">
-          <Button
-            fullWidth={true}
-            sx={{ marginTop: '38px' }}
-            onClick={() => {
-              if(toL2){
+          <Box alignSelf="flex-start">
+            <Button
+              sx={{ marginTop: '35px', padding: '10px 28px' }}
+              onClick={() => {
                 connectToETH()
-              } else {
-                connectToBOBA()
-              }
-            }}
-            color="primary"
-            variant="contained"
-          >
-            Connect
-          </Button>
-        </Box>
+              }}
+              color="primary"
+              variant="contained"
+            >
+              Connect
+            </Button>
+          </Box>
+        </S.BobaContent>
       </S.BobaBridgeWrapper>
     )
   }
+
 
   return (
     <>
@@ -185,9 +181,9 @@ function BobaBridge() {
           alignItems="center"
         >
           <Box width="100%">
-            <Typography variant="body2" pb="10px">
+            <S.ChainDirectionLabel variant="body2" pb="10px" sx={{color: theme.palette.primary.info}}>
               From
-            </Typography>
+            </S.ChainDirectionLabel>
             <S.ChainInput>
               {layer === 'L1' ? <L1ChainLabel /> : <L2ChainLabel />}
             </S.ChainInput>
@@ -201,9 +197,9 @@ function BobaBridge() {
             <ChainSwitchIcon />
           </Box>
           <Box width="100%">
-            <Typography variant="body2" pb="10px">
+            <S.ChainDirectionLabel variant="body2" pb="10px">
               To
-            </Typography>
+            </S.ChainDirectionLabel>
             <S.ChainInput>
               {layer === 'L2' ? <L1ChainLabel /> : <L2ChainLabel />}
             </S.ChainInput>
