@@ -9,8 +9,7 @@ import { getFilteredLogIndex, l2Wallet } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
 // use local sdk
-import { SimpleAccountAPI } from '@boba/bundler_sdk'
-import { wrapProvider } from '@boba/bundler_sdk'
+import { SimpleAccountAPI, wrapProvider } from '@boba/bundler_sdk'
 // change this to using factory
 import SimpleAccountDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountDeployer.sol/SimpleAccountDeployer.json'
 import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
