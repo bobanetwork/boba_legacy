@@ -18,7 +18,7 @@ import React, { useState } from 'react'
 import { Typography, Fade, useMediaQuery } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
-import * as S from './ListEarn.styles'
+import * as S from './Transaction.styles'
 
 import { useTheme } from '@emotion/react'
 
@@ -26,17 +26,10 @@ import truncate from 'truncate-middle'
 import networkService from 'services/networkService'
 
 function Transaction({
-  link,
-  status,
-  statusPercentage,
-  subStatus,
-  title,
   time,
-  subTitle,
   chain,
   typeTX,
   blockNumber,
-  tooltip = '',
   detail,
   oriChain,
   oriHash,
@@ -72,19 +65,12 @@ function Transaction({
       <Fade in={dropDownBox}>
         <S.DropdownContent>
           <S.DropdownWrapper
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-            }}
           >
             <Typography
               variant="body3"
+              color="fade"
               style={{
-                lineHeight: '0.7em',
                 fontSize: '0.7em',
-                color: 'rgba(255, 255, 255, 0.3)',
               }}
             >
               {prefix} Hash:&nbsp;
@@ -104,20 +90,18 @@ function Transaction({
 
             <Typography
               variant="body3"
+              color="fade"
               style={{
-                lineHeight: '0.7em',
-                fontSize: '0.7em',
-                color: 'rgba(255, 255, 255, 0.3)',
+                fontSize: '0.7em'
               }}
             >
               {prefix} Block:&nbsp;{detail.blockNumber}
             </Typography>
             <Typography
               variant="body3"
+              color="fade"
               style={{
-                lineHeight: '0.7em',
-                fontSize: '0.7em',
-                color: 'rgba(255, 255, 255, 0.3)',
+                fontSize: '0.7em'
               }}
             >
               {prefix} Block Hash:&nbsp;
@@ -127,10 +111,9 @@ function Transaction({
             </Typography>
             <Typography
               variant="body3"
+              color="fade"
               style={{
-                lineHeight: '0.7em',
-                fontSize: '0.7em',
-                color: 'rgba(255, 255, 255, 0.3)',
+                fontSize: '0.7em'
               }}
             >
               {prefix} From:&nbsp;
@@ -140,10 +123,9 @@ function Transaction({
             </Typography>
             <Typography
               variant="body3"
+              color="fade"
               style={{
-                lineHeight: '0.7em',
-                fontSize: '0.7em',
-                color: 'rgba(255, 255, 255, 0.3)',
+                fontSize: '0.7em'
               }}
             >
               {prefix} To:&nbsp;
@@ -177,22 +159,19 @@ function Transaction({
               paddingLeft: '3px',
             }}
           >
-            <Typography variant="body2" style={{ lineHeight: '1.1em' }}>
+            <Typography variant="caption" style={{ lineHeight: '1.1em' }}>
               {chain}
             </Typography>
             <Typography
               variant="body2"
-              style={{ lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)' }}
+              color="fade"
             >
               {time}
             </Typography>
             {completion === '' && (
               <Typography
                 variant="body2"
-                style={{
-                  lineHeight: '1.1em',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                }}
+                color="fade"
               >
                 &nbsp;
               </Typography>
@@ -200,10 +179,7 @@ function Transaction({
             {completion !== '' && (
               <Typography
                 variant="body2"
-                style={{
-                  lineHeight: '1.1em',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                }}
+                color="fade"
               >
                 {completion}
               </Typography>
@@ -211,20 +187,16 @@ function Transaction({
             {toChain && (
               <Typography
                 variant="body2"
-                style={{
-                  lineHeight: '1.1em',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                }}
+                color="fade"
               >
                 {toChain}
               </Typography>
             )}
             <Typography
               variant="body2"
+              color="fade"
               style={{
-                lineHeight: '1.1em',
                 fontSize: '0.7em',
-                color: 'rgba(255, 255, 255, 0.3)',
               }}
             >
               {oriChain}&nbsp;Hash:&nbsp;
@@ -261,17 +233,14 @@ function Transaction({
             </Typography>
             <Typography
               variant="body2"
-              style={{ lineHeight: '1.1em', color: 'rgba(255, 255, 255, 0.3)' }}
+              color="fade"
             >
               {typeTX}
             </Typography>
             {eventType ? (
               <Typography
                 variant="body2"
-                style={{
-                  lineHeight: '1.1em',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                }}
+                color="fade"
               >
                 {eventType}
               </Typography>

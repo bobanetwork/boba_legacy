@@ -20,6 +20,7 @@ export const Wrapper = styled(Box)(({ theme }) => ({
     justifyContent: 'flex-start',
     padding: '0 20px',
   },
+  color: 'rgba(255, 255, 255, 0.65)'
 }))
 
 export const ContentWrapper = styled(Box)(({ theme }) => ({
@@ -41,6 +42,7 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     gap: '20px',
   },
+
 }))
 
 export const FooterLink = styled(NavLink)(({ theme }) => ({
@@ -51,7 +53,7 @@ export const FooterLink = styled(NavLink)(({ theme }) => ({
   cursor: 'pointer',
   color: 'unset',
   '&:hover': {
-    color: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
   },
 }))
 
@@ -72,18 +74,12 @@ export const FooterLogoWrapper = styled(Box)(({ theme }) => ({
   alignSelf: 'flex-start',
   justifyContent: 'center',
   alignItems: 'center',
+
 }))
 
 export const FooterDivider = styled(Divider)(({ theme }) => ({
-  background: `${
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.04)'
-      : 'rgba(3, 19, 19, 0.04)'
-  }`,
+  background: 'rgba(49,49,49, 1)',
   boxSizing: 'border-box',
-  boxShadow: `${
-    theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'
-  }`,
   width: '100%',
 }))
 
@@ -91,15 +87,9 @@ export const FooterDividerMobile = styled(Divider)(({ theme }) => ({
   display: 'none',
   [theme.breakpoints.down('md')]: {
     display: 'block',
-    background: `${
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.04)'
-        : 'rgba(3, 19, 19, 0.04)'
-    }`,
+    background: 'rgba(255, 255, 255, 0.04)',
     boxSizing: 'border-box',
-    boxShadow: `${
-      theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'
-    }`,
+    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
     width: '100%',
   },
 }))
@@ -158,11 +148,21 @@ export const SocialWrapper = styled(Box)(({ theme }) => ({
 }))
 
 export const SocialButton = styled(IconButton)(({ theme }) => ({
+  svg: {
+    path: {
+      fill: 'rgba(255, 255, 255, 0.65)',
+      fillOpacity: 1,
+    },
+  },
+  color: 'rgba(255, 255, 255, 1)',
   opacity: 0.65,
   '&:hover': {
     background: 'none',
-    fill: theme.palette.primary.main,
-    color: theme.palette.primary.main,
-    opacity: 1,
+    svg: {
+      path: {
+        fill: theme.palette.secondary.main,
+        fillOpacity: 1,
+      },
+    },
   },
 }))

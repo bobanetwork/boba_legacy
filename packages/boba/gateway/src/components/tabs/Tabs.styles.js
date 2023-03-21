@@ -23,11 +23,7 @@ export const TabItem = styled(Box)(({ theme }) => ({
     opacity: 1,
   },
   '&.active': {
-    color: `${
-      theme.palette.mode === 'light'
-        ? theme.palette.primary.main
-        : theme.palette.neutral.main
-    }`,
+    color: theme.palette.secondary.main,
     opacity: 1,
     borderBottom: theme.palette.primary.tabBorderBottom,
     marginBottom: '-2px',

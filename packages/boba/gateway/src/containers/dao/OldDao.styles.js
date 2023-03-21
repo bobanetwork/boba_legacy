@@ -3,6 +3,7 @@ import { Box } from "@mui/material"
 
 export const DaoPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
@@ -45,7 +46,7 @@ export const DaoWalletContainer = styled(Box)(({ theme }) => ({
   width: '30%',
   gap: '10px',
   borderRadius: theme.palette.primary.borderRadius,
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
   },
@@ -59,7 +60,7 @@ export const DaoProposalContainer = styled(Box)(({ theme }) => ({
   padding: '0 32px',
   minHeight: '500px',
   borderRadius: theme.palette.primary.borderRadius,
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     padding: '0 20px',
