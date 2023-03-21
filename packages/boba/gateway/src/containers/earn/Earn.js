@@ -87,7 +87,7 @@ function Earn() {
   }
 
   const LayerAlert = () => {
-    const message = layer === 'L2' ? 
+    const message = lpChoice === 'L1LP' ? 
       'You are on L2. To transact on L1, SWITCH LAYER to L1' : 
       'You are on L1. To transact on L2, SWITCH LAYER to L2';
 
