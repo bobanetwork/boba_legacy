@@ -188,15 +188,13 @@ describe('AA Boba as Fee token Test\n', async () => {
       const postCallDepositAmount = (await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account.address)).amount
       const postCallEtherBalance = await env.l2Provider.getBalance(account.address)
 
-      // const returnedEPlogIndex = await getFilteredLogIndex(
-      //   receipt,
-      //   EntryPointJson.abi,
-      //   entryPointAddress,
-      //   'UserOperationEvent'
-      // )
-      // TODO: check returnedEPlogIndex failure
-      // UserOperationEvent emitted at logIndex 3
-      const logEP = EntryPoint.interface.parseLog(receipt.logs[3])
+      const returnedEPlogIndex = await getFilteredLogIndex(
+        receipt,
+        EntryPointJson.abi,
+        entryPointAddress,
+        'UserOperationEvent'
+      )
+      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
 
       // no token is used when approving, ether balance is used to pay approval fees
       expect(preApproveTokenBalance).to.eq(postApproveTokenBalance)

@@ -441,7 +441,7 @@ export const getFilteredLogIndex = async (
     (log) =>
       log.topics.length > 0 &&
       log.topics[0] === eventTopic &&
-      (!emitterAddress || log.address === emitterAddress)
+      (!emitterAddress || log.address.toLowerCase() === emitterAddress.toLowerCase())
   )
 
   return filteredLogs[0].logIndex

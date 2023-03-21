@@ -14,7 +14,6 @@ import { wrapProvider } from '@boba/bundler_sdk'
 // change this to using factory
 import SimpleAccountDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountDeployer.sol/SimpleAccountDeployer.json'
 import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
-import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SampleRecipientJson from '../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'

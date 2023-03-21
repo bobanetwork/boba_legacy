@@ -146,13 +146,13 @@ describe('Sponsoring Tx\n', async () => {
         // message is received and emitted
         expect(log.args.message).to.eq('hello')
 
-        // const returnedEPlogIndex = await getFilteredLogIndex(
-        //   receipt,
-        //   EntryPointJson.abi,
-        //   entryPointAddress,
-        //   'UserOperationEvent'
-        // )
-        const logEP = EntryPoint.interface.parseLog(receipt.logs[1])
+        const returnedEPlogIndex = await getFilteredLogIndex(
+          receipt,
+          EntryPointJson.abi,
+          entryPointAddress,
+          'UserOperationEvent'
+        )
+        const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
         const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
         const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
 
