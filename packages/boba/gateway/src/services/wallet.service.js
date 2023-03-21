@@ -143,25 +143,19 @@ class WalletService {
     }
   }
 
+  
   async connectWallet(type) {
-    if (type === 'metamask') {
-      return await this.connectMetaMask()
+    const wallets = {
+      metamask: await this.connectMetaMask(),
+      walletconnect: await this.connectWalletConnect()
     }
-    if (type === 'walletconnect') {
-      return await this.connectWalletConnect()
-    }
-  }
+    return wallets[type]
+  } 
 
   async disconnectWallet() {
-    let result = false
-    if (this.walletType === 'metamask') {
-      result = await this.disconnectMetaMask()
-    }
-    if (this.walletType === 'walletconnect') {
-      result = await this.disconnectWalletConnect()
-    }
-    this.resetValues()
-    return result
+    const result = await this.disconnectMetaMask() || await this.disconnectWalletConnect();
+    this.resetValues();
+    return result;
   }
 
   bindProviderListeners() {
