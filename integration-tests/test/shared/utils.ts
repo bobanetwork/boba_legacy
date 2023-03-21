@@ -207,6 +207,16 @@ if (!process.env.AA_BOBA_URL) {
 export const AA_BOBA_URL =
   process.env.AA_BOBA_URL || 'http://127.0.0.1:8080/aa-addr.json'
 
+if (!process.env.BUNDLER_URL) {
+  console.log(`!!You did not set process.env.BUNDLER_URL!!`)
+  console.log(`Setting to default value of http://localhost:3000/rpc`)
+} else {
+  console.log(`process.env.BUNDLER_URL set to:`, process.env.BUNDLER_URL)
+}
+
+export const BUNDLER_URL =
+  process.env.BUNDLER_URL || 'http://localhost:3000/rpc'
+
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
   const l1BridgeInterface = getContractInterface('L1StandardBridge')

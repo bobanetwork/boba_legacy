@@ -48,7 +48,7 @@ describe('Sponsoring Tx\n', async () => {
     recipient = await SampleRecipient__factory.deploy()
 
     bundlerProvider = new HttpRpcClient(
-      'http://localhost:3000/rpc',
+      env.bundlerUrl,
       entryPointAddress,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )

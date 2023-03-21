@@ -38,6 +38,7 @@ import {
   getBOBADeployerAddresses,
   getAABOBADeployerAddresses,
   envConfig,
+  BUNDLER_URL,
 } from './utils'
 
 export interface CrossDomainMessagePair {
@@ -59,6 +60,7 @@ export class OptimismEnv {
   //l1BlockNumber: Contract
   //ctc: Contract
   //scc: Contract
+  bundlerUrl: string
 
   // L2 Contracts
   ovmEth: Contract
@@ -121,12 +123,15 @@ export class OptimismEnv {
     this.replicaProvider = args.replicaProvider
     //this.ctc = args.ctc
     //this.scc = args.scc
+    this.bundlerUrl = args.bundlerUrl
   }
 
   static async new(): Promise<OptimismEnv> {
     const addressesBASE = await getBASEDeployerAddresses()
     const addressesBOBA = await getBOBADeployerAddresses()
     const addressesAABOBA = await getAABOBADeployerAddresses()
+
+    const bundlerUrl = BUNDLER_URL
 
     const l1Bridge = await getL1Bridge(
       l1Wallet,
@@ -180,6 +185,7 @@ export class OptimismEnv {
       verifierProvider,
       replicaProvider,
       l1Bridge,
+      bundlerUrl,
     })
   }
   //   //const addressManager = getAddressManager(l1Wallet)

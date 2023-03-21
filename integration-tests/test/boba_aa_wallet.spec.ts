@@ -49,7 +49,7 @@ describe('AA Wallet Test\n', async () => {
     console.log('recipient', recipient.address)
 
     bundlerProvider = new HttpRpcClient(
-      'http://localhost:3000/rpc',
+      env.bundlerUrl,
       entryPointAddress,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
@@ -116,7 +116,7 @@ describe('AA Wallet Test\n', async () => {
     const config = {
     chainId: await env.l2Provider.getNetwork().then(net => net.chainId),
     entryPointAddress,
-    bundlerUrl: 'http://localhost:3000/rpc'
+    bundlerUrl: env.bundlerUrl
     }
 
     const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet_3, senderCreator.address)

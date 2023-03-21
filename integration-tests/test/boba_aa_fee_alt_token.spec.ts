@@ -66,7 +66,7 @@ describe('AA Alt Fee Token Test\n', async () => {
     await L2ERC20Token.connect(env.l2Wallet_2).mint(env.l2Wallet.address, utils.parseEther('500'))
 
     bundlerProvider = new HttpRpcClient(
-      'http://localhost:3000/rpc',
+      env.bundlerUrl,
       entryPointAddress,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )

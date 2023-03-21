@@ -59,7 +59,7 @@ describe('AA Boba as Fee token Test\n', async () => {
     )
 
     bundlerProvider = new HttpRpcClient(
-      'http://localhost:3000/rpc',
+      env.bundlerUrl,
       entryPointAddress,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
