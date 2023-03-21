@@ -16,7 +16,7 @@ const Connect = ({
   layer = '',
 }) => {
   const dispatch = useDispatch()
-  const handdleConnect = () => {
+  const handleConnect = () => {
     dispatch(!accountEnabled && !connectToBoba ? setConnect(true) : setConnectBOBA(true))
   }
 
@@ -36,7 +36,7 @@ const Connect = ({
         variant="contained"
           size="small"
           newStyle
-        onClick={handdleConnect}
+        onClick={handleConnect}
         sx={{fontWeight: '500;'}}
       >
         { layer !== 'L2' && connectToBoba? 'Connect to Boba' : 'Connect' }
