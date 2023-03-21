@@ -40,7 +40,6 @@ export class OptimismEnv {
   // L1 Contracts
   addressesBASE
   addressesBOBA
-  addressesAABOBA
   l1Bridge: Contract
 
   // L2 Contracts
@@ -68,7 +67,6 @@ export class OptimismEnv {
   constructor(args: any) {
     this.addressesBASE = args.addressesBASE
     this.addressesBOBA = args.addressesBOBA
-    this.addressesAABOBA = args.addressesAABOBA
     this.l1Bridge = args.l1Bridge
     this.L2BOBA = args.L2BOBA
     this.l1Wallet = args.l1Wallet
@@ -91,9 +89,6 @@ export class OptimismEnv {
   static async new(): Promise<OptimismEnv> {
     const addressesBASE = await getBASEDeployerAddresses()
     const addressesBOBA = await getBOBADeployerAddresses()
-    const addressesAABOBA = await getAABOBADeployerAddresses()
-
-    const bundlerUrl = BUNDLER_URL
 
     const l1Bridge = await getL1Bridge(
       l1Wallet,
@@ -121,7 +116,6 @@ export class OptimismEnv {
     return new OptimismEnv({
       addressesBASE,
       addressesBOBA,
-      addressesAABOBA,
       messenger,
       messengerFast,
       L2BOBA,
@@ -139,7 +133,6 @@ export class OptimismEnv {
       verifierProvider,
       replicaProvider,
       l1Bridge,
-      bundlerUrl,
     })
   }
 
