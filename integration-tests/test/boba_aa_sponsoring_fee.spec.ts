@@ -95,14 +95,14 @@ describe('Sponsoring Tx\n', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
       account = await SimpleAccount__factory.deploy(
         entryPointAddress,
-        env.l2Wallet_3.address
+        env.l2Wallet_4.address
       )
       await account.deployed()
 
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        owner: env.l2Wallet_3,
+        owner: env.l2Wallet_4,
         walletAddress: account.address,
       })
 
@@ -124,7 +124,7 @@ describe('Sponsoring Tx\n', async () => {
       expect(await signedOp.sender).to.be.eq(account.address)
     })
     it('should be able to submit the userOp to the bundler and trigger tx', async () => {
-      const preUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
+      const preUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
       const prePaymasterDeposit = await VerifyingPaymaster.getDeposit()
 
       try {
@@ -153,7 +153,7 @@ describe('Sponsoring Tx\n', async () => {
         //   'UserOperationEvent'
         // )
         const logEP = EntryPoint.interface.parseLog(receipt.logs[1])
-        const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_3.address)
+        const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
         const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
 
         expect(postUserBalance).to.eq(preUserBalance)
