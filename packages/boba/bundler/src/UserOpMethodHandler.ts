@@ -238,6 +238,7 @@ export class UserOpMethodHandler {
       )}`
     )
 
+    // this is doing the geth debug_traceCall that the current ORU doesn't support
     // await this.simulateUserOp(userOp1, entryPointInput)
     const beneficiary = await this.selectBeneficiary()
     const userOpHash = await this.entryPoint.getUserOpHash(userOp)

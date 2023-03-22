@@ -83,7 +83,7 @@ describe('Sponsoring Tx\n', async () => {
     let signedOp
     let account
 
-    it('should be able to add paymaster stake ', async () => {
+    it('should allow the paymaster operator to add paymaster stake (set up paymaster)', async () => {
       await VerifyingPaymaster.addStake(1, { value: utils.parseEther('2') })
       await EntryPoint.depositTo(VerifyingPaymaster.address, {
         value: utils.parseEther('1')

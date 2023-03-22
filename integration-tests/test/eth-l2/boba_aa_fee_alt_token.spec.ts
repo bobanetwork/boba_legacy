@@ -97,115 +97,139 @@ describe('AA Alt Fee Token Test\n', async () => {
       EntryPointJson.abi,
       env.l2Wallet
     )
-
-    await ManualDepositPaymaster.addStake(1, { value: utils.parseEther('2') })
-    await EntryPoint.depositTo(ManualDepositPaymaster.address, {
-      value: utils.parseEther('1')
-    })
   })
-  it('A user without native token pays for a tx using an alt token through a paymaster', async () => {
-    // deploy a 4337 Wallet and send operation to this wallet
-    SimpleAccount__factory = new ContractFactory(
-      SimpleAccountJson.abi,
-      SimpleAccountJson.bytecode,
-      env.l2Wallet
-    )
-    const account = await SimpleAccount__factory.deploy(
-      entryPointAddress,
-      env.l2Wallet.address
-    )
-    await account.deployed()
+  describe('A user without native token pays for a tx using an alt token through a paymaster', async () => {
+    let accountAPI: SimpleAccountAPI
+    let account
+    let preApproveTokenBalance
+    let preApproveDepositAmount
+    let preApproveEtherBalance
+    let postApproveTokenBalance
+    let postApproveDepositAmount
+    let postApproveEtherBalance
+    let signedOp
 
-    await L2ERC20Token.transfer(account.address, utils.parseEther('1'))
-
-    await L2ERC20Token.approve(ManualDepositPaymaster.address, constants.MaxUint256)
-    await ManualDepositPaymaster.addDepositFor(L2ERC20Token.address, account.address, utils.parseEther('2'))
-
-    await env.l2Wallet.sendTransaction({
-      value: utils.parseEther('2'),
-      to: account.address,
+    it('should allow the paymaster operator to add paymaster stake (set up paymaster)', async () => {
+      await ManualDepositPaymaster.addStake(1, { value: utils.parseEther('2') })
+      await EntryPoint.depositTo(ManualDepositPaymaster.address, {
+        value: utils.parseEther('1')
+      })
+      expect(await ManualDepositPaymaster.getDeposit()).to.be.eq(utils.parseEther('1'))
     })
 
-    const accountAPI = new SimpleAccountAPI({
-      provider: env.l2Provider,
-      entryPointAddress,
-      owner: env.l2Wallet,
-      walletAddress: account.address,
+    it('should allow the user to approve token spends by the paymaster', async () => {
+      // deploy a 4337 Wallet and send operation to this wallet
+      SimpleAccount__factory = new ContractFactory(
+        SimpleAccountJson.abi,
+        SimpleAccountJson.bytecode,
+        env.l2Wallet
+      )
+      account = await SimpleAccount__factory.deploy(
+        entryPointAddress,
+        env.l2Wallet.address
+      )
+      await account.deployed()
+
+      await L2ERC20Token.transfer(account.address, utils.parseEther('1'))
+
+      await L2ERC20Token.approve(ManualDepositPaymaster.address, constants.MaxUint256)
+      await ManualDepositPaymaster.addDepositFor(L2ERC20Token.address, account.address, utils.parseEther('2'))
+
+      await env.l2Wallet.sendTransaction({
+        value: utils.parseEther('2'),
+        to: account.address,
+      })
+
+      accountAPI = new SimpleAccountAPI({
+        provider: env.l2Provider,
+        entryPointAddress,
+        owner: env.l2Wallet,
+        walletAddress: account.address,
+      })
+
+      const approveOp = await accountAPI.createSignedUserOp({
+          target: L2ERC20Token.address,
+          data: L2ERC20Token.interface.encodeFunctionData('approve', [ManualDepositPaymaster.address, constants.MaxUint256]),
+      })
+
+      preApproveTokenBalance = await L2ERC20Token.balanceOf(account.address)
+      preApproveDepositAmount = (await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account.address)).amount
+      preApproveEtherBalance = await env.l2Provider.getBalance(account.address)
+
+      try {
+          const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
+          const txid = await accountAPI.getUserOpReceipt(requestId)
+          console.log('reqId', requestId, 'txid=', txid)
+      } catch (e) {
+          throw new Error('Submission to Bundler Failed: ' + e)
+      }
+
+      postApproveTokenBalance = await L2ERC20Token.balanceOf(account.address)
+      postApproveDepositAmount = (await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account.address)).amount
+      postApproveEtherBalance = await env.l2Provider.getBalance(account.address)
+
+      expect(await L2ERC20Token.allowance(account.address, ManualDepositPaymaster.address)).to.be.eq(constants.MaxUint256)
     })
 
-    const approveOp = await accountAPI.createSignedUserOp({
-        target: L2ERC20Token.address,
-        data: L2ERC20Token.interface.encodeFunctionData('approve', [ManualDepositPaymaster.address, constants.MaxUint256]),
+    it('should be able to sign and generate a userOp including the paymaster', async () => {
+      const op = await accountAPI.createUnsignedUserOp({
+        target: recipient.address,
+        data: recipient.interface.encodeFunctionData('something', ['hello']),
+      })
+
+
+      op.paymasterAndData = hexConcat([ManualDepositPaymaster.address, hexZeroPad(L2ERC20Token.address, 20)])
+      op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
+
+      signedOp = await accountAPI.signUserOp(op)
+      expect(await signedOp.sender).to.be.eq(account.address)
+      expect(await signedOp.signature).to.not.be.eq('')
     })
 
-    const preApproveTokenBalance = await L2ERC20Token.balanceOf(account.address)
-    const preApproveDepositAmount = (await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account.address)).amount
-    const preApproveEtherBalance = await env.l2Provider.getBalance(account.address)
-
-    try {
-        const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
+    it('should be able to submit the userOp to the bundler and trigger tx', async () => {
+      try {
+        const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
         const txid = await accountAPI.getUserOpReceipt(requestId)
         console.log('reqId', requestId, 'txid=', txid)
-    } catch (e) {
+        const receipt = await env.l2Provider.getTransactionReceipt(txid)
+        const returnedlogIndex = await getFilteredLogIndex(
+          receipt,
+          SampleRecipientJson.abi,
+          recipient.address,
+          'Sender'
+        )
+        const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+        // tx.origin is the bundler
+        expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+        // msg.sender is the 4337 wallet
+        expect(log.args.msgSender).to.eq(account.address)
+        // message is received and emitted
+        expect(log.args.message).to.eq('hello')
+        const postCallTokenBalance = await L2ERC20Token.balanceOf(account.address)
+        const postCallDepositAmount = (await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account.address)).amount
+        const postCallEtherBalance = await env.l2Provider.getBalance(account.address)
+
+        const returnedEPlogIndex = await getFilteredLogIndex(
+          receipt,
+          EntryPointJson.abi,
+          entryPointAddress,
+          'UserOperationEvent'
+        )
+        const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+
+        // no token is used when approving, ether balance is used to pay approval fees
+        expect(preApproveTokenBalance).to.eq(postApproveTokenBalance)
+        expect(preApproveEtherBalance).to.gt(postApproveEtherBalance)
+        // users deposit amount on paymaster remains constant and is unused throughout
+        expect(preApproveDepositAmount).to.eq(postApproveDepositAmount)
+        expect(postApproveDepositAmount).to.eq(postCallDepositAmount)
+        // no ether is used when calling the recipient with the help of the paymaster, users boba token is used to pay
+        expect(postApproveEtherBalance).to.eq(postCallEtherBalance)
+        expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
+        expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.0001'))
+      } catch (e) {
         throw new Error('Submission to Bundler Failed: ' + e)
-    }
-
-    const postApproveTokenBalance = await L2ERC20Token.balanceOf(account.address)
-    const postApproveDepositAmount = (await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account.address)).amount
-    const postApproveEtherBalance = await env.l2Provider.getBalance(account.address)
-    const op = await accountAPI.createUnsignedUserOp({
-      target: recipient.address,
-      data: recipient.interface.encodeFunctionData('something', ['hello']),
+      }
     })
-
-
-    op.paymasterAndData = hexConcat([ManualDepositPaymaster.address, hexZeroPad(L2ERC20Token.address, 20)])
-    op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
-
-    const signedOp = await accountAPI.signUserOp(op)
-
-    try {
-      const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
-      const txid = await accountAPI.getUserOpReceipt(requestId)
-      console.log('reqId', requestId, 'txid=', txid)
-      const receipt = await env.l2Provider.getTransactionReceipt(txid)
-      const returnedlogIndex = await getFilteredLogIndex(
-        receipt,
-        SampleRecipientJson.abi,
-        recipient.address,
-        'Sender'
-      )
-      const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the bundler
-      expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
-      // msg.sender is the 4337 wallet
-      expect(log.args.msgSender).to.eq(account.address)
-      // message is received and emitted
-      expect(log.args.message).to.eq('hello')
-      const postCallTokenBalance = await L2ERC20Token.balanceOf(account.address)
-      const postCallDepositAmount = (await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account.address)).amount
-      const postCallEtherBalance = await env.l2Provider.getBalance(account.address)
-
-      const returnedEPlogIndex = await getFilteredLogIndex(
-        receipt,
-        EntryPointJson.abi,
-        entryPointAddress,
-        'UserOperationEvent'
-      )
-      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
-
-      // no token is used when approving, ether balance is used to pay approval fees
-      expect(preApproveTokenBalance).to.eq(postApproveTokenBalance)
-      expect(preApproveEtherBalance).to.gt(postApproveEtherBalance)
-      // users deposit amount on paymaster remains constant and is unused throughout
-      expect(preApproveDepositAmount).to.eq(postApproveDepositAmount)
-      expect(postApproveDepositAmount).to.eq(postCallDepositAmount)
-      // no ether is used when calling the recipient with the help of the paymaster, users boba token is used to pay
-      expect(postApproveEtherBalance).to.eq(postCallEtherBalance)
-      expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
-      expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.0001'))
-    } catch (e) {
-      throw new Error('Submission to Bundler Failed: ' + e)
-    }
   })
 })
