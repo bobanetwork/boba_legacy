@@ -83,15 +83,13 @@ describe('Sponsoring Tx\n', async () => {
     let signedOp
     let account
 
-    it('should allow the paymaster operator to add paymaster stake (set up paymaster)', async () => {
+    before('the paymaster operator sets up the paymaster by staking and adding deposits', async () => {
       await VerifyingPaymaster.addStake(1, { value: utils.parseEther('2') })
       await EntryPoint.depositTo(VerifyingPaymaster.address, {
         value: utils.parseEther('1')
       })
-
-      expect(await VerifyingPaymaster.getDeposit()).to.be.eq(utils.parseEther('1'))
     })
-    it('should be able to generate and sign an userOp', async () => {
+    before('account is created and accountAPI is setup', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
       account = await SimpleAccount__factory.deploy(
         entryPointAddress,
@@ -105,7 +103,8 @@ describe('Sponsoring Tx\n', async () => {
         owner: env.l2Wallet_4,
         walletAddress: account.address,
       })
-
+    })
+    it('should be able to submit a userOp to the bundler and trigger tx', async () => {
       const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
@@ -121,46 +120,39 @@ describe('Sponsoring Tx\n', async () => {
 
       signedOp = await accountAPI.signUserOp(op)
 
-      expect(await signedOp.sender).to.be.eq(account.address)
-    })
-    it('should be able to submit the userOp to the bundler and trigger tx', async () => {
       const preUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
       const prePaymasterDeposit = await VerifyingPaymaster.getDeposit()
 
-      try {
-        const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
-        const txid = await accountAPI.getUserOpReceipt(requestId)
-        console.log('reqId', requestId, 'txid=', txid)
-        const receipt = await env.l2Provider.getTransactionReceipt(txid)
-        const returnedlogIndex = await getFilteredLogIndex(
-          receipt,
-          SampleRecipientJson.abi,
-          recipient.address,
-          'Sender'
-        )
-        const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-        // tx.origin is the bundler
-        expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
-        // msg.sender is the 4337 wallet
-        expect(log.args.msgSender).to.eq(account.address)
-        // message is received and emitted
-        expect(log.args.message).to.eq('hello')
+      const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
+      const txid = await accountAPI.getUserOpReceipt(requestId)
+      console.log('reqId', requestId, 'txid=', txid)
+      const receipt = await env.l2Provider.getTransactionReceipt(txid)
+      const returnedlogIndex = await getFilteredLogIndex(
+        receipt,
+        SampleRecipientJson.abi,
+        recipient.address,
+        'Sender'
+      )
+      const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+      // tx.origin is the bundler
+      expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+      // msg.sender is the 4337 wallet
+      expect(log.args.msgSender).to.eq(account.address)
+      // message is received and emitted
+      expect(log.args.message).to.eq('hello')
 
-        const returnedEPlogIndex = await getFilteredLogIndex(
-          receipt,
-          EntryPointJson.abi,
-          entryPointAddress,
-          'UserOperationEvent'
-        )
-        const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
-        const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
-        const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
+      const returnedEPlogIndex = await getFilteredLogIndex(
+        receipt,
+        EntryPointJson.abi,
+        entryPointAddress,
+        'UserOperationEvent'
+      )
+      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+      const postUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
+      const postPaymasterDeposit = await VerifyingPaymaster.getDeposit()
 
-        expect(postUserBalance).to.eq(preUserBalance)
-        expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
-      } catch (e) {
-        throw new Error('Submission to Bundler Failed: ' + e)
-      }
+      expect(postUserBalance).to.eq(preUserBalance)
+      expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
     })
   })
 })

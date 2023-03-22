@@ -78,27 +78,25 @@ describe('AA Wallet Test\n', async () => {
       data: recipient.interface.encodeFunctionData('something', ['hello']),
     })
 
-    try {
-      const requestId = await bundlerProvider.sendUserOpToBundler(op)
-      const txid = await accountAPI.getUserOpReceipt(requestId)
-      console.log('reqId', requestId, 'txid=', txid)
-      const receipt = await env.l2Provider.getTransactionReceipt(txid)
-      const returnedlogIndex = await getFilteredLogIndex(
-        receipt,
-        SampleRecipientJson.abi,
-        recipient.address,
-        'Sender'
-      )
-      const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the bundler
-      expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
-      // msg.sender is the 4337 wallet
-      expect(log.args.msgSender).to.eq(account.address)
-      // message is received and emitted
-      expect(log.args.message).to.eq('hello')
-    } catch (e) {
-      throw new Error('Submission to Bundler Failed: ' + e)
-    }
+    expect(await op.sender).to.be.eq(account.address)
+
+    const requestId = await bundlerProvider.sendUserOpToBundler(op)
+    const txid = await accountAPI.getUserOpReceipt(requestId)
+    console.log('reqId', requestId, 'txid=', txid)
+    const receipt = await env.l2Provider.getTransactionReceipt(txid)
+    const returnedlogIndex = await getFilteredLogIndex(
+      receipt,
+      SampleRecipientJson.abi,
+      recipient.address,
+      'Sender'
+    )
+    const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+    // tx.origin is the bundler
+    expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+    // msg.sender is the 4337 wallet
+    expect(log.args.msgSender).to.eq(account.address)
+    // message is received and emitted
+    expect(log.args.message).to.eq('hello')
   })
   it('should be able to send a userOperation to a wallet through the bundler (high level api)', async () => {
     // deploy a senderCreator contract to get the create2 address on the provide
@@ -187,27 +185,23 @@ describe('AA Wallet Test\n', async () => {
     const preAccountCode = await env.l2Provider.getCode(op.sender)
     expect(preAccountCode).to.be.eq('0x')
 
-    try {
-      const requestId = await bundlerProvider.sendUserOpToBundler(op)
-      const txid = await accountAPI.getUserOpReceipt(requestId)
-      console.log('reqId', requestId, 'txid=', txid)
-      const receipt = await env.l2Provider.getTransactionReceipt(txid)
-      const returnedlogIndex = await getFilteredLogIndex(
-        receipt,
-        SampleRecipientJson.abi,
-        recipient.address,
-        'Sender'
-      )
-      const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-      // tx.origin is the bundler
-      expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
-      // msg.sender is the 4337 wallet
-      expect(log.args.msgSender).to.eq(accountAddress)
-      // message is received and emitted
-      expect(log.args.message).to.eq('hello')
-    } catch (e) {
-      throw new Error('Submission to Bundler Failed: ' + e)
-    }
+    const requestId = await bundlerProvider.sendUserOpToBundler(op)
+    const txid = await accountAPI.getUserOpReceipt(requestId)
+    console.log('reqId', requestId, 'txid=', txid)
+    const receipt = await env.l2Provider.getTransactionReceipt(txid)
+    const returnedlogIndex = await getFilteredLogIndex(
+      receipt,
+      SampleRecipientJson.abi,
+      recipient.address,
+      'Sender'
+    )
+    const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
+    // tx.origin is the bundler
+    expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
+    // msg.sender is the 4337 wallet
+    expect(log.args.msgSender).to.eq(accountAddress)
+    // message is received and emitted
+    expect(log.args.message).to.eq('hello')
 
     const postAccountCode = await env.l2Provider.getCode(op.sender)
     expect(postAccountCode).to.be.not.eq('0x')
