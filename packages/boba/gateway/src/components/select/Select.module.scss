@@ -18,7 +18,6 @@
     flex-direction: row;
     align-items: center;
     border-radius: 12px;
-
   }
 
   .select {
@@ -27,8 +26,7 @@
     border-radius: 0;
     padding-right: 10px;
     -webkit-appearance: none;
-    -webkit-border-radius: 0px;
-    background-color: $gray3;
+    -webkit-border-radius: 0;
     color: $gray3;
     position: absolute;
     left: 0;
@@ -47,7 +45,6 @@
     height: 40px;
     padding-inline: 10px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.04);
 
     .details {
       text-align: left;

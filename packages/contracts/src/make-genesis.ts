@@ -6,14 +6,19 @@ import {
   getStorageLayout,
 } from '@defi-wonderland/smock/dist/src/utils'
 import { remove0x } from '@eth-optimism/core-utils'
-import { utils, BigNumber } from 'ethers'
+import { utils, BigNumber, constants } from 'ethers'
 import { L2GovernanceERC20Helper } from './L2GovernanceERC20Helper'
+import { L2_L1NativeTokenHepler } from './L2_L1NativeTokenHepler'
+import { L2_BOBA } from './L2_BOBAHelper'
+import { supportedLocalTestnet } from '../src/local-network-config'
 
 /* Internal Imports */
 import { predeploys } from './predeploys'
 import { getContractArtifact } from './contract-artifacts'
 
 export interface RollupDeployConfig {
+  // Chain ID to give the L1 network.
+  l1ChainId: number
   // Deployer address
   deployer: string
   // Address that will own the L2 deployer whitelist.
@@ -50,6 +55,12 @@ export interface RollupDeployConfig {
   l1BobaTokenAddress: any
   // Block height to activate berlin hardfork
   berlinBlock: number
+  // L1 native token - name
+  l1NativeTokenName: string
+  // L1 native token - symbol
+  l1NativeTokenSymbol: string
+  // L1 native token - decimals
+  l1NativeTokenDecimals: number
 }
 
 const addSlotsForBobaProxyContract = (
@@ -74,6 +85,7 @@ const addSlotsForBobaProxyContract = (
 export const makeL2GenesisFile = async (
   cfg: RollupDeployConfig
 ): Promise<any> => {
+  const isLocalAltL1 = supportedLocalTestnet[cfg.l1ChainId]?.isLocalAltL1
   // Very basic validation.
   for (const [key, val] of Object.entries(cfg)) {
     if (val === undefined) {
@@ -151,12 +163,73 @@ export const makeL2GenesisFile = async (
       metaTransactionFee: utils.parseEther('3'),
       receivedETHAmount: utils.parseEther('0.005'),
       marketPriceRatio: 2000,
+    },
+    L2_BOBA: {
+      _name: 'Boba Network',
+      _symbol: 'BOBA',
+      l1Token: cfg.l1BobaTokenAddress,
+      l2Bridge:predeploys.L2StandardBridge,
+    },
+    L2_L1NativeToken: {
+      l2Bridge: predeploys.L2StandardBridge,
+      l1Token: constants.AddressZero,
+      _name: cfg.l1NativeTokenName, // from env
+      _symbol: cfg.l1NativeTokenSymbol, // from env
+      _decimals: cfg.l1NativeTokenDecimals, // from env
+    },
+    Boba_GasPriceOracleAltL1: {
+      _owner: cfg.gasPriceOracleOwner,
+      feeWallet: cfg.l1FeeWalletAddress,
+      secondaryFeeTokenAddress: predeploys.L2_L1NativeToken_ALT_L1,
+      minPriceRatio: 500,
+      maxPriceRatio: 5000,
+      priceRatio: 2000,
+      gasPriceOracleAddress: predeploys.OVM_GasPriceOracle,
+      metaTransactionFee: utils.parseEther('3'),
+      receivedBOBAAmount: utils.parseEther('0.005'),
+      marketPriceRatio: 2000,
+      decimals: 0,
     }
   }
 
+  const HIDDEN_CONTRACTS_FOR_ALT_L1 = [
+    'OVM_ETH',
+    'WETH9',
+    'L2GovernanceERC20'
+  ]
+
+  const HIDDEN_CONTRACTS_FOR_ETHEREUM = [
+    'L2_BOBA',
+    'L2_L1NativeToken',
+    'Boba_GasPriceOracleAltL1'
+  ]
+
+  const RENAME_SPECIAL_CONTRACTS = {
+    'L2_L1NativeToken_ALT_L1': 'L2_L1NativeToken',
+    'L2_BOBA_ALT_L1': 'L2_BOBA'
+  }
+
+  const SPECIAL_CONTRACTS_FOR_ALT_L1 = [
+    'Boba_GasPriceOracle',
+    'BobaTuringCredit',
+    'L2StandardBridge',
+    'OVM_SequencerFeeVault'
+  ]
+
   const dump = {}
-  for (const predeployName of Object.keys(predeploys)) {
+  for (let predeployName of Object.keys(predeploys)) {
     const predeployAddress = predeploys[predeployName]
+
+    if (RENAME_SPECIAL_CONTRACTS[predeployName]) {
+      predeployName = RENAME_SPECIAL_CONTRACTS[predeployName]
+    }
+    if (isLocalAltL1 && HIDDEN_CONTRACTS_FOR_ALT_L1.includes(predeployName)) {
+      continue
+    }
+    if (!isLocalAltL1 && HIDDEN_CONTRACTS_FOR_ETHEREUM.includes(predeployName)) {
+      continue
+    }
+
     dump[predeployAddress] = {
       balance: '00',
       storage: {},
@@ -177,6 +250,63 @@ export const makeL2GenesisFile = async (
     } else if (predeployName === 'Proxy__Boba_GasPriceOracle') {
       // Add proxy contract for Boba_GasPriceOracle
       const artifact = getContractArtifact('Lib_ResolvedDelegateBobaProxy')
+      dump[predeployAddress].code = artifact.deployedBytecode
+    } else if (predeployName === 'L2_L1NativeToken') {
+      // Fix the address(this) of L2GovernanceERC20
+      // Different network use the different bytecode
+      // Fantom local
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomLocalBytecode
+      }
+      // Fantom Testnet
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 4051) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomTestnetBytecode
+      }
+      // Fantom Testnet
+      if (cfg.l1NativeTokenSymbol === 'FTM' && cfg.l2ChainId === 301) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.FantomMainnetBytecode
+      }
+      // Moonbeam local
+      if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamLocalBytecode
+      }
+      // Moonbeam testnet
+      if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 1297) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamTestnetBytecode
+      }
+      // Moonbeam Mainnet
+      if (cfg.l1NativeTokenSymbol === 'GLMR' && cfg.l2ChainId === 1294) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.MoonbeamMainnetBytecode
+      }
+      // Avalanche local
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheLocalByteCode
+      }
+      // Avalanche Testnet
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 4328) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheTestnetByteCode
+      }
+      // Avalanche Mainnet
+      if (cfg.l1NativeTokenSymbol === 'AVAX' && cfg.l2ChainId === 43288) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.AvalancheMainnetByteCode
+      }
+      // Bnb local
+      if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 31338) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbLocalBytecode
+      }
+      // Bnb Testnet
+      if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 9728) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbTestnetBytecode
+      }
+      // Bnb Mainnet
+      if (cfg.l1NativeTokenSymbol === 'BNB' && cfg.l2ChainId === 56288) {
+        dump[predeployAddress].code = L2_L1NativeTokenHepler.BnbMainnetBytecode
+      }
+    } else if (predeployName === 'L2_BOBA') {
+      dump[predeployAddress].code = L2_BOBA.L2_BOBABytecode
+    } else if (isLocalAltL1 && SPECIAL_CONTRACTS_FOR_ALT_L1.includes(predeployName)) {
+      // Special case: get the deployed bytecode from the artifact for alt L1s
+      const artifact = getContractArtifact(`${predeployName}AltL1`)
       dump[predeployAddress].code = artifact.deployedBytecode
     } else {
       // Standard case: get the deployed bytecode from the artifact

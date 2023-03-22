@@ -7,7 +7,7 @@ export const ChainSwitcherItem = styled(MenuItem)(({ theme }) => ({
   cursor: 'pointer',
   '&:hover': {
     p: {
-      color: '#BAE21A'
+      color: theme.palette.secondary.main,
     }
   }
 }));

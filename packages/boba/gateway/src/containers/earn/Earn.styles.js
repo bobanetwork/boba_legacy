@@ -3,6 +3,7 @@ import { Box, Typography, Grid } from "@mui/material"
 
 export const EarnPageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
@@ -44,7 +45,7 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   borderRadius: '8px',
   margin: '20px 0px',
   padding: '25px',
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
   [theme.breakpoints.up('md')]: {
     padding: '25px 50px',
   },
@@ -59,7 +60,7 @@ export const Help = styled(Box)(({ theme }) => ({
   margin: '10px 0px',
   padding: '10px',
   borderRadius: theme.palette.primary.borderRadius,
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
 }))
 
 export const AlertText = styled(Typography)(({ theme }) => ({

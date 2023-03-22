@@ -183,7 +183,7 @@ function TokenPage() {
     return (
       <>
         {layer === 'L2' && network === 'mainnet' && (
-          <Box sx={{ padding: '10px 0px', lineHeight: '0.9em' }}>
+          <Box sx={{ padding: '10px 0px', lineHeight: '0.9em'}}>
             <Typography variant="body2">
               <span style={{ opacity: '0.9' }}>Need ETH or BOBA</span>
               {'? '}
@@ -253,7 +253,7 @@ function TokenPage() {
         )}
 
         <G.Container>
-          <G.Content>
+          <S.TokenContent>
             <S.TableHeading>
               {tokenTableHeads.map((item) => {
                 return (
@@ -310,7 +310,7 @@ function TokenPage() {
                 </S.LoaderContainer>
               )
             ) : null}
-          </G.Content>
+          </S.TokenContent>
         </G.Container>
       </>
     )

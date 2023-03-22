@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { Box, Typography, Switch, useTheme } from '@mui/material'
+
 import Button from 'components/button/Button.js'
 import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
@@ -66,6 +67,7 @@ function BobaBridge() {
   const navigate = useNavigate()
 
   async function switchDirection() {
+    console.log(toL2)
     if (accountEnabled) {
       if (isL1) dispatch(setConnectBOBA(true))
       else dispatch(setConnectETH(true))
@@ -120,10 +122,10 @@ function BobaBridge() {
   }
 
   const Bridge = () => {
-    const config = {
+    const config = (toL2) => ({
       from: toL2? <L1ChainLabel/> : <L2ChainLabel/>,
       to: toL2? <L2ChainLabel/> : <L1ChainLabel/>
-    };
+    });
 
     return (
       <>
@@ -135,11 +137,11 @@ function BobaBridge() {
           alignItems="flex-end"
         >
           <Box width="100%">
-            <Typography variant="body2" pb="10px">
+            <S.ChainDirectionLabel variant="body2" pb="10px" sx={{color: theme.palette.primary.info}}>
               From
-            </Typography>
+            </S.ChainDirectionLabel>
             <S.ChainInput>
-              { config.from }
+              { config().from }
             </S.ChainInput>
           </Box>
           <Box
@@ -151,11 +153,11 @@ function BobaBridge() {
             <ChainSwitchIcon />
           </Box>
           <Box width="100%">
-            <Typography variant="body2" pb="10px">
+            <S.ChainDirectionLabel variant="body2" pb="10px">
               To
-            </Typography>
+            </S.ChainDirectionLabel>
             <S.ChainInput>
-                { config.to }
+                { config().to }
             </S.ChainInput>
           </Box>
         </S.BobaContentWrapper>

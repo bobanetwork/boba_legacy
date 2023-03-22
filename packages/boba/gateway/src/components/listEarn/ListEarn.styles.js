@@ -4,7 +4,7 @@ import { Box, Divider, Grid } from '@mui/material'
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
   borderRadius: '0',
-  background: theme.palette.background.secondary,
+  background: theme.palette.background.glassy,
   [theme.breakpoints.down('md')]: {
     //padding: '30px 10px',
     background: '#1A1D1F',
@@ -16,7 +16,9 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   },
 }));
 
-export const GridContainer = styled(Grid)(({theme})=>({
+export const GridContainer = styled(Grid)(({ theme }) => ({
+  background: theme.palette.background.glassy,
+  margin: '-10px -8px',
   [theme.breakpoints.down('md')]:{
     justifyContent: 'flex-start',
     width: '100%',
@@ -49,7 +51,7 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
   width: '80%',
   display: 'flex',
   justifyContent: 'space-between',
-  backgroundColor: 'rgba(255, 255, 255, 0.06)',
+  backgroundColor: theme.palette.background.glassy,
   borderRadius: '20px',
   margin: '5px',
   padding: '20px 40px',

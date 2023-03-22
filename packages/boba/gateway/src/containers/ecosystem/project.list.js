@@ -43,12 +43,12 @@ import WitNetLogo from '../../images/ecosystem/WitNetLogo.svg'
 import zenchaLogo from '../../images/ecosystem/zencha.webp'
 import futuructaLogo from '../../images/ecosystem/futuructa.webp'
 import rabbyLogo from '../../images/ecosystem/rabbyWallet.webp'
-
 import sushicom from '../../images/ecosystem/sushicom.png'
 import pmc from '../../images/ecosystem/pmc.png'
 import cookbookLogo from '../../images/ecosystem/cookbook.png'
 import babylons from '../../images/ecosystem/babylons.png'
 import changenowLogo from '../../images/ecosystem/changenow.svg'
+import nowpaymentsLogo from '../../images/ecosystem/nowpayments.svg'
 import blockVisionLogo from '../../images/ecosystem/blockVisionLogo.svg'
 import bundlrNetworkLogo from '../../images/ecosystem/bundlrNetworkLogo.svg'
 import nowwalletLogo from '../../images/ecosystem/nowwallet.svg'
@@ -56,7 +56,6 @@ import foxtrotCommand from '../../images/ecosystem/foxtrotCommand.webp'
 import foxwalletLogo from '../../images/ecosystem/foxwalletLogo.png'
 import ghostncolorsLogo from '../../images/ecosystem/ghostncolorsLogo.png'
 import webthreenamesLogo from '../../images/ecosystem/webthreenamesLogo.png'
-
 import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon'
 import BobaBnbIcon from 'components/icons/chain/L2/BobaBNBIcon'
 import BobabaseIcon from 'components/icons/chain/L2/BobabaseIcon'
@@ -578,6 +577,15 @@ export const projectList = [
     "type": "tool",
     "image": changenowLogo,
     "description": "Non-custodial service created for simple and fast cryptocurrency exchanges: buy and swap BOBA."
+  },
+  {
+    "title": "NOWPayments",
+    "canLaunch": true,
+    "link": "https://nowpayments.io/?utm_source=boba_website&utm_medium=referral&utm_campaign=boba",
+    "twitter": "https://twitter.com/NOWPayments_io",
+    "type": "tool",
+    "image": nowpaymentsLogo,
+    "description": "NOWPayments is a non-custodial crypto payment gateway that lets you accept payments in 160+ cryptocurrencies, including BOBA, with auto coin conversion available."
   },
   {
     "title": "BlockVision",

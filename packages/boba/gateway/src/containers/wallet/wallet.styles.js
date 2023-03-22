@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { Box } from '@mui/material'
 
 export const PageContainer = styled(Box)(({ theme }) => ({
+  marginBottom: theme.palette.spacing.toFooter,
   margin: '0px auto',
   display: 'flex',
   flexDirection: 'column',
