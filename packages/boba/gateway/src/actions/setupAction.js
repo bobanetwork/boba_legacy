@@ -30,12 +30,6 @@ export function setBaseState(enabled) {
   }
 }
 
-export function setNetwork(network) {
-  return function (dispatch) {
-    return dispatch({ type: 'SETUP/NETWORK/SET', payload: network })
-  }
-}
-
 export function setLayer(layer) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/LAYER/SET', payload: layer })
@@ -79,5 +73,23 @@ export function setConnectBOBA( state ) {
 export function setConnect( state ) {
   return function (dispatch) {
     return dispatch({ type: 'SETUP/CONNECT', payload: state })
+  }
+}
+
+export function setWalletConnected( state ) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/WALLET_CONNECTED', payload: state })
+  }
+}
+
+export function setChainIdChanged(state) {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: state })
+  }
+}
+
+export function resetChainIdChanged() {
+  return function (dispatch) {
+    return dispatch({ type: 'SETUP/CHAINIDCHANGED/RESET' })
   }
 }

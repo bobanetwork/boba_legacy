@@ -111,27 +111,27 @@ describe('Oracle Flux Aggregator Tests', async () => {
   })
 
   describe('Oracle admin tests', async () => {
-    const staringRoundId = 1000
+    const startingRoundId = 1000
 
     it('should add an oracle', async () => {
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       const oracleAdmin = await FluxAggregatorHC.getAdmin()
       expect(oracleAdmin).to.be.eq(signerAddr)
     })
 
     it('should not add an oracle again', async () => {
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await expect(
-        FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+        FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       ).to.be.revertedWith('oracleAddress already set')
     })
 
     it('should transfer oracle admin', async () => {
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
       const signer2Addr = await (await ethers.getSigners())[1].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await FluxAggregatorHC.transferOracleAdmin(signer2Addr)
       const oracleAdmin = await FluxAggregatorHC.getAdmin()
       expect(oracleAdmin).to.be.eq(signer2Addr)
@@ -140,7 +140,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
     it('should not transfer oracle admin if not admin', async () => {
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
       const signer2Addr = await (await ethers.getSigners())[1].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await FluxAggregatorHC.transferOracleAdmin(signer2Addr)
       await expect(
         FluxAggregatorHC.transferOracleAdmin(signer2Addr)
@@ -149,20 +149,20 @@ describe('Oracle Flux Aggregator Tests', async () => {
 
     it('should get oracle address', async () => {
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       expect(await FluxAggregatorHC.getOracles()).to.be.deep.eq([signerAddr])
     })
   })
 
   describe('Data submission tests', async () => {
-    const staringRoundId = 1000
+    const startingRoundId = 1000
 
     it('should submit data for round 1001', async () => {
       const nextRoundId = 1001
       const submissionAnswer = 1000
 
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await FluxAggregatorHC.emergencySubmit(
         nextRoundId,
         submissionAnswer,
@@ -188,7 +188,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       const submissionAnswer = 1000
 
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await FluxAggregatorHC.emergencySubmit(
         nextRoundId,
         submissionAnswer,
@@ -209,7 +209,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       const chainLinkLatestRoundId = 10000
 
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await expect(
         FluxAggregatorHC.emergencySubmit(
           nextRoundId,
@@ -238,7 +238,7 @@ describe('Oracle Flux Aggregator Tests', async () => {
       const chainLinkLatestRoundId = 10000
 
       const signerAddr = await (await ethers.getSigners())[0].getAddress()
-      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, staringRoundId)
+      await FluxAggregatorHC.setOracle(signerAddr, signerAddr, startingRoundId)
       await FluxAggregatorHC.emergencySubmit(
         nextRoundId,
         submissionAnswer,

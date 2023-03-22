@@ -1,10 +1,11 @@
 import { Box, styled } from "@mui/material"
 
 export const BridgesContainer = styled(Box)(({ theme }) => ({
-  background: theme.palette.background.secondary,
-  borderRadius: theme.palette.primary.borderRadius,
-  border: theme.palette.primary.border,
-  backdropFilter: 'blur(100px)',
+  background: theme.palette.background.glassy,
+  filter: 'drop-shadow(0px 4px 20px rgba(35, 92, 41, 0.06))',
+  borderRadius: '20px',
+  border: 'none',
+  backdropFilter: 'blur(50px)',
   flex: 1,
   minHeight: 'fit-content',
   padding: '20px',

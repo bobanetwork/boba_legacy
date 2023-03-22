@@ -15,45 +15,35 @@ limitations under the License. */
 
 import React, { Suspense, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
 
 import { Box, useMediaQuery } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
-import { createTheme, responsiveFontSizes, ThemeProvider } from '@mui/material/styles'
+import {
+  createTheme,
+  responsiveFontSizes,
+  ThemeProvider,
+} from '@mui/material/styles'
 
 import { setTheme } from 'actions/uiAction'
-
-import Home from 'containers/home/Home'
-import Notification from 'containers/notification/Notification'
-
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { selectModalState } from 'selectors/uiSelector'
 
-import Transactions from 'containers/history/History'
-import BobaScope from 'containers/bobaScope/BobaScope'
-import Help from 'containers/help/Help'
-import Ecosystem from 'containers/ecosystem/Ecosystem'
-import Wallet from 'containers/wallet/Wallet'
-import Bridge from 'containers/bridge/Bridge'
-import MonsterWrapper from 'containers/monster/MonsterWrapper'
-import Lock from 'containers/veboba/Lock'
-import FarmWrapper from 'containers/farm/FarmWrapper'
-import SaveWrapper from 'containers/save/SaveWrapper'
-import Projects from 'containers/ecosystem/Projects'
-import { DISABLE_VE_DAO, ROUTES_PATH } from 'util/constant'
-import VoteAndDao from 'containers/VoteAndDao'
-import OldDao from 'containers/dao/OldDao'
-import DevTools from 'containers/devtools/DevTools'
+import Notification from 'containers/notification/Notification'
+
+import Router from './routes'
 
 function App() {
-
   const dispatch = useDispatch()
 
   const theme = useSelector(selectModalState('theme'))
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
-  const buttonColor = '#228fe5' //blue
-  const darkGrey = '#1b1c1f'
+  // const darkGrey = '#1b1c1f'
+  // const cyan = '#1CD6D1'
+
+  const buttonColor = '#BAE21A' //radioGreen
+  const buttonColorLightmode = '#1CD6D1' //cyan
 
   let MUItheme = createTheme({
     palette: {
@@ -63,29 +53,51 @@ function App() {
         gradient: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
         contrastText: '#fff',
         border: light ? 'solid 1px rgba(0, 0, 0, 0.12)' : 'solid 1px #2d2f3a',
-        borderRadius: '8px',
-        borderBottom: light ? 'solid 1px rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.04)',
-        tabBorderBottom: light ? `solid 2px ${buttonColor}}` : `2px solid ${buttonColor}}`,
+        borderRadius: '12px',
+        borderBottom: light
+          ? 'solid 1px rgba(0, 0, 0, 0.08)'
+          : '1px solid rgba(255, 255, 255, 0.04)',
+        tabBorderBottom: light
+          ? `solid 2px ${buttonColor}`
+          : `solid 2px ${buttonColor}`,
+        alert: light ? 'black' : '#FFD88D',
+        tooltip: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        info: light ? 'rgba(3, 19, 19, 0.65)' : 'rgba(255, 255, 255, 0.65)',
       },
       secondary: {
-        main: light ? buttonColor : buttonColor,
+        main: light ? buttonColorLightmode : buttonColor,
+        borderRadius: '20px',
+        border: light
+          ? 'solid 1px rgba(3, 19, 19, 0.06)'
+          : 'solid 1px rgba(255, 255, 255, 0.06)',
+        gradient: light ? '#1CD6D1' : '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
+        text: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       },
       background: {
-        default: light ? "#FFFFFF" : "#111315",
-        secondary: light ? 'rgba(0, 0, 0, 0.04)' : darkGrey,
-        secondaryLight: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.14)',
+        default: light ? '#FFFFFF' : '#111315',
+        secondary: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.06)',
+        secondaryLight: light
+          ? 'rgba(0, 0, 0, 0.08)'
+          : 'rgba(255, 255, 255, 0.14)',
         dropdown: light ? '#dadada' : '#142031',
-        modal: light ? "#fff" : '#1A1D1F',
-        modalTransparent: light ? "#fff" : 'transparent',
-        input: light ? "rgba(0, 0, 0, 0.06)" : "rgba(255, 255, 255, 0.04)",
+        modal: light ? '#fff' : '#1A1D1F',
+        modalTransparent: light ? '#fff' : 'transparent',
+        input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+        footer: light ? '#1A1D1F' : '#1A1D1F',
+        glassy: light ? 'rgba(0,0,0, 0.09)' : 'rgba(255, 255, 255, 0.04)',
+        tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+        alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
       neutral: {
         main: '#fff',
         contrastText: buttonColor,
       },
+      spacing: {
+        toFooter: '80px',
+      },
     },
     typography: {
-      fontFamily: [ "MrEavesXL", 'Roboto' ].join(','),
+      fontFamily: ['MrEavesXL', 'Roboto'].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,
@@ -104,45 +116,78 @@ function App() {
       },
       body1: {
         fontSize: 18,
-        display: 'block'
+        display: 'block',
       },
       body2: {
         fontSize: 16,
         fontWeight: 400,
         lineHeight: '1.0em',
-        display: 'block'
+        display: 'block',
       },
       body3: {
         fontSize: 14,
         lineHeight: '1.1em',
-        display: 'block'
+        display: 'block',
       },
       body4: {
-        fontSize: 12
+        fontSize: 12,
       },
     },
     components: {
+      ReactSelect : {
+        styleOverrides: {
+          root: {
+            borderRadius: '12px',
+            minWidth: '96px',
+            boxShadow: 'none',
+            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+          },
+        },
+      },
       MuiPaper: {
         defaultProps: {
           elevation: 0,
         },
         styleOverrides: {
-          root: {},
+          root: {
+            borderRadius: '12px',
+            minWidth: '96px',
+            boxShadow: 'none',
+            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+          },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            backgroundColor: light
+              ? 'rgba(0, 0, 0, 0.08)'
+              : 'rgba(255, 255, 255, 0.06)',
+            backdropFilter: 'blur(50px)',
+            borderRadius: '12px',
+          },
+          arrow: {
+            color: light ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)',
+          },
         },
       },
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: "8px",
-            textTransform: "none",
-            boxShadow: "box-shadow: 0px 0px 7px rgba(73, 107, 239, 0.35)",
-            minWidth: "0",
+            borderRadius: '8px',
+            textTransform: 'none',
+            boxShadow: 'none !important',
+            minWidth: '0',
             color: '#031313',
-            "&.Mui-disabled": {
+            '&.Mui-disabled': {
               background: light ? 'transparent' : 'rgba(255, 255, 255, 0.04)',
               color: light ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
               border: light ? '1px solid rgba(0, 0, 0, 0.5)' : 'none',
-            }
+            },
           },
         },
         variants: [
@@ -150,16 +195,18 @@ function App() {
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: buttonColor,
+              background: radioGreen,
               borderWidth: '1.4px',
-              borderColor: buttonColor,
+              borderColor: radioGreen,
               fontWeight: 500,
-              color: '#fff',
-              "&:hover": {
+              fontSize: '16px',
+              font: 'Roboto',
+              color: '#031313',
+              '&:hover': {
                 boxShadow: 'inset 0px 0px 0px 3px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: buttonColor,
-              }
+                backgroundColor: radioGreen,
+              },
             },
           },
           {
@@ -170,66 +217,104 @@ function App() {
               background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
-              filter: "drop-shadow(0px 0px 3px rgba(73, 107, 239, 0.35))",
-              "&:hover": {
+              '&:hover': {
                 color: '#000',
                 borderColor: buttonColor,
                 backgroundColor: buttonColor,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
-              }
+              },
             },
           },
           {
             props: { variant: 'standard', color: 'primary' },
             style: {
-              color: light ? 'rgba(0, 0, 0, 0.45)' : 'rgba(255, 255, 255, 0.45)',
-              background: light ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+              color: light
+                ? 'rgba(0, 0, 0, 0.45)'
+                : 'rgba(255, 255, 255, 0.45)',
+              background: light
+                ? 'rgba(0, 0, 0, 0.06)'
+                : 'rgba(255, 255, 255, 0.06)',
               borderWidth: '1.4px',
-              borderColor: radioGreen,
-              filter: "drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))",
-              "&:hover": {
-                color: radioGreen,
-                boxShadow: light ? 'none' : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
-              }
+              borderColor: buttonColor,
+              filter: 'drop-shadow(0px 0px 7px rgba(73, 107, 239, 0.35))',
+              '&:hover': {
+                color: buttonColor,
+                boxShadow: light
+                  ? 'none'
+                  : 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              },
+            },
+          },
+          {
+            props: { variant: 'standard', color: 'secondary' },
+            style: {
+              color: light
+                ? 'rgba(0, 0, 0, 0.45)'
+                : 'rgba(255, 255, 255, 0.45)',
+              background: light
+                ? 'rgba(0, 0, 0, 0.06)'
+                : 'rgba(255, 255, 255, 0.06)',
+              borderWidth: '1.4px',
+              borderColor: buttonColor,
+              '&:hover': {
+                color: light ? buttonColorLightmode : buttonColor,
+                boxShadow: 'none',
+              },
+            },
+          },
+          {
+            props: { variant: 'outlined', color: 'secondary' },
+            style: {
+              color: light ? buttonColor : buttonColor,
+              borderWidth: '1.4px',
+              borderColor: light ? buttonColor : 'rgba(255, 255, 255, 0.25)',
+              '&:hover': {
+                opacity: 0.9,
+                borderWidth: '1.4px',
+                transition: 'opacity 0.3s ease-in-out',
+                borderColor: light ? buttonColor : buttonColor,
+                boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
+              },
             },
           },
           {
             props: { variant: 'contained', color: 'neutral' },
             style: {
-              "&:hover": {
+              '&:hover': {
                 opacity: 0.9,
                 transition: 'opacity 0.3s ease-in-out',
-              }
+              },
             },
           },
           {
             props: { variant: 'outlined', color: 'neutral' },
             style: {
-              color: light ? "#000" : "rgba(255, 255, 255, 0.65)",
+              color: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               borderWidth: '1.4px',
-              borderColor: light ? "#000" : "rgba(255, 255, 255, 0.25)",
-              "&:hover": {
+              borderColor: light ?  'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+              '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',
                 transition: 'opacity 0.3s ease-in-out',
-                borderColor: light ? "#000" : "#fff",
+                borderColor: light ? '#000' : buttonColor,
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
-              }
+              },
             },
           },
           {
             props: { variant: 'small' },
             style: {
               fontSize: '14px',
-              background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
+              background:
+                'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
               textTransform: 'uppercase',
               borderRadius: '12px',
               minWidth: '0',
-              "&:hover": {
+              '&:hover': {
                 boxShadow: 'inset 0px 0px 0px 2px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-              }
+              },
             },
           },
           {
@@ -247,7 +332,7 @@ function App() {
         ],
       },
       MuiInputBase: {
-        backgroundColor: "#f00",
+        backgroundColor: '#f00',
       },
       MuiAlert: {
         variants: [
@@ -255,13 +340,31 @@ function App() {
             props: { variant: 'simple' },
             style: {
               padding: 0,
-              backgroundColor: 'transparent'
-            }
+              backgroundColor: 'transparent',
+            },
+          },
+        ],
+      },
+      MuiTypography: {
+        variants: [
+          {
+            props: { variant: 'body2', color: 'fade' },
+            style: {
+              lineHeight: '1.1em',
+              color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            },
+          },
+          {
+            props: { variant: 'body3', color: 'fade' },
+            style: {
+              lineHeight: '0.7em',
+              color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+            },
           }
         ]
       }
-    }
-  });
+    },
+  })
 
   MUItheme = responsiveFontSizes(MUItheme)
 
@@ -270,51 +373,27 @@ function App() {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-  }, [ dispatch ])
-
+  }, [dispatch])
 
   return (
     <ThemeProvider theme={MUItheme}>
       <CssBaseline />
       <BrowserRouter>
-        <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
+        <Box
+          sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+        >
           <div
             style={{
               display: 'flex',
               flex: '1 0',
               flexDirection: 'column',
               minHeight: `100vh`,
-              backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`
+              backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
             }}
           >
             <Notification />
             <Suspense fallback={<>Loading...</>}>
-              <Routes>
-                <Route exact path="/" element={<Home />} >
-                  <Route index element={<Bridge />} />
-                  <Route path={ROUTES_PATH.BRIDGE} element={<Bridge />} />
-                  <Route path={ROUTES_PATH.ECOSYSTEM} element={<Ecosystem />} >
-                    <Route path=":category" element={<Projects />} />
-                  </Route>
-                  <Route path={ROUTES_PATH.WALLET} element={<Wallet />} />
-                  <Route path={ROUTES_PATH.HISTORY} element={<Transactions />} />
-                  <Route path={ROUTES_PATH.EARN} element={<FarmWrapper />} />
-                  <Route path={ROUTES_PATH.STAKE} element={<SaveWrapper />} />
-
-                  <Route path={ROUTES_PATH.BOBASCOPE} element={<BobaScope />} />
-                  <Route path={ROUTES_PATH.HELP} element={<Help />} />
-                  <Route path={ROUTES_PATH.MONSTER} element={<MonsterWrapper />} />
-                  <Route path={ROUTES_PATH.BOBA_CHAINS} element={<Ecosystem ecosystemType='BOBA'/>} >
-                    <Route path=":category" element={<Projects projectType='BOBA' />} />
-                  </Route>
-                  <Route path={ROUTES_PATH.DEV_TOOLS} element={<DevTools />} />
-                  {/* FIXME: On setting flag below to 1 below routes will not be available to user. */}
-                  {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.LOCK} element={<Lock />} />}
-                  {!Number(DISABLE_VE_DAO) && <Route path={ROUTES_PATH.VOTE_DAO} element={<VoteAndDao />} />}
-                  <Route path={ROUTES_PATH.DAO} element={<OldDao />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Route>
-              </Routes>
+              <Router />
             </Suspense>
           </div>
         </Box>

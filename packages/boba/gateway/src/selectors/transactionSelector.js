@@ -21,3 +21,15 @@ export function selectErc20Deposits (state) {
 export function selectEthDeposits (state) {
   return Object.values(state.deposit.eth)
 }
+
+export function selectCDMType (state) {
+  return state.transaction.CDMType
+}
+
+export function selectCDMMessage (state) {
+  return state.transaction.CDMMessage
+}
+
+export function selectCDMTransaction (state) {
+  return state.transaction.CDMTransaction
+}

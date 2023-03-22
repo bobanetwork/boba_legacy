@@ -10,19 +10,17 @@ export const POLL_INTERVAL = process.env.REACT_APP_POLL_INTERVAL || 20000
 export const GAS_POLL_INTERVAL = process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
 export const GA4_MEASUREMENT_ID = process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV = process.env.REACT_APP_ENV || 'dev'
-export const APP_CHAIN = process.env.REACT_APP_CHAIN
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN || null
-export const APP_ZENDESK_KEY = process.env.REACT_APP_ZENDESK_KEY || null
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG = process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION
 export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
-export const SELLER_OPTIMISM_API_URL = process.env.REACT_APP_SELLER_OPTIMISM_API_URL
-export const SERVICE_OPTIMISM_API_URL = process.env.REACT_APP_SERVICE_OPTIMISM_API_URL
 export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
 // VE DAO FLAG
 export const DISABLE_VE_DAO = process.env.REACT_APP_DISABLE_VE_DAO
+// WalletConnect FLAG
+export const DISABLE_WALLETCONNECT = process.env.REACT_APP_DISABLE_WALLETCONNECT
 
 export const BRIDGE_TYPE = {
   FAST_BRIDGE: "FAST_BRIDGE",
@@ -73,3 +71,33 @@ export const ROUTES_PATH = {
   DEV_TOOLS: '/devtools',
 }
 export const PER_PAGE = 8
+
+export const PAGES_BY_NETWORK = {
+  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO', 'Monster'],
+  bnb: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
+  avax: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
+  fantom: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
+  moonbeam: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
+}
+
+export const LAYER = {
+  L1: 'L1',
+  L2: 'L2',
+}
+
+
+export const DEFAULT_NETWORK = {
+  NAME: {
+    L1: 'Ethereum',
+    L2: 'Boba'
+  },
+  ICON: {
+    L1: 'ethereum',
+    L2: 'boba'
+  }
+}
+
+
+export const MM_EXTENTION_URL = 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en'
+
+export const MIN_NATIVE_L1_BALANCE = 0.002

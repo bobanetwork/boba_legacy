@@ -142,7 +142,6 @@ function DAO() {
             }}
             sx={{ marginBottom: '20px' }}
             value={selectedState}
-            newSelect={true}
           ></Select>
         </S.DaoProposalHead>
         <DividerLine />

@@ -83,6 +83,9 @@ interface MessageRelayerOptions {
   isFastRelayer: boolean
 
   enableRelayerFilter: boolean
+
+  // extra relayer filter
+  relayerFilterWhitelist: string
 }
 
 export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
@@ -205,7 +208,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
         const secondsElapsed = Math.floor(
           (Date.now() - this.state.timeOfLastRelayS) / 1000
         )
-        console.log('\n***********************************')
         console.log('Seconds elapsed since last batch push:', secondsElapsed)
         const timeOut =
           secondsElapsed > this.options.maxWaitTimeS ? true : false
@@ -215,7 +217,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           const pendingTXSecondsElapsed = Math.floor(
             (Date.now() - this.state.timeOfLastPendingRelay) / 1000
           )
-          console.log('\n***********************************')
           console.log(
             'Next tx since last tx submitted',
             pendingTXSecondsElapsed
@@ -366,7 +367,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             this.state.messageBuffer.length
           )
           console.log('Buffer flush size set to:', this.options.minBatchSize)
-          console.log('***********************************\n')
         }
 
         // scanning the new messages only if the pending messages are relayed
@@ -537,6 +537,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             filter.Proxy__L1StandardBridge,
             filter.Proxy__L1NFTBridge,
             filter.Proxy__L1ERC1155Bridge,
+            ...this.options.relayerFilterWhitelist.split(','),
           ]
 
           this.state.lastFilterPollingTimestamp = new Date().getTime()

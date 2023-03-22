@@ -1,4 +1,3 @@
-
 /*
 Copyright 2021-present Boba Network.
 
@@ -27,7 +26,6 @@ import {
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
 import { switchFee } from 'actions/setupAction.js'
-import { Typography } from '@mui/material'
 
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
@@ -36,118 +34,139 @@ import { isEqual } from 'lodash'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
-import { HelpOutline } from '@mui/icons-material'
+import networkService from 'services/networkService.js'
+import {
+  selectActiveNetworkName,
+} from 'selectors/networkSelector.js'
+import {FeeSwitcherIcon, FeeSwitcherLabel} from "./FeeSwitcher.styles.js";
+
 
 function FeeSwitcher() {
-
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const feeUseBoba = useSelector(selectBobaFeeChoice())
+
+  const networkName = useSelector(selectActiveNetworkName())
 
   const layer = useSelector(selectLayer())
 
   const l2Balances = useSelector(selectlayer2Balance, isEqual)
 
-  const l2BalanceETH = l2Balances.filter((i) => i.symbol === 'ETH')
-  const balanceETH = l2BalanceETH[0]
-
+  const l2BalanceNativeToken = l2Balances.filter((i) => i.symbol === networkService.L1NativeTokenSymbol)
+  const balanceETH = l2BalanceNativeToken[ 0 ]
   const l2BalanceBOBA = l2Balances.filter((i) => i.symbol === 'BOBA')
   const balanceBOBA = l2BalanceBOBA[0]
 
-  const dispatchSwitchFee = useCallback(async (targetFee) => {
+  const dispatchSwitchFee = useCallback(
+    async (targetFee) => {
+      let tooSmallL1NativeToken = false
+      // mini balance required for token to use as bridge fee
+      let minL1NativeBalance = await networkService.estimateMinL1NativeTokenForFee() //0.002
+      let tooSmallBOBA = false
 
-    //console.log("balanceBOBA:",balanceBOBA)
-    //console.log("balanceETH:",balanceETH)
-
-    let tooSmallETH = false
-    let tooSmallBOBA = false
-
-    if(typeof(balanceBOBA) === 'undefined') {
-      tooSmallBOBA = true
-    } else {
-      //check actual balance
-      tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(3.0))
-    }
-
-    if(typeof(balanceETH) === 'undefined') {
-      tooSmallETH = true
-    } else {
-      //check actual balance
-      tooSmallETH = new BN(logAmount(balanceETH.balance, 18)).lt(new BN(0.002))
-    }
-
-    if (!balanceBOBA && !balanceETH) {
-      dispatch(openError('Wallet empty - please bridge in ETH or BOBA from L1'))
-      return
-    }
-
-    let res
-
-    if (feeUseBoba && targetFee === 'BOBA') {
-      // do nothing - already set to BOBA
-    }
-    else if ( !feeUseBoba && targetFee === 'ETH' ) {
-      // do nothing - already set to ETH
-    }
-    else if ( !feeUseBoba && targetFee === 'BOBA' ) {
-      // change to BOBA
-      if( tooSmallBOBA ) {
-        dispatch(openError(`You cannot change the fee token to BOBA since your BOBA balance is below 3 BOBA.
-          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.`))
+      if (typeof balanceBOBA === 'undefined') {
+        tooSmallBOBA = true
       } else {
-        res = await dispatch(switchFee(targetFee))
+        //check actual balance
+        tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(1))
       }
-    }
-    else if (feeUseBoba && targetFee === 'ETH') {
-      // change to ETH
-      if( tooSmallETH ) {
-        dispatch(openError(`You cannot change the fee token to ETH since your ETH balance is below 0.002 ETH.
-          If you change fee token now, you might get stuck. Please swap some BOBA for ETH first.`))
+
+      if (typeof balanceETH === 'undefined') {
+        tooSmallL1NativeToken = true
       } else {
-        res = await dispatch(switchFee(targetFee))
+        //check actual balance
+        tooSmallL1NativeToken = new BN(logAmount(balanceETH.balance, 18)).lt(
+          new BN(minL1NativeBalance)
+        )
       }
-    }
 
-    if (res) {
-      dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
-    }
+      if (!balanceBOBA && !balanceETH) {
+        dispatch(
+          openError('Wallet empty - please bridge in ETH or BOBA from L1')
+        )
+        return
+      }
 
-  }, [ dispatch, feeUseBoba, balanceETH, balanceBOBA ])
+      let res
+
+      if (feeUseBoba && targetFee === 'BOBA') {
+        // do nothing - already set to BOBA
+      } else if (
+        !feeUseBoba &&
+        targetFee === networkService.L1NativeTokenSymbol
+      ) {
+        // do nothing - already set to ETH
+      } else if (!feeUseBoba && targetFee === 'BOBA') {
+        // change to BOBA
+        if (tooSmallBOBA) {
+          dispatch(
+            openError(`You cannot change the fee token to BOBA since your BOBA balance is below 1 BOBA.
+          If you change fee token now, you might get stuck. Please swap some ETH for BOBA first.`)
+          )
+        } else {
+          res = await dispatch(switchFee(targetFee))
+        }
+      } else if (
+        feeUseBoba &&
+        targetFee === networkService.L1NativeTokenSymbol
+      ) {
+        // change to L1Native Token
+        if (tooSmallL1NativeToken) {
+          dispatch(
+            openError(`You cannot change the fee token to ${networkService.L1NativeTokenSymbol} since your ${networkService.L1NativeTokenSymbol} balance is below ${minL1NativeBalance}.
+          If you change fee token now, you might get stuck. Please obtain some ${networkService.L1NativeTokenSymbol} first.`)
+          )
+        } else {
+          res = await dispatch(switchFee(targetFee))
+        }
+      }
+
+      if (res) {
+        dispatch(openAlert(`Successfully changed fee to ${targetFee}`))
+      }
+    },
+    [dispatch, feeUseBoba, balanceETH, balanceBOBA]
+  )
 
   if (!accountEnabled && layer !== 'L2') {
-    return <S.FeeSwitcherWrapper>
-      <Tooltip title={'After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ETH as the gas fee token according to your choice.'}>
-        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
-      </Tooltip>
-      <Typography variant="body2">Fee</Typography>
-    </S.FeeSwitcherWrapper>
+    return (
+      <S.FeeSwitcherWrapper>
+        <Tooltip
+          title={`After switching to the Boba network, you can modify the Gas fee token used by the Boba network. The whole network will use BOBA or ${networkService.L1NativeTokenSymbol} as the gas fee token according to your choice.`}
+        >
+          <FeeSwitcherIcon fontSize="small" />
+        </Tooltip>
+        <FeeSwitcherLabel variant="body2">Fee</FeeSwitcherLabel>
+      </S.FeeSwitcherWrapper>
+    )
   }
 
   return (
     <S.FeeSwitcherWrapper>
-      <Tooltip title={'BOBA or ETH will be used across Boba according to your choice.'}>
-        <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
+      <Tooltip
+        title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across ${networkName['l2']} according to your choice.`}
+      >
+        <FeeSwitcherIcon fontSize="small" />
       </Tooltip>
-      <Typography variant="body2">Fee</Typography>
+      <FeeSwitcherLabel variant="body2">Fee</FeeSwitcherLabel>
       <Select
         onSelect={(e, d) => {
           dispatchSwitchFee(e.target.value)
         }}
-        value={!feeUseBoba ? "ETH" : 'BOBA'}
-        options={[ {
-          value: 'ETH',
-          title: 'ETH',
-        },
-        {
-          value: 'BOBA',
-          title: 'BOBA',
-          description: 'Save another 25% by using Boba as your gas fee token'
-        }
+        value={!feeUseBoba ? networkService.L1NativeTokenSymbol : 'BOBA'}
+        options={[
+          {
+            value: 'BOBA',
+            title: 'BOBA',
+          },
+          {
+            value: networkService.L1NativeTokenSymbol,
+            title: networkService.L1NativeTokenName,
+          },
         ]}
       />
     </S.FeeSwitcherWrapper>
   )
-
 }
 
 export default FeeSwitcher

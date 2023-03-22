@@ -1,37 +1,28 @@
-import { DeployFunction } from 'hardhat-deploy/types'
+import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
+import { Contract, ContractFactory } from 'ethers'
 import { registerBobaAddress } from './1-deploy-helper'
+import EntryPointJson from '../artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import { DeterministicDeployer } from '../src/DeterministicDeployer'
 
-// const UNSTAKE_DELAY_SEC = 100
-// const PAYMASTER_STAKE = ethers.utils.parseEther('1')
+let Factory__EntryPoint: ContractFactory
 
-// deploy entrypoint - but only on debug network..
 const deployFn: DeployFunction = async (hre) => {
-  // first verify if already deployed:
-  try {
-    await hre.deployments.deploy(
-      'EntryPoint', {
-        from: ethers.constants.AddressZero,
-        args: [],
-        deterministicDeployment: true,
-        log: true
-      })
+  Factory__EntryPoint = new ContractFactory(
+    EntryPointJson.abi,
+    EntryPointJson.bytecode,
+    (hre as any).deployConfig.deployer_l2
+  )
+  const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
+  const EntryPointAddress = await dep.deterministicDeploy(Factory__EntryPoint.bytecode)
+  console.log('Deployed EntryPoint at', EntryPointAddress)
 
-    // already deployed. do nothing.
-    return
-  } catch (e) {
+  const EntryPointDeploymentSubmission: DeploymentSubmission = {
+    address: EntryPointAddress,
+    abi: EntryPointJson.abi
   }
-
-  const EntryPoint = await hre.deployments.deploy(
-    'EntryPoint', {
-      from: (hre as any).deployConfig.deployer_l2.address,
-      args: [],
-      gasLimit: 4e6,
-      deterministicDeployment: true,
-      log: true
-    })
-
-  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'Boba_EntryPoint', EntryPoint.address )
+  await hre.deployments.save('EntryPoint', EntryPointDeploymentSubmission)
+  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_Boba_EntryPoint', EntryPointAddress )
 }
 
 export default deployFn

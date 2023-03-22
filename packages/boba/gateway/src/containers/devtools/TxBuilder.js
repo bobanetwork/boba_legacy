@@ -9,11 +9,9 @@ import Button from 'components/button/Button'
 import { openError } from 'actions/uiAction'
 
 import { selectTxBuilder } from 'selectors/devToolsSelector'
-import { selectNetwork, selectLayer } from 'selectors/setupSelector'
+import { selectLayer } from 'selectors/setupSelector'
 
 import { submitTxBuilder, resetTxBuilder } from 'actions/devToolsAction'
-
-import { getNetwork } from 'util/masterConfig'
 
 import networkService from 'services/networkService'
 
@@ -24,10 +22,6 @@ const TxBuilder = () => {
   const dispatch = useDispatch()
   const TxBuilderResult = useSelector(selectTxBuilder, shallowEqual)
   const networkLayer = useSelector(selectLayer())
-
-  const nw = getNetwork()
-  const masterConfig = useSelector(selectNetwork())
-  const blockexploerUrl = nw[masterConfig].L2.blockExplorer
 
   const [ contractAddress, setContractAddress ] = useState('')
   const [ contractABI, setContractABI ] = useState('')
@@ -91,6 +85,12 @@ const TxBuilder = () => {
     dispatch(resetTxBuilder())
   }
 
+  const viewTx = (txResult) => {
+    const blockExplorerUrl = networkService.networkConfig['L2'].blockExplorer
+    const url = `${blockExplorerUrl}tx/${txResult.transactionHash}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
   const submitTx = async (methodIndex) => {
     const method = contractMethos[methodIndex]
     const methodName = method.key
@@ -99,13 +99,13 @@ const TxBuilder = () => {
     const inputs = contractInputs[methodIndex] || []
 
     for (let i = 0; i < methodInputs.length; i++) {
-      if (typeof inputs[i] === undefined) {
+      if (typeof inputs[i] === 'undefined') {
         dispatch(openError('Please fill all inputs'))
         return
       }
     }
     if (stateMutability === 'payable') {
-      if (typeof inputs[methodInputs.length] === undefined) {
+      if (typeof inputs[methodInputs.length] === 'undefined') {
         dispatch(openError('Please fill all inputs'))
         return
       }
@@ -123,10 +123,6 @@ const TxBuilder = () => {
     )
     dispatch(submitTxBuilder(contract, methodIndex, methodName, inputs))
   }
-
-  const openInNewTab = url => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
 
   return (
     <S.TxBuilderWrapper>
@@ -214,7 +210,7 @@ const TxBuilder = () => {
                             <S.TxSuccessWrapper>
                               <Typography variant="body1" sx={{color: 'green', wordBreak: 'break-all', marginRight: '10px'}}>Succeeded!</Typography>
                               <Button
-                                onClick={() => openInNewTab(`${blockexploerUrl}tx/${TxResult.transactionHash}`)}
+                                onClick={() => viewTx(TxResult)}
                                 color='primary'
                                 variant="outlined"
                               >

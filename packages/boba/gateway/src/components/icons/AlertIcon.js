@@ -3,8 +3,7 @@ import { useTheme } from "@mui/material/styles";
 
 function AlertIcon() {
     const theme = useTheme();
-    const isLight = theme.palette.mode === 'light';
-    const color = theme.palette.common[isLight ? 'black' : 'white'];
+    const color = theme.palette.primary.alert;
     return (
         <svg width="26" height="24"
             viewBox="0 0 26 24"

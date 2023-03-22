@@ -1,17 +1,30 @@
-import { Box, Typography } from '@mui/material';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Box } from '@mui/material';
+
+import Button from 'components/button/Button';
+import Modal from 'components/modal/Modal';
+
+import { restTokenList } from 'actions/tokenAction';
+import { setConnect, setConnectETH } from 'actions/setupAction';
 import { closeModal } from 'actions/uiAction';
 
-import Modal from 'components/modal/Modal';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectNetwork } from 'selectors/setupSelector';
+import { selectNetwork } from 'selectors/networkSelector';
 
 function WrongNetworkModal({open}) {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
 
-  function handleClose () {
+  useEffect(() => {
+    if (open){
+      dispatch(restTokenList())
+    }
+  }, [dispatch, open])
+
+
+  function handleClose() {
+    dispatch(setConnect(false));
     dispatch(closeModal('wrongNetworkModal'));
   }
 
@@ -20,14 +33,19 @@ function WrongNetworkModal({open}) {
       open={open}
       onClose={handleClose}
       maxWidth="xs"
-      minHeight="200px"
+      minHeight="180px"
       title="Wrong Network"
       newStyle={true}
     >
       <Box display="flex" alignItems="center" justifyContent="center">
-        <Typography variant='body2'>
-          Please connect to the {network} network
-        </Typography>
+        <Button
+          type="primary"
+          variant="contained"
+          size="large"
+          onClick={()=>dispatch(setConnectETH(true))}
+        >
+          Connect to the {network} network
+        </Button>
       </Box>
     </Modal>
   )

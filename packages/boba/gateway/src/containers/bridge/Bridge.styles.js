@@ -1,10 +1,10 @@
 import styled from '@emotion/styled'
-import { Box } from "@mui/material"
-import bobaGlassBg from 'images/boba2/boba_glass_bg.svg'
+import {Box, Typography} from "@mui/material"
 import bobaGlassIcon from 'images/boba2/boba_glass.svg'
-
+import bobaBridgeBg from 'images/boba2/bridge_bg.svg'
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '20px auto',
+  marginBottom: theme.palette.spacing.toFooter,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around',
@@ -13,10 +13,32 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   [ theme.breakpoints.between('md', 'lg') ]: {
     width: '90%',
     padding: '0px',
+    '::after': {
+      content: '" "',
+      position: 'absolute',
+      left: '-5%',
+      bottom: '10%',
+      width: '130%',
+      height: '100%',
+      background: `url(${bobaBridgeBg}) no-repeat`,
+      backgroundSize: '85%',
+      zIndex: '-1',
+    }
   },
   [ theme.breakpoints.between('sm', 'md') ]: {
     width: '90%',
     padding: '0px',
+    '::after': {
+      content: '" "',
+      position: 'absolute',
+      left: '-5%',
+      bottom: '10%',
+      width: '130%',
+      height: '100%',
+      background: `url(${bobaBridgeBg}) no-repeat`,
+      backgroundSize: '85%',
+      zIndex: '-1',
+    }
   },
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',
@@ -29,7 +51,7 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   width: '100%',
-  alignItems: 'flex-start',
+  alignItems: 'flex-center',
   gap: '20px',
   [ theme.breakpoints.down('sm') ]: {
     flexDirection: 'column',
@@ -39,14 +61,14 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
 }))
 
 export const TitleContainer = styled(Box)(({ theme }) => ({
-  width: '40%',
+  width: '50%',
   textTransform: 'uppercase',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   padding: '70px 50px',
   position: 'relative',
-  minHeight: '500px',
+  minHeight: 'auto',
   [ theme.breakpoints.down('sm') ]: {
     padding: '0',
     width: '100%',
@@ -58,28 +80,44 @@ export const TitleContainer = styled(Box)(({ theme }) => ({
       display: 'none'
     }
   },
-  '::before': {
-    content: '" "',
-    position: 'absolute',
-    top: '5%',
-    right: '25%',
-    width: '50px',
-    height: '50px',
-    background: `url(${bobaGlassIcon}) no-repeat`,
-    backgroundSize: '100% 90%',
-  },
-  '::after': {
-    content: '" "',
-    position: 'absolute',
-    bottom: '20%',
-    left: 0,
-    width: '90%',
-    height: '100%',
-    background: `url(${bobaGlassBg}) no-repeat`,
-    backgroundSize: '100%',
-    zIndex: '-1'
-  }
+  // '::before': {
+  //   content: '" "',
+  //   position: 'absolute',
+  //   top: '20%',
+  //   right: '30%',
+  //   width: '80px',
+  //   height: '80px',
+  //   background: `url(${bobaGlassIcon}) no-repeat`,
+  //   backgroundSize: '100% 90%',
+  // },
 }))
+
+export const BobaGlassIcon = styled(Box)(({ theme }) => ({
+  content: '" "',
+  position: 'absolute',
+  top: '15%',
+  right: '35%',
+  width: '80px',
+  height: '80px',
+  background: `url(${bobaGlassIcon}) no-repeat`,
+  backgroundSize: '100% 90%',
+  [theme.breakpoints.down(1700)]: {
+    top: '20%',
+    right: '40%',
+    width: '70px',
+    height: '70px',
+  },
+  [theme.breakpoints.down(1400)]: {
+    top: '20%',
+    right: '20%',
+    width: '70px',
+    height: '70px',
+  },
+  [theme.breakpoints.down(900)]: {
+    display: 'none',
+  },
+}))
+
 
 export const Content = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -94,4 +132,14 @@ export const Content = styled(Box)(({ theme }) => ({
     padding: '0',
     width: '100%'
   }
+}))
+
+export const BridgeTypography = styled(Typography)(({ theme }) => ({
+  fontSize: '57px !important',
+  [theme.breakpoints.down(1700)]: {
+    fontSize: '40px !important',
+  },
+  [theme.breakpoints.down(1000)]: {
+    fontSize: '30px !important',
+  },
 }))

@@ -7,7 +7,7 @@ export const Content = styled(Box)(({ theme }) => ({
   gap: '20px',
   width: '100%',
   padding: '10px',
-  borderBottom: theme.palette.primary.borderBottom
+  borderBottom: theme.palette.primary.borderBottom,
 }))
 
 export const TableBody = styled(Box)(({ theme }) => ({
@@ -15,9 +15,9 @@ export const TableBody = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-between',
   textAlign: 'center',
-  [ theme.breakpoints.down('sm') ]: {
-    gap: '10px'
-  }
+  [theme.breakpoints.down('sm')]: {
+    gap: '10px',
+  },
 }))
 
 export const TableCell = styled(Box)(({ theme, isMobile }) => ({
@@ -25,16 +25,16 @@ export const TableCell = styled(Box)(({ theme, isMobile }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   width: '20%',
-  [ theme.breakpoints.down('sm') ]: {
+  [theme.breakpoints.down('sm')]: {
     minWidth: '20%',
-    width: isMobile ? '10%' : 'unset'
-  }
-}));
+    width: isMobile ? '10%' : 'unset',
+  },
+}))
 
-export const TextTableCell = styled(Typography)`
-  opacity: ${(props) => !props.enabled ? "0.4" : "1.0"};
-  font-weight: 700;
-`;
+export const TextTableCell = styled(Typography)(({ theme }) => ({
+  opacity: (props) => (!props.enabled ? '0.4' : '1.0'),
+  fontWeight: '700',
+}))
 
 export const DropdownWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -42,7 +42,7 @@ export const DropdownWrapper = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   flexDirection: 'row',
   gap: '10px',
-  [ theme.breakpoints.down('sm') ]: {
-    gap: '5px'
-  }
+  [theme.breakpoints.down('sm')]: {
+    gap: '5px',
+  },
 }))

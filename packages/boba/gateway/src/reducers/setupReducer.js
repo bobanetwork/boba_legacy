@@ -13,8 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { APP_CHAIN } from 'util/constant'
-
 let justSwitchedChain = localStorage.getItem("justSwitchedChain")
 
 if (justSwitchedChain) {
@@ -26,16 +24,18 @@ const initialState = {
   baseEnabled: null,
   netLayer: null,
   walletAddress: null,
-  network: APP_CHAIN,
   justSwitchedChain: justSwitchedChain ? justSwitchedChain : false,
   bobaFeePriceRatio: null,
   bobaFeeChoice: null,
   connectETH: false,
   connectBOBA: false,
-  connect: false
+  connect: false,
+  walletConnected: false,
+  chainIdChanged: false,
+  networkChanged: false,
 }
 
-function setupReducer (state = initialState, action) {
+function setupReducer(state = initialState, action) {
   switch (action.type) {
     case 'SETUP/ACCOUNT/SET':
       localStorage.setItem("justSwitchedChain", JSON.stringify(false))
@@ -55,15 +55,9 @@ function setupReducer (state = initialState, action) {
         baseEnabled: action.payload,
       }
     case 'SETUP/LAYER/SET':
-      console.log("SR: Setting layer to:", action.payload)
       return {
         ...state,
         netLayer: action.payload
-      }
-    case 'SETUP/NETWORK/SET':
-      return {
-        ...state,
-        network: action.payload
       }
     case 'SETUP/CONNECT_ETH':
       return {
@@ -80,26 +74,44 @@ function setupReducer (state = initialState, action) {
         ...state,
         connect: action.payload
       }
+    case 'SETUP/WALLET_CONNECTED':
+      return {
+        ...state,
+        walletConnected: action.payload
+      }
     case 'SETUP/SWITCH/REQUEST':
-      console.log("SR:REQUEST - setting just changed to true")
       localStorage.setItem("justSwitchedChain", JSON.stringify(true))
       return {
         ...state,
         justSwitchedChain: true
       }
     case 'SETUP/SWITCH/SUCCESS':
-      console.log("SR:SUCCESS - setting just changed to true")
       localStorage.setItem("justSwitchedChain", JSON.stringify(true))
       return {
         ...state,
         justSwitchedChain: true
       }
     case 'BOBAFEE/ADD/SUCCESS':
-      console.log("BOBAFEE/ADD/SUCCESS:",action.payload)
       return {
         ...state,
         bobaFeePriceRatio: action.payload.priceRatio,
         bobaFeeChoice: action.payload.feeChoice
+      }
+    case 'SETUP/APPCHAIN/SET':
+      return {
+        ...state,
+        appChain: action.payload,
+        network: action.payload
+      }
+    case 'SETUP/CHAINIDCHANGED/SET':
+      return {
+        ...state,
+        chainIdChanged: action.payload
+      }
+    case 'SETUP/CHAINIDCHANGED/RESET':
+      return {
+        ...state,
+        chainIdChanged: false
       }
     default:
       return state

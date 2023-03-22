@@ -5,9 +5,11 @@ export const LayerSwitcherWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: theme.palette.background.secondary,
+  background: 'transparent',
   borderRadius: '12px',
-  padding: '0'
+  padding: '0',
+  cursor: 'pointer',
+
 }));
 
 export const LayerContent = styled(Box)(({ theme }) => ({
