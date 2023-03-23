@@ -14,7 +14,7 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
     const config = {
       coinType:'ETH',
       fiatType: 'USD',
-      fiatAmount: '35',
+      fiatAmount: '',
       bloackChain: 'BOBA',
       walletAddress:walletAddress
     }
