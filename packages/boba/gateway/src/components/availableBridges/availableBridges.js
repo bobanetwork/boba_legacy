@@ -15,11 +15,11 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
       coinType:'ETH',
       fiatType: 'USD',
       fiatAmount: '',
-      bloackChain: 'BOBA',
+      blockChain: 'BOBA',
       walletAddress:walletAddress
     }
     
-    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&fiatAmount=${config.fiatAmount}&blockchain=${config.bloackChain}&walletAddress=${walletAddress}`
+    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&fiatAmount=${config.fiatAmount}&blockchain=${config.blockChain}&walletAddress=${walletAddress}`
   }
 
 
