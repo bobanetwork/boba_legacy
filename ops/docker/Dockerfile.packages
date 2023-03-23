@@ -126,6 +126,10 @@ FROM packages as integration-tests
 WORKDIR /opt/optimism/
 COPY --from=builder /opt/optimism/integration-tests ./integration-tests
 COPY --from=builder /opt/optimism/ops_boba/api ./ops_boba/api
+WORKDIR /opt/optimism/packages/boba
+COPY --from=builder /opt/optimism/packages/boba/account-abstraction ./account-abstraction
+COPY --from=builder /opt/optimism/packages/boba/bundler_sdk ./bundler_sdk
+COPY --from=builder /opt/optimism/packages/boba/bundler_utils ./bundler_utils
 WORKDIR /opt/optimism/integration-tests
 COPY ./ops/scripts/integration-tests.sh ./
 CMD ["yarn", "test:integration"]

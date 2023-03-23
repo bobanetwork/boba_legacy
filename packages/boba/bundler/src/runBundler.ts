@@ -57,16 +57,16 @@ function getCommandLineParams(programOpts: any): Partial<BundlerConfig> {
 
 export async function connectContractsViaAddressManager (
   providerL1: BaseProvider,
-  providerL2: BaseProvider,
+  wallet: Wallet,
   addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
   const addressManager = getAddressManager(providerL1, addressManagerAddress)
 
   const bundlerHelperAddress = await addressManager.getAddress('L2_Boba_BundlerHelper')
   const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
 
-  const entryPoint = EntryPoint__factory.connect(entryPointAddress, providerL2)
+  const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
 
-  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, providerL2)
+  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, wallet)
 
   return {
     entryPoint,
@@ -185,7 +185,7 @@ export async function runBundler(
   }
   let methodHandler: UserOpMethodHandler
   if (config.addressManager.length > 0) {
-    const { entryPoint } = await connectContractsViaAddressManager(providerL1, provider, config.addressManager)
+    const { entryPoint } = await connectContractsViaAddressManager(providerL1, wallet, config.addressManager)
     config.entryPoint = entryPoint.address
     methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
   } else {
