@@ -67,6 +67,9 @@ export function calcPreVerificationGas (userOp: Partial<NotPromise<UserOperation
     ...userOp
   } as any
 
+  if (p.signature === '') {
+    p.signature = hexlify(Buffer.alloc(ov.sigSize, 1))
+  }
   const packed = arrayify(packUserOp(p, false))
   const callDataCost = packed.map(x => x === 0 ? ov.zeroByte : ov.nonZeroByte).reduce((sum, x) => sum + x)
   const ret = Math.round(
