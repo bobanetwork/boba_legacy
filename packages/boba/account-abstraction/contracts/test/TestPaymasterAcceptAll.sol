@@ -9,16 +9,18 @@ import "../core/BasePaymaster.sol";
 contract TestPaymasterAcceptAll is BasePaymaster {
 
     constructor(IEntryPoint _entryPoint) BasePaymaster(_entryPoint) {
-        // to support "deterministic address" deployer
+        // to support "deterministic address" factory
         // solhint-disable avoid-tx-origin
         if (tx.origin != msg.sender) {
-            _transferOwnership(tx.origin);
+            transferOwnership(tx.origin);
         }
+
     }
 
-    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint maxCost) external virtual override view
-    returns (bytes memory context, uint256 deadline) {
+    function _validatePaymasterUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 maxCost)
+    internal virtual override view
+    returns (bytes memory context, uint256 validationData) {
         (userOp, userOpHash, maxCost);
-        return ("", 0);
+        return ("", maxCost == 12345 ? 1 : 0);
     }
 }

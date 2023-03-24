@@ -3,7 +3,6 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
-import './tasks/deploy'
 import 'solidity-coverage'
 
 import * as dotenv from 'dotenv'

@@ -8,7 +8,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p ./tsconfig.json",
+    "build:stop": "tsc -p ./tsconfig.json",
     "clean": "rimraf  dist/ cache node_modules ./tsconfig.tsbuildinfo",
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",

@@ -11,7 +11,7 @@ if [ "$?" == 1 ]; then
   #diff with no error - ok
   exit
 else
-  echo ERROR: found above unchecked reports. 
+  echo ERROR: found above unchecked reports.
   exit 1
 fi
 

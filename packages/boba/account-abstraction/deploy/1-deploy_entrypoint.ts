@@ -1,7 +1,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
-import BundlerHelperJson from '../artifacts/contracts/bundler/BundlerHelper.sol/BundlerHelper.json'
+import EntryPointJson from '../artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
 
 const sleep = async (ms: number): Promise<void> => {
@@ -70,30 +70,25 @@ export const registerBobaAddress = async (
   console.log(`✓ Registered address for ${name}`)
 }
 
-let Factory__BundlerHelper: ContractFactory
+let Factory__EntryPoint: ContractFactory
 
 const deployFn: DeployFunction = async (hre) => {
-  Factory__BundlerHelper = new ContractFactory(
-    BundlerHelperJson.abi,
-    BundlerHelperJson.bytecode,
+  Factory__EntryPoint = new ContractFactory(
+    EntryPointJson.abi,
+    EntryPointJson.bytecode,
     (hre as any).deployConfig.deployer_l2
   )
-
-  // specify network here to deploy on mainnet/goerli or other networks
-  // for example:   const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, "boba_mainnet")
-  // third parameter for DeterministicDeployer is network
   const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
-  const BundlerHelperAddress = await dep.deterministicDeploy(Factory__BundlerHelper.bytecode)
-  console.log('Deployed BundlerHelper at', BundlerHelperAddress)
+  const EntryPointAddress = await dep.deterministicDeploy(Factory__EntryPoint.bytecode)
+  console.log('Deployed EntryPoint at', EntryPointAddress)
 
-  const BundlerHelperDeploymentSubmission: DeploymentSubmission = {
-    address: BundlerHelperAddress,
-    abi: BundlerHelperJson.abi
+  const EntryPointDeploymentSubmission: DeploymentSubmission = {
+    address: EntryPointAddress,
+    abi: EntryPointJson.abi
   }
-  await hre.deployments.save('BundlerHelper', BundlerHelperDeploymentSubmission)
-
-  await registerBobaAddress((hre as any).deployConfig.addressManager, 'L2_Boba_BundlerHelper', BundlerHelperAddress )
+  await hre.deployments.save('EntryPoint', EntryPointDeploymentSubmission)
+  await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_Boba_EntryPoint', EntryPointAddress )
 }
 
 export default deployFn
-deployFn.tags = ['BundlerHelper']
+deployFn.tags = ['EntryPoint']

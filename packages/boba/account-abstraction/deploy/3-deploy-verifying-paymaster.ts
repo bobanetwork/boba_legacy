@@ -1,7 +1,7 @@
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/types'
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
-import { registerBobaAddress } from './1-deploy-helper'
+import { registerBobaAddress } from './1-deploy_entrypoint'
 import BobaVerifyingPaymasterJson from '../artifacts/contracts/samples/BobaVerifyingPaymaster.sol/BobaVerifyingPaymaster.json'
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
 

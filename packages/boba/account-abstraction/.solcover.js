@@ -1,9 +1,10 @@
 module.exports = {
   skipFiles: [
     "test",
-    "bls/lib",
+    "samples/bls/lib",
     //solc-coverage fails to compile our Manager module.
-    "gnosis",
-    "samples/SimpleWalletForTokens.sol"
+    "samples/gnosis",
+    "utils/Exec.sol"
   ],
+  configureYulOptimizer: true,
 };
