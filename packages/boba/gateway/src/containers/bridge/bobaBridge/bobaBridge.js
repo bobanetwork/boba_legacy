@@ -67,7 +67,6 @@ function BobaBridge() {
   const navigate = useNavigate()
 
   async function switchDirection() {
-    console.log(toL2)
     if (accountEnabled) {
       if (isL1) dispatch(setConnectBOBA(true))
       else dispatch(setConnectETH(true))
@@ -162,7 +161,7 @@ function BobaBridge() {
           </Box>
         </S.BobaContentWrapper>
       </S.BobaContent>
-      {!userWallet && 
+      {!userWallet &&
         <Box alignSelf="center">
           <Button
             fullWidth={true}
