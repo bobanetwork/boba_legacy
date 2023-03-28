@@ -7,13 +7,9 @@ import { TestCounter__factory } from '../typechain/factories/contracts/test/Test
 const deployer = new DeterministicDeployer(ethers.provider)
 
 describe('#deterministicDeployer', () => {
-  it('deploy deployer', async () => {
-    expect(await deployer.isDeployerDeployed()).to.equal(false)
-    await deployer.deployDeployer()
-    expect(await deployer.isDeployerDeployed()).to.equal(true)
-  })
   it('should ignore deploy again of deployer', async () => {
     await deployer.deployDeployer()
+    expect(await deployer.isDeployerDeployed()).to.equal(true)
   })
   it('should deploy at given address', async () => {
     const testCounter = await new TestCounter__factory(

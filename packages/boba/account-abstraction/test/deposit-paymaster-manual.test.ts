@@ -3,7 +3,6 @@ import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import {
   SimpleAccount,
-  SimpleAccount__factory,
   EntryPoint,
   ManualDepositPaymaster,
   ManualDepositPaymaster__factory,
@@ -17,7 +16,7 @@ import {
 import {
   AddressZero, createAddress,
   createAccountOwner,
-  deployEntryPoint, FIVE_ETH, ONE_ETH, simulationResultCatch, userOpsWithoutAgg
+  deployEntryPoint, FIVE_ETH, ONE_ETH, simulationResultCatch, userOpsWithoutAgg, createAccount
 } from './testutils'
 import { fillAndSign } from './UserOp'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
@@ -66,7 +65,7 @@ describe('ManualDepositPaymaster', () => {
     let account: SimpleAccount
 
     before(async () => {
-      account = await new SimpleAccount__factory(ethersSigner).deploy(entryPoint.address, await ethersSigner.getAddress())
+      ({ proxy: account } = await createAccount(ethersSigner, await ethersSigner.getAddress(), entryPoint.address))
     })
     it('should deposit and read balance', async () => {
       await paymaster.addDepositFor(token.address, account.address, 100)
@@ -82,7 +81,7 @@ describe('ManualDepositPaymaster', () => {
       const paymasterWithdraw = await paymaster.populateTransaction.withdrawTokensTo(token.address, AddressZero, 1).then(tx => tx.data!)
 
       await expect(
-        account.exec(paymaster.address, 0, paymasterWithdraw)
+        account.execute(paymaster.address, 0, paymasterWithdraw)
       ).to.revertedWith('DepositPaymaster: must unlockTokenDeposit')
     })
     it('should fail to withdraw within the same block ', async () => {
@@ -90,15 +89,15 @@ describe('ManualDepositPaymaster', () => {
       const paymasterWithdraw = await paymaster.populateTransaction.withdrawTokensTo(token.address, AddressZero, 1).then(tx => tx.data!)
 
       await expect(
-        account.execBatch([paymaster.address, paymaster.address], [paymasterUnlock, paymasterWithdraw])
+        account.executeBatch([paymaster.address, paymaster.address], [paymasterUnlock, paymasterWithdraw])
       ).to.be.revertedWith('DepositPaymaster: must unlockTokenDeposit')
     })
     it('should succeed to withdraw after unlock', async () => {
       const paymasterUnlock = await paymaster.populateTransaction.unlockTokenDeposit().then(tx => tx.data!)
       const target = createAddress()
       const paymasterWithdraw = await paymaster.populateTransaction.withdrawTokensTo(token.address, target, 1).then(tx => tx.data!)
-      await account.exec(paymaster.address, 0, paymasterUnlock)
-      await account.exec(paymaster.address, 0, paymasterWithdraw)
+      await account.execute(paymaster.address, 0, paymasterUnlock)
+      await account.execute(paymaster.address, 0, paymasterWithdraw)
       expect(await token.balanceOf(target)).to.eq(1)
     })
   })
@@ -106,11 +105,9 @@ describe('ManualDepositPaymaster', () => {
   describe('#validatePaymasterUserOp', () => {
     let account: SimpleAccount
     const gasPrice = 1e9
-    let accountOwner: string
 
     before(async () => {
-      accountOwner = await ethersSigner.getAddress()
-      account = await new SimpleAccount__factory(ethersSigner).deploy(entryPoint.address, accountOwner)
+      ({ proxy: account } = await createAccount(ethersSigner, await ethersSigner.getAddress(), entryPoint.address))
     })
 
     it('should fail if no token', async () => {
@@ -141,7 +138,7 @@ describe('ManualDepositPaymaster', () => {
       await paymaster.addDepositFor(token.address, account.address, ONE_ETH)
 
       const paymasterUnlock = await paymaster.populateTransaction.unlockTokenDeposit().then(tx => tx.data!)
-      await account.exec(paymaster.address, 0, paymasterUnlock)
+      await account.execute(paymaster.address, 0, paymasterUnlock)
 
       const userOp = await fillAndSign({
         sender: account.address,
@@ -153,7 +150,7 @@ describe('ManualDepositPaymaster', () => {
     it('succeed with valid deposit', async () => {
       // needed only if previous test did unlock.
       const paymasterLockTokenDeposit = await paymaster.populateTransaction.lockTokenDeposit().then(tx => tx.data!)
-      await account.exec(paymaster.address, 0, paymasterLockTokenDeposit)
+      await account.execute(paymaster.address, 0, paymasterLockTokenDeposit)
 
       const userOp = await fillAndSign({
         sender: account.address,
@@ -168,10 +165,10 @@ describe('ManualDepositPaymaster', () => {
     let counter: TestCounter
     let callData: string
     before(async () => {
-      account = await new SimpleAccount__factory(ethersSigner).deploy(entryPoint.address, accountOwner.address)
+      ({ proxy: account } = await createAccount(ethersSigner, await accountOwner.getAddress(), entryPoint.address))
       counter = await new TestCounter__factory(ethersSigner).deploy()
       const counterJustEmit = await counter.populateTransaction.justemit().then(tx => tx.data!)
-      callData = await account.populateTransaction.execFromEntryPoint(counter.address, 0, counterJustEmit).then(tx => tx.data!)
+      callData = await account.populateTransaction.execute(counter.address, 0, counterJustEmit).then(tx => tx.data!)
 
       await paymaster.addDepositFor(token.address, account.address, ONE_ETH)
     })
@@ -199,7 +196,7 @@ describe('ManualDepositPaymaster', () => {
 
       // need to "approve" the paymaster to use the tokens. we issue a UserOp for that (which uses the deposit to execute)
       const tokenApprovePaymaster = await token.populateTransaction.approve(paymaster.address, ethers.constants.MaxUint256).then(tx => tx.data!)
-      const execApprove = await account.populateTransaction.execFromEntryPoint(token.address, 0, tokenApprovePaymaster).then(tx => tx.data!)
+      const execApprove = await account.populateTransaction.execute(token.address, 0, tokenApprovePaymaster).then(tx => tx.data!)
       const userOp1 = await fillAndSign({
         sender: account.address,
         paymasterAndData: hexConcat([paymaster.address, hexZeroPad(token.address, 20)]),
@@ -227,20 +224,20 @@ describe('ManualDepositPaymaster', () => {
     let account: SimpleAccount
 
     before(async () => {
-      account = await new SimpleAccount__factory(ethersSigner).deploy(entryPoint.address, await ethersSigner.getAddress())
+      ({ proxy: account } = await createAccount(ethersSigner, await ethersSigner.getAddress(), entryPoint.address))
     })
     it('should not allow non owner to update priceRatio', async () => {
       const updatePriceRatio = await paymaster.populateTransaction.updatePriceRatio(token.address, 60).then(tx => tx.data!)
 
       await expect(
-        account.exec(paymaster.address, 0, updatePriceRatio)
+        account.execute(paymaster.address, 0, updatePriceRatio)
       ).to.revertedWith('Ownable: caller is not the owner')
     })
     it('should not allow non owner to update token params', async () => {
       const updateParams = await paymaster.populateTransaction.updateTokenParams(token.address, priceRatioDecimals, 10, 1000).then(tx => tx.data!)
 
       await expect(
-        account.exec(paymaster.address, 0, updateParams)
+        account.execute(paymaster.address, 0, updateParams)
       ).to.revertedWith('Ownable: caller is not the owner')
     })
     it('should allow only the owner to update token params and priceRatio', async () => {

@@ -1,8 +1,21 @@
 import { ethers } from 'hardhat'
-import { arrayify, getCreate2Address, hexConcat, keccak256, parseEther } from 'ethers/lib/utils'
-import { BigNumber, BigNumberish, Contract, ContractReceipt, Wallet } from 'ethers'
-import { EntryPoint, EntryPoint__factory, IEntryPoint, IERC20, SimpleAccount__factory, TestAggregatedAccount__factory } from '../typechain'
-import { BytesLike, hexValue } from '@ethersproject/bytes'
+import {
+  arrayify,
+  hexConcat,
+  keccak256,
+  parseEther
+} from 'ethers/lib/utils'
+import { BigNumber, BigNumberish, Contract, ContractReceipt, Signer, Wallet } from 'ethers'
+import {
+  EntryPoint,
+  EntryPoint__factory,
+  IERC20,
+  IEntryPoint,
+  SimpleAccount,
+  SimpleAccountFactory__factory,
+  SimpleAccount__factory, SimpleAccountFactory, TestAggregatedAccountFactory
+} from '../typechain'
+import { BytesLike } from '@ethersproject/bytes'
 import { expect } from 'chai'
 import { Create2Factory } from '../src/Create2Factory'
 import { debugTransaction } from './debugTx'
@@ -68,46 +81,37 @@ export function callDataCost (data: string): number {
 export async function calcGasUsage (rcpt: ContractReceipt, entryPoint: EntryPoint, beneficiaryAddress?: string): Promise<{ actualGasCost: BigNumberish }> {
   const actualGas = await rcpt.gasUsed
   const logs = await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(), rcpt.blockHash)
-  const { actualGasCost, actualGasPrice } = logs[0].args
+  const { actualGasCost, actualGasUsed } = logs[0].args
   console.log('\t== actual gasUsed (from tx receipt)=', actualGas.toString())
-  const calculatedGasUsed = actualGasCost.toNumber() / actualGasPrice.toNumber()
-  console.log('\t== calculated gasUsed (paid to beneficiary)=', calculatedGasUsed)
+  console.log('\t== calculated gasUsed (paid to beneficiary)=', actualGasUsed)
   const tx = await ethers.provider.getTransaction(rcpt.transactionHash)
-  console.log('\t== gasDiff', actualGas.toNumber() - calculatedGasUsed - callDataCost(tx.data))
+  console.log('\t== gasDiff', actualGas.toNumber() - actualGasUsed.toNumber() - callDataCost(tx.data))
   if (beneficiaryAddress != null) {
     expect(await getBalance(beneficiaryAddress)).to.eq(actualGasCost.toNumber())
   }
   return { actualGasCost }
 }
 
-// helper function to create a deployer (initCode) call to our account. relies on the global "create2Deployer"
-// note that this is a very naive deployer: merely calls "create2", which means entire constructor code is passed
-// with each deployment. a better deployer will only receive the constructor parameters.
-export function getAccountDeployer (entryPoint: string, owner: string): BytesLike {
-  const accountCtr = new SimpleAccount__factory(ethers.provider.getSigner()).getDeployTransaction(entryPoint, owner).data!
-  const factory = new Create2Factory(ethers.provider)
-  const initCallData = factory.getDeployTransactionCallData(hexValue(accountCtr), 0)
+// helper function to create the initCode to deploy the account, using our account factory.
+export function getAccountInitCode (owner: string, factory: SimpleAccountFactory, salt = 0): BytesLike {
   return hexConcat([
-    Create2Factory.contractAddress,
-    initCallData
+    factory.address,
+    factory.interface.encodeFunctionData('createAccount', [owner, salt])
   ])
 }
 
-export async function getAggregatedAccountDeployer (entryPoint: string, aggregator: string): Promise<BytesLike> {
-  const accountCtr = await new TestAggregatedAccount__factory(ethers.provider.getSigner()).getDeployTransaction(entryPoint, aggregator).data!
-
-  const factory = new Create2Factory(ethers.provider)
-  const initCallData = factory.getDeployTransactionCallData(hexValue(accountCtr), 0)
+export async function getAggregatedAccountInitCode (entryPoint: string, factory: TestAggregatedAccountFactory, salt = 0): Promise<BytesLike> {
+  // the test aggregated account doesn't check the owner...
+  const owner = AddressZero
   return hexConcat([
-    Create2Factory.contractAddress,
-    initCallData
+    factory.address,
+    factory.interface.encodeFunctionData('createAccount', [owner, salt])
   ])
 }
 
 // given the parameters as AccountDeployer, return the resulting "counterfactual address" that it would create.
-export function getAccountAddress (entryPoint: string, owner: string): string {
-  const accountCtr = new SimpleAccount__factory(ethers.provider.getSigner()).getDeployTransaction(entryPoint, owner).data!
-  return getCreate2Address(Create2Factory.contractAddress, HashZero, keccak256(hexValue(accountCtr)))
+export async function getAccountAddress (owner: string, factory: SimpleAccountFactory, salt = 0): Promise<string> {
+  return await factory.getAddress(owner, salt)
 }
 
 const panicCodes: { [key: number]: string } = {
@@ -183,6 +187,7 @@ export async function checkForGeth (): Promise<void> {
 
   currentNode = await provider.request({ method: 'web3_clientVersion' })
 
+  console.log('node version:', currentNode)
   // NOTE: must run geth with params:
   // --http.api personal,eth,net,web3
   // --allow-insecure-unlock
@@ -190,7 +195,7 @@ export async function checkForGeth (): Promise<void> {
     for (let i = 0; i < 2; i++) {
       const acc = await provider.request({ method: 'personal_newAccount', params: ['pass'] }).catch(rethrow)
       await provider.request({ method: 'personal_unlockAccount', params: [acc, 'pass'] }).catch(rethrow)
-      await fund(acc)
+      await fund(acc, '10')
     }
   }
 }
@@ -213,7 +218,7 @@ export async function checkForBannedOps (txHash: string, checkPaymaster: boolean
   const tx = await debugTransaction(txHash)
   const logs = tx.structLogs
   const blockHash = logs.map((op, index) => ({ op: op.op, index })).filter(op => op.op === 'NUMBER')
-  expect(blockHash.length).to.equal(1, 'expected exactly 1 call to NUMBER (Just before validatePaymasterUserOp)')
+  expect(blockHash.length).to.equal(2, 'expected exactly 2 call to NUMBER (Just before and after validateUserOperation)')
   const validateAccountOps = logs.slice(0, blockHash[0].index - 1)
   const validatePaymasterOps = logs.slice(blockHash[0].index + 1)
   const ops = validateAccountOps.filter(log => log.depth > 1).map(log => log.op)
@@ -237,22 +242,22 @@ export async function checkForBannedOps (txHash: string, checkPaymaster: boolean
 }
 
 /**
- * process exception of SimulationResult
+ * process exception of ValidationResult
  * usage: entryPoint.simulationResult(..).catch(simulationResultCatch)
  */
 export function simulationResultCatch (e: any): any {
-  if (e.errorName !== 'SimulationResult') {
+  if (e.errorName !== 'ValidationResult') {
     throw e
   }
   return e.errorArgs
 }
 
 /**
- * process exception of SimulationResultWithAggregation
+ * process exception of ValidationResultWithAggregation
  * usage: entryPoint.simulationResult(..).catch(simulationResultWithAggregation)
  */
 export function simulationResultWithAggregationCatch (e: any): any {
-  if (e.errorName !== 'SimulationResultWithAggregation') {
+  if (e.errorName !== 'ValidationResultWithAggregation') {
     throw e
   }
   return e.errorArgs
@@ -277,4 +282,28 @@ export function userOpsWithoutAgg (userOps: UserOperation[]): IEntryPoint.UserOp
     aggregator: AddressZero,
     signature: '0x'
   }]
+}
+
+// Deploys an implementation and a proxy pointing to this implementation
+export async function createAccount (
+  ethersSigner: Signer,
+  accountOwner: string,
+  entryPoint: string,
+  _factory?: SimpleAccountFactory
+):
+  Promise<{
+    proxy: SimpleAccount
+    accountFactory: SimpleAccountFactory
+    implementation: string
+  }> {
+  const accountFactory = _factory ?? await new SimpleAccountFactory__factory(ethersSigner).deploy(entryPoint)
+  const implementation = await accountFactory.accountImplementation()
+  await accountFactory.createAccount(accountOwner, 0)
+  const accountAddress = await accountFactory.getAddress(accountOwner, 0)
+  const proxy = SimpleAccount__factory.connect(accountAddress, ethersSigner)
+  return {
+    implementation,
+    accountFactory,
+    proxy
+  }
 }
