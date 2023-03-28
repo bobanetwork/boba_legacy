@@ -3,12 +3,18 @@ import { ethers } from 'hardhat'
 import { expect } from 'chai'
 import {
   SimpleAccount,
-  SimpleAccountDeployer__factory,
-  SimpleAccount__factory,
+  SimpleAccountFactory__factory,
   TestUtil,
   TestUtil__factory
 } from '../typechain'
-import { AddressZero, createAddress, createAccountOwner, getBalance, isDeployed, ONE_ETH } from './testutils'
+import {
+  createAddress,
+  createAccountOwner,
+  getBalance,
+  isDeployed,
+  ONE_ETH,
+  createAccount, HashZero
+} from './testutils'
 import { fillUserOpDefaults, getUserOpHash, packUserOp, signUserOp } from './UserOp'
 import { parseEther } from 'ethers/lib/utils'
 import { UserOperation } from './UserOperation'
@@ -29,14 +35,14 @@ describe('SimpleAccount', function () {
   })
 
   it('owner should be able to call transfer', async () => {
-    const account = await new SimpleAccount__factory(ethers.provider.getSigner()).deploy(entryPoint, accounts[0])
+    const { proxy: account } = await createAccount(ethers.provider.getSigner(), accounts[0], entryPoint)
     await ethersSigner.sendTransaction({ from: accounts[0], to: account.address, value: parseEther('2') })
-    await account.transfer(accounts[2], ONE_ETH)
+    await account.execute(accounts[2], ONE_ETH, '0x')
   })
   it('other account should not be able to call transfer', async () => {
-    const account = await new SimpleAccount__factory(ethers.provider.getSigner()).deploy(entryPoint, accounts[0])
-    await expect(account.connect(ethers.provider.getSigner(1)).transfer(accounts[2], ONE_ETH))
-      .to.be.revertedWith('only owner')
+    const { proxy: account } = await createAccount(ethers.provider.getSigner(), accounts[0], entryPoint)
+    await expect(account.connect(ethers.provider.getSigner(1)).execute(accounts[2], ONE_ETH, '0x'))
+      .to.be.revertedWith('account: not Owner or EntryPoint')
   })
 
   it('should pack in js the same as solidity', async () => {
@@ -56,8 +62,8 @@ describe('SimpleAccount', function () {
 
     before(async () => {
       // that's the account of ethersSigner
-      const entryPoint = accounts[2]
-      account = await new SimpleAccount__factory(await ethers.getSigner(entryPoint)).deploy(entryPoint, accountOwner.address)
+      const entryPoint = accounts[2];
+      ({ proxy: account } = await createAccount(await ethers.getSigner(entryPoint), accountOwner.address, entryPoint))
       await ethersSigner.sendTransaction({ from: accounts[0], to: account.address, value: parseEther('0.2') })
       const callGasLimit = 200000
       const verificationGasLimit = 100000
@@ -76,7 +82,7 @@ describe('SimpleAccount', function () {
       expectedPay = actualGasPrice * (callGasLimit + verificationGasLimit)
 
       preBalance = await getBalance(account.address)
-      const ret = await account.validateUserOp(userOp, userOpHash, AddressZero, expectedPay, { gasPrice: actualGasPrice })
+      const ret = await account.validateUserOp(userOp, userOpHash, expectedPay, { gasPrice: actualGasPrice })
       await ret.wait()
     })
 
@@ -88,23 +94,24 @@ describe('SimpleAccount', function () {
     it('should increment nonce', async () => {
       expect(await account.nonce()).to.equal(1)
     })
+
     it('should reject same TX on nonce error', async () => {
-      await expect(account.validateUserOp(userOp, userOpHash, AddressZero, 0)).to.revertedWith('invalid nonce')
+      await expect(account.validateUserOp(userOp, userOpHash, 0)).to.revertedWith('invalid nonce')
     })
-    it('should reject tx with wrong signature', async () => {
-      // validateUserOp doesn't check the actual UserOp for the signature, but relies on the userOpHash given by
-      // the entrypoint
-      const wrongUserOpHash = ethers.constants.HashZero
-      await expect(account.validateUserOp(userOp, wrongUserOpHash, AddressZero, 0)).to.revertedWith('account: wrong signature')
+
+    it('should return NO_SIG_VALIDATION on wrong signature', async () => {
+      const userOpHash = HashZero
+      const deadline = await account.callStatic.validateUserOp({ ...userOp, nonce: 1 }, userOpHash, 0)
+      expect(deadline).to.eq(1)
     })
   })
-  context('SimpleAccountDeployer', () => {
+  context('SimpleAccountFactory', () => {
     it('sanity: check deployer', async () => {
       const ownerAddr = createAddress()
-      const deployer = await new SimpleAccountDeployer__factory(ethersSigner).deploy()
-      const target = await deployer.callStatic.deployAccount(entryPoint, ownerAddr, 1234)
+      const deployer = await new SimpleAccountFactory__factory(ethersSigner).deploy(entryPoint)
+      const target = await deployer.callStatic.createAccount(ownerAddr, 1234)
       expect(await isDeployed(target)).to.eq(false)
-      await deployer.deployAccount(entryPoint, ownerAddr, 1234)
+      await deployer.createAccount(ownerAddr, 1234)
       expect(await isDeployed(target)).to.eq(true)
     })
   })

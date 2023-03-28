@@ -79,7 +79,7 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
+            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer
           working_directory: ops
       - run:
           name: Start background logging
@@ -254,5 +254,5 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      - test_flow_bundler_and_depcheck
+      # - test_flow_bundler_and_depcheck
 

@@ -117,10 +117,9 @@ import { Create2Factory } from './Create2Factory'
     const ev = await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(), block)
     // if (ev.length === 0) return {}
     return ev.map(event => {
-      const { nonce, actualGasCost, actualGasPrice } = event.args
-      const gasPaid = actualGasCost.div(actualGasPrice).toNumber()
+      const { nonce, actualGasUsed } = event.args
       const gasUsed = rcpt.gasUsed.toNumber()
-      return { nonce: nonce.toNumber(), gasPaid, gasUsed: gasUsed, diff: gasUsed - gasPaid }
+      return { nonce: nonce.toNumber(), gasPaid, gasUsed: gasUsed, diff: gasUsed - actualGasUsed.toNumber() }
     })
   }
 })()

@@ -6,7 +6,6 @@ pragma solidity ^0.8.12;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "../core/BasePaymaster.sol";
 import "./IBobaGasPriceOracle.sol";
 
@@ -56,6 +55,10 @@ contract GPODepositPaymaster is BasePaymaster {
         }
     }
 
+    /**
+     * @return amount - the amount of given token deposited to the Paymaster.
+     * @return _unlockBlock - the block height at which the deposit can be withdrawn.
+     */
     function depositInfo(address account) public view returns (uint256 amount, uint256 _unlockBlock) {
         amount = balances[account];
         _unlockBlock = unlockBlock[account];
@@ -107,8 +110,8 @@ contract GPODepositPaymaster is BasePaymaster {
      * Note that the sender's balance is not checked. If it fails to pay from its balance,
      * this deposit will be used to compensate the paymaster for the transaction.
      */
-    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 maxCost)
-    external view override returns (bytes memory context, uint256 deadline) {
+    function _validatePaymasterUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 maxCost)
+    internal view override returns (bytes memory context, uint256 validationData) {
 
         (userOpHash);
         // verificationGasLimit is dual-purposed, as gas limit for postOp. make sure it is high enough
