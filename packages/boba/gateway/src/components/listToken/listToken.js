@@ -555,7 +555,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
                   tooltip="Transfer funds from one L2 account to another L2 account."
                   fullWidth
                 >
-                  Transfer
+                  Transfer 1
                 </Button>
               </>
             )}
