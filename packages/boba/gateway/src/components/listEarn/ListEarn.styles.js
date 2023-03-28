@@ -18,7 +18,8 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
 
 export const GridContainer = styled(Grid)(({ theme }) => ({
   background: theme.palette.background.glassy,
-  margin: '-10px -8px',
+  margin: '-6px',
+  paddingBottom: '10px',
   [theme.breakpoints.down('md')]:{
     justifyContent: 'flex-start',
     width: '100%',
@@ -48,13 +49,13 @@ export const DropdownWrapper = styled(Box)`
 `;
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '80%',
+  width: '100%',
   display: 'flex',
   justifyContent: 'space-between',
   backgroundColor: theme.palette.background.glassy,
-  borderRadius: '20px',
-  margin: '5px',
-  padding: '20px 40px',
+  borderRadius: theme.palette.primary.borderRadius,
+  margin: '5px 0px',
+  padding: '20px',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     gap: '5px',
