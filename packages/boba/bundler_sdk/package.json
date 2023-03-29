@@ -8,12 +8,12 @@
     "README.md"
   ],
   "scripts": {
-    "build:stopp": "tsc -p ./tsconfig.json",
+    "build": "tsc -p ./tsconfig.json",
     "clean": "rimraf  dist/ cache node_modules ./tsconfig.tsbuildinfo",
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
     "test": "hardhat test",
-    "test:coverage:stop": "COVERAGE=1 hardhat coverage",
+    "test:coverage": "COVERAGE=1 hardhat coverage",
     "hardhat-test": "hardhat test",
     "tsc": "tsc",
     "watch-tsc": "tsc -w --preserveWatchOutput"
@@ -27,6 +27,11 @@
     "@ethersproject/properties": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
     "@types/debug": "^4.1.7",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "async-mutex": "^0.4.0",
+    "commander": "^9.4.0",
+    "cors": "^2.8.5",
     "debug": "^4.3.4",
     "ethers": "^5.7.0"
   },

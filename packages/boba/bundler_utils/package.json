@@ -11,7 +11,7 @@
     "README.md"
   ],
   "scripts": {
-    "build:stopp": "tsc -p ./tsconfig.json && hardhat compile",
+    "build": "hardhat compile && tsc -p ./tsconfig.json",
     "clean": "rimraf node_modules cache artifacts dist/ ./tsconfig.tsbuildinfo",
     "hardhat-compile": "hardhat compile",
     "lint-fix": "eslint -f unix . --fix",
@@ -22,7 +22,7 @@
     "@boba/accountabstraction": "^1.0.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.5.0",
-    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts": "^4.3.2",
     "ethers": "^5.7.0"
   },
   "devDependencies": {

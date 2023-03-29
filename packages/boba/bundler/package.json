@@ -11,10 +11,11 @@
   },
   "scripts": {
     "bundler": "ts-node ./src/exec.ts --config ./localconfig/bundler.config.json",
-    "build:stopp": "tsc -p ./tsconfig.json && hardhat compile",
+    "build": "yarn hardhat-compile && tsc -p ./tsconfig.json",
+    "hardhat-compile": "hardhat compile",
     "clean": "rimraf artifacts cache node_modules dist dockers/bundler ./tsconfig.tsbuildinfo",
     "test": "hardhat test --grep '/^((?!Flow).)*$/'",
-    "test:coverage:stop": "yarn test",
+    "test:coverage": "yarn test",
     "test-flows": "npx hardhat test --network localhost --grep \"Flow\"",
     "hardhat-test": "hardhat test --grep '/^((?!Flow).)*$/'",
     "hardhat-node": "npx hardhat node --no-deploy"
