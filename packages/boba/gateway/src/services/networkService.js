@@ -1041,10 +1041,7 @@ class NetworkService {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if(token.balance.lte(new BN(1000000))) {
-          //do nothing
-        }
-        else if (token.layer === 'L1' &&
+          if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&
