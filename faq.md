@@ -3,11 +3,11 @@ description: Frequently asked questions
 ---
 # FAQ
 
-<p align="center">
-  <img src="//boba_documentation/.gitbook/assets/what-is-boba-network.png)"/>
-</p>
+<a href="link" style="text-align:center">
+  <img src="../boba/boba_documentation/.gitbook/assets/what-is-boba-network.png" align="center">
+</a>
 
-![](./boba_documentation/.gitbook/assets/what-is-boba-network.png)
+<!-- ![](./boba_documentation/.gitbook/assets/what-is-boba-network.png) -->
 
 [Boba](https://boba.network) is a compute-focused Layer 2 (L2) solution built on top of the Layer 1 blockchain, [Ethereum](https://ethereum.org/en). Boba scales and augments the core _compute_ capabilities of Ethereum, reducing gas fees and improving transaction throughput - while retaining the security guarantees of Ethereum.
 
@@ -113,4 +113,28 @@ There are [four different methods](./boba_documentation/developer/xdomain-tx-sta
 
 ## ![Developer FAQ](./boba_documentation/.gitbook/assets/developer-faq.png)
 
+![Smart Contracts](./boba_documentation/.gitbook/assets/smart-contracts.png)
 
+## Q1: Why can't I Deploy my 100kb Copy/Paste Contract?
+
+Instead of deploying just one contract, you need to deploy several.
+
+## Q2: Are there any technical changes or differences in smart contracts and gas tables in Boba Network in comparison to BNB Smart Chain (BSC) or Ethereum Networks?
+
+No, there is no difference.
+
+## Q3: DEX (decentralized exchange) is built on 0.7.6. Is it safe to use Solc Optimization on it?
+
+Yes!
+
+## Q4: Is it all right with the Boba Network if the source code of our app is closed source?
+
+Boba network is a permission-less network and hence we cannot influence app creators about the disclosure of their source code. However, we do advise end users not to interact with smart contracts that use source code that is not verified in the Blockexplorer.
+
+## Q5: Is there a way to run arbitrarly compiled Smart Contract native code, or a Smart Contract in a WebAssembly (WASM) environment?
+
+Unfortunately no, not at the moment.
+
+## Q6: I am trying to deploy a Smart Contract to Boba Rinkeby with Remix but get this error: "creation of SCContract errored: \[ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"\}}}'
+
+See Q2 of Transactions.
