@@ -115,26 +115,156 @@ There are [four different methods](./boba_documentation/developer/xdomain-tx-sta
 
 ![Smart Contracts](./boba_documentation/.gitbook/assets/smart-contracts.png)
 
-## Q1: Why can't I Deploy my 100kb Copy/Paste Contract?
+## Why can't I Deploy my 100kb Copy/Paste Contract?
 
 Instead of deploying just one contract, you need to deploy several.
 
-## Q2: Are there any technical changes or differences in smart contracts and gas tables in Boba Network in comparison to BNB Smart Chain (BSC) or Ethereum Networks?
+## Are there any technical changes or differences in smart contracts and gas tables in Boba Network in comparison to BNB Smart Chain (BSC) or Ethereum Networks?
 
 No, there is no difference.
 
-## Q3: DEX (decentralized exchange) is built on 0.7.6. Is it safe to use Solc Optimization on it?
+## DEX (decentralized exchange) is built on 0.7.6. Is it safe to use Solc Optimization on it?
 
 Yes!
 
-## Q4: Is it all right with the Boba Network if the source code of our app is closed source?
+## Is it all right with the Boba Network if the source code of our app is closed source?
 
 Boba network is a permission-less network and hence we cannot influence app creators about the disclosure of their source code. However, we do advise end users not to interact with smart contracts that use source code that is not verified in the Blockexplorer.
 
-## Q5: Is there a way to run arbitrarly compiled Smart Contract native code, or a Smart Contract in a WebAssembly (WASM) environment?
+## Is there a way to run arbitrarly compiled Smart Contract native code, or a Smart Contract in a WebAssembly (WASM) environment?
 
 Unfortunately no, not at the moment.
 
-## Q6: I am trying to deploy a Smart Contract to Boba Rinkeby with Remix but get this error: "creation of SCContract errored: \[ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"\}}}'
+## exceeds block gas limit"\}}}'
 
-See Q2 of Transactions.
+Please see Q2 of Transactions.
+
+</br>
+
+![Testing and Testnet](./boba_documentation/.gitbook/assets/testing-and-testnet.png)
+
+## Does Boba Network Have a testnet/How do I gettTestnet Boba or Eth?
+
+Boba Network does have a testnet and it uses authentication through Twitter. Here’s a short walkthrough on how to get authenticated.
+
+First, download MetaMask on your browser as a plug-in and set up a MetaMask wallet.
+
+Don’t be surprised by the fox that will follow your cursor when you first launch the application. He’s friendly.
+
+![Welcome to Metamask](./boba_documentation/.gitbook/assets/WELCOME-TO-METAMASK.png)
+
+After you’ve set up your MetaMask account, you can [connect to the Rinkeby network Testnet](https://gateway.rinkeby.boba.network/). After that, follow these steps:
+
+* Notice your connection status being displayed in the upper-right corner, along with a button that will allow you to select a chain to connect to.
+* Click on the Boba icon, and MetaMask will prompt you to connect to the Rinkeby Boba network.
+* Click on the account you would like to use for your testnet, then hit Next.
+* Allow permissions by hitting Connect.
+* Observe that all of the network details such as the Network name, URL, and Chain ID have all been auto-filled.
+* Hit Approve.
+
+![Add to Network](./boba_documentation/.gitbook/assets/ALLOW-THIS-SITE-TO-ADD-NETWORK.png)
+
+* Now that you’re connected to the network, you can authenticate with Twitter:
+
+![Boba Wallet](./boba_documentation/.gitbook/assets/BOBA-WALLET-SCREENSHOT.png)
+
+* Hit the Tweet Now button to tweet your _Boba Bubble_ token.
+* Once your tweet is shared, copy the link leading to it.
+* Paste the link to your tweet where you’re prompted to do so.
+
+For more information on Boba’s testnet and fountain, [check out our documentation](https://docs.boba.network/for-developers/network-fantom#bobaopera-testnet-addresses).
+
+**NOTE: You can only make one fountain call per Twitter account, per day.**
+
+## I am trying to run Boba Network locally and  I am able to run unit tests. However, integration tests give an error:
+
+`./scripts/wait-for-sequencer.sh is getting timed out. Any Solutions?`
+
+Please be sure to attach logs of output of `docker-compose logs` as well as integration tests. That should solve the problem.
+
+## I have started deploying Boba Testnet, but it looks like the Testnet Subgraph is private?
+
+We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
+
+<br/>
+
+![Transactions](./boba_documentation/.gitbook/assets/Transactions.png)
+
+## Why isn’t my transaction going through?
+
+Although you will get an error message that says the gas limit is 1,000,000,000,000,000 Wei, the Boba Network will throw an error anytime the gas price is equal to or more than three times the expected gas price for any given transaction.
+
+When you make an Ethereum transaction, the user will be given an expected fee for what they can expect that transaction to cost. Say you’re about to transfer some Ethereum into your friend’s account. And you’re given an expected transaction fee of 3 USD. If, for whatever reason (because the market changes quickly), the gas prices sky-rocket, and now the transaction fee is 9 USD, you’re going to receive an error message.
+
+The reason why is because Boba is looking out for you. Before that unexpectedly expensive payment goes through, Boba will throw an error and prevent the payment from going through to make sure you aren’t paying more than you should be. If the transaction fee is at least three times what the expected cost was (in our example, your transaction fee of 3 USD jumped to 9 USD), the transaction will fail before you’re faced with that kind of payment.
+
+[Read up on the documentation](https://docs.boba.network/for-developers/fee-scheme#for-frontend-and-wallet-developers) to find out more.
+
+## The Dapp Requires an Approximate XZY Gas to Deploy, Boba's Block Gas Limit is Only 11,000,000, Making it Impossible to Deploy the DEX. What Can Be Done to Deploy the DEX on Boba?
+
+Try to increase higher solc optimizations. For more clarification, check out the Solidity documentation or break down contracts into smaller chunks.
+
+## How Can I Pay for Fees with BOBA Via an API?
+
+Below is the js code needed to utilize the API:
+
+```
+const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
+   await registerTx.wait()
+```
+
+## In the Other Blockchains That an ICO Was Made On, the Payment Coin Was the Blockchain’s Default Gas Coin. In Boba’s Case, the Coin is Ethereum. Shouldn’t the Option to Pay via Boba Token Be Added as Well?
+
+Boba Network fees can be paid in Boba token and in Eth and it's in our End Users’ own discretion to decide which to use.
+
+## When Making a Transaction on Boba and Paying Transaction Fee with Boba, is the Fee First Calculated in ETH at a Gas Price of 1 GWEI, Then Converted to Boba With a 25% Discount?
+
+Yes, exactly!
+
+## Do You Recommend Solidity Optimization, as the Max Value of Runs is 2^32 - 1? What Happens if the DEX Gets More Transactions Than That?
+
+Optimization does not mean that there’s a limit set to the number of transactions this DEX can process.
+
+[Check out Solidity’s official documentation for more information.](https://blog.soliditylang.org/2020/11/04/solidity-ama-1-recap/)
+
+You can also [read up on using compilers and optimization options](https://docs.soliditylang.org/en/v0.8.4/using-the-compiler.html#optimizer-options) in Solidity’s documentation as well.
+
+## Does Boba Network have a public TheGraph Node for deploying Subgraphs?
+
+Please refer to the Boba docs on using The Graph (https://docs.boba.network/for-developers/subgraph).
+
+## Which bridge does Boba Network use?
+
+There are multiple bridges available and are listed on our ecosystem page:
+
+![Boba Bridges](./boba_documentation/.gitbook/assets/BOBA-ECOSYSTEM-BRIDGES.png)
+
+<br/>
+
+[On the Boba Network page](https://gateway.boba.network/), click the Ecosystem link in top menu to navigate to the list available bridges.
+
+<br/>
+
+![Hybrid Compute](./boba_documentation/.gitbook/assets/hybrid-compute.png)
+
+## What are the limits on Hybrid Compute Web2 calls?
+
+This //docs.boba.network/turing/turing#important-properties-of-turing). Be sure to read up and check it out!
+
+## If Hybrid Compute is automatic, does that mean contract execution now waits on API response? How long can an endpoint delay execution? Won't this hit the API endpoint even in cases of Simulations/Reverts?
+
+First, [check out the documentation](https://docs.boba.network/turing/turing#important-properties-of-turing), it should clear up any confusion you may have about our Hybrid Compute.
+
+Hybrid Compute calls need to execute estimateGas first. This puts the API response in a short lived cache, out of which the result is fetched in transaction processing.
+
+## When using the Hybrid Compute feature, the transaction on metamask pops up, and if I submit it within a few seconds, everything works. However, waiting longer and submitting results in failure. Why does this happen?
+
+That's because the Hybrid Compute feature puts the Hybrid Compute response in a cache bucket. Your request including a Hybrid Compute request will put the response under a cache key that expires in 5 seconds:
+
+`const turingCacheExpire = 5 \* time.Second`
+
+[You can see more about this in the documentation.](https://github.com/bobanetwork/boba/blob/develop/l2geth/core/vm/evm.go#L277)
+
+## Is it possible to hide the API Key on Boba Hybrid Compute?
+
+Not directly at the moment. We propose all authenticated calls that need API keys and similar go through a proxy/gateway that would act as an authentication layer for the caller - if that's a suitable design.
