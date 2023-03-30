@@ -7,7 +7,7 @@ description: Frequently asked questions
   <img src="../boba/boba_documentation/.gitbook/assets/what-is-boba-network.png" align="center">
 </a>
 
-<!-- ![](./boba_documentation/.gitbook/assets/what-is-boba-network.png) -->
+<br/>
 
 [Boba](https://boba.network) is a compute-focused Layer 2 (L2) solution built on top of the Layer 1 blockchain, [Ethereum](https://ethereum.org/en). Boba scales and augments the core _compute_ capabilities of Ethereum, reducing gas fees and improving transaction throughput - while retaining the security guarantees of Ethereum.
 
@@ -19,29 +19,29 @@ Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.
 
 ## Is Boba a side chain?
 
-Boba is not a side chain. Side chains are their own blockchain systems with entirely separate consensus mechanisms. Boba Network lives _inside_ of Ethereum as a series of smart contracts that are capable of executing Ethereum transactions. Side chains on the other hand rely on their own consensus mechanisms for security.  Boba as a child chain instead relies on the security of Ethereum itself.
+Boba is not a side chain. Side chains are their own blockchain systems with entirely separate consensus mechanisms. Boba Network lives _inside_ of Ethereum as a series of smart contracts that are capable of executing Ethereum transactions. Side chains on the other hand rely on their own consensus mechanisms for security. Boba as a child chain instead relies on the security of Ethereum itself.
 
-## What's the difference between Boba and Ethereum?
+## What is the difference between Boba and Ethereum?
 
 Boba is similar to Ethereum. Just like you would on Ethereum, you can create and interact with Solidity smart contracts using the same wallet software you are already familiar with.
 
 ## Is Boba safe?
 
-Boba Network is just as safe as the Ethereum chain. Optimistic Rollups like Boba are safe as long as Ethereum itself is "live" (that is, not actively censoring transactions). This security model is backed by a system of "fraud proofs" whereby users are paid to reveal bad transaction results published to the Boba Optimism based chain.
+Boba Network is just as safe as the Ethereum chain. Optimistic Rollups like Boba are safe as long as Ethereum itself is _live_ (that is, not actively censoring transactions). In addition, Boba is in the process of implementing a security model backed by a system of _fraud proofs_, where users are paid to reveal bad transaction results published to the Boba Optimism based chain.
 
 ## Is there a delay moving assets from Boba to Ethereum?
 
 Boba has developed a swap-based mechanism to deliver a smooth user experience for moving funds across chains. Porting assets from L1 to L2, L2 to L1, or between two L2s (as long as they are both EVM-compatible), is fast and dependable.
 
-The users who choose to take advantage of this bridging between L1 and L2 will pay a small convenience fee that is shared among the liquidity providers of the pools backing the swaps. Acting as liquidity providers is just the first of several staking opportunities Boba will roll out to the community. The higher level goal is to encourage broad-based participation in the operations and governance of Boba. As the only tokenized EVM-compatible L2, Boba is in a unique position to use the Boba token responsibly for the long-term sustainability of the network.
+The users who choose to take advantage of this bridging between L1 and L2 will pay a small convenience fee that is shared among the liquidity providers of the pools backing the swaps. Acting as liquidity providers is just the first of several staking opportunities Boba will roll out to the community. The higher level goal is to encourage broad participation in the operations and governance of Boba. As the only tokenized, EVM-compatible L2, Boba is in a unique position to use the Boba token responsibly for the long-term sustainability of the network.
 
 ## How are developers incentivized to build on Boba?
 
-The high gas fees of Ethereum itself is a pretty strong incentive for developers to move to layer 2 networks like Boba. Boba not only helps you scale Ethereum, but also helps tap into more advanced compute capabilities that are not available to you today. Boba also has plans to create an ecosystem fund to incentivize some of the early-stage projects that are just starting out and plan to launch something really interesting. It’s going to take some time to put something like that together. That’s in our plans.
+The high gas fees of Ethereum itself is a pretty strong incentive for developers to move to layer 2 networks like Boba. Boba not only helps you scale Ethereum, but also helps tap into more advanced compute capabilities that are not available to you today. Boba also has plans to create an ecosystem fund to incentivize some of the early-stage projects that are just starting out and that plan to launch interesting apps. It’s going to take some time to put something like that together. That’s in our plans.
 
 ## How do I connect my wallet to Boba Network?
 
-Many wallets now allow applications to trigger a popup to switch between networks. If your wallet supports this feature, you will be automatically prompted to switch networks when an application wants to utilize a Boba Ethereum network. You can use these bridges to add the network to your wallet:
+Many wallets now allow applications to trigger a popup to switch between networks. If your wallet supports this feature, you will be automatically prompted to switch networks when an application wants to use the Boba Ethereum network. You can use these bridges to add the Boba network to your wallet:
 
 \* [The Boba **production** Network Ethereum](https://gateway.boba.network).
 
@@ -51,20 +51,21 @@ If your wallet does not support this feature, you will have to connect manually.
 
 ## How do I move assets into or out of Boba Network?
 
-To move assets into or out of an Optimistic Ethereum network you can use the [**Boba Gateway**](https://gateway.boba.network). We have detailed instructions in our [user documentation](./boba_documentation/user/001_how-to-bridge.md).
+To move assets into or out of an Optimistic Ethereum network you can use the [**Boba Gateway**](https://gateway.boba.network). Detailed instructions in our [user documentation](./boba_documentation/user/001_how-to-bridge.md).
+
 If you are a developer, you can choose any of these two methods: [the **classical bridge**, or the **fast bridge**](./boba_documentation/developer/bridge-l1-and-l2/bridge-basics.md).
 
 ## Can I cancel a withdrawal after it has been submitted?
 
-**No, withdrawals currently cannot be cancelled once submitted.**
+_No_, withdrawals currently cannot be cancelled once submitted.
 
-## Can I transfer directly from Boba to a centralized Exchange?
+## Can I transfer directly from Boba to a centralized exchange?
 
-Only if the centralized exchange supports Boba Network (at this time none of them do). Otherwise you have to bridge your assets into a network they do support, such as L1.
+Only if the centralized exchange supports Boba Network (at this time none of them do). Hence, you have to bridge your assets into a network they do support, such as L1.
 
 ## Where can I find RPC endpoints and connection details?
 
-Connection details for our Mainnet and Goerli network can be found [here](./boba_documentation/developer/network-parameters.md).
+Connection details for our Mainnet and Goerli network are [here](./boba_documentation/developer/network-parameters.md).
 
 ## Are multicall contracts supported on Boba?
 
@@ -75,6 +76,7 @@ Yes. However, you will have to deploy your own version.
 The token decimals on Boba L2 are the same as on Ethereum L1. So if the token has 6 decimals on L1, it will have 6 decimals on L2.
 
 You can check decimals using the [blockexplorer](https://blockexplorer.boba.network).
+
 Here's an [example](https://blockexplorer.boba.network/tokens/0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc/token-transfers).
 
 You can also check the decimals by calling the token contracts:
@@ -86,7 +88,7 @@ const decimals = await this.ERC20_Contract.attach(tokenAddress).connect(this.L2P
 
 ## Why is the incentive contract for verification proofs disabled?
 
-In the current release of the Boba Network protocol, there may be rare cases where the Sequencer submits a state root (transaction result) that is invalid and hence could be challenged. As a result, we have not yet deployed the [Bond Manager](./packages/contracts/contracts/contracts/L1/verification/BondManager.sol) contract which compensates Verifier nodes for gas spent when submitting state root challenges. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
+In the current release of the Boba Network protocol, there may be rare cases where the Sequencer submits a state root (transaction result), that is invalid and hence could be challenged. As a result, we have not yet deployed the [Bond Manager](./packages/contracts/contracts/contracts/L1/verification/BondManager.sol) contract which compensates Verifier nodes for gas spent when submitting state root challenges. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
 
 ## Does Boba operate the only "Sequencer" node?
 
@@ -112,8 +114,21 @@ There are [four different methods](./boba_documentation/developer/xdomain-tx-sta
 ## Are there any other documentation resources besides the docs on Boba Network?
 
 In addition to the docs in this [Boba Developer Docs](https://docs.boba.network/faq) space, we have some [examples](https://github.com/bobanetwork/boba/tree/develop/boba_examples) that could provide more context.
+
 Here is an example that shows a [user's journey setting up NFT Bridges](https://github.com/bobanetwork/boba/blob/develop/boba_examples/nft_bridging/README.md).
 
+## Boba is based on the work done by Optimism. Do you plan to support Optimism Bedrock?
+
+Yes, we are working towards supporting Bedrock in the future.
+
+## Could you tell me the main purpose of `DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` contracts, and how each of them interact with the existing system?
+
+In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 ourselves. All three of the contracts: `DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` are a way to compensate for the cost of relaying transactions on L1. However, they do not subsidize and take back the costs from the user.
+
+`DiscretionaryExitBurn` is a contract on our interface (the gateway), that we use to route Standard Exits through. The contract has a `burnAndWithdraw()` method that allows users to spend gas (a pre-configured amount). After spending the amount, a call is made to the standard bridge to withdraw the users funds. The gas spent before calling the withdraw method allows for the sequencer to gain funds (because right now it is a single entity that sequences and relays). This serves the purpose of voluntary collection.
+
+`DiscretionaryExitFee` is also a contract that we use to route Standard Exits through on our interface (the gateway). The purpose of this contract is to not burn native tokens for the compensation, but instead collect Boba token from the user. This contract uses the `L2BillingContract` to get the correct amount of `exitFee`, and then transfer the amount to the billing contract. The contract then proceeds with the withdrawal on the standard bridge.
+This again serves the purpose of voluntary collection.
 
 </br>
 
@@ -121,11 +136,11 @@ Here is an example that shows a [user's journey setting up NFT Bridges](https://
 
 ![Smart Contracts](./boba_documentation/.gitbook/assets/smart-contracts.png)
 
-## Why can't I Deploy my 100kb Copy/Paste Contract?
+## Why can't I Deploy my 100kb copy/paste Contract?
 
 Instead of deploying just one contract, you need to deploy several.
 
-## Are there any technical changes or differences in smart contracts and gas tables in Boba Network in comparison to BNB Smart Chain (BSC) or Ethereum Networks?
+## Are there any technical changes or differences in smart contracts and gas tables in Boba Network, in comparison to BNB Smart Chain (BSC) or Ethereum Networks?
 
 No, there is no difference.
 
@@ -141,17 +156,16 @@ Boba network is a permission-less network and hence we cannot influence app crea
 
 Unfortunately no, not at the moment.
 
-## I am trying to deploy a smart contract to Boba Rinkeby with Remix but get this error:
+## Could you please explain the difference between the two mappings [mentioned in the token list](https://docs.boba.network/for-developers/exchange-integration#the-boba-token-list?)
 
-`"creation of SCContract errored: [ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"}}}'`
-
-Please see Q2 of Transactions.
-
-## Could you please explain the difference between the two mappings [mentioned in the token list](https://docs.boba.network/for-developers/exchange-integration#the-boba-token-list?
-
-Technically, an L1 token can have multiple representations on L2. This mean that an L1 token can be wrapped in distinct tokens: L2_token_A, or L2_token_B, both being valid and pointing to the same L1 token.
+Technically, an L1 token can have multiple representations on L2. This mean that an L1 token can be wrapped in distinct tokens: L2_token_A, or L2_token_B, both being valid and point to the same L1 token.
 But in order to standardize, the token list specifies only a single L2 token address for every corresponding L1 token.
 
+## Could you share more information on how cross-chain messages are relayed?
+
+[Here's some info on communication between contracts on Optimism and Ethereum](https://github.com/ethereum-optimism/optimism-tutorial/tree/01e4f94fa2671cfed0c6c82257345f77b3b858ef/cross-dom-comm).
+
+[And here's the relayer service Boba uses for relaying messages from L2 to L1](https://github.com/bobanetwork/boba/tree/develop/packages/message-relayer).
 
 </br>
 
@@ -161,40 +175,38 @@ But in order to standardize, the token list specifies only a single L2 token add
 
 Boba Network does have a testnet and it uses authentication through Twitter. Here’s a short walkthrough on how to get authenticated.
 
-First, download MetaMask on your browser as a plug-in and set up a MetaMask wallet.
-
-Don’t be surprised by the fox that will follow your cursor when you first launch the application. He’s friendly.
+First, download MetaMask on your browser as a plug-in and set up a MetaMask wallet (do not be surprised by the fox that will follow your cursor when you first launch the application. He’s friendly!)
 
 ![Welcome to Metamask](./boba_documentation/.gitbook/assets/WELCOME-TO-METAMASK.png)
 
-After you’ve set up your MetaMask account, you can [connect to the Rinkeby network Testnet](https://gateway.rinkeby.boba.network/). After that, follow these steps:
+After you’ve set up your MetaMask account, you can [connect to the Rinkeby network Testnet](https://gateway.rinkeby.boba.network/). After connecting, follow these steps:
 
-* Notice your connection status being displayed in the upper-right corner, along with a button that will allow you to select a chain to connect to.
-* Click on the Boba icon, and MetaMask will prompt you to connect to the Rinkeby Boba network.
-* Click on the account you would like to use for your testnet, then hit Next.
-* Allow permissions by hitting Connect.
-* Observe that all of the network details such as the Network name, URL, and Chain ID have all been auto-filled.
+* view your connection status displayed in the upper-right corner, along with a button that will allow you to select a chain to connect to.
+* click on the Boba icon. MetaMask will prompt you to connect to the Rinkeby Boba network.
+* click on the account you would like to use for your testnet. Hit Next.
+* allow permissions by hitting Connect.
+* make sure that all of the network details such as the Network name, URL, and Chain ID have all been auto-filled.
 * Hit Approve.
 
 ![Add to Network](./boba_documentation/.gitbook/assets/ALLOW-THIS-SITE-TO-ADD-NETWORK.png)
 
-* Now that you’re connected to the network, you can authenticate with Twitter:
+* now that you’re connected to the network, you can authenticate with Twitter:
 
 ![Boba Wallet](./boba_documentation/.gitbook/assets/BOBA-WALLET-SCREENSHOT.png)
 
-* Hit the Tweet Now button to tweet your _Boba Bubble_ token.
-* Once your tweet is shared, copy the link leading to it.
-* Paste the link to your tweet where you’re prompted to do so.
+* hit the Tweet Now button to tweet your _Boba Bubble_ token.
+* once your tweet is shared, copy the link leading to it.
+* paste the link to your tweet where you are prompted to do so.
 
 For more information on Boba’s testnet and fountain, [check out our documentation](https://docs.boba.network/for-developers/network-fantom#bobaopera-testnet-addresses).
 
-**NOTE: You can only make one fountain call per Twitter account, per day.**
+_NOTE: You can only make one fountain call per Twitter account, per day._
 
 ## I am trying to run Boba Network locally and  I am able to run unit tests. However, integration tests give an error:
 
 `./scripts/wait-for-sequencer.sh is getting timed out. Any Solutions?`
 
-Please be sure to attach logs of output of `docker-compose logs` as well as integration tests. That should solve the problem.
+Please be sure to attach logs of the output of `docker-compose logs`, as well as integration test results.
 
 ## I have started deploying Boba Testnet, but it looks like the Testnet Subgraph is private?
 
@@ -206,32 +218,38 @@ We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph 
 
 ## Why isn’t my transaction going through?
 
-Although you will get an error message that says the gas limit is 1,000,000,000,000,000 Wei, the Boba Network will throw an error anytime the gas price is equal to or more than three times the expected gas price for any given transaction.
+Although you will get an error message that says the gas limit is 1,000,000,000,000,000 Wei, the Boba Network will throw an error anytime the gas price is equal to, or more than three times the expected gas price for any given transaction.
 
-When you make an Ethereum transaction, the user will be given an expected fee for what they can expect that transaction to cost. Say you’re about to transfer some Ethereum into your friend’s account. And you’re given an expected transaction fee of 3 USD. If, for whatever reason (because the market changes quickly), the gas prices sky-rocket, and now the transaction fee is 9 USD, you’re going to receive an error message.
+When you make an Ethereum transaction, the user will be given an expected fee for the transaction. Say you are about to transfer some Ethereum into your friend’s account and you are given an expected transaction fee of 3 USD. Because the market changes quickly, the gas prices could sky-rocket, and the transaction fee is now 9 USD. In such cases you will receive an error message.
 
-The reason why is because Boba is looking out for you. Before that unexpectedly expensive payment goes through, Boba will throw an error and prevent the payment from going through to make sure you aren’t paying more than you should be. If the transaction fee is at least three times what the expected cost was (in our example, your transaction fee of 3 USD jumped to 9 USD), the transaction will fail before you’re faced with that kind of payment.
+Here, Boba is looking out for you. Before that unexpected increased fee goes through, Boba throws an error message and prevents the payment from going through. If the transaction fee is at least three times what the expected cost was (in this example, your transaction fee of 3 USD jumped to 9 USD), the transaction will fail and saves you from the increased fee.
 
 [Read up on the documentation](https://docs.boba.network/for-developers/fee-scheme#for-frontend-and-wallet-developers) to find out more.
 
-## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of just only 11,000,000 makes it impossible to deploy a DEX smart contract. What can I do to deploy the DEX on Boba?
+## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of only 11,000,000 makes it impossible to deploy a DEX smart contract. What can I do to deploy the DEX on Boba?
 
-Try to increase SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html), or break down contracts into smaller chunks.
+Try to increase SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html). In addition, you can break down contracts into smaller chunks.
+
+## I am trying to deploy a smart contract to Boba Rinkeby with Remix but get this error:
+
+`"creation of SCContract errored: [ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"}}}'`
+
+As mentioned above, try to increase SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html), or break down contracts into smaller chunks.
 
 ## How can I pay for fees with Boba via an API?
 
-Below is the js code needed to utilize the Boba API:
+Here is the js code needed to utilize the Boba API:
 
 ```
 const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
    await registerTx.wait()
 ```
 
-## In the other blockchains that an initial coin offering (ICO) was made on, the payment coin was the blockchain’s default gas coin. Howvere, in Boba’s case, the coin seems to be Ethereum. Shouldn’t the option to pay via Boba token be added as well?
+## In the other blockchains where an initial coin offering (ICO) was made, the payment coin was the blockchain’s default gas coin. However, in Boba’s case, the coin seems to be Ethereum. Shouldn’t the option to pay via Boba token be added as well?
 
 Boba Network fees can be paid either in Boba token, or in Eth. It is your choice to decide which to use.
 
-## How is the fee calculated and converted to Boba, and the discount added, when making a transaction and paying transaction fees with Boba?
+## How is the fee calculated and converted to Boba (and the discount added), when making a transaction and paying transaction fees with Boba?
 
 When making a transaction on Boba and paying the transaction fee, the fee is first calculated in eth at a gas price of 1 gwei. This fee is then converted to Boba with a 25% discount.
 
@@ -241,7 +259,7 @@ Optimization does not mean that there’s a limit set to the number of transacti
 
 [Check out Solidity’s official documentation for more information.](https://blog.soliditylang.org/2020/11/04/solidity-ama-1-recap/)
 
-You can also [read up on using compilers and optimization options](https://docs.soliditylang.org/en/v0.8.4/using-the-compiler.html#optimizer-options) in Solidity’s documentation as well.
+You can also [look into using compilers and optimization options](https://docs.soliditylang.org/en/v0.8.4/using-the-compiler.html#optimizer-options) in Solidity’s documentation.
 
 ## Does Boba Network have a public TheGraph Node for deploying Subgraphs?
 
@@ -255,7 +273,28 @@ There are multiple bridges available and are listed on our ecosystem page:
 
 <br/>
 
-[On the Boba Network page](https://gateway.boba.network/), click the Ecosystem link in top menu to navigate to the list available bridges.
+[On the Boba Network page](https://gateway.boba.network/), click the Ecosystem link in the top menu to navigate to the list of available bridges.
+
+## On Optimism it is possible to skip the sequencer entirely and submit transactions directly to the CanonicalTransactionChain via an Ethereum transaction. Can you do this with Boba too?
+
+Yes, its possible on Boba as well. You could submit transactions [directly on L1 by calling 'enqueue()'](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/rollup/CanonicalTransactionChain.sol#L207) on the Canonical Transaction Chain (CTC). The sequencer is forced to include your transaction on L2, but you would still need it to be up and running.
+
+## On Optimism commitments are regularly published (approximately once or twice per hour), to a smart contract on Ethereum called the StateCommitmentChain. Is the publishing frequency same for Boba?
+
+Yes, state commitments are published on L1 [approximately every hour](https://etherscan.io/address/0xdE7355C971A5B733fe2133753Abd7e5441d441Ec). This applies to under-sized batches as well, which are published after waiting an interval.
+
+## What is the duration of the fault challenge period on Boba?
+
+The fault challenge period is 7 days.
+
+## Do you have any information on bridging multiple assets in one transaction, and Liquidity Pool (LP) floating fee rate?
+
+Bridging multiple assets in one transaction and LP floating fee rate are two tweaks that have been made to the Liquidity Pool contracts.
+
+Bridging multiple assets in one transaction involves extending the LP1 contract to allow bridging eth, and/or multiple tokens, to L2 in a single transaction call. This primarily enables users to bridge gas token along with their desired token to L2 in one transaction. This is a method that is applicable only on bridging (on-ramp) through the Liquidity Pools, and works for only the tokens that the LPs support. Contract methods that enforce this bridging are: `clientDepositL1Batch()` on L1LP, and `clientPayL2Batch()` on L2LP.
+
+LP floating fee rate refers to the change in the fee logic on LPs. LP fee consists of `userRewardFee` (fee distributed to liquidity providers), and `ownerRewardFee` (fee for the owner of the contract).
+Before the change, LPs had a configurable fixed value for both these fees. After the change, the `userRewardFee` is a dynamic value that depends on the pool balance, which moves between configured min/max ranges. The `ownerRewardFeeRate` continues to be a configurable fixed value.
 
 <br/>
 
@@ -275,7 +314,7 @@ Hybrid Compute calls need to execute estimateGas first. This puts the API respon
 
 [Check out additional info in Boba examples](https://github.com/bobanetwork/boba/blob/develop/boba_examples/turing-lending/README.md).
 
-## When using the Hybrid Compute feature, the transaction on metamask pops up, and if I submit it within a few seconds, everything works. However, waiting longer and submitting results in failure. Why does this happen?
+## When using the Hybrid Compute feature, the transaction pops up on Metamask, and if I submit it within a few seconds, everything works. However, waiting longer and submitting results in failure. Why does this happen?
 
 That's because the Hybrid Compute feature puts the Hybrid Compute response in a cache bucket. Your request including a Hybrid Compute request will put the response under a cache key that expires in 5 seconds:
 
@@ -286,4 +325,3 @@ That's because the Hybrid Compute feature puts the Hybrid Compute response in a 
 ## Is it possible to hide the API Key on Boba Hybrid Compute?
 
 Not directly at the moment. We propose all authenticated calls that need API keys and similar go through a proxy/gateway that would act as an authentication layer for the caller - if that's a suitable design.
-
