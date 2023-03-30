@@ -109,6 +109,12 @@ There are [four different methods](./boba_documentation/developer/xdomain-tx-sta
 3. run a typescript `watcher`
 4. use third-party analytics
 
+## Are there any other documentation resources besides the docs on Boba Network?
+
+In addition to the docs in this [Boba Developer Docs](https://docs.boba.network/faq) space, we have some [examples](https://github.com/bobanetwork/boba/tree/develop/boba_examples) that could provide more context.
+Here is an example that shows a [user's journey setting up NFT Bridges](https://github.com/bobanetwork/boba/blob/develop/boba_examples/nft_bridging/README.md).
+
+
 </br>
 
 ## ![Developer FAQ](./boba_documentation/.gitbook/assets/developer-faq.png)
@@ -135,9 +141,17 @@ Boba network is a permission-less network and hence we cannot influence app crea
 
 Unfortunately no, not at the moment.
 
-## exceeds block gas limit"\}}}'
+## I am trying to deploy a smart contract to Boba Rinkeby with Remix but get this error:
+
+`"creation of SCContract errored: [ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"}}}'`
 
 Please see Q2 of Transactions.
+
+## Could you please explain the difference between the two mappings [mentioned in the token list](https://docs.boba.network/for-developers/exchange-integration#the-boba-token-list?
+
+Technically, an L1 token can have multiple representations on L2. This mean that an L1 token can be wrapped in distinct tokens: L2_token_A, or L2_token_B, both being valid and pointing to the same L1 token.
+But in order to standardize, the token list specifies only a single L2 token address for every corresponding L1 token.
+
 
 </br>
 
@@ -200,28 +214,28 @@ The reason why is because Boba is looking out for you. Before that unexpectedly 
 
 [Read up on the documentation](https://docs.boba.network/for-developers/fee-scheme#for-frontend-and-wallet-developers) to find out more.
 
-## The Dapp Requires an Approximate XZY Gas to Deploy, Boba's Block Gas Limit is Only 11,000,000, Making it Impossible to Deploy the DEX. What Can Be Done to Deploy the DEX on Boba?
+## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of just only 11,000,000 makes it impossible to deploy a DEX smart contract. What can I do to deploy the DEX on Boba?
 
-Try to increase higher solc optimizations. For more clarification, check out the Solidity documentation or break down contracts into smaller chunks.
+Try to increase SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html), or break down contracts into smaller chunks.
 
-## How Can I Pay for Fees with BOBA Via an API?
+## How can I pay for fees with Boba via an API?
 
-Below is the js code needed to utilize the API:
+Below is the js code needed to utilize the Boba API:
 
 ```
 const registerTx = await Boba_GasPriceOracle.useBobaAsFeeToken()
    await registerTx.wait()
 ```
 
-## In the Other Blockchains That an ICO Was Made On, the Payment Coin Was the Blockchain’s Default Gas Coin. In Boba’s Case, the Coin is Ethereum. Shouldn’t the Option to Pay via Boba Token Be Added as Well?
+## In the other blockchains that an initial coin offering (ICO) was made on, the payment coin was the blockchain’s default gas coin. Howvere, in Boba’s case, the coin seems to be Ethereum. Shouldn’t the option to pay via Boba token be added as well?
 
-Boba Network fees can be paid in Boba token and in Eth and it's in our End Users’ own discretion to decide which to use.
+Boba Network fees can be paid either in Boba token, or in Eth. It is your choice to decide which to use.
 
-## When Making a Transaction on Boba and Paying Transaction Fee with Boba, is the Fee First Calculated in ETH at a Gas Price of 1 GWEI, Then Converted to Boba With a 25% Discount?
+## How is the fee calculated and converted to Boba, and the discount added, when making a transaction and paying transaction fees with Boba?
 
-Yes, exactly!
+When making a transaction on Boba and paying the transaction fee, the fee is first calculated in eth at a gas price of 1 gwei. This fee is then converted to Boba with a 25% discount.
 
-## Do You Recommend Solidity Optimization, as the Max Value of Runs is 2^32 - 1? What Happens if the DEX Gets More Transactions Than That?
+## Since the max value of runs is 2^32 - 1, do you recommend Solidity optimization? What Happens if the DEX gets more transactions than that?
 
 Optimization does not mean that there’s a limit set to the number of transactions this DEX can process.
 
@@ -249,13 +263,17 @@ There are multiple bridges available and are listed on our ecosystem page:
 
 ## What are the limits on Hybrid Compute Web2 calls?
 
-This //docs.boba.network/turing/turing#important-properties-of-turing). Be sure to read up and check it out!
+Boba's Hybrid Compute Turing model:
+
+* limits strings returned from external endpoints to 322 characters (5*64+2=322).
+* allows only one Turing call per execution.
+* imposes a 1200 ms timeout on API responses. Hence, please make sure that API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', and could result in persistent failure of the first call to your endpoint.
 
 ## If Hybrid Compute is automatic, does that mean contract execution now waits on API response? How long can an endpoint delay execution? Won't this hit the API endpoint even in cases of Simulations/Reverts?
 
-First, [check out the documentation](https://docs.boba.network/turing/turing#important-properties-of-turing), it should clear up any confusion you may have about our Hybrid Compute.
-
 Hybrid Compute calls need to execute estimateGas first. This puts the API response in a short lived cache, out of which the result is fetched in transaction processing.
+
+[Check out additional info in Boba examples](https://github.com/bobanetwork/boba/blob/develop/boba_examples/turing-lending/README.md).
 
 ## When using the Hybrid Compute feature, the transaction on metamask pops up, and if I submit it within a few seconds, everything works. However, waiting longer and submitting results in failure. Why does this happen?
 
@@ -263,8 +281,9 @@ That's because the Hybrid Compute feature puts the Hybrid Compute response in a 
 
 `const turingCacheExpire = 5 \* time.Second`
 
-[You can see more about this in the documentation.](https://github.com/bobanetwork/boba/blob/develop/l2geth/core/vm/evm.go#L277)
+[Learn more about cache expiration.](https://github.com/bobanetwork/boba/blob/develop/l2geth/core/vm/evm.go#L277)
 
 ## Is it possible to hide the API Key on Boba Hybrid Compute?
 
 Not directly at the moment. We propose all authenticated calls that need API keys and similar go through a proxy/gateway that would act as an authentication layer for the caller - if that's a suitable design.
+
