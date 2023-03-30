@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import fs from 'fs'
 
 import { Command } from 'commander'
@@ -25,58 +27,37 @@ const CONFIG_FILE_NAME = 'workdir/bundler.config.json'
 
 export let showStackTraces = false
 
-function getCommandLineParams(programOpts: any): Partial<BundlerConfig> {
-   const params: any = {}
-  for (const bundlerConfigShapeKey in BundlerConfigShape) {
-    const optionValue = programOpts[bundlerConfigShapeKey]
-    if (optionValue != null) {
-      params[bundlerConfigShapeKey] = optionValue
-    }
-  }
-  return params as BundlerConfig
-}
-
-export async function connectContractsViaAddressManager (
-  providerL1: BaseProvider,
+export async function connectContracts(
   wallet: Wallet,
-  addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, bundlerHelper: BundlerHelper }> {
-  const addressManager = getAddressManager(providerL1, addressManagerAddress)
-
-  const bundlerHelperAddress = await addressManager.getAddress('L2_Boba_BundlerHelper')
-  const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
-
+  entryPointAddress: string
+): Promise<{ entryPoint: EntryPoint }> {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-
-  const bundlerHelper = BundlerHelper__factory.connect(bundlerHelperAddress, wallet)
-
   return {
     entryPoint,
-    bundlerHelper
-  }
-}
-
-export async function connectContracts (
-  wallet: Wallet,
-  entryPointAddress: string): Promise<{ entryPoint: EntryPoint }> {
-  const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-  return {
-    entryPoint
   }
 }
 
 /**
  * start the bundler server.
  * this is an async method, but only to resolve configuration. after it returns, the server is only active after asyncInit()
+ *
  * @param argv
  * @param overrideExit
  */
-export async function runBundler (argv: string[], overrideExit = true): Promise<BundlerServer> {
+export async function runBundler(
+  argv: string[],
+  overrideExit = true
+): Promise<BundlerServer> {
   const program = new Command()
 
   if (overrideExit) {
-    (program as any)._exit = (exitCode: any, code: any, message: any) => {
+    ;(program as any)._exit = (exitCode: any, code: any, message: any) => {
       class CommandError extends Error {
-        constructor (message: string, readonly code: any, readonly exitCode: any) {
+        constructor(
+          message: string,
+          readonly code: any,
+          readonly exitCode: any
+        ) {
           super(message)
         }
       }
@@ -89,19 +70,30 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .version(erc4337RuntimeVersion)
     .option('--beneficiary <string>', 'address to receive funds')
     .option('--gasFactor <number>', '', '1')
-    .option('--minBalance <number>', 'below this signer balance, keep fee for itself, ignoring "beneficiary" address ')
+    .option(
+      '--minBalance <number>',
+      'below this signer balance, keep fee for itself, ignoring "beneficiary" address '
+    )
     .option('--network <string>', 'network name or url')
     .option('--mnemonic <file>', 'mnemonic/private-key file of signer account')
-    .option('--entryPoint <string>', 'address of the supported EntryPoint contract')
+    .option(
+      '--entryPoint <string>',
+      'address of the supported EntryPoint contract'
+    )
     .option('--port <number>', 'server listening port', '3000')
     .option('--config <string>', 'path to config file', CONFIG_FILE_NAME)
-    .option('--auto', 'automatic bundling (bypass config.autoBundleMempoolSize)', false)
-    .option('--unsafe', 'UNSAFE mode: no storage or opcode checks (safe mode requires geth)')
+    .option(
+      '--auto',
+      'automatic bundling (bypass config.autoBundleMempoolSize)',
+      false
+    )
+    .option(
+      '--unsafe',
+      'UNSAFE mode: no storage or opcode checks (safe mode requires geth)'
+    )
     .option('--conditionalRpc', 'Use eth_sendRawTransactionConditional RPC)')
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
-    .option('--addressManager <string>', 'address of the Address Manager', '')
-    .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
@@ -113,7 +105,9 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     const mnemonicFile = config.mnemonic
     console.log('Creating mnemonic in file', mnemonicFile)
     if (fs.existsSync(mnemonicFile)) {
-      throw new Error(`Can't --createMnemonic: out file ${mnemonicFile} already exists`)
+      throw new Error(
+        `Can't --createMnemonic: out file ${mnemonicFile} already exists`
+      )
     }
     const newMnemonic = Wallet.createRandom().mnemonic.phrase
     fs.writeFileSync(mnemonicFile, newMnemonic)
@@ -123,38 +117,39 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
 
   const {
     // name: chainName,
-    chainId
+    chainId,
   } = await provider.getNetwork()
 
   if (chainId === 31337 || chainId === 1337) {
-    await new DeterministicDeployer(provider as any).deterministicDeploy(EntryPoint__factory.bytecode)
-  }
-  let methodHandler: UserOpMethodHandler
-  if (config.addressManager.length > 0) {
-    const { entryPoint } = await connectContractsViaAddressManager(providerL1, wallet, config.addressManager)
-    config.entryPoint = entryPoint.address
-    methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
-  } else {
-    const { entryPoint } = await connectContracts(wallet, config.entryPoint, config.helper)
-    methodHandler = new UserOpMethodHandler(provider, wallet, config, entryPoint)
+    await new DeterministicDeployer(provider as any).deterministicDeploy(
+      EntryPoint__factory.bytecode
+    )
   }
 
-  if (config.conditionalRpc && !await supportsRpcMethod(provider as any, 'eth_sendRawTransactionConditional')) {
-    console.error('FATAL: --conditionalRpc requires a node that support eth_sendRawTransactionConditional')
+  if (
+    config.conditionalRpc &&
+    !(await supportsRpcMethod(
+      provider as any,
+      'eth_sendRawTransactionConditional'
+    ))
+  ) {
+    console.error(
+      'FATAL: --conditionalRpc requires a node that support eth_sendRawTransactionConditional'
+    )
     process.exit(1)
   }
-  if (!config.unsafe && !await isGeth(provider as any)) {
-    console.error('FATAL: full validation requires GETH. for local UNSAFE mode: use --unsafe')
+  if (!config.unsafe && !(await isGeth(provider as any))) {
+    console.error(
+      'FATAL: full validation requires GETH. for local UNSAFE mode: use --unsafe'
+    )
     process.exit(1)
   }
 
-  const {
-    entryPoint
-  } = await connectContracts(wallet, config.entryPoint)
+  const { entryPoint } = await connectContracts(wallet, config.entryPoint)
 
   // bundleSize=1 replicate current immediate bundling mode
   const execManagerConfig = {
-    ...config
+    ...config,
     // autoBundleMempoolSize: 0
   }
   if (programOpts.auto === true) {
@@ -162,7 +157,8 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     execManagerConfig.autoBundleInterval = 0
   }
 
-  const [execManager, eventsManager, reputationManager, mempoolManager] = initServer(execManagerConfig, entryPoint.signer)
+  const [execManager, eventsManager, reputationManager, mempoolManager] =
+    initServer(execManagerConfig, entryPoint.signer)
   const methodHandler = new UserOpMethodHandler(
     execManager,
     provider,
@@ -171,7 +167,12 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     entryPoint
   )
   eventsManager.initEventListener()
-  const debugHandler = new DebugMethodHandler(execManager, eventsManager, reputationManager, mempoolManager)
+  const debugHandler = new DebugMethodHandler(
+    execManager,
+    eventsManager,
+    reputationManager,
+    mempoolManager
+  )
 
   const bundlerServer = new BundlerServer(
     methodHandler,
@@ -182,13 +183,19 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
   )
 
   void bundlerServer.asyncStart().then(async () => {
-    console.log('Bundle interval (seconds)', execManagerConfig.autoBundleInterval)
-    console.log('connected to network', await provider.getNetwork().then(net => {
-      return {
-        name: net.name,
-        chainId: net.chainId
-      }
-    }))
+    console.log(
+      'Bundle interval (seconds)',
+      execManagerConfig.autoBundleInterval
+    )
+    console.log(
+      'connected to network',
+      await provider.getNetwork().then((net) => {
+        return {
+          name: net.name,
+          chainId: net.chainId,
+        }
+      })
+    )
     console.log(`running on http://localhost:${config.port}/rpc`)
   })
 

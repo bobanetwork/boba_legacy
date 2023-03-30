@@ -22,7 +22,7 @@
     "@boba/accountabstraction": "^1.0.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.5.0",
-    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts": "^4.7.3",
     "ethers": "^5.7.0"
   },
   "devDependencies": {

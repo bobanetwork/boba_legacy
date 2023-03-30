@@ -3,16 +3,23 @@
 // should NOT "require" anything, or use logs.
 // see LogTrace for valid types (but alas, this one must be javascript, not typescript..
 
-import { LogCallFrame, LogContext, LogDb, LogFrameResult, LogStep, LogTracer } from './GethTracer'
+import {
+  LogCallFrame,
+  LogContext,
+  LogDb,
+  LogFrameResult,
+  LogStep,
+  LogTracer,
+} from './GethTracer'
 
 // functions available in a context of geth tracer
-declare function toHex (a: any): string
+declare function toHex(a: any): string
 
-declare function toWord (a: any): string
+declare function toWord(a: any): string
 
-declare function toAddress (a: any): string
+declare function toAddress(a: any): string
 
-declare function isPrecompiled (addr: any): boolean
+declare function isPrecompiled(addr: any): boolean
 
 /**
  * return type of our BundlerCollectorTracer.
@@ -88,7 +95,7 @@ interface BundlerCollectorTracer extends LogTracer, BundlerCollectorReturn {
  *  calls: for each call, an array of [type, from, to, value]
  *  slots: accessed slots (on any address)
  */
-export function bundlerCollectorTracer (): BundlerCollectorTracer {
+export function bundlerCollectorTracer(): BundlerCollectorTracer {
   return {
     numberLevels: [],
     currentLevel: null as any,
@@ -99,21 +106,30 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
     lastOp: '',
     numberCounter: 0,
 
-    fault (log: LogStep, db: LogDb): void {
-      this.debug.push('fault depth=', log.getDepth(), ' gas=', log.getGas(), ' cost=', log.getCost(), ' err=', log.getError())
+    fault(log: LogStep, db: LogDb): void {
+      this.debug.push(
+        'fault depth=',
+        log.getDepth(),
+        ' gas=',
+        log.getGas(),
+        ' cost=',
+        log.getCost(),
+        ' err=',
+        log.getError()
+      )
     },
 
-    result (ctx: LogContext, db: LogDb): BundlerCollectorReturn {
+    result(ctx: LogContext, db: LogDb): BundlerCollectorReturn {
       return {
         numberLevels: this.numberLevels,
         keccak: this.keccak,
         logs: this.logs,
         calls: this.calls,
-        debug: this.debug // for internal debugging.
+        debug: this.debug, // for internal debugging.
       }
     },
 
-    enter (frame: LogCallFrame): void {
+    enter(frame: LogCallFrame): void {
       // this.debug.push('enter gas=', frame.getGas(), ' type=', frame.getType(), ' to=', toHex(frame.getTo()), ' in=', toHex(frame.getInput()).slice(0, 500))
       this.calls.push({
         type: frame.getType(),
@@ -121,22 +137,22 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
         to: toHex(frame.getTo()),
         method: toHex(frame.getInput()).slice(0, 10),
         gas: frame.getGas(),
-        value: frame.getValue()
+        value: frame.getValue(),
       })
     },
-    exit (frame: LogFrameResult): void {
+    exit(frame: LogFrameResult): void {
       this.calls.push({
         type: frame.getError() != null ? 'REVERT' : 'RETURN',
         gasUsed: frame.getGasUsed(),
-        data: toHex(frame.getOutput()).slice(0, 1000)
+        data: toHex(frame.getOutput()).slice(0, 1000),
       })
     },
 
     // increment the "key" in the list. if the key is not defined yet, then set it to "1"
-    countSlot (list: { [key: string]: number | undefined }, key: any) {
+    countSlot(list: { [key: string]: number | undefined }, key: any) {
       list[key] = (list[key] ?? 0) + 1
     },
-    step (log: LogStep, db: LogDb): any {
+    step(log: LogStep, db: LogDb): any {
       const opcode = log.op.toString()
       // this.debug.push(this.lastOp + '-' + opcode + '-' + log.getDepth() + '-' + log.getGas() + '-' + log.getCost())
       if (log.getGas() < log.getCost()) {
@@ -154,29 +170,36 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
           this.calls.push({
             type: opcode,
             gasUsed: 0,
-            data
+            data,
           })
         }
       }
 
-      if (opcode.match(/^(EXT.*|CALL|CALLCODE|DELEGATECALL|STATICCALL)$/) != null) {
+      if (
+        opcode.match(/^(EXT.*|CALL|CALLCODE|DELEGATECALL|STATICCALL)$/) != null
+      ) {
         // this.debug.push('op=' + opcode + ' last=' + this.lastOp + ' stacksize=' + log.stack.length())
         const idx = opcode.startsWith('EXT') ? 0 : 1
         const addr = toAddress(log.stack.peek(idx).toString(16))
         const addrHex = toHex(addr)
-        if ((this.currentLevel.contractSize[addrHex] ?? 0) === 0 && !isPrecompiled(addr)) {
+        if (
+          (this.currentLevel.contractSize[addrHex] ?? 0) === 0 &&
+          !isPrecompiled(addr)
+        ) {
           this.currentLevel.contractSize[addrHex] = db.getCode(addr).length
         }
       }
 
       if (log.getDepth() === 1) {
         // NUMBER opcode at top level split levels
-        if (opcode === 'NUMBER') this.numberCounter++
+        if (opcode === 'NUMBER') {
+          this.numberCounter++
+        }
         if (this.numberLevels[this.numberCounter] == null) {
           this.currentLevel = this.numberLevels[this.numberCounter] = {
             access: {},
             opcodes: {},
-            contractSize: {}
+            contractSize: {},
           }
         }
         this.lastOp = ''
@@ -189,7 +212,11 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
       }
       if (opcode !== 'GAS') {
         // ignore "unimportant" opcodes:
-        if (opcode.match(/^(DUP\d+|PUSH\d+|SWAP\d+|POP|ADD|SUB|MUL|DIV|EQ|LTE?|S?GTE?|SLT|SH[LR]|AND|OR|NOT|ISZERO)$/) == null) {
+        if (
+          opcode.match(
+            /^(DUP\d+|PUSH\d+|SWAP\d+|POP|ADD|SUB|MUL|DIV|EQ|LTE?|S?GTE?|SLT|SH[LR]|AND|OR|NOT|ISZERO)$/
+          ) == null
+        ) {
           this.countSlot(this.currentLevel.opcodes, opcode)
         }
       }
@@ -204,7 +231,7 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
         if (access == null) {
           access = {
             reads: {},
-            writes: {}
+            writes: {},
           }
           this.currentLevel.access[addrHex] = access
         }
@@ -241,9 +268,9 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
         const data = toHex(log.memory.slice(ofs, ofs + len))
         this.logs.push({
           topics,
-          data
+          data,
         })
       }
-    }
+    },
   }
 }

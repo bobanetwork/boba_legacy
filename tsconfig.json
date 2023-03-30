@@ -10,6 +10,7 @@
     "noImplicitAny": false,
     "removeComments": true,
     "noLib": false,
+    "composite": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "typeRoots": [

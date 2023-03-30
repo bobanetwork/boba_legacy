@@ -1,9 +1,10 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { EntryPoint } from '@boba/accountabstraction'
 import { ReputationManager } from './ReputationManager'
 import { BigNumber, BigNumberish, BytesLike, ethers } from 'ethers'
 import { requireCond, RpcError } from '../utils'
 import { AddressZero, decodeErrorReason } from '@boba/bundler_utils'
-import { calcPreVerificationGas } from '@boba/bundler_sdk/dist/src/calcPreVerificationGas'
+import { calcPreVerificationGas } from '@boba/bundler_sdk/dist/calcPreVerificationGas'
 import { parseScannerResult } from '../parseScannerResult'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import {

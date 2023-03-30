@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { UserOperationStruct } from '@boba/accountabstraction'
 import { NotPromise, packUserOp } from '@boba/bundler_utils'
 import { arrayify, hexlify } from 'ethers/lib/utils'
@@ -48,36 +49,39 @@ export const DefaultGasOverheads: GasOverheads = {
   zeroByte: 4,
   nonZeroByte: 16,
   bundleSize: 1,
-  sigSize: 65
+  sigSize: 65,
 }
 
 /**
  * calculate the preVerificationGas of the given UserOperation
  * preVerificationGas (by definition) is the cost overhead that can't be calculated on-chain.
  * it is based on parameters that are defined by the Ethereum protocol for external transactions.
+ *
  * @param userOp filled userOp to calculate. The only possible missing fields can be the signature and preVerificationGas itself
  * @param overheads gas overheads to use, to override the default values
  */
-export function calcPreVerificationGas (userOp: Partial<NotPromise<UserOperationStruct>>, overheads?: Partial<GasOverheads>): number {
+export function calcPreVerificationGas(
+  userOp: Partial<NotPromise<UserOperationStruct>>,
+  overheads?: Partial<GasOverheads>
+): number {
   const ov = { ...DefaultGasOverheads, ...(overheads ?? {}) }
   const p: NotPromise<UserOperationStruct> = {
     // dummy values, in case the UserOp is incomplete.
     preVerificationGas: 21000, // dummy value, just for calldata cost
     signature: hexlify(Buffer.alloc(ov.sigSize, 1)), // dummy signature
-    ...userOp
+    ...userOp,
   } as any
 
-  if (p.signature === '') {
-    p.signature = hexlify(Buffer.alloc(ov.sigSize, 1))
-  }
   const packed = arrayify(packUserOp(p, false))
   const lengthInWord = (packed.length + 31) / 32
-  const callDataCost = packed.map(x => x === 0 ? ov.zeroByte : ov.nonZeroByte).reduce((sum, x) => sum + x)
+  const callDataCost = packed
+    .map((x) => (x === 0 ? ov.zeroByte : ov.nonZeroByte))
+    .reduce((sum, x) => sum + x)
   const ret = Math.round(
     callDataCost +
-    ov.fixed / ov.bundleSize +
-    ov.perUserOp +
-    ov.perUserOpWord * lengthInWord
+      ov.fixed / ov.bundleSize +
+      ov.perUserOp +
+      ov.perUserOpWord * lengthInWord
   )
   return ret
 }
