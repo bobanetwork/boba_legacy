@@ -26,7 +26,7 @@ const CONFIG_FILE_NAME = 'workdir/bundler.config.json'
 export let showStackTraces = false
 
 function getCommandLineParams(programOpts: any): Partial<BundlerConfig> {
-  const params: any = {}
+   const params: any = {}
   for (const bundlerConfigShapeKey in BundlerConfigShape) {
     const optionValue = programOpts[bundlerConfigShapeKey]
     if (optionValue != null) {
@@ -100,6 +100,8 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .option('--conditionalRpc', 'Use eth_sendRawTransactionConditional RPC)')
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
+    .option('--addressManager <string>', 'address of the Address Manager', '')
+    .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces

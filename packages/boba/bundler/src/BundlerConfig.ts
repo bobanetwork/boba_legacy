@@ -11,7 +11,6 @@ export interface BundlerConfig {
   port: string
   unsafe: boolean
   conditionalRpc: boolean
-
   whitelist?: string[]
   blacklist?: string[]
   maxBundleGas: number
@@ -19,6 +18,8 @@ export interface BundlerConfig {
   minUnstakeDelay: number
   autoBundleInterval: number
   autoBundleMempoolSize: number
+  addressManager: string
+  l1NodeWeb3Url: string
 }
 
 // TODO: implement merging config (args -> config.js -> default) and runtime shape validation
@@ -32,14 +33,15 @@ export const BundlerConfigShape = {
   port: ow.string,
   unsafe: ow.boolean,
   conditionalRpc: ow.boolean,
-
   whitelist: ow.optional.array.ofType(ow.string),
   blacklist: ow.optional.array.ofType(ow.string),
   maxBundleGas: ow.number,
   minStake: ow.string,
   minUnstakeDelay: ow.number,
   autoBundleInterval: ow.number,
-  autoBundleMempoolSize: ow.number
+  autoBundleMempoolSize: ow.number,
+  addressManager: ow.string,
+  l1NodeWeb3Url: ow.string,
 }
 
 // TODO: consider if we want any default fields at all
