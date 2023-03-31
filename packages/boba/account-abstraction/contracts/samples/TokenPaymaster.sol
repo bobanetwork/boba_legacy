@@ -4,14 +4,13 @@ pragma solidity ^0.8.12;
 /* solhint-disable reason-string */
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./SimpleAccount.sol";
 import "../core/BasePaymaster.sol";
 
 /**
- * A sample paymaster that define itself as a token to pay for gas.
+ * A sample paymaster that defines itself as a token to pay for gas.
  * The paymaster IS the token to use, since a paymaster cannot use an external contract.
  * Also, the exchange rate has to be fixed, since it can't reference an external Uniswap or other exchange contract.
- * subclass should override "getTokenValueOfEth to provide actual token exchange rate, settable by the owner.
+ * subclass should override "getTokenValueOfEth" to provide actual token exchange rate, settable by the owner.
  * Known Limitation: this paymaster is exploitable when put into a batch with multiple ops (of different accounts):
  * - while a single op can't exploit the paymaster (if postOp fails to withdraw the tokens, the user's op is reverted,
  *   and then we know we can withdraw the tokens), multiple ops with different senders (all using this paymaster)
@@ -24,10 +23,10 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
     //calculated cost of the postOp
     uint256 constant public COST_OF_POST = 15000;
 
-    address public theDeployer;
+    address public immutable theFactory;
 
-    constructor(address accountDeployer, string memory _symbol, IEntryPoint _entryPoint) ERC20(_symbol, _symbol) BasePaymaster(_entryPoint) {
-        theDeployer = accountDeployer;
+    constructor(address accountFactory, string memory _symbol, IEntryPoint _entryPoint) ERC20(_symbol, _symbol) BasePaymaster(_entryPoint) {
+        theFactory = accountFactory;
         //make it non-empty
         _mint(address(this), 1);
 
@@ -36,7 +35,11 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
     }
 
 
-    //helpers for owner, to mint and withdraw tokens.
+    /**
+     * helpers for owner, to mint and withdraw tokens.
+     * @param recipient - the address that will receive the minted tokens.
+     * @param amount - the amount it will receive.
+     */
     function mintTokens(address recipient, uint256 amount) external onlyOwner {
         _mint(recipient, amount);
     }
@@ -54,7 +57,7 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
         _approve(address(this), newOwner, type(uint).max);
     }
 
-    //TODO: this method assumes a fixed ratio of token-to-eth. subclass should override to supply oracle
+    //Note: this method assumes a fixed ratio of token-to-eth. subclass should override to supply oracle
     // or a setter.
     function getTokenValueOfEth(uint256 valueEth) internal view virtual returns (uint256 valueToken) {
         return valueEth / 100;
@@ -62,13 +65,12 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
 
     /**
       * validate the request:
-      * if this is a constructor call, make sure it is a known account (that is, a contract that
-      * we trust that in its constructor will set
+      * if this is a constructor call, make sure it is a known account.
       * verify the sender has enough tokens.
       * (since the paymaster is also the token, there is no notion of "approval")
       */
-    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 /*userOpHash*/, uint256 requiredPreFund)
-    external view override returns (bytes memory context, uint256 deadline) {
+    function _validatePaymasterUserOp(UserOperation calldata userOp, bytes32 /*userOpHash*/, uint256 requiredPreFund)
+    internal view override returns (bytes memory context, uint256 validationData) {
         uint256 tokenPrefund = getTokenValueOfEth(requiredPreFund);
 
         // verificationGasLimit is dual-purposed, as gas limit for postOp. make sure it is high enough
@@ -87,12 +89,10 @@ contract TokenPaymaster is BasePaymaster, ERC20 {
     }
 
     // when constructing an account, validate constructor code and parameters
-    // this code highly dependent on the deployer we use.
-    // our deployer has a method deploy(bytes,salt)
+    // we trust our factory (and that it doesn't have any other public methods)
     function _validateConstructor(UserOperation calldata userOp) internal virtual view {
-        //we trust a specific deployer contract
-        address deployer = address(bytes20(userOp.initCode[0 : 20]));
-        require(deployer == theDeployer, "TokenPaymaster: wrong account deployer");
+        address factory = address(bytes20(userOp.initCode[0 : 20]));
+        require(factory == theFactory, "TokenPaymaster: wrong account factory");
     }
 
     /**
