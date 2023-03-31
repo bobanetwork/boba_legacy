@@ -178,17 +178,17 @@ RUN chmod +x ./scripts/wait-for-l1-and-l2.sh
 RUN chmod +x ./scripts/deployer.sh
 ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
 
-# FROM packages as bundler
-# COPY --from=builder /opt/optimism/packages/boba/bundler /opt/optimism/packages/boba/bundler
-# COPY --from=builder /opt/optimism/packages/boba/account-abstraction /opt/optimism/packages/boba/account-abstraction
-# COPY --from=builder /opt/optimism/packages/boba/bundler_sdk /opt/optimism/packages/boba/bundler_sdk
-# COPY --from=builder /opt/optimism/packages/boba/bundler_utils /opt/optimism/packages/boba/bundler_utils
-# WORKDIR /opt/optimism/packages/boba/bundler
-# RUN npx webpack
-# RUN rm -rf /opt/optimism/packages/boba/account-abstraction
-# RUN rm -rf /opt/optimism/packages/boba/bundler_sdk
-# RUN rm -rf /opt/optimism/packages/boba/bundler_utils
-# RUN rm -rf /opt/optimism/packages/boba/bundler/node_modules
-# RUN chmod +x ./wait-for-l1-and-l2.sh
-# RUN chmod +x ./bundler.sh
-# ENTRYPOINT ["./wait-for-l1-and-l2.sh", "./bundler.sh"]
+FROM packages as bundler
+COPY --from=builder /opt/optimism/packages/boba/bundler /opt/optimism/packages/boba/bundler
+COPY --from=builder /opt/optimism/packages/boba/account-abstraction /opt/optimism/packages/boba/account-abstraction
+COPY --from=builder /opt/optimism/packages/boba/bundler_sdk /opt/optimism/packages/boba/bundler_sdk
+COPY --from=builder /opt/optimism/packages/boba/bundler_utils /opt/optimism/packages/boba/bundler_utils
+WORKDIR /opt/optimism/packages/boba/bundler
+RUN npx webpack
+RUN rm -rf /opt/optimism/packages/boba/account-abstraction
+RUN rm -rf /opt/optimism/packages/boba/bundler_sdk
+RUN rm -rf /opt/optimism/packages/boba/bundler_utils
+RUN rm -rf /opt/optimism/packages/boba/bundler/node_modules
+RUN chmod +x ./wait-for-l1-and-l2.sh
+RUN chmod +x ./bundler.sh
+ENTRYPOINT ["./wait-for-l1-and-l2.sh", "./bundler.sh"]
