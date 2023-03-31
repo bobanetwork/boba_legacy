@@ -12,7 +12,7 @@ import { EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
 
 import { initServer } from './modules/initServer'
 import { DebugMethodHandler } from './DebugMethodHandler'
-import { DeterministicDeployer } from '@boba/bundler_sdk'
+import { DeterministicDeployer } from '../../bundler_sdk/dist'
 import { isGeth, supportsRpcMethod } from './utils'
 import { resolveConfiguration } from './Config'
 
