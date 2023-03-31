@@ -3,9 +3,7 @@ description: Frequently asked questions
 ---
 # FAQ
 
-<a href="link" style="text-align:center">
-  <img src="../boba/boba_documentation/.gitbook/assets/what-is-boba-network.png" align="center">
-</a>
+![What is Boba Network](./boba_documentation/.gitbook/assets/what-is-boba-network.png)
 
 <br/>
 
@@ -88,9 +86,9 @@ const decimals = await this.ERC20_Contract.attach(tokenAddress).connect(this.L2P
 
 ## Why is the incentive contract for verification proofs disabled?
 
-In the current release of the Boba Network protocol, there may be rare cases where the Sequencer submits a state root (transaction result), that is invalid and hence could be challenged. As a result, we have not yet deployed the [Bond Manager](./packages/contracts/contracts/contracts/L1/verification/BondManager.sol) contract which compensates Verifier nodes for gas spent when submitting state root challenges. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
+In the current release of the Boba Network protocol, there may be rare cases where the Sequencer submits a state root (transaction result), that is invalid and hence could be challenged. As a result, we have not yet deployed the [Bond Manager](./packages/contracts/contracts/L1/verification/BondManager.sol) contract which compensates Verifier nodes for gas spent when submitting state root challenges. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
 
-## Does Boba operate the only "Sequencer" node?
+## Does Boba operate the only _Sequencer_ node?
 
 A Sequencer node is a special node in an Optimistic Ethereum network that can order transactions on short timescales (on the order of minutes). This opens up the door to very fast transaction confirmation times with strong guarantees about finality. Eventually, the operator of the Sequencer node on a network will be determined by some governing mechanism. For now, Boba Network operates the only such node.
 
@@ -121,7 +119,9 @@ Here is an example that shows a [user's journey setting up NFT Bridges](https://
 
 Yes, we are working towards supporting Bedrock in the future.
 
-## Could you tell me the main purpose of `DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` contracts, and how each of them interact with the existing system?
+## Could you tell me the main purpose of these three contracts and how each of them interact with the existing system?
+
+`DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol`
 
 In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 ourselves. All three of the contracts: `DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` are a way to compensate for the cost of relaying transactions on L1. However, they do not subsidize and take back the costs from the user.
 
@@ -133,6 +133,7 @@ This again serves the purpose of voluntary collection.
 </br>
 
 ## ![Developer FAQ](./boba_documentation/.gitbook/assets/developer-faq.png)
+---
 
 ![Smart Contracts](./boba_documentation/.gitbook/assets/smart-contracts.png)
 
@@ -156,7 +157,7 @@ Boba network is a permission-less network and hence we cannot influence app crea
 
 Unfortunately no, not at the moment.
 
-## Could you please explain the difference between the two mappings [mentioned in the token list](https://docs.boba.network/for-developers/exchange-integration#the-boba-token-list?)
+## Could you please explain the difference between the two mappings [mentioned in the token list](https://docs.boba.network/for-developers/exchange-integration#the-boba-token-list?)?
 
 Technically, an L1 token can have multiple representations on L2. This mean that an L1 token can be wrapped in distinct tokens: L2_token_A, or L2_token_B, both being valid and point to the same L1 token.
 But in order to standardize, the token list specifies only a single L2 token address for every corresponding L1 token.
@@ -224,7 +225,7 @@ When you make an Ethereum transaction, the user will be given an expected fee fo
 
 Here, Boba is looking out for you. Before that unexpected increased fee goes through, Boba throws an error message and prevents the payment from going through. If the transaction fee is at least three times what the expected cost was (in this example, your transaction fee of 3 USD jumped to 9 USD), the transaction will fail and saves you from the increased fee.
 
-[Read up on the documentation](https://docs.boba.network/for-developers/fee-scheme#for-frontend-and-wallet-developers) to find out more.
+[Here's more info on fees](https://docs.boba.network/for-developers/fee-scheme#for-frontend-and-wallet-developers).
 
 ## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of only 11,000,000 makes it impossible to deploy a DEX smart contract. What can I do to deploy the DEX on Boba?
 
@@ -263,7 +264,7 @@ You can also [look into using compilers and optimization options](https://docs.s
 
 ## Does Boba Network have a public TheGraph Node for deploying Subgraphs?
 
-Please refer to the Boba docs on using The Graph (https://docs.boba.network/for-developers/subgraph).
+[Please refer to the Boba docs on using The Graph](https://docs.boba.network/for-developers/subgraph).
 
 ## Which bridge does Boba Network use?
 
@@ -279,7 +280,7 @@ There are multiple bridges available and are listed on our ecosystem page:
 
 Yes, its possible on Boba as well. You could submit transactions [directly on L1 by calling 'enqueue()'](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/rollup/CanonicalTransactionChain.sol#L207) on the Canonical Transaction Chain (CTC). The sequencer is forced to include your transaction on L2, but you would still need it to be up and running.
 
-## On Optimism commitments are regularly published (approximately once or twice per hour), to a smart contract on Ethereum called the StateCommitmentChain. Is the publishing frequency same for Boba?
+## On Optimism, commitments are regularly published (approximately once or twice per hour), to a smart contract on Ethereum called the StateCommitmentChain. Is the publishing frequency same for Boba?
 
 Yes, state commitments are published on L1 [approximately every hour](https://etherscan.io/address/0xdE7355C971A5B733fe2133753Abd7e5441d441Ec). This applies to under-sized batches as well, which are published after waiting an interval.
 
@@ -287,7 +288,7 @@ Yes, state commitments are published on L1 [approximately every hour](https://et
 
 The fault challenge period is 7 days.
 
-## Do you have any information on bridging multiple assets in one transaction, and Liquidity Pool (LP) floating fee rate?
+## Do you have any information on bridging multiple assets in one transaction and the Liquidity Pool (LP) floating fee rate?
 
 Bridging multiple assets in one transaction and LP floating fee rate are two tweaks that have been made to the Liquidity Pool contracts.
 
