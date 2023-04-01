@@ -5,6 +5,7 @@ import { logAmount, powAmount } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
 import { openAlert, openModal } from 'actions/uiAction';
+
 import { getEarnInfo, updateStakeToken, updateWithdrawToken } from 'actions/earnAction';
 
 import Button from 'components/button/Button';
@@ -14,12 +15,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import networkService from 'services/networkService'
 
 import { getCoinImage } from 'util/coinImage';
+import MetamaskLogo from 'images/metamask.svg';
 
 import { Box, Typography, Fade, CircularProgress } from '@mui/material';
 import * as S from "./ListEarn.styles"
-import { getAllAddresses, getReward } from 'actions/networkAction';
+import { getAllAddresses, getReward, getWalletType } from 'actions/networkAction';
 import Tooltip from 'components/tooltip/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
+import { addTokenToWallet } from "util/network/addWalletToken"
+
+
+
+
+
+
 
 class ListEarn extends React.Component {
 
@@ -35,11 +44,13 @@ class ListEarn extends React.Component {
       showAll,
       showStakesOnly,
       accountEnabled,
+      chainId
     } = this.props;
 
     this.state = {
       balance,
       L1orL2Pool,
+      chainId,
       // data
       poolInfo,
       userInfo,
@@ -60,33 +71,23 @@ class ListEarn extends React.Component {
     this.props.dispatch(getAllAddresses());
   }
 
-  componentDidUpdate(prevState) {
-
-    const { poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props
-
-    if (!isEqual(prevState.poolInfo, poolInfo)) {
-      this.setState({ poolInfo });
-    }
-
-    if (!isEqual(prevState.userInfo, userInfo)) {
-      this.setState({ userInfo });
-    }
-
-    if (!isEqual(prevState.balance, balance)) {
-      this.setState({ balance });
-    }
-
-    if (!isEqual(prevState.showAll, showAll)) {
-      this.setState({ showAll });
-    }
-
-    if (!isEqual(prevState.showStakesOnly, showStakesOnly)) {
-      this.setState({ showStakesOnly });
-    }
-
-    if (prevState.accountEnabled !== accountEnabled) {
-      this.setState({ accountEnabled });
-    }
+  componentDidUpdate(prevProps, prevState) {
+    const { chainId, poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props;
+    const config = {
+      chainId,
+      poolInfo,
+      userInfo,
+      balance,
+      showAll,
+      showStakesOnly,
+      accountEnabled
+    };
+  
+    Object.keys(config).forEach(key => {
+      if (!isEqual(prevProps[key], this.props[key])) {
+        this.setState({ [key]: this.props[key] });
+      }
+    });
   }
 
   async handleStakeToken() {
@@ -155,17 +156,16 @@ class ListEarn extends React.Component {
   }
 
   render() {
-
+    const walletType = getWalletType();
     const {
       poolInfo, userInfo,
       dropDownBox, showAll, showStakesOnly,
-      loading, L1orL2Pool, accountEnabled
+      loading, L1orL2Pool, accountEnabled, chainId
     } = this.state;
 
     const pageLoading = Object.keys(poolInfo).length === 0;
 
     const { isMobile } = this.props
-
     let userReward = 0;
 
     if (Object.keys(userInfo).length && Object.keys(poolInfo).length && accountEnabled) {
@@ -207,14 +207,19 @@ class ListEarn extends React.Component {
       enableReward = true
     }
 
+
     return (
-      <S.Wrapper>
+      <S.Wrapper    
+      >
         {pageLoading ? (
           <Box sx={{ textAlign: 'center' }}>
             <CircularProgress color="secondary" />
           </Box>
         ) : (
-          <S.GridContainer container
+          <S.GridContainer 
+            sx={{ cursor:'pointer' }}               
+            onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
+            container
             spacing={2}
             direction="row"
             justifyContent="space-around"
@@ -257,12 +262,25 @@ class ListEarn extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width:'100%' }}>
                   <img src={logo} alt="logo" width={35} height={35} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
                     <Typography variant="overline" style={{ lineHeight: '1em' }}>{symbol}</Typography>
                     <Typography variant="overline" style={{ lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)' }}>{name}</Typography>
                   </div>
+                  {walletType && 
+                    <div 
+                      onClick={(e) => {addTokenToWallet(e, {
+                        symbol, 
+                        address:L1orL2Pool === 'L1LP' ? 
+                        poolInfo.l1TokenAddress : poolInfo.l2TokenAddress, 
+                        chainId:chainId,
+                        decimals:poolInfo.decimals
+                      })}}
+                      className="metamask" style={{ display: 'flex', marginLeft:'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
+                      <img src={MetamaskLogo} alt="Add to Metamask" width={20} height={20} />
+                    </div>
+                    }
                 </div>
               </S.GridItemTag>
             }
@@ -425,7 +443,6 @@ class ListEarn extends React.Component {
               >
                 <Box
                   disabled={disabled}
-                  onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
                   sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
                 >
                   {accountEnabled ? <ExpandMoreIcon /> : <></>}
@@ -443,10 +460,10 @@ class ListEarn extends React.Component {
           <Fade in={dropDownBox}>
             <S.DropdownContent>
               <S.DropdownWrapper>
-                <Typography sx={{ flex: 1 }} variant="body2" component="div">Earned</Typography>
+                <Typography sx={{ flex: 1, display:'inline-flex' }} variant="body2" component="div">Earned</Typography>
                 <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   fullWidth
                   disabled={logAmount(userReward, decimals) === '0' || disabled || !enableReward}
                   onClick={() => { this.handleHarvest() }}
@@ -460,7 +477,7 @@ class ListEarn extends React.Component {
               <S.DropdownWrapper>
                 {logAmount(userInfo.amount, decimals) === '0' ?
                   <>
-                    <Typography sx={{ flex: 1 }} variant="body2" component="div">Staked</Typography>
+                    <Typography sx={{ flex: 1, display:'inline-flex' }} variant="body2" component="div">Staked</Typography>
                     <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">0.00</Typography>
                     <Button
                       variant="outlined"

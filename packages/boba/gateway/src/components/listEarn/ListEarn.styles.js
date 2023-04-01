@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles'
 import { Box, Divider, Grid } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
-  borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
+  borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #1a1c1e',
   borderRadius: '0',
   background: theme.palette.background.glassy,
   [theme.breakpoints.down('md')]: {
@@ -19,11 +19,21 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
 export const GridContainer = styled(Grid)(({ theme }) => ({
   background: theme.palette.background.glassy,
   margin: '-10px -8px',
+  paddingBottom:'10px',
   [theme.breakpoints.down('md')]:{
     justifyContent: 'flex-start',
     width: '100%',
     margin: 'auto'
-  }
+  },
+  '&:hover': {
+    '.metamask': {
+      opacity:1,
+    }
+  },
+  '.metamask': {
+    opacity: 0,
+    transition: 'opacity 0.3s ease-in-out',
+  },
 }))
 
 export const GridItemTag = styled(Grid)(({ theme, item, ...props }) => ({
@@ -35,26 +45,26 @@ export const GridItemTag = styled(Grid)(({ theme, item, ...props }) => ({
   }
 }))
 
-export const DropdownWrapper = styled(Box)`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 5px;
-  width: 100%;
-  padding: 6px;
-  margin-top: 10px;
-  border-radius: 4px;
-  text-align: center;
-`;
+export const DropdownWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '5px',
+  width: '100%',
+  padding: '10px 15px',
+  marginTop: '10px',
+  borderRadius: '10px',
+  textAlign: 'center',
+  backgroundColor: theme.palette.background.glassy
+}));
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '80%',
+  width: '100%',
   display: 'flex',
-  justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.glassy,
+  justifyContent: 'flex-start',
   borderRadius: '20px',
   margin: '5px',
-  padding: '20px 40px',
+  padding: '10px 10px 0px 10px',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     gap: '5px',
@@ -64,7 +74,7 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
   },
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
-    gap: '16px',
+    gap: '30px',
   },
 }));
 

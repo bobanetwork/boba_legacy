@@ -47,7 +47,7 @@ function Earn() {
   const [showMSO, setShowMSO] = useState(false)
   const [lpChoice, setLpChoice] = useState(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
   const [poolTab, setPoolTab] = useState(networkService.L1orL2 === 'L1' ? 'Ethereum Pool' : 'Boba L2 Pool')
-
+  const [chainId, setChainId] = useState(1);
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -74,6 +74,10 @@ function Earn() {
     }
   }, [dispatch, baseEnabled, accountEnabled])
 
+  useEffect(()=> {
+    setChainId({L2:288, L1:1})
+  },[layer])
+
   function getBalance(address, chain) {
     if (typeof (layer1Balance) === 'undefined') return [ 0, 0 ]
     if (typeof (layer2Balance) === 'undefined') return [ 0, 0 ]
@@ -97,6 +101,7 @@ function Earn() {
 
     return [ 0, 0 ]
   }
+
 
   return (
     <S.EarnPageContainer>
@@ -289,6 +294,7 @@ function Earn() {
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
                 <ListEarn
+                  chainId={chainId.L1}
                   key={i}
                   poolInfo={poolInfo.L1LP[ v ]}
                   userInfo={userInfo.L1LP[ v ]}
@@ -310,6 +316,7 @@ function Earn() {
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
                 <ListEarn
+                  chainId={chainId.L2}
                   key={i}
                   poolInfo={poolInfo.L2LP[ v ]}
                   userInfo={userInfo.L2LP[ v ]}
