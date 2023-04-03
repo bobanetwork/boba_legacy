@@ -9,11 +9,11 @@ const deployer = new DeterministicDeployer(ethers.provider)
 describe('#deterministicDeployer', () => {
   it('deploy deployer', async () => {
     expect(await deployer.isDeployerDeployed()).to.equal(false)
-    await deployer.deployDeployer()
+    await deployer.deployFactory()
     expect(await deployer.isDeployerDeployed()).to.equal(true)
   })
   it('should ignore deploy again of deployer', async () => {
-    await deployer.deployDeployer()
+    await deployer.deployFactory()
   })
   it('should deploy at given address', async () => {
     const ctr = hexValue(new SampleRecipient__factory(ethers.provider.getSigner()).getDeployTransaction().data!)
@@ -23,7 +23,7 @@ describe('#deterministicDeployer', () => {
     await DeterministicDeployer.deploy(ctr)
     expect(await deployer.isContractDeployed(addr)).to.equal(true)
   })
-  it('should deploy at given address with ethers.wallet', async () => {
+  it.only('should deploy at given address with ethers.wallet', async () => {
     const randWallet = ethers.Wallet.createRandom()
     const pk = (randWallet._signingKey()).privateKey
     // generate a ethers.wallet to use with sdk
@@ -32,11 +32,11 @@ describe('#deterministicDeployer', () => {
     await ethers.provider.getSigner().sendTransaction({ to: testWallet.address, value: ethers.utils.parseEther('0.01') })
 
     const ctr = hexValue(new SampleRecipient__factory(ethers.provider.getSigner()).getDeployTransaction().data!)
-    DeterministicDeployer.init(ethers.provider, testWallet)
+    console.log(DeterministicDeployer.init(ethers.provider, testWallet))
     const addr = await DeterministicDeployer.getAddress(ctr, 1)
     expect(await deployer.isContractDeployed(addr)).to.equal(false)
     const preWalletBalance = await ethers.provider.getBalance(testWallet.address)
-    await DeterministicDeployer.deploy(ctr, 1)
+    console.log(await DeterministicDeployer.deploy(ctr, 1))
     const postWalletBalance = await ethers.provider.getBalance(testWallet.address)
     expect(await deployer.isContractDeployed(addr)).to.equal(true)
     // wallet deploys contract

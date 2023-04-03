@@ -2,7 +2,7 @@
   "name": "@boba/bobalink",
   "version": "1.0.0",
   "description": "BOBA Link Service",
-  "main": "dist/src/index",
+  "main": "dist/index",
   "files": [
     "dist/src/index",
     "test/**/*.ts"

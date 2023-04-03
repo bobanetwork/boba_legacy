@@ -5,13 +5,20 @@ import { Provider } from '@ethersproject/providers'
 import { Wallet, utils } from 'ethers'
 import { parseEther } from 'ethers/lib/utils'
 
-import { AddressZero, deepHexlify, erc4337RuntimeVersion } from '@boba/bundler_utils'
+import {
+  AddressZero,
+  deepHexlify,
+  erc4337RuntimeVersion,
+} from '@boba/bundler_utils'
 
 import { BundlerConfig } from './BundlerConfig'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import { Server } from 'http'
 import { RpcError } from './utils'
-import { EntryPoint__factory, UserOperationStruct } from '@boba/accountabstraction'
+import {
+  EntryPoint__factory,
+  UserOperationStruct,
+} from '@boba/accountabstraction'
 import { DebugMethodHandler } from './DebugMethodHandler'
 
 import Debug from 'debug'
@@ -21,7 +28,7 @@ export class BundlerServer {
   app: Express
   private readonly httpServer: Server
 
-  constructor (
+  constructor(
     readonly methodHandler: UserOpMethodHandler,
     readonly debugHandler: DebugMethodHandler,
     readonly config: BundlerConfig,
@@ -44,16 +51,16 @@ export class BundlerServer {
 
   startingPromise: Promise<void>
 
-  async asyncStart (): Promise<void> {
+  async asyncStart(): Promise<void> {
     await this.startingPromise
   }
 
-  async stop (): Promise<void> {
+  async stop(): Promise<void> {
     this.httpServer.close()
   }
 
-  async _preflightCheck (): Promise<void> {
-    if (await this.provider.getCode(this.config.entryPoint) === '0x') {
+  async _preflightCheck(): Promise<void> {
+    if ((await this.provider.getCode(this.config.entryPoint)) === '0x') {
       this.fatal(`entrypoint not deployed at ${this.config.entryPoint}`)
     }
 
@@ -69,39 +76,50 @@ export class BundlerServer {
       callGasLimit: 0,
       maxFeePerGas: 0,
       maxPriorityFeePerGas: 0,
-      signature: '0x'
+      signature: '0x',
     }
     // await EntryPoint__factory.connect(this.config.entryPoint,this.provider).callStatic.addStake(0)
-    const err = await EntryPoint__factory.connect(this.config.entryPoint, this.provider).callStatic.simulateValidation(emptyUserOp)
-      .catch(e => e)
+    const err = await EntryPoint__factory.connect(
+      this.config.entryPoint,
+      this.provider
+    )
+      .callStatic.simulateValidation(emptyUserOp)
+      .catch((e) => e)
     if (err?.errorName !== 'FailedOp') {
-      this.fatal(`Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`)
+      this.fatal(
+        `Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`
+      )
     }
     const bal = await this.provider.getBalance(this.wallet.address)
-    console.log('signer', this.wallet.address, 'balance', utils.formatEther(bal))
+    console.log(
+      'signer',
+      this.wallet.address,
+      'balance',
+      utils.formatEther(bal)
+    )
     if (bal.eq(0)) {
       this.fatal('cannot run with zero balance')
     } else if (bal.lt(parseEther(this.config.minBalance))) {
-      console.log('WARNING: initial balance below --minBalance ', this.config.minBalance)
+      console.log(
+        'WARNING: initial balance below --minBalance ',
+        this.config.minBalance
+      )
     }
   }
 
-  fatal (msg: string): never {
+  fatal(msg: string): never {
     console.error('FATAL:', msg)
     process.exit(1)
   }
 
-  intro (req: Request, res: Response): void {
-    res.send(`Account-Abstraction Bundler v.${erc4337RuntimeVersion}. please use "/rpc"`)
+  intro(req: Request, res: Response): void {
+    res.send(
+      `Account-Abstraction Bundler v.${erc4337RuntimeVersion}. please use "/rpc"`
+    )
   }
 
-  async rpc (req: Request, res: Response): Promise<void> {
-    const {
-      method,
-      params,
-      jsonrpc,
-      id
-    } = req.body
+  async rpc(req: Request, res: Response): Promise<void> {
+    const { method, params, jsonrpc, id } = req.body
     debug('>>', { jsonrpc, id, method, params })
     try {
       const result = deepHexlify(await this.handleMethod(method, params))
@@ -110,13 +128,13 @@ export class BundlerServer {
       res.send({
         jsonrpc,
         id,
-        result
+        result,
       })
     } catch (err: any) {
       const error = {
         message: err.message,
         data: err.data,
-        code: err.code
+        code: err.code,
       }
       console.log('failed: ', method, 'error:', JSON.stringify(error))
       debug('<<', { jsonrpc, id, error })
@@ -124,12 +142,12 @@ export class BundlerServer {
       res.send({
         jsonrpc,
         id,
-        error
+        error,
       })
     }
   }
 
-  async handleMethod (method: string, params: any[]): Promise<any> {
+  async handleMethod(method: string, params: any[]): Promise<any> {
     let result: any
     switch (method) {
       case 'eth_chainId':
@@ -141,10 +159,16 @@ export class BundlerServer {
         result = await this.methodHandler.getSupportedEntryPoints()
         break
       case 'eth_sendUserOperation':
-        result = await this.methodHandler.sendUserOperation(params[0], params[1])
+        result = await this.methodHandler.sendUserOperation(
+          params[0],
+          params[1]
+        )
         break
       case 'eth_estimateUserOperationGas':
-        result = await this.methodHandler.estimateUserOperationGas(params[0], params[1])
+        result = await this.methodHandler.estimateUserOperationGas(
+          params[0],
+          params[1]
+        )
         break
       case 'eth_getUserOperationReceipt':
         result = await this.methodHandler.getUserOperationReceipt(params[0])

@@ -8,7 +8,8 @@ const deployer = new DeterministicDeployer(ethers.provider)
 
 describe('#deterministicDeployer', () => {
   it('should ignore deploy again of deployer', async () => {
-    await deployer.deployDeployer()
+    expect(await deployer.isDeployerDeployed()).to.equal(false)
+    await deployer.deployFactory()
     expect(await deployer.isDeployerDeployed()).to.equal(true)
   })
   it('should deploy at given address', async () => {

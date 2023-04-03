@@ -61,6 +61,11 @@ commands:
           working_directory: ops
 
       - run:
+          name: Update yq
+          command: yq --version && sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod a+x /usr/local/bin/yq
+          working_directory: ops
+
+      - run:
           name: Build the side services
           command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
           working_directory: ops
@@ -254,5 +259,5 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      # - test_flow_bundler_and_depcheck
+      - test_flow_bundler_and_depcheck
 
