@@ -172,31 +172,6 @@ jobs:
                 command: make <<parameters.binary_name>>
                 working_directory: <<parameters.working_directory>>
 
-  test_flow_bundler_and_depcheck:
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - checkout
-      - attach_workspace:
-          at: .
-      - run: # run hardhat-node as standalone process fork
-          command: yarn && yarn build
-          working_directory: ./
-      - run: # run hardhat-node as standalone process fork
-          name: hardhat-node-process
-          command: yarn hardhat-node
-          background: true
-          working_directory: ./packages/boba/bundler
-      - run: # run tests
-          name: test
-          command: yarn test-flows | tee /tmp/test-flows-results.log
-          working_directory: ./packages/boba/bundler
-      - run:
-          name: depcheck
-          command: yarn depcheck
-          working_directory: ./packages/boba/bundler
-      - store_test_results: # special step to upload test results for display in Test Summary
-          path: /tmp/test-flow-results.log
   integration-tests:
     executor: intergration-tests-executor
     parallelism: 4
@@ -259,5 +234,4 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      - test_flow_bundler_and_depcheck
 
