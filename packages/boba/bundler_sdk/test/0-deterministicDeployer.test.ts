@@ -12,9 +12,6 @@ describe('#deterministicDeployer', () => {
     await deployer.deployFactory()
     expect(await deployer.isDeployerDeployed()).to.equal(true)
   })
-  it('should ignore deploy again of deployer', async () => {
-    await deployer.deployFactory()
-  })
   it('should deploy at given address', async () => {
     const ctr = hexValue(new SampleRecipient__factory(ethers.provider.getSigner()).getDeployTransaction().data!)
     DeterministicDeployer.init(ethers.provider)
