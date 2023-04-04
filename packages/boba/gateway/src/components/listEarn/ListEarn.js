@@ -25,11 +25,6 @@ import { HelpOutline } from '@mui/icons-material';
 import { addTokenToWallet } from "util/network/addWalletToken"
 
 
-
-
-
-
-
 class ListEarn extends React.Component {
 
   constructor(props) {
@@ -200,10 +195,7 @@ class ListEarn extends React.Component {
     const decimals = poolInfo.decimals
     let logo = getCoinImage(symbol)
 
-    //Deal with Token migration to REPv2
-    if (symbol === 'REPv2') {
-      logo = getCoinImage('REP')
-    }
+
 
     if (showAll === false) {
       if (Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
@@ -221,7 +213,6 @@ class ListEarn extends React.Component {
     if (Number(logAmount(userReward, decimals, 3)) >= 0.001) {
       enableReward = true
     }
-
 
     return (
       <S.Wrapper    
@@ -277,7 +268,7 @@ class ListEarn extends React.Component {
                   alignItems: 'center',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width:'100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', width:'100%' }}>
                   <img src={logo} alt="logo" width={35} height={35} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
                     <Typography variant="overline" style={{ lineHeight: '1em' }}>{symbol}</Typography>
@@ -287,7 +278,8 @@ class ListEarn extends React.Component {
                     <div 
                       onClick={(e)=> {this.handleAddWallet(e)}}
                       className="metamask" style={{ display: 'flex', marginLeft:'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
-                      <img src={MetamaskLogo} alt="Add to Metamask" width={20} height={20} />
+                      <img src={MetamaskLogo} 
+                        alt={"Add to Metamask"} width={20} height={20} />
                     </div>
                     }
                 </div>
