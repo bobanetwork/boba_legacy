@@ -160,8 +160,8 @@ class ListEarn extends React.Component {
 
     const { poolInfo, L1orL2Pool, chainId } = this.state;
     const { symbol } = poolInfo;
-    
-    addTokenToWallet({
+
+    await addTokenToWallet({
       symbol, 
       address:L1orL2Pool === 'L1LP' ? 
       poolInfo.l1TokenAddress : poolInfo.l2TokenAddress, 
