@@ -155,12 +155,27 @@ class ListEarn extends React.Component {
 
   }
 
+  async handleAddWallet(e) {
+    e.stopPropagation()
+
+    const { poolInfo, L1orL2Pool, chainId } = this.state;
+    const { symbol } = poolInfo;
+    
+    addTokenToWallet({
+      symbol, 
+      address:L1orL2Pool === 'L1LP' ? 
+      poolInfo.l1TokenAddress : poolInfo.l2TokenAddress, 
+      chainId:chainId,
+      decimals:poolInfo.decimals
+    })
+  }
+
   render() {
     const walletType = getWalletType();
     const {
       poolInfo, userInfo,
       dropDownBox, showAll, showStakesOnly,
-      loading, L1orL2Pool, accountEnabled, chainId
+      loading, L1orL2Pool, accountEnabled
     } = this.state;
 
     const pageLoading = Object.keys(poolInfo).length === 0;
@@ -270,13 +285,7 @@ class ListEarn extends React.Component {
                   </div>
                   {walletType && 
                     <div 
-                      onClick={(e) => {addTokenToWallet(e, {
-                        symbol, 
-                        address:L1orL2Pool === 'L1LP' ? 
-                        poolInfo.l1TokenAddress : poolInfo.l2TokenAddress, 
-                        chainId:chainId,
-                        decimals:poolInfo.decimals
-                      })}}
+                      onClick={(e)=> {this.handleAddWallet(e)}}
                       className="metamask" style={{ display: 'flex', marginLeft:'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
                       <img src={MetamaskLogo} alt="Add to Metamask" width={20} height={20} />
                     </div>
