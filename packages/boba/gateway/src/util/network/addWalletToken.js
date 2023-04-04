@@ -50,7 +50,6 @@ export const addWalletToken = async (token) => {
 };
 
 
-  export const addTokenToWallet = async (e, token) => {
-    e.stopPropagation()
+  export const addTokenToWallet = async (token) => {
     addWalletToken(token);
   };
