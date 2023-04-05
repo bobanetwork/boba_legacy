@@ -28,7 +28,7 @@ export const LabelContainer = styled(Box)(({ theme }) => ({
   margin: '10px 0px'
 }))
 
-export const BridgeContent = styled(Box)(({ theme, border }) => ({
+export const BridgeContent = styled(Box)(({ theme }) => ({
   borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondaryLight,
   padding: '5px 10px',

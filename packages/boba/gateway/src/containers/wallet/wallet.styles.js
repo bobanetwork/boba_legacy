@@ -36,14 +36,18 @@ export const WalletTitleContainer = styled(Box)(({ theme }) => ({
 
 export const WalletActionContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
-  justifyContent: 'flex-start',
+  justifyContent: 'space-between',
   alignItems: 'center',
   gap: '20px',
   marginBottom: '10px',
   marginTop: '10px',
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
+    gap: '5px',
     alignItems: 'flex-start',
+    'label': {
+      margin: '0'
+    }
   },
 }))
 
