@@ -14,7 +14,7 @@ import {
   MockFeedRegistry,
   TestTokenValueBobaDepositPaymaster__factory,
   TestTokenValueBobaDepositPaymaster
-} from '../typechain'
+} from '../dist/types'
 import {
   AddressZero, createAddress,
   createAccountOwner,

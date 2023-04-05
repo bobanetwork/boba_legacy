@@ -1,5 +1,5 @@
 import { parseEther } from 'ethers/lib/utils'
-import { TestPaymasterAcceptAll__factory } from '../typechain'
+import { TestPaymasterAcceptAll__factory } from '../dist/types'
 import { ethers } from 'hardhat'
 import { GasChecker } from './GasChecker'
 import { Create2Factory } from '../src/Create2Factory'

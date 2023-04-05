@@ -16,13 +16,13 @@ import {
   TestStorageAccount,
   TestCoin,
   TestCoin__factory
-} from '../dist/src/types'
+} from '../dist/types'
 import { ValidateUserOpResult, ValidationManager } from '../src/modules/ValidationManager'
 import { ReputationManager } from '../src/modules/ReputationManager'
 import { toBytes32 } from '../src/modules/moduleUtils'
 import { AddressZero, decodeErrorReason } from '@boba/accountabstraction'
 import { isGeth } from '../src/utils'
-import { TestRecursionAccount__factory } from '../dist/src/types/factories/contracts/tests/TestRecursionAccount__factory'
+import { TestRecursionAccount__factory } from '../dist/types/factories/contracts/tests/TestRecursionAccount__factory'
 // import { resolveNames } from './testUtils'
 import { UserOperation } from '../src/modules/Types'
 

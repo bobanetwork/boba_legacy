@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers'
 import { AddressZero } from './testutils'
 import { expect } from 'chai'
 import { hexlify } from 'ethers/lib/utils'
-import { TestHelpers, TestHelpers__factory } from '../typechain'
+import { TestHelpers, TestHelpers__factory } from '../dist/types'
 import { ethers } from 'hardhat'
 
 const provider = ethers.provider

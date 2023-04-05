@@ -9,7 +9,7 @@ import {
   TestCounter__factory,
   SimpleAccountFactory,
   SimpleAccountFactory__factory
-} from '../typechain'
+} from '../dist/types'
 import {
   AddressZero,
   createAccountOwner,

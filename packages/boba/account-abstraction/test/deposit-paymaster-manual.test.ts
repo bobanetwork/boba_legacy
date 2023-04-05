@@ -12,7 +12,7 @@ import {
   TestToken__factory,
   TestTokenValueManualDepositPaymaster__factory,
   TestTokenValueManualDepositPaymaster
-} from '../typechain'
+} from '../dist/types'
 import {
   AddressZero, createAddress,
   createAccountOwner,

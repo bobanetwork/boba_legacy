@@ -14,7 +14,7 @@ import {
   MockGasPriceOracle__factory,
   TestTokenValueGPODepositPaymaster__factory,
   TestTokenValueGPODepositPaymaster
-} from '../typechain'
+} from '../dist/types'
 import {
   AddressZero, createAddress,
   createAccountOwner,

@@ -10,7 +10,7 @@ import {
   BLSAccountFactory__factory,
   BrokenBLSAccountFactory__factory,
   EntryPoint
-} from '../typechain'
+} from '../dist/types'
 import { ethers } from 'hardhat'
 import { createAddress, deployEntryPoint, fund, ONE_ETH, simulationResultWithAggregationCatch } from './testutils'
 import { DefaultsForUserOp, fillUserOp } from './UserOp'

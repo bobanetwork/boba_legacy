@@ -11,7 +11,7 @@ import {
 import {
   EntryPoint, EntryPoint__factory, SimpleAccountFactory,
   SimpleAccountFactory__factory, SimpleAccount__factory
-} from '../typechain'
+} from '../dist/types'
 import { BigNumberish, Wallet } from 'ethers'
 import hre from 'hardhat'
 import { fillAndSign } from '../test/UserOp'
@@ -19,7 +19,7 @@ import { TransactionReceipt } from '@ethersproject/abstract-provider'
 import { table, TableUserConfig } from 'table'
 import { Create2Factory } from '../src/Create2Factory'
 import * as fs from 'fs'
-import { SimpleAccountInterface } from '../typechain/contracts/samples/SimpleAccount'
+import { SimpleAccountInterface } from '../dist/types/contracts/samples/SimpleAccount'
 
 const gasCheckerLogFile = './reports/gas-checker.txt'
 

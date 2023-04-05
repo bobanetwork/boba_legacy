@@ -6,7 +6,7 @@ import {
   EntryPoint,
   VerifyingPaymaster,
   VerifyingPaymaster__factory
-} from '../typechain'
+} from '../dist/types'
 import {
   createAccount,
   createAccountOwner, createAddress,

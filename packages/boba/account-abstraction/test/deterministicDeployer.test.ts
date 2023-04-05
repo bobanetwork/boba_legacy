@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import { hexValue } from 'ethers/lib/utils'
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
-import { TestCounter__factory } from '../typechain/factories/contracts/test/TestCounter__factory'
+import { TestCounter__factory } from '../dist/types/factories/contracts/test/TestCounter__factory'
 
 const deployer = new DeterministicDeployer(ethers.provider)
 

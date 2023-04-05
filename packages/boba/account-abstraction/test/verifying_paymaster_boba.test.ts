@@ -12,7 +12,7 @@ import {
   MockFeedRegistry,
   TestToken,
   TestToken__factory
-} from '../typechain'
+} from '../dist/types'
 import {
   createAccount,
   createAccountOwner, createAddress,

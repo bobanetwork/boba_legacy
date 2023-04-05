@@ -14,7 +14,7 @@ import {
   SimpleAccount,
   SimpleAccountFactory__factory,
   SimpleAccount__factory, SimpleAccountFactory, TestAggregatedAccountFactory
-} from '../typechain'
+} from '../dist/types'
 import { BytesLike } from '@ethersproject/bytes'
 import { expect } from 'chai'
 import { Create2Factory } from '../src/Create2Factory'

@@ -6,7 +6,7 @@ import {
   SimpleAccountFactory__factory,
   TestUtil,
   TestUtil__factory
-} from '../typechain'
+} from '../dist/types'
 import {
   createAddress,
   createAccountOwner,

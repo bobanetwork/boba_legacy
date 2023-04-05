@@ -1,4 +1,4 @@
-import { TracerTest, TracerTest__factory } from '../dist/src/types'
+import { TracerTest, TracerTest__factory } from '../dist/types'
 import { ethers } from 'hardhat'
 import { debug_traceCall } from '../src/GethTracer'
 import { expect } from 'chai'

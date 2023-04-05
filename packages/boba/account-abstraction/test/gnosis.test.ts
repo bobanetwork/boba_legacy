@@ -15,7 +15,7 @@ import {
   GnosisSafe__factory,
   TestCounter,
   TestCounter__factory
-} from '../typechain'
+} from '../dist/types'
 import {
   AddressZero,
   createAddress,
