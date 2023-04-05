@@ -135,7 +135,7 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
       try {
         if (networkService.walletService.provider) {
           if (await networkService.switchChain(layer)) {
-            if (layer === 'L1') {
+            if (layer === 'L2') {
               dispatch(setConnectBOBA(false))
             } else {
               dispatch(setConnectETH(false))
