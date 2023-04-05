@@ -18,8 +18,6 @@ import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
 
-import {formatDate} from 'util/dates'
-
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { logAmount } from 'util/amountConvert'
@@ -97,8 +95,6 @@ function TX_All({ searchHistory, transactions }) {
                 //we have both
                 annotation = `${metaData} (${i.activity})`
               }
-
-              const time = formatDate(i.timeStamp,'lll')
               const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
               let details = null
@@ -140,7 +136,7 @@ function TX_All({ searchHistory, transactions }) {
                 <Transaction
                   key={index}
                   title={`${chain} Hash: ${i.hash}`}
-                  time={time}
+                  time={i.timeStamp}
                   blockNumber={`Block ${i.blockNumber}`}
                   chain={`${chain} Chain`}
                   typeTX={annotation === '' ? `` : `TX Type: ${annotation}`}

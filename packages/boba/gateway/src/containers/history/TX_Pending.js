@@ -19,8 +19,6 @@ import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
 import { orderBy } from 'util/lodash';
 
-import {formatDate} from 'util/dates'
-
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectTokens } from 'selectors/tokenSelector'
 import { logAmount } from 'util/amountConvert'
@@ -29,6 +27,7 @@ import Transaction from 'components/transaction/Transaction'
 import Pager from 'components/pager/Pager'
 
 import * as S from './History.styles'
+import { formatDate } from 'util/dates';
 
 const PER_PAGE = 8
 
@@ -212,13 +211,11 @@ function TX_Pending({ searchHistory, transactions }) {
                   completion = i.labelStatus + ' - Completion time: ' + completionTime
                 }
 
-                const time = formatDate(i.timeStamp,'lll')
-
                 return (
                     <Transaction
                       key={index}
                       title={`${chain} Hash: ${i.hash}`}
-                      time={time}
+                      time={i.timeStamp}
                       blockNumber={`Block ${i.blockNumber}`}
                       chain={`${chain} Chain`}
                       typeTX={annotation === '' ? `` : `TX Type: ${annotation}`}

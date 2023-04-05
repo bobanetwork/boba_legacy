@@ -24,9 +24,11 @@ import { useTheme } from '@emotion/react'
 
 import truncate from 'truncate-middle'
 import networkService from 'services/networkService'
+import { formatDate } from 'util/dates'
 
 function Transaction({
   time,
+  timeLabel = null,
   chain,
   typeTX,
   blockNumber,
@@ -166,7 +168,7 @@ function Transaction({
               variant="body2"
               color="fade"
             >
-              {time}
+              {timeLabel ? timeLabel : formatDate(time, 'lll')}
             </Typography>
             {completion === '' && (
               <Typography

@@ -16,7 +16,6 @@ limitations under the License. */
 import React, { useState, useEffect } from 'react'
 import { Grid, Box } from '@mui/material'
 import { useSelector } from 'react-redux'
-import {formatDate} from 'util/dates'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectTokens } from 'selectors/tokenSelector'
@@ -125,7 +124,7 @@ function TX_Deposits({ searchHistory, transactions }) {
                   <Transaction
                     key={index}
                     title={`Hash: ${i.hash}`}
-                    time={formatDate(i.timeStamp,'lll')}
+                    time={i.timeStamp}
                     blockNumber={`Block ${i.blockNumber}`}
                     chain={`${networkName['l1']} to ${networkName['l2']} ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
                     typeTX={`TX Type: ${metaData}`}

@@ -111,7 +111,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
         chain={`${networkName['l2']} to ${networkName['l1']}`}
         title={`${chain} Hash: ${i.hash}`}
         blockNumber={`Block ${i.blockNumber}`}
-        time={timeLabel}
+        timeLabel={timeLabel}
         button={undefined}
         typeTX={`TX Type: ${metaData}`}
         detail={details}
