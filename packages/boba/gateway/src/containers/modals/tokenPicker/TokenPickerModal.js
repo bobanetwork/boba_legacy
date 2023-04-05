@@ -4,7 +4,8 @@ import { updateToken } from 'actions/bridgeAction'
 import { fetchBalances } from 'actions/networkAction'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'util/lodash';
+
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'

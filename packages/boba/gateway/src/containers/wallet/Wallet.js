@@ -23,7 +23,7 @@ import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 import { selectlayer2Balance } from 'selectors/balanceSelector'
 
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'util/lodash';
 
 import { DEFAULT_NETWORK, LAYER, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'

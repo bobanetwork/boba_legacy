@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import intersection from 'lodash/intersection'
+import { intersection } from 'util/lodash';
 
 import { selectMonster } from 'selectors/setupSelector'
 import { MENU_LIST } from './menu.config'

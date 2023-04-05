@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'util/lodash';
+
 import Button from 'components/button/Button'
 import { Typography } from '@mui/material'
 import * as S from "./ListContract.styles"

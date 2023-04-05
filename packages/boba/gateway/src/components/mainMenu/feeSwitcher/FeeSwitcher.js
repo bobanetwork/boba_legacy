@@ -30,7 +30,7 @@ import { switchFee } from 'actions/setupAction.js'
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
 import Tooltip from 'components/tooltip/Tooltip.js'
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'util/lodash';
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'

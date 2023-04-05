@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'util/lodash';
 import Copy from "components/copy/Copy";
 import { Md5 } from "ts-md5/dist/md5";
 

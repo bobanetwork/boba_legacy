@@ -1,4 +1,4 @@
-import groupBy from 'lodash/groupBy'
+import { groupBy } from 'util/lodash';
 
 import apeBoardLogo from '../../images/ecosystem/apeBoard.webp'
 import bandProtocolLogo from '../../images/ecosystem/bandProtocol.webp'

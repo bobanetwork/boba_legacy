@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'util/lodash';
 
 import { openAlert, openError } from 'actions/uiAction'
 import {formatDate} from 'util/dates'

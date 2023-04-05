@@ -17,7 +17,8 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
-import orderBy from 'lodash/orderBy'
+import { orderBy } from 'util/lodash';
+
 import {formatDate} from 'util/dates'
 
 import { selectLoading } from 'selectors/loadingSelector'
