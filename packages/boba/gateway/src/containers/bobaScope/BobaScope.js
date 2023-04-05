@@ -15,7 +15,8 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
+import isEqual from 'lodash/isEqual';
+import orderBy from 'lodash/orderBy';
 import { useSelector } from 'react-redux'
 
 import "react-datepicker/dist/react-datepicker.css"

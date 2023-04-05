@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
+import isEqual from 'lodash/isEqual'
 
 import ListNFT from 'components/listNFT/listNFT'
 import * as S from './Nft.styles'
