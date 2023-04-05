@@ -37,7 +37,9 @@ import { useNavigate } from 'react-router-dom'
 
 import Faucet from 'components/faucet/Faucet'
 
-function TokenPage() {
+function TokenPage({
+  balanceToken
+}) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -277,6 +279,7 @@ function TokenPage() {
                 l2Balance.map((i) => {
                   return (
                     <ListToken
+                      showBalanceToken={balanceToken}
                       key={i.currency}
                       token={i}
                       chain={'L2'}
@@ -296,6 +299,7 @@ function TokenPage() {
                 l1Balance.map((i) => {
                   return (
                     <ListToken
+                      showBalanceToken={balanceToken}
                       key={i.currency}
                       token={i}
                       chain={'L1'}
