@@ -3,8 +3,7 @@ import { connect } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 
 import { openAlert, openError } from 'actions/uiAction'
-import moment from 'moment'
-
+import {formatDate} from 'util/dates'
 import Button from 'components/button/Button'
 // eslint-disable-next-line no-unused-vars
 import { Box, Typography, LinearProgress } from '@mui/material'
@@ -66,7 +65,7 @@ class ListSave extends React.Component {
     } = this.state
 
     const timeDeposit_S = stakeInfo.depositTimestamp
-    const timeDeposit = moment.unix(timeDeposit_S).format('MM/DD/YYYY hh:mm a')
+    const timeDeposit = formatDate(timeDeposit_S)
 
     const timeNow_S = Math.round(Date.now() / 1000)
     let duration_S = timeNow_S - timeDeposit_S
@@ -77,8 +76,8 @@ class ListSave extends React.Component {
 
     const residual_S = duration_S % (twoWeeks + twoDays)
     const timeZero_S = timeNow_S - residual_S
-    const unlocktimeNextBegin = moment.unix(timeZero_S + twoWeeks).format('MM/DD/YYYY hh:mm a')
-    const unlocktimeNextEnd = moment.unix(timeZero_S + twoWeeks + twoDays).format('MM/DD/YYYY hh:mm a')
+    const unlocktimeNextBegin = formatDate(timeZero_S + twoWeeks)
+    const unlocktimeNextEnd = formatDate(timeZero_S + twoWeeks + twoDays)
 
     let locked = true
     if (residual_S > twoWeeks) locked = false

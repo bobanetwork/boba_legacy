@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { Box, Grid } from '@mui/material'
-import moment from 'moment'
+import {formatDate} from 'util/dates'
 import React, { useState } from 'react'
 
 
@@ -40,7 +40,7 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
 
     const chain = (i.chain === 'L0pending') ? 'L0' : i.chain
 
-    let timeLabel = moment.unix(i.timeStamp).format('lll')
+    let timeLabel = formatDate(i.timeStamp,'lll')
 
     let amountTx = `${logAmount(i.amount, 18, 3)} BOBA`;
 

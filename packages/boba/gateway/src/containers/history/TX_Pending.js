@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
 import orderBy from 'lodash/orderBy'
-import moment from 'moment'
+import {formatDate} from 'util/dates'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectTokens } from 'selectors/tokenSelector'
@@ -177,7 +177,7 @@ function TX_Pending({ searchHistory, transactions }) {
                 let completionTime = 'Not available'
 
                 if(i.completion)
-                    completionTime = moment.unix(i.completion).format('lll')
+                    completionTime = formatDate(i.completion,'lll')
 
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
@@ -211,7 +211,7 @@ function TX_Pending({ searchHistory, transactions }) {
                   completion = i.labelStatus + ' - Completion time: ' + completionTime
                 }
 
-                const time = moment.unix(i.timeStamp).format('lll')
+                const time = formatDate(i.timeStamp,'lll')
 
                 return (
                     <Transaction

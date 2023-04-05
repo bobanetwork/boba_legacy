@@ -6,7 +6,7 @@ import Modal from 'components/modal/Modal'
 import { closeModal } from 'actions/uiAction'
 
 import WithdrawLock from './WithdrawLock'
-import moment from 'moment'
+import {Now,convertDate} from 'util/dates'
 import IncreaseLock from './IncreaseLock'
 import { fetchLockRecords } from 'actions/veBobaAction'
 
@@ -21,8 +21,8 @@ function ManageLockModal({
 
   useEffect(() => {
     if (lock) {
-      let today = moment()
-      let expiry = moment(lock.expiry);
+      let today = Now()
+      let expiry = convertDate(lock.expiry);
 
       let expired = expiry.isBefore(today);
       setisWithdrawable(expired); // whether lock is withdrawable or not base expiry.

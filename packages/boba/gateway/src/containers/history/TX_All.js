@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
 
-import moment from 'moment'
+import {formatDate} from 'util/dates'
 
 import { selectLoading } from 'selectors/loadingSelector'
 import { selectTokens } from 'selectors/tokenSelector'
@@ -98,7 +98,7 @@ function TX_All({ searchHistory, transactions }) {
                 annotation = `${metaData} (${i.activity})`
               }
 
-              const time = moment.unix(i.timeStamp).format('lll')
+              const time = formatDate(i.timeStamp,'lll')
               const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
               let details = null

@@ -1,5 +1,4 @@
-import moment from 'moment'
-
+import {addMonths, Now, addYear} from 'util/dates'
 
 /**************
  * Env Params *
@@ -32,15 +31,15 @@ export const BRIDGE_TYPE = {
 
 export const EXPIRY_OPTIONS = [
   {
-    value: moment().add(3, 'M').format("YYYY-MM-DD"),
+    value: addMonths(Now(), 3, "YYYY-MM-DD"),
     label: '3 Months',
   },
   {
-    value: moment().add(6, 'M').format("YYYY-MM-DD"),
+    value: addMonths(Now(), 7, "YYYY-MM-DD"),
     label: '6 Months',
   },
   {
-    value: moment().add(1, 'y').format("YYYY-MM-DD"),
+    value: addYear(1,"YYYY-MM-DD"),
     label: '1 Year',
   },
 ]

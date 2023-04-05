@@ -9,7 +9,7 @@ import L2ToL1Icon from 'components/icons/L2ToL1Icon';
 import LinkIcon from 'components/icons/LinkIcon';
 import UpIcon from 'components/icons/UpIcon';
 
-import moment from 'moment';
+import {formatDate} from 'util/dates';
 import truncate from 'truncate-middle';
 
 import {
@@ -63,7 +63,7 @@ function TransactionTableRow({ chainLink, index, ...data }) {
                         }}
                     >
                         <CellTitle color="#06D3D3"> Swapped </CellTitle>
-                        <CellSubTitle> {moment.unix(data.timeStamp).format('lll')} </CellSubTitle>
+                        <CellSubTitle> {formatDate(data.timeStamp,'lll' )} </CellSubTitle>
                     </Box>
                 </Grid>
             </StyledTableCell>

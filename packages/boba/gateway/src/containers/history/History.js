@@ -24,7 +24,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 
 import { useMediaQuery, useTheme } from '@mui/material'
 
-import moment from 'moment'
+import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
@@ -84,8 +84,8 @@ function History() {
   const transactions = orderedTransactions.filter((i) => {
     if (startDate && endDate) {
       return (
-        moment.unix(i.timeStamp).isSameOrAfter(startDate) &&
-        moment.unix(i.timeStamp).isSameOrBefore(endDate)
+        isSameOrAfterDate(i.timeStamp, startDate) &&
+        isSameOrBeforeDate(i.timeStamp,endDate)
       )
     }
     return true
