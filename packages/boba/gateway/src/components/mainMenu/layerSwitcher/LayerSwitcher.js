@@ -22,7 +22,6 @@ import {
   IconButton,
 } from '@mui/material'
 import { useTheme } from '@mui/styles'
-import { setConnect, setConnectBOBA, setConnectETH, setLayer, setWalletConnected } from 'actions/setupAction.js'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -34,7 +33,7 @@ import {
   selectConnectBOBA,
   selectConnect,
   selectWalletConnected,
-  selectChainIdChanged,
+  selectChainIdChanged
 } from 'selectors/setupSelector'
 
 import {
@@ -48,7 +47,15 @@ import * as S from './LayerSwitcher.styles.js'
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
 
-import { setEnableAccount, setWalletAddress } from 'actions/setupAction'
+import {
+  setEnableAccount,
+  setWalletAddress,
+  setConnect,
+  setConnectBOBA,
+  setConnectETH,
+  setLayer,
+  setWalletConnected
+} from 'actions/setupAction'
 
 import { fetchTransactions } from 'actions/networkAction'
 
@@ -128,7 +135,7 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
       try {
         if (networkService.walletService.provider) {
           if (await networkService.switchChain(layer)) {
-            if (layer === 'L1') {
+            if (layer === 'L2') {
               dispatch(setConnectBOBA(false))
             } else {
               dispatch(setConnectETH(false))
