@@ -7,7 +7,7 @@ description: Frequently asked questions
 
 <br/>
 
-[Boba](https://boba.network) is a compute-focused Layer 2 (L2) solution built on top of the Layer 1 blockchain, [Ethereum](https://ethereum.org/en). Boba scales and augments the core _compute_ capabilities of Ethereum, reducing gas fees and improving transaction throughput - while retaining the security guarantees of Ethereum.
+[Boba](https://boba.network) is a compute-focused Layer 2 (L2) solution built on top of the Layer 1 blockchain, [Ethereum](https://ethereum.org/en). Ethereum is similar to L1 blockchains like Avalanche, BNB, and Moonbeam, and acts as a base blockchain platform that executes all on-chain transactions. Boba scales and augments the core _compute_ capabilities of Ethereum, reducing gas fees and improving transaction throughput - while retaining the security guarantees of Ethereum.
 
 The complexity of smart contract algorithms can make them expensive and slow to execute at speed. To solve this, Boba has designed a Hybrid Compute architecture that enables smart contracts to trigger much more complex algorithms off-chain (similar to running an app on AWS for example), and then bring the result back into the on-chain smart contract. Hence, the Boba Hybrid compute model runs both on-chain and off-chain.
 
@@ -21,7 +21,7 @@ Boba is not a side chain. Side chains are their own blockchain systems with enti
 
 ## What is the difference between Boba and Ethereum?
 
-Boba is similar to Ethereum. Just like you would on Ethereum, you can create and interact with Solidity smart contracts using the same wallet software you are already familiar with.
+Boba is an augumentation over Ethereum. Just like you would on Ethereum, you can create and interact with Solidity smart contracts using the same wallet software you are already familiar with. However, Boba does not have a consensus algorithm of its own and relies on Ethereum.
 
 ## Is Boba safe?
 
@@ -31,11 +31,11 @@ Boba Network is just as safe as the Ethereum chain. Optimistic Rollups like Boba
 
 Boba has developed a swap-based mechanism to deliver a smooth user experience for moving funds across chains. Porting assets from L1 to L2, L2 to L1, or between two L2s (as long as they are both EVM-compatible), is fast and dependable.
 
-The users who choose to take advantage of this bridging between L1 and L2 will pay a small convenience fee that is shared among the liquidity providers of the pools backing the swaps. Acting as liquidity providers is just the first of several staking opportunities Boba will roll out to the community. The higher level goal is to encourage broad participation in the operations and governance of Boba. As the only tokenized, EVM-compatible L2, Boba is in a unique position to use the Boba token responsibly for the long-term sustainability of the network.
+The users who choose to take advantage of this bridging between L1 and L2 will pay a small convenience fee that is shared among the liquidity providers of the pools backing the swaps. Acting as liquidity providers is just the first of several staking opportunities Boba will roll out to the community. The higher level goal is to encourage broad participation in the operations and governance of Boba. As a tokenized, EVM-compatible L2, Boba is in a position to use the Boba token responsibly for the long-term sustainability of the network.
 
 ## How are developers incentivized to build on Boba?
 
-The high gas fees of Ethereum itself is a pretty strong incentive for developers to move to layer 2 networks like Boba. Boba not only helps you scale Ethereum, but also helps tap into more advanced compute capabilities that are not available to you today. Boba also has plans to create an ecosystem fund to incentivize some of the early-stage projects that are just starting out and that plan to launch interesting apps. It’s going to take some time to put something like that together. That’s in our plans.
+The high gas fees of Ethereum itself is a pretty strong incentive for developers to move to layer 2 networks like Boba. Boba not only helps Ethereum scale, but also allows contracts to tap into advanced off-chain compute capabilities that are not available on other chains. Boba also has plans to create an ecosystem fund to incentivize some of the early-stage projects that are just starting out and that plan to launch interesting apps. It’s going to take some time to put something like that together. That’s in our plans.
 
 ## How do I connect my wallet to Boba Network?
 
@@ -45,7 +45,7 @@ Many wallets now allow applications to trigger a popup to switch between network
 
 \* [The Boba **test** Goerli Network](https://gateway.goerli.boba.network).
 
-If your wallet does not support this feature, you will have to connect manually. The exact process for connecting your wallet to a Boba Ethereum network depends on the specific wallet software you are using.
+If your wallet does not support this feature, you will have to connect manually. The exact process for connecting your wallet to a Boba Ethereum network depends on the specific wallet software you are using. To get started on Boba/Ethereum, you can use the available [community RPC endpoint](https://docs.boba.network/for-developers/network-parameters).
 
 ## How do I move assets into or out of Boba Network?
 
@@ -92,9 +92,9 @@ In the current release of the Boba Network protocol, there may be rare cases whe
 
 A Sequencer node is a special node in an Optimistic Ethereum network that can order transactions on short timescales (on the order of minutes). This opens up the door to very fast transaction confirmation times with strong guarantees about finality. Eventually, the operator of the Sequencer node on a network will be determined by some governing mechanism. For now, Boba Network operates the only such node.
 
-## What is the Gas Price on Boba L2?
+## What is the Gas price on Boba L2?
 
-The Gas Price on L2 changes every **30 seconds** with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change from one value to another is capped at no more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. As on the mainchain, the current gas price can be obtained via `.getGasPrice()`, which is typically around 10 Gwei.
+The Gas usage price on the Boba L2 updates every **10 minutes** if the Ethereum L1 gas price changes (with some smoothing to reduce sharp discontinuities in the price from one moment to the next). The maximum percentage change from one value to another is capped at no more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. As on the Ethereum Mainnet, the current gas price can be obtained via `.getGasPrice()`, which is typically around 10 Gwei.
 
 ## Do you support EIP-2470: Singleton Factory?
 
@@ -119,9 +119,7 @@ Here is an example that shows a [user's journey setting up NFT Bridges](https://
 
 Yes, we are working towards supporting Bedrock in the future.
 
-## Could you tell me the main purpose of these three contracts and how each of them interact with the existing system?
-
-`DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol`
+## Could you tell me the main purpose of `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` contracts, and how they interact with the existing system?
 
 In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 ourselves. All three of the contracts: `DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` are a way to compensate for the cost of relaying transactions on L1. However, they do not subsidize and take back the costs from the user.
 
@@ -137,7 +135,7 @@ This again serves the purpose of voluntary collection.
 
 ![Smart Contracts](./boba_documentation/.gitbook/assets/smart-contracts.png)
 
-## Why can't I Deploy my 100kb copy/paste Contract?
+## Why am I getting the 'contract size exceeds limit' error?
 
 Instead of deploying just one contract, you need to deploy several.
 
@@ -172,7 +170,7 @@ But in order to standardize, the token list specifies only a single L2 token add
 
 ![Testing and Testnet](./boba_documentation/.gitbook/assets/testing-and-testnet.png)
 
-## Does Boba Network Have a testnet/How do I gettTestnet Boba or Eth?
+## Does Boba Network Have a testnet/How do I get Testnet Boba or Eth?
 
 Boba Network does have a testnet and it uses authentication through Twitter. Here’s a short walkthrough on how to get authenticated.
 
@@ -180,7 +178,7 @@ First, download MetaMask on your browser as a plug-in and set up a MetaMask wall
 
 ![Welcome to Metamask](./boba_documentation/.gitbook/assets/WELCOME-TO-METAMASK.png)
 
-After you’ve set up your MetaMask account, you can [connect to the Rinkeby network Testnet](https://gateway.rinkeby.boba.network/). After connecting, follow these steps:
+After you’ve set up your MetaMask account, you can [connect to the Goerli network Testnet](https://gateway.goerli.boba.network). After connecting, follow these steps:
 
 * view your connection status displayed in the upper-right corner, along with a button that will allow you to select a chain to connect to.
 * click on the Boba icon. MetaMask will prompt you to connect to the Rinkeby Boba network.
@@ -207,7 +205,7 @@ _NOTE: You can only make one fountain call per Twitter account, per day._
 
 `./scripts/wait-for-sequencer.sh is getting timed out. Any Solutions?`
 
-Please be sure to attach logs of the output of `docker-compose logs`, as well as integration test results.
+Please run `docker-compose logs`, as well as integration tests, and send us the output of the logs and test results via our [Discord server](https://discord.com/invite/YFweUKCb8a).
 
 ## I have started deploying Boba Testnet, but it looks like the Testnet Subgraph is private?
 
@@ -217,7 +215,7 @@ We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph 
 
 ![Transactions](./boba_documentation/.gitbook/assets/Transactions.png)
 
-## Why isn’t my transaction going through?
+## Why am I getting an error that says the gas limit is 1,000,000,000,000,000 Wei?
 
 Although you will get an error message that says the gas limit is 1,000,000,000,000,000 Wei, the Boba Network will throw an error anytime the gas price is equal to, or more than three times the expected gas price for any given transaction.
 
@@ -227,9 +225,9 @@ Here, Boba is looking out for you. Before that unexpected increased fee goes thr
 
 [Here's more info on fees](https://docs.boba.network/for-developers/fee-scheme#for-frontend-and-wallet-developers).
 
-## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of only 11,000,000 makes it impossible to deploy a DEX smart contract. What can I do to deploy the DEX on Boba?
+## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of only 11,000,000 makes it impossible to deploy a smart contract. What can I do to deploy this smart contract on Boba?
 
-Try to increase SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html). In addition, you can break down contracts into smaller chunks.
+Try to increase or decrease SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html). In addition, you can break down contracts into smaller chunks.
 
 ## I am trying to deploy a smart contract to Boba Rinkeby with Remix but get this error:
 
@@ -254,7 +252,7 @@ Boba Network fees can be paid either in Boba token, or in Eth. It is your choice
 
 When making a transaction on Boba and paying the transaction fee, the fee is first calculated in eth at a gas price of 1 gwei. This fee is then converted to Boba with a 25% discount.
 
-## Since the max value of runs is 2^32 - 1, do you recommend Solidity optimization? What Happens if the DEX gets more transactions than that?
+## Since the max value of runs is 2^32 - 1, do you recommend Solidity optimization?
 
 Optimization does not mean that there’s a limit set to the number of transactions this DEX can process.
 
