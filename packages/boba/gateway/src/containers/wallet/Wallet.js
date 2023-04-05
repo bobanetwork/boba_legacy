@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import Button from 'components/button/Button'
 
 import { Info } from '@mui/icons-material'
-import { Box, Icon, Typography } from '@mui/material'
+import { Box, Checkbox, FormControlLabel, Icon, Typography } from '@mui/material'
 
 import { getETHMetaTransaction } from 'actions/setupAction'
 import { openAlert, openError } from 'actions/uiAction'
@@ -43,6 +43,7 @@ function Wallet() {
   const [page, setPage] = useState('Token')
   const [tooSmallSec, setTooSmallSec] = useState(false)
   const [tooSmallBOBA, setTooSmallBOBA] = useState(false)
+  const [ balanceToken, setBalanceToken ] = useState(false);
 
   const dispatch = useDispatch()
   const network = useSelector(selectActiveNetwork())
@@ -178,6 +179,17 @@ function Wallet() {
                 {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2} Wallet
               </Typography>
             </G.PageSwitcher>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={balanceToken}
+                  onChange={e => setBalanceToken(e.target.checked)}
+                  name="my tokens only"
+                  color="primary"
+                />
+              }
+              label="My tokens only"
+            />
           </S.WalletActionContainer>
           {network === NETWORK.ETHEREUM ? (
             <>
@@ -189,10 +201,10 @@ function Wallet() {
                   tabs={[ 'Token', 'NFT' ]}
                 />
               </Box>
-              {page === 'Token' ? <Token /> : <Nft />}
+              {page === 'Token' ? <Token balanceToken={balanceToken} /> : <Nft />}
             </>
           ) : (
-            <Token />
+            <Token balanceToken={balanceToken} />
           )}
         </>
       ) : ('')}
