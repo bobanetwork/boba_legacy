@@ -67,7 +67,7 @@
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@openzeppelin/contracts": "4.8.0",
     "@thehubbleproject/bls": "^0.5.1",
-    "@typechain/hardhat": "^6.1.2",
+    "@typechain/hardhat": "^6.1.5",
     "@types/mocha": "^9.0.0",
     "ethereumjs-util": "^7.1.0",
     "ethereumjs-wallet": "^1.0.1",

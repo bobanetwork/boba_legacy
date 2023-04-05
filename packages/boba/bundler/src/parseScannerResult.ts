@@ -19,7 +19,7 @@ import {
   TestOpcodesAccountFactory__factory,
   TestOpcodesAccount__factory,
   TestStorageAccount__factory,
-} from '../dist/src/types'
+} from '../dist/types'
 import {
   StakeInfo,
   StorageMap,

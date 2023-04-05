@@ -37,7 +37,8 @@
     "hardhat-gas-reporter": "^1.0.8",
     "ow": "^0.28.1",
     "source-map-support": "^0.5.21",
-    "async-mutex": "^0.4.0"
+    "async-mutex": "^0.4.0",
+    "@typechain/hardhat": "^6.1.5"
   },
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.11",
@@ -51,7 +52,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^3.0.0",
     "@typechain/ethers-v5": "^10.1.0",
-    "@typechain/hardhat": "^6.1.2",
+    "@typechain/hardhat": "^6.1.5",
     "@types/chai": "^4.2.0",
     "@types/mocha": "^9.1.0",
     "@types/node": "^16.4.12",

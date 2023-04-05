@@ -28,7 +28,7 @@ const optimizedComilerSettings = {
 
 const config: HardhatUserConfig = {
   typechain: {
-    outDir: 'typechain',
+    outDir: 'dist/types',
     target: 'ethers-v5'
   },
   solidity: {

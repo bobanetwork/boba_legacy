@@ -9,7 +9,7 @@
     "dist/index"
   ],
   "scripts": {
-    "clean": "rimraf ./dist ./tsconfig.tsbuildinfo",
+    "clean": "rimraf node_modules ./dist ./tsconfig.tsbuildinfo",
     "clean:db": "rimraf ./db",
     "lint": "yarn run lint:fix && yarn run lint:check",
     "lint:fix": "yarn lint:check --fix",
