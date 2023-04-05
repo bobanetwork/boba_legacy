@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual'
 import { logAmount, powAmount } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 

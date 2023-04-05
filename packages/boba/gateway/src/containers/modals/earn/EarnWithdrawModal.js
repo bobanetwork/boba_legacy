@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
+import isEqual from 'lodash/isEqual'
 
 import { closeModal, openAlert } from 'actions/uiAction'
 import { fetchL1LPBalance, fetchL2LPBalance, getEarnInfo } from 'actions/earnAction'
