@@ -15,15 +15,6 @@ function NetworkListItem({
   isActive
 }) {
 
-  console.table({
-    chain,
-    icon,
-    label,
-    name,
-    onChainChange,
-    isActive
-  })
-
   const L1Icon = L1_ICONS[ icon ];
   const L2Icon = L2_ICONS[ icon ];
 
