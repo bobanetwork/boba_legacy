@@ -1,6 +1,6 @@
 import * as React from "react"
 
-function EthereumIcon({ selected = false }) {
+function FantomIcon({ selected = false }) {
 
 
   if (!selected) {
@@ -21,4 +21,4 @@ function EthereumIcon({ selected = false }) {
   )
 }
 
-export default EthereumIcon
+export default FantomIcon
