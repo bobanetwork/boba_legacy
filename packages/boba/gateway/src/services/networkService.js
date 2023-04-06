@@ -22,7 +22,7 @@ import {
 import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
-import { orderBy, groupBy } from 'lodash'
+import { orderBy,groupBy } from 'util/lodash';
 import BN from 'bn.js'
 
 import { logAmount } from 'util/amountConvert'
