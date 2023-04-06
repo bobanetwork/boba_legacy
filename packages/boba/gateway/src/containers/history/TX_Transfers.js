@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { Box, Grid } from '@mui/material'
-import moment from 'moment'
 import React, { useState } from 'react'
 
 
@@ -40,8 +39,6 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
 
     const chain = (i.chain === 'L0pending') ? 'L0' : i.chain
 
-    let timeLabel = moment.unix(i.timeStamp).format('lll')
-
     let amountTx = `${logAmount(i.amount, 18, 3)} BOBA`;
 
     return (
@@ -50,7 +47,7 @@ function TX_Transfers({ searchHistory, transactions, chainLink }) {
         chain={`Bridge between L1's`}
         title={`${chain} Hash: ${i.hash}`}
         blockNumber={`Block ${i.blockNumber}`}
-        time={timeLabel}
+        time={i.timeStamp}
         button={undefined}
         typeTX={``}
         oriChain={chain}

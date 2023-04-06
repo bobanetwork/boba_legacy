@@ -19,10 +19,10 @@ import { makeStyles } from '@mui/styles'
 import { executeProposal, queueProposal } from 'actions/daoAction'
 import { openAlert, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
-import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import * as S from "./listProposal.styles"
+import {formatDate} from 'util/dates';
 
 const useStyles = makeStyles({
     colorPrimary: {
@@ -87,8 +87,8 @@ function ListProposal({
         return <>{description}</>;
     }
 
-    const startTime = moment.unix(proposal.startTimestamp).format('lll')
-    const endTime = moment.unix(proposal.endTimestamp).format('lll')
+    const startTime = formatDate(proposal.startTimestamp,'lll');
+    const endTime = formatDate(proposal.endTimestamp,'lll');
 
     let hasVoted = proposal.hasVoted
 

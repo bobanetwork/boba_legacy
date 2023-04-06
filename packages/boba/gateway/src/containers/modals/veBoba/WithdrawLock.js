@@ -11,7 +11,7 @@ import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg';
 
 import * as G from 'containers/Global.styles';
 
-import moment from 'moment';
+import {convertDate} from 'util/dates'
 
 function WithdrawLock({
   handleClose,
@@ -54,7 +54,7 @@ function WithdrawLock({
         Lock Expiry :
       </Typography>
       <Typography variant="h3">
-        {moment(expiry).format('yyyy-MM-DD')}
+        {convertDate(expiry,'yyyy-MM-DD')}
       </Typography>
     </Box>
     <Box display="flex" flexDirection="column" justifyContent="space-around" alignItems="flex-start">
