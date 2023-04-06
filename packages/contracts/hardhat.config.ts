@@ -1,60 +1,31 @@
 import { HardhatUserConfig } from 'hardhat/types'
 import 'solidity-coverage'
 import * as dotenv from 'dotenv'
-
-import {
-  DEFAULT_ACCOUNTS_HARDHAT,
-  RUN_OVM_TEST_GAS,
-} from './test/helpers/constants'
+import { ethers } from 'ethers'
 
 // Hardhat plugins
-// Hardhat plugins
+import '@eth-optimism/hardhat-deploy-config'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
-import 'hardhat-deploy'
 import '@typechain/hardhat'
-import './tasks/deploy'
-import './tasks/l2-gasprice'
-import './tasks/set-owner'
-import './tasks/validate-address-dictator'
-import './tasks/validate-chugsplash-dictator'
-import './tasks/whitelist'
-import './tasks/withdraw-fees'
+import 'hardhat-deploy'
 import 'hardhat-gas-reporter'
-//import '@primitivefi/hardhat-dodoc'
 import 'hardhat-output-validator'
 
 // Load environment variables from .env
 dotenv.config()
 
 const enableGasReport = !!process.env.ENABLE_GAS_REPORT
-const privateKey =
-  process.env.PRIVATE_KEY ||
-  '0x0000000000000000000000000000000000000000000000000000000000000000' // this is to avoid hardhat error
+const privateKey = process.env.PRIVATE_KEY || '0x' + '11'.repeat(32) // this is to avoid hardhat error
+const deploy = process.env.DEPLOY_DIRECTORY || 'deploy'
 
 const config: HardhatUserConfig = {
   networks: {
     hardhat: {
-      accounts: DEFAULT_ACCOUNTS_HARDHAT,
-      blockGasLimit: RUN_OVM_TEST_GAS * 2,
       live: false,
       saveDeployments: false,
       tags: ['local'],
-    },
-    optimism: {
-      url: 'http://127.0.0.1:8545',
-      saveDeployments: false,
-    },
-    'optimism-kovan': {
-      chainId: 69,
-      url: 'https://kovan.optimism.io',
-      accounts: [privateKey],
-    },
-    'optimism-mainnet': {
-      chainId: 10,
-      url: 'https://mainnet.optimism.io',
-      accounts: [privateKey],
     },
     mainnet: {
       url: process.env.L1_NODE_WEB3_URL || '',
@@ -96,14 +67,8 @@ const config: HardhatUserConfig = {
       url: 'https://testnet.bnb.boba.network',
     },
     fantom: {
-      url: 'https://rpc.fantom.network',
-    },
-    bobaopera: {
-      url: 'https://bobaopera.boba.network',
-    },
-    bobaoperaTestnet: {
-      url: 'https://testnet.bobaopera.boba.network',
-    },
+      url: 'https://rpc.fantom.network'
+    }
   },
   mocha: {
     timeout: 50000,
@@ -114,28 +79,25 @@ const config: HardhatUserConfig = {
         version: '0.8.9',
         settings: {
           optimizer: { enabled: true, runs: 10_000 },
-          metadata: {
-            bytecodeHash: 'none',
-          },
-          outputSelection: {
-            '*': {
-              '*': ['storageLayout'],
-            },
-          },
         },
       },
       {
         version: '0.5.17', // Required for WETH9
         settings: {
           optimizer: { enabled: true, runs: 10_000 },
-          outputSelection: {
-            '*': {
-              '*': ['storageLayout'],
-            },
-          },
         },
       },
     ],
+    settings: {
+      metadata: {
+        bytecodeHash: 'none',
+      },
+      outputSelection: {
+        '*': {
+          '*': ['metadata', 'storageLayout'],
+        },
+      },
+    },
   },
   typechain: {
     outDir: 'dist/types',
@@ -144,6 +106,7 @@ const config: HardhatUserConfig = {
   paths: {
     deploy: './deploy',
     deployments: './deployments',
+    deployConfig: './deploy-config',
   },
   namedAccounts: {
     deployer: {
@@ -289,6 +252,96 @@ const config: HardhatUserConfig = {
         },
       },
     ],
+  },
+  outputValidator: {
+    runOnCompile: true,
+    errorMode: false,
+    checks: {
+      events: false,
+      variables: false,
+    },
+    exclude: ['contracts/test-helpers', 'contracts/test-libraries'],
+  },
+  deployConfigSpec: {
+    isForkedNetwork: {
+      type: 'boolean',
+      default: false,
+    },
+    numDeployConfirmations: {
+      type: 'number',
+      default: 0,
+    },
+    gasPrice: {
+      type: 'number',
+      default: undefined,
+    },
+    l1BlockTimeSeconds: {
+      type: 'number',
+    },
+    l2BlockGasLimit: {
+      type: 'number',
+    },
+    l2ChainId: {
+      type: 'number',
+    },
+    ctcL2GasDiscountDivisor: {
+      type: 'number',
+    },
+    ctcEnqueueGasCost: {
+      type: 'number',
+    },
+    sccFaultProofWindowSeconds: {
+      type: 'number',
+    },
+    sccSequencerPublishWindowSeconds: {
+      type: 'number',
+    },
+    ovmSequencerAddress: {
+      type: 'address',
+    },
+    ovmProposerAddress: {
+      type: 'address',
+    },
+    ovmBlockSignerAddress: {
+      type: 'address',
+    },
+    ovmFeeWalletAddress: {
+      type: 'address',
+    },
+    ovmAddressManagerOwner: {
+      type: 'address',
+    },
+    ovmGasPriceOracleOwner: {
+      type: 'address',
+    },
+    ovmWhitelistOwner: {
+      type: 'address',
+      default: ethers.constants.AddressZero,
+    },
+    gasPriceOracleOverhead: {
+      type: 'number',
+      default: 2750,
+    },
+    gasPriceOracleScalar: {
+      type: 'number',
+      default: 1_500_000,
+    },
+    gasPriceOracleDecimals: {
+      type: 'number',
+      default: 6,
+    },
+    gasPriceOracleL1BaseFee: {
+      type: 'number',
+      default: 1,
+    },
+    gasPriceOracleL2GasPrice: {
+      type: 'number',
+      default: 1,
+    },
+    hfBerlinBlock: {
+      type: 'number',
+      default: 0,
+    },
   },
 }
 

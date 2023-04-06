@@ -7,7 +7,7 @@ import { TestCounter__factory } from '../dist/types/factories/contracts/test/Tes
 const deployer = new DeterministicDeployer(ethers.provider)
 
 describe('#deterministicDeployer', () => {
-  it('should ignore deploy again of deployer', async () => {
+  it('deploy deployer', async () => {
     expect(await deployer.isDeployerDeployed()).to.equal(false)
     await deployer.deployFactory()
     expect(await deployer.isDeployerDeployed()).to.equal(true)

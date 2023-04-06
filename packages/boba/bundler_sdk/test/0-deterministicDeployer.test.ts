@@ -20,7 +20,7 @@ describe('#deterministicDeployer', () => {
     await DeterministicDeployer.deploy(ctr)
     expect(await deployer.isContractDeployed(addr)).to.equal(true)
   })
-  it.only('should deploy at given address with ethers.wallet', async () => {
+  it('should deploy at given address with ethers.wallet', async () => {
     const randWallet = ethers.Wallet.createRandom()
     const pk = (randWallet._signingKey()).privateKey
     // generate a ethers.wallet to use with sdk

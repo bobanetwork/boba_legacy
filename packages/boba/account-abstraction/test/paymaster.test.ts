@@ -5,10 +5,8 @@ import {
   SimpleAccount,
   EntryPoint,
   TokenPaymaster,
-  TokenPaymaster__factory,
-  TestCounter__factory,
-  SimpleAccountFactory,
-  SimpleAccountFactory__factory
+
+
 } from '../dist/types'
 import {
   AddressZero,
@@ -26,6 +24,12 @@ import {
   createAccount,
   getAccountAddress
 } from './testutils'
+import { SimpleAccountFactory__factory, TokenPaymaster__factory } from '../dist/types/factories/contracts/samples/'
+import {
+  TestCounter__factory,
+} from '../dist/types/factories/contracts/test/'
+import { SimpleAccountFactory } from '../dist/types/contracts/samples/'
+
 import { fillAndSign } from './UserOp'
 import { hexConcat, parseEther } from 'ethers/lib/utils'
 import { UserOperation } from './UserOperation'

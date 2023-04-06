@@ -10,9 +10,9 @@ import {
   BobaDepositPaymaster__factory,
   MockFeedRegistry__factory,
   MockFeedRegistry,
-  TestToken,
-  TestToken__factory
+  TestToken
 } from '../dist/types'
+import { TestToken__factory } from '../dist/types/factories/contracts/test/'
 import {
   createAccount,
   createAccountOwner, createAddress,

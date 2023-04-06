@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./exec/run-monitor.js",
     "test": "hardhat test --show-stack-traces",
-    "test:coverage": "hardhat test --show-stack-traces"
+    "test:coveragee": "hardhat test --show-stack-traces"
   },
   "license": "MIT",
   "dependencies": {

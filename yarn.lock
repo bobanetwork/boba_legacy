@@ -1783,6 +1783,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.37.0.tgz#cf1b5fa24217fe007f6487a26d765274925efa7d"
   integrity sha512-x5vzdtOOGgFVDCUs81QRB2+liax8rFg3+7hqM+QhBG0/G3F1ZsoYl97UrqgHgQ9KKT7G6c4V+aTUCgu/n22v1A==
 
+"@eth-optimism/hardhat-deploy-config@^0.2.5":
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/hardhat-deploy-config/-/hardhat-deploy-config-0.2.5.tgz#a8d7658156a005d412609ff004bb71589aedcaf4"
+  integrity sha512-zmuevtOiXWX463dK7jsi2ysWfUnphHkXa8xin6M6V8lyJPur2Eoe6UpP5DiXzQ1H0s2mt1ziEweFVWtQiEoTtw==
+
 "@eth-optimism/ynatm@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@eth-optimism/ynatm/-/ynatm-0.2.2.tgz#b1f165c3149188f184b66329228746260ae18677"
@@ -4614,7 +4619,7 @@
   dependencies:
     ethers "^5.0.2"
 
-"@typechain/hardhat@^6.1.5":
+"@typechain/hardhat@^6.1.2", "@typechain/hardhat@^6.1.5":
   version "6.1.5"
   resolved "https://registry.yarnpkg.com/@typechain/hardhat/-/hardhat-6.1.5.tgz#caad58a1d3e9cd88061a584eb4f4fa763d5dcad1"
   integrity sha512-lg7LW4qDZpxFMknp3Xool61Fg6Lays8F8TXdFGBG+MxyYcYU5795P1U2XdStuzGq9S2Dzdgh+1jGww9wvZ6r4Q==
