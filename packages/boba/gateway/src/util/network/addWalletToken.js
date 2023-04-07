@@ -2,7 +2,7 @@ import { utils } from 'ethers';
 import { getWalletType } from 'actions/networkAction';
 import {getCoinImage} from '../coinImage';
 
-
+//migrate this to wallet services
 export const addWalletToken = async (token) => {
   const { ethereum } = window;
 

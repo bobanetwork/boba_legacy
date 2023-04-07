@@ -41,6 +41,7 @@ import networkService from 'services/networkService'
 
 import * as S from './Earn.styles'
 import { fetchBalances } from 'actions/networkAction';
+import {TABLEHEADER} from 'components/global/table'
 
 function Earn() {
   const [showMDO, setShowMDO] = useState(false)
@@ -101,6 +102,15 @@ function Earn() {
 
     return [ 0, 0 ]
   }
+
+  const tableHeaderOptions = [
+    {name:'Token'},
+    {name:'Available Balance', tooltip: 'Available Balance refers to the amount of funds currently in each pool.'},
+    {name:'Total Staked', tooltip: 'Total staked denotes the funds staked by liquidity providers.'},
+    {name:'APR', tooltip: 'The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.'},
+    {name:'Your Stake'},
+    {name:'Earned'},
+  ]
 
 
   return (
@@ -227,99 +237,20 @@ function Earn() {
           </Tooltip>
         </S.Help>
 
-
-        {!isMobile ? (
-          <S.TableHeading>
-            <S.GridItemTagContainer
-              container spacing={1} direction="row" alignItems="center"
-              sx={{
-                justifyContent: "space-around"
-              }}
-            >
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Token</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Available Balance
-                </Typography>
-                <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Total Staked
-                </Typography>
-                <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Past APR %
-                </Typography>
-                <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Your Stake</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={1}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Earned</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={1}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Actions</Typography>
-              </S.GridItemTag>
-            </S.GridItemTagContainer>
-          </S.TableHeading>
-        ) : (null)}
-
-        {lpChoice === 'L1LP' &&
+          {!isMobile && (
+            <TABLEHEADER options={tableHeaderOptions} />
+          )}
+          
           <S.EarnListContainer>
-            {Object.keys(poolInfo.L1LP).map((v, i) => {
-              const ret = getBalance(v, 'L1')
+            {Object.keys(poolInfo?.[lpChoice]).map((v, i) => {
+              const ret = getBalance(v, lpChoice?.slice(0,2))
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
                 <ListEarn
-                  chainId={chainId.L1}
+                  chainId={chainId?.[lpChoice.slice(0,2)]}
                   key={i}
-                  poolInfo={poolInfo.L1LP[ v ]}
-                  userInfo={userInfo.L1LP[ v ]}
-                  L1orL2Pool={lpChoice}
-                  balance={ret[ 0 ]}
-                  decimals={ret[ 1 ]}
-                  isMobile={isMobile}
-                  showStakesOnly={showMSO}
-                  accountEnabled={accountEnabled}
-                />
-              )
-            })}
-          </S.EarnListContainer>}
-
-        {lpChoice === 'L2LP' &&
-          <S.EarnListContainer>
-            {Object.keys(poolInfo.L2LP).map((v, i) => {
-              const ret = getBalance(v, 'L2')
-              if (showMDO && Number(ret[ 0 ]) === 0) return null
-              return (
-                <ListEarn
-                  chainId={chainId.L2}
-                  key={i}
-                  poolInfo={poolInfo.L2LP[ v ]}
-                  userInfo={userInfo.L2LP[ v ]}
+                  poolInfo={poolInfo?.[lpChoice][ v ]}
+                  userInfo={userInfo?.[lpChoice][ v ]}
                   L1orL2Pool={lpChoice}
                   balance={ret[ 0 ]}
                   decimals={ret[ 1 ]}
@@ -330,7 +261,6 @@ function Earn() {
               )
             })}
           </S.EarnListContainer>
-        }
       </Box>
     </S.EarnPageContainer>
   )

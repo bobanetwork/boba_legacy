@@ -81,3 +81,12 @@ export function amountToUsd(amount, lookupPrice, token) {
     return 0
   }
 }
+
+
+export const formatLargeNumber = (num) => {
+  const exp = Math.floor(Math.log10(Math.abs(num)) / 3);
+  const scaledNum = Math.abs(num) / Math.pow(10, exp * 3);
+  const formattedNumber = scaledNum.toFixed(2);
+  const exponent = ['', 'k', 'M', 'B', 'T'][exp] || '';
+  return isNaN(formattedNumber) ? '0' : formattedNumber + exponent;
+}

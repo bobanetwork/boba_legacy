@@ -14,17 +14,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import networkService from 'services/networkService'
 
-import { getCoinImage } from 'util/coinImage';
-import MetamaskLogo from 'images/metamask.svg';
-
 import { Box, Typography, Fade, CircularProgress } from '@mui/material';
 import * as S from "./ListEarn.styles"
-import { getAllAddresses, getReward, getWalletType } from 'actions/networkAction';
-import Tooltip from 'components/tooltip/Tooltip';
-import { HelpOutline } from '@mui/icons-material';
-import { addTokenToWallet } from "util/network/addWalletToken"
+import { getAllAddresses, getReward } from 'actions/networkAction';
 
 
+import {TEXT} from 'components/global/text'
+import {APRLABEL} from 'components/global/label'
+import {IconLabel} from 'components/IconLabel';
+import {formatLargeNumber} from 'util/amountConvert';
+import {TABLECONTENT} from 'components/global/table'
 class ListEarn extends React.Component {
 
   constructor(props) {
@@ -150,32 +149,18 @@ class ListEarn extends React.Component {
 
   }
 
-  async handleAddWallet(e) {
-    e.stopPropagation()
-
-    const { poolInfo, L1orL2Pool, chainId } = this.state;
-    const { symbol } = poolInfo;
-
-    await addTokenToWallet({
-      symbol, 
-      address:L1orL2Pool === 'L1LP' ? 
-      poolInfo.l1TokenAddress : poolInfo.l2TokenAddress, 
-      chainId:chainId,
-      decimals:poolInfo.decimals
-    })
-  }
+ 
 
   render() {
-    const walletType = getWalletType();
     const {
       poolInfo, userInfo,
       dropDownBox, showAll, showStakesOnly,
-      loading, L1orL2Pool, accountEnabled
+      loading, L1orL2Pool, accountEnabled,
+      chainId,
     } = this.state;
 
     const pageLoading = Object.keys(poolInfo).length === 0;
 
-    const { isMobile } = this.props
     let userReward = 0;
 
     if (Object.keys(userInfo).length && Object.keys(poolInfo).length && accountEnabled) {
@@ -193,9 +178,30 @@ class ListEarn extends React.Component {
     const symbol = poolInfo.symbol
     const name = poolInfo.name
     const decimals = poolInfo.decimals
-    let logo = getCoinImage(symbol)
+    const currentAddress = L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress;
 
+    
 
+    const formatNumber = (value,limit) => {
+      const limits = limit || 2;
+      return formatLargeNumber(Number(logAmount(value, decimals, limits)))
+    }
+    const tableOptions = [
+      { content: <IconLabel token={{ name, symbol, address: currentAddress, chainId, decimals:poolInfo.decimals }} /> },
+      { content: <TEXT> {formatNumber(poolInfo.tokenBalance)}</TEXT> },
+      { content: <TEXT> {formatNumber(poolInfo.userDepositAmount)} </TEXT> },
+      { content: <APRLABEL>{`${logAmount(poolInfo.APR, 0, 2)}`}</APRLABEL> },
+      { content: <TEXT> {userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`}</TEXT> },
+      { content: <> <TEXT>{ userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}</TEXT>
+          <Box
+            disabled={disabled}
+            sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
+          >
+            {accountEnabled ? <ExpandMoreIcon /> : <></>}
+          </Box>
+        </>
+      }
+    ];
 
     if (showAll === false) {
       if (Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
@@ -216,247 +222,19 @@ class ListEarn extends React.Component {
 
     return (
       <S.Wrapper    
+        onClick={() => {
+          this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }
+        }
       >
         {pageLoading ? (
           <Box sx={{ textAlign: 'center' }}>
             <CircularProgress color="secondary" />
           </Box>
         ) : (
-          <S.GridContainer 
-            sx={{ cursor:'pointer' }}               
-            onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
-            container
-            spacing={2}
-            direction="row"
-            justifyContent="space-around"
-            alignItems="center"
-          >
-
-            {isMobile &&
-              <S.GridItemTag item
-                xs={12}
-                md={2}
-                sx={{
-                  gap: 2,
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Box
-                  display="flex"
-                  direction="row"
-                  justifyContent="flex-start" gap="10px" alignItems="center"
-                >
-                  <img src={logo} alt="logo" width={35} height={35} />
-                  <Typography variant="overline" style={{ lineHeight: '1em', fontSize: '1.2em' }}>{symbol}</Typography>
-                </Box>
-                <Box
-                  disabled={disabled}
-                  onClick={() => { this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }}
-                  sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
-                >
-                  {accountEnabled ? <ExpandMoreIcon /> : <></>}
-                </Box>
-              </S.GridItemTag>
-            }
-
-            {!isMobile &&
-              <S.GridItemTag item
-                xs={4}
-                md={2}
-                style={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', width:'100%' }}>
-                  <img src={logo} alt="logo" width={35} height={35} />
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
-                    <Typography variant="overline" style={{ lineHeight: '1em' }}>{symbol}</Typography>
-                    <Typography variant="overline" style={{ lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)' }}>{name}</Typography>
-                  </div>
-                  {walletType && 
-                    <div 
-                      onClick={(e)=> {this.handleAddWallet(e)}}
-                      className="metamask" style={{ display: 'flex', marginLeft:'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
-                      <img src={MetamaskLogo} 
-                        alt={"Add to Metamask"} width={20} height={20} />
-                    </div>
-                    }
-                </div>
-              </S.GridItemTag>
-            }
-
-            {isMobile ? (
-              <S.GridItemTag item
-                xs={6}
-                md={2}
-                flexDirection="column"
-                sx={{ alignItems: "flex-start" }}
-              >
-                <Box display="flex" gap="5px">
-                  <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }}
-                    whiteSpace="nowrap">Available Balance
-                  </Typography>
-                  <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
-                    <HelpOutline sx={{ opacity: 0.65 }} fontSize="small" />
-                  </Tooltip>
-                </Box>
-                <Typography variant="body2">
-                  {poolInfo.tokenBalance ?
-                    `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
-                  }
-                </Typography>
-              </S.GridItemTag>
-            ) : <S.GridItemTag item
-              xs={6}
-              md={2}
-            >
-              <Typography variant="body2">
-                {poolInfo.tokenBalance ?
-                  `${Number(logAmount(poolInfo.tokenBalance, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
-                }
-              </Typography>
-            </S.GridItemTag>}
-
-            {isMobile ?
-              <S.GridItemTag item
-                xs={6}
-                md={2}
-                flexDirection="column"
-                sx={{ alignItems: "flex-end" }}
-              >
-                <Box
-                  display="flex" gap="5px"
-                >
-
-                  <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }} whiteSpace="nowrap">Total Staked
-                  </Typography>
-                  <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
-                    <HelpOutline sx={{ opacity: 0.65 }} />
-                  </Tooltip>
-                </Box>
-                <Typography variant="body2" >
-                  {poolInfo.userDepositAmount ?
-                    `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
-                  }
-                </Typography>
-              </S.GridItemTag>
-              :
-              <S.GridItemTag item
-                xs={6}
-                md={2}
-              >
-                <Typography variant="body2" >
-                  {poolInfo.userDepositAmount ?
-                    `${Number(logAmount(poolInfo.userDepositAmount, decimals, 2)).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`
-                  }
-                </Typography>
-              </S.GridItemTag>}
-
-
-            {isMobile ? <S.DividerLine sx={{ mt: 2 }} /> : null}
-
-            {isMobile ?
-              <S.GridItemTag item
-                xs={4}
-                md={2}
-                flexDirection="column"
-                sx={{ alignItems: "flex-start" }}
-              >
-                <Box display="flex" gap="5px">
-                  <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }} whiteSpace="nowrap">Past APR %
-                  </Typography>
-                  <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
-                    <HelpOutline sx={{ opacity: 0.65 }} />
-                  </Tooltip>
-                </Box>
-                <Typography variant="body2">
-                  {`${logAmount(poolInfo.APR, 0, 2)}`}
-                </Typography>
-              </S.GridItemTag>
-              : <S.GridItemTag item
-                xs={4}
-                md={2}
-              >
-                <Typography variant="body2">
-                  {`${logAmount(poolInfo.APR, 0, 2)}`}
-                </Typography>
-              </S.GridItemTag>}
-
-            {isMobile ?
-              <S.GridItemTag item
-                xs={4}
-                md={2}
-                flexDirection="column"
-                sx={{ alignItems: "center" }}
-              >
-                <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }}>Your Stake</Typography>
-                <Typography variant="body2">
-                  {accountEnabled ?
-                    userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
-                    : <></>
-                  }
-                </Typography>
-              </S.GridItemTag>
-              : <S.GridItemTag item
-                xs={4}
-                md={2}
-              >
-                <Typography variant="body2">
-                  {accountEnabled ?
-                    userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`
-                    : <></>
-                  }
-                </Typography>
-              </S.GridItemTag>}
-
-            {isMobile ?
-              <S.GridItemTag item
-                xs={4}
-                md={1}
-                flexDirection="column"
-                sx={{ alignItems: "flex-end" }}
-              >
-                <Typography variant="overline" sx={{ opacity: 0.7, paddingRight: '5px' }}>Earned</Typography>
-
-                <Typography variant="body2">
-                  {accountEnabled ?
-                    userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
-                    : <></>
-                  }
-                </Typography>
-              </S.GridItemTag>
-              : <S.GridItemTag item
-                xs={4}
-                md={1}
-              >
-                <Typography variant="body2">
-                  {accountEnabled ?
-                    userReward ? `${logAmount(userReward, decimals, 5)}` : `0`
-                    : <></>
-                  }
-                </Typography>
-              </S.GridItemTag>}
-            {!isMobile ?
-              <S.GridItemTag item
-                xs={3}
-                md={1}
-              >
-                <Box
-                  disabled={disabled}
-                  sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
-                >
-                  {accountEnabled ? <ExpandMoreIcon /> : <></>}
-                </Box>
-              </S.GridItemTag>
-              : null}
-          </S.GridContainer>
+          <TABLECONTENT options={tableOptions} mobileOptions={[0,3]}/>
         )}
 
-        {/*********************************************/
-          /**************  Drop Down Box ****************/
-          /**********************************************/
-        }
+
         {dropDownBox ? (
           <Fade in={dropDownBox}>
             <S.DropdownContent>

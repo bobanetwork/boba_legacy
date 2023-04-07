@@ -19,6 +19,9 @@ import WalletConnectProvider from "@walletconnect/web3-provider"
 import { rpcUrls } from 'util/network/network.util'
 import store from 'store'
 
+/*
+  
+*/
 class WalletService {
   constructor() {
     this.provider = null
