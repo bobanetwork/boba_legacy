@@ -1,4 +1,4 @@
-import { TracerTest, TracerTest__factory } from '../dist/src/types'
+import { TracerTest, TracerTest__factory } from '../dist/types'
 import { ethers } from 'hardhat'
 import { debug_traceCall } from '../src/GethTracer'
 import { expect } from 'chai'
@@ -11,9 +11,9 @@ const signer = provider.getSigner()
 describe('#bundlerCollectorTracer', () => {
   let tester: TracerTest
   before(async function () {
-    const ver = await (provider as any).send('web3_clientVersion')
-    if (ver.match('Geth') == null) {
-      console.warn('\t==WARNING: test requires debug_traceCall on Geth (go-ethereum) node')
+    const ver: string = await (provider as any).send('web3_clientVersion')
+    if (ver.match('go1') == null) {
+      console.warn('\t==WARNING: test requires debug_traceCall on Geth (go-ethereum) node. ver=' + ver)
       this.skip()
       return
     }
@@ -23,7 +23,6 @@ describe('#bundlerCollectorTracer', () => {
 
   it('should count opcodes on depth>1', async () => {
     const ret = await traceExecSelf(tester.interface.encodeFunctionData('callTimeStamp'), false, true)
-    console.log('ret=', ret, ret.numberLevels)
     const execEvent = tester.interface.decodeEventLog('ExecSelfResult', ret.logs[0].data, ret.logs[0].topics)
     expect(execEvent.success).to.equal(true)
     expect(ret.numberLevels[0].opcodes.TIMESTAMP).to.equal(1)
@@ -77,7 +76,7 @@ describe('#bundlerCollectorTracer', () => {
       })
     })
   })
-  4
+
   it('should report direct use of GAS opcode', async () => {
     const ret = await traceExecSelf(tester.interface.encodeFunctionData('testCallGas'), false)
     expect(ret.numberLevels['0'].opcodes.GAS).to.eq(1)
@@ -89,20 +88,5 @@ describe('#bundlerCollectorTracer', () => {
     const callDoNothing = tester.interface.encodeFunctionData('execSelf', [doNothing, false])
     const ret = await traceExecSelf(callDoNothing, false)
     expect(ret.numberLevels['0'].opcodes.GAS).to.be.undefined
-  })
-
-  it.skip('should collect reverted call info', async () => {
-    const revertingCallData = tester.interface.encodeFunctionData('callRevertingFunction', [true])
-
-    const tracer = bundlerCollectorTracer
-    const ret = await debug_traceCall(provider, {
-      to: tester.address,
-      data: revertingCallData
-    }, {
-      tracer
-    }) as BundlerCollectorReturn
-
-    expect(ret.debug[0]).to.include(['fault'])
-    // todo: tests for failures. (e.g. detect oog)
   })
 })
