@@ -112,7 +112,7 @@ export const PageSwitcher = styled(Box)(({ theme }) => ({
     alignItems: 'center',
     '&.active': {
       color: '#031313',
-      background: '#BAE21A',
+      background: theme.palette.mode === 'dark'? '#BAE21A' :'#1CD6D1',
     }
   },
   [ theme.breakpoints.down('sm') ]: {

@@ -195,9 +195,9 @@ function App() {
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: radioGreen,
+              background: !light? radioGreen: buttonColorLightmode,
               borderWidth: '1.4px',
-              borderColor: radioGreen,
+              borderColor: !light? radioGreen: buttonColorLightmode,
               fontWeight: 500,
               fontSize: '16px',
               font: 'Roboto',
@@ -205,22 +205,22 @@ function App() {
               '&:hover': {
                 boxShadow: 'inset 0px 0px 0px 3px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: radioGreen,
+                backgroundColor: !light? radioGreen: buttonColorLightmode,
               },
             },
           },
           {
             props: { variant: 'outlined', color: 'primary' },
             style: {
-              color: buttonColor,
-              borderColor: buttonColor,
+              color: !light? radioGreen: buttonColorLightmode,
+              borderColor: !light? radioGreen: buttonColorLightmode,
               background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
               '&:hover': {
                 color: '#000',
-                borderColor: buttonColor,
-                backgroundColor: buttonColor,
+                borderColor: !light? radioGreen: buttonColorLightmode,
+                backgroundColor: !light? radioGreen: buttonColorLightmode,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               },
@@ -258,7 +258,7 @@ function App() {
               borderWidth: '1.4px',
               borderColor: buttonColor,
               '&:hover': {
-                color: light ? buttonColorLightmode : buttonColor,
+                color: !light ? buttonColor: buttonColorLightmode,
                 boxShadow: 'none',
               },
             },
@@ -266,14 +266,14 @@ function App() {
           {
             props: { variant: 'outlined', color: 'secondary' },
             style: {
-              color: light ? buttonColor : buttonColor,
+              color: !light ? buttonColor : buttonColorLightmode,
               borderWidth: '1.4px',
-              borderColor: light ? buttonColor : 'rgba(255, 255, 255, 0.25)',
+              borderColor: !light ? buttonColor : buttonColorLightmode,
               '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',
                 transition: 'opacity 0.3s ease-in-out',
-                borderColor: light ? buttonColor : buttonColor,
+                borderColor: !light ? buttonColor : buttonColorLightmode,
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               },
             },

@@ -126,7 +126,7 @@ function OldDao() {
           }}>
             <Button
               fullWidth={true}
-              color="neutral"
+              color="primary"
               variant="outlined"
               disabled={!accountEnabled}
               onClick={() => {
