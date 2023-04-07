@@ -82,7 +82,7 @@ function Sevens({ searchData, sevens }) {
                   title={`Hash: ${hash}`}
                   blockNumber={`Block ${blockNumber}`}
                   oriHash={hash}
-                  age={moment.unix(timestamp).format('lll')}
+                  age={formatDate(timestamp)}
                   unixTime={timestamp}
                 />
               ))}
