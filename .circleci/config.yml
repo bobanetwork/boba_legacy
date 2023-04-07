@@ -79,7 +79,7 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer
+            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
