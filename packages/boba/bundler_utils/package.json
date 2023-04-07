@@ -11,7 +11,7 @@
     "README.md"
   ],
   "scripts": {
-    "build:stopp": "tsc -p ./tsconfig.json && hardhat compile",
+    "build": "tsc -p ./tsconfig.json && hardhat compile",
     "clean": "rimraf node_modules cache artifacts dist/ ./tsconfig.tsbuildinfo",
     "hardhat-compile": "hardhat compile",
     "lint-fix": "eslint -f unix . --fix",
