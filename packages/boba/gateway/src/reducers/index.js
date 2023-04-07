@@ -19,12 +19,9 @@ import loadingReducer from './loadingReducer'
 import depositReducer from './depositReducer'
 import transactionReducer from './transactionReducer'
 import dataReducer from './dataReducer'
-import statusReducer from './statusReducer'
 import balanceReducer from './balanceReducer'
-import queueReducer from './queueReducer'
 import tokenReducer from './tokenReducer'
 import nftReducer from './nftReducer'
-import feeReducer from './feeReducer'
 import uiReducer from './uiReducer'
 import setupReducer from './setupReducer'
 import notificationReducer from './notificationReducer'
@@ -45,12 +42,9 @@ const rootReducer = combineReducers({
   transaction: transactionReducer,
   data: dataReducer,
   signature: signatureReducer,
-  status: statusReducer,
   balance: balanceReducer,
-  queue: queueReducer,
   tokenList: tokenReducer,
   nft: nftReducer,
-  fees: feeReducer,
   ui: uiReducer,
   setup: setupReducer,
   notification: notificationReducer,
