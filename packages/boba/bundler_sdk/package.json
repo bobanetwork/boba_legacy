@@ -8,12 +8,12 @@
     "README.md"
   ],
   "scripts": {
-    "build:stopp": "tsc -p ./tsconfig.json",
+    "build": "tsc -p ./tsconfig.json",
     "clean": "rimraf  dist/ cache node_modules ./tsconfig.tsbuildinfo",
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
     "test": "hardhat test",
-    "test:coverage:stop": "COVERAGE=1 hardhat coverage",
+    "test:coverage": "COVERAGE=1 hardhat coverage",
     "hardhat-test": "hardhat test",
     "tsc": "tsc",
     "watch-tsc": "tsc -w --preserveWatchOutput"
