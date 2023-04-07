@@ -24,7 +24,7 @@ import { HelpOutline } from '@mui/icons-material'
 
 import { selectUserInfo, selectPoolInfo } from 'selectors/earnSelector'
 import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectBaseEnabled, selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectBaseEnabled, selectAccountEnabled } from 'selectors/setupSelector'
 import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 import { getEarnInfo } from 'actions/earnAction'
@@ -61,7 +61,6 @@ function Earn() {
 
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
-  const layer = useSelector(selectLayer())
 
   const activeNetworkName = useSelector(selectActiveNetworkName())
 
@@ -87,8 +86,8 @@ function Earn() {
   }
 
   const LayerAlert = () => {
-    const message = lpChoice === 'L1LP' ? 
-      'You are on L2. To transact on L1, SWITCH LAYER to L1' : 
+    const message = lpChoice === 'L1LP' ?
+      'You are on L2. To transact on L1, SWITCH LAYER to L1' :
       'You are on L1. To transact on L2, SWITCH LAYER to L2';
 
       return (
@@ -107,7 +106,7 @@ function Earn() {
       )
     }
 
- 
+
 const Column = ({ text, tooltip, xs = 4, md = 2 }) => {
   return (
     <S.GridItemTag item xs={xs} md={md}>
