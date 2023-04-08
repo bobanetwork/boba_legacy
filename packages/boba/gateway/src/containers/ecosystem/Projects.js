@@ -9,7 +9,7 @@ import Tooltip from 'components/tooltip/Tooltip'
 
 import { useParams } from 'react-router-dom'
 import * as S from './Ecosystem.styles'
-import { loadProjectByCategory, loadBobaProjectByCategory } from './project.list'
+import { loadProjectByCategory } from './project.list'
 import { SvgIcon, useMediaQuery, useTheme } from '@mui/material'
 import ShowMoreShowLess from 'components/showMoreShowLess/ShowMoreShowLess'
 
@@ -20,11 +20,7 @@ const Projects = ({projectType}) => {
   const params = useParams();
 
   useEffect(() => {
-    if (projectType === 'BOBA') {
-      setprojectByCategory(loadBobaProjectByCategory())
-    } else {
-      setprojectByCategory(loadProjectByCategory())
-    }
+    setprojectByCategory(loadProjectByCategory())
     return () => {
       setprojectByCategory({})
     }

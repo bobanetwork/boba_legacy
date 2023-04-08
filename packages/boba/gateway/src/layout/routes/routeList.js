@@ -89,17 +89,6 @@ export const ROUTE_LIST = [
         key: 'Monster',
       },
       {
-        path: ROUTES_PATH.BOBA_CHAINS,
-        element: <Ecosystem ecosystemType='BOBA' />,
-        key: 'LinksToBobaChains',
-        children: [
-          {
-            path: ':category',
-            element: <Projects projectType='BOBA' />
-          }
-        ]
-      },
-      {
         path: ROUTES_PATH.ECOSYSTEM,
         element: <Ecosystem />,
         key: 'Ecosystem',
