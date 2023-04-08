@@ -16,7 +16,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -65,6 +65,11 @@ function BobaBridge() {
 
   const isL1 = layer === LAYER.L1;
   const navigate = useNavigate()
+
+
+  useEffect(() => {
+    setToL2(isL1);
+  }, [isL1]);
 
   async function switchDirection() {
     if (accountEnabled) {
@@ -121,7 +126,7 @@ function BobaBridge() {
   }
 
   const Bridge = () => {
-    const config = (toL2) => ({
+    const config = () => ({
       from: toL2? <L1ChainLabel/> : <L2ChainLabel/>,
       to: toL2? <L2ChainLabel/> : <L1ChainLabel/>
     });
