@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import moment from 'moment';
+import {convertDate, Now, addYear, addDays} from 'util/dates'
 import DatePicker from 'react-datepicker';
 
 import { Box, IconButton, Typography, useTheme } from '@mui/material';
@@ -52,19 +52,19 @@ function IncreaseLock({
 
   const [ amountTo, setAmountTo ] = useState('');
   const [ votingPower, setVotingPower ] = useState(0);
-  const [ expirtyTo, setExpiryTo ] = useState(moment(expiry).format("YYYY-MM-DD"));
+  const [ expirtyTo, setExpiryTo ] = useState(convertDate(expiry, 'YYYY-MM-DD'));
 
   const [ maxBalance, setMaxBalance ] = useState(0);
 
   useEffect(() => {
     if (expiry) {
-      setExpiryTo(moment(expiry).format("YYYY-MM-DD"));
+      setExpiryTo(convertDate(expiry, 'YYYY-MM-DD'));
     }
   }, [ expiry ])
 
   useEffect(() => {
-    const endD = moment(expirtyTo);
-    const currD = moment();
+    const endD = convertDate(expirtyTo);
+    const currD = Now();
     let secondsYear = 365 * 24 * 3600;
     let secondsTillExpiry = endD.diff(currD, 'days') * 24 * 3600
     let vpower = (secondsTillExpiry / secondsYear) * (Number(lockedAmount) + Number(amountTo));
@@ -83,8 +83,8 @@ function IncreaseLock({
   }, [ layer2 ]);
 
   const onExtendTime = async () => {
-    const endD = moment(expirtyTo);
-    const currD = moment();
+    const endD = convertDate(expirtyTo);
+    const currD = Now();
     // expiry duration in seconds
     const diffD = endD.diff(currD, 'days') * 24 * 3600;
 
@@ -164,9 +164,9 @@ function IncreaseLock({
             popperClassName={Styles.popperStyle}
             dateFormat="yyyy-MM-dd"
             selected={new Date(expirtyTo)}
-            minDate={new Date(moment(expiry).add(8, 'days'))}
-            maxDate={new Date(moment().add(1, 'year'))}
-            onChange={(date) => { setExpiryTo(moment(date).format('yyyy-MM-DD')) }}
+            minDate={new Date(addDays(expiry,8))}
+            maxDate={new Date(addYear(1))}
+            onChange={(date) => { setExpiryTo(convertDate(date,'yyyy-MM-DD')) }}
             calendarClassName={theme.palette.mode}
           />
         </Box>
@@ -208,7 +208,7 @@ function IncreaseLock({
           {lockedAmount} locked
         </Typography>
         <Typography variant='body2'>
-          until {moment(expiry).format('YYYY/MM/DD')}
+          until {convertDate(expiry,'YYYY/MM/DD')}
         </Typography>
       </Box>
     </Box>

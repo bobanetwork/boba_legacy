@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import { Typography } from '@mui/material'
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash';
 import React from 'react'
 import { connect } from 'react-redux'
 import ReactCardFlip from 'react-card-flip'

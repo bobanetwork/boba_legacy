@@ -6,7 +6,7 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #1a1c1e',
   borderRadius: '0',
   background: theme.palette.background.glassy,
-  
+
   [theme.breakpoints.down('md')]: {
     //padding: '30px 10px',
     background: '#1A1D1F',
@@ -33,6 +33,7 @@ export const DropdownWrapper = styled(Box)(({ theme }) => ({
 }));
 
 export const DropdownContent = styled(Box)(({ theme }) => ({
+  width: '100%',
   width: '100%',
   display: 'flex',
   justifyContent: 'flex-start',

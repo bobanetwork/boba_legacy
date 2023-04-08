@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import { isEqual } from 'util/lodash';
+
 import { logAmount, powAmount } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
@@ -76,7 +77,7 @@ class ListEarn extends React.Component {
       showStakesOnly,
       accountEnabled
     };
-  
+
     Object.keys(config).forEach(key => {
       if (!isEqual(prevProps[key], this.props[key])) {
         this.setState({ [key]: this.props[key] });
@@ -149,7 +150,7 @@ class ListEarn extends React.Component {
 
   }
 
- 
+
 
   render() {
     const {
@@ -180,7 +181,7 @@ class ListEarn extends React.Component {
     const decimals = poolInfo.decimals
     const currentAddress = L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress;
 
-    
+
 
     const formatNumber = (value,limit) => {
       const limits = limit || 2;
@@ -221,7 +222,7 @@ class ListEarn extends React.Component {
     }
 
     return (
-      <S.Wrapper    
+      <S.Wrapper
         onClick={() => {
           this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }
         }
