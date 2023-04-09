@@ -186,7 +186,7 @@ export const NetworkList = {
       key: 'avax',
       name: {
         l1: 'Avalanche Mainnet C-Chain',
-        l2: 'Boba Avalance'
+        l2: 'Boba Avalanche'
       }
     },
     {
