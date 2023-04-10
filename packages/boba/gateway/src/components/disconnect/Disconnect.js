@@ -14,34 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { LoginOutlined } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 
-import {
-  setLayer,
-  setConnect,
-  setConnectBOBA,
-  setConnectETH,
-  setEnableAccount,
-  setWalletConnected
- } from 'actions/setupAction';
-
-import networkService from 'services/networkService';
+import useDisconnect from 'hooks/useDisconnect';
 
 function Disconnect () {
 
-  const dispatch = useDispatch();
-
-  const disconnect = async () => {
-    await networkService.walletService.disconnectWallet()
-    dispatch(setLayer(null))
-    dispatch(setConnect(false))
-    dispatch(setConnectBOBA(false))
-    dispatch(setConnectETH(false))
-    dispatch(setWalletConnected(false))
-    dispatch(setEnableAccount(false))
-  }
+  const { disconnect } = useDisconnect();
 
   return (
     <>

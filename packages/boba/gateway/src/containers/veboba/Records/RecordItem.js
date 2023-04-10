@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from '@mui/material'
 import Button from 'components/button/Button'
 import * as G from 'containers/Global.styles'
 import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
-import moment from 'moment'
+import {isSameMonth, isSameWeek, isBeforeDate, convertDate} from 'util/dates'
 import React from 'react'
 
 function RecordItem({
@@ -16,10 +16,10 @@ function RecordItem({
     balance,
     expiry } = lock
 
-  const expired = moment(expiry).isBefore(moment());
+  const expired = isBeforeDate(expiry);
 
-  const sameMonth = moment(expiry).isSame(moment(), 'month');
-  const sameWeek = moment(expiry).isSame(moment(), 'week');
+  const sameMonth = isSameMonth(expiry);
+  const sameWeek = isSameWeek(expiry);
 
   let expiryText = '';
   if (sameMonth) {
@@ -40,7 +40,7 @@ function RecordItem({
           <Typography variant="body2" >
             {
             expired ? 'Expired':
-            moment(expiry).format('YYYY-MM-DD')}</Typography>
+            convertDate(expiry,'YYYY-MM-DD')}</Typography>
           <Typography variant="body4" sx={{ opacity: 0.5 }} >{expiryText}</Typography>
 
         </Box>

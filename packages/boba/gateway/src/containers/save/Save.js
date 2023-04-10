@@ -17,7 +17,7 @@
 */
 import React from 'react'
 import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash';
 
 import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
 import { openAlert } from 'actions/uiAction'

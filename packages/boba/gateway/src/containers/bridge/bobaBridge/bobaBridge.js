@@ -16,7 +16,7 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -29,7 +29,7 @@ import * as S from './bobaBridge.styles'
 
 import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
 
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer, selectWalletAddress } from 'selectors/setupSelector'
 import {
   selectBridgeTokens,
   selectMultiBridgeMode,
@@ -53,6 +53,7 @@ function BobaBridge() {
   const tokens = useSelector(selectBridgeTokens())
   const networkName = useSelector(selectActiveNetworkName())
   const icon = useSelector(selectActiveNetworkIcon())
+  const userWallet = useSelector(selectWalletAddress())
 
   const L1Icon = L1_ICONS[icon]
   const L2Icon = L2_ICONS[icon]
@@ -62,23 +63,29 @@ function BobaBridge() {
   const theme = useTheme()
   const iconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
 
+  const isL1 = layer === LAYER.L1;
   const navigate = useNavigate()
 
-  async function connectToETH() {
-    dispatch(setConnectETH(true))
-  }
 
-  async function connectToBOBA() {
-    dispatch(setConnectBOBA(true))
-  }
+  useEffect(() => {
+    setToL2(isL1);
+  }, [isL1]);
 
   async function switchDirection() {
     if (accountEnabled) {
-      if (layer === LAYER.L1) dispatch(setConnectBOBA(true))
+      if (isL1) dispatch(setConnectBOBA(true))
       else dispatch(setConnectETH(true))
     } else {
       setToL2(!toL2)
     }
+  }
+
+  const handelConnect = async () => {
+    await dispatch(toL2 ? setConnectETH(true) : setConnectBOBA(true))
+  }
+
+  const handleMultiBridge = async () => {
+    await dispatch(multibridgeMode ? resetToken() : setMultiBridgeMode(!multibridgeMode))
   }
 
   const L1ChainLabel = () => {
@@ -87,6 +94,7 @@ function BobaBridge() {
       {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}
     </S.ChainLabel>)
   }
+
   const L2ChainLabel = () => {
     return (<S.ChainLabel component="p" variant="body">
       <L2Icon selected />
@@ -117,81 +125,33 @@ function BobaBridge() {
     </S.IconSwitcher>
   }
 
-  if (!accountEnabled) {
+  const Bridge = () => {
+    const config = () => ({
+      from: toL2? <L1ChainLabel/> : <L2ChainLabel/>,
+      to: toL2? <L2ChainLabel/> : <L1ChainLabel/>
+    });
+
     return (
-      <S.BobaBridgeWrapper>
-        <Box>
-          <Typography variant="h3">
-            Bridge
-          </Typography>
-          <Typography variant="body2">Select the bridge direction</Typography>
-        </Box>
-        <S.BobaDivider></S.BobaDivider>
-        <S.BobaContent>
-          <S.BobaContentWrapper
-            flexDirection="column"
-            fullWidth={true}
-            gap={2}
-            alignItems="flex-start"
-            my={1}
-          >
-            <Box width="100%">
-              <S.ChainDirectionLabel variant="body2" pb="10px">
-                From
-              </S.ChainDirectionLabel>
-              <S.ChainInput>
-                {toL2? <L1ChainLabel/> : <L2ChainLabel/>}
-              </S.ChainInput>
-            </Box>
-            <ChainSwitchIcon />
-            <Box width="100%">
-              <S.ChainDirectionLabel variant="body2" mt="10px" pb="10px">
-                To
-              </S.ChainDirectionLabel>
-              <S.ChainInput>
-                {toL2? <L2ChainLabel/> : <L1ChainLabel/>}
-              </S.ChainInput>
-            </Box>
-          </S.BobaContentWrapper>
-          <Box alignSelf="flex-start">
-            <Button
-              sx={{ marginTop: '35px', padding: '10px 28px' }}
-              onClick={() => {
-                connectToETH()
-              }}
-              color="primary"
-              variant="contained"
-            >
-              Connect
-            </Button>
-          </Box>
-        </S.BobaContent>
-      </S.BobaBridgeWrapper>
-    )
-  }
-
-
-  return (
-    <>
-      <S.BobaBridgeWrapper>
+      <>
+      <S.BobaContent>
         <S.BobaContentWrapper
           flexDirection="row"
           fullWidth={true}
           gap="10px"
-          alignItems="center"
+          alignItems="flex-end"
         >
           <Box width="100%">
             <S.ChainDirectionLabel variant="body2" pb="10px" sx={{color: theme.palette.primary.info}}>
               From
             </S.ChainDirectionLabel>
             <S.ChainInput>
-              {layer === 'L1' ? <L1ChainLabel /> : <L2ChainLabel />}
+              { config().from }
             </S.ChainInput>
           </Box>
           <Box
             display="flex"
             flexDirection="column"
-            alignItems="center"
+            alignItems="flex-end"
             mt="26px"
           >
             <ChainSwitchIcon />
@@ -201,14 +161,50 @@ function BobaBridge() {
               To
             </S.ChainDirectionLabel>
             <S.ChainInput>
-              {layer === 'L2' ? <L1ChainLabel /> : <L2ChainLabel />}
+                { config().to }
             </S.ChainInput>
           </Box>
         </S.BobaContentWrapper>
-      </S.BobaBridgeWrapper>
+      </S.BobaContent>
+      {!userWallet &&
+        <Box alignSelf="center">
+          <Button
+            fullWidth={true}
+            sx={{ marginTop: '38px' }}
+            onClick={() => handelConnect() }
+            color="primary"
+            variant="contained"
+          >
+            Connect
+          </Button>
+        </Box>
+        }
+      </>
+    )
+  }
 
+  if (!accountEnabled) {
+    return (
       <S.BobaBridgeWrapper>
-        {layer === 'L1' && !multibridgeMode && tokens.length < 1 && (
+        <Box>
+          <Typography variant="h3">
+            Bridge
+          </Typography>
+          <Typography variant="body2">Select the bridge direction</Typography>
+        </Box>
+        <S.BobaDivider />
+        <Bridge/>
+      </S.BobaBridgeWrapper>
+    )
+  }
+
+  return (
+    <>
+      <S.BobaBridgeWrapper>
+        <Bridge/>
+      </S.BobaBridgeWrapper>
+      <S.BobaBridgeWrapper>
+        {isL1 && !multibridgeMode && tokens.length < 1 && (
           <Box display="flex" my={1} justifyContent="space-between">
             <Typography variant="body2">
               Bridge multiple tokens at once?
@@ -233,12 +229,7 @@ function BobaBridge() {
                   },
                 },
               }}
-              onChange={() => {
-                if (multibridgeMode) {
-                  dispatch(resetToken())
-                }
-                dispatch(setMultiBridgeMode(!multibridgeMode))
-              }}
+              onChange={() => handleMultiBridge }
             />
           </Box>
         )}
@@ -246,14 +237,14 @@ function BobaBridge() {
         <BridgeTransfer />
       </S.BobaBridgeWrapper>
 
-      {tokens.length === 1 && <AvailableBridges token={tokens[0]} />}
+      {tokens.length === 1 && <AvailableBridges token={tokens[0]} walletAddress={userWallet}/>}
 
       <S.HistoryLink
+        display="flex"
+        justifyContent="center"
         onClick={() => {
           navigate('/history')
         }}
-        display="flex"
-        justifyContent="center"
       >
         <Typography sx={{ cursor: 'pointer' }} variant="body2" component="span">
           {'Transaction History >'}

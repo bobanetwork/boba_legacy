@@ -51,7 +51,7 @@ export const ContentWrapper = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   width: '100%',
-  alignItems: 'flex-center',
+  alignItems: 'flex-start',
   gap: '20px',
   [ theme.breakpoints.down('sm') ]: {
     flexDirection: 'column',
@@ -66,7 +66,7 @@ export const TitleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '70px 50px',
+  padding: '50px',
   position: 'relative',
   minHeight: 'auto',
   [ theme.breakpoints.down('sm') ]: {

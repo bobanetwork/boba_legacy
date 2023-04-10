@@ -29,7 +29,8 @@ import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
 import Pulse from 'components/pulse/PulsingBadge'
 
-import { isEqual, orderBy } from 'lodash'
+
+import { isEqual,orderBy } from 'util/lodash';
 
 import networkService from 'services/networkService'
 
@@ -37,7 +38,9 @@ import { useNavigate } from 'react-router-dom'
 
 import Faucet from 'components/faucet/Faucet'
 
-function TokenPage() {
+function TokenPage({
+  balanceToken
+}) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -277,6 +280,7 @@ function TokenPage() {
                 l2Balance.map((i) => {
                   return (
                     <ListToken
+                      showBalanceToken={balanceToken}
                       key={i.currency}
                       token={i}
                       chain={'L2'}
@@ -296,6 +300,7 @@ function TokenPage() {
                 l1Balance.map((i) => {
                   return (
                     <ListToken
+                      showBalanceToken={balanceToken}
                       key={i.currency}
                       token={i}
                       chain={'L1'}

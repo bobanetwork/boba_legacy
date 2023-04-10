@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import { isEqual } from 'util/lodash';
+
 import { logAmount, powAmount } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
@@ -261,7 +262,7 @@ class ListEarn extends React.Component {
                   <img src={logo} alt="logo" width={35} height={35} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', paddingLeft: '8px' }}>
                     <Typography variant="overline" style={{ lineHeight: '1em' }}>{symbol}</Typography>
-                    <Typography variant="overline" style={{ lineHeight: '1em', color: 'rgba(255, 255, 255, 0.3)' }}>{name}</Typography>
+                    <Typography variant="overline" style={{ lineHeight: '1em'}}>{name}</Typography>
                   </div>
                 </div>
               </S.GridItemTag>

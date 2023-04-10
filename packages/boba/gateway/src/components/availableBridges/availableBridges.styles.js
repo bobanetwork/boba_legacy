@@ -8,13 +8,12 @@ export const BridgesContainer = styled(Box)(({ theme }) => ({
   backdropFilter: 'blur(50px)',
   flex: 1,
   minHeight: 'fit-content',
-  padding: '20px',
+  padding: '24px',
   width: '100%',
+    maxWidth: '600px',
 }))
 
 export const Wrapper = styled(Box)(({ theme }) => ({
-  maxHeight: '300px',
-  overflowY: 'scroll',
   display: 'flex',
   flexDirection: 'column',
   gap: '5px'
@@ -29,7 +28,7 @@ export const LabelContainer = styled(Box)(({ theme }) => ({
   margin: '10px 0px'
 }))
 
-export const BridgeContent = styled(Box)(({ theme, border }) => ({
+export const BridgeContent = styled(Box)(({ theme }) => ({
   borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.secondaryLight,
   padding: '5px 10px',

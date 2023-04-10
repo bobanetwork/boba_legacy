@@ -56,11 +56,5 @@ export const MENU_LIST = [
     icon: "VoteIcon",
     title: "Dao",
     url: ROUTES_PATH.DAO
-  },
-  {
-    key: 'LinksToBobaChains',
-    icon: "LinksToBobaChainsIcon",
-    title: "BOBA Chains",
-    url: ROUTES_PATH.BOBA_CHAINS
   }
 ]
