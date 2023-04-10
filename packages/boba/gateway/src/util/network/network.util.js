@@ -175,8 +175,8 @@ export const NetworkList = {
       label: 'BNB <> Boba',
       key: 'bnb',
       name: {
-        l1: 'Binance Smart Chain Mainnet',
-        l2: 'Boba BNB Mainnet'
+        l1: 'Binance Smart Chain',
+        l2: 'Boba BNB'
       }
     },
     {
@@ -186,7 +186,7 @@ export const NetworkList = {
       key: 'avax',
       name: {
         l1: 'Avalanche Mainnet C-Chain',
-        l2: 'Boba Avalance Mainnet'
+        l2: 'Boba Avalanche'
       }
     },
     {
@@ -195,8 +195,8 @@ export const NetworkList = {
       label: 'Fantom <> Boba',
       key: 'fantom',
       name: {
-        l1: 'Fantom Mainnet',
-        l2: 'Bobaopera Mainnet'
+        l1: 'Fantom',
+        l2: 'Bobaopera'
       }
     },
     {
