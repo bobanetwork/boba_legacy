@@ -1,6 +1,6 @@
 {
   "name": "@boba/gateway",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "buildenv-dev": "react-env",
