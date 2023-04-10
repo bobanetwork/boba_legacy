@@ -44,9 +44,6 @@ export const EXPIRY_OPTIONS = [
   },
 ]
 
-
-export const BOBA_PROJECTS_CATEGORY = [ 'mainnet', 'testnet' ]
-
 export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
 
 /*********************
@@ -56,7 +53,6 @@ export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet',
 export const ROUTES_PATH = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
-  BOBA_CHAINS: '/bobachains',
   WALLET: '/wallet',
   HISTORY: '/history',
   EARN: '/earn',
@@ -72,11 +68,11 @@ export const ROUTES_PATH = {
 export const PER_PAGE = 8
 
 export const PAGES_BY_NETWORK = {
-  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO', 'Monster'],
-  bnb: [ 'Bridge', 'Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
-  avax: [ 'Bridge', 'Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
-  fantom: [ 'Bridge', 'Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
-  moonbeam: [ 'Bridge', 'Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
+  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'DAO', 'Monster'],
+  bnb: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  avax: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  fantom: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  moonbeam: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
 }
 
 export const LAYER = {
