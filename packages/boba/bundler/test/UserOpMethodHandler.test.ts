@@ -15,7 +15,7 @@ import { DeterministicDeployer, SimpleAccountAPI } from '@boba/bundler_sdk'
 import { postExecutionDump } from '@boba/bundler_utils/dist/postExecCheck'
 import {
   SampleRecipient, TestRuleAccount, TestOpcodesAccount__factory
-} from '../dist/types'
+} from '../dist/src/types'
 import { resolveHexlify } from '@boba/bundler_utils'
 import { UserOperationEventEvent } from '@boba/accountabstraction'
 import { UserOperationReceipt } from '../src/RpcTypes'
