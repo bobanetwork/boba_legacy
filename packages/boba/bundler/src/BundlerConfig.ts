@@ -50,5 +50,9 @@ export const bundlerConfigDefault: Partial<BundlerConfig> = {
   port: '3000',
   entryPoint: '0x1306b01bC3e4AD202612D3843387e94737673F53',
   unsafe: false,
-  conditionalRpc: false
+  conditionalRpc: false,
+  minStake: '1',
+  minUnstakeDelay: 60,
+  autoBundleInterval: 1,
+  autoBundleMempoolSize: 1,
 }

@@ -16,7 +16,7 @@ import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samp
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
 
 import BobaDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
 

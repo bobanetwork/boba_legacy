@@ -11,11 +11,11 @@ import { OptimismEnv } from './shared/env'
 // use local sdk
 import { SimpleAccountAPI, wrapProvider } from '@boba/bundler_sdk'
 // change this to using factory
-import SimpleAccountDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountDeployer.sol/SimpleAccountDeployer.json'
+import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
 
 describe('AA Wallet Test\n', async () => {
   let env: OptimismEnv
@@ -142,13 +142,13 @@ describe('AA Wallet Test\n', async () => {
   })
   it('should deploy a wallet if it does not exist through initCode', async () => {
     // Deploy WalletDeployer
-    const SimpleAccountDeployer__factory = new ContractFactory(
-      SimpleAccountDeployerJson.abi,
-      SimpleAccountDeployerJson.bytecode,
+    const SimpleAccount__factory = new ContractFactory(
+      SimpleAccountFactoryJson.abi,
+      SimpleAccountFactoryJson.bytecode,
       env.l2Wallet_2
     )
-    const SimpleAccountDeployer = await SimpleAccountDeployer__factory.deploy()
-    console.log('factory deployed to', SimpleAccountDeployer.address)
+    const SimpleAccount = await SimpleAccount__factory.deploy()
+    console.log('factory deployed to', SimpleAccount.address)
 
     // deploy a senderCreator contract to get the create2 address on the provide
     const SenderCreator__factory = new ContractFactory(
@@ -164,12 +164,12 @@ describe('AA Wallet Test\n', async () => {
       entryPointAddress,
       senderCreatorAddress: senderCreator.address,
       owner: env.l2Wallet_2,
-      factoryAddress: SimpleAccountDeployer.address,
+      factoryAddress: SimpleAccount.address,
     })
 
     const accountAddress = await accountAPI.getWalletAddress()
     // computed address is correct
-    expect(accountAddress).to.be.eq(await SimpleAccountDeployer.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
+    expect(accountAddress).to.be.eq(await SimpleAccount.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
 
     await env.l2Wallet.sendTransaction({
       value: utils.parseEther('2'),
