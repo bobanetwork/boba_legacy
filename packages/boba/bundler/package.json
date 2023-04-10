@@ -10,8 +10,8 @@
     ]
   },
   "scripts": {
+    "build": "hardhat compile || tsc -p ./tsconfig.json || hardhat compile",
     "bundler": "ts-node ./src/exec.ts --config ./localconfig/bundler.config.json",
-    "build": "hardhat compile",
     "clean": "rimraf artifacts cache node_modules dist dockers/bundler ./tsconfig.tsbuildinfo",
     "test": "hardhat test --grep '/^((?!Flow).)*$/'",
     "test:coverage": "yarn test",
@@ -20,6 +20,8 @@
     "hardhat-node": "npx hardhat node --no-deploy"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/contracts-upgradeable": "4.3.2",
     "@boba/accountabstraction": "^1.0.0",
     "@boba/bundler_utils": "^0.2.3",
     "@boba/bundler_sdk": "^0.2.3",
