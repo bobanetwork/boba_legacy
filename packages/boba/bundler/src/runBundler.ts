@@ -5,11 +5,11 @@ import fs from 'fs'
 import { Command } from 'commander'
 import { erc4337RuntimeVersion } from '@boba/bundler_utils'
 import { ethers, Wallet } from 'ethers'
-
+import { getContractFactory } from '@eth-optimism/contracts'
 import { BundlerServer } from './BundlerServer'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import { EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
-
+import { BaseProvider } from '@ethersproject/providers'
 import { initServer } from './modules/initServer'
 import { DebugMethodHandler } from './DebugMethodHandler'
 import { DeterministicDeployer } from '@boba/bundler_sdk'
@@ -35,6 +35,25 @@ export async function connectContracts(
   return {
     entryPoint,
   }
+}
+
+export async function connectContractsViaAddressManager (
+  providerL1: BaseProvider,
+  wallet: Wallet,
+  addressManagerAddress: string): Promise<{ entryPoint: EntryPoint }> {
+  const addressManager = getAddressManager(providerL1, addressManagerAddress)
+
+  const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
+
+  const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
+
+  return { entryPoint }
+}
+
+function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
+  return getContractFactory('Lib_AddressManager')
+    .attach(addressManagerAddress)
+    .connect(provider)
 }
 
 /**
@@ -94,11 +113,14 @@ export async function runBundler(
     .option('--conditionalRpc', 'Use eth_sendRawTransactionConditional RPC)')
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
+    .option('--addressManager <string>', 'address of the Address Manager', '')
+    .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
+    .option('--maxBundleGas <number>', 'Max Bundle Gas available to use', '5000000')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
 
-  console.log('command-line arguments: ', program.opts())
+  //console.log('command-line arguments: ', program.opts())
 
   const { config, provider, wallet } = await resolveConfiguration(programOpts)
   if (programOpts.createMnemonic != null) {
@@ -145,8 +167,13 @@ export async function runBundler(
     process.exit(1)
   }
 
-  const { entryPoint } = await connectContracts(wallet, config.entryPoint)
-
+  let entryPoint: EntryPoint
+  if (config.addressManager.length > 0) {
+    const providerL1: BaseProvider = new ethers.providers.JsonRpcProvider(config.l1NodeWeb3Url)
+    let { entryPoint } = await connectContractsViaAddressManager(providerL1, wallet, config.addressManager)
+  } else {
+    let { entryPoint } = await connectContracts(wallet, config.entryPoint)
+  }
   // bundleSize=1 replicate current immediate bundling mode
   const execManagerConfig = {
     ...config,
