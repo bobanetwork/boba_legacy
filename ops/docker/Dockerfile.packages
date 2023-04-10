@@ -120,7 +120,7 @@ COPY --from=builder /opt/optimism/packages/data-transport-layer ./data-transport
 WORKDIR /opt/optimism/packages/data-transport-layer
 RUN mkdir ./state-dumps
 COPY ./ops/scripts/dtl.sh .
-CMD ["node", "dist/src/services/run.js"]
+CMD ["node", "dist/services/run.js"]
 
 FROM packages as integration-tests
 WORKDIR /opt/optimism/
