@@ -9,14 +9,18 @@ import { setActiveNetwork } from 'actions/networkAction';
 import { closeModal } from 'actions/uiAction';
 import { setBaseState, setConnect, setEnableAccount } from 'actions/setupAction';
 
-import { selectNetwork } from 'selectors/networkSelector';
+import { selectNetwork, selectNetworkType } from 'selectors/networkSelector';
+import { useSearchParams } from 'react-router-dom';
 
 function SwitchNetworkModal({open}) {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
+  const networkType = useSelector(selectNetworkType());
+  const [searchParams, setSearchParams] = useSearchParams();
 
   function onClick() {
+    setSearchParams(`?${new URLSearchParams({ network: networkType, chain: network })}`)
     dispatch(setActiveNetwork());
     // reset baseState to false to trigger initialization on chain change.
     // and trigger the connect to BOBA & ETH base on current chain.
