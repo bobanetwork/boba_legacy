@@ -2,4 +2,4 @@
 
 set -e
 
-exec node dist/src/services/run.js
+exec node dist/services/run.js
