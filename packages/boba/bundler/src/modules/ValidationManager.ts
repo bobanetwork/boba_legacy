@@ -14,7 +14,7 @@ import {
 } from '../BundlerCollectorTracer'
 import { debug_traceCall } from '../GethTracer'
 import Debug from 'debug'
-import { GetCodeHashes__factory } from '../../dist/types'
+import { GetCodeHashes__factory } from '../../dist/src/types'
 import {
   ReferencedCodeHashes,
   StakeInfo,
