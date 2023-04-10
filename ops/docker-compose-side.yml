@@ -147,7 +147,7 @@ services:
       L2_NODE_WEB3_URL: http://l2geth:8545
       ENTRYPOINT: "0x"
       BENEFICIARY: "0xcd3b766ccdd6ae721141f452c550ca635964ce71"
-      HELPER: "0x"
+      MAX_BUNDLE_GAS: 5000000
     mem_limit: 300M
     logging:
       driver: "json-file"
