@@ -69,10 +69,10 @@ export const PER_PAGE = 8
 
 export const PAGES_BY_NETWORK = {
   ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'DAO', 'Monster'],
-  bnb: ['Wallet', 'Earn', 'History'],
-  avax: ['Wallet', 'Earn', 'History'],
-  fantom: ['Wallet', 'Earn', 'History'],
-  moonbeam: ['Wallet', 'Earn', 'History'],
+  bnb: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  avax: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  fantom: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  moonbeam: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
 }
 
 export const LAYER = {

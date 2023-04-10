@@ -330,7 +330,7 @@ function Home() {
         <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
           <Container maxWidth={false} sx={{
-            minHeight: 'calc(100vh - 64px)',
+            minHeight: 'calc(100vh - 200px)',
             width: '100vw',
             marginLeft: 'unset',
             marginRight: 'unset'
