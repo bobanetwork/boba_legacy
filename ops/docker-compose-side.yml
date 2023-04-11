@@ -148,6 +148,8 @@ services:
       ENTRYPOINT: "0x"
       BENEFICIARY: "0xcd3b766ccdd6ae721141f452c550ca635964ce71"
       MAX_BUNDLE_GAS: 5000000
+      #should be set to false in prod!
+      UNSAFE: 'true'
     mem_limit: 300M
     logging:
       driver: "json-file"

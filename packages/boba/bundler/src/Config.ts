@@ -26,24 +26,12 @@ function mergeConfigs (...sources: Array<Partial<BundlerConfig>>): BundlerConfig
 }
 
 export async function resolveConfiguration (programOpts: any): Promise<{ config: BundlerConfig, provider: BaseProvider, wallet: Wallet }> {
-  // console.log(config.maxBundleGas)
-  // console.log(programOpts.config.maxBundleGas)
-  // console.log(commandLineParams.maxBundleGas)
-  // config.maxBundleGas = parseInt(programOpts.config.maxBundleGas, 10)
-  // console.log(config)
-  console.log('resolveConfiguration')
-  console.log(programOpts)
   const commandLineParams = getCommandLineParams(programOpts)
-  console.log('resolveConfiguration1')
   let fileConfig: Partial<BundlerConfig> = {}
   const configFileName = programOpts.config
   if (fs.existsSync(configFileName)) {
     fileConfig = JSON.parse(fs.readFileSync(configFileName, 'ascii'))
   }
-  console.log(bundlerConfigDefault)
-  console.log(fileConfig)
-  console.log(commandLineParams)
-  console.log('resolveConfiguration2')
 
   const config = mergeConfigs(bundlerConfigDefault, fileConfig, commandLineParams)
   console.log('Merged configuration:', JSON.stringify(config))
