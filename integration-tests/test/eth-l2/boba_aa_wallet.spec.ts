@@ -55,10 +55,10 @@ describe('AA Wallet Test\n', async () => {
   it('should be able to send a userOperation to a wallet through the bundler (low level api)', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
     const account = await SimpleAccount__factory.deploy(
-      entryPointAddress,
-      env.l2Wallet.address
+      entryPointAddress
     )
     await account.deployed()
+
     console.log('Account deployed to:', account.address)
 
     await env.l2Wallet.sendTransaction({
@@ -147,7 +147,7 @@ describe('AA Wallet Test\n', async () => {
       SimpleAccountFactoryJson.bytecode,
       env.l2Wallet_2
     )
-    const simpleAccount = await simpleAccount__factory.deploy()
+    const simpleAccount = await simpleAccount__factory.deploy(entryPointAddress)
     console.log('factory deployed to', simpleAccount.address)
 
     // deploy a senderCreator contract to get the create2 address on the provide
