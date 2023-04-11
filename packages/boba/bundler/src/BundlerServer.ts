@@ -79,17 +79,19 @@ export class BundlerServer {
       signature: '0x',
     }
     // await EntryPoint__factory.connect(this.config.entryPoint,this.provider).callStatic.addStake(0)
-    const err = await EntryPoint__factory.connect(
-      this.config.entryPoint,
-      this.provider
-    )
-      .callStatic.simulateValidation(emptyUserOp)
-      .catch((e) => e)
-    if (err?.errorName !== 'FailedOp') {
-      this.fatal(
-        `Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`
-      )
-    }
+
+    // const err = await EntryPoint__factory.connect(
+    //   this.config.entryPoint,
+    //   this.provider
+    // )
+    //   .callStatic.simulateValidation(emptyUserOp)
+    //   .catch((e) => e)
+    // console.log(err)
+    // if (err?.errorName !== 'FailedOp') {
+    //   this.fatal(
+    //     `Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`
+    //   )
+    // }
     const bal = await this.provider.getBalance(this.wallet.address)
     console.log(
       'signer',
@@ -164,12 +166,13 @@ export class BundlerServer {
           params[1]
         )
         break
-      case 'eth_estimateUserOperationGas':
-        result = await this.methodHandler.estimateUserOperationGas(
-          params[0],
-          params[1]
-        )
-        break
+      // custom errors post bedrock!
+      // case 'eth_estimateUserOperationGas':
+      //   result = await this.methodHandler.estimateUserOperationGas(
+      //     params[0],
+      //     params[1]
+      //   )
+      //   break
       case 'eth_getUserOperationReceipt':
         result = await this.methodHandler.getUserOperationReceipt(params[0])
         break
