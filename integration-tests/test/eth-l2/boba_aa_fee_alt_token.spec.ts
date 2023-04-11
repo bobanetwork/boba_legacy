@@ -124,8 +124,7 @@ describe('AA Alt Fee Token Test\n', async () => {
         env.l2Wallet
       )
       account = await SimpleAccount__factory.deploy(
-        entryPointAddress,
-        env.l2Wallet.address
+        entryPointAddress
       )
       await account.deployed()
 

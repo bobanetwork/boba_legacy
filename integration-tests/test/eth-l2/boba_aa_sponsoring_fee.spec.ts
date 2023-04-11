@@ -92,9 +92,9 @@ describe('Sponsoring Tx\n', async () => {
     before('account is created and accountAPI is setup', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
       account = await SimpleAccount__factory.deploy(
-        entryPointAddress,
-        env.l2Wallet_4.address
+        entryPointAddress
       )
+      await account.initialize(env.l2Wallet_4.address)
       await account.deployed()
 
       accountAPI = new SimpleAccountAPI({
