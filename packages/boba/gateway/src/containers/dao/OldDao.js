@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
 import { openError, openModal } from 'actions/uiAction'
-import orderBy from 'lodash/orderBy'
+import { orderBy } from 'util/lodash';
 
 import Button from 'components/button/Button'
 import ListProposal from 'components/listProposal/listProposal'
@@ -126,7 +126,7 @@ function OldDao() {
           }}>
             <Button
               fullWidth={true}
-              color="neutral"
+              color="primary"
               variant="outlined"
               disabled={!accountEnabled}
               onClick={() => {

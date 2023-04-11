@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { BigNumber, utils } from 'ethers'
-import moment from 'moment'
+import {Now, convertDate, addDays,addYear} from 'util/dates'
 import DatePicker from 'react-datepicker'
 
 import { Box, FormControlLabel, Radio, Typography, useTheme, IconButton } from '@mui/material'
@@ -76,8 +76,8 @@ function CreateLock({
   }
 
   const conversioRation = () => {
-    const endD = moment(expiry);
-    const currD = moment();
+    const endD = convertDate(expiry);
+    const currD = Now();
     let secondsYear = 365 * 24 * 3600;
     let secondsTillExpiry = endD.diff(currD, 'days') * 24 * 3600
     let ratio = (secondsTillExpiry / secondsYear);
@@ -87,8 +87,8 @@ function CreateLock({
 
   const onCreateLock = async () => {
 
-    const endD = moment(expiry);
-    const currD = moment();
+    const endD = convertDate(expiry);
+    const currD = Now();
     // expiry duration in seconds
     const diffD = endD.diff(currD, 'days') * 24 * 3600;
 
@@ -137,9 +137,9 @@ function CreateLock({
           popperClassName={Styles.popperStyle}
           dateFormat="yyyy-MM-dd"
           selected={new Date(expiry)}
-          minDate={new Date(moment().add(8, 'days'))}
-          maxDate={new Date(moment().add(1, 'year'))}
-          onChange={(date) => {setExpiry(moment(date).format('yyyy-MM-DD'))}}
+          minDate={new Date(addDays(Now(), 8))}
+          maxDate={new Date(addYear(1))}
+          onChange={(date) => {setExpiry(convertDate(date,'yyyy-MM-DD'))}}
           calendarClassName={theme.palette.mode}
         />
 

@@ -140,14 +140,14 @@ const PulsingBadge = ({
   const classes = useStyles();
   return (
     <span className={classes.container}>
-      <div
+      <span
         className={clsx(classes.badge, classes[variant + "Badge"], {
           [classes[variant + "BadgeBorder"]]: withBorder,
           [classes.badgeBorder]: withBorder
         })}
       >
-        <div className={clsx(classes.circle, classes[variant + "Circle"])} />
-      </div>
+        <span className={clsx(classes.circle, classes[variant + "Circle"])} />
+      </span>
       {children}
     </span>
   );

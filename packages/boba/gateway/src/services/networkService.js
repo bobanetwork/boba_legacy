@@ -22,8 +22,7 @@ import {
 import { ethers, BigNumber, utils } from 'ethers'
 
 import store from 'store'
-import groupBy from 'lodash/groupBy';
-import orderBy from 'lodash/orderBy';
+import { orderBy,groupBy } from 'util/lodash';
 import BN from 'bn.js'
 
 import { logAmount } from 'util/amountConvert'
@@ -1042,10 +1041,7 @@ class NetworkService {
       const tokenBalances = await Promise.all(getBalancePromise)
 
       tokenBalances.forEach((token) => {
-        if(token.balance.lte(new BN(1000000))) {
-          //do nothing
-        }
-        else if (token.layer === 'L1' &&
+          if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
             token.symbol !== 'WAGMIv1' &&

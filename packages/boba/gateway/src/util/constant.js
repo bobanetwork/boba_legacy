@@ -1,5 +1,4 @@
-import moment from 'moment'
-
+import {addMonths, Now, addYear} from 'util/dates'
 
 /**************
  * Env Params *
@@ -32,21 +31,18 @@ export const BRIDGE_TYPE = {
 
 export const EXPIRY_OPTIONS = [
   {
-    value: moment().add(3, 'M').format("YYYY-MM-DD"),
+    value: addMonths(Now(), 3, "YYYY-MM-DD"),
     label: '3 Months',
   },
   {
-    value: moment().add(6, 'M').format("YYYY-MM-DD"),
+    value: addMonths(Now(), 7, "YYYY-MM-DD"),
     label: '6 Months',
   },
   {
-    value: moment().add(1, 'y').format("YYYY-MM-DD"),
+    value: addYear(1,"YYYY-MM-DD"),
     label: '1 Year',
   },
 ]
-
-
-export const BOBA_PROJECTS_CATEGORY = [ 'mainnet', 'testnet' ]
 
 export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
 
@@ -57,7 +53,6 @@ export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet',
 export const ROUTES_PATH = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
-  BOBA_CHAINS: '/bobachains',
   WALLET: '/wallet',
   HISTORY: '/history',
   EARN: '/earn',
@@ -73,11 +68,11 @@ export const ROUTES_PATH = {
 export const PER_PAGE = 8
 
 export const PAGES_BY_NETWORK = {
-  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'LinksToBobaChains', 'DAO', 'Monster'],
-  bnb: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
-  avax: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
-  fantom: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
-  moonbeam: ['Wallet', 'Earn', 'History', 'LinksToBobaChains' ],
+  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'DAO', 'Monster'],
+  bnb: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  avax: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  fantom: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  moonbeam: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
 }
 
 export const LAYER = {

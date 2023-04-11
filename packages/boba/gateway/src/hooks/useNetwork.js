@@ -39,6 +39,16 @@ const useNetwork = () => {
         network: chain,
         networkIcon: icon,
       }));
+    } else if (queryParams.network && queryParams.chain) {
+      let type = queryParams.network;
+      let chain = queryParams.chain;
+      const { name, icon } = NetworkList[ type ].filter((n) => n.chain === chain)[ 0 ];
+      dispatch(setNetwork({
+        networkType: type,
+        name,
+        network: chain,
+        networkIcon: icon,
+      }));
     }
   }, [ searchParams, dispatch ]);
 

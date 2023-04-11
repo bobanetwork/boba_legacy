@@ -40,6 +40,7 @@ import PageTitle from 'components/pageTitle/PageTitle'
 import networkService from 'services/networkService'
 
 import * as S from './Earn.styles'
+import * as G from 'containers/Global.styles'
 import { fetchBalances } from 'actions/networkAction';
 
 function Earn() {
@@ -138,7 +139,7 @@ function Earn() {
 
       <Box sx={{ my: 1, width: '100%' }}>
         <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
-          <S.PageSwitcher>
+          <G.PageSwitcher>
             <Typography
               className={poolTab === 'Ethereum Pool' ? 'active' : ''}
               onClick={() => {
@@ -159,7 +160,7 @@ function Earn() {
               component="span">
               {activeNetworkName['l2']} Pools
             </Typography>
-          </S.PageSwitcher>
+          </G.PageSwitcher>
 
           <S.EarnAction>
             <FormControlLabel

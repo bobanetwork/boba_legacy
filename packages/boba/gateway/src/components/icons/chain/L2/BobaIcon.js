@@ -1,6 +1,6 @@
 import * as React from "react"
 
-function EthereumIcon({ selected = false }) {
+function BobaIcon({ selected = false }) {
 
   if (!selected) {
     return <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,4 +56,4 @@ function EthereumIcon({ selected = false }) {
 
 }
 
-export default EthereumIcon
+export default BobaIcon
