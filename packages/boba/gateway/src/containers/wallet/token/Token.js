@@ -29,14 +29,9 @@ import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
 import Pulse from 'components/pulse/PulsingBadge'
 
-<<<<<<< HEAD
-import isEqual from 'lodash/isEqual'
-import orderBy from 'lodash/orderBy';
-=======
 
 import { isEqual,orderBy } from 'util/lodash';
 
->>>>>>> 19f2eb6385e0e61b0256bf25b05495fb19a83274
 import networkService from 'services/networkService'
 
 import { useNavigate } from 'react-router-dom'

@@ -18,11 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
 import { openError, openModal } from 'actions/uiAction'
-<<<<<<< HEAD
-import orderBy from 'lodash/orderBy';
-=======
 import { orderBy } from 'util/lodash';
->>>>>>> 19f2eb6385e0e61b0256bf25b05495fb19a83274
 
 import Button from 'components/button/Button'
 import ListProposal from 'components/listProposal/listProposal'

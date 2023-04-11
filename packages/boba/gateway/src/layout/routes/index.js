@@ -4,12 +4,8 @@ import { COMMON_ROUTES, ROUTE_LIST } from './routeList'
 import { useSelector } from 'react-redux';
 import { selectActiveNetwork } from 'selectors/networkSelector';
 import { useRoutes } from 'react-router-dom';
-<<<<<<< HEAD
-import intersection from 'lodash/intersection';
-=======
 import { intersection } from 'util/lodash';
 
->>>>>>> 19f2eb6385e0e61b0256bf25b05495fb19a83274
 
 export const Router = () => {
 

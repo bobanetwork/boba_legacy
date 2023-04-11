@@ -13,11 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-<<<<<<< HEAD
-import keyBy from 'lodash/keyBy';
-=======
 import { keyBy } from 'util/lodash';
->>>>>>> 19f2eb6385e0e61b0256bf25b05495fb19a83274
 
 const initialState = {
   sevens: {},
