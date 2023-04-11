@@ -134,7 +134,7 @@ export class UserOpMethodHandler {
 
   /**
    * eth_estimateUserOperationGas RPC api.
-   *
+   * TODO: gonna work post bedrock!
    * @param userOp1
    * @param entryPointInput
    */
