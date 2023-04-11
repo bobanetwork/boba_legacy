@@ -1,3 +1,5 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable prettier/prettier */
 import { ExecutionManager } from './ExecutionManager'
 import { BundlerReputationParams, ReputationManager } from './ReputationManager'
 import { MempoolManager } from './MempoolManager'

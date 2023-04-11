@@ -34,7 +34,6 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
   }
 
   const config = mergeConfigs(bundlerConfigDefault, fileConfig, commandLineParams)
-  console.log('Merged configuration:', JSON.stringify(config))
 
   const provider: BaseProvider = config.network === 'hardhat'
     // eslint-disable-next-line
