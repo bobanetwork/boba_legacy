@@ -30,24 +30,22 @@ export let showStackTraces = false
 export async function connectContracts(
   wallet: Wallet,
   entryPointAddress: string
-): Promise<{ entryPoint: EntryPoint }> {
+): Promise<EntryPoint> {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-  return {
-    entryPoint,
-  }
+  return entryPoint
 }
 
 export async function connectContractsViaAddressManager (
   providerL1: BaseProvider,
   wallet: Wallet,
-  addressManagerAddress: string): Promise<{ entryPoint: EntryPoint }> {
+  addressManagerAddress: string): Promise<EntryPoint> {
   const addressManager = getAddressManager(providerL1, addressManagerAddress)
 
   const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
 
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
 
-  return { entryPoint }
+  return entryPoint
 }
 
 function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
@@ -137,17 +135,6 @@ export async function runBundler(
     process.exit(1)
   }
 
-  const {
-    // name: chainName,
-    chainId,
-  } = await provider.getNetwork()
-
-  if (chainId === 31337 || chainId === 1337) {
-    await new DeterministicDeployer(provider as any).deterministicDeploy(
-      EntryPoint__factory.bytecode
-    )
-  }
-
   if (
     config.conditionalRpc &&
     !(await supportsRpcMethod(
@@ -169,10 +156,16 @@ export async function runBundler(
 
   let entryPoint: EntryPoint
   if (config.addressManager.length > 0) {
+    console.log('Getting entrypoint from address manager')
     const providerL1: BaseProvider = new ethers.providers.JsonRpcProvider(config.l1NodeWeb3Url)
-    let { entryPoint } = await connectContractsViaAddressManager(providerL1, wallet, config.addressManager)
+    const eP = await connectContractsViaAddressManager(providerL1, wallet, config.addressManager)
+    console.log(eP.address)
+    config.entryPoint = eP.address
+    console.log(config.entryPoint)
+    entryPoint = eP
   } else {
-    let { entryPoint } = await connectContracts(wallet, config.entryPoint)
+    const eP = await connectContracts(wallet, config.entryPoint)
+    entryPoint = eP
   }
   // bundleSize=1 replicate current immediate bundling mode
   const execManagerConfig = {
@@ -183,9 +176,10 @@ export async function runBundler(
     execManagerConfig.autoBundleMempoolSize = 0
     execManagerConfig.autoBundleInterval = 0
   }
-
   const [execManager, eventsManager, reputationManager, mempoolManager] =
     initServer(execManagerConfig, entryPoint.signer)
+
+  console.log('initServer done')
   const methodHandler = new UserOpMethodHandler(
     execManager,
     provider,
@@ -208,7 +202,7 @@ export async function runBundler(
     provider,
     wallet
   )
-
+  console.log('bundlerServer...')
   void bundlerServer.asyncStart().then(async () => {
     console.log(
       'Bundle interval (seconds)',
