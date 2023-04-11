@@ -142,13 +142,13 @@ describe('AA Wallet Test\n', async () => {
   })
   it('should deploy a wallet if it does not exist through initCode', async () => {
     // Deploy WalletDeployer
-    const SimpleAccount__factory = new ContractFactory(
+    const simpleAccount__factory = new ContractFactory(
       SimpleAccountFactoryJson.abi,
       SimpleAccountFactoryJson.bytecode,
       env.l2Wallet_2
     )
-    const SimpleAccount = await SimpleAccount__factory.deploy()
-    console.log('factory deployed to', SimpleAccount.address)
+    const simpleAccount = await simpleAccount__factory.deploy()
+    console.log('factory deployed to', simpleAccount.address)
 
     // deploy a senderCreator contract to get the create2 address on the provide
     const SenderCreator__factory = new ContractFactory(
@@ -164,12 +164,12 @@ describe('AA Wallet Test\n', async () => {
       entryPointAddress,
       senderCreatorAddress: senderCreator.address,
       owner: env.l2Wallet_2,
-      factoryAddress: SimpleAccount.address,
+      factoryAddress: simpleAccount.address,
     })
 
     const accountAddress = await accountAPI.getWalletAddress()
     // computed address is correct
-    expect(accountAddress).to.be.eq(await SimpleAccount.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
+    expect(accountAddress).to.be.eq(await simpleAccount.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
 
     await env.l2Wallet.sendTransaction({
       value: utils.parseEther('2'),
