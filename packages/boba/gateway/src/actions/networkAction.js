@@ -18,11 +18,6 @@ import networkService from 'services/networkService'
 import transctionService from 'services/transaction.service'
 import { createAction } from './createAction'
 
-
-export function getWalletType(){
-  return networkService.walletService.walletType;
-}
-
 export function fetchBalances() {
   return createAction('BALANCE/GET', () => networkService.getBalances())
 }
