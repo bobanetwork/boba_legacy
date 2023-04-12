@@ -19,5 +19,9 @@ type AprLabelType = {
 
 export const AprLabel = ({ children }: AprLabelType): JSX.Element => {
   const label = children.toLowerCase() === 'infinity' ? '~' : children + '%'
-  return <Label>{label}</Label>
+  return (
+    <>
+      <Label>{label}</Label>
+    </>
+  )
 }
