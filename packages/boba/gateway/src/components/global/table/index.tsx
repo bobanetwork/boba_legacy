@@ -2,13 +2,13 @@ import React from 'react'
 import { styled } from '@mui/material/styles'
 import { useTheme } from '@emotion/react'
 
-import { ROW } from 'components/global/containers'
-import { TEXT } from 'components/global/text'
+import { Row } from 'components/global/containers'
+import { Text } from 'components/global/text'
 import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material'
 
-export const TableHeaderContainer = styled(ROW)(({ theme }) => ({
+export const TableHeaderContainer = styled(Row)(({ theme }) => ({
   padding: '20px',
   borderTopLeftRadius: '6px',
   borderTopRightRadius: '6px',
@@ -22,7 +22,7 @@ export const TableHeaderContainer = styled(ROW)(({ theme }) => ({
   },
 }))
 
-const TABLEROW = styled(ROW)`
+const TableRow = styled(Row)`
   &:not(:first-of-type) {
     justify-content: flex-end;
   }
@@ -36,19 +36,19 @@ type TableHeaderType = {
   options: TableHeaderOptionType[]
 }
 
-export const TABLEHEADER = ({ options }: TableHeaderType) => {
+export const TableHeader = ({ options }: TableHeaderType) => {
   return (
     <TableHeaderContainer>
       {options?.map((option) => {
         return (
-          <TABLEROW key={option.name}>
-            <TEXT>{option.name}</TEXT>
+          <TableRow key={option.name}>
+            <Text>{option.name}</Text>
             {option.tooltip && (
               <Tooltip title={option.tooltip}>
                 <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
               </Tooltip>
             )}
-          </TABLEROW>
+          </TableRow>
         )
       })}
     </TableHeaderContainer>
@@ -64,16 +64,16 @@ type TableContentType = {
   mobileOptions?: number[]
 }
 
-export const TABLECONTENT = ({ options, mobileOptions }: TableContentType) => {
+export const TableContent = ({ options, mobileOptions }: TableContentType) => {
   const theme = useTheme() as any
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const currentOptions =
     isMobile && mobileOptions ? mobileOptions.map((i) => options[i]) : options
   return (
-    <ROW>
+    <Row>
       {currentOptions?.map((option, index) => {
-        return <TABLEROW key={index}>{option.content}</TABLEROW>
+        return <TableRow key={index}>{option.content}</TableRow>
       })}
-    </ROW>
+    </Row>
   )
 }

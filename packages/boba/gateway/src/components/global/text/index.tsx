@@ -10,7 +10,7 @@ const P = styled.p`
   text-transform: uppercase;
   line-height: 1.25;
 `
-const Small = styled.p`
+export const Small = styled.p`
   text-transform: uppercase;
   padding: 0px;
   margin: 0px;
@@ -18,10 +18,6 @@ const Small = styled.p`
   font-size: 0.75rem;
   opacity: 0.5;
 `
-export const TEXT = ({ children }: ComponentType) => {
+export const Text = ({ children }: ComponentType) => {
   return <P>{children}</P>
-}
-
-export const SMALL = ({ children }: ComponentType) => {
-  return <Small>{children}</Small>
 }

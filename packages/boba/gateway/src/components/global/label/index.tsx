@@ -14,7 +14,7 @@ const Label = styled.p`
   line-height: 1.15;
 `
 
-export const APRLABEL = (children: string) => {
+export const AprLabel = (children: string) => {
   const label = children.toLowerCase() === 'infinity' ? '~' : children + '%'
   return <Label>{label}</Label>
 }
