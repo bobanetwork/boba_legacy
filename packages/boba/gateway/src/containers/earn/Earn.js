@@ -64,7 +64,6 @@ function Earn() {
   const layer = useSelector(selectLayer())
 
   const activeNetworkName = useSelector(selectActiveNetworkName())
-
   useEffect(() => {
     if (baseEnabled) {
       dispatch(getEarnInfo())
@@ -74,6 +73,7 @@ function Earn() {
       dispatch(fetchBalances())
     }
   }, [dispatch, baseEnabled, accountEnabled])
+
 
   function getBalance(address, chain) {
     if (typeof (layer1Balance) === 'undefined') return [ 0, 0 ]
@@ -290,6 +290,7 @@ function Earn() {
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
                 <ListEarn
+                  chain={networkService?.networkConfig?.L1?.chainIdHex}
                   key={i}
                   poolInfo={poolInfo.L1LP[ v ]}
                   userInfo={userInfo.L1LP[ v ]}
@@ -311,6 +312,7 @@ function Earn() {
               if (showMDO && Number(ret[ 0 ]) === 0) return null
               return (
                 <ListEarn
+                  chain={networkService?.networkConfig?.L2?.chainIdHex}
                   key={i}
                   poolInfo={poolInfo.L2LP[ v ]}
                   userInfo={userInfo.L2LP[ v ]}
