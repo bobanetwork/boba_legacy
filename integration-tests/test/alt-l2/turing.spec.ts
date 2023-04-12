@@ -189,9 +189,9 @@ describe('Turing 256 Bit Random Number Test', async () => {
     console.log('    BOBA Balance in your account', bobaBalance.toString())
 
     const depositTx = await BobaTuringCredit.addBalanceTo(
-      txPrice.mul(8),
+      txPrice.mul(2),
       TuringHelper.address,
-      { value: txPrice.mul(8) }
+      { value: txPrice.mul(2) }
     )
     await depositTx.wait()
 
