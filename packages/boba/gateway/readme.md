@@ -16,3 +16,10 @@ gateway.boba.betwork.
 | REACT_APP_SENTRY_DSN         | Yes      | N/A          | Sentry DSN url to catch the error on frontend                   |
 | REACT_APP_ENABLE_LOCK_PAGE   | No       | N/A          | to enable the lock page on gateway menu                         |
 | REACT_APP_GAS_POLL_INTERVAL   | Yes       | 30000          | Poll interval to fetch the gas price and verifier status                         |
+
+
+### Execute to update the version of package with latest tag from git.
+
+``
+yarn release
+```
