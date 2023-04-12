@@ -1,8 +1,6 @@
-import React from 'react'
 import styled from 'styled-components'
-import { ComponentType } from '../model'
 
-const P = styled.p`
+export const Text = styled.p`
   padding: 0px;
   margin: 0px;
   font-weight: 400;
@@ -18,6 +16,3 @@ export const Small = styled.p`
   font-size: 0.75rem;
   opacity: 0.5;
 `
-export const Text = ({ children }: ComponentType) => {
-  return <P>{children}</P>
-}
