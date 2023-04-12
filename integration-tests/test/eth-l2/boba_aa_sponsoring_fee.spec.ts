@@ -96,13 +96,13 @@ describe('Sponsoring Tx\n', async () => {
       )
       account = await account.createAccount(env.l2Wallet_4.address, 0)
       // await account.initialize()
-      // await account.deployed()
+      await account.deployed()
 
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
         owner: env.l2Wallet_4,
-        walletAddress: account.address,
+        factoryAddress: account.address
       })
     })
     it.only('should be able to submit a userOp to the bundler and trigger tx', async () => {
