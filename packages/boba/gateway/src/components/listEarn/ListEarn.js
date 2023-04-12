@@ -21,6 +21,7 @@ import * as S from "./ListEarn.styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
 import Tooltip from 'components/tooltip/Tooltip';
 import { HelpOutline } from '@mui/icons-material';
+import { AddToMetamask } from 'components/global';
 
 class ListEarn extends React.Component {
 
@@ -36,11 +37,13 @@ class ListEarn extends React.Component {
       showAll,
       showStakesOnly,
       accountEnabled,
+      chain
     } = this.props;
 
     this.state = {
       balance,
       L1orL2Pool,
+      chain,
       // data
       poolInfo,
       userInfo,
@@ -63,7 +66,11 @@ class ListEarn extends React.Component {
 
   componentDidUpdate(prevState) {
 
-    const { poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props
+    const { chain, poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props;
+    
+    if (!isEqual(prevState.chain, chain)) {
+      this.setState({ chain });
+    }
 
     if (!isEqual(prevState.poolInfo, poolInfo)) {
       this.setState({ poolInfo });
@@ -160,7 +167,8 @@ class ListEarn extends React.Component {
     const {
       poolInfo, userInfo,
       dropDownBox, showAll, showStakesOnly,
-      loading, L1orL2Pool, accountEnabled
+      loading, L1orL2Pool, accountEnabled,
+      chain
     } = this.state;
 
     const pageLoading = Object.keys(poolInfo).length === 0;
@@ -181,15 +189,11 @@ class ListEarn extends React.Component {
     // L1orL2Pool: L1LP || L2LP
     // networkService.L1OrL2 L1 || L2
     const disabled = !L1orL2Pool.includes(networkService.L1orL2)
-    const symbol = poolInfo.symbol
-    const name = poolInfo.name
-    const decimals = poolInfo.decimals
+    const {symbol, name, decimals } = poolInfo;
     let logo = getCoinImage(symbol)
+    const address = L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress;
 
-    //Deal with Token migration to REPv2
-    if (symbol === 'REPv2') {
-      logo = getCoinImage('REP')
-    }
+
 
     if (showAll === false) {
       if (Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
@@ -264,6 +268,10 @@ class ListEarn extends React.Component {
                     <Typography variant="overline" style={{ lineHeight: '1em' }}>{symbol}</Typography>
                     <Typography variant="overline" style={{ lineHeight: '1em'}}>{name}</Typography>
                   </div>
+                  { accountEnabled && (
+                      <AddToMetamask token={{symbol,decimals,address,chain}} />
+                    )
+                  }
                 </div>
               </S.GridItemTag>
             }
