@@ -28,6 +28,8 @@ class WalletService {
     this.walletType = null
   }
 
+  
+
   async connectMetaMask() {
     try {
       await window.ethereum.request({ method: 'eth_requestAccounts' })
