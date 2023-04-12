@@ -17,3 +17,6 @@ echo "Current package version  $CURRENT_VERSION"
 
 ## Replace the current version tag with new version in package.json
 sed -i '' "s/${CURRENT_VERSION}/${NEW_VERSION}/g" ./package.json
+
+UPDATED_VERSION=$(node -p "require('./package.json').version");
+echo "Package version updated to  $UPDATED_VERSION"
