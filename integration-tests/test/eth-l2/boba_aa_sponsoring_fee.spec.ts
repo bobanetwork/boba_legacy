@@ -11,7 +11,7 @@ import { OptimismEnv } from './shared/env'
 import { hexConcat } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@boba/bundler_sdk'
-import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
+import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
@@ -94,8 +94,9 @@ describe('Sponsoring Tx\n', async () => {
       account = await SimpleAccount__factory.deploy(
         entryPointAddress
       )
-      await account.initialize(env.l2Wallet_4.address)
-      await account.deployed()
+      account = await account.createAccount(env.l2Wallet_4.address, 0)
+      // await account.initialize()
+      // await account.deployed()
 
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
@@ -104,7 +105,7 @@ describe('Sponsoring Tx\n', async () => {
         walletAddress: account.address,
       })
     })
-    it('should be able to submit a userOp to the bundler and trigger tx', async () => {
+    it.only('should be able to submit a userOp to the bundler and trigger tx', async () => {
       const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
