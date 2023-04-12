@@ -1,26 +1,14 @@
 {
   "compilerOptions": {
+    "target": "es5",
     "module": "commonjs",
-    "target": "es2017",
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "composite": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "allowJs": true,
-    "noImplicitAny": false,
-    "removeComments": true,
-    "noLib": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "moduleResolution": "node",
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "outDir": "dist"
+    "strict": true,
+    "outDir": "dist",
+    "baseUrl": "src"
   },
+  "include": [
+    "./src/components/global"
+  ],
   "exclude": [
     "node_modules",
     "dist"
