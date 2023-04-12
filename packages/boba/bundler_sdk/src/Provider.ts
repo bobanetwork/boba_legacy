@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from 'ethers'
 
