@@ -427,7 +427,7 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
  */
 
 // TuringCharge moves Turing credits from a credit wallet to the operator
-func (s *StateDB) TuringCharge(userID common.Address) error {
+func (s *StateDB) TuringCharge(userID common.Address, isTuringChargeFork bool) error {
 	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
 	// userID is the address of that user's Turing Helper contract
 
@@ -450,6 +450,11 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 		return errors.New("Insufficient Turing credit")
 	}
 
+	if isTuringChargeFork && balUser.Cmp(price) == 0 && price.BitLen() > 0 {
+		// Discount the price slightly to ensure balUser stays positive
+		price.Sub(price, big.NewInt(1))
+	} // NOP if balance was > price, or if price was 0 and wouldn't change the statedb.
+
 	// perform the transfer
 	balUser = balUser.Sub(balUser, price)
 	balOwner = balOwner.Add(balOwner, price)
@@ -464,7 +469,7 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 }
 
 // TuringCharge moves Turing credits from a credit wallet to the operator
-func (s *StateDB) TuringCheck(userID common.Address) error {
+func (s *StateDB) TuringCheck(userID common.Address, isTuringChargeFork bool) error {
 	// userID is the address of that user's Turing Helper contract
 	// checks for sufficient credit
 	keyUser := GetTuringPrepayKey(userID)
@@ -479,6 +484,10 @@ func (s *StateDB) TuringCheck(userID common.Address) error {
 		log.Trace("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
+	if isTuringChargeFork && balUser.Cmp(price) == 0 && price.BitLen() > 0 {
+		// Discount the price slightly to ensure balUser stays positive
+		price.Sub(price, big.NewInt(1))
+	} // NOP if balance was > price, or if price was 0 and wouldn't change the statedb.
 
 	log.Trace("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
 
@@ -730,8 +739,8 @@ func (s *StateDB) createObject(addr common.Address) (newobj, prev *stateObject) 
 // CreateAccount is called during the EVM CREATE operation. The situation might arise that
 // a contract does the following:
 //
-//   1. sends funds to sha(account ++ (nonce + 1))
-//   2. tx_create(sha(account ++ nonce)) (note that this gets the address of 1)
+//  1. sends funds to sha(account ++ (nonce + 1))
+//  2. tx_create(sha(account ++ nonce)) (note that this gets the address of 1)
 //
 // Carrying over the balance ensures that Ether doesn't disappear.
 func (s *StateDB) CreateAccount(addr common.Address) {

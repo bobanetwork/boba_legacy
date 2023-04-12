@@ -251,6 +251,11 @@ var (
 
 	// BobaGoerliFeeUpdatedForkNum is the height at which the fee update fork activates on Goerli.
 	BobaGoerliFeeUpdatedForkNum = big.NewInt(0)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaMainnetTuringChargeForkNum = big.NewInt(1003000)
+
+	BobaGoerliTuringChargeForkNum = big.NewInt(8000)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -472,6 +477,19 @@ func (c *ChainConfig) IsFeeTokenUpdate(num *big.Int) bool {
 	}
 	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
 		return isForked(BobaGoerliFeeUpdatedForkNum, num)
+	}
+	return true
+}
+
+func (c *ChainConfig) IsTuringChargeFork(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
+	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
+		return isForked(BobaMainnetTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
+		return isForked(BobaGoerliTuringChargeForkNum, num)
 	}
 	return true
 }

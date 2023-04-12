@@ -18,8 +18,10 @@ describe('Turing 256 Bit Random Number Test', async () => {
   let L2BOBAToken: Contract
 
   let TuringHelper: Contract
-
   let random: Contract
+
+  const apiPort = 5123
+  let URL: string
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -73,6 +75,49 @@ describe('Turing 256 Bit Random Number Test', async () => {
       'L1StandardBridge',
       env.l1Wallet
     ).attach(L1StandardBridgeAddress)
+    /* eslint-disable */
+    const http = require('http')
+    const ip = require("ip")
+    // start local server
+    const server = module.exports = http.createServer(async function (req, res) {
+
+      if (req.headers['content-type'] === 'application/json') {
+
+        let body = '';
+
+        req.on('data', function (chunk) {
+          body += chunk.toString()
+        })
+
+        req.on('end', async function () {
+          const jsonBody = JSON.parse(body)
+          const input = JSON.parse(body).params[0]
+          let result
+
+          const args = utils.defaultAbiCoder.decode(['uint256','uint256'], input)
+          if (req.url === "/echo") {
+            const randomPrice = Math.floor(Math.random() * 1000)
+            result = input
+            let response = {
+              "jsonrpc": "2.0",
+              "id": jsonBody.id,
+              "result": result
+            }
+            res.end(JSON.stringify(response))
+            server.emit('success', body)
+          } else {
+            res.writeHead(400, { 'Content-Type': 'text/plain' })
+            res.end('Bad request')
+          }
+        });
+      } else {
+        console.log("Other request:", req)
+        res.writeHead(400, { 'Content-Type': 'text/plain' })
+        res.end('Expected content-type: application/json')
+      }
+    }).listen(apiPort)
+    URL = `http://${ip.address()}:${apiPort}/echo`
+    /* eslint-enable */
   })
 
   after(async () => {
@@ -132,7 +177,8 @@ describe('Turing 256 Bit Random Number Test', async () => {
   it('Should register and fund your Turing helper contract in turingCredit', async () => {
     env = await OptimismEnv.new()
 
-    const depositAmount = utils.parseEther('0.1')
+    const txPrice = await BobaTuringCredit.turingPrice()
+    const depositAmount = txPrice.mul(2)
 
     const preBalance = await BobaTuringCredit.prepaidBalance(
       TuringHelper.address
@@ -143,9 +189,9 @@ describe('Turing 256 Bit Random Number Test', async () => {
     console.log('    BOBA Balance in your account', bobaBalance.toString())
 
     const depositTx = await BobaTuringCredit.addBalanceTo(
-      depositAmount,
+      txPrice.mul(8),
       TuringHelper.address,
-      { value: depositAmount }
+      { value: txPrice.mul(8) }
     )
     await depositTx.wait()
 
@@ -167,4 +213,94 @@ describe('Turing 256 Bit Random Number Test', async () => {
   })
     .timeout(100000)
     .retries(3)
+
+  it('should be funded for two transactions', async () => {
+    const txPrice = await BobaTuringCredit.turingPrice()
+    const bal = await BobaTuringCredit.prepaidBalance(
+      TuringHelper.address
+    )
+    expect(bal).to.be.deep.eq(txPrice.mul(2))
+  })
+
+  it('should get a 256 bit random number', async () => {
+    const tr = await random.getRandom()
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const rawData = res.events[0].data
+    const numberHexString = '0x' + rawData.slice(-64)
+    const result = BigInt(numberHexString)
+    console.log('    Turing VRF 256 =', result)
+  })
+    .timeout(100000)
+    .retries(3)
+
+    // The price of one transaction should have been deducted, leaving 1
+    it('should now be funded for one transaction', async () => {
+    const txPrice = await BobaTuringCredit.turingPrice()
+    const bal = await BobaTuringCredit.prepaidBalance(
+      TuringHelper.address
+    )
+    expect(bal).to.be.deep.eq(txPrice)
+  })
+
+  // A security patch prevents the credit balance from reaching zero
+  it('should maintain a nonzero credit balance', async () => {
+    const tr = await random.getRandom()
+    const res = await tr.wait()
+    expect(res).to.be.ok
+    const bal = await BobaTuringCredit.prepaidBalance(
+      TuringHelper.address
+    )
+    expect(bal).to.be.deep.eq(1)
+  })
+
+  it('should top up the credit balance', async () => {
+    // Needed for following tests
+    const txPrice = await BobaTuringCredit.turingPrice()
+    const depositAmount = txPrice.mul(6)
+    const depositTx = await BobaTuringCredit.addBalanceTo(
+      depositAmount,
+      TuringHelper.address
+    )
+    await depositTx.wait()
+    const bal = await BobaTuringCredit.prepaidBalance(
+      TuringHelper.address
+    )
+    expect(bal).to.be.deep.at.least(txPrice.mul(6))
+  })
+
+  // Previously a user could make more than one Turing call per Tx with
+  // different inputs. All calls after the first would get a replay of
+  // the first result rather than one matching their own input.
+  it('should disallow mixed-input Turing calls', async () => {
+    try {
+      await random.estimateGas.MixedInput(URL, 123, 999)
+      expect(1).to.equal(0)
+    } catch (e) {
+      expect(e.error.toString()).to.contain("SERVER_ERROR")
+    }
+  })
+
+  // Should reject a 2nd call from a different EVM depth.
+  it('should disallow nested Turing calls', async () => {
+    try {
+      const tr = await random.NestedRandom(1)
+      expect(1).to.equal(0)
+    } catch (e) {
+      expect(e.error.toString()).to.contain("SERVER_ERROR")
+    }
+  })
+
+  it('should allow repeated Random calls (legacy support)', async () => {
+    const tr = await random.MultiRandom()
+    const res = await tr.wait()
+    expect(res).to.be.ok
+  })
+
+  it('should allow repeated-input Turing calls', async () => {
+    await random.estimateGas.MixedInput(URL, 123, 123)
+    const tr = await random.MixedInput(URL, 123, 123)
+    const rcpt = await tr.wait()
+    expect(rcpt).to.be.ok
+  })
 })
