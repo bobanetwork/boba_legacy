@@ -19,7 +19,7 @@ import networkService from 'services/networkService.js'
 
 import useInterval from 'hooks/useInterval.js'
 
-import { GAS_POLL_INTERVAL } from 'util/constant.js'
+import { GAS_POLL_INTERVAL } from 'util/constant.ts'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util.js'
 
 function GasSwitcher() {
