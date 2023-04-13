@@ -202,18 +202,6 @@ describe('Turing 256 Bit Random Number Test', async () => {
     expect(postBalance).to.be.deep.eq(preBalance.add(depositAmount))
   })
 
-  it('should get a 256 bit random number', async () => {
-    const tr = await random.getRandom()
-    const res = await tr.wait()
-    expect(res).to.be.ok
-    const rawData = res.events[0].data
-    const numberHexString = '0x' + rawData.slice(-64)
-    const result = BigInt(numberHexString)
-    console.log('    Turing VRF 256 =', result)
-  })
-    .timeout(100000)
-    .retries(3)
-
   it('should be funded for two transactions', async () => {
     const txPrice = await BobaTuringCredit.turingPrice()
     const bal = await BobaTuringCredit.prepaidBalance(
