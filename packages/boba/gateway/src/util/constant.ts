@@ -1,13 +1,17 @@
-import {addMonths, Now, addYear} from 'util/dates'
+import { addMonths, Now, addYear } from 'util/dates'
 
 /**************
  * Env Params *
  **************/
+
+/* eslint-disable @typescript-eslint/no-var-requires */
 require('dotenv').config()
 
 export const POLL_INTERVAL = process.env.REACT_APP_POLL_INTERVAL || 20000
-export const GAS_POLL_INTERVAL = process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
-export const GA4_MEASUREMENT_ID = process.env.REACT_APP_GA4_MEASUREMENT_ID || null
+export const GAS_POLL_INTERVAL =
+  process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
+export const GA4_MEASUREMENT_ID =
+  process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV = process.env.REACT_APP_ENV || 'dev'
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN || null
 export const INFURA_ID = process.env.REACT_APP_INFURA_ID
@@ -22,29 +26,36 @@ export const DISABLE_VE_DAO = process.env.REACT_APP_DISABLE_VE_DAO
 export const DISABLE_WALLETCONNECT = process.env.REACT_APP_DISABLE_WALLETCONNECT
 
 export const BRIDGE_TYPE = {
-  FAST_BRIDGE: "FAST_BRIDGE",
-  CLASSIC_BRIDGE: "CLASSIC_BRIDGE",
-  MULTI_BRIDGE: "MULTI_BRIDGE", /// FIXME: remove me,
-  MULTI_CHAIN_BRIDGE: "MULTI_CHAIN_BRIDGE"
+  FAST_BRIDGE: 'FAST_BRIDGE',
+  CLASSIC_BRIDGE: 'CLASSIC_BRIDGE',
+  MULTI_BRIDGE: 'MULTI_BRIDGE', /// FIXME: remove me,
+  MULTI_CHAIN_BRIDGE: 'MULTI_CHAIN_BRIDGE',
 }
-
 
 export const EXPIRY_OPTIONS = [
   {
-    value: addMonths(Now(), 3, "YYYY-MM-DD"),
+    value: addMonths(Now(), 3, 'YYYY-MM-DD'),
     label: '3 Months',
   },
   {
-    value: addMonths(Now(), 7, "YYYY-MM-DD"),
+    value: addMonths(Now(), 7, 'YYYY-MM-DD'),
     label: '6 Months',
   },
   {
-    value: addYear(1,"YYYY-MM-DD"),
+    value: addYear(1, 'YYYY-MM-DD'),
     label: '1 Year',
   },
 ]
 
-export const ECOSYSTEM_CATEGORY = [ 'defi', 'gamefi', 'nft', 'bridge', 'wallet', 'tool', 'token' ];
+export const ECOSYSTEM_CATEGORY = [
+  'defi',
+  'gamefi',
+  'nft',
+  'bridge',
+  'wallet',
+  'tool',
+  'token',
+]
 
 /*********************
  * Routes Constants **
@@ -68,11 +79,20 @@ export const ROUTES_PATH = {
 export const PER_PAGE = 8
 
 export const PAGES_BY_NETWORK = {
-  ethereum: ['Bridge', 'Ecosystem', 'Wallet', 'History', 'Earn', 'Stake', 'DAO', 'Monster'],
-  bnb: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
-  avax: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
-  fantom: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
-  moonbeam: [ 'Bridge', 'Wallet', 'Earn', 'History' ],
+  ethereum: [
+    'Bridge',
+    'Ecosystem',
+    'Wallet',
+    'History',
+    'Earn',
+    'Stake',
+    'DAO',
+    'Monster',
+  ],
+  bnb: ['Bridge', 'Wallet', 'Earn', 'History'],
+  avax: ['Bridge', 'Wallet', 'Earn', 'History'],
+  fantom: ['Bridge', 'Wallet', 'Earn', 'History'],
+  moonbeam: ['Bridge', 'Wallet', 'Earn', 'History'],
 }
 
 export const LAYER = {
@@ -80,19 +100,19 @@ export const LAYER = {
   L2: 'L2',
 }
 
-
 export const DEFAULT_NETWORK = {
   NAME: {
     L1: 'Ethereum',
-    L2: 'Boba'
+    L2: 'Boba',
   },
   ICON: {
     L1: 'ethereum',
-    L2: 'boba'
-  }
+    L2: 'boba',
+  },
 }
 
-export const MM_EXTENTION_URL = 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en'
+export const MM_EXTENTION_URL =
+  'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en'
 
 export const MIN_NATIVE_L1_BALANCE = 0.002
 

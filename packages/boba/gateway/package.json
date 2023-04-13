@@ -12,9 +12,11 @@
     "deploy:mainnet": "yarn build:prod && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr --recursive && aws s3 sync build s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr && aws s3 cp s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
-    "lint": "yarn lint:fix && yarn lint:check",
-    "lint:fix": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
+    "lint": "yarn lint:format && yarn lint:fix",
+    "lint:format": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
+    "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint .",
+    "pre-commit": "lint-staged",
     "prebuild": "./bin/release.sh",
     "postinstall": "patch-package",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
@@ -83,6 +85,7 @@
   "devDependencies": {
     "@beam-australia/react-env": "2.1.2",
     "@types/styled-components": "^5.1.26",
-    "audit-ci": "^3.1.1"
+    "audit-ci": "^3.1.1",
+    "lint-staged": "^13.2.1"
   }
 }
