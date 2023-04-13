@@ -70,7 +70,7 @@ contract Lib_ResolvedDelegateBobaProxy {
      * Performs the proxy call via a delegatecall.
      */
     function _doProxyCall() internal {
-        require(addressManager["proxyOwner"] != address(0), "Target address must be initialized.");
+        require(addressManager["proxyTarget"] != address(0), "Target address must be initialized.");
 
         (bool success, bytes memory returndata) = addressManager["proxyTarget"].delegatecall(
             msg.data
