@@ -14,7 +14,7 @@ export const TableHeaderContainer = styled(Row)(({ theme }) => ({
   borderTopRightRadius: '6px',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  justifyContent: 'space-between',
   // @ts-ignore
   background: theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
@@ -22,14 +22,22 @@ export const TableHeaderContainer = styled(Row)(({ theme }) => ({
   },
 }))
 
+const TableContentContainer = styled(Row)`
+  justify-content: space-between;
+`
+
 const TableRow = styled(Row)`
   &:not(:first-of-type) {
-    justify-content: flex-end;
+    margin-left: auto;
+  }
+  &:last-of-type {
+    margin-right: 0px;
   }
 `
 type TableHeaderOptionType = {
   name: string
   tooltip: string
+  width: number
 }
 
 type TableHeaderType = {
@@ -41,7 +49,10 @@ export const TableHeader = ({ options }: TableHeaderType) => {
     <TableHeaderContainer>
       {options?.map((option) => {
         return (
-          <TableRow key={option.name}>
+          <TableRow
+            key={option.name}
+            style={{ maxWidth: option?.width + 'px' }}
+          >
             <Text>{option.name}</Text>
             {option.tooltip && (
               <Tooltip title={option.tooltip}>
@@ -57,6 +68,7 @@ export const TableHeader = ({ options }: TableHeaderType) => {
 
 type TableContentOptionType = {
   content: any
+  width: number
 }
 
 type TableContentType = {
@@ -70,10 +82,14 @@ export const TableContent = ({ options, mobileOptions }: TableContentType) => {
   const currentOptions =
     isMobile && mobileOptions ? mobileOptions.map((i) => options[i]) : options
   return (
-    <Row>
+    <TableContentContainer>
       {currentOptions?.map((option, index) => {
-        return <TableRow key={index}>{option.content}</TableRow>
+        return (
+          <TableRow key={index} style={{ maxWidth: option?.width + 'px' }}>
+            {option.content}
+          </TableRow>
+        )
       })}
-    </Row>
+    </TableContentContainer>
   )
 }
