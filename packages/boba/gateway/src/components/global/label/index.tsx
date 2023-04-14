@@ -13,8 +13,11 @@ const Label = styled.p`
   font-size: 0.9rem;
   line-height: 1.15;
 `
+type AprLabelType = {
+  children: string
+}
 
-export const AprLabel = (children: string) => {
+export const AprLabel = ({ children }: AprLabelType): JSX.Element => {
   const label = children.toLowerCase() === 'infinity' ? '~' : children + '%'
   return <Label>{label}</Label>
 }
