@@ -4,7 +4,7 @@ description: Adding new ERC20 tokens to Boba
 
 To add a new ERC20 token to Boba, please:
 
-1. Deploy an suitable L2 ERC20 contract, which allows only the `L2StandardBridge` to mint and burn tokens. The standard template is `L2StandardERC20.sol` (see `./packages/contracts/contracts/standards/L2StandardERC20.sol`)
+1. Deploy a suitable L2 ERC20 contract, which allows only the `L2StandardBridge` to mint and burn tokens. The standard template is `L2StandardERC20.sol` (see `./packages/contracts/contracts/standards/L2StandardERC20.sol`)
 
 2. Then, pass the address to the bridge, as in this example:
 
