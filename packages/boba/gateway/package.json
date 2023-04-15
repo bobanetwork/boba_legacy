@@ -7,6 +7,8 @@
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
     "format": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
+    "lint:check": "eslint . --ext ts,tsx",
+    "lint:fix": "yarn lint:check --fix",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
     "start": "npm run buildenv-dev && REACT_APP_WALLET_VERSION=$npm_package_version react-scripts start",
     "prebuild": "./bin/release.sh",
@@ -31,8 +33,6 @@
     "@mui/styles": "^5.3.0",
     "@sentry/react": "^7.30.0",
     "@sentry/tracing": "^7.30.0",
-    "@typescript-eslint/eslint-plugin": "^5.10.2",
-    "@typescript-eslint/parser": "^5.10.2",
     "@walletconnect/web3-provider": "^1.8.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
@@ -70,17 +70,23 @@
     "typescript": "^4.3.5",
     "web3": "^1.8.2"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not op_mini all"
   ],
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
     "@beam-australia/react-env": "2.1.2",
     "@types/styled-components": "^5.1.26",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jsdoc": "^35.1.2",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-unicorn": "^32.0.1",
     "audit-ci": "^3.1.1"
   }
 }

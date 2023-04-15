@@ -3,6 +3,7 @@ import { addMonths, Now, addYear, Dayjs } from 'util/dates'
 /**************
  * Env Params *
  **************/
+/* eslint-disable @typescript-eslint/no-var-requires */
 require('dotenv').config()
 
 type EnvType = string | number | null | undefined

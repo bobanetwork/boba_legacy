@@ -32,11 +32,11 @@ const comparator: ComparatorType = (a, b) => {
 
 export const sortRawTokens = (tokens: any) => {
   //change any for tokens type after we create the token type
-  let start = tokens
+  const start = tokens
     .filter((d: any) => ['ETH', 'BOBA', 'OMG'].includes(d.tokenSymbol))
     .sort(comparator)
 
-  let last = tokens
+  const last = tokens
     .filter((d: any) => !['ETH', 'BOBA', 'OMG'].includes(d.tokenSymbol))
     .sort(comparator)
 
