@@ -1,38 +1,54 @@
-import { addMonths, Now, addYear } from 'util/dates'
+import { addMonths, Now, addYear, Dayjs } from 'util/dates'
 
 /**************
  * Env Params *
  **************/
-
 /* eslint-disable @typescript-eslint/no-var-requires */
 require('dotenv').config()
 
-export const POLL_INTERVAL = process.env.REACT_APP_POLL_INTERVAL || 20000
-export const GAS_POLL_INTERVAL =
-  process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
-export const GA4_MEASUREMENT_ID =
-  process.env.REACT_APP_GA4_MEASUREMENT_ID || null
-export const APP_ENV = process.env.REACT_APP_ENV || 'dev'
-export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN || null
-export const INFURA_ID = process.env.REACT_APP_INFURA_ID
-export const MAX_HEALTH_BLOCK_LAG = process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
-export const WALLET_VERSION = process.env.REACT_APP_WALLET_VERSION
-export const APP_STATUS = process.env.REACT_APP_STATUS || 'normal'
-export const SPEED_CHECK = process.env.REACT_APP_SPEED_CHECK
-export const TARGET_CHAIN_URL = process.env.REACT_APP_TARGET_CHAIN_URL
-// VE DAO FLAG
-export const DISABLE_VE_DAO = process.env.REACT_APP_DISABLE_VE_DAO
-// WalletConnect FLAG
-export const DISABLE_WALLETCONNECT = process.env.REACT_APP_DISABLE_WALLETCONNECT
+type EnvType = string | number | null | undefined
 
-export const BRIDGE_TYPE = {
+export const POLL_INTERVAL: EnvType =
+  process.env.REACT_APP_POLL_INTERVAL || 20000
+export const GAS_POLL_INTERVAL: EnvType =
+  process.env.REACT_APP_GAS_POLL_INTERVAL || 40000
+export const GA4_MEASUREMENT_ID: EnvType =
+  process.env.REACT_APP_GA4_MEASUREMENT_ID || null
+export const APP_ENV: EnvType = process.env.REACT_APP_ENV || 'dev'
+export const SENTRY_DSN: EnvType = process.env.REACT_APP_SENTRY_DSN || null
+export const INFURA_ID: EnvType = process.env.REACT_APP_INFURA_ID
+export const MAX_HEALTH_BLOCK_LAG: EnvType =
+  process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
+export const WALLET_VERSION: EnvType = process.env.REACT_APP_WALLET_VERSION
+export const APP_STATUS: EnvType = process.env.REACT_APP_STATUS || 'normal'
+export const SPEED_CHECK: EnvType = process.env.REACT_APP_SPEED_CHECK
+export const TARGET_CHAIN_URL: EnvType = process.env.REACT_APP_TARGET_CHAIN_URL
+// VE DAO FLAG
+export const DISABLE_VE_DAO: EnvType = process.env.REACT_APP_DISABLE_VE_DAO
+// WalletConnect FLAG
+export const DISABLE_WALLETCONNECT: EnvType =
+  process.env.REACT_APP_DISABLE_WALLETCONNECT
+
+type BridgeType = {
+  FAST_BRIDGE: string
+  CLASSIC_BRIDGE: string
+  MULTI_BRIDGE: string
+  MULTI_CHAIN_BRIDGE: string
+}
+
+export const BRIDGE_TYPE: BridgeType = {
   FAST_BRIDGE: 'FAST_BRIDGE',
   CLASSIC_BRIDGE: 'CLASSIC_BRIDGE',
-  MULTI_BRIDGE: 'MULTI_BRIDGE', /// FIXME: remove me,
+  MULTI_BRIDGE: 'MULTI_BRIDGE', //fix me remove me
   MULTI_CHAIN_BRIDGE: 'MULTI_CHAIN_BRIDGE',
 }
 
-export const EXPIRY_OPTIONS = [
+type ExpiryOptionType = {
+  value: string | Dayjs
+  label: string
+}
+
+export const EXPIRY_OPTIONS: ExpiryOptionType[] = [
   {
     value: addMonths(Now(), 3, 'YYYY-MM-DD'),
     label: '3 Months',
@@ -47,7 +63,7 @@ export const EXPIRY_OPTIONS = [
   },
 ]
 
-export const ECOSYSTEM_CATEGORY = [
+export const ECOSYSTEM_CATEGORY: string[] = [
   'defi',
   'gamefi',
   'nft',
@@ -61,7 +77,23 @@ export const ECOSYSTEM_CATEGORY = [
  * Routes Constants **
  *********************/
 
-export const ROUTES_PATH = {
+type RoutesPathType = {
+  BRIDGE: string
+  ECOSYSTEM: string
+  WALLET: string
+  HISTORY: string
+  EARN: string
+  LOCK: string
+  STAKE: string
+  HELP: string
+  BOBASCOPE: string
+  MONSTER: string
+  VOTE_DAO: string
+  DAO: string
+  DEV_TOOLS: string
+}
+
+export const ROUTES_PATH: RoutesPathType = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
   WALLET: '/wallet',
@@ -76,9 +108,22 @@ export const ROUTES_PATH = {
   DAO: '/DAO',
   DEV_TOOLS: '/devtools',
 }
-export const PER_PAGE = 8
 
-export const PAGES_BY_NETWORK = {
+export const PER_PAGE: number = 8
+
+type Network = 'ethereum' | 'bnb' | 'avax' | 'fantom' | 'moonbeam' //we move this to global network type once we define this
+type Page =
+  | 'Bridge'
+  | 'Ecosystem'
+  | 'Wallet'
+  | 'History'
+  | 'Earn'
+  | 'Stake'
+  | 'DAO'
+  | 'Monster'
+type PagesByNetworkType = Record<Network, Page[]>
+
+export const PAGES_BY_NETWORK: PagesByNetworkType = {
   ethereum: [
     'Bridge',
     'Ecosystem',
@@ -95,12 +140,25 @@ export const PAGES_BY_NETWORK = {
   moonbeam: ['Bridge', 'Wallet', 'Earn', 'History'],
 }
 
-export const LAYER = {
-  L1: 'L1',
-  L2: 'L2',
+enum Layer {
+  L1 = 'L1',
+  L2 = 'L2',
+}
+export const LAYER: { [key: string]: Layer } = Layer
+
+type NetworkIconType = 'ethereum' | 'boba'
+
+type NetworkNameType = {
+  L1: string
+  L2: string
 }
 
-export const DEFAULT_NETWORK = {
+type DefaultNetworkType = {
+  NAME: NetworkNameType
+  ICON: Record<Layer, NetworkIconType>
+}
+
+export const DEFAULT_NETWORK: DefaultNetworkType = {
   NAME: {
     L1: 'Ethereum',
     L2: 'Boba',
@@ -111,9 +169,9 @@ export const DEFAULT_NETWORK = {
   },
 }
 
-export const MM_EXTENTION_URL =
+export const MM_EXTENTION_URL: string =
   'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en'
 
-export const MIN_NATIVE_L1_BALANCE = 0.002
+export const MIN_NATIVE_L1_BALANCE: number = 0.002
 
-export const BANXA_URL = 'https://boba.banxa.com/iframe?'
+export const BANXA_URL: string = 'https://boba.banxa.com/iframe?'
