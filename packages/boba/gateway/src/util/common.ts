@@ -13,8 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+type TokenSymbolType = {
+    tokenSymbol: string;
+}
+type ComparatorType = (a: TokenSymbolType, b: TokenSymbolType) => -1 | 0 | 1;
 
-const comparator = (a, b) => {
+const comparator: ComparatorType = (a, b) => {
     if (a.tokenSymbol < b.tokenSymbol) {
         return -1;
     }
@@ -26,10 +30,10 @@ const comparator = (a, b) => {
     return 0;
 }
 
-export const sortRawTokens = (tokens) => {
-    let start = tokens.filter((d) => [ 'ETH', 'BOBA', 'OMG' ].includes(d.tokenSymbol)).sort(comparator);
+export const sortRawTokens = (tokens:any) => {//change any for tokens type after we create the token type
+    let start = tokens.filter((d:any) => [ 'ETH', 'BOBA', 'OMG' ].includes(d.tokenSymbol)).sort(comparator);
 
-    let last = tokens.filter((d) => ![ 'ETH', 'BOBA', 'OMG' ].includes(d.tokenSymbol)).sort(comparator);
+    let last = tokens.filter((d:any) => ![ 'ETH', 'BOBA', 'OMG' ].includes(d.tokenSymbol)).sort(comparator);
 
     return [ ...start, ...last ]
 }
