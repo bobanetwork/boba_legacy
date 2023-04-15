@@ -10,7 +10,7 @@ Although Boba Network is an L2 (and therefore fundamentally connected to Ethereu
 
 ### Sending tokens between L1 and L2
 
-For the most common usecase, moving tokens around, we've created the Standard Token Bridge. The Standard Token Bridge is a simple smart contract with all the functionality you need to move tokens between Boba Network and Ethereum.
+For the most common use case, moving tokens around, we've created the Standard Token Bridge. The Standard Token Bridge is a simple smart contract with all the functionality you need to move tokens between Boba Network and Ethereum.
 
 Beside the Standard Token Bridge, we created the Fast Token Bridge to allow you to exit assets from L2 in serval hours or even serval minutes based on the number of transactions. The Fast Token Bridge collects a certain percentage of the deposit amount as the transaction fee and distributes them to the liquidity providers.
 
@@ -29,7 +29,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 #### Deposit ERC20s
 
-ERC20 deposits into L2 can triggered via the `depositERC20` and `depositERC20To` functions on the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/IL1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
+ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/IL1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
 ```
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_STANDARD_BRIDGE_ADDRESS
@@ -196,7 +196,7 @@ The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meani
 
 ## Using the Fast Token Bridge
 
-The fast bridge provides a method for both side users to add liquidities for the L1 Fast Bridge Pool and the L2 Fast Bridge Pool. When an ERC20 token is deposited and added to L1 Fast Bridge Pool, the L2 Fast Bridge releases the token on L2 and charges a certain percentage of the deposit amount as the transaction feee. This process is known as "fast bridge a token". e.g. depositing 100 BOBA on L1 in exchange for 99.7 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the 99.7 BOBA on L1. In addition to bridging tokens the standard bridge is also used for ETH.
+The fast bridge provides a method for both side users to add liquidities for the L1 Fast Bridge Pool and the L2 Fast Bridge Pool. When an ERC20 token is deposited and added to L1 Fast Bridge Pool, the L2 Fast Bridge releases the token on L2 and charges a certain percentage of the deposit amount as the transaction fees. This process is known as "fast bridge a token". e.g. depositing 100 BOBA on L1 in exchange for 99.7 BOBA on L2 and also the reverse - withdrawing 100 BOBA on L2 in exchange for the 99.7 BOBA on L1. In addition to bridging tokens the standard bridge is also used for ETH.
 
 The Standard Bridge is composed of two main contracts the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol)(for Layer 1) and the [`L2LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L2LiquidityPool.sol)(for Layer 2).
 
@@ -204,11 +204,11 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 ### Deposits
 
-> Please check the liquidity balance of the L2 Liquidity Pool first before depositing tokens on the L1 Liquidity Pool. If the L2 Liquidty Pool doesn't have enough balance, your funds will be fast exited from L2 and the L1 Liquidity Pool charges a certain percentage of deposit amounts.
+> Please check the liquidity balance of the L2 Liquidity Pool first before depositing tokens on the L1 Liquidity Pool. If the L2 Liquidity Pool doesn't have enough balance, your funds will be fast exited from L2 and the L1 Liquidity Pool charges a certain percentage of deposit amounts.
 
 #### Deposit ERC20s or ETH
 
-ERC20 deposits into L2 can triggered via the `clientDepositL1` functions on the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
+ERC20 deposits into L2 can be triggered via the `clientDepositL1` functions on the [`L1LiquidityPool` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/LP/L1LiquidityPool.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
 ```
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_LIQUIDITY_POOL_ADDRESS
@@ -245,7 +245,7 @@ await depositETHTx.wait()
 
 ### Withdraws
 
-> Please check the liquidity balance of the L1 Liquidity Pool first before depositing tokens on the L2 Liquidity Pool. If the L1 Liquidty Pool doesn't have enough balance, your funds will be fast deposited from L1 and the L2 Liquidity Pool charges a certain percentage of exit amounts.
+> Please check the liquidity balance of the L1 Liquidity Pool first before depositing tokens on the L2 Liquidity Pool. If the L1 Liquidity Pool doesn't have enough balance, your funds will be fast deposited from L1 and the L2 Liquidity Pool charges a certain percentage of exit amounts.
 
 #### Withdraw ERC20s or ETH
 
