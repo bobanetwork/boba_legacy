@@ -31,21 +31,19 @@ export const IconLabel = (props: any) => {
   const logo = getCoinImage(symbol)
 
   return (
-    <>
-      <IconLabelContainer>
-        <Column>
-          <Row>
-            <div>
-              <Icon src={logo} alt="logo" />
-            </div>
-            <div>
-              <Text>{symbol}</Text>
-              <Small>{name}</Small>
-            </div>
-          </Row>
-        </Column>
-        <AddToMetamask token={props.token} className="metamask" />
-      </IconLabelContainer>
-    </>
+    <IconLabelContainer>
+      <Column>
+        <Row>
+          <div>
+            <Icon src={logo} alt="logo" />
+          </div>
+          <div>
+            <Text>{symbol}</Text>
+            <Small>{name}</Small>
+          </div>
+        </Row>
+      </Column>
+      <AddToMetamask token={props.token} className="metamask" />
+    </IconLabelContainer>
   )
 }
