@@ -17,36 +17,36 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-type ChartToCodeType = (str: string, index: number) => number;
-const charToCode:ChartToCodeType = (str, index) => {
-  if (index >= str.length) return 0;
-  return str.toLowerCase().charCodeAt(index) - 97 + 1;
+type ChartToCodeType = (str: string, index: number) => number
+const charToCode: ChartToCodeType = (str, index) => {
+  if (index >= str.length) return 0
+  return str.toLowerCase().charCodeAt(index) - 97 + 1
 }
 
-type CodeToCharType = (int: number) => string;
-const codeToChar:CodeToCharType = (int) => {
+type CodeToCharType = (int: number) => string
+const codeToChar: CodeToCharType = (int) => {
   if (int === 0) return ''
-  return String.fromCharCode(int - 1 + 97).toUpperCase();
+  return String.fromCharCode(int - 1 + 97).toUpperCase()
 }
 
-type CoinToArrayType = (name: string) => number[];
+type CoinToArrayType = (name: string) => number[]
 export const coinToArray: CoinToArrayType = (name) => {
   // the length of the name should be 3 or 4
   if (name.length < 3 || name.length > 4) {
-    return [];
-  } 
-
-  let nameArray:number[] = [];
-  for (let i = 0; i < 4; i++) {
-    nameArray.push(charToCode(name, i));
+    return []
   }
 
-  return nameArray;
+  let nameArray: number[] = []
+  for (let i = 0; i < 4; i++) {
+    nameArray.push(charToCode(name, i))
+  }
+
+  return nameArray
 }
 
-type ArrayToCoinType = (array: number[]) => string;
+type ArrayToCoinType = (array: number[]) => string
 export const arrayToCoin: ArrayToCoinType = (array) => {
-  let coin = '';
-  array.forEach(e => coin += codeToChar(e));
-  return coin;
+  let coin = ''
+  array.forEach((e) => (coin += codeToChar(e)))
+  return coin
 }

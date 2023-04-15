@@ -5,6 +5,7 @@
   "scripts": {
     "buildenv-dev": "react-env",
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
+    "format": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
     "start": "npm run buildenv-dev && REACT_APP_WALLET_VERSION=$npm_package_version react-scripts start",
