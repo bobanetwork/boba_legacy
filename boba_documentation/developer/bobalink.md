@@ -27,7 +27,7 @@ function getChainLinkQuote(uint256 _roundId) public onlyOwner returns (uint256 ,
 
 In order to keep tracking of ChainLink's smart contract, the `roundId` of BobaLink is same as ChainLink's. To keep things simple and clear, we add the following function to override the starting `roundId`. This allows us to start the round from a specific Id. 
 
-> Note: This means that you are not be able to get the history data before the starting round.
+> Note: This means that you are not able to get the history data before the starting round.
 
 ```solidity
 // override the latestRoundId, startingRound and reportingRoundId
@@ -52,7 +52,7 @@ function emergencySubmit(uint256 _roundId, int256 _submission, uint256 _CLLatest
 
 You can write smart contracts that consume Price Feeds using several languages, but this guide shows examples using the following languages:
 
-### Soldity
+### Solidity
 
 To consume price data, your smart contract should reference [`AggregatorV3Interface`](https://github.com/smartcontractkit/chainlink/blob/master/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol), which defines the external functions implemented by Data Feeds.
 
@@ -99,7 +99,7 @@ This example uses [web3.js](https://web3js.readthedocs.io/) to retrieve feed dat
 ```javascript
 /**
  * THIS IS EXAMPLE CODE THAT USES HARDCODED VALUES FOR CLARITY.
- * THIS IS EXAMPLE CODE THAT USES UN-AUDITED CODE.
+ * THIS IS EXAMPLE CODE THAT USES UNAUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
 
