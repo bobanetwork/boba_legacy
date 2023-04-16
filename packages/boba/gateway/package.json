@@ -7,6 +7,8 @@
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
     "format": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
+    "lint:check": "eslint . --ext ts,tsx",
+    "lint:fix": "yarn lint:check --fix",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
     "start": "npm run buildenv-dev && REACT_APP_WALLET_VERSION=$npm_package_version react-scripts start",
     "prebuild": "./bin/release.sh",
@@ -14,6 +16,7 @@
     "build:dev": "yarn prebuild && GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=dev react-scripts build",
     "audit-check": "audit-ci --moderate",
     "postinstall": "patch-package",
+    "pre-commit": "lint-staged --allow-empty",
     "deploy:onegateway": "yarn build:prod && aws s3 rm s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31 --recursive && aws s3 sync build s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31 && aws s3 cp s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31/index.html s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "deploy:mainnet": "yarn build:prod && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr --recursive && aws s3 sync build s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr && aws s3 cp s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
@@ -31,8 +34,6 @@
     "@mui/styles": "^5.3.0",
     "@sentry/react": "^7.30.0",
     "@sentry/tracing": "^7.30.0",
-    "@typescript-eslint/eslint-plugin": "^5.10.2",
-    "@typescript-eslint/parser": "^5.10.2",
     "@walletconnect/web3-provider": "^1.8.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
@@ -70,17 +71,29 @@
     "typescript": "^4.3.5",
     "web3": "^1.8.2"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not op_mini all"
   ],
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
     "@beam-australia/react-env": "2.1.2",
     "@types/styled-components": "^5.1.26",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jsdoc": "^35.1.2",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-unicorn": "^32.0.1",
     "audit-ci": "^3.1.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn format",
+      "yarn lint:check"
+    ]
   }
 }

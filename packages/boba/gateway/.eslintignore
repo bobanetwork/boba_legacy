@@ -1,0 +1,7 @@
+# build artifacts
+build
+bin
+
+# all javascript files
+**/*.js
+**/*.json

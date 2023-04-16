@@ -19,13 +19,17 @@
 
 type ChartToCodeType = (str: string, index: number) => number
 const charToCode: ChartToCodeType = (str, index) => {
-  if (index >= str.length) return 0
+  if (index >= str.length) {
+    return 0
+  }
   return str.toLowerCase().charCodeAt(index) - 97 + 1
 }
 
 type CodeToCharType = (int: number) => string
 const codeToChar: CodeToCharType = (int) => {
-  if (int === 0) return ''
+  if (int === 0) {
+    return ''
+  }
   return String.fromCharCode(int - 1 + 97).toUpperCase()
 }
 
@@ -36,7 +40,7 @@ export const coinToArray: CoinToArrayType = (name) => {
     return []
   }
 
-  let nameArray: number[] = []
+  const nameArray: number[] = []
   for (let i = 0; i < 4; i++) {
     nameArray.push(charToCode(name, i))
   }
