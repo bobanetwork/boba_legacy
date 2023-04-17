@@ -590,7 +590,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
             if (replyNeeded) {
                 bytes memory message = abi.encodeWithSelector(
-                    iL2ERC1155Bridge.finalizeDeposit.selector,
+                    iL2ERC1155Bridge.finalizeDepositBatch.selector,
                     _l1Contract,
                     _l2Contract,
                     _to,   // switched the _to and _from here to bounce back the deposit to the sender
