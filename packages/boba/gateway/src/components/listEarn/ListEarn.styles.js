@@ -3,19 +3,13 @@ import { Box } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
   cursor:'pointer',
-  borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #1f2123',
   borderRadius: '0',
-  background: theme.palette.background.glassy,
 
   [theme.breakpoints.down('md')]: {
-    //padding: '30px 10px',
-    background: '#1A1D1F',
     borderRadius: '20px',
-    padding: '10px 20px',
+
   },
-  [theme.breakpoints.up('md')]: {
-    padding: '10px',
-  },
+
 }));
 
 

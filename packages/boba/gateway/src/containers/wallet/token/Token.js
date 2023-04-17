@@ -22,7 +22,6 @@ import * as S from './Token.styles'
 import * as G from '../../Global.styles'
 
 import { Box, Typography, CircularProgress } from '@mui/material'
-import { tokenTableHeads } from './token.tableHeads'
 
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
@@ -37,6 +36,7 @@ import networkService from 'services/networkService'
 import { useNavigate } from 'react-router-dom'
 
 import Faucet from 'components/faucet/Faucet'
+import { TableHeader } from 'components/global/table'
 
 function TokenPage({
   balanceToken
@@ -49,8 +49,10 @@ function TokenPage({
 
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
-
+  
   const layer = useSelector(selectLayer())
+  const balance = layer === 'L1 ' ? l1Balance : l2Balance
+
   const network = useSelector(selectNetwork())
 
   const [debug, setDebug] = useState(false)
@@ -68,9 +70,9 @@ function TokenPage({
     'desc'
   )
 
-  const pendingL1 = orderedTransactions.filter((i) => {
+  const pending = orderedTransactions.filter((i) => {
     if (
-      i.chain === 'L1pending' && //use the custom API watcher for fast data on pending L1->L2 TXs
+      (i.chain === 'L1pending' || i.chain === 'L2') && // check for both L1pending and L2
       i.crossDomainMessage &&
       i.crossDomainMessage.crossDomainMessage === 1 &&
       i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
@@ -80,31 +82,11 @@ function TokenPage({
     }
     return false
   })
-
-  const pendingL2 = orderedTransactions.filter((i) => {
-    if (
-      i.chain === 'L2' &&
-      i.crossDomainMessage &&
-      i.crossDomainMessage.crossDomainMessage === 1 &&
-      i.crossDomainMessage.crossDomainMessageFinalize === 0 &&
-      i.action.status === 'pending'
-    ) {
-      return true
-    }
-    return false
-  })
-
-  const pending = [...pendingL1, ...pendingL2]
 
   const inflight = pending.filter((i) => {
-    if (
-      pending &&
-      i.hasOwnProperty('stateRoot') &&
-      i.stateRoot.stateRootHash === null
-    ) {
-      return true
-    }
-    return false
+    return pending &&
+    i.hasOwnProperty('stateRoot') &&
+    i.stateRoot.stateRootHash === null ? true : false;
   })
 
   useEffect(() => {
@@ -119,37 +101,36 @@ function TokenPage({
     }
   }, [dispatch ,accountEnabled])
 
-  const getLookupPrice = useCallback(() => {
-    if (!accountEnabled) return
-    // only run once all the tokens have been added to the tokenList
-    if (Object.keys(tokenList).length < networkService.tokenAddresses.length)
-      return
 
-    const symbolList = Object.values(tokenList).map((i) => {
-      if (i.symbolL1 === 'ETH') {
-        return 'ethereum'
-      } else if (i.symbolL1 === 'OMG') {
-        return 'omg'
-      } else if (i.symbolL1 === 'BOBA') {
-        return 'boba-network'
-      } else if (i.symbolL1 === 'OLO') {
-        return 'oolongswap'
-      } else if (i.symbolL1 === 'USDC') {
-        return 'usd-coin'
-      } else if (i.symbolL1 === 'AVAX') {
-        return 'avalanche-2'
-      } else if (i.symbolL1 === 'FTM') {
-        return 'fantom'
-      } else if (['BNB', 'tBNB'].includes(i.symbolL1)) {
-        return 'binancecoin'
-      } else if (['DEV', 'GLMR'].includes(i.symbolL1)) {
-        return 'moonbeam'
-      } else {
-        return i.symbolL1.toLowerCase()
-      }
-    })
-    dispatch(fetchLookUpPrice(symbolList))
-  }, [tokenList, dispatch, accountEnabled])
+
+
+const getLookupPrice = useCallback(() => {
+  const tokenConfig = {
+    ETH: 'ethereum',
+    OMG: 'omg',
+    BOBA: 'boba-network',
+    OLO: 'oolongswap',
+    USDC: 'usd-coin',
+    AVAX: 'avalanche-2',
+    FTM: 'fantom',
+    BNB: 'binancecoin',
+    tBNB: 'binancecoin',
+    DEV: 'moonbeam',
+    GLMR: 'moonbeam'
+  }
+
+  if (!accountEnabled) return
+  // only run once all the tokens have been added to the tokenList
+  if (Object.keys(tokenList).length < networkService.tokenAddresses.length)
+    return
+
+  const symbolList = Object.values(tokenList).map((i) => {
+    const symbolL1 = i.symbolL1.toUpperCase()
+    return tokenConfig[symbolL1] || symbolL1.toLowerCase()
+  })
+  
+  dispatch(fetchLookUpPrice(symbolList))
+}, [tokenList, dispatch, accountEnabled])
 
   useEffect(() => {
     if (!baseEnabled) return
@@ -160,6 +141,14 @@ function TokenPage({
     let approval = networkService.estimateApprove()
     console.log(['Gas Estimate Approval', approval])
   }
+
+  const tableHeaderOptions = [
+    {name:'Token', width:225},
+    {name:'Amount', width:145},
+    {name:'Value', width:115},
+    {name:'Actions',width:85},
+  ]
+
 
   if (!accountEnabled) {
     return (
@@ -255,68 +244,28 @@ function TokenPage({
           </Box>
         )}
 
-        <G.Container>
-          <S.TokenContent>
-            <S.TableHeading>
-              {tokenTableHeads.map((item) => {
+          <TableHeader options={tableHeaderOptions} />
+
+          {['L1', 'L2'].includes(layer) && (
+            !balanceLoading || !!balance.length ? (
+              balance.map((i) => {
                 return (
-                  <S.TableHeadingItem
-                    sx={{
-                      width: item.size,
-                      flex: item.flex,
-                      ...item.sx,
-                    }}
-                    key={item.label}
-                    variant="body2"
-                    component="div"
-                  >
-                    {item.label}
-                  </S.TableHeadingItem>
+                  <ListToken
+                    showBalanceToken={balanceToken}
+                    key={i.currency}
+                    token={i}
+                    chain={layer}
+                    networkLayer={layer}
+                    disabled={disabled}
+                  />
                 )
-              })}
-            </S.TableHeading>
-            {layer === 'L2' ? (
-              !balanceLoading || !!l2Balance.length ? (
-                l2Balance.map((i) => {
-                  return (
-                    <ListToken
-                      showBalanceToken={balanceToken}
-                      key={i.currency}
-                      token={i}
-                      chain={'L2'}
-                      networkLayer={layer}
-                      disabled={disabled}
-                    />
-                  )
-                })
-              ) : (
-                <S.LoaderContainer>
-                  <CircularProgress color="secondary" />
-                </S.LoaderContainer>
-              )
-            ) : null}
-            {layer === 'L1' ? (
-              !balanceLoading || !!l1Balance.length ? (
-                l1Balance.map((i) => {
-                  return (
-                    <ListToken
-                      showBalanceToken={balanceToken}
-                      key={i.currency}
-                      token={i}
-                      chain={'L1'}
-                      networkLayer={layer}
-                      disabled={disabled}
-                    />
-                  )
-                })
-              ) : (
-                <S.LoaderContainer>
-                  <CircularProgress color="secondary" />
-                </S.LoaderContainer>
-              )
-            ) : null}
-          </S.TokenContent>
-        </G.Container>
+              })
+            ) : (
+              <S.LoaderContainer>
+                <CircularProgress color="secondary" />
+              </S.LoaderContainer>
+            )
+          )}
       </>
     )
   }

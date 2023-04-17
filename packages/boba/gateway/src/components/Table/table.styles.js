@@ -2,19 +2,19 @@ import styled from '@emotion/styled';
 import { TableCell, TableRow } from '@mui/material';
 
 export const CellTitle = styled.div`
-font-weight: normal;
-font-size: 24px;
-line-height: 24px;
-color: ${props => props.color ? props.color : '#fff'};
-opacity: 0.9;
-margin-bottom: 7px;
-`
-export const CellSubTitle = styled.div`
-font-weight: normal;
-font-size: 18px;
-line-height: 112%;
-color: rgba(255, 255, 255, 0.7);
-opacity: 0.9;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 24px;
+    color: ${props => props.color ? props.color : '#fff'};
+    opacity: 0.9;
+    margin-bottom: 7px;
+    `
+    export const CellSubTitle = styled.div`
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 112%;
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 0.9;
 `
 
 export const StyledTableRow = styled(TableRow)`

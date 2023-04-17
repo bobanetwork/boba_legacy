@@ -22,11 +22,29 @@ export const TableHeaderContainer = styled(Row)(({ theme }) => ({
   },
 }))
 
-const TableContentContainer = styled(Row)`
-  justify-content: space-between;
-`
+const TableContentContainer = styled(Row)(({ theme }) => ({
+  padding: '10px 15px',
+  gap: '10px 0px',
+  borderBottom:
+    theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #1f2123',
+  background: theme.palette.background.glassy,
+  justifyContent: 'space-between',
+  [theme.breakpoints.down('md')]: {
+    marginBottom: '5px',
+  },
+}))
 
 const TableRow = styled(Row)`
+  &:not(:first-of-type) {
+    margin-left: auto;
+  }
+  &:last-of-type {
+    margin-right: 0px;
+  }
+`
+
+const TableContentRow = styled(Row)`
+  padding: '10px';
   &:not(:first-of-type) {
     margin-left: auto;
   }
@@ -85,9 +103,12 @@ export const TableContent = ({ options, mobileOptions }: TableContentType) => {
     <TableContentContainer>
       {currentOptions?.map((option, index) => {
         return (
-          <TableRow key={index} style={{ maxWidth: option?.width + 'px' }}>
+          <TableContentRow
+            key={index}
+            style={{ maxWidth: option?.width + 'px' }}
+          >
             {option.content}
-          </TableRow>
+          </TableContentRow>
         )
       })}
     </TableContentContainer>

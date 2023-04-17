@@ -1,23 +1,26 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const ROW = styled.div`
+const RowStyle = styled.div<{ gap?: string }>`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   width: 100%;
+  gap: ${(props) => props.gap};
 `
 
-const COLUMN = styled.div`
+const ColumStyle = styled.div<{ gap?: string }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  gap: ${(props) => props.gap};
 `
 
 interface RowOrColumnType {
   children: React.ReactNode
+  gap?: string
   style?: React.CSSProperties
   className?: string
 }
@@ -25,23 +28,25 @@ interface RowOrColumnType {
 export const Row = ({
   children,
   style,
+  gap,
   className,
 }: RowOrColumnType): JSX.Element => {
   return (
-    <ROW className={className} style={style}>
+    <RowStyle className={className} style={style} gap={gap || '0px'}>
       {children}
-    </ROW>
+    </RowStyle>
   )
 }
 
 export const Column = ({
   children,
   style,
+  gap,
   className,
 }: RowOrColumnType): JSX.Element => {
   return (
-    <COLUMN className={className} style={style}>
+    <ColumStyle className={className} style={style} gap={gap || '0px'}>
       {children}
-    </COLUMN>
+    </ColumStyle>
   )
 }
