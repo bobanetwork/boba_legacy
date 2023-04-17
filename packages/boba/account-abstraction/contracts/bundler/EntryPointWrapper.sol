@@ -39,6 +39,8 @@ contract EntryPointWrapper {
         StakeInfo stakeInfo;
     }
 
+    event ReturnedData(bytes revertData);
+
     /**
      * Successful result from simulateValidation.
      * @param returnInfo gas and time-range returned values
@@ -82,7 +84,7 @@ contract EntryPointWrapper {
                 (ReturnInfo memory returnInfo, StakeInfo memory senderInfo, StakeInfo memory factoryInfo, StakeInfo memory paymasterInfo, AggregatorStakeInfo memory aggregatorInfo) = abi.decode(slice(revertData, 4, revertData.length - 4), (ReturnInfo, StakeInfo, StakeInfo, StakeInfo, AggregatorStakeInfo));
                 return (returnInfo, senderInfo, factoryInfo, paymasterInfo, aggregatorInfo);
             } else {
-                revert();
+                emit ReturnedData(revertData);
             }
         }
     }
