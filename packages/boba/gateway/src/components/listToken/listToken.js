@@ -186,7 +186,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
                       tooltip="A multi-chain bridge to Alt L1."
                       fullWidth
                     >
-                      Bridge
+                      Bridge to alt L1
                     </Button>
                   )}
                 </>
@@ -504,7 +504,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
                   variant="contained"
                   fullWidth
                 >
-                  Bridge
+                  Bridge to alt L1
                 </Button>
               )}
             </>
