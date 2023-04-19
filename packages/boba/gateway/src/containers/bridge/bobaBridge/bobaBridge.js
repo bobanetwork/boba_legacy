@@ -166,7 +166,7 @@ function BobaBridge() {
           </Box>
         </S.BobaContentWrapper>
       </S.BobaContent>
-      {!userWallet &&
+      {!accountEnabled &&
         <Box alignSelf="center">
           <Button
             fullWidth={true}
