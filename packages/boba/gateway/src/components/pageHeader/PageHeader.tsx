@@ -1,11 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
+
 import * as S from './PageHeader.styles'
-import BobaLogo from "../icons/BobaLogo";
+import BobaLogo from '../icons/BobaLogo'
 import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
-import MenuItems from 'components/mainMenu/menuItems/MenuItems'
-import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
-import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
-import { useState } from 'react'
 import {
   Box,
   Container,
@@ -15,20 +13,25 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
+
 import NavIcon from 'components/icons/NavIcon'
 import WalletIcon from 'components/icons/WalletIcon'
 import CloseIcon from 'components/icons/CloseIcon'
 import networkService from 'services/networkService'
 import { makeStyles } from '@mui/styles'
-import Copy from 'components/copy/Copy'
-import Disconnect from 'components/disconnect/Disconnect'
-import { useSelector } from 'react-redux'
+import {
+  Copy,
+  Disconnect,
+  MenuItems,
+  ThemeSwitcher,
+  FeeSwitcher,
+  NetworkSwitcher,
+} from 'components'
 import {
   selectAccountEnabled,
   selectLayer,
   selectMonster,
 } from 'selectors/setupSelector'
-import NetworkSwitcher from 'components/mainMenu/networkSwitcher/NetworkSwitcher'
 import { LAYER } from 'util/constant'
 
 const useStyles = makeStyles({
@@ -38,21 +41,23 @@ const useStyles = makeStyles({
   },
 })
 
-const PageHeader = ({ maintenance }) => {
+type PageHeaderType = {
+  maintenance: boolean
+}
+
+const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
   const classes = useStyles()
-  // eslint-disable-next-line no-unused-vars
-  const [open, setOpen] = useState()
-  const [walletOpen, setWalletOpen] = useState()
-  const [feeOpen, setFeeOpen] = useState()
+  const [open, setOpen] = useState<boolean>(false)
+  const [walletOpen, setWalletOpen] = useState<boolean>(false)
+  const [feeOpen, setFeeOpen] = useState<boolean>(false)
 
   const theme = useTheme()
-  const accountEnabled = useSelector(selectAccountEnabled())
-  const layer = useSelector(selectLayer())
-  const monsterNumber = useSelector(selectMonster())
+  const accountEnabled: boolean = useSelector(selectAccountEnabled())
+  const layer: 'L1' | 'L2' = useSelector(selectLayer())
+  const monsterNumber: number = useSelector(selectMonster())
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  let Logo = BobaLogo
-  if (monsterNumber > 0) Logo = BobaLogoM
+  const Logo = monsterNumber > 0 ? BobaLogoM : BobaLogo
 
   if (maintenance) {
     return (

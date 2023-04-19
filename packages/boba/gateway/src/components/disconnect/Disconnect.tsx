@@ -13,25 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
-import { LoginOutlined } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import React from 'react'
+import { LoginOutlined } from '@mui/icons-material'
+import { IconButton, Tooltip } from '@mui/material'
 
-import useDisconnect from 'hooks/useDisconnect';
+import useDisconnect from 'hooks/useDisconnect'
 
-function Disconnect () {
-
-  const { disconnect } = useDisconnect();
-
+const Disconnect = () => {
+  const { disconnect } = useDisconnect()
   return (
     <>
       <Tooltip onClick={disconnect}>
-        <IconButton size='medium'>
+        <IconButton size="medium">
           <LoginOutlined sx={{ fontSize: 16 }} />
         </IconButton>
       </Tooltip>
     </>
-  );
+  )
 }
 
-export default React.memo(Disconnect);
+export default React.memo(Disconnect)
