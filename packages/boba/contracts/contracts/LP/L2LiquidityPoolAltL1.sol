@@ -305,38 +305,6 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
     }
 
     /**
-     * @dev Configure fee of the L1LP contract
-     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
-     * @param _userRewardMinFeeRate minimum fee rate that users get
-     * @param _userRewardMaxFeeRate maximum fee rate that users get
-     * @param _ownerRewardFeeRate fee rate that contract owner gets
-     */
-    function configureFeeExits(
-        uint256 _userRewardMinFeeRate,
-        uint256 _userRewardMaxFeeRate,
-        uint256 _ownerRewardFeeRate
-    )
-        external
-        onlyDAO()
-        onlyInitialized()
-    {
-        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
-        bytes memory data = abi.encodeWithSelector(
-            iL1LiquidityPool.configureFee.selector,
-            _userRewardMinFeeRate,
-            _userRewardMaxFeeRate,
-            _ownerRewardFeeRate
-        );
-
-        // Send calldata into L1
-        sendCrossDomainMessage(
-            address(L1LiquidityPoolAddress),
-            getFinalizeDepositL1Gas(),
-            data
-        );
-    }
-
-    /**
      * @dev Configure gas.
      *
      * @param _l1GasFee default finalized withdraw L1 Gas

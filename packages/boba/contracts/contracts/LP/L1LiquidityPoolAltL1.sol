@@ -888,7 +888,7 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
     }
 
     /**
-     * @dev Configure fee of this contract. called from L2
+     * @dev Configure fee of this contract.
      * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
@@ -903,7 +903,7 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
         onlyOwner()
         onlyInitialized()
     {
-        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate, "Invalud user reward fee");
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         _configureFee(_userRewardMinFeeRate, _userRewardMaxFeeRate,_ownerRewardFeeRate);
     }
 }
