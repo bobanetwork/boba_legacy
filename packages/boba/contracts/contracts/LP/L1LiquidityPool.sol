@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.7.5;
+pragma solidity >=0.8.0;
 pragma experimental ABIEncoderV2;
 
 import "./interfaces/iL2LiquidityPool.sol";
@@ -533,7 +533,7 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             if (token.l1TokenAddress != address(0)) {
                 IERC20(token.l1TokenAddress).safeTransferFrom(msg.sender, address(this), token.amount);
             } else {
-                ETHAmount = ETHAmount + token.amount;
+                ETHAmount = ETHAmount.add(token.amount);
             }
             payload[i] = ClientPayToken(msg.sender, pool.l2TokenAddress, token.amount);
         }
