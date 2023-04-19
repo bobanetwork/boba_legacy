@@ -13,15 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-const initialState = {}
+const initialState: any = {}
 
-function lookupReducer(state = initialState, action) {
-  switch (action.type) {
-    case 'PRICE/GET/SUCCESS':
-      return { ...state, ...action.payload };
-    default:
-      return state;
+type ReducerMapType = {
+  [key: string]: (state: any, action: any) => any
+}
+
+const reducersMap: ReducerMapType = {
+  'PRICE/GET/SUCCESS': (state, action) => ({ ...state, ...action.payload }),
+}
+
+type lookupReducerType = (state: any, action: any) => any
+
+const lookupReducer: lookupReducerType = (
+  state = initialState,
+  action: any
+) => {
+  const reducer = reducersMap[action.type]
+  if (reducer) {
+    return reducer(state, action)
   }
+  return state
 }
 
 export default lookupReducer
