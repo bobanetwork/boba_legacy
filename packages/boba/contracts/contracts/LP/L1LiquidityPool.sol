@@ -530,6 +530,9 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
             PoolInfo storage pool = poolInfo[token.l1TokenAddress];
             require(pool.l2TokenAddress != address(0), "Invaild Token");
 
+            // update deposit hash
+            _updateDepositHash(token.l1TokenAddress, msg.sender, token.amount);
+
             if (token.l1TokenAddress != address(0)) {
                 IERC20(token.l1TokenAddress).safeTransferFrom(msg.sender, address(this), token.amount);
             } else {
