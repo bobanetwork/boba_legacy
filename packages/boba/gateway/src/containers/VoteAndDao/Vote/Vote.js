@@ -29,8 +29,7 @@ import {
   onSavePoolVote
 } from 'actions/veBobaAction'
 
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectLockRecords, selectPools } from 'selectors/veBobaSelector'
+import { selectAccountEnabled, selectLayer,selectLockRecords, selectPools } from 'selectors'
 
 import { ContentEmpty } from 'containers/Global.styles'
 

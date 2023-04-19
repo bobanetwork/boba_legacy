@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/react';
 import { Typography } from '@mui/material';
 import { APP_ENV, SENTRY_DSN } from 'util/constant';
 import { useSelector } from 'react-redux';
-import { selectActiveNetwork } from 'selectors/networkSelector';
+import { selectActiveNetwork } from 'selectors';
 
 
 /**

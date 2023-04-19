@@ -1,11 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import * as S from './PageHeader.styles'
 import BobaLogo from "../icons/BobaLogo";
 import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
 import MenuItems from 'components/mainMenu/menuItems/MenuItems'
 import ThemeSwitcher from 'components/mainMenu/themeSwitcher/ThemeSwitcher'
 import FeeSwitcher from 'components/mainMenu/feeSwitcher/FeeSwitcher'
-import { useState } from 'react'
 import {
   Box,
   Container,
@@ -27,7 +26,7 @@ import {
   selectAccountEnabled,
   selectLayer,
   selectMonster,
-} from 'selectors/setupSelector'
+} from 'selectors'
 import NetworkSwitcher from 'components/mainMenu/networkSwitcher/NetworkSwitcher'
 import { LAYER } from 'util/constant'
 

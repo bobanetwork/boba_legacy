@@ -23,7 +23,7 @@ import Pager from 'components/pager/Pager'
 import Transaction from 'components/transaction/Transaction'
 import * as S from './History.styles'
 import { useSelector } from 'react-redux'
-import { selectLoading } from 'selectors/loadingSelector'
+import { selectLoading } from 'selectors'
 
 const PER_PAGE = 8
 

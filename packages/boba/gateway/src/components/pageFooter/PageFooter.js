@@ -7,11 +7,11 @@ import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'
 import { LAYER, ROUTES_PATH, WALLET_VERSION } from 'util/constant'
 import { useSelector } from 'react-redux'
-import { selectLayer } from 'selectors/setupSelector'
 import {
+  selectLayer,
   selectActiveNetwork,
   selectActiveNetworkType,
-} from 'selectors/networkSelector'
+} from 'selectors'
 import { getBlockExplorerUrl } from 'util/network/network.util'
 
 

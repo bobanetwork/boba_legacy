@@ -25,9 +25,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import { setActiveDataTab } from 'actions/uiAction'
 import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
-import { selectBaseEnabled } from 'selectors/setupSelector'
-import { selectActiveDataTab } from 'selectors/uiSelector'
-import { selectSevens, selectFastExits } from 'selectors/dataSelector'
+import { selectBaseEnabled, selectActiveDataTab,selectSevens, selectFastExits } from 'selectors'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
