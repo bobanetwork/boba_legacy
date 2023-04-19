@@ -143,10 +143,10 @@ const getLookupPrice = useCallback(() => {
   }
 
   const tableHeaderOptions = [
-    {name:'Token', width:225},
+    {name:'Token', width:275},
     {name:'Amount', width:145},
     {name:'Value', width:115},
-    {name:'Actions',width:85},
+    {name:'Actions',width:350},
   ]
 
 
@@ -244,7 +244,7 @@ const getLookupPrice = useCallback(() => {
           </Box>
         )}
 
-          <TableHeader options={tableHeaderOptions} />
+          <TableHeader options={tableHeaderOptions} mobileOptions={[0,3]}/>
 
           {['L1', 'L2'].includes(layer) && (
             !balanceLoading || !!balance.length ? (

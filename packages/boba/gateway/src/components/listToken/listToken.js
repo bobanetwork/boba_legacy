@@ -88,7 +88,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
     return null;
   }
 
-  if (isMobile) {
+  /*if (isMobile) {
     return (
       <S.Content>
         <S.TableBody>
@@ -426,7 +426,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
       </S.Content>
     )
   }
-  
+  */
   const configActions = {
     OLO : {
       link: { 
@@ -576,7 +576,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
               Transfer
             </Button>
           </>
-        )}
+      )}
 
       { enabled && chain === 'L2' && excludedSymbols.includes(symbol) && (
         <Row>
@@ -609,18 +609,39 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
     )
  };
 
+ const actionView = () => {
+  if(!isMobile) {
+    return  <Row gap="0px 10px"> {Actions()} </Row>
+  }
+  if(isMobile) {
+    return <Row gap="0px 10px"
+      > <ExpandMoreIcon sx={{ width: '12px' }} /> </Row>
+
+
+  }
+ }
+
   const tableOptions = [
-    { content: <IconLabel token={{ name, symbol, address, chainId:chain, decimals }} />, width:225 },
+    { content: <IconLabel token={{ name, symbol, address, chainId:chain, decimals }} />, width:275 },
     { content: <Text> {amount}</Text>,width:145 },
     { content: <Text> {`$${amountToUsd(amountInNumber, lookupPrice, token).toFixed(2)}`} </Text>,width:115 },
-    { content: <Row gap="0px 10px"> {Actions()} </Row>,width:350 },
+    { content: actionView() ,width:350 },
   ];
 
 
   return (
-    <>
-      <TableContent options={tableOptions} mobileOptions={[0,3]}/>
-    </>
+    <div  onClick={() => {
+      setDropDownBox(!dropDownBox)
+    }}>
+      <TableContent options={tableOptions} mobileOptions={[0,3]}/> 
+      {isMobile && dropDownBox && (
+        <Fade in={dropDownBox}>
+          <S.DropdownWrapper>
+            {Actions()}
+          </S.DropdownWrapper>
+        </Fade>
+      )}
+    </div>
   )
 }
 

@@ -23,14 +23,17 @@ export const TableHeaderContainer = styled(Row)(({ theme }) => ({
 }))
 
 const TableContentContainer = styled(Row)(({ theme }) => ({
-  padding: '10px 15px',
+  padding: '5px 15px',
   gap: '10px 0px',
   borderBottom:
     theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #1f2123',
+  // @ts-ignore
   background: theme.palette.background.glassy,
   justifyContent: 'space-between',
   [theme.breakpoints.down('md')]: {
-    marginBottom: '5px',
+    marginBottom: '0px',
+    padding: '5px 15px',
+    borderRadius: '15px',
   },
 }))
 
@@ -43,15 +46,19 @@ const TableRow = styled(Row)`
   }
 `
 
-const TableContentRow = styled(Row)`
-  padding: '10px';
-  &:not(:first-of-type) {
-    margin-left: auto;
-  }
-  &:last-of-type {
-    margin-right: 0px;
-  }
-`
+const TableContentRow = styled(Row)(({ theme }) => ({
+  padding: '10px',
+  '&:not(:first-of-type)': {
+    marginLeft: 'auto',
+  },
+  '&:last-of-type': {
+    marginRight: 0,
+  },
+  [theme.breakpoints.down('md')]: {
+    padding: '8px 10px',
+  },
+}))
+
 type TableHeaderOptionType = {
   name: string
   tooltip: string
@@ -60,12 +67,17 @@ type TableHeaderOptionType = {
 
 type TableHeaderType = {
   options: TableHeaderOptionType[]
+  mobileOptions?: number[]
 }
 
-export const TableHeader = ({ options }: TableHeaderType) => {
+export const TableHeader = ({ options, mobileOptions }: TableHeaderType) => {
+  const theme = useTheme() as any
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const currentOptions =
+    isMobile && mobileOptions ? mobileOptions.map((i) => options[i]) : options
   return (
     <TableHeaderContainer>
-      {options?.map((option) => {
+      {currentOptions?.map((option) => {
         return (
           <TableRow
             key={option.name}

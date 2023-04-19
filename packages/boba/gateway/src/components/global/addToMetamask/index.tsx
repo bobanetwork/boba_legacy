@@ -17,6 +17,7 @@ type AddToMetamaskType = {
 }
 
 const AddToMetamaskContainer = styled.div`
+  display: flex;
   margin-left: auto;
   cursor: pointer;
 `

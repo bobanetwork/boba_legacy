@@ -7,7 +7,7 @@ export const Wrapper = styled(Box)(({ theme, ...props }) => ({
 
   [theme.breakpoints.down('md')]: {
     borderRadius: '20px',
-
+    paddingBottom: '10px'
   },
 
 }));
@@ -43,5 +43,6 @@ export const DropdownContent = styled(Box)(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     flexDirection: 'row',
     gap: '30px',
+    marginBottom:'20px',
   },
 }));
