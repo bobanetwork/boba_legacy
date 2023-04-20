@@ -716,15 +716,16 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             _tokenAddress
         );
 
+
+        // burn xBOBA
+        burnXBOBA(_amount, _tokenAddress);
+
         if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
             require(sent, "Failed to send ovm_Eth");
         }
-
-        // burn xBOBA
-        burnXBOBA(_amount, _tokenAddress);
     }
 
     /**
