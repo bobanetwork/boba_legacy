@@ -169,8 +169,8 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
           <NetworkSwitcher />
           {!!accountEnabled ? (
             <>
-              <Copy value={networkService.account} light={false} />
-              <Disconnect light={false} />
+              <Copy value={networkService.account} />
+              <Disconnect />
             </>
           ) : null}
           <ThemeSwitcher />

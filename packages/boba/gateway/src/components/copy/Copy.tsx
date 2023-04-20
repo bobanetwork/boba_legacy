@@ -19,7 +19,7 @@ import { ContentCopyOutlined } from '@mui/icons-material'
 import { IconButton, Tooltip } from '@mui/material'
 
 type CopyType = {
-  value: string | null
+  value?: string | null
 }
 const Copy = ({ value }: CopyType): JSX.Element => {
   const [open, setOpen] = useState(false)
@@ -33,7 +33,7 @@ const Copy = ({ value }: CopyType): JSX.Element => {
   }, [open, setOpen])
 
   return (
-    <CopyToClipboard text={value} onCopy={() => setOpen(true)}>
+    <CopyToClipboard text={value || ''} onCopy={() => setOpen(true)}>
       <Tooltip open={open} title="Copied to clipboard!">
         <IconButton size="medium">
           <ContentCopyOutlined sx={{ fontSize: 16 }} />
