@@ -23,7 +23,7 @@ const Disconnect = () => {
   const { disconnect } = useDisconnect()
   return (
     <>
-      <Tooltip onClick={disconnect}>
+      <Tooltip title="" onClick={disconnect}>
         <IconButton size="medium">
           <LoginOutlined sx={{ fontSize: 16 }} />
         </IconButton>

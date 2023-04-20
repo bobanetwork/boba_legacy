@@ -154,11 +154,7 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
                   </S.WrapperCloseIcon>
                 </S.DrawerHeader>
                 <S.HeaderDivider />
-                {layer === LAYER.L2 ? (
-                  <FeeSwitcher
-                    style={{ paddingTop: '15px', marginTop: '20px' }}
-                  />
-                ) : null}
+                {layer === LAYER.L2 ? <FeeSwitcher /> : null}
               </S.StyleDrawer>
             </Drawer>
           </S.HeaderWrapper>

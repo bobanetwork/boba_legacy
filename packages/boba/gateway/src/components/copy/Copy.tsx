@@ -19,7 +19,7 @@ import { ContentCopyOutlined } from '@mui/icons-material'
 import { IconButton, Tooltip } from '@mui/material'
 
 type CopyType = {
-  value: string
+  value: string | null
 }
 const Copy = ({ value }: CopyType): JSX.Element => {
   const [open, setOpen] = useState(false)
