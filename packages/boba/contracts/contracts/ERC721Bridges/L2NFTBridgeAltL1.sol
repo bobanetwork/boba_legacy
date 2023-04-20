@@ -381,7 +381,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
     {
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
+        require(msg.value == billingContract.exitFee(), "Insufficient Boba amount");
         (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
         require(sent, "Failed to collect exit fee");
 
