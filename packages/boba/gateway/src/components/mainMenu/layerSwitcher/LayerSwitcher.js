@@ -33,15 +33,14 @@ import {
   selectConnectBOBA,
   selectConnect,
   selectWalletConnected,
-  selectChainIdChanged
-} from 'selectors/setupSelector'
-
-import {
+  selectChainIdChanged,
   selectActiveNetwork,
   selectActiveNetworkIcon,
   selectActiveNetworkName,
   selectActiveNetworkType,
-} from 'selectors/networkSelector'
+} from 'selectors'
+
+
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'

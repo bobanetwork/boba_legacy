@@ -22,7 +22,7 @@ import Input from 'components/input/Input'
 import Select from 'components/select/Select'
 
 import { createDaoProposal } from 'actions/daoAction'
-import { selectProposalThreshold } from 'selectors/daoSelector'
+import { selectProposalThreshold } from 'selectors'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
 function NewProposalModal({ open }) {

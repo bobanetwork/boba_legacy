@@ -24,7 +24,7 @@ import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import { selectCDMType, selectCDMMessage, selectCDMTransaction } from 'selectors/transactionSelector'
+import { selectCDMType, selectCDMMessage, selectCDMTransaction } from 'selectors'
 
 import networkService from 'services/networkService'
 

@@ -22,10 +22,16 @@ import { useTheme } from '@emotion/react';
 import { Box, FormControlLabel, Checkbox, Typography, useMediaQuery } from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
 
-import { selectUserInfo, selectPoolInfo } from 'selectors/earnSelector'
-import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectBaseEnabled, selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
+import { 
+  selectUserInfo, 
+  selectPoolInfo,
+  selectlayer1Balance,
+  selectlayer2Balance,
+  selectBaseEnabled,
+  selectAccountEnabled,
+  selectLayer,
+  selectActiveNetworkName
+} from 'selectors'
 
 import { getEarnInfo } from 'actions/earnAction'
 

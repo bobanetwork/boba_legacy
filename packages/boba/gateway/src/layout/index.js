@@ -26,7 +26,7 @@ import {
 } from '@mui/material/styles'
 
 import { setTheme } from 'actions/uiAction'
-import { selectModalState } from 'selectors/uiSelector'
+import { selectModalState } from 'selectors'
 
 import Notification from 'containers/notification/Notification'
 
