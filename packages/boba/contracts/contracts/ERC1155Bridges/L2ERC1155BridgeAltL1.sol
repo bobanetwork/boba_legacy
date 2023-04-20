@@ -3,7 +3,7 @@
 /**
  Note: This contract has not been audited, exercise caution when using this on mainnet
  */
-pragma solidity >0.7.5;
+pragma solidity 0.8.9;
 pragma experimental ABIEncoderV2;
 
 /* Interface Imports */
