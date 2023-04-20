@@ -54,13 +54,21 @@ type Config struct {
 	// SCCAddress is the SCC contract address.
 	SCCAddress string
 
-	// MinL1TxSize is the minimum size in bytes of any L1 transactions generated
-	// by the batch submitter.
-	MinL1TxSize uint64
+	// MinSequencerL1TxSize is the minimum size in bytes of any L1 transactions generated
+	// by the sequencer.
+	MinSequencerL1TxSize uint64
 
-	// MaxL1TxSize is the maximum size in bytes of any L1 transactions generated
-	// by the batch submitter.
-	MaxL1TxSize uint64
+	// MaxSequencerL1TxSize is the maximum size in bytes of any L1 transactions generated
+	// by the sequencer.
+	MaxSequencerL1TxSize uint64
+
+	// MinProposerL1TxSize is the minimum size in bytes of any L1 transactions generated
+	// by the proposer.
+	MinProposerL1TxSize uint64
+
+	// MaxProposerL1TxSize is the maximum size in bytes of any L1 transactions generated
+	// by the proposer.
+	MaxProposerL1TxSize uint64
 
 	// MaxTxBatchCount is the maximum number of L2 transactions that can ever be
 	// in a batch.
@@ -172,8 +180,10 @@ func NewConfig(ctx *cli.Context) (Config, error) {
 		L2EthRpc:                ctx.GlobalString(flags.L2EthRpcFlag.Name),
 		CTCAddress:              ctx.GlobalString(flags.CTCAddressFlag.Name),
 		SCCAddress:              ctx.GlobalString(flags.SCCAddressFlag.Name),
-		MinL1TxSize:             ctx.GlobalUint64(flags.MinL1TxSizeFlag.Name),
-		MaxL1TxSize:             ctx.GlobalUint64(flags.MaxL1TxSizeFlag.Name),
+		MinSequencerL1TxSize:    ctx.GlobalUint64(flags.MinSequencerL1TxSizeFlag.Name),
+		MaxSequencerL1TxSize:    ctx.GlobalUint64(flags.MaxSequencerL1TxSizeFlag.Name),
+		MinProposerL1TxSize:     ctx.GlobalUint64(flags.MinProposerL1TxSizeFlag.Name),
+		MaxProposerL1TxSize:     ctx.GlobalUint64(flags.MaxProposerL1TxSizeFlag.Name),
 		MaxBatchSubmissionTime:  ctx.GlobalDuration(flags.MaxBatchSubmissionTimeFlag.Name),
 		PollInterval:            ctx.GlobalDuration(flags.PollIntervalFlag.Name),
 		NumConfirmations:        ctx.GlobalUint64(flags.NumConfirmationsFlag.Name),
