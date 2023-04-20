@@ -63,6 +63,20 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     // Maps L1 token address to tokenInfo
     mapping(address => PairTokenInfo) public pairTokenInfo;
 
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        address newDepositGas
+    );
+
+    event PairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
+
     /***************
      * Constructor *
      ***************/
@@ -104,6 +118,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     {
         require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -119,6 +134,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         onlyInitialized()
     {
         depositL2Gas = _depositL2Gas;
+        emit GasConfigured(depositL2Gas);
     }
 
     /**
@@ -189,6 +205,8 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit PairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /**************

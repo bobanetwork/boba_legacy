@@ -75,6 +75,20 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
 
     // billing contract address
     address public billingContractAddress;
+
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        address exitL1Gas
+    );
+
+    event NFTPairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
     /***************
      * Constructor *
      ***************/
@@ -114,6 +128,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     {
         require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -153,6 +168,7 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         onlyInitialized()
     {
         exitL1Gas = _exitL1Gas;
+        emit GasConfigured(exitL1Gas);
     }
 
     /**
@@ -217,6 +233,8 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit NFTPairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /***************

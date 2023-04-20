@@ -64,6 +64,20 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     // Maps L1 NFT address to NFTInfo
     mapping(address => PairNFTInfo) public pairNFTInfo;
 
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        address newDepositGas
+    );
+
+    event NFTPairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
+
     /***************
      * Constructor *
      ***************/
@@ -105,6 +119,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     {
         require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -120,6 +135,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         onlyInitialized()
     {
         depositL2Gas = _depositL2Gas;
+        emit GasConfigured(depositL2Gas);
     }
 
     /**
@@ -191,6 +207,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit NFTPairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /**************

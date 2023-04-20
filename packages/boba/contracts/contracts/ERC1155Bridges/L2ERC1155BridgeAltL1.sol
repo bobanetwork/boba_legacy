@@ -75,6 +75,24 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
     // billing contract address
     address payable public billingContractAddress;
 
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        address exitL1Gas
+    );
+
+    event PairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
+
+    event BillingContractUpdated(
+        address billingContract
+    )
+
     /***************
      * Constructor *
      ***************/
@@ -114,6 +132,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
     {
         require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -153,6 +172,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
         onlyInitialized()
     {
         exitL1Gas = _exitL1Gas;
+        emit GasConfigured(exitL1Gas);
     }
 
     /**
@@ -168,6 +188,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
     {
         require(_billingContractAddress != address(0), "Billing contract address cannot be zero");
         billingContractAddress = _billingContractAddress;
+        emit BillingContractUpdated(billingContractAddress);
     }
 
     /***
@@ -216,6 +237,8 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit PairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /***************
