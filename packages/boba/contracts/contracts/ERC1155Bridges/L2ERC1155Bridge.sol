@@ -237,6 +237,9 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateWithdrawal(
             _l2Contract,
             msg.sender,
@@ -264,6 +267,9 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateWithdrawalBatch(
             _l2Contract,
             msg.sender,
@@ -399,9 +405,6 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 message
             );
         } else {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a native token is withdrawn on L2, the L1 Bridge mints the funds to itself for future
             // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
             // _from is an EOA or address(0).
@@ -501,9 +504,6 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 message
             );
         } else {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a native token is withdrawn on L2, the L1 Bridge mints the funds to itself for future
             // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
             // _from is an EOA or address(0).

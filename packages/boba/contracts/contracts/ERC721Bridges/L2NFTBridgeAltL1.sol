@@ -238,6 +238,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateWithdrawal(
             _l2Contract,
             msg.sender,
@@ -289,6 +292,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         bytes memory extraData;
         // if token has base on this layer
         if (pairNFTInfo[_l2Contract].baseNetwork == Network.L2) {
@@ -417,9 +423,6 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
                 message
             );
         } else {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a native NFT is withdrawn on L2, the L1 Bridge mints the funds to itself for future
             // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
             // _from is an EOA or address(0).

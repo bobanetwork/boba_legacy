@@ -211,6 +211,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _amount, _data, _l2Gas);
     }
 
@@ -230,6 +233,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateDepositBatch(_l1Contract, msg.sender, msg.sender, _tokenIds, _amounts, _data, _l2Gas);
     }
 
@@ -304,9 +310,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         require(_amount > 0, "Amount should be greater than 0");
 
         if (pairToken.baseNetwork == Network.L1) {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
             // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
             // _from is an EOA or address(0).
@@ -408,9 +411,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         }
 
         if (pairToken.baseNetwork == Network.L1) {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
             // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
             // _from is an EOA or address(0).
