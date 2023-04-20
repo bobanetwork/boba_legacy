@@ -112,6 +112,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
         public
         onlyOwner()
     {
+        require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
     }
 
@@ -186,6 +187,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
         public
         onlyOwner()
     {
+        require(_l1Contract != address(0), "L1 token cannot be zero address");
         //create2 would prevent this check
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc1155 = 0xd9b67a26;
@@ -366,6 +368,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
 
         PairTokenInfo storage pairToken = pairTokenInfo[_l2Contract];
         require(pairToken.l1Contract != address(0), "Can't Find L1 token Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
 
         require(_amount > 0, "Amount should be greater than 0");
 
@@ -473,6 +476,8 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
 
         PairTokenInfo storage pairToken = pairTokenInfo[_l2Contract];
         require(pairToken.l1Contract != address(0), "Can't Find L1 token Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
+        require(_tokenIds.length == _amounts.length, "TokenId and Amount list size do not match");
 
         for (uint256 i = 0; i < _amounts.length; i++) {
             require(_amounts[i] > 0, "Amount should be greater than 0");

@@ -582,6 +582,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
+        require(_amount != 0, "Incorrect Amount");
         require(user.amount >= _amount, "Requested amount exceeds amount staked");
 
         // Update accUserRewardPerShare

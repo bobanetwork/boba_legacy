@@ -103,6 +103,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         onlyOwner()
         onlyInitialized()
     {
+        require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
     }
 
@@ -160,6 +161,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         public
         onlyOwner()
     {
+        require(_l2Contract != address(0), "L2 NFT cannot be zero address");
         //create2 would prevent this check
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
@@ -179,6 +181,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         }
         else {
             require(ERC165Checker.supportsInterface(_l1Contract, 0xec88b5ce), "L1 contract is not bridgable");
+            require(IL1StandardERC721(_l1Contract).l2Contract() == _l2Contract, "L1 contract is not compatible with L2 contract");
             baseNetwork = Network.L2;
         }
 
@@ -314,6 +317,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     {
         PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
         require(pairNFT.l2Contract != address(0), "Can't Find L2 NFT Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
 
         if (pairNFT.baseNetwork == Network.L1) {
             //  This check could be bypassed by a malicious contract via initcode,
