@@ -21,9 +21,22 @@ import { depositL2LP } from 'actions/networkAction'
 import { openModal } from 'actions/uiAction'
 import { setCDMCompletion } from 'actions/transactionAction'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { 
+  selectLoading,
+  selectSignatureStatus_exitLP,
+  selectLookupPrice,
+  selectL1FeeRateN,
+  selectFastExitCost, //estimated total cost of this exit
+  selectL1LPBalanceString,
+  selectL1LPPendingString,
+  selectL2BalanceBOBA,
+  selectL2BalanceETH,
+  selectL1LPLiquidity,
+  selectExitFee,
+  selectBobaFeeChoice,
+   selectBobaPriceRatio,
+} from 'selectors'
+
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -49,21 +62,7 @@ import {
   fetchExitFee,
 } from 'actions/balanceAction'
 
-import {
-  selectL1FeeRateN,
-  selectFastExitCost, //estimated total cost of this exit
-  selectL1LPBalanceString,
-  selectL1LPPendingString,
-  selectL2BalanceBOBA,
-  selectL2BalanceETH,
-  selectL1LPLiquidity,
-  selectExitFee,
-} from 'selectors/balanceSelector'
 
-import {
-   selectBobaFeeChoice,
-   selectBobaPriceRatio,
-} from 'selectors/setupSelector'
 import networkService from 'services/networkService'
 
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {

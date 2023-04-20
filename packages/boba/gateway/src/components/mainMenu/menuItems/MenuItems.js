@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { intersection } from 'util/lodash';
 
-import { selectMonster } from 'selectors/setupSelector'
+import { selectMonster, selectActiveNetwork } from 'selectors'
 import { MENU_LIST } from './menu.config'
 import { useLocation } from 'react-router-dom'
 
 import * as S from './MenuItems.styles'
 import { PAGES_BY_NETWORK } from 'util/constant'
-import { selectActiveNetwork } from 'selectors/networkSelector'
 import { useTheme, useMediaQuery } from '@mui/material'
 
 const MenuItems = ({

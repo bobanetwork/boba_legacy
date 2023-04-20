@@ -18,7 +18,7 @@ import { Typography } from '@mui/material'
 import { openModal } from 'actions/uiAction'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectMultiBridgeMode } from 'selectors/bridgeSelector'
+import { selectMultiBridgeMode } from 'selectors'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './TokenInput.styles'
 

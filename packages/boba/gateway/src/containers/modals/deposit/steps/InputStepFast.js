@@ -13,6 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
 import { useTheme } from '@emotion/react'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
@@ -28,12 +31,20 @@ import Input from 'components/input/Input'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
-import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector'
+import { 
+  selectLoading,
+  selectLookupPrice,
+  selectSignatureStatus_depositLP,
+  selectL2FeeRateN,
+  selectFastDepositCost,
+  selectL2LPBalanceString,
+  selectL2LPPendingString,
+  selectL1FeeBalance,
+  selectL2LPLiquidity,
+  selectActiveNetworkName
+} from 'selectors'
+
 
 import networkService from 'services/networkService'
 import { logAmount, amountToUsd, toWei_String } from 'util/amountConvert'
@@ -52,15 +63,6 @@ import {
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
 
-import {
-  selectL2FeeRateN,
-  selectFastDepositCost,
-  selectL2LPBalanceString,
-  selectL2LPPendingString,
-  selectL1FeeBalance,
-  selectL2LPLiquidity,
-} from 'selectors/balanceSelector'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const dispatch = useDispatch()

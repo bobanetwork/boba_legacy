@@ -10,9 +10,12 @@ import { BigNumber, utils } from 'ethers';
 
 import { openAlert } from 'actions/uiAction';
 import { extendLockTime, increaseLockAmount } from 'actions/veBobaAction';
-import { selectlayer2Balance } from 'selectors/balanceSelector';
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector';
-import { selectLoading } from 'selectors/loadingSelector';
+import { 
+  selectlayer2Balance,
+  selectAccountEnabled, 
+  selectLayer,
+  selectLoading
+} from 'selectors';
 
 import Button from 'components/button/Button';
 import CalenderIcon from 'components/icons/CalenderIcon';
