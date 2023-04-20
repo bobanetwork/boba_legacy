@@ -73,9 +73,7 @@ Yes. However, you will have to deploy your own version.
 
 The token decimals on Boba L2 are the same as on Ethereum L1. So if the token has 6 decimals on L1, it will have 6 decimals on L2.
 
-You can check decimals using the [blockexplorer](https://blockexplorer.boba.network).
-
-Here's an [example](https://blockexplorer.boba.network/tokens/0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc/token-transfers).
+You can check decimals using the [blockexplorer](https://blockexplorer.boba.network). Here's an [example](https://blockexplorer.boba.network/tokens/0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc/token-transfers).
 
 You can also check the decimals by calling the token contracts:
 
