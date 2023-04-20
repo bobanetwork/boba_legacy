@@ -248,7 +248,8 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const depositAmount = txPrice.mul(6)
     const depositTx = await BobaTuringCredit.addBalanceTo(
       depositAmount,
-      TuringHelper.address
+      TuringHelper.address,
+      { value: depositAmount }
     )
     await depositTx.wait()
     const bal = await BobaTuringCredit.prepaidBalance(
