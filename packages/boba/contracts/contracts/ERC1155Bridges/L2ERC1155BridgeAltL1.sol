@@ -81,7 +81,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
     );
 
     event GasConfigured(
-        address exitL1Gas
+        uint32 exitL1Gas
     );
 
     event PairRegistered(
@@ -92,7 +92,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
 
     event BillingContractUpdated(
         address billingContract
-    )
+    );
 
     /***************
      * Constructor *
@@ -227,6 +227,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
         if (bn == l1) {
             // check the IL2StandardERC1155 interface is supported
             require(ERC165Checker.supportsInterface(_l2Contract, 0x945d1710), "L2 contract is not bridgable");
+            require(IL2StandardERC1155(_l2Contract).l1Contract() == _l1Contract, "L2 contract is not compatible with L1 contract");
             baseNetwork = Network.L1;
         }
         else {
@@ -404,9 +405,6 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
         require(_amount > 0, "Amount should be greater than 0");
 
         if (pairToken.baseNetwork == Network.L1) {
-            address l1Contract = IL2StandardERC1155(_l2Contract).l1Contract();
-            require(pairToken.l1Contract == l1Contract, "L1 token Contract Address Error");
-
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             uint256 balance = IL2StandardERC1155(_l2Contract).balanceOf(msg.sender, _tokenId);
@@ -419,7 +417,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
 
             message = abi.encodeWithSelector(
                         iL1ERC1155Bridge.finalizeWithdrawal.selector,
-                        l1Contract,
+                        pairToken.l1Contract,
                         _l2Contract,
                         _from,
                         _to,
@@ -510,9 +508,6 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
         }
 
         if (pairToken.baseNetwork == Network.L1) {
-            address l1Contract = IL2StandardERC1155(_l2Contract).l1Contract();
-            require(pairToken.l1Contract == l1Contract, "L1 token Contract Address Error");
-
             IL2StandardERC1155(_l2Contract).burnBatch(msg.sender, _tokenIds, _amounts);
 
             // Construct calldata for l1ERC1155Bridge.finalizeWithdrawal(_to, _amount)
@@ -520,7 +515,7 @@ contract L2ERC1155BridgeAltL1 is iL2ERC1155BridgeAltL1, CrossDomainEnabled, ERC1
 
             message = abi.encodeWithSelector(
                         iL1ERC1155Bridge.finalizeWithdrawalBatch.selector,
-                        l1Contract,
+                        pairToken.l1Contract,
                         _l2Contract,
                         _from,
                         _to,

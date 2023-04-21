@@ -82,7 +82,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
     );
 
     event GasConfigured(
-        address exitL1Gas
+        uint32 exitL1Gas
     );
 
     event NFTPairRegistered(
@@ -410,9 +410,6 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         require(_from == msg.sender, "Sender does not have token priviledges");
 
         if (pairNFT.baseNetwork == Network.L1) {
-            address l1Contract = IL2StandardERC721(_l2Contract).l1Contract();
-            require(pairNFT.l1Contract == l1Contract, "L1 NFT Contract Address Error");
-
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             address NFTOwner = IL2StandardERC721(_l2Contract).ownerOf(_tokenId);
@@ -428,7 +425,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
 
             message = abi.encodeWithSelector(
                         iL1NFTBridge.finalizeNFTWithdrawal.selector,
-                        l1Contract,
+                        pairNFT.l1Contract,
                         _l2Contract,
                         _from,
                         _to,

@@ -68,7 +68,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     );
 
     event GasConfigured(
-        address newDepositGas
+        uint32 newDepositGas
     );
 
     event PairRegistered(
@@ -197,6 +197,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         else {
             // check the IL1StandardERC1155 interface is supported
             require(ERC165Checker.supportsInterface(_l1Contract, 0xc8a973c4), "L1 contract is not bridgable");
+            require(IL1StandardERC1155(_l1Contract).l2Contract() == _l2Contract, "L1 contract is not compatible with L2 contract");
             baseNetwork = Network.L2;
         }
 
@@ -361,9 +362,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
             deposits[_l1Contract][_tokenId] += _amount;
         } else {
-            address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
-            require(pairToken.l2Contract == l2Contract, "L2 token Contract Address Error");
-
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             uint256 balance = IL1StandardERC1155(_l1Contract).balanceOf(msg.sender, _tokenId);
@@ -377,7 +375,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDeposit.selector,
                 _l1Contract,
-                l2Contract,
+                pairToken.l2Contract,
                 _from,
                 _to,
                 _tokenId,
@@ -464,9 +462,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 deposits[_l1Contract][_tokenIds[i]] += _amounts[i];
             }
         } else {
-            address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
-            require(pairToken.l2Contract == l2Contract, "L2 token Contract Address Error");
-
             IL1StandardERC1155(_l1Contract).burnBatch(msg.sender, _tokenIds, _amounts);
 
             // Construct calldata for l2ERC1155Bridge.finalizeDepositBatch(_to, _amount)
@@ -475,7 +470,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDepositBatch.selector,
                 _l1Contract,
-                l2Contract,
+                pairToken.l2Contract,
                 _from,
                 _to,
                 _tokenIds,
