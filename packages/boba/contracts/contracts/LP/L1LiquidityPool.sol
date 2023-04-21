@@ -544,13 +544,13 @@ contract L1LiquidityPool is CrossDomainEnabledFast, ReentrancyGuardUpgradeable, 
         // verify that the total ETH amount is eqaul to msg.value
         require(ETHAmount == msg.value, "Invalid ETH Amount");
 
-        // Construct calldata for L1LiquidityPool.clientPayL2Batch(ClientPayToken)
+        // Construct calldata for L2LiquidityPool.clientPayL2Batch(ClientPayToken)
         bytes memory data = abi.encodeWithSelector(
             iL2LiquidityPool.clientPayL2Batch.selector,
             payload
         );
 
-        // Send calldata into L1
+        // Send calldata into L2
         sendCrossDomainMessage(
             address(L2LiquidityPoolAddress),
             // extra gas for complex l2 logic

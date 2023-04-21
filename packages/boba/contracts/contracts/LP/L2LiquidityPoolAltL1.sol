@@ -503,6 +503,8 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
      * Client deposit ERC20 from their account to this contract, which then releases funds on the L1 side
      * @param _amount amount that client wants to transfer.
      * @param _tokenAddress L2 token address
+     * @dev user should approve the billingContract.feeTokenAddress() token with at least the
+     * billingContract.exitFee() amount before calling this function.
      */
     function clientDepositL2(
         uint256 _amount,

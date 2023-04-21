@@ -363,9 +363,9 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     }
 
     /**
-     * @dev Performs the logic for withdrawals by burning the token and informing the L1 ERC721 Gateway
+     * @dev Performs the logic for withdrawals by burning the token and informing the L1 ERC1155 Gateway
      * of the withdrawal.
-     * @param _l2Contract Address of L2 ERC721 where withdrawal was initiated.
+     * @param _l2Contract Address of L2 ERC1155 where withdrawal was initiated.
      * @param _from Account to pull the deposit from on L2.
      * @param _to Account to give the withdrawal to on L1.
      * @param _tokenId id of token to withdraw.
@@ -401,8 +401,6 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             require(pairToken.l1Contract == l1Contract, "L1 token Contract Address Error");
 
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
-            // usage
-           // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             uint256 balance = IL2StandardERC1155(_l2Contract).balanceOf(msg.sender, _tokenId);
             require(_amount <= balance, "Amount exceeds balance");
@@ -441,7 +439,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 _data
             );
 
-            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            // Construct calldata for l1ERC1155Bridge.finalizeDeposit(_to, _amount)
             bytes memory message = abi.encodeWithSelector(
                 iL1ERC1155Bridge.finalizeWithdrawal.selector,
                 pairToken.l1Contract,
@@ -540,7 +538,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 _data
             );
 
-            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            // Construct calldata for l1ERC1155Bridge.finalizeDeposit(_to, _amount)
             bytes memory message = abi.encodeWithSelector(
                 iL1ERC1155Bridge.finalizeWithdrawalBatch.selector,
                 pairToken.l1Contract,

@@ -340,7 +340,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 _data
             );
 
-            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            // Construct calldata for l2ERC1155Bridge.finalizeDeposit(_to, _amount)
             bytes memory message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDeposit.selector,
                 _l1Contract,
@@ -397,8 +397,8 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     }
 
     /**
-     * @dev Performs the logic for deposits by informing the L2 Deposited Token
-     * contract of the deposit and calling a handler to lock the L1 token. (e.g. transferFrom)
+     * @dev Performs the logic for batch deposits by informing the L2 Deposited Token
+     * contract of the deposits and calling a handler to lock the L1 tokens. (e.g. transferFrom)
      *
      * @param _l1Contract Address of the L1 token contract we are depositing
      * @param _from Account to pull the deposit from on L1
@@ -441,7 +441,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 _data
             );
 
-            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            // Construct calldata for l2ERC1155Bridge.finalizeDeposit(_to, _amount)
             bytes memory message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDepositBatch.selector,
                 _l1Contract,

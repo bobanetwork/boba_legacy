@@ -427,6 +427,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     /***
      * @dev Add the new token pair to the pool
      * DO NOT add the same LP token more than once. Rewards will be messed up if you do.
+     * unlike the _l2TokenAddress, the _l1TokenAddress can be adddress(0),
+     * and is used to represent the native L1 token.
      *
      * @param _l1TokenAddress
      * @param _l2TokenAddress
@@ -614,9 +616,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     }
 
     /**
-     * Client deposit ERC20 from their account to this contract, which then releases funds on the L1 side
+     * Client deposit ERC20 or ETH from their account to this contract, which then releases funds on the L1 side
      * @param _amount amount that client wants to transfer.
      * @param _tokenAddress L2 token address
+     * @dev user should approve the billingContract.feeTokenAddress() token with at least the
+     * billingContract.exitFee() amount before calling this function.
      */
     function clientDepositL2(
         uint256 _amount,
