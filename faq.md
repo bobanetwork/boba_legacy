@@ -92,7 +92,7 @@ A Sequencer node is a special node in an Optimistic Ethereum network that can or
 
 ## What is the Gas price on Boba L2?
 
-The Gas Price on L2 changes every **30 seconds** with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change from one value to another is capped at no more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. As on the mainchain, the current gas price can be obtained via `.getGasPrice()`, which is typically around 10 Gwei.
+The Gas usage price on the Boba L2 updates every **10 minutes** if the Ethereum L1 gas price changes (with some smoothing to reduce sharp discontinuities in the price from one moment to the next). The maximum percentage change from one value to another is capped at no more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. As on the Ethereum Mainnet, the current gas price can be obtained via `.getGasPrice()`, which is typically around 10 Gwei.
 
 ## Do you support EIP-2470: Singleton Factory?
 
@@ -119,9 +119,7 @@ Yes, we are working towards supporting Bedrock in the future.
 
 ## Could you tell me the main purpose of `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` contracts, and how they interact with the existing system?
 
-In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 ourselves. All three of the contracts: `DiscretionaryExitBurn.sol`, `DiscretionaryExitFee.sol`, and `L2BillingContract.sol` are a way to compensate for the cost of relaying transactions on L1. However, they do not subsidize and take back the costs from the user.
-
-`DiscretionaryExitBurn` is a contract on our interface (the gateway), that we use to route Standard Exits through. The contract has a `burnAndWithdraw()` method that allows users to spend gas (a pre-configured amount). After spending the amount, a call is made to the standard bridge to withdraw the users funds. The gas spent before calling the withdraw method allows for the sequencer to gain funds (because right now it is a single entity that sequences and relays). This serves the purpose of voluntary collection.
+In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 ourselves. The contracts `DiscretionaryExitFee.sol` and `L2BillingContract.sol` are a way to compensate for the cost of relaying transactions on L1. However, they do not subsidize and take back the costs from the user.
 
 `DiscretionaryExitFee` is also a contract that we use to route Standard Exits through on our interface (the gateway). The purpose of this contract is to not burn native tokens for the compensation, but instead collect Boba token from the user. This contract uses the `L2BillingContract` to get the correct amount of `exitFee`, and then transfer the amount to the billing contract. The contract then proceeds with the withdrawal on the standard bridge.
 This again serves the purpose of voluntary collection.
@@ -207,7 +205,7 @@ Please run `docker-compose logs`, as well as integration tests, and send us the 
 
 ## I have started deploying Boba Testnet, but it looks like the Testnet Subgraph is private?
 
-We have the graph node on Ethereum Mainnet L2 and Rinkeby L2. The Rinkeby graph node is public. The Mainnet graph node is hosted by The Graph team.
+We have the graph node on Ethereum Mainnet L2 and Goerli L2. The Goerli graph node is public. The Mainnet graph node is hosted by The Graph team.
 
 <br/>
 
