@@ -55,6 +55,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
     address public owner;
     address public l1Bridge;
+    // this is unused, however is a part of the contract to preserve the storage layout
     uint256 public extraGasRelay;
     uint32 public exitL1Gas;
 
@@ -223,6 +224,7 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         require(bn == l1 || bn == l2, "Invalid Network");
         Network baseNetwork;
         if (bn == l1) {
+            // check the IL2StandardERC1155 interface is supported
             require(ERC165Checker.supportsInterface(_l2Contract, 0x945d1710), "L2 contract is not bridgable");
             baseNetwork = Network.L1;
         }
@@ -429,8 +431,8 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             );
         } else {
             // When a native token is withdrawn on L2, the L1 Bridge mints the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC1155(_l2Contract).safeTransferFrom(
                 _from,
                 address(this),
@@ -528,8 +530,8 @@ contract L2ERC1155Bridge is iL2ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             );
         } else {
             // When a native token is withdrawn on L2, the L1 Bridge mints the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC1155(_l2Contract).safeBatchTransferFrom(
                 _from,
                 address(this),

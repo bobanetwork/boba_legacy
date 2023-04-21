@@ -1819,7 +1819,7 @@ describe('Liquidity Pool Test', async () => {
             l1TokenAddress: L1ERC20Test.address,
           },
         ])
-      ).to.be.revertedWith('Invaild Token')
+      ).to.be.revertedWith('Invalid Token')
     })
 
     it('should add liquidities for l1 native token on l1 and l2', async () => {

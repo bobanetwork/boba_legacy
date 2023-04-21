@@ -56,6 +56,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
 
     address public owner;
     address public l1NFTBridge;
+    // this is unused, however is a part of the contract to preserve the storage layout
     uint256 public extraGasRelay;
     uint32 public exitL1Gas;
 
@@ -219,6 +220,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         require(bn == l1 || bn == l2, "Invalid Network");
         Network baseNetwork;
         if (bn == l1) {
+            // check the IL2StandardERC721 interface is supported
             require(ERC165Checker.supportsInterface(_l2Contract, 0xb07cd11a), "L2 contract is not bridgable");
             require(IL2StandardERC721(_l2Contract).l1Contract() == _l1Contract, "L2 contract is not compatible with L1 contract");
             baseNetwork = Network.L1;
@@ -442,8 +444,8 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
             );
         } else {
             // When a native NFT is withdrawn on L2, the L1 Bridge mints the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC721(_l2Contract).safeTransferFrom(
                 _from,
                 address(this),

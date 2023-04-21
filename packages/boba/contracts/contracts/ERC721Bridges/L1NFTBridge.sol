@@ -39,7 +39,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
  * Runtime target: EVM
  */
 contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     /********************************
      * External Contract References *
@@ -196,6 +196,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             baseNetwork = Network.L1;
         }
         else {
+            // check the IL1StandardERC721 interface is supported
             require(ERC165Checker.supportsInterface(_l1Contract, 0xec88b5ce), "L1 contract is not bridgable");
             require(IL1StandardERC721(_l1Contract).l2Contract() == _l2Contract, "L1 contract is not compatible with L2 contract");
             baseNetwork = Network.L2;
@@ -345,8 +346,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
 
         if (pairNFT.baseNetwork == Network.L1) {
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC721(_l1Contract).safeTransferFrom(
                 _from,
                 address(this),

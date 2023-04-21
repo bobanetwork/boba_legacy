@@ -38,7 +38,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
  * Runtime target: EVM
  */
 contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     /********************************
      * External Contract References *
@@ -195,6 +195,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             baseNetwork = Network.L1;
         }
         else {
+            // check the IL1StandardERC1155 interface is supported
             require(ERC165Checker.supportsInterface(_l1Contract, 0xc8a973c4), "L1 contract is not bridgable");
             baseNetwork = Network.L2;
         }
@@ -329,8 +330,8 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
         if (pairToken.baseNetwork == Network.L1) {
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC1155(_l1Contract).safeTransferFrom(
                 _from,
                 address(this),
@@ -430,8 +431,8 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
         if (pairToken.baseNetwork == Network.L1) {
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC1155(_l1Contract).safeBatchTransferFrom(
                 _from,
                 address(this),

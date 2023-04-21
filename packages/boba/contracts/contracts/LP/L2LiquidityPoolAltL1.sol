@@ -103,6 +103,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
 
     address public DAO;
 
+    // this is unused, however is a part of the contract to preserve the storage layout
     uint256 public extraGasRelay;
 
     uint256 public userRewardMaxFeeRate;

@@ -528,7 +528,7 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
             require(token.amount != 0, "Invalid Amount");
 
             PoolInfo storage pool = poolInfo[token.l1TokenAddress];
-            require(pool.l2TokenAddress != address(0), "Invaild Token");
+            require(pool.l2TokenAddress != address(0), "Invalid Token");
 
             // update deposit hash
             _updateDepositHash(token.l1TokenAddress, msg.sender, token.amount);
