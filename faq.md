@@ -92,7 +92,7 @@ A Sequencer node is a special node in an Optimistic Ethereum network that can or
 
 ## What is the Gas price on Boba L2?
 
-The Gas usage price on the Boba L2 updates every **10 minutes** if the Ethereum L1 gas price changes (with some smoothing to reduce sharp discontinuities in the price from one moment to the next). The maximum percentage change from one value to another is capped at no more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. As on the Ethereum Mainnet, the current gas price can be obtained via `.getGasPrice()`, which is typically around 10 Gwei.
+The Gas Price on L2 changes every **30 seconds** with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change from one value to another is capped at no more than 5% in the gas price oracle. For example, if the current `gasPrice` is 10 Gwei then the next `gasPrice` will be between 9.5 and 10.5 Gwei. As on the mainchain, the current gas price can be obtained via `.getGasPrice()`, which is typically around 10 Gwei.
 
 ## Do you support EIP-2470: Singleton Factory?
 
@@ -141,7 +141,7 @@ Instead of deploying just one contract, you need to deploy several.
 
 No, there is no difference.
 
-## DEX (decentralized exchange) is built on 0.7.6. Is it safe to use Solc Optimization on it?
+## Is it safe to use Solc optimization on contracts?
 
 Yes!
 
@@ -203,7 +203,7 @@ _NOTE: You can only make one fountain call per Twitter account, per day._
 
 `./scripts/wait-for-sequencer.sh is getting timed out. Any Solutions?`
 
-Please run `docker-compose logs`, as well as integration tests, and send us the output of the logs and test results via our [Discord server](https://discord.com/invite/YFweUKCb8a).
+Please run `docker-compose logs`, as well as integration tests, and send us the output of the logs and test results via our [Discord server](https://boba.eco/discord).
 
 ## I have started deploying Boba Testnet, but it looks like the Testnet Subgraph is private?
 
@@ -225,13 +225,13 @@ Here, Boba is looking out for you. Before that unexpected increased fee goes thr
 
 ## DAPPs require an XYZ gas amount to deploy. However, Boba's block gas limit of only 11,000,000 makes it impossible to deploy a smart contract. What can I do to deploy this smart contract on Boba?
 
-Try to increase or decrease SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html). In addition, you can break down contracts into smaller chunks.
+Try to increase or decrease Solc optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html). In addition, you can break down contracts into smaller chunks.
 
-## I am trying to deploy a smart contract to Boba Rinkeby with Remix but get this error:
+## I am trying to deploy a smart contract to Boba with Remix but get this error:
 
 `"creation of SCContract errored: [ethjs-query] while formatting outputs from RPC '{"value":{"code":-32603,"data":{"code":-32000,"message":"invalid transaction: exceeds block gas limit"}}}'`
 
-As mentioned above, try to increase SOLC optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html), or break down contracts into smaller chunks.
+As mentioned above, try to increase Solc optimizations. For more information, check out the [Solidity documentation](https://docs.soliditylang.org/en/latest/using-the-compiler.html), or break down contracts into smaller chunks.
 
 ## How can I pay for fees with Boba via an API?
 
@@ -252,7 +252,7 @@ When making a transaction on Boba and paying the transaction fee, the fee is fir
 
 ## Since the max value of runs is 2^32 - 1, do you recommend Solidity optimization?
 
-Optimization does not mean that there’s a limit set to the number of transactions this DEX can process.
+Optimization does not mean that there’s a limit set to the number of transactions this contract can process.
 
 [Check out Solidity’s official documentation for more information.](https://blog.soliditylang.org/2020/11/04/solidity-ama-1-recap/)
 
