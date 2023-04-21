@@ -778,6 +778,9 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
     /**
      * Move funds in batch from L1 to L2, and pay out from the right liquidity pool
      * @param _tokens tokens in batch
+     *
+     * finalization of the batch deposit depends on the available pool balance
+     * If any transfer in the batch fails, the same tokens are returned on the other layer
      */
     function clientPayL2Batch(
         ClientPayToken [] calldata _tokens
