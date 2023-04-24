@@ -27,7 +27,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-import CounterButton from 'components/counterButton/CounterButton'
+import { CounterButton } from 'components';
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
