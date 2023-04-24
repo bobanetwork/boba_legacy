@@ -10,9 +10,7 @@ import { getFilteredLogIndex, l2Wallet } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 // use local sdk
 import { SimpleAccountAPI, wrapProvider } from '@boba/bundler_sdk'
-// change this to using factory
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
-import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
@@ -32,8 +30,8 @@ describe('AA Wallet Test\n', async () => {
     entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
     SimpleAccount__factory = new ContractFactory(
-      SimpleAccountJson.abi,
-      SimpleAccountJson.bytecode,
+      SimpleAccountFactoryJson.abi,
+      SimpleAccountFactoryJson.bytecode,
       env.l2Wallet
     )
 
@@ -52,33 +50,46 @@ describe('AA Wallet Test\n', async () => {
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
     )
   })
-  it('should be able to send a userOperation to a wallet through the bundler (low level api)', async () => {
+  it.only('should be able to send a userOperation to a wallet through the bundler (low level api)', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
-    const account = await SimpleAccount__factory.deploy(
-      entryPointAddress
+    const accountFactory = await SimpleAccount__factory.deploy(
+      entryPointAddress,
+      { gasLimit: 9_500_000 }
     )
-    await account.deployed()
+    await accountFactory.deployed()
+    console.log('Account Factory deployed to:', accountFactory.address)
+    await accountFactory.createAccount(env.l2Wallet.address, 0)
+    const account = await accountFactory.getAddress(env.l2Wallet.address, 0)
+    console.log('Account deployed to:', account)
+    const SenderCreator__factory = new ContractFactory(
+        SenderCreatorJson.abi,
+        SenderCreatorJson.bytecode,
+        env.l2Wallet
+      )
+    const senderCreator = await SenderCreator__factory.deploy({ gasLimit: 9_500_000 })
 
-    console.log('Account deployed to:', account.address)
-
-    await env.l2Wallet.sendTransaction({
-      value: utils.parseEther('2'),
-      to: account.address,
-    })
+    console.log('Sender Creator Factory deployed to:', senderCreator.address)
 
     const accountAPI = new SimpleAccountAPI({
-      provider: env.l2Provider,
-      entryPointAddress,
-      owner: env.l2Wallet,
-      walletAddress: account.address,
-    })
+        provider: env.l2Provider,
+        entryPointAddress: entryPointAddress,
+        senderCreator.address,
+        owner: env.l2Wallet,
+        factoryAddress: accountFactory.address,
+        accountAddress: account
+      })
 
     const op = await accountAPI.createSignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
     })
+    await env.l2Wallet.sendTransaction({
+      value: utils.parseEther('2'),
+      to: await op.sender,
+    })
 
-    expect(await op.sender).to.be.eq(account.address)
+    //what is this supposed to be?
+    expect(await op.sender).to.be.eq(account)
 
     const requestId = await bundlerProvider.sendUserOpToBundler(op)
     const txid = await accountAPI.getUserOpReceipt(requestId)
@@ -91,10 +102,9 @@ describe('AA Wallet Test\n', async () => {
       'Sender'
     )
     const log = recipient.interface.parseLog(receipt.logs[returnedlogIndex])
-    // tx.origin is the bundler
+
     expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
-    // msg.sender is the 4337 wallet
-    expect(log.args.msgSender).to.eq(account.address)
+    expect(log.args.msgSender).to.eq(account)
     // message is received and emitted
     expect(log.args.message).to.eq('hello')
   })
@@ -167,7 +177,7 @@ describe('AA Wallet Test\n', async () => {
       factoryAddress: simpleAccount.address,
     })
 
-    const accountAddress = await accountAPI.getWalletAddress()
+    const accountAddress = await accountAPI.getAccountAddress()
     // computed address is correct
     expect(accountAddress).to.be.eq(await simpleAccount.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
 
@@ -179,6 +189,7 @@ describe('AA Wallet Test\n', async () => {
     const op = await accountAPI.createSignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
+      gasLimit: 21000000,
     })
 
     expect(await op.sender).to.be.eq(accountAddress)

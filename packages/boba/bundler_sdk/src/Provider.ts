@@ -31,12 +31,19 @@ export async function wrapProvider (
 ): Promise<ERC4337EthersProvider> {
   const entryPoint = EntryPoint__factory.connect(config.entryPointAddress, originalProvider)
   // Initial SimpleAccount instance is not deployed and exists just for the interface
-  const detDeployer = new DeterministicDeployer(originalProvider)
+  const detDeployer = new DeterministicDeployer(originalProvider, wallet)
   const SimpleAccountFactory = await detDeployer.deterministicDeploy(new SimpleAccountFactory__factory(), 0, [entryPoint.address])
+  let smartWalletAPIOwner
+   if (wallet != null) {
+     smartWalletAPIOwner = wallet
+   } else {
+     smartWalletAPIOwner = originalSigner
+   }
   const smartAccountAPI = new SimpleAccountAPI({
     provider: originalProvider,
     entryPointAddress: entryPoint.address,
-    owner: originalSigner,
+    owner: smartWalletAPIOwner,
+    senderCreatorAddress: senderCreatorAddress,
     factoryAddress: SimpleAccountFactory,
     paymasterAPI: config.paymasterAPI
   })

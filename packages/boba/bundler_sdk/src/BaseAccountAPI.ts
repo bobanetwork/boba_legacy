@@ -1,8 +1,9 @@
-import { ethers, BigNumber, BigNumberish } from 'ethers'
+import { ethers, BigNumber, BigNumberish, Contract } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import {
   EntryPoint, EntryPoint__factory,
-  UserOperationStruct
+  UserOperationStruct,
+  SenderCreator__factory
 } from '@boba/accountabstraction'
 
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp'
@@ -14,6 +15,7 @@ import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas'
 export interface BaseApiParams {
   provider: Provider
   entryPointAddress: string
+  senderCreatorAddress?: string
   accountAddress?: string
   overheads?: Partial<GasOverheads>
   paymasterAPI?: PaymasterAPI
@@ -46,6 +48,7 @@ export abstract class BaseAccountAPI {
   provider: Provider
   overheads?: Partial<GasOverheads>
   entryPointAddress: string
+  senderCreatorAddress?: string
   accountAddress?: string
   paymasterAPI?: PaymasterAPI
 
@@ -57,6 +60,7 @@ export abstract class BaseAccountAPI {
     this.provider = params.provider
     this.overheads = params.overheads
     this.entryPointAddress = params.entryPointAddress
+    this.senderCreatorAddress = params.senderCreatorAddress
     this.accountAddress = params.accountAddress
     this.paymasterAPI = params.paymasterAPI
 
@@ -123,12 +127,17 @@ export abstract class BaseAccountAPI {
     const initCode = this.getAccountInitCode()
     // use entryPoint to query account address (factory can provide a helper method to do the same, but
     // this method attempts to be generic
-    try {
-      await this.entryPointView.callStatic.getSenderAddress(initCode)
-    } catch (e: any) {
-      return e.errorArgs.sender
-    }
-    throw new Error('must handle revert')
+    if (this.senderCreatorAddress != null) {
+       const senderCreator = new Contract(this.senderCreatorAddress, SenderCreator__factory.abi, this.provider)
+       return senderCreator.callStatic.createSender(initCode)
+     } else {
+       try {
+         await this.entryPointView.callStatic.getSenderAddress(initCode)
+       } catch (e: any) {
+         return e.errorArgs.sender
+       }
+       throw new Error('must handle revert')
+     }
   }
 
   /**
@@ -239,17 +248,17 @@ export abstract class BaseAccountAPI {
 
     let {
       maxFeePerGas,
-      maxPriorityFeePerGas
-    } = info
-    if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
-      const feeData = await this.provider.getFeeData()
-      if (maxFeePerGas == null) {
-        maxFeePerGas = feeData.maxFeePerGas ?? undefined
-      }
-      if (maxPriorityFeePerGas == null) {
-        maxPriorityFeePerGas = feeData.maxPriorityFeePerGas ?? undefined
-      }
-    }
+       maxPriorityFeePerGas
+     } = info
+     if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
+       const feeData = await this.provider.getGasPrice()
+       if (maxFeePerGas == null) {
+         maxFeePerGas = feeData ?? undefined
+       }
+       if (maxPriorityFeePerGas == null) {
+         maxPriorityFeePerGas = feeData.lt(ethers.utils.parseUnits('1', 'gwei')) ? feeData : ethers.utils.parseUnits('1', 'gwei') ?? undefined
+       }
+     }
 
     const partialUserOp: any = {
       sender: this.getAccountAddress(),

@@ -1,4 +1,4 @@
-import { EntryPoint } from '@boba/accountabstraction'
+import { EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
 import { MempoolManager } from './MempoolManager'
 import { ValidateUserOpResult, ValidationManager } from './ValidationManager'
 import { BigNumber, BigNumberish } from 'ethers'
@@ -6,9 +6,8 @@ import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import Debug from 'debug'
 import { ReputationManager, ReputationStatus } from './ReputationManager'
 import { Mutex } from 'async-mutex'
-import { GetUserOpHashes__factory } from '../../dist/src/types'
 import { StorageMap, UserOperation } from './Types'
-import { getAddr, mergeStorageMap, runContractScript } from './moduleUtils'
+import { getAddr, mergeStorageMap, runContractScript, runContractScriptviaWrapper } from './moduleUtils'
 import { EventsManager } from './EventsManager'
 import { ErrorDescription } from '@ethersproject/abi/lib/interface'
 
@@ -36,7 +35,8 @@ export class BundleManager {
     // use eth_sendRawTransactionConditional with storage map
     readonly conditionalRpc: boolean,
     // in conditionalRpc: always put root hash (not specific storage slots) for "sender" entries
-    readonly mergeToAccountRootHash: boolean = false
+    readonly mergeToAccountRootHash: boolean = false,
+    readonly entryPointWrapper?: EntryPointWrapper
   ) {
     this.provider = entryPoint.provider as JsonRpcProvider
     this.signer = entryPoint.signer as JsonRpcSigner
@@ -77,16 +77,18 @@ export class BundleManager {
    */
   async sendBundle (userOps: UserOperation[], beneficiary: string, storageMap: StorageMap): Promise<SendBundleReturn | undefined> {
     try {
-      const feeData = await this.provider.getFeeData()
+      //const feeData = await this.provider.getFeeData()
       const tx = await this.entryPoint.populateTransaction.handleOps(userOps, beneficiary, {
-        type: 2,
+        //type: 1,
         nonce: await this.signer.getTransactionCount(),
         gasLimit: 10e6,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? 0,
-        maxFeePerGas: feeData.maxFeePerGas ?? 0
+        gasPrice: 10e9
+        //maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? 0,
+        //maxFeePerGas: feeData.maxFeePerGas ?? 0
       })
       tx.chainId = this.provider._network.chainId
       const signedTx = await this.signer.signTransaction(tx)
+
       let ret: string
       if (this.conditionalRpc) {
         debug('eth_sendRawTransactionConditional', storageMap)
@@ -246,10 +248,7 @@ export class BundleManager {
 
   // helper function to get hashes of all UserOps
   async getUserOpHashes (userOps: UserOperation[]): Promise<string[]> {
-    const { userOpHashes } = await runContractScript(this.entryPoint.provider,
-      new GetUserOpHashes__factory(),
-      [this.entryPoint.address, userOps])
-
+    const userOpHashes = await runContractScriptviaWrapper(this.entryPoint, this.entryPointWrapper, userOps)
     return userOpHashes
   }
 }
