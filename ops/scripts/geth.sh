@@ -51,5 +51,5 @@ exec geth \
   --mine \
   --miner.etherbase $BLOCK_SIGNER_ADDRESS \
   --rangelimit \
-  --rpc.gascap ${GAS_CAP:-11000000} \
+  --rpc.gascap ${GAS_CAP:-501000000} \
   "$@"
