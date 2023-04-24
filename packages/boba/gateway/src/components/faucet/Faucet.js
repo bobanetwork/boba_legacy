@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectActiveNetworkType } from 'selectors/networkSelector';
+import { selectActiveNetworkType, selectLayer, selectWalletAddress  } from 'selectors';
 
 import * as G from 'containers/Global.styles'
 import { Box, Typography, Input } from '@mui/material';
 
 import faucetService from 'services/faucet.service';
 import { openAlert } from 'actions/uiAction';
-import { selectLayer, selectWalletAddress } from 'selectors/setupSelector';
 import { NETWORK_TYPE } from 'util/network/network.util';
 import Copy from 'components/copy/Copy';
 import Button from 'components/button/Button';

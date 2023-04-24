@@ -14,7 +14,7 @@ import {
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { selectLookupPrice } from 'selectors'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'

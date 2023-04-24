@@ -25,9 +25,17 @@ import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { selectDaoBalance, selectDaoBalanceX, selectDaoVotes, selectDaoVotesX, selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectDaoBalance, 
+  selectDaoBalanceX, 
+  selectDaoVotes, 
+  selectDaoVotesX, 
+  selectProposals, 
+  selectProposalThreshold,
+  selectLoading,
+  selectAccountEnabled, 
+  selectLayer
+} from 'selectors'
 
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'

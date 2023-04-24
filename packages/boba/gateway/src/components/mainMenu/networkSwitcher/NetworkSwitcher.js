@@ -13,7 +13,7 @@ import {NetworkList, NETWORK_TYPE } from 'util/network/network.util';
 
 import * as S from './NetworkSwitcher.styles'
 import { setNetwork } from 'actions/networkAction';
-import { selectNetwork, selectNetworkType } from 'selectors/networkSelector';
+import { selectNetwork, selectNetworkType } from 'selectors';
 
 function NetworkSwitcher() {
   const dispatch = useDispatch();

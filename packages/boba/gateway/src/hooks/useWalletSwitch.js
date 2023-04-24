@@ -3,8 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { openModal } from 'actions/uiAction';
 import { setConnect, setConnectBOBA, setConnectETH } from 'actions/setupAction';
-import { selectActiveNetwork, selectActiveNetworkType, selectNetwork, selectNetworkType } from 'selectors/networkSelector';
-import { selectBaseEnabled, selectLayer } from 'selectors/setupSelector';
+import { 
+  selectActiveNetwork, 
+  selectActiveNetworkType, 
+  selectNetwork, 
+  selectNetworkType,
+  selectBaseEnabled,
+  selectLayer
+} from 'selectors';
 import { LAYER } from 'util/constant';
 
 const useWalletSwitch = () => {

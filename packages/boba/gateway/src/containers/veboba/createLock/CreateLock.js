@@ -15,8 +15,12 @@ import * as G from 'containers/Global.styles'
 import { setConnectBOBA } from 'actions/setupAction'
 import { createLock, fetchLockRecords } from 'actions/veBobaAction'
 
-import { selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectlayer2Balance,
+  selectAccountEnabled, 
+  selectLayer,
+  selectLoading
+} from 'selectors'
 
 import { toWei_String } from 'util/amountConvert'
 import { openAlert } from 'actions/uiAction'
@@ -25,7 +29,6 @@ import * as S from './CreateLock.styles'
 import * as Styles from './CreateLock.module.scss'
 import "react-datepicker/dist/react-datepicker.css"
 import { useRef } from 'react'
-import { selectLoading } from 'selectors/loadingSelector'
 import { EXPIRY_OPTIONS } from 'util/constant'
 
 
