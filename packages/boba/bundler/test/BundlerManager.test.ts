@@ -1,4 +1,4 @@
-import { EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
+import { EntryPoint, EntryPoint__factory, EntryPointWrapper, EntryPointWrapper__factory  } from '@boba/accountabstraction'
 import { parseEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
 import { BundlerReputationParams, ReputationManager } from '../src/modules/ReputationManager'
@@ -16,12 +16,14 @@ describe('#BundlerManager', () => {
   let bm: BundleManager
 
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
 
   const provider = ethers.provider
   const signer = provider.getSigner()
 
   before(async function () {
     entryPoint = await new EntryPoint__factory(signer).deploy()
+    entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
     DeterministicDeployer.init(provider)
 
     const config: BundlerConfig = {
@@ -38,13 +40,14 @@ describe('#BundlerManager', () => {
       maxBundleGas: 5e6,
       // minstake zero, since we don't fund deployer.
       minStake: '0',
-      minUnstakeDelay: 0
+      minUnstakeDelay: 0,
+      entryPointWrapper: entryPointWrapper.address
     }
 
     const repMgr = new ReputationManager(BundlerReputationParams, parseEther(config.minStake), config.minUnstakeDelay)
     const mempoolMgr = new MempoolManager(repMgr)
     const validMgr = new ValidationManager(entryPoint, repMgr, config.unsafe)
-    bm = new BundleManager(entryPoint, mempoolMgr, validMgr, repMgr, config.beneficiary, parseEther(config.minBalance), config.maxBundleGas)
+    bm = new BundleManager(entryPoint, undefined, mempoolMgr, validMgr, repMgr, config.beneficiary, parseEther(config.minBalance), config.maxBundleGas, false, false, entryPointWrapper)
   })
 
   it('#getUserOpHashes', async () => {
@@ -62,8 +65,10 @@ describe('#BundlerManager', () => {
       preVerificationGas: 10
     }
 
-    const hash = await entryPoint.getUserOpHash(userOp)
+    const hash1 = await entryPointWrapper.getUserOpHashes(entryPoint.address, [userOp])
+    const hash2 = await entryPoint.getUserOpHash(userOp)
     const bmHash = await bm.getUserOpHashes([userOp])
-    expect(bmHash).to.eql([hash])
+    expect(bmHash).to.eql([hash2])
+    expect(bmHash).to.eql(hash1)
   })
 })

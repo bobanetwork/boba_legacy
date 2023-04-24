@@ -9,7 +9,7 @@ import { ValidationManager } from '../src/modules/ValidationManager'
 import { BundleManager, SendBundleReturn } from '../src/modules/BundleManager'
 import { UserOpMethodHandler } from '../src/UserOpMethodHandler'
 import { ethers } from 'hardhat'
-import { EntryPoint, EntryPoint__factory, SimpleAccountFactory__factory } from '@boba/accountabstraction'
+import { EntryPoint, EntryPoint__factory, EntryPointWrapper, EntryPointWrapper__factory, SimpleAccountFactory__factory } from '@boba/accountabstraction'
 import { DeterministicDeployer, SimpleAccountAPI } from '@boba/bundler_sdk'
 import { Signer, Wallet } from 'ethers'
 import { resolveHexlify } from '@boba/bundler_utils'
@@ -22,6 +22,7 @@ const provider = ethers.provider
 describe('#DebugMethodHandler', () => {
   let debugMethodHandler: DebugMethodHandler
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
   let methodHandler: UserOpMethodHandler
   let smartAccountAPI: SimpleAccountAPI
   let signer: Signer
@@ -31,6 +32,7 @@ describe('#DebugMethodHandler', () => {
     signer = await createSigner()
 
     entryPoint = await new EntryPoint__factory(signer).deploy()
+    entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
     DeterministicDeployer.init(provider)
 
     const config: BundlerConfig = {
@@ -56,10 +58,10 @@ describe('#DebugMethodHandler', () => {
 
     const repMgr = new ReputationManager(BundlerReputationParams, parseEther(config.minStake), config.minUnstakeDelay)
     const mempoolMgr = new MempoolManager(repMgr)
-    const validMgr = new ValidationManager(entryPoint, repMgr, config.unsafe)
+    const validMgr = new ValidationManager(entryPoint, repMgr, config.unsafe, entryPointWrapper)
     const eventsManager = new EventsManager(entryPoint, mempoolMgr, repMgr)
     const bundleMgr = new BundleManager(entryPoint, eventsManager, mempoolMgr, validMgr, repMgr,
-      config.beneficiary, parseEther(config.minBalance), config.maxBundleGas, false)
+      config.beneficiary, parseEther(config.minBalance), config.maxBundleGas, false, false, entryPointWrapper)
     const execManager = new ExecutionManager(repMgr, mempoolMgr, bundleMgr, validMgr)
 
     methodHandler = new UserOpMethodHandler(

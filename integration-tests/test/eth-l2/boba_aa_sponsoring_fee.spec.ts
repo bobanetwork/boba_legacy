@@ -11,7 +11,8 @@ import { OptimismEnv } from './shared/env'
 import { hexConcat } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@boba/bundler_sdk'
-import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
+import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
+import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
@@ -54,8 +55,8 @@ describe('Sponsoring Tx\n', async () => {
     )
 
     SimpleAccount__factory = new ContractFactory(
-      SimpleAccountJson.abi,
-      SimpleAccountJson.bytecode,
+      SimpleAccountFactoryJson.abi,
+      SimpleAccountFactoryJson.bytecode,
       env.l2Wallet
     )
 
@@ -91,41 +92,56 @@ describe('Sponsoring Tx\n', async () => {
     })
     before('account is created and accountAPI is setup', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
-      account = await SimpleAccount__factory.deploy(
+      const factory = await SimpleAccount__factory.deploy(
         entryPointAddress
       )
-      account = await account.createAccount(env.l2Wallet_4.address, 0)
-      // await account.initialize()
-//      await account.deployed()
-
-      accountAPI = new SimpleAccountAPI({
+      //let account = await factory.createAccount(env.l2Wallet_4.address, 0)
+      // deploy a senderCreator contract to get the create2 address on the provide
+      const SenderCreator__factory = new ContractFactory(
+        SenderCreatorJson.abi,
+        SenderCreatorJson.bytecode,
+        env.l2Wallet
+      )
+    const senderCreator = await SenderCreator__factory.deploy()
+    accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
+        senderCreatorAddress: senderCreator.address,
         owner: env.l2Wallet_4,
-        factoryAddress: account.address
+        factoryAddress: factory.address
       })
     })
-
-    it.only('should be able to submit a userOp to the bundler and trigger tx', async () => {
+//this
+    it('should be able to submit a userOp to the bundler and trigger tx', async () => {
       const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
+      console.log(op)
       // add preverificaiton gas to account for paymaster signature
       op.preVerificationGas = BigNumber.from(await op.preVerificationGas).add(3000)
 
-      const hash = await VerifyingPaymaster.getHash(op)
+      const MOCK_VALID_UNTIL = '0x00000000deadbeef'
+      const MOCK_VALID_AFTER = '0x0000000000001234'
+      const hash = await VerifyingPaymaster.getHash(op, MOCK_VALID_UNTIL, MOCK_VALID_AFTER)
+      console.log('111')
       const sig = await offchainSigner.signMessage(utils.arrayify(hash))
 
-
+console.log('1')
       op.paymasterAndData = hexConcat([VerifyingPaymaster.address, sig])
 
+console.log('2')
       signedOp = await accountAPI.signUserOp(op)
 
+console.log('3')
       const preUserBalance = await env.l2Provider.getBalance(env.l2Wallet_4.address)
+      console.log('333')
       const prePaymasterDeposit = await VerifyingPaymaster.getDeposit()
 
+console.log('4')
       const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
+
+console.log('5')
       const txid = await accountAPI.getUserOpReceipt(requestId)
       console.log('reqId', requestId, 'txid=', txid)
       const receipt = await env.l2Provider.getTransactionReceipt(txid)
