@@ -8,8 +8,7 @@ import Button from 'components/button/Button'
 
 import { openError } from 'actions/uiAction'
 
-import { selectTxBuilder } from 'selectors/devToolsSelector'
-import { selectLayer } from 'selectors/setupSelector'
+import { selectTxBuilder, selectLayer } from 'selectors'
 
 import { submitTxBuilder, resetTxBuilder } from 'actions/devToolsAction'
 

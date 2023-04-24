@@ -9,17 +9,15 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { selectLoading } from 'selectors/loadingSelector'
+import { selectLoading, selectLookupPrice, selectActiveNetworkName } from 'selectors'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { useTheme } from '@emotion/react'
 import { Box, Checkbox, FormControlLabel, Typography, useMediaQuery } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
-import { selectLookupPrice } from 'selectors/lookupSelector'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 

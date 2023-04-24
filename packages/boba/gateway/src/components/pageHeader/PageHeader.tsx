@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
-
 import * as S from './PageHeader.styles'
 import BobaLogo from '../icons/BobaLogo'
 import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
+
 import {
   Box,
   Container,
@@ -27,11 +26,7 @@ import {
   FeeSwitcher,
   NetworkSwitcher,
 } from 'components'
-import {
-  selectAccountEnabled,
-  selectLayer,
-  selectMonster,
-} from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer, selectMonster } from 'selectors'
 import { LAYER } from 'util/constant'
 
 const useStyles = makeStyles({

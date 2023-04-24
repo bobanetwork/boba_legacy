@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { PAGES_BY_NETWORK } from 'util/constant'
 import { COMMON_ROUTES, ROUTE_LIST } from './routeList'
 import { useSelector } from 'react-redux';
-import { selectActiveNetwork } from 'selectors/networkSelector';
+import { selectActiveNetwork } from 'selectors';
 import { useRoutes } from 'react-router-dom';
 import { intersection } from 'util/lodash';
 

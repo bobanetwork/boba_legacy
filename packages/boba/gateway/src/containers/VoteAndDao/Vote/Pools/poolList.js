@@ -22,8 +22,7 @@ import PoolListItem from './poolListItem'
 import { Pager } from 'components'
 import { PER_PAGE } from 'util/constant'
 import { useSelector } from 'react-redux'
-import { selectPools } from 'selectors/veBobaSelector'
-import { selectLoading } from 'selectors/loadingSelector'
+import { selectPools, selectLoading } from 'selectors'
 import { Typography } from '@mui/material'
 
 
