@@ -4,7 +4,7 @@ import {  useSelector } from 'react-redux'
 import PageTitle from 'components/pageTitle/PageTitle'
 import Connect from 'containers/connect/Connect'
 
-import { selectLayer, selectAccountEnabled } from 'selectors/setupSelector'
+import { selectLayer, selectAccountEnabled } from 'selectors'
 
 import TxBuilder from './TxBuilder'
 

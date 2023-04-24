@@ -26,9 +26,8 @@ import Select from 'components/select/Select'
 
 import { castProposalVote } from 'actions/daoAction'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import { selectLockRecords } from 'selectors/veBobaSelector'
+import { selectLockRecords,selectLoading } from 'selectors'
 import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
-import { selectLoading } from 'selectors/loadingSelector'
 
 import networkService from 'services/networkService'
 

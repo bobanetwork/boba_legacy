@@ -25,12 +25,16 @@ import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { selectLatestProposalState, selectProposals } from 'selectors/daoSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectLatestProposalState, 
+  selectProposals,
+  selectLoading,
+  selectAccountEnabled, 
+  selectLayer,
+  selectLockRecords
+} from 'selectors'
 
 import { fetchLockRecords } from 'actions/veBobaAction'
-import { selectLockRecords } from 'selectors/veBobaSelector'
 
 
 import {DividerLine} from 'containers/Global.styles'

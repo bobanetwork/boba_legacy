@@ -9,7 +9,7 @@ import * as S from './Lock.styles'
 import CreateLock from './createLock/CreateLock'
 import LockRecords from './Records/Records'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { selectAccountEnabled, selectLayer } from 'selectors'
 
 const data = [
   { name: '0', uv: 0 },

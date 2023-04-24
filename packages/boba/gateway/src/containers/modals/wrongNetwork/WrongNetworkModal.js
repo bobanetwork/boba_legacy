@@ -9,7 +9,7 @@ import { restTokenList } from 'actions/tokenAction';
 import { setConnect, setConnectETH } from 'actions/setupAction';
 import { closeModal } from 'actions/uiAction';
 
-import { selectNetwork } from 'selectors/networkSelector';
+import { selectNetwork } from 'selectors';
 
 function WrongNetworkModal({open}) {
 

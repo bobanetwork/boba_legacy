@@ -6,8 +6,7 @@ import * as G from '../Global.styles'
 import PageTitle from 'components/pageTitle/PageTitle';
 import Tabs from 'components/tabs/Tabs';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectLockRecords } from 'selectors/veBobaSelector';
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector';
+import { selectLockRecords, selectAccountEnabled, selectLayer  } from 'selectors';
 import { fetchLockRecords } from 'actions/veBobaAction';
 import Vote from './Vote/Vote';
 import Dao from './Dao/Dao';

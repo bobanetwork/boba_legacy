@@ -4,13 +4,14 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import * as S from './GasSwitcher.styles'
 
-import { selectGas } from 'selectors/balanceSelector'
-import { selectVerifierStatus } from 'selectors/verifierSelector'
-import { selectBaseEnabled } from 'selectors/setupSelector'
-import {
-  selectActiveNetwork,
+import { 
+  selectGas, 
+  selectVerifierStatus, 
+  selectBaseEnabled, 
+  selectActiveNetwork, 
   selectActiveNetworkName
-} from 'selectors/networkSelector'
+} from 'selectors'
+
 
 import { fetchGas } from 'actions/networkAction'
 import { fetchVerifierStatus } from 'actions/verifierAction'
