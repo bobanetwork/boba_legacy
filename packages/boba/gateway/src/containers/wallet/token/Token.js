@@ -4,16 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   selectlayer1Balance,
   selectlayer2Balance,
-} from 'selectors/balanceSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import {
+  selectLoading,
   selectAccountEnabled,
   selectBaseEnabled,
   selectLayer,
-} from 'selectors/setupSelector'
-import { selectNetwork } from 'selectors/networkSelector'
-import { selectTokens } from 'selectors/tokenSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
+  selectNetwork,
+  selectTokens,
+  selectTransactions
+} from 'selectors'
+
 
 import { fetchBalances, fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab } from 'actions/uiAction'
