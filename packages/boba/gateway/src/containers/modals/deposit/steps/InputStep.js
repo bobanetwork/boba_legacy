@@ -9,7 +9,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { selectLoading, selectLookupPrice, selectActiveNetworkName } from 'selectors'
+import { selectLoading, selectLookupPrice, selectActiveNetworkName, selectActiveNetwork } from 'selectors'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { useTheme } from '@emotion/react'
@@ -18,6 +18,8 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
+import { NETWORK } from 'util/network/network.util'
+import { BOBABEAM_STATUS } from 'util/constant'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -34,6 +36,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
   const networkName = useSelector(selectActiveNetworkName())
+  const activeNetwork = useSelector(selectActiveNetwork())
   const lookupPrice = useSelector(selectLookupPrice)
 
   const maxValue = logAmount(token.balance, token.decimals)
@@ -108,15 +111,40 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
-        <Button
-          onClick={handleClose}
-          disabled={false}
-          variant='contained'
-          color='primary'
-          size='large'
-        >
-          Cancel
-        </Button>
+        <WrapperActionsModal>
+          <Button
+            onClick={handleClose}
+            disabled={false}
+            variant='contained'
+            color='primary'
+            size='large'
+          >
+            Cancel
+          </Button>
+        </WrapperActionsModal>
+      </Box>)
+  }
+
+  if (!!Number(BOBABEAM_STATUS)
+    && activeNetwork === NETWORK.MOONBEAM
+  ) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
+          Bobabeam is closing - Deposits on Bobabeam will no longer be available, please withdraw your funds.
+        </Typography>
+        <WrapperActionsModal>
+          <Button
+            onClick={handleClose}
+            disabled={false}
+            variant='contained'
+            color='primary'
+            size='large'
+          >
+            Cancel
+          </Button>
+        </WrapperActionsModal>
       </Box>)
   }
 

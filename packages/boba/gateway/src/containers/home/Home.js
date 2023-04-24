@@ -261,7 +261,7 @@ function Home() {
         !!Number(BOBABEAM_STATUS)
         && activeNetwork === 'MOONBEAM'
         && <NotificationBar
-          message='Bobabeam is closing - please withdraw your funds'
+          message='Bobabeam is closing - Please withdraw your funds'
           open={true}
         />}
 
