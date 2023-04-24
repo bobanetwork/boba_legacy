@@ -51,10 +51,10 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-  selectAlert, 
+  selectAlert,
   selectError,
   selectModalState,
-  selectActiveNetwork, 
+  selectActiveNetwork,
   selectActiveNetworkType
 } from 'selectors'
 
@@ -95,6 +95,7 @@ import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import useWalletSwitch from 'hooks/useWalletSwitch'
+import NotificationBar from 'components/notificationBar'
 
 
 function Home() {
@@ -255,6 +256,11 @@ function Home() {
       {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
       {!!switchNetworkModalState && <SwitchNetworkModal open={switchNetworkModalState} />}
+
+      <NotificationBar
+        message='Bobabeam is closing - please withdraw your funds'
+        open={true}
+      />
 
       <Alert
         type='error'
