@@ -4,7 +4,7 @@ import { Log, Provider } from '@ethersproject/providers'
 import { BundlerConfig } from './BundlerConfig'
 import { resolveProperties } from 'ethers/lib/utils'
 import { deepHexlify, erc4337RuntimeVersion } from '@boba/bundler_utils'
-import { UserOperationStruct, EntryPoint } from '@boba/accountabstraction'
+import { UserOperationStruct, EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
 import { UserOperationEventEvent } from '@boba/accountabstraction/dist/types/EntryPoint'
 import { calcPreVerificationGas } from '@boba/bundler_sdk/dist/calcPreVerificationGas'
 import { requireCond, RpcError, tostr } from './utils'
@@ -53,7 +53,8 @@ export class UserOpMethodHandler {
     readonly provider: Provider,
     readonly signer: Signer,
     readonly config: BundlerConfig,
-    readonly entryPoint: EntryPoint
+    readonly entryPoint: EntryPoint,
+    readonly entryPointWrapper?: EntryPointWrapper
   ) {}
 
   async getSupportedEntryPoints(): Promise<string[]> {
@@ -207,6 +208,7 @@ export class UserOpMethodHandler {
     userOp1: UserOperationStruct,
     entryPointInput: string
   ): Promise<string> {
+
     await this._validateParameters(userOp1, entryPointInput)
 
     const userOp = await resolveProperties(userOp1)
@@ -219,7 +221,7 @@ export class UserOpMethodHandler {
       )}`
     )
     await this.execManager.sendUserOperation(userOp, entryPointInput)
-    return await this.entryPoint.getUserOpHash(userOp)
+    return this.entryPoint.getUserOpHash(userOp)
   }
 
   async _getUserOperationEvent(

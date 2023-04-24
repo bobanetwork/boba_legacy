@@ -4,6 +4,7 @@ import ow from 'ow'
 export interface BundlerConfig {
   beneficiary: string
   entryPoint: string
+  entryPointWrapper?: string
   gasFactor: string
   minBalance: string
   mnemonic: string
@@ -26,6 +27,7 @@ export interface BundlerConfig {
 export const BundlerConfigShape = {
   beneficiary: ow.string,
   entryPoint: ow.string,
+  entryPointWrapper: ow.optional.string,
   gasFactor: ow.string,
   minBalance: ow.string,
   mnemonic: ow.string,

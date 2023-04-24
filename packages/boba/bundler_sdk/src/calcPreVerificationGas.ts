@@ -71,7 +71,9 @@ export function calcPreVerificationGas(
     signature: hexlify(Buffer.alloc(ov.sigSize, 1)), // dummy signature
     ...userOp,
   } as any
-
+  if (p.signature === '') {
+    p.signature = hexlify(Buffer.alloc(ov.sigSize, 1))
+  }
   const packed = arrayify(packUserOp(p, false))
   const lengthInWord = (packed.length + 31) / 32
   const callDataCost = packed

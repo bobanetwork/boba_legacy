@@ -1,3 +1,5 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable prettier/prettier */
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
 import { Deferrable } from '@ethersproject/properties'
@@ -50,12 +52,14 @@ export function getTracerBodyString (func: LogTracerFunc): string {
   const tracerFunc = func.toString()
   // function must return a plain object:
   //  function xyz() { return {...}; }
-  const regexp = /function \w+\s*\(\s*\)\s*{\s*return\s*(\{[\s\S]+\});?\s*\}\s*$/ // (\{[\s\S]+\}); \} $/
+  const regexp = /function\w*\s*\(\s*\)\s*{\s*return\s*(\{[\s\S]+\});?\s*\}\s*$/ // (\{[\s\S]+\}); \} $/
   const match = tracerFunc.match(regexp)
   if (match == null) {
     throw new Error('Not a simple method returning value')
   }
+
   let ret = match[1]
+  console.log(ret)
   ret = ret
     // .replace(/\/\/.*\n/g,'\n')
     // .replace(/\n\s*\n/g, '\n')
