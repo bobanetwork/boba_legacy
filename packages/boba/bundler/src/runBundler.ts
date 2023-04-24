@@ -8,11 +8,15 @@ import { ethers, Wallet } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { BundlerServer } from './BundlerServer'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
-import { EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
+import {
+  EntryPoint,
+  EntryPoint__factory,
+  EntryPointWrapper,
+  EntryPointWrapper__factory,
+} from '@boba/accountabstraction'
 import { BaseProvider } from '@ethersproject/providers'
 import { initServer } from './modules/initServer'
 import { DebugMethodHandler } from './DebugMethodHandler'
-import { DeterministicDeployer } from '@boba/bundler_sdk'
 import { isGeth, supportsRpcMethod } from './utils'
 import { resolveConfiguration } from './Config'
 
@@ -38,14 +42,13 @@ export async function connectContracts(
 export async function connectContractsViaAddressManager (
   providerL1: BaseProvider,
   wallet: Wallet,
-  addressManagerAddress: string): Promise<EntryPoint> {
+  addressManagerAddress: string): Promise<{ entryPoint: EntryPoint, entryPointWrapper: EntryPointWrapper }> {
   const addressManager = getAddressManager(providerL1, addressManagerAddress)
-
   const entryPointAddress = await addressManager.getAddress('L2_Boba_EntryPoint')
-
+  const entryPointWrapperAddress = await addressManager.getAddress('L2_EntryPointWrapper')
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-
-  return entryPoint
+  const entryPointWrapper = EntryPointWrapper__factory.connect(entryPointWrapperAddress, wallet)
+  return { entryPoint: entryPoint, entryPointWrapper }
 }
 
 function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
@@ -154,15 +157,24 @@ export async function runBundler(
     process.exit(1)
   }
 
+  //todo this could need a cleanup
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
   if (config.addressManager.length > 0) {
     console.log('Getting entrypoint from address manager')
     const providerL1: BaseProvider = new ethers.providers.JsonRpcProvider(config.l1NodeWeb3Url)
-    const eP = await connectContractsViaAddressManager(providerL1, wallet, config.addressManager)
+    const { entryPoint: eP, entryPointWrapper: epW } =
+      await connectContractsViaAddressManager(
+        providerL1,
+        wallet,
+        config.addressManager
+      )
     console.log(eP.address)
     config.entryPoint = eP.address
+    config.entryPointWrapper = epW.address
     console.log(config.entryPoint)
     entryPoint = eP
+    entryPointWrapper = epW
   } else {
     const eP = await connectContracts(wallet, config.entryPoint)
     entryPoint = eP
@@ -185,7 +197,8 @@ export async function runBundler(
     provider,
     wallet,
     config,
-    entryPoint
+    entryPoint,
+    entryPointWrapper
   )
   eventsManager.initEventListener()
   const debugHandler = new DebugMethodHandler(

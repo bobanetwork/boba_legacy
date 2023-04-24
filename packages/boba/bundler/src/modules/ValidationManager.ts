@@ -1,18 +1,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import { EntryPoint } from '@boba/accountabstraction'
+import { EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
 import { ReputationManager } from './ReputationManager'
 import { BigNumber, BigNumberish, BytesLike, ethers } from 'ethers'
 import { requireCond, RpcError } from '../utils'
-import { AddressZero, decodeErrorReason } from '@boba/bundler_utils'
+import { AddressZero } from '@boba/bundler_utils'
 import { calcPreVerificationGas } from '@boba/bundler_sdk/dist/calcPreVerificationGas'
-import { parseScannerResult } from '../parseScannerResult'
-import { JsonRpcProvider } from '@ethersproject/providers'
-import {
-  BundlerCollectorReturn,
-  bundlerCollectorTracer,
-  ExitInfo,
-} from '../BundlerCollectorTracer'
-import { debug_traceCall } from '../GethTracer'
+
 import Debug from 'debug'
 import { GetCodeHashes__factory } from '../../dist/src/types'
 import {
@@ -23,8 +16,7 @@ import {
   ValidationErrors,
 } from './Types'
 import { getAddr, runContractScript } from './moduleUtils'
-
-const debug = Debug('aa.mgr.validate')
+import { hexlify } from 'ethers/lib/utils'
 
 /**
  * result from successful simulateValidation
@@ -34,7 +26,9 @@ export interface ValidationResult {
     preOpGas: BigNumberish
     prefund: BigNumberish
     sigFailed: boolean
-    deadline: number
+    validAfter: number
+    validUntil: number
+    paymasterContext: string
   }
 
   senderInfo: StakeInfo
@@ -54,61 +48,69 @@ export class ValidationManager {
   constructor(
     readonly entryPoint: EntryPoint,
     readonly reputationManager: ReputationManager,
-    readonly unsafe: boolean
+    readonly unsafe: boolean,
+    readonly entryPointWrapper?: EntryPointWrapper
   ) {}
 
   // standard eth_call to simulateValidation
   async _callSimulateValidation(
     userOp: UserOperation
   ): Promise<ValidationResult> {
-    const errorResult = await this.entryPoint.callStatic
-      .simulateValidation(userOp, { gasLimit: 10e6 })
-      .catch((e) => e)
-    return this._parseErrorResult(userOp, errorResult)
+    const simulateValidation =
+      await this.entryPointWrapper.callStatic.simulateValidation(userOp, {
+        gasLimit: 10e6,
+      })
+    return this._parseResult(userOp, simulateValidation)
   }
 
-  _parseErrorResult(
+  _parseResult(
     userOp: UserOperation,
-    errorResult: { errorName: string; errorArgs: any }
+    simulateValidation: any
   ): ValidationResult {
-    if (!errorResult?.errorName?.startsWith('ValidationResult')) {
+
+    let selectorType: EntryPointWrapper.SelectorTypeStructOutput
+    let returnInfo: EntryPointWrapper.ReturnInfoStructOutput
+    let senderInfo: EntryPointWrapper.StakeInfoStructOutput
+    let factoryInfo: EntryPointWrapper.StakeInfoStructOutput
+    let paymasterInfo: EntryPointWrapper.StakeInfoStructOutput
+    let aggregatorInfo: EntryPointWrapper.AggregatorStakeInfoStructOutput
+    ;[
+      selectorType,
+      returnInfo,
+      senderInfo,
+      factoryInfo,
+      paymasterInfo,
+      aggregatorInfo,
+    ] = simulateValidation
+
+    if (!selectorType.validator.startsWith('ValidationResult')) {
       // parse it as FailedOp
       // if its FailedOp, then we have the paymaster param... otherwise its an Error(string)
-      let paymaster = errorResult.errorArgs.paymaster
+      let paymaster = hexlify(userOp.paymasterAndData)?.slice(0, 42)
       if (paymaster === AddressZero) {
         paymaster = undefined
       }
-      // eslint-disable-next-line
-      const msg: string = errorResult.errorArgs?.reason ?? errorResult.toString()
 
       if (paymaster == null) {
         throw new RpcError(
-          `account validation failed: ${msg}`,
+          `account validation failed: ${selectorType}`,
           ValidationErrors.SimulateValidation
         )
       } else {
         throw new RpcError(
-          `paymaster validation failed: ${msg}`,
+          `paymaster validation failed: ${selectorType}`,
           ValidationErrors.SimulatePaymasterValidation,
           { paymaster }
         )
       }
     }
 
-    const {
-      returnInfo,
-      senderInfo,
-      factoryInfo,
-      paymasterInfo,
-      aggregatorInfo, // may be missing (exists only SimulationResultWithAggregator
-    } = errorResult.errorArgs
-
     // extract address from "data" (first 20 bytes)
     // add it as "addr" member to the "stakeinfo" struct
     // if no address, then return "undefined" instead of struct.
     function fillEntity(
       data: BytesLike,
-      info: StakeInfo
+      info: StakeInfo | EntryPointWrapper.StakeInfoStructOutput
     ): StakeInfo | undefined {
       const addr = getAddr(data)
       return addr == null
@@ -128,81 +130,9 @@ export class ValidationManager {
       factoryInfo: fillEntity(userOp.initCode, factoryInfo),
       paymasterInfo: fillEntity(userOp.paymasterAndData, paymasterInfo),
       aggregatorInfo: fillEntity(
-        aggregatorInfo?.actualAggregator,
+        aggregatorInfo?.aggregator,
         aggregatorInfo?.stakeInfo
       ),
-    }
-  }
-
-  async _geth_traceCall_SimulateValidation(
-    userOp: UserOperation
-  ): Promise<[ValidationResult, BundlerCollectorReturn]> {
-    const provider = this.entryPoint.provider as JsonRpcProvider
-    const simulateCall = this.entryPoint.interface.encodeFunctionData(
-      'simulateValidation',
-      [userOp]
-    )
-
-    const simulationGas = BigNumber.from(userOp.preVerificationGas).add(
-      userOp.verificationGasLimit
-    )
-
-    const tracerResult: BundlerCollectorReturn = await debug_traceCall(
-      provider,
-      {
-        from: ethers.constants.AddressZero,
-        to: this.entryPoint.address,
-        data: simulateCall,
-        gasLimit: simulationGas,
-      },
-      { tracer: bundlerCollectorTracer }
-    )
-
-    const lastResult = tracerResult.calls.slice(-1)[0]
-    if (lastResult.type !== 'REVERT') {
-      throw new Error('Invalid response. simulateCall must revert')
-    }
-    const data = (lastResult as ExitInfo).data
-    // Hack to handle SELFDESTRUCT until we fix entrypoint
-    if (data === '0x') {
-      return [data as any, tracerResult]
-    }
-    try {
-      const { name: errorName, args: errorArgs } =
-        this.entryPoint.interface.parseError(data)
-      const errFullName = `${errorName}(${errorArgs.toString()})`
-      const errorResult = this._parseErrorResult(userOp, {
-        errorName,
-        errorArgs,
-      })
-      if (!errorName.includes('Result')) {
-        // a real error, not a result.
-        throw new Error(errFullName)
-      }
-      debug(
-        '==dump tree=',
-        JSON.stringify(tracerResult, null, 2)
-          .replace(new RegExp(userOp.sender.toLowerCase()), '{sender}')
-          .replace(
-            new RegExp(getAddr(userOp.paymasterAndData) ?? '--no-paymaster--'),
-            '{paymaster}'
-          )
-          .replace(
-            new RegExp(getAddr(userOp.initCode) ?? '--no-initcode--'),
-            '{factory}'
-          )
-      )
-      // console.log('==debug=', ...tracerResult.numberLevels.forEach(x=>x.access), 'sender=', userOp.sender, 'paymaster=', hexlify(userOp.paymasterAndData)?.slice(0, 42))
-      // errorResult is "ValidationResult"
-      return [errorResult, tracerResult]
-    } catch (e: any) {
-      // if already parsed, throw as is
-      if (e.code != null) {
-        throw e
-      }
-      // not a known error of EntryPoint (probably, only Error(string), since FailedOp is handled above)
-      const err = decodeErrorReason(data)
-      throw new RpcError(err != null ? err.message : data, 111)
     }
   }
 
@@ -219,67 +149,54 @@ export class ValidationManager {
     checkStakes = true
   ): Promise<ValidateUserOpResult> {
     if (previousCodeHashes != null && previousCodeHashes.addresses.length > 0) {
-      const { hash: codeHashes } = await this.getCodeHashes(
+      const CodeHashesWrapper = await this.getCodeHashesWrapper(
         previousCodeHashes.addresses
       )
+      const codeHashes = CodeHashesWrapper.hash
       requireCond(
         codeHashes === previousCodeHashes.hash,
         'modified code after first validation',
         ValidationErrors.OpcodeValidation
       )
     }
-    let res: ValidationResult
     let codeHashes: ReferencedCodeHashes = {
       addresses: [],
       hash: '',
     }
-    let storageMap: StorageMap = {}
-    if (!this.unsafe) {
-      let tracerResult: BundlerCollectorReturn
-      ;[res, tracerResult] = await this._geth_traceCall_SimulateValidation(
-        userOp
-      )
-      let contractAddresses: string[]
-      ;[contractAddresses, storageMap] = parseScannerResult(
-        userOp,
-        tracerResult,
-        res,
-        this.entryPoint
-      )
-      // if no previous contract hashes, then calculate hashes of contracts
-      if (previousCodeHashes == null) {
-        codeHashes = await this.getCodeHashes(contractAddresses)
-      }
-      if ((res as any) === '0x') {
-        throw new Error('simulateValidation reverted with no revert string!')
-      }
-    } else {
-      // NOTE: this mode doesn't do any opcode checking and no stake checking!
-      res = await this._callSimulateValidation(userOp)
-    }
+    const storageMap: StorageMap = {}
 
+    // NOTE: this mode doesn't do any opcode checking and no stake checking!
+    const res = await this._callSimulateValidation(userOp)
+
+    console.log(`_callSimulateValidation ${JSON.stringify(res)}`)
     requireCond(
       !res.returnInfo.sigFailed,
       'Invalid UserOp signature or paymaster signature',
       ValidationErrors.InvalidSignature
     )
 
-    requireCond(
-      res.returnInfo.deadline == null ||
-        res.returnInfo.deadline + 30 < Date.now() / 1000,
-      'expires too soon',
-      ValidationErrors.ExpiresShortly
-    )
+//     requireCond(
+//       res.returnInfo.validUntil == null ||
+//         res.returnInfo.validUntil + 30 < Date.now() / 1000,
+//       'expires too soon',
+//       ValidationErrors.ExpiresShortly
+//     )
 
-    if (res.aggregatorInfo != null) {
+    if (
+      res.aggregatorInfo.addr !== AddressZero &&
+      !BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
+      !BigNumber.from(0).eq(res.aggregatorInfo.unstakeDelaySec)
+    ) {
       this.reputationManager.checkStake('aggregator', res.aggregatorInfo)
     }
 
-    requireCond(
-      res.aggregatorInfo == null,
-      'Currently not supporting aggregator',
-      ValidationErrors.UnsupportedSignatureAggregator
-    )
+//     requireCond(
+//       res.aggregatorInfo.addr === AddressZero &&
+//         BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
+//         BigNumber.from(0).eq(res.aggregatorInfo.unstakeDelaySec),
+//       'Currently not supporting aggregator',
+//       ValidationErrors.UnsupportedSignatureAggregator
+//     )
 
     return {
       ...res,
@@ -294,6 +211,15 @@ export class ValidationManager {
       new GetCodeHashes__factory(),
       [addresses]
     )
+
+    return {
+      hash,
+      addresses,
+    }
+  }
+
+  async getCodeHashesWrapper(addresses: string[]): Promise<ReferencedCodeHashes> {
+    const hash = await this.entryPointWrapper.getCodeHashes(addresses)
 
     return {
       hash,

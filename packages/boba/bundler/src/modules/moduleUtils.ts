@@ -1,12 +1,14 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 // misc utilities for the various modules.
 
 import { BytesLike, ContractFactory } from 'ethers'
 import { hexlify, hexZeroPad, Result } from 'ethers/lib/utils'
-import { SlotMap, StorageMap } from './Types'
+import { SlotMap, StorageMap, UserOperation } from './Types'
 import { Provider } from '@ethersproject/providers'
+import { EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
 
 // extract address from initCode or paymasterAndData
-export function getAddr (data?: BytesLike): string | undefined {
+export function getAddr(data?: BytesLike): string | undefined {
   if (data == null) {
     return undefined
   }
@@ -23,10 +25,14 @@ export function getAddr (data?: BytesLike): string | undefined {
  * - merge slot entries
  * NOTE: slot values are supposed to be the value before the transaction started.
  *  so same address/slot in different validations should carry the same value
+ *
  * @param mergedStorageMap
  * @param validationStorageMap
  */
-export function mergeStorageMap (mergedStorageMap: StorageMap, validationStorageMap: StorageMap): StorageMap {
+export function mergeStorageMap(
+  mergedStorageMap: StorageMap,
+  validationStorageMap: StorageMap
+): StorageMap {
   Object.entries(validationStorageMap).forEach(([addr, validationEntry]) => {
     if (typeof validationEntry === 'string') {
       // it's a root. override specific slots, if any
@@ -49,12 +55,13 @@ export function mergeStorageMap (mergedStorageMap: StorageMap, validationStorage
   return mergedStorageMap
 }
 
-export function toBytes32 (b: BytesLike | number): string {
+export function toBytes32(b: BytesLike | number): string {
   return hexZeroPad(hexlify(b).toLowerCase(), 32)
 }
 
 /**
  * run the constructor of the given type as a script: it is expected to revert with the script's return values.
+ *
  * @param provider provider to use fo rthe call
  * @param c - contract factory of the script class
  * @param ctrParams constructor parameters
@@ -62,10 +69,25 @@ export function toBytes32 (b: BytesLike | number): string {
  * example usasge:
  *     hashes = await runContractScript(provider, new GetUserOpHashes__factory(), [entryPoint.address, userOps]).then(ret => ret.userOpHashes)
  */
-export async function runContractScript<T extends ContractFactory> (provider: Provider, c: T, ctrParams: Parameters<T['getDeployTransaction']>): Promise<Result> {
+export async function runContractScript<T extends ContractFactory>(
+  provider: Provider,
+  c: T,
+  ctrParams: Parameters<T['getDeployTransaction']>
+): Promise<Result> {
   const tx = c.getDeployTransaction(...ctrParams)
   const ret = await provider.call(tx)
+
   const parsed = ContractFactory.getInterface(c.interface).parseError(ret)
-  if (parsed == null) throw new Error('unable to parse script (error) response: ' + ret)
+  if (parsed == null) {
+    throw new Error('unable to parse script (error) response: ' + ret)
+  }
   return parsed.args
+}
+
+export async function runContractScriptviaWrapper<T extends ContractFactory>(
+  entryPoint: EntryPoint,
+  entryPointWrapper: EntryPointWrapper,
+  userOps: UserOperation[]
+): Promise<string[]> {
+  return entryPointWrapper.getUserOpHashes(entryPoint.address, userOps)
 }

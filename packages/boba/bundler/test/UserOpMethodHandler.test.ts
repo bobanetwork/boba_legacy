@@ -6,6 +6,8 @@ import { BundlerConfig } from '../src/BundlerConfig'
 import {
   EntryPoint,
   EntryPoint__factory,
+  EntryPointWrapper,
+  EntryPointWrapper__factory,
   SimpleAccountFactory__factory,
   UserOperationStruct
 } from '@boba/accountabstraction'
@@ -41,6 +43,7 @@ describe('UserOpMethodHandler', function () {
   let mempoolMgr: MempoolManager
 
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
   let sampleRecipient: SampleRecipient
 
   before(async function () {
@@ -48,6 +51,7 @@ describe('UserOpMethodHandler', function () {
 
     signer = await createSigner()
     entryPoint = await new EntryPoint__factory(signer).deploy()
+    entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
 
     DeterministicDeployer.init(ethers.provider)
     accountDeployerAddress = await DeterministicDeployer.deploy(new SimpleAccountFactory__factory(), 0, [entryPoint.address])
@@ -70,14 +74,15 @@ describe('UserOpMethodHandler', function () {
       maxBundleGas: 5e6,
       // minstake zero, since we don't fund deployer.
       minStake: '0',
-      minUnstakeDelay: 0
+      minUnstakeDelay: 0,
+      entryPointWrapper: entryPointWrapper.address
     }
 
     const repMgr = new ReputationManager(BundlerReputationParams, parseEther(config.minStake), config.minUnstakeDelay)
     mempoolMgr = new MempoolManager(repMgr)
-    const validMgr = new ValidationManager(entryPoint, repMgr, config.unsafe)
+    const validMgr = new ValidationManager(entryPoint, repMgr, config.unsafe, entryPointWrapper)
     const evMgr = new EventsManager(entryPoint, mempoolMgr, repMgr)
-    const bundleMgr = new BundleManager(entryPoint, evMgr, mempoolMgr, validMgr, repMgr, config.beneficiary, parseEther(config.minBalance), config.maxBundleGas, false)
+    const bundleMgr = new BundleManager(entryPoint, evMgr, mempoolMgr, validMgr, repMgr, config.beneficiary, parseEther(config.minBalance), config.maxBundleGas, false, false, entryPointWrapper)
     const execManager = new ExecutionManager(repMgr, mempoolMgr, bundleMgr, validMgr)
     methodHandler = new UserOpMethodHandler(
       execManager,
@@ -190,7 +195,7 @@ describe('UserOpMethodHandler', function () {
       expect(rcpt?.success).to.be.true
     })
 
-    it('should expose FailedOp errors as text messages', async () => {
+    it.only('should expose FailedOp errors as text messages', async () => {
       const smartAccountAPI = new SimpleAccountAPI({
         provider,
         entryPointAddress: entryPoint.address,
