@@ -29,14 +29,20 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_exitTRAD } from 'selectors/signatureSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { 
+  selectLoading, 
+  selectSignatureStatus_exitTRAD, 
+  selectLookupPrice,
+  selectBobaFeeChoice,
+  selectBobaPriceRatio,
+  selectClassicExitCost, //estimated total cost of this exit
+  selectL2BalanceETH,
+  selectL2BalanceBOBA,
+  selectExitFee,
+} from 'selectors'
 
-import {
-   selectBobaFeeChoice,
-   selectBobaPriceRatio,
-} from 'selectors/setupSelector'
+
+
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
@@ -52,12 +58,6 @@ import {
   fetchExitFee,
 } from 'actions/balanceAction'
 
-import {
-  selectClassicExitCost, //estimated total cost of this exit
-  selectL2BalanceETH,
-  selectL2BalanceBOBA,
-  selectExitFee,
-} from 'selectors/balanceSelector'
 import networkService from 'services/networkService'
 
 function DoExitStep({ handleClose, token, isBridge, openTokenPicker }) {

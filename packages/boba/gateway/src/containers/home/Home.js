@@ -51,11 +51,13 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-} from 'selectors/setupSelector'
+  selectAlert, 
+  selectError,
+  selectModalState,
+  selectActiveNetwork, 
+  selectActiveNetworkType
+} from 'selectors'
 
-
-import { selectAlert, selectError } from 'selectors/uiSelector'
-import { selectModalState } from 'selectors/uiSelector'
 
 /******** MODALs ********/
 import DepositModal from 'containers/modals/deposit/DepositModal'
@@ -89,7 +91,6 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
-import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
 import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
