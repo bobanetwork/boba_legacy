@@ -104,12 +104,14 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     convertToUSD = true
   }
 
-  if (Number(logAmount(token.balance, token.decimals)) === 0) {
+  if (!!Number(BOBABEAM_STATUS)
+    && activeNetwork === NETWORK.MOONBEAM
+  ) {
     //no token in this account
     return (
       <Box>
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
-          Sorry, nothing to deposit - no {token.symbol} in this wallet
+          Bobabeam is closing - Deposits on Bobabeam will no longer be available, please withdraw your funds.
         </Typography>
         <WrapperActionsModal>
           <Button
@@ -125,14 +127,12 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
       </Box>)
   }
 
-  if (!!Number(BOBABEAM_STATUS)
-    && activeNetwork === NETWORK.MOONBEAM
-  ) {
+  if (Number(logAmount(token.balance, token.decimals)) === 0) {
     //no token in this account
     return (
       <Box>
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
-          Bobabeam is closing - Deposits on Bobabeam will no longer be available, please withdraw your funds.
+          Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
         <WrapperActionsModal>
           <Button

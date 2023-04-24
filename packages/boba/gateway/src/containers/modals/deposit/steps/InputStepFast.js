@@ -293,30 +293,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     }
   }
 
-  if (Number(logAmount(token.balance, token.decimals)) === 0) {
-    //no token in this account
-    return (
-      <Box>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
-        >
-          Sorry, nothing to deposit - no {token.symbol} in this wallet
-        </Typography>
-        <WrapperActionsModal>
-          <Button
-            onClick={handleClose}
-            disabled={false}
-            variant="outlined"
-            color="primary"
-            size="large"
-          >
-            Cancel
-          </Button>
-        </WrapperActionsModal>
-      </Box>
-    )
-  }
 
 
   if (!!Number(BOBABEAM_STATUS)
@@ -340,6 +316,32 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
           </Button>
         </WrapperActionsModal>
       </Box>)
+  }
+
+
+  if (Number(logAmount(token.balance, token.decimals)) === 0) {
+    //no token in this account
+    return (
+      <Box>
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
+        >
+          Sorry, nothing to deposit - no {token.symbol} in this wallet
+        </Typography>
+        <WrapperActionsModal>
+          <Button
+            onClick={handleClose}
+            disabled={false}
+            variant="outlined"
+            color="primary"
+            size="large"
+          >
+            Cancel
+          </Button>
+        </WrapperActionsModal>
+      </Box>
+    )
   }
 
   return (
