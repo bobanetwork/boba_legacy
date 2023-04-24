@@ -19,7 +19,7 @@ import { poolsTableHeads } from './pools.tableHeads'
 
 import * as G from 'containers/Global.styles'
 import PoolListItem from './poolListItem'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 import { PER_PAGE } from 'util/constant'
 import { useSelector } from 'react-redux'
 import { selectPools } from 'selectors/veBobaSelector'

@@ -23,7 +23,7 @@ import { selectTokens } from 'selectors/tokenSelector'
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import * as S from './History.styles'
 

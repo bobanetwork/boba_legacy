@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux'
 import {formatDate} from 'util/dates'
 
 import { selectLoading } from 'selectors/loadingSelector'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 import FastExit from 'components/seven/FastExit'
 
 import * as styles from './Transactions.module.scss'

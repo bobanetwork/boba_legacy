@@ -8,7 +8,7 @@ import { selectLockRecords } from 'selectors/veBobaSelector'
 import { selectLoading } from 'selectors/loadingSelector'
 import { useDispatch } from 'react-redux'
 import { openModal } from 'actions/uiAction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 const PER_PAGE = 8
 
