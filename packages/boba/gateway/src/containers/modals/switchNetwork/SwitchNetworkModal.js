@@ -9,7 +9,7 @@ import { setActiveNetwork } from 'actions/networkAction';
 import { closeModal } from 'actions/uiAction';
 import { setBaseState, setConnect, setEnableAccount } from 'actions/setupAction';
 
-import { selectNetwork, selectNetworkType } from 'selectors/networkSelector';
+import { selectNetwork, selectNetworkType } from 'selectors';
 import { useSearchParams } from 'react-router-dom';
 
 function SwitchNetworkModal({open}) {
