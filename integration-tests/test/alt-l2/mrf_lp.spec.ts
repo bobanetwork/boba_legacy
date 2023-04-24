@@ -2283,7 +2283,7 @@ describe('Liquidity Pool Test', async () => {
               l1TokenAddress: ethers.constants.AddressZero,
             },
           ],
-          { value: depositAmount.mul(2) }
+          { value: depositAmount.mul(2), ...gasLimitOption }
         )
       )
 
@@ -2497,7 +2497,7 @@ describe('Liquidity Pool Test', async () => {
               l1TokenAddress: ethers.constants.AddressZero,
             },
           ],
-          { value: swapOnAmount }
+          { value: swapOnAmount, ...gasLimitOption }
         )
       )
 

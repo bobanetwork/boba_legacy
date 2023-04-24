@@ -24,6 +24,7 @@ describe('ERC1155 Bridge Test', async () => {
   const DUMMY_TOKEN_ID_1 = 1
   const DUMMY_TOKEN_ID_2 = 2
   const DUMMY_TOKEN_ID_3 = 3
+  const DUMMY_TOKEN_ID_4 = 4
   const DUMMY_TOKEN_AMOUNT_1 = 100
   const DUMMY_TOKEN_AMOUNT_2 = 200
   const DUMMY_TOKEN_AMOUNT_3 = 300
@@ -1461,6 +1462,87 @@ describe('ERC1155 Bridge Test', async () => {
       expect(balanceL1).to.deep.eq(DUMMY_TOKEN_AMOUNT_1)
       expect(balanceL2).to.deep.eq(0)
     }).timeout(100000)
+    it('should try depositing a batch of token to L2', async () => {
+      const mintType1Tx = await L1ERC1155.mint(
+        env.l1Wallet.address,
+        DUMMY_TOKEN_ID_2,
+        DUMMY_TOKEN_AMOUNT_3
+      )
+      await mintType1Tx.wait()
+      const mintType2Tx = await L1ERC1155.mint(
+        env.l1Wallet.address,
+        DUMMY_TOKEN_ID_3,
+        DUMMY_TOKEN_AMOUNT_3
+      )
+      await mintType2Tx.wait()
+      const mintType3Tx = await L1ERC1155.mint(
+        env.l1Wallet.address,
+        DUMMY_TOKEN_ID_4,
+        DUMMY_TOKEN_AMOUNT_3
+      )
+      await mintType3Tx.wait()
+
+      const approveTx = await L1ERC1155.setApprovalForAll(
+        L1Bridge.address,
+        true
+      )
+      await approveTx.wait()
+
+      const depositTx = await env.waitForXDomainTransaction(
+        await L1Bridge.depositBatch(
+          L1ERC1155.address,
+          [DUMMY_TOKEN_ID_2, DUMMY_TOKEN_ID_3, DUMMY_TOKEN_ID_4],
+          [DUMMY_TOKEN_AMOUNT_3, DUMMY_TOKEN_AMOUNT_3, DUMMY_TOKEN_AMOUNT_3],
+          '0x',
+          999999
+        )
+      )
+
+      // submit a random l2 tx, so the relayer is unstuck for the tests
+      await env.l2Wallet_2.sendTransaction({
+        to: env.l2Wallet_2.address,
+        value: utils.parseEther('0.01'),
+        gasLimit: 1000000,
+      })
+
+      const backTx = await env.messenger.l2Provider.getTransaction(
+        depositTx.remoteReceipt.transactionHash
+      )
+      await env.waitForXDomainTransaction(backTx)
+
+      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155Bridge')
+      // check event DepositBatchFailed is emittted
+      const returnedlogIndex = await getFilteredLogIndex(
+        depositTx.remoteReceipt,
+        L2ERC1155BridgeABI,
+        L2Bridge.address,
+        'DepositBatchFailed'
+      )
+      const ifaceL2Bridge = new ethers.utils.Interface(L2ERC1155BridgeABI)
+      const log = ifaceL2Bridge.parseLog(
+        depositTx.remoteReceipt.logs[returnedlogIndex]
+      )
+      expect(log.args._tokenIds[0]).to.deep.eq(DUMMY_TOKEN_ID_2)
+
+      const [postL1Balance1, postL1Balance2, postL1Balance3] =
+        await L1ERC1155.balanceOfBatch(
+          [env.l1Wallet.address, env.l1Wallet.address, env.l1Wallet.address],
+          [DUMMY_TOKEN_ID_2, DUMMY_TOKEN_ID_3, DUMMY_TOKEN_ID_4]
+        )
+      const [postL2Balance1, postL2Balance2, postL2Balance3] =
+        await L2ERC1155.balanceOfBatch(
+          [env.l2Wallet.address, env.l2Wallet.address, env.l2Wallet.address],
+          [DUMMY_TOKEN_ID_2, DUMMY_TOKEN_ID_3, DUMMY_TOKEN_ID_4]
+        )
+      // expect(balanceL1).to.deep.eq(DUMMY_TOKEN_AMOUNT_3)
+      // expect(balanceL2).to.deep.eq(0)
+      expect(postL1Balance1).to.deep.eq(DUMMY_TOKEN_AMOUNT_3)
+      expect(postL1Balance2).to.deep.eq(DUMMY_TOKEN_AMOUNT_3)
+      expect(postL1Balance3).to.deep.eq(DUMMY_TOKEN_AMOUNT_3)
+      expect(postL2Balance1).to.deep.eq(0)
+      expect(postL2Balance2).to.deep.eq(0)
+      expect(postL2Balance3).to.deep.eq(0)
+    }).timeout(100000)
   })
 
   describe('L2 native token - failing mint on L1', async () => {
@@ -1537,6 +1619,62 @@ describe('ERC1155 Bridge Test', async () => {
       )
       expect(balanceL1).to.deep.eq(0)
       expect(balanceL2).to.deep.eq(DUMMY_TOKEN_AMOUNT_1)
+    }).timeout(100000)
+    it('should try withdraw a batch of tokens to L1', async () => {
+      const mintType1Tx = await L2ERC1155.mint(
+        env.l2Wallet.address,
+        DUMMY_TOKEN_ID_2,
+        DUMMY_TOKEN_AMOUNT_1
+      )
+      await mintType1Tx.wait()
+      const mintType2Tx = await L2ERC1155.mint(
+        env.l2Wallet.address,
+        DUMMY_TOKEN_ID_3,
+        DUMMY_TOKEN_AMOUNT_2
+      )
+      await mintType2Tx.wait()
+      const mintType3Tx = await L2ERC1155.mint(
+        env.l2Wallet.address,
+        DUMMY_TOKEN_ID_4,
+        DUMMY_TOKEN_AMOUNT_3
+      )
+      await mintType3Tx.wait()
+
+      const approveTX = await L2ERC1155.connect(env.l2Wallet).setApprovalForAll(
+        L2Bridge.address,
+        true
+      )
+      await approveTX.wait()
+
+      const exitFee = await BOBABillingContract.exitFee()
+
+      await env.waitForRevertXDomainTransactionL1(
+        L2Bridge.withdrawBatch(
+          L2ERC1155.address,
+          [DUMMY_TOKEN_ID_2, DUMMY_TOKEN_ID_3, DUMMY_TOKEN_ID_4],
+          [DUMMY_TOKEN_AMOUNT_1, DUMMY_TOKEN_AMOUNT_2, DUMMY_TOKEN_AMOUNT_3],
+          '0x',
+          9999999,
+          { value: exitFee }
+        )
+      )
+
+      const [postL1Balance1, postL1Balance2, postL1Balance3] =
+        await L1ERC1155.balanceOfBatch(
+          [env.l1Wallet.address, env.l1Wallet.address, env.l1Wallet.address],
+          [DUMMY_TOKEN_ID_2, DUMMY_TOKEN_ID_3, DUMMY_TOKEN_ID_4]
+        )
+      const [postL2Balance1, postL2Balance2, postL2Balance3] =
+        await L2ERC1155.balanceOfBatch(
+          [env.l2Wallet.address, env.l2Wallet.address, env.l2Wallet.address],
+          [DUMMY_TOKEN_ID_2, DUMMY_TOKEN_ID_3, DUMMY_TOKEN_ID_4]
+        )
+      expect(postL1Balance1).to.deep.eq(0)
+      expect(postL1Balance2).to.deep.eq(0)
+      expect(postL1Balance3).to.deep.eq(0)
+      expect(postL2Balance1).to.deep.eq(DUMMY_TOKEN_AMOUNT_1)
+      expect(postL2Balance2).to.deep.eq(DUMMY_TOKEN_AMOUNT_2)
+      expect(postL2Balance3).to.deep.eq(DUMMY_TOKEN_AMOUNT_3)
     }).timeout(100000)
   })
 
