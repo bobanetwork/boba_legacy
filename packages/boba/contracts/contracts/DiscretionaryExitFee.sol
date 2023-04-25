@@ -47,6 +47,7 @@ contract DiscretionaryExitFee is Ownable {
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
         IERC20(billingContract.feeTokenAddress()).safeTransferFrom(msg.sender, billingContractAddress, billingContract.exitFee());
 
+        require(msg.value != 0 || _l2Token != Lib_PredeployAddresses.OVM_ETH, "Amount Incorrect");
         require(!(msg.value != 0 && _l2Token != Lib_PredeployAddresses.OVM_ETH), "Amount Incorrect");
 
         if (msg.value != 0) {
