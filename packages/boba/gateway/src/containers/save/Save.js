@@ -26,7 +26,7 @@ import * as S from './Save.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'

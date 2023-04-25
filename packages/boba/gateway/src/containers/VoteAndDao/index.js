@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material'
 
 import * as S from './Dao/Dao.styles';
 import * as G from '../Global.styles'
-import PageTitle from 'components/pageTitle/PageTitle';
+import {PageTitle} from 'components'
 import Tabs from 'components/tabs/Tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectLockRecords, selectAccountEnabled, selectLayer  } from 'selectors';
