@@ -119,7 +119,8 @@
   "workspaces": {
     "nohoist": [
       "@types/**",
-      "**/@types/**"
+      "**/@types/**",
+      "**/eslint/**"
     ]
   }
 }
