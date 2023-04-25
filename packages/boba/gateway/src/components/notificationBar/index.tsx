@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useState } from 'react'
 import styled from 'styled-components'
 import CloseIcon from 'components/icons/CloseIcon'
 
@@ -32,6 +32,8 @@ const NotificationBarMessage = styled.div`
   a {
     color: inherit;
     text-decoration: underline;
+    cursor: pointer;
+    opacity: 0.65;
   }
 `
 
@@ -53,6 +55,7 @@ const NotificationBarCloseIcon = styled.div`
 // @inteface
 interface NotificationBarProps {
   message?: string
+  content?: string
   open?: boolean
   children?: ReactNode
   onClose?: (() => void) | null
@@ -61,14 +64,23 @@ interface NotificationBarProps {
 // @component
 const NotificationBar: React.FC<NotificationBarProps> = ({
   message,
+  content,
   open = false,
   children,
   onClose = null,
 }: NotificationBarProps) => {
+  const [readMore, setReadMore] = useState(false)
+
   return (
     <NotificationBarContainer className={`${open && 'open'}`}>
       <NotificationBarMessage>
-        {message ? message : children}
+        {message ? (readMore ? content : message) : children}
+        {content && (
+          <a onClick={() => setReadMore(!readMore)}>
+            {' '}
+            {!readMore ? `read more` : 'read less'}
+          </a>
+        )}
       </NotificationBarMessage>
       {onClose !== null && (
         <NotificationBarCloseIcon>

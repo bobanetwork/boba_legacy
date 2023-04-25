@@ -261,7 +261,9 @@ function Home() {
         !!Number(BOBABEAM_STATUS)
         && activeNetwork === 'MOONBEAM'
         && <NotificationBar
-          message='Bobabeam is closing - Please withdraw your funds'
+          message='Bobabeam is being wound down & will no longer be available, starting May 25th'
+          content='Bobabeam is being wound down & will no longer be available, starting May 25th.
+          For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam.'
           open={true}
         />}
 

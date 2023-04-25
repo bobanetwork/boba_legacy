@@ -302,7 +302,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     return (
       <Box>
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
-          Bobabeam is closing - Deposits on Bobabeam will no longer be available, please withdraw your funds.
+          Deposits are disabled. For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam
         </Typography>
         <WrapperActionsModal>
           <Button
