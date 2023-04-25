@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BobaBeamAlert should match the snapshot when active network is ethereum 1`] = `<DocumentFragment />`;
+
+exports[`BobaBeamAlert should match the snapshot when active network is moonbeam 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-beqWaB sc-dmqHEX dndckl XSlOg"
+  >
+    Deposits are disabled. For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam
+  </p>
+</DocumentFragment>
+`;
