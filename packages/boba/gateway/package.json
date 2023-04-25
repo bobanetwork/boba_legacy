@@ -121,7 +121,7 @@
     "nohoist": [
       "@types/**",
       "**/@types/**",
-      "**/eslint/**"
+      "eslint"
     ]
   }
 }
