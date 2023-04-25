@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import CloseIcon from 'components/icons/CloseIcon'
 
 // @style
-const NotificationBarContainer = styled('div')`
+const NotificationBannerContainer = styled('div')`
   max-height: 0;
   line-height: 40px;
   position: relative;
@@ -25,7 +25,7 @@ const NotificationBarContainer = styled('div')`
   }
 `
 
-const NotificationBarMessage = styled.div`
+const NotificationBannerMessage = styled.div`
   text-align: center;
   font-size: 18px;
   line-height: 1.2em;
@@ -47,7 +47,7 @@ const NotificationBarMessage = styled.div`
   }
 `
 
-const NotificationBarCloseIcon = styled.div`
+const NotificationBannerCloseIcon = styled.div`
   position: absolute;
   top: 50%;
   right: 32px;
@@ -70,7 +70,7 @@ const ReadMoreLess = styled.span`
 `
 
 // @inteface
-interface NotificationBarProps {
+interface NotificationBannerProps {
   message?: string
   content?: string
   open?: boolean
@@ -79,35 +79,34 @@ interface NotificationBarProps {
 }
 
 // @component
-const NotificationBar: React.FC<NotificationBarProps> = ({
+const NotificationBanner: React.FC<NotificationBannerProps> = ({
   message,
   content,
   open = false,
   children,
   onClose = null,
-}: NotificationBarProps) => {
+}: NotificationBannerProps) => {
   const [readMore, setReadMore] = useState(false)
 
   return (
-    <NotificationBarContainer
-      className={`${open && 'open '} ${readMore && 'expand'}`}
+    <NotificationBannerContainer
+      className={`${open ? 'open' : ''} ${readMore ? 'expand' : ''}`}
     >
-      <NotificationBarMessage>
+      <NotificationBannerMessage data-testid="message">
         {message ? (readMore ? content : message) : children}
         {content && (
-          <ReadMoreLess onClick={() => setReadMore(!readMore)}>
-            {' Read '}
-            {!readMore ? `more` : 'less'}
+          <ReadMoreLess role="readMore" onClick={() => setReadMore(!readMore)}>
+            {`Read ${!readMore ? 'more' : 'less'}`}
           </ReadMoreLess>
         )}
-      </NotificationBarMessage>
+      </NotificationBannerMessage>
       {onClose !== null && (
-        <NotificationBarCloseIcon>
+        <NotificationBannerCloseIcon onClick={onClose}>
           <CloseIcon />
-        </NotificationBarCloseIcon>
+        </NotificationBannerCloseIcon>
       )}
-    </NotificationBarContainer>
+    </NotificationBannerContainer>
   )
 }
 
-export default NotificationBar
+export default NotificationBanner

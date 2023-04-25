@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NotificationBanner  should match snapshot and check show banner when open set to true 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-beqWaB czvzoq open "
+  >
+    <div
+      class="sc-gueYoa kloqjB"
+      data-testid="message"
+    >
+      Mock test message data!
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`NotificationBanner  should match snapshot without message 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-beqWaB czvzoq  "
+  >
+    <div
+      class="sc-gueYoa kloqjB"
+      data-testid="message"
+    />
+  </div>
+</DocumentFragment>
+`;

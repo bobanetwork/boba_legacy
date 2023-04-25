@@ -95,7 +95,7 @@ import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import useWalletSwitch from 'hooks/useWalletSwitch'
-import NotificationBar from 'components/notificationBar'
+import NotificationBanner from 'components/notificationBanner'
 
 
 function Home() {
@@ -260,7 +260,7 @@ function Home() {
       {
         !!Number(BOBABEAM_STATUS)
         && activeNetwork === 'MOONBEAM'
-        && <NotificationBar
+        && <NotificationBanner
           message='Bobabeam is being wound down & will no longer be available, starting May 25th'
           content='Bobabeam is being wound down & will no longer be available, starting May 25th.
           For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam.'
