@@ -22,4 +22,8 @@ contract TestFailingMintL2StandardERC1155 is L2StandardERC1155 {
     function mint(address _to, uint256 _tokenId, uint256 _amount, bytes memory _data) public virtual override onlyL2Bridge {
         revert("mint failing");
     }
+
+    function mintBatch(address _to, uint256[] memory _tokenId, uint256[] memory _amount, bytes memory _data) public virtual override onlyL2Bridge {
+        revert("mint failing");
+    }
 }

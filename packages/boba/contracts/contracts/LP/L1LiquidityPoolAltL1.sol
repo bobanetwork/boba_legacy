@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.7.5;
+pragma solidity 0.8.9;
 pragma experimental ABIEncoderV2;
 
 import "./interfaces/iL2LiquidityPool.sol";
@@ -528,12 +528,15 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
             require(token.amount != 0, "Invalid Amount");
 
             PoolInfo storage pool = poolInfo[token.l1TokenAddress];
-            require(pool.l2TokenAddress != address(0), "Invaild Token");
+            require(pool.l2TokenAddress != address(0), "Invalid Token");
+
+            // update deposit hash
+            _updateDepositHash(token.l1TokenAddress, msg.sender, token.amount);
 
             if (token.l1TokenAddress != address(0)) {
                 IERC20(token.l1TokenAddress).safeTransferFrom(msg.sender, address(this), token.amount);
             } else {
-                ETHAmount = ETHAmount + token.amount;
+                ETHAmount = ETHAmount.add(token.amount);
             }
             payload[i] = ClientPayToken(msg.sender, pool.l2TokenAddress, token.amount);
         }
@@ -541,13 +544,13 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
         // verify that the total ETH amount is eqaul to msg.value
         require(ETHAmount == msg.value, "Invalid ETH Amount");
 
-        // Construct calldata for L1LiquidityPool.clientPayL2Batch(ClientPayToken)
+        // Construct calldata for L2LiquidityPool.clientPayL2Batch(ClientPayToken)
         bytes memory data = abi.encodeWithSelector(
             iL2LiquidityPool.clientPayL2Batch.selector,
             payload
         );
 
-        // Send calldata into L1
+        // Send calldata into L2
         sendCrossDomainMessage(
             address(L2LiquidityPoolAddress),
             // extra gas for complex l2 logic
@@ -578,6 +581,7 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
+        require(_amount != 0, "Incorrect Amount");
         require(user.amount >= _amount, "Withdraw Error");
 
         // Update accUserRewardPerShare
@@ -885,7 +889,7 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
     }
 
     /**
-     * @dev Configure fee of this contract. called from L2
+     * @dev Configure fee of this contract.
      * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
      * @param _userRewardMinFeeRate minimum fee rate that users get
      * @param _userRewardMaxFeeRate maximum fee rate that users get
@@ -900,7 +904,7 @@ contract L1LiquidityPoolAltL1 is CrossDomainEnabledFast, ReentrancyGuardUpgradea
         onlyOwner()
         onlyInitialized()
     {
-        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate, "Invalud user reward fee");
+        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
         _configureFee(_userRewardMinFeeRate, _userRewardMaxFeeRate,_ownerRewardFeeRate);
     }
 }
