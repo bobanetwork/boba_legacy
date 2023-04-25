@@ -59,9 +59,7 @@ type AddDaysType = (
 ) => string | Dayjs
 export const addDays: AddDaysType = (date, days, format) => {
   return format
-    ? dayjs(date)
-        .add(days, 'days')
-        .format(format)
+    ? dayjs(date).add(days, 'days').format(format)
     : dayjs(date).add(days, 'days')
 }
 
@@ -72,18 +70,14 @@ type AddMonthsType = (
 ) => string | Dayjs
 export const addMonths: AddMonthsType = (date, months, format) => {
   return format
-    ? dayjs(date)
-        .add(months, 'months')
-        .format(format)
+    ? dayjs(date).add(months, 'months').format(format)
     : dayjs(date).add(months, 'months')
 }
 
 type AddYearType = (year: number, format?: string) => string | Dayjs
 export const addYear: AddYearType = (year, format) => {
   return format
-    ? dayjs()
-        .add(year, 'year')
-        .format(format)
+    ? dayjs().add(year, 'year').format(format)
     : dayjs().add(year, 'year')
 }
 
