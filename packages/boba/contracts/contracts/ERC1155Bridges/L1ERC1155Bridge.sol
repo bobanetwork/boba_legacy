@@ -4,7 +4,7 @@
 /**
  Note: This contract has not been audited, exercise caution when using this on mainnet
  */
-pragma solidity >0.7.5;
+pragma solidity 0.8.9;
 pragma experimental ABIEncoderV2;
 
 /* Interface Imports */
@@ -38,7 +38,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
  * Runtime target: EVM
  */
 contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     /********************************
      * External Contract References *
@@ -62,6 +62,20 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     mapping(address => mapping (uint256 => uint256)) public deposits;
     // Maps L1 token address to tokenInfo
     mapping(address => PairTokenInfo) public pairTokenInfo;
+
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        uint32 newDepositGas
+    );
+
+    event PairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
 
     /***************
      * Constructor *
@@ -102,7 +116,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         onlyOwner()
         onlyInitialized()
     {
+        require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -118,6 +134,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         onlyInitialized()
     {
         depositL2Gas = _depositL2Gas;
+        emit GasConfigured(depositL2Gas);
     }
 
     /**
@@ -159,6 +176,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         public
         onlyOwner()
     {
+        require(_l2Contract != address(0), "L2 token cannot be zero address");
         //create2 would prevent this check
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc1155 = 0xd9b67a26;
@@ -177,7 +195,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             baseNetwork = Network.L1;
         }
         else {
+            // check the IL1StandardERC1155 interface is supported
             require(ERC165Checker.supportsInterface(_l1Contract, 0xc8a973c4), "L1 contract is not bridgable");
+            require(IL1StandardERC1155(_l1Contract).l2Contract() == _l2Contract, "L1 contract is not compatible with L2 contract");
             baseNetwork = Network.L2;
         }
 
@@ -187,6 +207,8 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit PairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /**************
@@ -209,6 +231,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _amount, _data, _l2Gas);
     }
 
@@ -228,6 +253,9 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateDepositBatch(_l1Contract, msg.sender, msg.sender, _tokenIds, _amounts, _data, _l2Gas);
     }
 
@@ -297,16 +325,14 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     {
         PairTokenInfo storage pairToken = pairTokenInfo[_l1Contract];
         require(pairToken.l2Contract != address(0), "Can't Find L2 token Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
 
         require(_amount > 0, "Amount should be greater than 0");
 
         if (pairToken.baseNetwork == Network.L1) {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC1155(_l1Contract).safeTransferFrom(
                 _from,
                 address(this),
@@ -315,7 +341,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 _data
             );
 
-            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            // Construct calldata for l2ERC1155Bridge.finalizeDeposit(_to, _amount)
             bytes memory message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDeposit.selector,
                 _l1Contract,
@@ -336,9 +362,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
             deposits[_l1Contract][_tokenId] += _amount;
         } else {
-            address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
-            require(pairToken.l2Contract == l2Contract, "L2 token Contract Address Error");
-
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             uint256 balance = IL1StandardERC1155(_l1Contract).balanceOf(msg.sender, _tokenId);
@@ -352,7 +375,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDeposit.selector,
                 _l1Contract,
-                l2Contract,
+                pairToken.l2Contract,
                 _from,
                 _to,
                 _tokenId,
@@ -372,8 +395,8 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     }
 
     /**
-     * @dev Performs the logic for deposits by informing the L2 Deposited Token
-     * contract of the deposit and calling a handler to lock the L1 token. (e.g. transferFrom)
+     * @dev Performs the logic for batch deposits by informing the L2 Deposited Token
+     * contract of the deposits and calling a handler to lock the L1 tokens. (e.g. transferFrom)
      *
      * @param _l1Contract Address of the L1 token contract we are depositing
      * @param _from Account to pull the deposit from on L1
@@ -397,18 +420,17 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
     {
         PairTokenInfo storage pairToken = pairTokenInfo[_l1Contract];
         require(pairToken.l2Contract != address(0), "Can't Find L2 token Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
+        require(_tokenIds.length == _amounts.length, "TokenId and Amount list size do not match");
 
         for (uint256 i = 0; i < _amounts.length; i++) {
             require(_amounts[i] > 0, "Amount should be greater than 0");
         }
 
         if (pairToken.baseNetwork == Network.L1) {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC1155(_l1Contract).safeBatchTransferFrom(
                 _from,
                 address(this),
@@ -417,7 +439,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 _data
             );
 
-            // Construct calldata for _l2Contract.finalizeDeposit(_to, _amount)
+            // Construct calldata for l2ERC1155Bridge.finalizeDeposit(_to, _amount)
             bytes memory message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDepositBatch.selector,
                 _l1Contract,
@@ -440,9 +462,6 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
                 deposits[_l1Contract][_tokenIds[i]] += _amounts[i];
             }
         } else {
-            address l2Contract = IL1StandardERC1155(_l1Contract).l2Contract();
-            require(pairToken.l2Contract == l2Contract, "L2 token Contract Address Error");
-
             IL1StandardERC1155(_l1Contract).burnBatch(msg.sender, _tokenIds, _amounts);
 
             // Construct calldata for l2ERC1155Bridge.finalizeDepositBatch(_to, _amount)
@@ -451,7 +470,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
             message = abi.encodeWithSelector(
                 iL2ERC1155Bridge.finalizeDepositBatch.selector,
                 _l1Contract,
-                l2Contract,
+                pairToken.l2Contract,
                 _from,
                 _to,
                 _tokenIds,
@@ -590,7 +609,7 @@ contract L1ERC1155Bridge is iL1ERC1155Bridge, CrossDomainEnabled, ERC1155Holder,
 
             if (replyNeeded) {
                 bytes memory message = abi.encodeWithSelector(
-                    iL2ERC1155Bridge.finalizeDeposit.selector,
+                    iL2ERC1155Bridge.finalizeDepositBatch.selector,
                     _l1Contract,
                     _l2Contract,
                     _to,   // switched the _to and _from here to bounce back the deposit to the sender
