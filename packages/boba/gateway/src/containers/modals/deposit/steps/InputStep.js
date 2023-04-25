@@ -18,8 +18,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
-import { NETWORK } from 'util/network/network.util'
-import { BOBABEAM_STATUS } from 'util/constant'
+import BobaBeamAlert from './bobaBeamAlert'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -104,33 +103,11 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     convertToUSD = true
   }
 
-  if (!!Number(BOBABEAM_STATUS)
-    && activeNetwork === NETWORK.MOONBEAM
-  ) {
-    //no token in this account
-    return (
-      <Box>
-        <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
-          Deposits are disabled. For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam
-        </Typography>
-        <WrapperActionsModal>
-          <Button
-            onClick={handleClose}
-            disabled={false}
-            variant='contained'
-            color='primary'
-            size='large'
-          >
-            Cancel
-          </Button>
-        </WrapperActionsModal>
-      </Box>)
-  }
-
   if (Number(logAmount(token.balance, token.decimals)) === 0) {
     //no token in this account
     return (
       <Box>
+        <BobaBeamAlert />
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
@@ -151,6 +128,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
+        <BobaBeamAlert />
         {!isBridge &&
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
             Classic Bridge {token && token.symbol ? token.symbol : ''} to L2

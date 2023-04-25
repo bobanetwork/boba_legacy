@@ -63,8 +63,8 @@ import {
   fetchL1FeeBalance,
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
-import { BOBABEAM_STATUS } from 'util/constant'
-import { NETWORK } from 'util/network/network.util'
+
+import BobaBeamAlert from './bobaBeamAlert'
 
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
@@ -293,36 +293,11 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     }
   }
 
-
-
-  if (!!Number(BOBABEAM_STATUS)
-    && activeNetwork === NETWORK.MOONBEAM
-  ) {
-    //no token in this account
-    return (
-      <Box>
-        <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
-          Deposits are disabled. For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam
-        </Typography>
-        <WrapperActionsModal>
-          <Button
-            onClick={handleClose}
-            disabled={false}
-            variant='contained'
-            color='primary'
-            size='large'
-          >
-            Cancel
-          </Button>
-        </WrapperActionsModal>
-      </Box>)
-  }
-
-
   if (Number(logAmount(token.balance, token.decimals)) === 0) {
     //no token in this account
     return (
       <Box>
+        <BobaBeamAlert />
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
@@ -347,6 +322,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
+        <BobaBeamAlert />
         {!isBridge && (
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
             Fast Bridge to L2

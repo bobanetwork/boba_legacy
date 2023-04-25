@@ -5,6 +5,7 @@ const light = {
   primarybg: '#1CD6D1', //cyan
   primaryfg: '#000000',
   screen,
+  warning: 'yellow',
 }
 
 export default light
