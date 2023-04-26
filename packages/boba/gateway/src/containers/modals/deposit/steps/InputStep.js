@@ -9,7 +9,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { selectLoading, selectLookupPrice, selectActiveNetworkName } from 'selectors'
+import { selectLoading, selectLookupPrice, selectActiveNetworkName, selectActiveNetwork } from 'selectors'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { useTheme } from '@emotion/react'
@@ -18,6 +18,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
+import BobaBeamAlert from './bobaBeamAlert'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -34,6 +35,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
   const networkName = useSelector(selectActiveNetworkName())
+  const activeNetwork = useSelector(selectActiveNetwork())
   const lookupPrice = useSelector(selectLookupPrice)
 
   const maxValue = logAmount(token.balance, token.decimals)
@@ -105,24 +107,28 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
+        <BobaBeamAlert />
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
-        <Button
-          onClick={handleClose}
-          disabled={false}
-          variant='contained'
-          color='primary'
-          size='large'
-        >
-          Cancel
-        </Button>
+        <WrapperActionsModal>
+          <Button
+            onClick={handleClose}
+            disabled={false}
+            variant='contained'
+            color='primary'
+            size='large'
+          >
+            Cancel
+          </Button>
+        </WrapperActionsModal>
       </Box>)
   }
 
   return (
     <>
       <Box>
+        <BobaBeamAlert />
         {!isBridge &&
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
             Classic Bridge {token && token.symbol ? token.symbol : ''} to L2
