@@ -51,10 +51,10 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-  selectAlert, 
+  selectAlert,
   selectError,
   selectModalState,
-  selectActiveNetwork, 
+  selectActiveNetwork,
   selectActiveNetworkType
 } from 'selectors'
 
@@ -88,13 +88,14 @@ import Alert from 'components/alert/Alert'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 /******** UTILS ********/
-import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
+import { APP_STATUS, BOBABEAM_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import useWalletSwitch from 'hooks/useWalletSwitch'
+import NotificationBanner from 'components/notificationBanner'
 
 
 function Home() {
@@ -255,6 +256,16 @@ function Home() {
       {!!walletSelectorModalState && <WalletSelectorModal open={walletSelectorModalState} />}
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
       {!!switchNetworkModalState && <SwitchNetworkModal open={switchNetworkModalState} />}
+
+      {
+        !!Number(BOBABEAM_STATUS)
+        && activeNetwork === 'MOONBEAM'
+        && <NotificationBanner
+          message='Bobabeam is being wound down & will no longer be available, starting May 25th'
+          content='Bobabeam is being wound down & will no longer be available, starting May 25th.
+          For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam.'
+          open={true}
+        />}
 
       <Alert
         type='error'

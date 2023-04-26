@@ -32,7 +32,7 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 
-import { 
+import {
   selectLoading,
   selectLookupPrice,
   selectSignatureStatus_depositLP,
@@ -42,7 +42,8 @@ import {
   selectL2LPPendingString,
   selectL1FeeBalance,
   selectL2LPLiquidity,
-  selectActiveNetworkName
+  selectActiveNetworkName,
+  selectActiveNetwork
 } from 'selectors'
 
 
@@ -63,14 +64,16 @@ import {
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
 
+import BobaBeamAlert from './bobaBeamAlert'
+
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const dispatch = useDispatch()
 
-  const [value, setValue] = useState('')
-  const [value_Wei_String, setValue_Wei_String] = useState('0') //support for Use Max
+  const [ value, setValue ] = useState('')
+  const [ value_Wei_String, setValue_Wei_String ] = useState('0') //support for Use Max
 
-  const [LPRatio, setLPRatio] = useState(0)
+  const [ LPRatio, setLPRatio ] = useState(0)
 
   const LPBalance = useSelector(selectL2LPBalanceString)
   const LPPending = useSelector(selectL2LPPendingString)
@@ -83,11 +86,12 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
   const networkName = useSelector(selectActiveNetworkName())
+  const activeNetwork = useSelector(selectActiveNetwork())
 
   const [ validValue, setValidValue ] = useState(false)
 
-  const depositLoading = useSelector(selectLoading(['DEPOSIT/CREATE']))
-  const approvalLoading = useSelector(selectLoading(['APPROVE/CREATE']))
+  const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
+  const approvalLoading = useSelector(selectLoading([ 'APPROVE/CREATE' ]))
 
   const lookupPrice = useSelector(selectLookupPrice)
   const signatureStatus = useSelector(selectSignatureStatus_depositLP)
@@ -152,7 +156,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
     let receipt = ''
 
-    if(token.symbol === networkService.L1NativeTokenSymbol) {
+    if (token.symbol === networkService.L1NativeTokenSymbol) {
 
       console.log("L1 Native token Fast Bridge")
 
@@ -168,7 +172,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
           CDMTransaction: receipt
         }))
         dispatch(openModal('CDMCompletionModal'))
-        dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
+        dispatch(setActiveHistoryTab(`${networkName[ 'l1' ]} to ${networkName[ 'l2' ]}`))
         handleClose()
         return
       }
@@ -190,7 +194,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     receipt = await dispatch(depositL1LP(token.address, value_Wei_String))
 
     if (receipt) {
-      dispatch(setActiveHistoryTab(`${networkName['l1']} to ${networkName['l2']}`))
+      dispatch(setActiveHistoryTab(`${networkName[ 'l1' ]} to ${networkName[ 'l2' ]}`))
       dispatch(setCDMCompletion({
         CDMType: 'L1FastBridge',
         CDMMessage: {
@@ -219,7 +223,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
         dispatch({ type: 'BALANCE/L2/RESET' })
       }
     }
-  }, [token, dispatch])
+  }, [ token, dispatch ])
 
   useEffect(() => {
     const lbl = Number(logAmount(LPLiquidity, token.decimals))
@@ -228,7 +232,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       const LPR = lbp / lbl
       setLPRatio(Number(LPR).toFixed(3))
     }
-  }, [LPLiquidity, LPBalance, token.decimals])
+  }, [ LPLiquidity, LPBalance, token.decimals ])
 
   useEffect(() => {
     if (signatureStatus && depositLoading) {
@@ -236,10 +240,10 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       //transaction has been sent and signed
       handleClose()
     }
-  }, [signatureStatus, depositLoading, handleClose])
+  }, [ signatureStatus, depositLoading, handleClose ])
 
   let buttonLabel_1 = 'Cancel'
-  if( depositLoading || approvalLoading ) buttonLabel_1 = 'Close window'
+  if (depositLoading || approvalLoading) buttonLabel_1 = 'Close window'
 
   let buttonLabel_2 = 'Bridge'
 
@@ -293,21 +297,24 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
+        <BobaBeamAlert />
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
         >
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
-        <Button
-          onClick={handleClose}
-          disabled={false}
-          variant="outlined"
-          color="primary"
-          size="large"
-        >
-          Cancel
-        </Button>
+        <WrapperActionsModal>
+          <Button
+            onClick={handleClose}
+            disabled={false}
+            variant="outlined"
+            color="primary"
+            size="large"
+          >
+            Cancel
+          </Button>
+        </WrapperActionsModal>
       </Box>
     )
   }
@@ -315,6 +322,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
+        <BobaBeamAlert />
         {!isBridge && (
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
             Fast Bridge to L2
@@ -346,11 +354,10 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
         <BridgeFee
           lpFee={`${feeRateN}%`}
-          estReceive={`${receivableAmount(value)} ${token.symbol} ${
-            !!amountToUsd(value, lookupPrice, token)
+          estReceive={`${receivableAmount(value)} ${token.symbol} ${!!amountToUsd(value, lookupPrice, token)
               ? `($${amountToUsd(value, lookupPrice, token).toFixed(2)})`
               : ''
-          }`}
+            }`}
           time="20 mins - 3 hours"
           estFee={`${Number(cost).toFixed(4)} ETH`}
         />
