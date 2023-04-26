@@ -28,6 +28,8 @@ export const DISABLE_VE_DAO: EnvType = process.env.REACT_APP_DISABLE_VE_DAO
 // WalletConnect FLAG
 export const DISABLE_WALLETCONNECT: EnvType =
   process.env.REACT_APP_DISABLE_WALLETCONNECT
+export const BOBABEAM_STATUS: EnvType =
+  process.env.REACT_APP_BOBA_BEAM_STATUS || 0
 
 type BridgeType = {
   FAST_BRIDGE: string
