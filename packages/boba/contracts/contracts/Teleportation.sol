@@ -31,6 +31,11 @@ contract Teleportation is PausableUpgradeable {
         uint256 depositId;
     }
 
+    struct FailedNativeDisbursement {
+        bool failed;
+        Disbursement disbursement;
+    }
+
     /*************
      * Variables *
      *************/
@@ -56,6 +61,8 @@ contract Teleportation is PausableUpgradeable {
     uint256 public transferredAmount;
     // The timestamp of the checkpoint
     uint256 public transferTimestampCheckPoint;
+
+    mapping (uint256 => FailedNativeDisbursement) public failedNativeDisbursements;
 
     /********************
      *       Events     *
@@ -119,6 +126,13 @@ contract Teleportation is PausableUpgradeable {
     event ChainSupported(
         uint256 indexed chainId,
         bool supported
+    );
+
+    event DisbursementRetrySuccess(
+        uint256 indexed depositId,
+        address indexed to,
+        uint256 amount,
+        uint256 sourceChainId
     );
 
     /**********************
@@ -339,7 +353,10 @@ contract Teleportation is PausableUpgradeable {
             // slither-disable-next-line calls-loop,reentrancy-events
             (bool success, ) = _addr.call{ gas: 3000, value: _amount }("");
             if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
-            else emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
+            else {
+                failedNativeDisbursements[_depositId] = FailedNativeDisbursement(true, _disbursements[i]);
+                emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
+            }
         }
     }
 
@@ -393,6 +410,41 @@ contract Teleportation is PausableUpgradeable {
             // slither-disable-next-line calls-loop,reentrancy-events
             IERC20(BobaTokenAddress).safeTransfer(_addr, _amount);
             emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
+        }
+    }
+
+    /**
+     * @dev Retry native Boba disbursement if it failed previously
+     *
+     * @param _depositIds A list of DepositIds to process.
+     */
+    function retryDisburseNativeBOBA(uint256[] memory _depositIds)
+        external
+        payable
+        onlyDisburser()
+        onlyAltL2s()
+        whenNotPaused()
+    {
+        // Ensure there are disbursements to process.
+        uint256 _numDisbursements = _depositIds.length;
+        require(_numDisbursements > 0, "No disbursements");
+
+        // Failed Disbursement amounts should remain in the contract
+
+        // Process disbursements.
+        for (uint256 i = 0; i < _numDisbursements; i++) {
+            FailedNativeDisbursement storage failedDisbursement = failedNativeDisbursements[_depositIds[i]];
+            require(failedDisbursement.failed, "DepositId is not a failed disbursement");
+            uint256 _amount = failedDisbursement.disbursement.amount;
+            address _addr = failedDisbursement.disbursement.addr;
+            uint256 _sourceChainId = failedDisbursement.disbursement.sourceChainId;
+
+            // slither-disable-next-line calls-loop,reentrancy-events
+            (bool success, ) = _addr.call{ gas: 3000, value: _amount }("");
+            if (success) {
+                failedNativeDisbursements[_depositIds[i]].failed = false;
+                emit DisbursementRetrySuccess(_depositIds[i], _addr, _amount, _sourceChainId);
+            }
         }
     }
 
