@@ -3,26 +3,37 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectAccountEnabled } from 'selectors'
 import BobaBridge from './bobaBridge/bobaBridge'
+import BanxaBridge from './banxaBridge'
+
 import * as S from './Bridge.styles'
+import {Tabs} from 'components/global';
 
 function BridgeContainer() {
 
   const theme = useTheme()
   const accountEnabled = useSelector(selectAccountEnabled())
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-
+  const content = [
+    {
+      title: 'Bridge',
+      content: <BobaBridge />
+    },
+    {
+      title: 'Fiat Ramp',
+      content: <BanxaBridge/>
+    }
+  ]
   return (
     <S.PageContainer>
       <S.ContentWrapper>
+        
+        <S.Content>
         {
           isMobile && accountEnabled ?
             null
             : <S.TitleContainer>
-              <Typography variant="h1">
-                Transfer
-                {isMobile ? " " : <br />}
-                tokens across
-                <br />
+              <Typography variant="h1" sx={{textAlign:"center", textTransform:'capitalize'}}>
+                {`Transfer tokens across `}
                 <Typography
                   variant="h1"
                   component="span"
@@ -32,14 +43,14 @@ function BridgeContainer() {
                     'WebkitTextFillColor': 'transparent',
                   }}
                 >
-                  Multichain
-                </Typography>
-                {" "} layers
+                   Multichain
+                </Typography> layers
               </Typography>
             </S.TitleContainer>
         }
-        <S.Content>
-          <BobaBridge />
+
+        <Tabs data={content} /> 
+          
         </S.Content>
       </S.ContentWrapper>
     </S.PageContainer>

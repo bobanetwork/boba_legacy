@@ -188,9 +188,6 @@ function BobaBridge() {
     return (
       <S.BobaBridgeWrapper>
         <Box>
-          <Typography variant="h3">
-            Bridge
-          </Typography>
           <Typography variant="body2">Select the bridge direction</Typography>
         </Box>
         <S.BobaDivider />
