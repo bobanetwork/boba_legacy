@@ -17,7 +17,8 @@ function SwitchNetworkModal({open}) {
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
   const networkType = useSelector(selectNetworkType());
-  const [searchParams, setSearchParams] = useSearchParams();
+  // eslint-disable-next-line no-unused-vars
+  const [sp, setSearchParams] = useSearchParams();
 
   function onClick() {
     setSearchParams(`?${new URLSearchParams({ network: networkType, chain: network })}`)

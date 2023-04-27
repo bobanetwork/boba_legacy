@@ -93,7 +93,7 @@ contract Lib_ResolvedDelegateProxy {
     {
 
         require(
-            addressManager["proxyOwner"] != address(0),
+            addressManager["proxyTarget"] != address(0),
             "Target address must be initialized."
         );
 
