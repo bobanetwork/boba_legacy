@@ -1,12 +1,13 @@
 /* Imports: External */
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory } from 'ethers'
+import { Contract } from 'ethers'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+} from '../src/hardhat-deploy-ethers'
 
-import AtomicSwapJson from '../artifacts/contracts/AtomicSwap.sol/AtomicSwap.json'
-
-let Factory__AtomicSwap: ContractFactory
 let AtomicSwap: Contract
 
 const deployFn: DeployFunction = async (hre) => {
@@ -14,20 +15,13 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__AtomicSwap = new ContractFactory(
-    AtomicSwapJson.abi,
-    AtomicSwapJson.bytecode,
+  AtomicSwap = await deployBobaContract(
+    hre,
+    'AtomicSwap',
+    [],
     (hre as any).deployConfig.deployer_l2
   )
-
-  AtomicSwap = await Factory__AtomicSwap.deploy()
-  await AtomicSwap.deployTransaction.wait()
-  const AtomicSwapDeploymentSubmission: DeploymentSubmission = {
-    ...AtomicSwap,
-    receipt: AtomicSwap.receipt,
-    address: AtomicSwap.address,
-    abi: AtomicSwapJson.abi,
-  }
+  const AtomicSwapDeploymentSubmission = getDeploymentSubmission(AtomicSwap)
   await hre.deployments.save('AtomicSwap', AtomicSwapDeploymentSubmission)
   await registerBobaAddress(addressManager, 'AtomicSwap', AtomicSwap.address)
   console.log(`AtomicSwap deployed to: ${AtomicSwap.address}`)

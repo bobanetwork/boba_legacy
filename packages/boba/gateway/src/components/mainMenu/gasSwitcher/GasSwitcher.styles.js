@@ -4,9 +4,6 @@ import { Typography, Box } from '@mui/material'
 export const Label = styled(Typography)(({ theme }) => ({
   opacity: '0.85',
   fontSize: '0.8em',
-  [ theme.breakpoints.down('md') ]: {
-    marginLeft: theme.spacing(1),
-  }
 }));
 
 export const Value = styled(Typography)(({ theme }) => ({
@@ -20,13 +17,12 @@ export const Menu = styled(Box)(({ theme }) => ({
   justifyContent: 'flex-start',
   alignItems: 'center',
   gap: '10px',
-  //background: 'green',
   'a': {
     cursor: 'pointer',
   },
   [ theme.breakpoints.down('md') ]: {
     width: '100%',
-    flexDirection: 'column'
+    flexDirection: 'column',
   }
 }))
 

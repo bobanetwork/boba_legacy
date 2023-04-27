@@ -1,15 +1,22 @@
-import { BigNumber, Bytes, ethers, Signer, Event } from 'ethers'
+import { BigNumber, Bytes, ethers, Event, Signer } from 'ethers'
+import { zeroAddress } from 'ethereumjs-util'
 import { BaseProvider, Provider, TransactionRequest } from '@ethersproject/providers'
 import { Deferrable, resolveProperties } from '@ethersproject/properties'
-import { SimpleWallet, SimpleWallet__factory, EntryPoint, EntryPoint__factory } from '../typechain'
+import {
+  EntryPoint,
+  EntryPoint__factory,
+  ERC1967Proxy__factory,
+  SimpleAccount,
+  SimpleAccount__factory
+} from '../typechain'
 import { BytesLike, hexValue } from '@ethersproject/bytes'
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { fillAndSign, getRequestId } from '../test/UserOp'
+import { fillAndSign, getUserOpHash } from '../test/UserOp'
 import { UserOperation } from '../test/UserOperation'
 import { TransactionReceipt } from '@ethersproject/abstract-provider/src.ts/index'
 import { clearInterval } from 'timers'
 import { Create2Factory } from './Create2Factory'
-import { getCreate2Address, hexConcat, keccak256 } from 'ethers/lib/utils'
+import { getCreate2Address, hexConcat, Interface, keccak256 } from 'ethers/lib/utils'
 import { HashZero } from '../test/testutils'
 
 export type SendUserOp = (userOp: UserOperation) => Promise<TransactionResponse | undefined>
@@ -156,7 +163,7 @@ async function sendQueuedUserOps (queueSender: QueueSendUserOp, entryPoint: Entr
  * for testing: instead of connecting through RPC to a remote host, directly send the transaction
  * @param entryPointAddress the entryPoint address to use.
  * @param signer ethers provider to send the request (must have eth balance to send)
- * @param beneficiary the account to receive the payment (from wallet/paymaster). defaults to the signer's address
+ * @param beneficiary the account to receive the payment (from account/paymaster). defaults to the signer's address
  */
 export function localUserOpSender (entryPointAddress: string, signer: Signer, beneficiary?: string): SendUserOp {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, signer)
@@ -191,7 +198,7 @@ export class AAProvider extends BaseProvider {
  * a signer that wraps account-abstraction.
  */
 export class AASigner extends Signer {
-  _wallet?: SimpleWallet
+  _account?: SimpleAccount
 
   private _isPhantom = true
   public entryPoint: EntryPoint
@@ -203,7 +210,7 @@ export class AASigner extends Signer {
    * @param signer - the underlying signer. has no funds (=can't send TXs)
    * @param entryPoint the entryPoint contract. used for read-only operations
    * @param sendUserOp function to actually send the UserOp to the entryPoint.
-   * @param index - index of this wallet for this signer.
+   * @param index - index of this account for this signer.
    */
   constructor (readonly signer: Signer, readonly entryPointAddress: string, readonly sendUserOp: SendUserOp, readonly index = 0, readonly provider = signer.provider) {
     super()
@@ -211,15 +218,15 @@ export class AASigner extends Signer {
   }
 
   // connect to a specific pre-deployed address
-  // (note: in order to send transactions, the underlying signer address must be valid signer for this wallet (its owner)
-  async connectWalletAddress (address: string): Promise<void> {
-    if (this._wallet != null) {
-      throw Error('already connected to wallet')
+  // (note: in order to send transactions, the underlying signer address must be valid signer for this account (its owner)
+  async connectAccountAddress (address: string): Promise<void> {
+    if (this._account != null) {
+      throw Error('already connected to account')
     }
     if (await this.provider!.getCode(address).then(code => code.length) <= 2) {
       throw new Error('cannot connect to non-existing contract')
     }
-    this._wallet = SimpleWallet__factory.connect(address, this.signer)
+    this._account = SimpleAccount__factory.connect(address, this.signer)
     this._isPhantom = false
   }
 
@@ -231,15 +238,17 @@ export class AASigner extends Signer {
     return getCreate2Address(Create2Factory.contractAddress, HashZero, keccak256(await this._deploymentTransaction()))
   }
 
+  // TODO TODO: THERE IS UTILS.getAccountInitCode - why not use that?
   async _deploymentTransaction (): Promise<BytesLike> {
+    const implementationAddress = zeroAddress() // TODO: pass implementation in here
     const ownerAddress = await this.signer.getAddress()
-    return new SimpleWallet__factory(this.signer)
-      .getDeployTransaction(this.entryPoint.address, ownerAddress).data!
+    const initializeCall = new Interface(SimpleAccount__factory.abi).encodeFunctionData('initialize', [ownerAddress])
+    return new ERC1967Proxy__factory(this.signer).getDeployTransaction(implementationAddress, initializeCall).data!
   }
 
   async getAddress (): Promise<string> {
     await this.syncAccount()
-    return this._wallet!.address
+    return this._account!.address
   }
 
   async signMessage (message: Bytes | string): Promise<string> {
@@ -250,15 +259,15 @@ export class AASigner extends Signer {
     throw new Error('signMessage: unsupported by AA')
   }
 
-  async getWallet (): Promise<SimpleWallet> {
+  async getAccount (): Promise<SimpleAccount> {
     await this.syncAccount()
-    return this._wallet!
+    return this._account!
   }
 
   // fabricate a response in a format usable by ethers users...
   async userEventResponse (userOp: UserOperation): Promise<TransactionResponse> {
     const entryPoint = this.entryPoint
-    const requestId = getRequestId(userOp, entryPoint.address, await this._chainId!)
+    const userOpHash = getUserOpHash(userOp, entryPoint.address, await this._chainId!)
     const provider = entryPoint.provider
     const currentBLock = provider.getBlockNumber()
 
@@ -276,16 +285,16 @@ export class AASigner extends Signer {
           console.error('got event without args', event)
           return
         }
-        if (event.args.requestId !== requestId) {
+        if (event.args.userOpHash !== userOpHash) {
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions,@typescript-eslint/no-base-to-string
-          console.log(`== event with wrong requestId: sender/nonce: event.${event.args.sender}@${event.args.nonce.toString()}!= userOp.${userOp.sender}@${parseInt(userOp.nonce.toString())}`)
+          console.log(`== event with wrong userOpHash: sender/nonce: event.${event.args.sender}@${event.args.nonce.toString()}!= userOp.${userOp.sender}@${parseInt(userOp.nonce.toString())}`)
           return
         }
 
         const rcpt = await event.getTransactionReceipt()
         console.log('got event with status=', event.args.success, 'gasUsed=', rcpt.gasUsed)
 
-        // TODO: should use "requestId" as "transactionId" (but this has to be done in a provider, not a signer)
+        // TODO: should use "userOpHash" as "transactionId" (but this has to be done in a provider, not a signer)
 
         // before returning the receipt, update the status from the event.
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -311,7 +320,7 @@ export class AASigner extends Signer {
       entryPoint.on('UserOperationEvent', listener)
       // for some reason, 'on' takes at least 2 seconds to be triggered on local network. so add a one-shot timer:
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      setTimeout(async () => await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(requestId)).then(query => {
+      setTimeout(async () => await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(userOpHash)).then(query => {
         if (query.length > 0) {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           listener(query[0])
@@ -319,7 +328,7 @@ export class AASigner extends Signer {
       }), 500)
     })
     const resp: TransactionResponse = {
-      hash: requestId,
+      hash: userOpHash,
       confirmations: 0,
       from: userOp.sender,
       nonce: BigNumber.from(userOp.nonce).toNumber(),
@@ -343,23 +352,23 @@ export class AASigner extends Signer {
   }
 
   async syncAccount (): Promise<void> {
-    if (this._wallet == null) {
+    if (this._account == null) {
       const address = await this._deploymentAddress()
-      this._wallet = SimpleWallet__factory.connect(address, this.signer)
+      this._account = SimpleAccount__factory.connect(address, this.signer)
     }
 
     this._chainId = this.provider?.getNetwork().then(net => net.chainId)
     // once an account is deployed, it can no longer be a phantom.
     // but until then, we need to re-check
     if (this._isPhantom) {
-      const size = await this.signer.provider?.getCode(this._wallet.address).then(x => x.length)
-      // console.log(`== __isPhantom. addr=${this._wallet.address} re-checking code size. result = `, size)
+      const size = await this.signer.provider?.getCode(this._account.address).then(x => x.length)
+      // console.log(`== __isPhantom. addr=${this._account.address} re-checking code size. result = `, size)
       this._isPhantom = size === 2
       // !await this.entryPoint.isContractDeployed(await this.getAddress());
     }
   }
 
-  // return true if wallet not yet created.
+  // return true if account not yet created.
   async isPhantom (): Promise<boolean> {
     await this.syncAccount()
     return this._isPhantom
@@ -378,7 +387,7 @@ export class AASigner extends Signer {
         initCallData
       ])
     }
-    const execFromEntryPoint = await this._wallet!.populateTransaction.execFromEntryPoint(tx.to!, tx.value ?? 0, tx.data!)
+    const execFromEntryPoint = await this._account!.populateTransaction.execute(tx.to!, tx.value ?? 0, tx.data!)
 
     let { gasPrice, maxPriorityFeePerGas, maxFeePerGas } = tx
     // gasPrice is legacy, and overrides eip1559 values:
@@ -388,7 +397,7 @@ export class AASigner extends Signer {
       maxFeePerGas = gasPrice
     }
     const userOp = await fillAndSign({
-      sender: this._wallet!.address,
+      sender: this._account!.address,
       initCode,
       nonce: initCode == null ? tx.nonce : this.index,
       callData: execFromEntryPoint.data!,

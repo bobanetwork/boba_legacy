@@ -4,6 +4,7 @@ import { Contract, Wallet, BigNumber, providers } from 'ethers'
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
+import { getBobaContractABI } from '@boba/contracts'
 
 /* Imports: Inteface */
 import {
@@ -12,9 +13,6 @@ import {
   BobaLinkContract,
   GasPriceOverride,
 } from './utils/types'
-
-/* Imports: Contract Inteface */
-import FluxAggregatorHCJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
 
 interface BobaLinkOptions {
   l1RpcProvider: providers.StaticJsonRpcProvider
@@ -55,11 +53,12 @@ export class BobaLinkService extends BaseService<BobaLinkOptions> {
       bobaLinkPairs: this.options.bobaLinkPairs,
     })
     /* eslint-disable */
+    const FluxAggregatorHCABI = await getBobaContractABI('FluxAggregatorHC')
     this.state.bobaLinkContracts = Object.keys(this.options.bobaLinkPairs).reduce((bobaLinkContracts, key) => {
       const l2ContractAddress = this.options.bobaLinkPairs[key].l2ContractAddress
       bobaLinkContracts[l2ContractAddress] = {
-        l2Contract: new Contract(l2ContractAddress, FluxAggregatorHCJson.abi, this.options.reporterWallet),
-        l1Contract: new Contract(key, FluxAggregatorHCJson.abi, this.options.l1RpcProvider),
+        l2Contract: new Contract(l2ContractAddress, FluxAggregatorHCABI, this.options.reporterWallet),
+        l1Contract: new Contract(key, FluxAggregatorHCABI, this.options.l1RpcProvider),
       }
       return bobaLinkContracts
     }, {})

@@ -1,12 +1,11 @@
 import {
   arrayify,
   defaultAbiCoder,
-  getCreate2Address,
   hexDataSlice,
   keccak256
 } from 'ethers/lib/utils'
 import { BigNumber, Contract, Signer, Wallet } from 'ethers'
-import { AddressZero, callDataCost, HashZero, rethrow } from './testutils'
+import { AddressZero, callDataCost, rethrow } from './testutils'
 import { ecsign, toRpcSig, keccak256 as keccak256_buffer } from 'ethereumjs-util'
 import {
   EntryPoint
@@ -102,7 +101,7 @@ export function packUserOp1 (op: UserOperation): string {
   ])
 }
 
-export function getRequestId (op: UserOperation, entryPoint: string, chainId: number): string {
+export function getUserOpHash (op: UserOperation, entryPoint: string, chainId: number): string {
   const userOpHash = keccak256(packUserOp(op, true))
   const enc = defaultAbiCoder.encode(
     ['bytes32', 'address', 'uint256'],
@@ -125,7 +124,7 @@ export const DefaultsForUserOp: UserOperation = {
 }
 
 export function signUserOp (op: UserOperation, signer: Wallet, entryPoint: string, chainId: number): UserOperation {
-  const message = getRequestId(op, entryPoint, chainId)
+  const message = getUserOpHash(op, entryPoint, chainId)
   const msg1 = Buffer.concat([
     Buffer.from('\x19Ethereum Signed Message:\n32', 'ascii'),
     Buffer.from(arrayify(message))
@@ -156,16 +155,16 @@ export function fillUserOpDefaults (op: Partial<UserOperation>, defaults = Defau
 }
 
 // helper to fill structure:
-// - default callGasLimit to estimate call from entryPoint to wallet (TODO: add overhead)
+// - default callGasLimit to estimate call from entryPoint to account (TODO: add overhead)
 // if there is initCode:
 //  - calculate sender by eth_call the deployment code
 //  - default verificationGasLimit estimateGas of deployment code plus default 100000
 // no initCode:
-//  - update nonce from wallet.nonce()
+//  - update nonce from account.nonce()
 // entryPoint param is only required to fill in "sender address when specifying "initCode"
 // nonce: assume contract as "nonce()" function, and fill in.
 // sender - only in case of construction: fill sender from initCode.
-// callGasLimit: VERY crude estimation (by estimating call to wallet, and add rough entryPoint overhead
+// callGasLimit: VERY crude estimation (by estimating call to account, and add rough entryPoint overhead
 // verificationGasLimit: hard-code default at 100k. should add "create2" cost
 export async function fillUserOp (op: Partial<UserOperation>, entryPoint?: EntryPoint): Promise<UserOperation> {
   const op1 = { ...op }
@@ -175,10 +174,11 @@ export async function fillUserOp (op: Partial<UserOperation>, entryPoint?: Entry
     const initCallData = hexDataSlice(op1.initCode!, 20)
     if (op1.nonce == null) op1.nonce = 0
     if (op1.sender == null) {
-      // hack: if the init contract is our deployer, then we know what the address would be, without a view call
+      // hack: if the init contract is our known deployer, then we know what the address would be, without a view call
       if (initAddr.toLowerCase() === Create2Factory.contractAddress.toLowerCase()) {
-        const [ctr] = defaultAbiCoder.decode(['bytes', 'bytes32'], '0x' + initCallData.slice(10))
-        op1.sender = getCreate2Address(initAddr, HashZero, keccak256(ctr))
+        const ctr = hexDataSlice(initCallData, 32)
+        const salt = hexDataSlice(initCallData, 0, 32)
+        op1.sender = Create2Factory.getDeployedAddress(ctr, salt)
       } else {
         // console.log('\t== not our deployer. our=', Create2Factory.contractAddress, 'got', initAddr)
         if (provider == null) throw new Error('no entrypoint/provider')
@@ -237,7 +237,7 @@ export async function fillAndSign (op: Partial<UserOperation>, signer: Wallet | 
   const op2 = await fillUserOp(op, entryPoint)
 
   const chainId = await provider!.getNetwork().then(net => net.chainId)
-  const message = arrayify(getRequestId(op2, entryPoint!.address, chainId))
+  const message = arrayify(getUserOpHash(op2, entryPoint!.address, chainId))
 
   return {
     ...op2,

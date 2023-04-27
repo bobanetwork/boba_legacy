@@ -13,9 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
-import { batch, useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { isEqual,orderBy } from 'util/lodash';
+
+
 import { useSelector } from 'react-redux'
 
 import "react-datepicker/dist/react-datepicker.css"
@@ -23,9 +25,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import { setActiveDataTab } from 'actions/uiAction'
 import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
-import { selectActiveDataTab } from 'selectors/uiSelector'
-import { selectSevens, selectFastExits } from 'selectors/dataSelector'
-import { selectAccountEnabled } from 'selectors/setupSelector'
+import { selectBaseEnabled, selectActiveDataTab,selectSevens, selectFastExits } from 'selectors'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
@@ -40,9 +40,6 @@ import * as S from './History.styles'
 import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-import Connect from 'containers/connect/Connect'
-
-
 
 function BobaScope() {
 
@@ -51,7 +48,7 @@ function BobaScope() {
   const [ searchData, setSearchData ] = useState('')
 
   const activeTab = useSelector(selectActiveDataTab, isEqual)
-  const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
 
   const unorderedSevens = useSelector(selectSevens, isEqual)
   const orderedSevens = orderBy(unorderedSevens, i => i.timeStamp, 'desc')
@@ -61,59 +58,56 @@ function BobaScope() {
   const orderedFastExits = orderBy(unorderedFastExits, i => i.timeStamp, 'desc')
   const fastExits = orderedFastExits
 
+  useEffect(() => {
+    if (baseEnabled) {
+      dispatch(fetchSevens())
+      dispatch(fetchFastExits())
+    }
+  }, [dispatch, baseEnabled])
+
   useInterval(() => {
-    if (accountEnabled) {
-      batch(() => {
-        dispatch(fetchSevens())
-        dispatch(fetchFastExits())
-      })
+    if (baseEnabled) {
+      dispatch(fetchSevens())
+      dispatch(fetchFastExits())
     }
   }, POLL_INTERVAL)
 
   return (
     <S.ScopePageContainer>
       <PageTitle title="Boba Scope" />
+      <S.Header>
+        <div className={styles.searchInput}>
+          <Input
+            size='small'
+            placeholder='Search by hash'
+            value={searchData}
+            onChange={i => { setSearchData(i.target.value) }}
+            className={styles.searchBar}
+          />
+        </div>
+      </S.Header>
+      <div className={styles.data}>
+        <div className={styles.section}>
+          <Tabs
+            onClick={tab => { dispatch(setActiveDataTab(tab)) }}
+            activeTab={activeTab}
+            tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
+          />
 
-      <Connect
-        userPrompt={'Please connect to a chain to use the BobaScope'}
-        accountEnabled={accountEnabled}
-      />
-      {accountEnabled &&
-        <>
-          <S.Header>
-            <div className={styles.searchInput}>
-              <Input
-                size='small'
-                placeholder='Search by hash'
-                value={searchData}
-                onChange={i => { setSearchData(i.target.value) }}
-                className={styles.searchBar}
-              />
-            </div>
-          </S.Header>
-          <div className={styles.data}>
-            <div className={styles.section}>
-              <Tabs
-                onClick={tab => { dispatch(setActiveDataTab(tab)) }}
-                activeTab={activeTab}
-                tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
-              />
-
-              {activeTab === 'Seven Day Queue' && (
-                <Sevens
-                  searchData={searchData}
-                  sevens={sevens}
-                />
-              )}
-              {activeTab === 'Fast Exits' && (
-                <FastExits
-                  searchData={searchData}
-                  data={fastExits}
-                />
-              )}
-            </div>
-          </div>
-    </>}
+          {activeTab === 'Seven Day Queue' && (
+            <Sevens
+              searchData={searchData}
+              sevens={sevens}
+            />
+          )}
+          {activeTab === 'Fast Exits' && (
+            <FastExits
+              searchData={searchData}
+              data={fastExits}
+            />
+          )}
+        </div>
+      </div>
     </S.ScopePageContainer>
   );
 }

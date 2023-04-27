@@ -19,10 +19,11 @@ import { useTheme } from '@emotion/react'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
 
-import { depositL1LPBatch, approveFastDepositBatch } from 'actions/networkAction'
+import { depositL1LPBatch, approveFastDepositBatch, fetchBalances } from 'actions/networkAction'
 import { utils } from 'ethers'
 
-import { openAlert, openError, setActiveHistoryTab } from 'actions/uiAction'
+import { openModal, openError, setActiveHistoryTab } from 'actions/uiAction'
+import { setCDMCompletion } from 'actions/transactionAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -30,8 +31,14 @@ import CounterButton from 'components/counterButton/CounterButton'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector'
+import { 
+  selectLoading, 
+  selectSignatureStatus_depositLP,
+  selectlayer1Balance,
+  selectFastDepositBatchCost,
+  selectL1FeeBalance,
+  selectUserAndL2LPBalanceBatch,
+ } from 'selectors'
 
 import networkService from 'services/networkService'
 
@@ -44,12 +51,6 @@ import {
   fetchFastDepositBatchCost,
  } from 'actions/balanceAction'
 
-import {
-  selectlayer1Balance,
-  selectFastDepositBatchCost,
-  selectL1FeeBalance,
-  selectUserAndL2LPBalanceBatch,
-} from 'selectors/balanceSelector'
 
 function InputStepBatch({ isBridge, handleClose }) {
 
@@ -85,28 +86,38 @@ function InputStepBatch({ isBridge, handleClose }) {
 
     console.log(`Updated payload: `, updatedPayload)
 
-    let res
-    res = await dispatch(
-      approveFastDepositBatch(updatedPayload)
-    )
+    let receipt = {transactionHash: '0x1234567890'}
+    receipt = await dispatch(approveFastDepositBatch(updatedPayload))
 
-    if(res === false) {
+    if(receipt === false) {
       dispatch(openError('Failed to approve amount or user rejected signature'))
       handleClose()
       return
     }
 
-    res = await dispatch(
-      depositL1LPBatch(updatedPayload)
-    )
+    receipt = await dispatch(depositL1LPBatch(updatedPayload))
 
-    if (res) {
+    if (receipt) {
+      const [token, receivedToken] = updatedPayload.reduce((tokenPayload, tokenInfo) => {
+        let [tokenStr, receivedTokenStr] = tokenPayload
+        if (tokenStr !== "") {
+          tokenStr += ", "
+        }
+        tokenStr += `${tokenInfo.symbol}`
+        if (receivedTokenStr !== "") {
+          receivedTokenStr += ", "
+        }
+        const l2LPFeeRate = batchInfo[tokenInfo.symbol].l2LPFeeRate
+        receivedTokenStr += `${(tokenInfo.value * (1 - l2LPFeeRate / 100)).toFixed(3)} ${tokenInfo.symbol}`
+        return [tokenStr, receivedTokenStr]
+      }, ["", ""])
+      dispatch(setCDMCompletion({
+        CDMType: 'L1FastBridge',
+        CDMMessage: { token, receivedToken },
+        CDMTransaction: receipt
+      }))
+      dispatch(openModal('CDMCompletionModal'))
       dispatch(setActiveHistoryTab('Boba Ethereum L2 to Ethereum'))
-      dispatch(
-        openAlert(
-          `Your funds were bridged to the L1LP in batch.`
-        )
-      )
       handleClose()
     }
   }
@@ -114,6 +125,8 @@ function InputStepBatch({ isBridge, handleClose }) {
   useEffect(() => {
       dispatch(fetchL2TotalFeeRate())
       dispatch(fetchL1FeeBalance()) //ETH balance for paying gas
+      dispatch(fetchBalances())
+
       return ()=>{
         dispatch({type: 'BALANCE/L2/RESET'})
       }

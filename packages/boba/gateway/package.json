@@ -5,15 +5,25 @@
   "scripts": {
     "buildenv-dev": "react-env",
     "buildenv-prod": "NODE_ENV=production react-env --dest build",
+    "format": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
+    "lint:check": "eslint . --ext ts,tsx",
+    "lint:fix": "yarn lint:check --fix",
     "serve": "npm run buildenv-prod && serve -s build -l 3000 -c public/serve.json",
-    "start": "npm run buildenv-dev && react-scripts start",
-    "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build",
-    "build:dev": "GENERATE_SOURCEMAP=false REACT_APP_ENV=dev react-scripts build",
+    "start": "npm run buildenv-dev && REACT_APP_WALLET_VERSION=$npm_package_version react-scripts start",
+    "prebuild": "./bin/release.sh",
+    "build:prod": "yarn prebuild && GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod react-scripts build",
+    "build:dev": "yarn prebuild && GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=dev react-scripts build",
     "audit-check": "audit-ci --moderate",
     "postinstall": "patch-package",
-    "deploy:mainnet": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
-    "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr --recursive && aws s3 sync build s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr && aws s3 cp s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
+    "pre-commit": "lint-staged --allow-empty",
+    "test": "react-scripts test --watchAll=false",
+    "test:w": "react-scripts test --watchAll=true",
+    "snapshots": "react-scripts test -u",
+    "coverage": "yarn test --coverage",
+    "deploy:onegateway": "yarn build:prod && aws s3 rm s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31 --recursive && aws s3 sync build s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31 && aws s3 cp s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31/index.html s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
+    "deploy:mainnet": "yarn build:prod && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
+    "deploy:goerli": "GENERATE_SOURCEMAP=false REACT_APP_WALLET_VERSION=$npm_package_version REACT_APP_ENV=prod REACT_APP_CHAIN=goerli react-scripts build && aws s3 rm s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr --recursive && aws s3 sync build s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr && aws s3 cp s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html s3://ethereum-testnet-gateway-gatewaybucket-jn968xk15skr/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -28,19 +38,18 @@
     "@mui/styles": "^5.3.0",
     "@sentry/react": "^7.30.0",
     "@sentry/tracing": "^7.30.0",
-    "@typescript-eslint/eslint-plugin": "^5.10.2",
-    "@typescript-eslint/parser": "^5.10.2",
+    "@walletconnect/web3-provider": "^1.8.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "bn.js": "^5.1.3",
+    "dayjs": "^1.11.7",
     "dotenv": "^8.2.0",
     "eslint-config-react-app": "^7.0.0",
     "ethers": "^5.5.4",
     "graphql": "^16.3.0",
     "html-react-parser": "^1.4.0",
     "human-standard-token-abi": "^2.0.0",
-    "lodash": "^4.17.20",
-    "moment": "^2.24.0",
+    "lodash": "^4.17.21",
     "node-forge": "^1.3.1",
     "patch-package": "^6.2.2",
     "react": "^17.0.2",
@@ -54,33 +63,63 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^3.4.3",
     "react-select": "^5.2.2",
-    "react-zendesk": "^0.1.13",
     "recharts": "^2.1.10",
     "redux": "^4.1.2",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "sass": "^1.51.0",
     "serve": "^11.3.2",
+    "styled-components": "^5.3.10",
     "truncate-middle": "^1.0.6",
     "ts-md5": "^1.2.11",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "web3": "^1.8.2"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
   "devDependencies": {
     "@beam-australia/react-env": "2.1.2",
-    "audit-ci": "^3.1.1"
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^12.1.2",
+    "@types/jest": "^29.5.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/redux-mock-store": "^1.0.3",
+    "@types/styled-components": "^5.1.26",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "audit-ci": "^3.1.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsdoc": "^35.1.2",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-unicorn": "^32.0.1",
+    "jest-styled-components": "^7.1.1",
+    "redux-mock-store": "^1.5.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn format",
+      "yarn lint:check"
+    ]
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}"
+    ]
+  },
+  "resolutions": {
+    "@types/react": "17.0.58"
+  },
+  "workspaces": {
+    "nohoist": [
+      "@types/**",
+      "**/@types/**"
+    ]
   }
 }

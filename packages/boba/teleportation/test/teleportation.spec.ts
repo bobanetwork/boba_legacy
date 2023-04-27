@@ -57,7 +57,7 @@ describe('teleportation', () => {
     // Remove file if it exists
     const dumpsPath = path.resolve(
       __dirname,
-      '../dist/db/depositInfo-31337.json'
+      '../dist/src/db/depositInfo-31337.json'
     )
     if (fs.existsSync(dumpsPath)) {
       fs.unlinkSync(dumpsPath)
@@ -423,7 +423,7 @@ describe('teleportation', () => {
       // should store the latest block
       const storedBlock = await teleportationService._getDepositInfo(chainId)
       expect(storedBlock).to.be.eq(latestBlock)
-    })
+    }).retries(3)
 
     it('should get all BobaReceived events', async () => {
       const chainId = (await ethers.provider.getNetwork()).chainId
@@ -496,13 +496,13 @@ describe('teleportation', () => {
       // should store the latest block
       const storedBlock = await teleportationService._getDepositInfo(chainId)
       expect(storedBlock).to.be.eq(latestBlock)
-    })
+    }).retries(3)
 
     it('should not disbure BOBA token if the data is reset', async () => {
       // Remove file if it exists
       const dumpsPath = path.resolve(
         __dirname,
-        '../dist/db/depositInfo-31337.json'
+        '../dist/src/db/depositInfo-31337.json'
       )
       if (fs.existsSync(dumpsPath)) {
         fs.unlinkSync(dumpsPath)

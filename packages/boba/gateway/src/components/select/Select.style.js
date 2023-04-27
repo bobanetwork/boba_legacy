@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import {Box} from '@mui/material';
 
 
 export const Field = styled(Box)(({ theme }) => ({
@@ -19,3 +19,14 @@ export const SelectOptionContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center'
 }));
+export const SelectedContainer = styled(Box)(({ theme }) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-around',
+  height: '40px',
+  borderRadius: '10px',
+  background: theme.palette.background.secondary,
+}));
+

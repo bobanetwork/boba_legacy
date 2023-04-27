@@ -1,56 +1,64 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { useTheme } from '@mui/material'
+import { intersection } from 'util/lodash';
 
-import { selectMonster } from 'selectors/setupSelector'
-import { menuItems } from './menuList'
+import { selectMonster, selectActiveNetwork } from 'selectors'
+import { MENU_LIST } from './menu.config'
+import { useLocation } from 'react-router-dom'
 
 import * as S from './MenuItems.styles'
-import { DISABLE_VE_DAO } from 'util/constant'
+import { PAGES_BY_NETWORK } from 'util/constant'
+import { useTheme, useMediaQuery } from '@mui/material'
 
-const MenuItems = () => {
+const MenuItems = ({
+  setOpen
+}) => {
 
-  const theme = useTheme()
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const menuList = MENU_LIST;
+
   const monsterNumber = useSelector(selectMonster())
-  const monstersAdded = menuItems.some(item => item.key === 'Monster')
-  const [ menuList, setMenuList ] = useState([]);
+  const network = useSelector(selectActiveNetwork())
+
+  const [list, setList] = useState([])
+  const location = useLocation()
 
   useEffect(() => {
-    setMenuList(menuItems)
-  },[])
+    let _menuList = menuList
 
-  useEffect(() => {
-    if (monsterNumber > 0 && !monstersAdded) {
-      setMenuList([
-        ...menuItems,
+    if (monsterNumber > 0) {
+      _menuList = [
+        ...menuList,
         {
           key: 'Monster',
-          icon: "MonsterIcon",
-          title: "MonsterVerse",
-          url: "/monster"
-        }
-      ])
+          icon: 'MonsterIcon',
+          title: 'MonsterVerse',
+          url: '/monster',
+        },
+      ]
     }
-  }, [ monsterNumber, monstersAdded ]);
+
+    let fMenu = _menuList
+      .filter(
+        (m) =>
+          intersection([m.key], PAGES_BY_NETWORK[network.toLowerCase()]).length
+      )
+      .filter((m) => !m.disable)
+
+    setList(fMenu)
+  }, [network, menuList, monsterNumber])
 
   return (
     <S.Nav>
-      {menuList.map((item) => {
-        if (!!Number(DISABLE_VE_DAO) && (['Lock','Vote&Dao'].includes(item.key))) {
-          return null;
-        }
+      {list.map((item) => {
         return (
-          <S.MenuItem
-            style={({ isActive }) => {
-              return {
-                color: isActive ? theme.palette.secondary.main : 'inherit'
-              }
-            }}
-            key={item.key}
-            to={item.url}
-          >
+          <S.MenuListItem key={item.key} to={item.url} activeclassname="active" onClick={() => isMobile ? setOpen(false): null}>
+            {item.url.split('/')[1] === location.pathname.split('/')[1] && (
+              <S.MenuIcon />
+            )}
             {item.title}
-          </S.MenuItem>
+          </S.MenuListItem>
         )
       })}
     </S.Nav>

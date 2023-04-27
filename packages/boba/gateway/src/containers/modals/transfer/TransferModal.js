@@ -18,15 +18,16 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { transfer } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { 
+  selectLoading, 
+  selectLookupPrice,
+  selectBobaFeeChoice,
+  selectBobaPriceRatio,
+} from 'selectors'
 
 import { BigNumber, utils } from 'ethers'
 
-import {
-   selectBobaFeeChoice,
-   selectBobaPriceRatio,
-} from 'selectors/setupSelector'
+
 
 import BN from 'bignumber.js'
 
@@ -197,7 +198,7 @@ function TransferModal ({ open, token, minHeight }) {
 
         {fee && !feeUseBoba && (
           <Typography variant="body2" component="p" sx={{opacity: 0.5, mt: 2}}>
-            Fee: {fee} ETH
+            Fee: {fee} {networkService.L1NativeTokenSymbol}
           </Typography>
         )}
 
@@ -224,8 +225,9 @@ function TransferModal ({ open, token, minHeight }) {
         {!isMobile ? (
           <Button
             onClick={handleClose}
-            color="neutral"
-            size="large"
+            variant='outlined'
+            color='primary'
+            size='large'
           >
             Cancel
           </Button>

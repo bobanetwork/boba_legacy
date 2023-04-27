@@ -4,10 +4,24 @@ import * as S from './availableBridges.styles'
 import { Link, Typography } from '@mui/material'
 
 import networkService from 'services/networkService'
+import { BANXA_URL } from 'util/constant'
 
-function AvailableBridges({ token = null }) {
+function AvailableBridges({ token = null, walletAddress = "" }) {
 
   const [ bridges, setBridges ] = useState([])
+
+  const banxaUrl = () => {
+    const banxaUrl = BANXA_URL;
+    const config = {
+      coinType: 'ETH',
+      fiatType: 'USD',
+      fiatAmount: '',
+      blockChain: 'BOBA',
+      walletAddress: walletAddress
+    }
+
+    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&fiatAmount=${config.fiatAmount}&blockchain=${config.blockChain}&walletAddress=${walletAddress}`
+  }
 
   useEffect(() => {
     if (token) {
@@ -18,11 +32,22 @@ function AvailableBridges({ token = null }) {
 
   return <S.BridgesContainer>
     <S.LabelContainer>
-        <Typography variant="body2">
-          Third party bridges
-        </Typography>
+      <Typography variant="body2">
+        Third party bridges
+      </Typography>
     </S.LabelContainer>
     <S.Wrapper>
+      <S.BridgeContent key={'banxa'}>
+        <Link color="inherit"
+          variant="body2"
+          href={banxaUrl()}
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{ textDecoration: 'none' }}
+        >
+          <Typography variant="body1" component="span" my={1}> Banxa</Typography>
+        </Link>
+      </S.BridgeContent>
       {bridges.map((bridge) => {
         return <S.BridgeContent key={bridge.type}>
           <Link color="inherit"

@@ -1,0 +1,21 @@
+{
+  "network": "fuji",
+  "contracts": {
+    "L1CrossDomainMessenger": {
+      "address": "0x68c19B7FbAe4F8034cf6316b2045ba6aB6978F6b",
+      "startBlock": 11967644
+    },
+    "L1CrossDomainMessengerFast": {
+      "address": "0xBc5249095c890F58C0b75795bd21667eFd123F5F",
+      "startBlock": 11967644
+    },
+    "StateCommitmentChain": {
+      "address": "0x57B9C47F2Ae857005238096486C5B107447dE221",
+      "startBlock": 11967644
+    },
+    "Lib_AddressManager": {
+      "address": "0xcE78de95b85212BC348452e91e0e74c17cf37c79",
+      "startBlock": 11967644
+    }
+  }
+}

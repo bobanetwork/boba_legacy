@@ -14,78 +14,86 @@ import {
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { selectLookupPrice } from 'selectors'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
 import { BRIDGE_TYPE } from 'util/constant'
+import { BN } from 'bn.js'
 
-function ListToken({
-  token,
-  chain,
-  networkLayer,
-  disabled,
-  loading
+function ListToken({ token, chain, networkLayer, disabled, loading,
+  showBalanceToken
 }) {
-  const [ dropDownBox, setDropDownBox ] = useState(false)
+  const [dropDownBox, setDropDownBox] = useState(false)
 
   const theme = useTheme()
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const dispatch = useDispatch();
-  const enabled = (networkLayer === chain) ? true : false
+  const dispatch = useDispatch()
+  const enabled = networkLayer === chain ? true : false
   const logo = getCoinImage(token.symbol)
   const lookupPrice = useSelector(selectLookupPrice)
 
-  const amountInNumber = token.symbol === 'ETH' ?
-  Number(logAmount(token.balance, token.decimals, 3)):
-  Number(logAmount(token.balance, token.decimals, 2))
+  const amountInNumber =
+    token.symbol === 'ETH'
+      ? Number(logAmount(token.balance, token.decimals, 3))
+      : Number(logAmount(token.balance, token.decimals, 2))
 
-  const amount = token.symbol === 'ETH' ?
-    Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) :
-    Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const amount =
+    token.symbol === 'ETH'
+      ? Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 3, maximumFractionDigits: 3 }
+        )
+      : Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(
+          undefined,
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        )
 
   const handleModalClick = (modalName, token, fast) => {
     dispatch(openModal(modalName, token, fast))
   }
 
-  async function doSettle_v0 () {
+  async function doSettle_v0() {
     await dispatch(settle_v0())
   }
 
-  async function doSettle_v1 () {
+  async function doSettle_v1() {
     await dispatch(settle_v1())
   }
 
-  async function doSettle_v2 () {
+  async function doSettle_v2() {
     await dispatch(settle_v2())
   }
 
-  async function doSettle_v2OLO () {
+  async function doSettle_v2OLO() {
     await dispatch(settle_v2OLO())
   }
 
-  async function doSettle_v3 () {
+  async function doSettle_v3() {
     await dispatch(settle_v3())
   }
 
-  async function doSettle_v3OLO () {
+  async function doSettle_v3OLO() {
     await dispatch(settle_v3OLO())
   }
 
+  if (showBalanceToken && token.balance.lte(new BN(1000000))) {
+    return null;
+  }
 
   if (isMobile) {
     return (
       <S.Content>
         <S.TableBody>
-          <S.TableCell sx={{ gap: "10px" }}>
+          <S.TableCell sx={{ gap: '10px' }}>
             <img src={logo} alt="logo" width={42} height={42} />
 
             <S.TextTableCell variant="body2" component="div">
               {token.symbol}
             </S.TextTableCell>
           </S.TableCell>
-          <S.TableCell >
+          <S.TableCell>
             <S.TextTableCell
               variant="body2"
               component="div"
@@ -94,7 +102,7 @@ function ListToken({
               {amount}
             </S.TextTableCell>
           </S.TableCell>
-          <S.TableCell >
+          <S.TableCell>
             <S.TextTableCell
               variant="body2"
               component="div"
@@ -105,16 +113,23 @@ function ListToken({
           </S.TableCell>
           <S.TableCell
             onClick={() => {
-              setDropDownBox(!dropDownBox);
+              setDropDownBox(!dropDownBox)
             }}
-            isMobile={isMobile}>
+            isMobile={isMobile}
+          >
             <S.TextTableCell
               variant="body2"
               component="div"
               sx={{ fontWeight: '700' }}
             >
-              <Box sx={{ display: "flex", opacity: !enabled ? "0.4" : "1.0", transform: dropDownBox ? "rotate(-180deg)" : "" }}>
-                <ExpandMoreIcon sx={{ width: "12px" }} />
+              <Box
+                sx={{
+                  display: 'flex',
+                  opacity: !enabled ? '0.4' : '1.0',
+                  transform: dropDownBox ? 'rotate(-180deg)' : '',
+                }}
+              >
+                <ExpandMoreIcon sx={{ width: '12px' }} />
               </Box>
             </S.TextTableCell>
           </S.TableCell>
@@ -122,45 +137,63 @@ function ListToken({
         {isMobile && dropDownBox ? (
           <Fade in={dropDownBox}>
             <S.DropdownWrapper>
-
-              {enabled && chain === 'L1' &&
+              {enabled && chain === 'L1' && (
                 <>
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
-                    color='neutral'
+                    onClick={() => {
+                      handleModalClick(
+                        'depositModal',
+                        token,
+                        BRIDGE_TYPE.CLASSIC_BRIDGE
+                      )
+                    }}
+                    color="primary"
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
                     fullWidth
                   >
-                    Bridge to L2
+                    Bridge
                   </Button>
                   <Button
-                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
-                    color='primary'
+                    onClick={() => {
+                      handleModalClick(
+                        'depositModal',
+                        token,
+                        BRIDGE_TYPE.FAST_BRIDGE
+                      )
+                    }}
+                    color="secondary"
                     disabled={disabled}
                     variant="contained"
                     tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
                     fullWidth
                   >
-                    Fast Bridge to L2
-                </Button>
-                {token.symbol === 'BOBA' &&
-                  <Button
-                    onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
-                    color='primary'
-                    disabled={disabled}
-                    variant="contained"
-                    tooltip="A multi-chain bridge to Alt L1."
-                    fullWidth
-                  >
-                    Bridge to alt L1
+                    Fast Bridge
                   </Button>
-                }
-              </>
-              }
+                  {token.symbol === 'BOBA' && (
+                    <Button
+                      onClick={() => {
+                        handleModalClick(
+                          'depositModal',
+                          token,
+                          BRIDGE_TYPE.MULTI_CHAIN_BRIDGE
+                        )
+                      }}
+                      color="secondary"
+                      disabled={disabled}
+                      variant="contained"
+                      tooltip="A multi-chain bridge to Alt L1."
+                      fullWidth
+                    >
+                      Bridge
+                    </Button>
+                  )}
+                </>
+              )}
 
-              {enabled && chain === 'L2' &&
+              {enabled &&
+                chain === 'L2' &&
                 token.symbol !== 'OLO' &&
                 token.symbol !== 'xBOBA' &&
                 token.symbol !== 'WAGMIv0' &&
@@ -168,42 +201,50 @@ function ListToken({
                 token.symbol !== 'WAGMIv2' &&
                 token.symbol !== 'WAGMIv2-Oolong' &&
                 token.symbol !== 'WAGMIv3' &&
-                token.symbol !== 'WAGMIv3-Oolong' &&
-                <>
-                  <Button
-                    onClick={() => { handleModalClick('exitModal', token, false) }}
-                    variant="outlined"
-                    disabled={disabled}
-                    tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
-                    fullWidth
-                  >
-                    Bridge to L1
-                  </Button>
+                token.symbol !== 'WAGMIv3-Oolong' && (
+                  <>
+                    <Button
+                      onClick={() => {
+                        handleModalClick('exitModal', token, false)
+                      }}
+                      variant="outlined"
+                      color="secondary"
+                      disabled={disabled}
+                      tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
+                      fullWidth
+                    >
+                      Bridge
+                    </Button>
 
-                  <Button
-                    onClick={() => { handleModalClick('exitModal', token, true) }}
-                    variant="outlined"
-                    disabled={disabled}
-                    tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
-                    fullWidth
-                  >
-                    Fast Bridge to L1
-                  </Button>
+                    <Button
+                      onClick={() => {
+                        handleModalClick('exitModal', token, true)
+                      }}
+                      variant="outlined"
+                      color="secondary"
+                      disabled={disabled}
+                      tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
+                      fullWidth
+                    >
+                      Fast Bridge
+                    </Button>
 
-                  <Button
-                    onClick={() => { handleModalClick('transferModal', token, false) }}
-                    variant="contained"
-                    color="primary"
-                    disabled={disabled}
-                    tooltip="Transfer funds from one L2 account to another L2 account."
-                    fullWidth
-                  >
-                    Transfer
-                  </Button>
-                </>
-              }
+                    <Button
+                      onClick={() => {
+                        handleModalClick('transferModal', token, false)
+                      }}
+                      variant="contained"
+                      color="primary"
+                      disabled={disabled}
+                      tooltip="Transfer funds from one L2 account to another L2 account."
+                      fullWidth
+                    >
+                      Transfer
+                    </Button>
+                  </>
+                )}
 
-              {enabled && chain === 'L2' && token.symbol === 'OLO' &&
+              {enabled && chain === 'L2' && token.symbol === 'OLO' && (
                 <>
                   <Link
                     color="inherit"
@@ -215,7 +256,9 @@ function ListToken({
                     CELER BRIDGE
                   </Link>
                   <Button
-                    onClick={() => { handleModalClick('transferModal', token, false) }}
+                    onClick={() => {
+                      handleModalClick('transferModal', token, false)
+                    }}
                     variant="contained"
                     color="primary"
                     disabled={disabled}
@@ -225,18 +268,22 @@ function ListToken({
                     Transfer
                   </Button>
                 </>
-              }
+              )}
 
-              {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}>
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
                   <Button
-                    onClick={() => { doSettle_v0() }}
+                    onClick={() => {
+                      doSettle_v0()
+                    }}
                     variant="contained"
                     color="primary"
                     disabled={false}
@@ -246,18 +293,22 @@ function ListToken({
                     Settle
                   </Button>
                 </div>
-              }
+              )}
 
-              {enabled && chain === 'L2' && token.symbol === 'WAGMIv1' &&
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}>
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv1' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
                   <Button
-                    onClick={() => { doSettle_v1() }}
+                    onClick={() => {
+                      doSettle_v1()
+                    }}
                     variant="contained"
                     disabled={false}
                     tooltip="Settle your WAGMv1 long options."
@@ -266,17 +317,21 @@ function ListToken({
                     Settle
                   </Button>
                 </div>
-              }
-              {enabled && chain === 'L2' && token.symbol === 'WAGMIv2' &&
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}>
+              )}
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv2' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
                   <Button
-                    onClick={() => { doSettle_v2() }}
+                    onClick={() => {
+                      doSettle_v2()
+                    }}
                     variant="contained"
                     disabled={false}
                     tooltip="Settle your WAGMv2 long options."
@@ -285,36 +340,46 @@ function ListToken({
                     Settle
                   </Button>
                 </div>
-              }
-              {enabled && chain === 'L2' && token.symbol === 'WAGMIv2-Oolong' &&
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}>
-                  <Button
-                    onClick={() => { doSettle_v2OLO() }}
-                    variant="contained"
-                    disabled={false}
-                    tooltip="Settle your WAGMv2-Oolong long options."
-                    fullWidth
+              )}
+              {enabled &&
+                chain === 'L2' &&
+                token.symbol === 'WAGMIv2-Oolong' && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'flex-end',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
                   >
-                    Settle
-                  </Button>
-                </div>
-              }
-              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' &&
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}>
+                    <Button
+                      onClick={() => {
+                        doSettle_v2OLO()
+                      }}
+                      variant="contained"
+                      disabled={false}
+                      tooltip="Settle your WAGMv2-Oolong long options."
+                      fullWidth
+                    >
+                      Settle
+                    </Button>
+                  </div>
+                )}
+              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'flex-end',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
                   <Button
-                    onClick={() => { doSettle_v3() }}
+                    onClick={() => {
+                      doSettle_v3()
+                    }}
                     variant="contained"
                     disabled={true}
                     tooltip="Settle your WAGMv3 long options."
@@ -323,26 +388,32 @@ function ListToken({
                     Settle
                   </Button>
                 </div>
-              }
-              {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' &&
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}>
-                  <Button
-                    onClick={() => { doSettle_v3OLO() }}
-                    variant="contained"
-                    disabled={true}
-                    tooltip="Settle your WAGMv3-Oolong long options."
-                    fullWidth
+              )}
+              {enabled &&
+                chain === 'L2' &&
+                token.symbol === 'WAGMIv3-Oolong' && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'flex-end',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
                   >
-                    Settle
-                  </Button>
-                </div>
-              }
+                    <Button
+                      onClick={() => {
+                        doSettle_v3OLO()
+                      }}
+                      variant="contained"
+                      disabled={true}
+                      tooltip="Settle your WAGMv3-Oolong long options."
+                      fullWidth
+                    >
+                      Settle
+                    </Button>
+                  </div>
+                )}
             </S.DropdownWrapper>
           </Fade>
         ) : null}
@@ -353,13 +424,13 @@ function ListToken({
   return (
     <S.Content>
       <S.TableBody>
-        <S.TableCell sx={{ gap: "10px", justifyContent: "flex-start" }}>
+        <S.TableCell sx={{ gap: '10px', justifyContent: 'flex-start' }}>
           <img src={logo} alt="logo" width={42} height={42} />
           <S.TextTableCell variant="body2" component="div">
             {token.symbol}
           </S.TextTableCell>
         </S.TableCell>
-        <S.TableCell sx={{ justifyContent: "flex-start" }}>
+        <S.TableCell sx={{ justifyContent: 'flex-start' }}>
           <S.TextTableCell
             variant="body2"
             component="div"
@@ -368,7 +439,7 @@ function ListToken({
             {amount}
           </S.TextTableCell>
         </S.TableCell>
-        <S.TableCell sx={{ justifyContent: "flex-start" }}>
+        <S.TableCell sx={{ justifyContent: 'flex-start' }}>
           <S.TextTableCell
             variant="body2"
             component="div"
@@ -381,47 +452,65 @@ function ListToken({
           sx={{
             gap: '5px',
             width: '40%',
-            justifyContent: 'flex-start'
+            justifyContent: 'flex-start',
           }}
         >
-          {enabled && chain === 'L1' &&
+          {enabled && chain === 'L1' && (
             <>
               <Button
-                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.CLASSIC_BRIDGE) }}
-                color='neutral'
+                onClick={() => {
+                  handleModalClick(
+                    'depositModal',
+                    token,
+                    BRIDGE_TYPE.CLASSIC_BRIDGE
+                  )
+                }}
+                color="secondary"
                 variant="outlined"
                 disabled={disabled}
                 tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
                 fullWidth
               >
-                Bridge to L2
+                Bridge
               </Button>
 
               <Button
-                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.FAST_BRIDGE) }}
-                color='primary'
+                onClick={() => {
+                  handleModalClick(
+                    'depositModal',
+                    token,
+                    BRIDGE_TYPE.FAST_BRIDGE
+                  )
+                }}
+                color="secondary"
                 disabled={disabled}
                 variant="outlined"
                 tooltip="A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient."
                 fullWidth
               >
-                Fast Bridge to L2
-            </Button>
-            {token.symbol === 'BOBA' &&
-
-              <Button
-                onClick={() => { handleModalClick('depositModal', token, BRIDGE_TYPE.MULTI_CHAIN_BRIDGE) }}
-                color='primary'
-                disabled={disabled}
-                variant="contained"
-                fullWidth
-              >
-                Bridge to alt L1
+                Fast Bridge
               </Button>
-            }
+              {token.symbol === 'BOBA' && (
+                <Button
+                  onClick={() => {
+                    handleModalClick(
+                      'depositModal',
+                      token,
+                      BRIDGE_TYPE.MULTI_CHAIN_BRIDGE
+                    )
+                  }}
+                  color="secondary"
+                  disabled={disabled}
+                  variant="contained"
+                  fullWidth
+                >
+                  Bridge
+                </Button>
+              )}
             </>
-          }
-          {enabled && chain === 'L2' &&
+          )}
+          {enabled &&
+            chain === 'L2' &&
             token.symbol !== 'OLO' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
@@ -429,40 +518,48 @@ function ListToken({
             token.symbol !== 'WAGMIv2' &&
             token.symbol !== 'WAGMIv2-Oolong' &&
             token.symbol !== 'WAGMIv3' &&
-            token.symbol !== 'WAGMIv3-Oolong' &&
-            <>
-              <Button
-                onClick={() => { handleModalClick('exitModal', token, false) }}
-                variant="outlined"
-                disabled={disabled}
-                tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
-                fullWidth
-              >
-                Bridge to L1
-              </Button>
-              <Button
-                onClick={() => { handleModalClick('exitModal', token, true) }}
-                variant="outlined"
-                disabled={disabled}
-                tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
-                fullWidth
-                sx={{ whiteSpace: 'nowrap' }}
-              >
-                Fast Bridge to L1
-              </Button>
-              <Button
-                onClick={() => { handleModalClick('transferModal', token, false) }}
-                variant="contained"
-                color="primary"
-                disabled={disabled}
-                tooltip="Transfer funds from one L2 account to another L2 account."
-                fullWidth
-              >
-                Transfer
-              </Button>
-            </>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'OLO' &&
+            token.symbol !== 'WAGMIv3-Oolong' && (
+              <>
+                <Button
+                  onClick={() => {
+                    handleModalClick('exitModal', token, false)
+                  }}
+                  variant="outlined"
+                  color="secondary"
+                  disabled={disabled}
+                  tooltip="Classic Bridge to L1. This option is always available but has a 7 day delay before receiving your funds."
+                  fullWidth
+                >
+                  Bridge
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleModalClick('exitModal', token, true)
+                  }}
+                  variant="outlined"
+                  color="secondary"
+                  disabled={disabled}
+                  tooltip="A swap-based bridge to L1 without a 7 day waiting period. There is a fee, however, and this option is only available if the pool balance is sufficient."
+                  fullWidth
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
+                  Fast Bridge
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleModalClick('transferModal', token, false)
+                  }}
+                  variant="outlined"
+                  color="secondary"
+                  disabled={disabled}
+                  tooltip="Transfer funds from one L2 account to another L2 account."
+                  fullWidth
+                >
+                  Transfer
+                </Button>
+              </>
+            )}
+          {enabled && chain === 'L2' && token.symbol === 'OLO' && (
             <>
               <Link
                 color="inherit"
@@ -474,7 +571,9 @@ function ListToken({
                 CELER BRIDGE
               </Link>
               <Button
-                onClick={() => { handleModalClick('transferModal', token, false) }}
+                onClick={() => {
+                  handleModalClick('transferModal', token, false)
+                }}
                 variant="contained"
                 color="primary"
                 disabled={disabled}
@@ -484,24 +583,30 @@ function ListToken({
                 Transfer
               </Button>
             </>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' &&
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-              <div style={{
+          )}
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv0' && (
+            <div
+              style={{
                 display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                flexDirection: 'column',
                 gap: '10px',
-              }}>
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: '10px',
+                }}
+              >
                 <Button
-                  onClick={() => { doSettle_v0() }}
+                  onClick={() => {
+                    doSettle_v0()
+                  }}
                   variant="contained"
                   color="primary"
                   disabled={false}
@@ -512,24 +617,30 @@ function ListToken({
                 </Button>
               </div>
             </div>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'WAGMIv1' &&
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-              <div style={{
+          )}
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv1' && (
+            <div
+              style={{
                 display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                flexDirection: 'column',
                 gap: '10px',
-              }}>
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: '10px',
+                }}
+              >
                 <Button
-                  onClick={() => { doSettle_v1() }}
+                  onClick={() => {
+                    doSettle_v1()
+                  }}
                   variant="contained"
                   color="primary"
                   disabled={false}
@@ -540,24 +651,30 @@ function ListToken({
                 </Button>
               </div>
             </div>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'WAGMIv2' &&
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-              <div style={{
+          )}
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv2' && (
+            <div
+              style={{
                 display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                flexDirection: 'column',
                 gap: '10px',
-              }}>
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: '10px',
+                }}
+              >
                 <Button
-                  onClick={() => { doSettle_v2() }}
+                  onClick={() => {
+                    doSettle_v2()
+                  }}
                   variant="contained"
                   color="primary"
                   disabled={false}
@@ -568,24 +685,30 @@ function ListToken({
                 </Button>
               </div>
             </div>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'WAGMIv2-Oolong' &&
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-              <div style={{
+          )}
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv2-Oolong' && (
+            <div
+              style={{
                 display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                flexDirection: 'column',
                 gap: '10px',
-              }}>
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: '10px',
+                }}
+              >
                 <Button
-                  onClick={() => { doSettle_v2OLO() }}
+                  onClick={() => {
+                    doSettle_v2OLO()
+                  }}
                   variant="contained"
                   color="primary"
                   disabled={false}
@@ -596,24 +719,30 @@ function ListToken({
                 </Button>
               </div>
             </div>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' &&
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-              <div style={{
+          )}
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3' && (
+            <div
+              style={{
                 display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                flexDirection: 'column',
                 gap: '10px',
-              }}>
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: '10px',
+                }}
+              >
                 <Button
-                  onClick={() => { doSettle_v3() }}
+                  onClick={() => {
+                    doSettle_v3()
+                  }}
                   variant="contained"
                   color="primary"
                   disabled={false}
@@ -624,24 +753,30 @@ function ListToken({
                 </Button>
               </div>
             </div>
-          }
-          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' &&
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              flexDirection: 'column',
-              gap: '10px',
-            }}>
-              <div style={{
+          )}
+          {enabled && chain === 'L2' && token.symbol === 'WAGMIv3-Oolong' && (
+            <div
+              style={{
                 display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                flexDirection: 'column',
                 gap: '10px',
-              }}>
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: '10px',
+                }}
+              >
                 <Button
-                  onClick={() => { doSettle_v3OLO() }}
+                  onClick={() => {
+                    doSettle_v3OLO()
+                  }}
                   variant="contained"
                   color="primary"
                   disabled={false}
@@ -652,7 +787,7 @@ function ListToken({
                 </Button>
               </div>
             </div>
-          }
+          )}
         </S.TableCell>
       </S.TableBody>
     </S.Content>

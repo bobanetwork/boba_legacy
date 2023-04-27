@@ -39,6 +39,14 @@ export const BobaChains = {
     height: 10604,
     BobaTokenAddress: '0x4200000000000000000000000000000000000006',
   },
+  2888: {
+    url: 'https://replica.goerli.boba.network',
+    testnet: true,
+    name: 'Boba Ethereum Goerli',
+    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    height: 59,
+    BobaTokenAddress: '0x4200000000000000000000000000000000000023',
+  },
   1297: {
     url: 'https://replica.bobabase.boba.network',
     testnet: true,

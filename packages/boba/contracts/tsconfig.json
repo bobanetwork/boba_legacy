@@ -1,9 +1,11 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
+    "rootDir": "./src",
     "outDir": "./dist",
-    "resolveJsonModule": true
+    "types": ["node"]
   },
-  "include": ["./hardhat.config.ts", "./scripts", "./bin", "./deploy", "./test"],
-  "files": ["./hardhat.config.ts"]
+  "include": [
+    "src/**/*"
+  ]
 }

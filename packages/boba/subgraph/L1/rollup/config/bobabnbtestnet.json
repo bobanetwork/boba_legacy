@@ -1,0 +1,21 @@
+{
+  "network": "chapel",
+  "contracts": {
+    "L1CrossDomainMessenger": {
+      "address": "0x53aD38aE4a63Fe33a86E011F7AF4d3fDe3daD145",
+      "startBlock": 21979675
+    },
+    "L1CrossDomainMessengerFast": {
+      "address": "0xbbD6a271abcC44f6dE284E6051Da76b4fB57458C",
+      "startBlock": 21979675
+    },
+    "StateCommitmentChain": {
+      "address": "0x37FB8bB9EA100CA9a0DE822c9923643ef48Cb8EE",
+      "startBlock": 21979675
+    },
+    "Lib_AddressManager": {
+      "address": "0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa",
+      "startBlock": 21979675
+    }
+  }
+}
