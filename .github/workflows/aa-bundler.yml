@@ -21,6 +21,6 @@ jobs:
         run: yarn install --frozen-lockfile --legacy-peer-deps && yarn run build
       - name: Publish package on NPM 📦
         working-directory: ./packages/boba/bundler_sdk
-        run: npm publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_BOBA_FOUNDATION }}
