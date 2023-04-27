@@ -13,7 +13,7 @@ import {
 } from '@boba/accountabstraction'
 
 import { Signer, Wallet } from 'ethers'
-import { DeterministicDeployer, SimpleAccountAPI } from '@boba/bundler_sdk'
+import { DeterministicDeployer, SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import { postExecutionDump } from '@boba/bundler_utils/dist/postExecCheck'
 import {
   SampleRecipient, TestRuleAccount, TestOpcodesAccount__factory
