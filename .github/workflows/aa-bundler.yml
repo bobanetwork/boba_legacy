@@ -18,7 +18,7 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies and build 🔧
-        run: npm ci && npm run build
+        run: npm ci --legacy-peer-deps && npm run build
       - name: Publish package on NPM 📦
         working-directory: ./packages/boba/bundler_sdk
         run: npm publish
