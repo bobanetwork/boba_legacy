@@ -39,7 +39,7 @@ import {
 
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 
 const PROPOSAL_STATES = [

@@ -1,7 +1,7 @@
 import React from 'react'
 import {  useSelector } from 'react-redux'
 
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 
 import { selectLayer, selectAccountEnabled } from 'selectors'
