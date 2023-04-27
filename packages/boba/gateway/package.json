@@ -54,7 +54,6 @@
     "patch-package": "^6.2.2",
     "react": "^17.0.2",
     "react-card-flip": "^1.1.5",
-    "react-copy-to-clipboard": "^5.0.4",
     "react-datepicker": "^4.6.0",
     "react-dom": "^17.0.2",
     "react-ga4": "^1.4.1",
@@ -82,7 +81,6 @@
   ],
   "devDependencies": {
     "@beam-australia/react-env": "2.1.2",
-    "@types/react-copy-to-clipboard": "^5.0.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.2",
     "@types/jest": "^29.5.1",

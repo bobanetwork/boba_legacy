@@ -14,15 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { ContentCopyOutlined } from '@mui/icons-material'
 import { IconButton, Tooltip } from '@mui/material'
 
 type CopyType = {
-  value?: string | null
+  value?: string
 }
-const Copy = ({ value }: CopyType): JSX.Element => {
+
+const Copy = ({ value = '' }: CopyType): JSX.Element => {
   const [open, setOpen] = useState(false)
+
+  const handdleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setOpen(true)
+  }
 
   useEffect(() => {
     if (open) {
@@ -33,13 +38,13 @@ const Copy = ({ value }: CopyType): JSX.Element => {
   }, [open, setOpen])
 
   return (
-    <CopyToClipboard text={value || ''} onCopy={() => setOpen(true)}>
+    <div onClick={() => handdleCopy(value)}>
       <Tooltip open={open} title="Copied to clipboard!">
         <IconButton size="medium">
           <ContentCopyOutlined sx={{ fontSize: 16 }} />
         </IconButton>
       </Tooltip>
-    </CopyToClipboard>
+    </div>
   )
 }
 
