@@ -15,7 +15,7 @@ This script allows anyone to check the status of a cross chain message from L2 t
   $ yarn
   ```
 
-  Then, add `.env` in `boba/boba_examples/boba-fee`.
+  Then, add `.env` in `boba/boba_community/boba-relayer`.
 
   ```yaml
 L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/KEY
