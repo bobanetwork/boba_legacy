@@ -17,7 +17,7 @@ import { setNetwork } from 'actions/networkAction';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { CHAIN_ID_LIST, NetworkList } from 'util/network/network.util';
+import { CHAIN_ID_LIST, NETWORK, NETWORK_TYPE, NetworkList } from 'util/network/network.util';
 
 const useNetwork = () => {
   const [ searchParams ] = useSearchParams();
@@ -40,8 +40,10 @@ const useNetwork = () => {
         networkIcon: icon,
       }));
     } else if (queryParams.network && queryParams.chain) {
-      let type = queryParams.network;
-      let chain = queryParams.chain;
+      console.log(NETWORK_TYPE)
+      let type = Object.values(NETWORK_TYPE).includes(queryParams.network) ? queryParams.network : NETWORK_TYPE.MAINNET;
+      let chain = Object.values(NETWORK).includes(queryParams.chain) ? queryParams.chain : NETWORK.ETHEREUM;
+
       const { name, icon } = NetworkList[ type ].filter((n) => n.chain === chain)[ 0 ];
       dispatch(setNetwork({
         networkType: type,

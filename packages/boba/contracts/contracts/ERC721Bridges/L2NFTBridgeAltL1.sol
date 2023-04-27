@@ -56,6 +56,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
 
     address public owner;
     address public l1NFTBridge;
+    // this is unused, however is a part of the contract to preserve the storage layout
     uint256 public extraGasRelay;
     uint32 public exitL1Gas;
 
@@ -75,6 +76,20 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
 
     // billing contract address
     address public billingContractAddress;
+
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        uint32 exitL1Gas
+    );
+
+    event NFTPairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
     /***************
      * Constructor *
      ***************/
@@ -112,7 +127,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         public
         onlyOwner()
     {
+        require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -152,6 +169,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         onlyInitialized()
     {
         exitL1Gas = _exitL1Gas;
+        emit GasConfigured(exitL1Gas);
     }
 
     /**
@@ -186,6 +204,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         public
         onlyOwner()
     {
+        require(_l1Contract != address(0), "L1 NFT cannot be zero address");
         //create2 would prevent this check
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
@@ -201,7 +220,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         require(bn == l1 || bn == l2, "Invalid Network");
         Network baseNetwork;
         if (bn == l1) {
+            // check the IL2StandardERC721 interface is supported
             require(ERC165Checker.supportsInterface(_l2Contract, 0xb07cd11a), "L2 contract is not bridgable");
+            require(IL2StandardERC721(_l2Contract).l1Contract() == _l1Contract, "L2 contract is not compatible with L1 contract");
             baseNetwork = Network.L1;
         }
         else {
@@ -214,6 +235,8 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit NFTPairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /***************
@@ -235,6 +258,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateWithdrawal(
             _l2Contract,
             msg.sender,
@@ -286,6 +312,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         bytes memory extraData;
         // if token has base on this layer
         if (pairNFTInfo[_l2Contract].baseNetwork == Network.L2) {
@@ -372,17 +401,15 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
     {
         // Collect the exit fee
         L2BillingContract billingContract = L2BillingContract(billingContractAddress);
-        require(msg.value >= billingContract.exitFee(), "Insufficient Boba amount");
+        require(msg.value == billingContract.exitFee(), "Insufficient Boba amount");
         (bool sent,) = billingContractAddress.call{gas: 3000, value: billingContract.exitFee()}("");
         require(sent, "Failed to collect exit fee");
 
         PairNFTInfo storage pairNFT = pairNFTInfo[_l2Contract];
         require(pairNFT.l1Contract != address(0), "Can't Find L1 NFT Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
 
         if (pairNFT.baseNetwork == Network.L1) {
-            address l1Contract = IL2StandardERC721(_l2Contract).l1Contract();
-            require(pairNFT.l1Contract == l1Contract, "L1 NFT Contract Address Error");
-
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             address NFTOwner = IL2StandardERC721(_l2Contract).ownerOf(_tokenId);
@@ -398,7 +425,7 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
 
             message = abi.encodeWithSelector(
                         iL1NFTBridge.finalizeNFTWithdrawal.selector,
-                        l1Contract,
+                        pairNFT.l1Contract,
                         _l2Contract,
                         _from,
                         _to,
@@ -413,12 +440,9 @@ contract L2NFTBridgeAltL1 is iL2NFTBridgeAltL1, CrossDomainEnabled, ERC721Holder
                 message
             );
         } else {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a native NFT is withdrawn on L2, the L1 Bridge mints the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC721(_l2Contract).safeTransferFrom(
                 _from,
                 address(this),
