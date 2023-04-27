@@ -68,22 +68,14 @@ export class ValidationManager {
     simulateValidation: any
   ): ValidationResult {
 
-    let selectorType: EntryPointWrapper.SelectorTypeStructOutput
-    let returnInfo: EntryPointWrapper.ReturnInfoStructOutput
-    let senderInfo: EntryPointWrapper.StakeInfoStructOutput
-    let factoryInfo: EntryPointWrapper.StakeInfoStructOutput
-    let paymasterInfo: EntryPointWrapper.StakeInfoStructOutput
-    let aggregatorInfo: EntryPointWrapper.AggregatorStakeInfoStructOutput
+    let failedOpStatus: EntryPointWrapper.FailedOpStatusStructOutput
+    let response: EntryPointWrapper.ResponseStructOutput
     ;[
-      selectorType,
-      returnInfo,
-      senderInfo,
-      factoryInfo,
-      paymasterInfo,
-      aggregatorInfo,
+      failedOpStatus,
+      response,
     ] = simulateValidation
 
-    if (!selectorType.validator.startsWith('ValidationResult')) {
+    if (!response.selectorType.startsWith('ValidationResult')) {
       // parse it as FailedOp
       // if its FailedOp, then we have the paymaster param... otherwise its an Error(string)
       let paymaster = hexlify(userOp.paymasterAndData)?.slice(0, 42)
@@ -93,12 +85,12 @@ export class ValidationManager {
 
       if (paymaster == null) {
         throw new RpcError(
-          `account validation failed: ${selectorType}`,
+          `account validation failed: ${failedOpStatus}`,
           ValidationErrors.SimulateValidation
         )
       } else {
         throw new RpcError(
-          `paymaster validation failed: ${selectorType}`,
+          `paymaster validation failed: ${failedOpStatus}`,
           ValidationErrors.SimulatePaymasterValidation,
           { paymaster }
         )
@@ -122,16 +114,16 @@ export class ValidationManager {
     }
 
     return {
-      returnInfo,
+      returnInfo: response.returnInfo,
       senderInfo: {
-        ...senderInfo,
+        ...response.senderInfo,
         addr: userOp.sender,
       },
-      factoryInfo: fillEntity(userOp.initCode, factoryInfo),
-      paymasterInfo: fillEntity(userOp.paymasterAndData, paymasterInfo),
+      factoryInfo: fillEntity(userOp.initCode, response.factoryInfo),
+      paymasterInfo: fillEntity(userOp.paymasterAndData, response.paymasterInfo),
       aggregatorInfo: fillEntity(
-        aggregatorInfo?.aggregator,
-        aggregatorInfo?.stakeInfo
+        response.aggregatorInfo?.aggregator,
+        response.aggregatorInfo?.stakeInfo
       ),
     }
   }

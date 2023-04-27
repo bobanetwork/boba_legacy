@@ -39,18 +39,21 @@ contract EntryPointWrapper {
         StakeInfo stakeInfo;
     }
 
-    /**
-     * returned aggregated signature info.
-     * the aggregator returned by the account, and its current stake.
-     */
-    struct SelectorType {
-        string validator;
+    struct FailedOpStatus {
+        bool status;
+        uint256 opIndex;
+        string reason;
     }
 
+    struct Response {
+        string selectorType;
+        ReturnInfo returnInfo;
+        StakeInfo senderInfo;
+        StakeInfo factoryInfo;
+        StakeInfo paymasterInfo;
+        AggregatorStakeInfo aggregatorInfo;
+    }
 
-
-    event ReturnedData(bytes revertData);
-    // event SelectorType(string);
 
      /**
      * a custom revert error of handleOps, to identify the offending op.
@@ -89,27 +92,30 @@ contract EntryPointWrapper {
 
     IEntryPoint public entryPoint;
 
+    StakeInfo private emptyStakeInfo = StakeInfo(0, 0);
+    AggregatorStakeInfo private emptyAggregatorInfo = AggregatorStakeInfo(address(0), emptyStakeInfo);
+    ReturnInfo private emptyReturnInfo = ReturnInfo(0, 0, false, 0, 0, new bytes(0));
+    Response private emptyResponse = Response("", emptyReturnInfo, emptyStakeInfo, emptyStakeInfo, emptyStakeInfo, emptyAggregatorInfo);
+    FailedOpStatus private emptyFailedOp = FailedOpStatus(false, 0, "");
+
     constructor(IEntryPoint _entryPoint) {
         entryPoint = _entryPoint;
     }
 
-    function simulateValidation(UserOperation calldata userOp) external returns (SelectorType memory, ReturnInfo memory, StakeInfo memory, StakeInfo memory, StakeInfo memory, AggregatorStakeInfo memory) {
+    function simulateValidation(UserOperation calldata userOp) external returns (FailedOpStatus memory, Response memory) {
         try entryPoint.simulateValidation(userOp) {}
         catch (bytes memory revertData) {
             bytes4 receivedSelector = bytes4(revertData);
 
             if (receivedSelector == ValidationResult.selector) {
                 (ReturnInfo memory returnInfo, StakeInfo memory senderInfo, StakeInfo memory factoryInfo, StakeInfo memory paymasterInfo) = abi.decode(slice(revertData, 4, revertData.length - 4), (ReturnInfo, StakeInfo, StakeInfo, StakeInfo));
-                StakeInfo memory emptyStakeInfo = StakeInfo(0, 0);
-                AggregatorStakeInfo memory emptyAggregatorInfo = AggregatorStakeInfo(address(0), emptyStakeInfo);
-                SelectorType memory selector = SelectorType('ValidationResult');
-                return (selector, returnInfo, senderInfo, factoryInfo, paymasterInfo, emptyAggregatorInfo);
+                return (emptyFailedOp, Response('ValidationResult', returnInfo, senderInfo, factoryInfo, paymasterInfo, emptyAggregatorInfo));
             } else if (receivedSelector == ValidationResultWithAggregation.selector) {
                 (ReturnInfo memory returnInfo, StakeInfo memory senderInfo, StakeInfo memory factoryInfo, StakeInfo memory paymasterInfo, AggregatorStakeInfo memory aggregatorInfo) = abi.decode(slice(revertData, 4, revertData.length - 4), (ReturnInfo, StakeInfo, StakeInfo, StakeInfo, AggregatorStakeInfo));
-                SelectorType memory selector = SelectorType('ValidationResultWithAggregation');
-                return (selector, returnInfo, senderInfo, factoryInfo, paymasterInfo, aggregatorInfo);
+                return (emptyFailedOp, Response('ValidationResultWithAggregation', returnInfo, senderInfo, factoryInfo, paymasterInfo, aggregatorInfo));
             } else if (receivedSelector == FailedOp.selector){
-                emit ReturnedData(revertData);
+                (uint256 opIndex, string memory reason) = abi.decode(slice(revertData, 4, revertData.length - 4), (uint256, string));
+                return (FailedOpStatus(true, opIndex, reason), emptyResponse);
             }
         }
     }
