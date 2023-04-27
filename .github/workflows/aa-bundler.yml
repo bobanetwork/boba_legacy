@@ -6,10 +6,6 @@ on:
     branches:
       - wsdt/bundler-2-ci-pipeline #todo
 
-defaults:
-  run:
-    working-directory: ./packages/boba/bundler_sdk
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +20,7 @@ jobs:
       - name: Install dependencies and build 🔧
         run: npm ci && npm run build
       - name: Publish package on NPM 📦
+        working-directory: ./packages/boba/bundler_sdk
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_BOBA_FOUNDATION }}
