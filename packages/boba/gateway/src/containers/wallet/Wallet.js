@@ -39,7 +39,7 @@ import { logAmount } from 'util/amountConvert.js'
 import networkService from 'services/networkService'
 import { NETWORK } from 'util/network/network.util'
 import Connect from "../connect/Connect";
-import PageTitle from "../../components/pageTitle/PageTitle";
+import {PageTitle} from 'components'
 
 function Wallet() {
   const [page, setPage] = useState('Token')

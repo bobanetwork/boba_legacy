@@ -23,7 +23,7 @@ import { selectLoading, selectTokens } from 'selectors'
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import * as S from './History.styles'
 import { formatDate } from 'util/dates';

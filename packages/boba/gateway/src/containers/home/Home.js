@@ -81,7 +81,7 @@ import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionMod
 import SwitchNetworkModal from 'containers/modals/switchNetwork/SwitchNetworkModal'
 
 /******** COMPONENTS ********/
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import PageHeader from 'components/pageHeader/PageHeader'
 import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'

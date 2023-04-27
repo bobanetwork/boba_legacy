@@ -13,32 +13,45 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React from 'react';
-import { NavigateNext, NavigateBefore } from '@mui/icons-material';
+import React from 'react'
+import { NavigateNext, NavigateBefore } from '@mui/icons-material'
 
-import * as styles from './Pager.module.scss';
-import * as S from './Pager.styles';
-import { useTheme } from '@emotion/react';
+import * as S from './Pager.styles'
+import { useTheme } from '@emotion/react'
 
-function Pager ({ currentPage, totalPages, isLastPage, onClickNext, onClickBack, label }) {
-  const theme = useTheme();
+interface PagerProps {
+  currentPage: number
+  totalPages: number
+  isLastPage: boolean
+  onClickNext: () => void
+  onClickBack: () => void
+  label: string
+}
 
+const Pager = ({
+  currentPage,
+  totalPages,
+  isLastPage,
+  onClickNext,
+  onClickBack,
+  label,
+}: PagerProps): JSX.Element | null => {
+  const theme = useTheme() as any
+  const variant = theme.palette.mode === 'light' ? 'contained' : 'outlined'
   if (totalPages <= 1) {
-    return null;
+    return null
   }
 
   return (
     <S.PagerContainer>
-      <div className={styles.numberLeft}>{label}</div>
+      <div>{label}</div>
       <S.PagerContent>
-        <S.PagerLabel>
-        {`Page ${currentPage} of ${totalPages}`}
-        </S.PagerLabel>
+        <S.PagerLabel>{`Page ${currentPage} of ${totalPages}`}</S.PagerLabel>
 
         <S.PagerNavigation
-          variant={theme.palette.mode === "light" ? "contained" : "outlined"}
+          variant={variant}
           size="small"
-          color='primary'
+          color="primary"
           disabled={currentPage === 1}
           onClick={onClickBack}
         >
@@ -46,18 +59,17 @@ function Pager ({ currentPage, totalPages, isLastPage, onClickNext, onClickBack,
         </S.PagerNavigation>
 
         <S.PagerNavigation
-          variant={theme.palette.mode === "light" ? "contained" : "outlined"}
+          variant={variant}
           size="small"
-          color='primary'
+          color="primary"
           disabled={isLastPage}
           onClick={onClickNext}
         >
           <NavigateNext />
         </S.PagerNavigation>
-
       </S.PagerContent>
     </S.PagerContainer>
   )
 }
 
-export default Pager;
+export default Pager
