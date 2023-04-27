@@ -1,10 +1,7 @@
 name: Publish AA-Bundler to NPM
 on:
-  #todo release:
-  #  types: [created]
-  push:
-    branches:
-      - wsdt/bundler-2-ci-pipeline #todo
+  release:
+    types: [created]
 
 jobs:
   build:
