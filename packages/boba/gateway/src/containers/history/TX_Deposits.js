@@ -21,7 +21,7 @@ import { selectLoading, selectTokens, selectActiveNetworkName } from 'selectors'
 
 import { logAmount } from 'util/amountConvert'
 
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 import Transaction from 'components/transaction/Transaction'
 
 import * as S from './History.styles';

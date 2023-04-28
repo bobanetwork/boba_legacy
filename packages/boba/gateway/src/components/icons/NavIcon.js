@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTheme } from "@mui/material/styles";
 
-function NavIcon({ onClick }) {
+function NavIcon() {
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
   const color = theme.palette.common[ isLight ? 'black' : 'white' ];
