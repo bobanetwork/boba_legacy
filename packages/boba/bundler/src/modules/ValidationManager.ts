@@ -70,10 +70,7 @@ export class ValidationManager {
 
     let failedOpStatus: EntryPointWrapper.FailedOpStatusStructOutput
     let response: EntryPointWrapper.ResponseStructOutput
-    ;[
-      failedOpStatus,
-      response,
-    ] = simulateValidation
+    ;[failedOpStatus, response] = simulateValidation
 
     if (!response.selectorType.startsWith('ValidationResult')) {
       // parse it as FailedOp
@@ -85,12 +82,12 @@ export class ValidationManager {
 
       if (paymaster == null) {
         throw new RpcError(
-          `account validation failed: ${failedOpStatus}`,
+          `account validation failed: ${failedOpStatus.reason}`,
           ValidationErrors.SimulateValidation
         )
       } else {
         throw new RpcError(
-          `paymaster validation failed: ${failedOpStatus}`,
+          `paymaster validation failed: ${failedOpStatus.reason}`,
           ValidationErrors.SimulatePaymasterValidation,
           { paymaster }
         )
@@ -159,14 +156,14 @@ export class ValidationManager {
 
     // NOTE: this mode doesn't do any opcode checking and no stake checking!
     const res = await this._callSimulateValidation(userOp)
-
-    console.log(`_callSimulateValidation ${JSON.stringify(res)}`)
+console.log(`res after validation ${JSON.stringify(res)}`)
+console.log(`res.returnInfo.sigFailed ${res.returnInfo.sigFailed}`)
     requireCond(
       !res.returnInfo.sigFailed,
       'Invalid UserOp signature or paymaster signature',
       ValidationErrors.InvalidSignature
     )
-
+//TODO
 //     requireCond(
 //       res.returnInfo.validUntil == null ||
 //         res.returnInfo.validUntil + 30 < Date.now() / 1000,
@@ -181,7 +178,7 @@ export class ValidationManager {
     ) {
       this.reputationManager.checkStake('aggregator', res.aggregatorInfo)
     }
-
+//TODO
 //     requireCond(
 //       res.aggregatorInfo.addr === AddressZero &&
 //         BigNumber.from(0).eq(res.aggregatorInfo.stake) &&

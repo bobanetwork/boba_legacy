@@ -180,8 +180,8 @@ export abstract class BaseAccountAPI {
       if (a == null || a === '') return null
       return BigNumber.from(a.toString())
     }
-
     const value = parseNumber(detailsForUserOp.value) ?? BigNumber.from(0)
+
     const callData = await this.encodeExecute(detailsForUserOp.target, value, detailsForUserOp.data)
 
     const callGasLimit = parseNumber(detailsForUserOp.gasLimit) ?? await this.provider.estimateGas({
@@ -189,7 +189,6 @@ export abstract class BaseAccountAPI {
       to: this.getAccountAddress(),
       data: callData
     })
-
     return {
       callData,
       callGasLimit
@@ -241,15 +240,11 @@ export abstract class BaseAccountAPI {
       callGasLimit
     } = await this.encodeUserOpCallDataAndGasLimit(info)
     const initCode = await this.getInitCode()
-
     const initGas = await this.estimateCreationGas(initCode)
     const verificationGasLimit = BigNumber.from(await this.getVerificationGasLimit())
       .add(initGas)
 
-    let {
-      maxFeePerGas,
-       maxPriorityFeePerGas
-     } = info
+      let { maxFeePerGas, maxPriorityFeePerGas } = info
      if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
        const feeData = await this.provider.getGasPrice()
        if (maxFeePerGas == null) {
@@ -282,6 +277,7 @@ export abstract class BaseAccountAPI {
       paymasterAndData = await this.paymasterAPI.getPaymasterAndData(userOpForPm)
     }
     partialUserOp.paymasterAndData = paymasterAndData ?? '0x'
+
     return {
       ...partialUserOp,
       preVerificationGas: this.getPreVerificationGas(partialUserOp),

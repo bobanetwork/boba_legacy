@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 import { Wallet } from 'ethers'
 import { ethers } from 'hardhat'
 import { expect } from 'chai'
