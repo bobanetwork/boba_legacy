@@ -156,8 +156,7 @@ export class ValidationManager {
 
     // NOTE: this mode doesn't do any opcode checking and no stake checking!
     const res = await this._callSimulateValidation(userOp)
-console.log(`res after validation ${JSON.stringify(res)}`)
-console.log(`res.returnInfo.sigFailed ${res.returnInfo.sigFailed}`)
+
     requireCond(
       !res.returnInfo.sigFailed,
       'Invalid UserOp signature or paymaster signature',
@@ -170,7 +169,10 @@ console.log(`res.returnInfo.sigFailed ${res.returnInfo.sigFailed}`)
 //       'expires too soon',
 //       ValidationErrors.ExpiresShortly
 //     )
-
+console.log(`res.aggregatorInfo ${res.aggregatorInfo}`)
+console.log(res.aggregatorInfo.addr)
+console.log(res.aggregatorInfo.stake)
+console.log(res.aggregatorInfo.unstakeDelaySec)
     if (
       res.aggregatorInfo.addr !== AddressZero &&
       !BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
@@ -178,14 +180,14 @@ console.log(`res.returnInfo.sigFailed ${res.returnInfo.sigFailed}`)
     ) {
       this.reputationManager.checkStake('aggregator', res.aggregatorInfo)
     }
-//TODO
-//     requireCond(
-//       res.aggregatorInfo.addr === AddressZero &&
-//         BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
-//         BigNumber.from(0).eq(res.aggregatorInfo.unstakeDelaySec),
-//       'Currently not supporting aggregator',
-//       ValidationErrors.UnsupportedSignatureAggregator
-//     )
+
+    requireCond(
+      res.aggregatorInfo.addr === AddressZero &&
+        BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
+        BigNumber.from(0).eq(res.aggregatorInfo.unstakeDelaySec),
+      'Currently not supporting aggregator',
+      ValidationErrors.UnsupportedSignatureAggregator
+    )
 
     return {
       ...res,
