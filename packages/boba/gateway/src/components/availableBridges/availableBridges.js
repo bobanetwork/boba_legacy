@@ -7,7 +7,7 @@ import networkService from 'services/networkService'
 import { BANXA_URL } from 'util/constant'
 
 function AvailableBridges({ token = null, walletAddress = "" }) {
-
+  const currentNetwork = networkService?.network;
   const [ bridges, setBridges ] = useState([])
 
   const banxaUrl = () => {
@@ -36,17 +36,20 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
       </Typography>
     </S.LabelContainer>
     <S.Wrapper>
-      <S.BridgeContent key={'banxa'}>
-        <Link color="inherit"
-          variant="body2"
-          href={banxaUrl()}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ textDecoration: 'none' }}
-        >
-          <Typography variant="body1" component="span" my={1}> Banxa</Typography>
-        </Link>
-      </S.BridgeContent>
+      {currentNetwork === 'ETHEREUM' && (
+        <S.BridgeContent key={'banxa'}>
+          <Link color="inherit"
+            variant="body2"
+            href={banxaUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ textDecoration: 'none' }}
+          >
+            <Typography variant="body1" component="span" my={1}> Banxa</Typography>
+          </Link>
+        </S.BridgeContent>
+        )
+      }
       {bridges.map((bridge) => {
         return <S.BridgeContent key={bridge.type}>
           <Link color="inherit"
