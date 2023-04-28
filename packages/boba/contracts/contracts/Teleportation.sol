@@ -404,11 +404,6 @@ contract Teleportation is PausableUpgradeable {
             require(supportedChains[_sourceChainId], "Source chain is not supported");
             totalDisbursements[_sourceChainId] += 1;
 
-            // Deliver the dispursement amount to the receiver. If the
-            // disbursement fails, the amount will be kept by the contract
-            // rather than reverting to prevent blocking progress on other
-            // disbursements.
-
             // slither-disable-next-line calls-loop,reentrancy-events
             IERC20(BobaTokenAddress).safeTransfer(_addr, _amount);
             emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
