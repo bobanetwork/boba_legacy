@@ -21,7 +21,7 @@ import {
   ToggleButton,
   IconButton,
 } from '@mui/material'
-import { useTheme } from '@mui/styles'
+import { useTheme } from '@mui/material/styles'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 

@@ -42,8 +42,7 @@ import {
   selectL2LPPendingString,
   selectL1FeeBalance,
   selectL2LPLiquidity,
-  selectActiveNetworkName,
-  selectActiveNetwork
+  selectActiveNetworkName
 } from 'selectors'
 
 
@@ -86,7 +85,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const feeBalance = useSelector(selectL1FeeBalance) //amount of ETH on L1 to pay gas
 
   const networkName = useSelector(selectActiveNetworkName())
-  const activeNetwork = useSelector(selectActiveNetwork())
 
   const [ validValue, setValidValue ] = useState(false)
 
