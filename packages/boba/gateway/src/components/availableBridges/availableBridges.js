@@ -7,9 +7,11 @@ import networkService from 'services/networkService'
 import { BANXA_URL } from 'util/constant'
 
 function AvailableBridges({ token = null, walletAddress = "" }) {
-  const currentNetwork = networkService?.network;
-  const [ bridges, setBridges ] = useState([])
 
+  const currentNetwork = networkService?.network;
+  const isAvailableOnBanxa = token?.symbol === 'ETH' || token?.symbol === 'BOBA'
+
+  const [ bridges, setBridges ] = useState([])
   const banxaUrl = () => {
     const banxaUrl = BANXA_URL;
     const config = {
@@ -36,7 +38,7 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
       </Typography>
     </S.LabelContainer>
     <S.Wrapper>
-      {currentNetwork === 'ETHEREUM' && (
+      {currentNetwork === 'ETHEREUM' && isAvailableOnBanxa && (
         <S.BridgeContent key={'banxa'}>
           <Link color="inherit"
             variant="body2"
