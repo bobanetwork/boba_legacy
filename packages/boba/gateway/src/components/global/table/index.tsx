@@ -8,7 +8,7 @@ import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material'
 
-export const TableHeaderContainer = styled(Row)(({ theme }) => ({
+const TableHeaderContainer = styled(Row)(({ theme }) => ({
   padding: '20px',
   borderTopLeftRadius: '6px',
   borderTopRightRadius: '6px',
@@ -22,7 +22,11 @@ export const TableHeaderContainer = styled(Row)(({ theme }) => ({
   },
 }))
 
-const TableContentContainer = styled(Row)`
+interface TableHeaderContainerProps {
+  children?: React.ReactNode
+}
+
+const TableContentContainer = styled<any>(Row)`
   justify-content: space-between;
 `
 
