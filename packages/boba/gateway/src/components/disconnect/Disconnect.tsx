@@ -1,4 +1,3 @@
-
 /*
 Copyright 2021-present Boba Network.
 
@@ -15,25 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
+import { LoginOutlined } from '@mui/icons-material'
+import { IconButton, Tooltip } from '@mui/material'
 
-import { AddCircleOutline, RemoveCircleOutline } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import useDisconnect from 'hooks/useDisconnect'
 
-function CounterButton ({
-  onClick,
-  disabled,
-  minus,
-}) {
-
-  return <IconButton
-    color="primary"
-    size="medium"
-    disabled={disabled}
-    onClick={onClick}>
-    {
-      minus ? <RemoveCircleOutline fontSize="medium" /> : <AddCircleOutline fontSize="medium" />
-    }
-  </IconButton>
+const Disconnect = () => {
+  const { disconnect } = useDisconnect()
+  return (
+    <>
+      <Tooltip title="" onClick={disconnect}>
+        <IconButton size="medium">
+          <LoginOutlined sx={{ fontSize: 16 }} />
+        </IconButton>
+      </Tooltip>
+    </>
+  )
 }
 
-export default React.memo(CounterButton);
+export default React.memo(Disconnect)
