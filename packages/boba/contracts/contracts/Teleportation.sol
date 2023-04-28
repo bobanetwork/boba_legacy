@@ -61,7 +61,7 @@ contract Teleportation is PausableUpgradeable {
     uint256 public transferredAmount;
     // The timestamp of the checkpoint
     uint256 public transferTimestampCheckPoint;
-
+    // depositId to failed status and disbursement info
     mapping (uint256 => FailedNativeDisbursement) public failedNativeDisbursements;
 
     /********************

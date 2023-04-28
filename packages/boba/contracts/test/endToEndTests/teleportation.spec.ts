@@ -671,6 +671,194 @@ describe('BOBA Teleportation Tests', async () => {
     })
   })
 
+  describe('Alt L2 - Failed Disbursements', () => {
+    let PausedReceiver: Contract
+
+    before(async () => {
+      signer = (await ethers.getSigners())[0]
+      signer2 = (await ethers.getSigners())[1]
+      signerAddress = await signer.getAddress()
+      signer2Address = await signer2.getAddress()
+
+      L2Boba = await (
+        await ethers.getContractFactory('L1ERC20')
+      ).deploy(initialSupply, tokenName, tokenSymbol, 18)
+
+      const Factory__Teleportation = await ethers.getContractFactory(
+        'Teleportation'
+      )
+      Teleportation = await Factory__Teleportation.deploy()
+      await Teleportation.deployTransaction.wait()
+      const Factory__Proxy__Teleportation = await ethers.getContractFactory(
+        'Lib_ResolvedDelegateProxy'
+      )
+      Proxy__Teleportation = await Factory__Proxy__Teleportation.deploy(
+        Teleportation.address
+      )
+      await Proxy__Teleportation.deployTransaction.wait()
+      Proxy__Teleportation = new ethers.Contract(
+        Proxy__Teleportation.address,
+        Factory__Teleportation.interface,
+        signer
+      )
+      await Proxy__Teleportation.initialize(
+        '0x4200000000000000000000000000000000000006',
+        ethers.utils.parseEther('1'),
+        ethers.utils.parseEther('100000')
+      )
+    })
+
+    it('should emit events when disbursement of BOBA tokens fail', async () => {
+      await Proxy__Teleportation.addSupportedChain(4)
+      const Factory__PausedReceiver = await ethers.getContractFactory(
+        'PausedReceiver'
+      )
+      PausedReceiver = await Factory__PausedReceiver.deploy()
+      await PausedReceiver.setPauseStatus(true);
+      expect(await ethers.provider.getBalance(Proxy__Teleportation.address)).to.be.eq(0)
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          amount: _amount,
+          addr: PausedReceiver.address, //tweaking recipient address to an address that cannot receive native tokens
+          sourceChainId: 4,
+          depositId: 0,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseNativeBOBA(payload, { value: _amount })
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementFailed')
+        .withArgs(0, PausedReceiver.address, _amount, 4)
+
+      const failedDisbursement = await Proxy__Teleportation.failedNativeDisbursements(0)
+      expect(failedDisbursement.failed).to.be.eq(true)
+      expect(failedDisbursement.disbursement.amount).to.be.eq(_amount)
+      expect(failedDisbursement.disbursement.addr).to.be.eq(PausedReceiver.address)
+      expect(failedDisbursement.disbursement.sourceChainId).to.be.eq(4)
+      expect(failedDisbursement.disbursement.depositId).to.be.eq(0)
+      expect(await ethers.provider.getBalance(Proxy__Teleportation.address)).to.be.eq(_amount)
+    })
+
+    it('should not be able to retry incorrect Disbursements', async () => {
+      await PausedReceiver.setPauseStatus(false);
+      await expect(
+        Proxy__Teleportation.retryDisburseNativeBOBA([1])
+      ).to.be.revertedWith('DepositId is not a failed disbursement')
+    })
+
+    it('should not be able to call from non disburser', async () => {
+      await PausedReceiver.setPauseStatus(false);
+      await expect(
+        Proxy__Teleportation.connect(signer2).retryDisburseNativeBOBA([0])
+      ).to.be.revertedWith('Caller is not the disburser')
+    })
+
+    it('should be able to retry failed Disbursements', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      await PausedReceiver.setPauseStatus(false);
+      await expect(
+        Proxy__Teleportation.retryDisburseNativeBOBA([0])
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementRetrySuccess')
+        .withArgs(0, PausedReceiver.address, _amount, 4)
+
+      const failedDisbursement = await Proxy__Teleportation.failedNativeDisbursements(0)
+      expect(failedDisbursement.failed).to.be.eq(false)
+      expect(failedDisbursement.disbursement.amount).to.be.eq(_amount)
+      expect(failedDisbursement.disbursement.addr).to.be.eq(PausedReceiver.address)
+      expect(failedDisbursement.disbursement.sourceChainId).to.be.eq(4)
+      expect(failedDisbursement.disbursement.depositId).to.be.eq(0)
+      expect(await ethers.provider.getBalance(Proxy__Teleportation.address)).to.be.eq(0)
+      expect(await ethers.provider.getBalance(PausedReceiver.address)).to.be.eq(_amount)
+    })
+
+    it('should not be able to retry an already retried Disbursements', async () => {
+      await expect(
+        Proxy__Teleportation.retryDisburseNativeBOBA([0])
+      ).to.be.revertedWith('DepositId is not a failed disbursement')
+    })
+
+    it('should not be able to retry passed Disbursements', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 1,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseNativeBOBA(payload, { value: _amount })
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
+        .withArgs(1, signerAddress, _amount, 4)
+
+      await expect(
+        Proxy__Teleportation.retryDisburseNativeBOBA([1])
+      ).to.be.revertedWith('DepositId is not a failed disbursement')
+    })
+
+    it('should be able to retry a batch of failed disbursements', async () => {
+      await PausedReceiver.setPauseStatus(true);
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          amount: ethers.utils.parseEther('100'),
+          addr: PausedReceiver.address,
+          sourceChainId: 4,
+          depositId: 2,
+        },
+        {
+          amount: ethers.utils.parseEther('1'),
+          addr: PausedReceiver.address,
+          sourceChainId: 4,
+          depositId: 3,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseNativeBOBA(payload, { value: ethers.utils.parseEther('101') })
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementFailed')
+        .withArgs(2, PausedReceiver.address, _amount, 4)
+
+      const failedDisbursement = await Proxy__Teleportation.failedNativeDisbursements(2)
+      expect(failedDisbursement.failed).to.be.eq(true)
+      const failedDisbursement2 = await Proxy__Teleportation.failedNativeDisbursements(3)
+      expect(failedDisbursement2.failed).to.be.eq(true)
+      expect(await ethers.provider.getBalance(Proxy__Teleportation.address)).to.be.eq(ethers.utils.parseEther('101'))
+
+      const preBalanceReceiver = await ethers.provider.getBalance(PausedReceiver.address)
+      // retry disbursement
+
+      await PausedReceiver.setPauseStatus(false);
+      await expect(
+        Proxy__Teleportation.retryDisburseNativeBOBA([2, 3])
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementRetrySuccess')
+        .withArgs(2, PausedReceiver.address, _amount, 4)
+        .to.emit(Proxy__Teleportation, 'DisbursementRetrySuccess')
+        .withArgs(3, PausedReceiver.address, ethers.utils.parseEther('1'), 4)
+
+      const failedDisbursementRetried1 = await Proxy__Teleportation.failedNativeDisbursements(2)
+      expect(failedDisbursementRetried1.failed).to.be.eq(false)
+      expect(failedDisbursementRetried1.disbursement.amount).to.be.eq(_amount)
+      expect(failedDisbursementRetried1.disbursement.addr).to.be.eq(PausedReceiver.address)
+      expect(failedDisbursementRetried1.disbursement.sourceChainId).to.be.eq(4)
+      expect(failedDisbursementRetried1.disbursement.depositId).to.be.eq(2)
+
+      const failedDisbursementRetried2 = await Proxy__Teleportation.failedNativeDisbursements(3)
+      expect(failedDisbursementRetried2.failed).to.be.eq(false)
+      expect(failedDisbursementRetried2.disbursement.amount).to.be.eq(ethers.utils.parseEther('1'))
+      expect(failedDisbursementRetried2.disbursement.addr).to.be.eq(PausedReceiver.address)
+      expect(failedDisbursementRetried2.disbursement.sourceChainId).to.be.eq(4)
+      expect(failedDisbursementRetried2.disbursement.depositId).to.be.eq(3)
+      expect(await ethers.provider.getBalance(Proxy__Teleportation.address)).to.be.eq(0)
+      expect(await ethers.provider.getBalance(PausedReceiver.address)).to.be.eq(preBalanceReceiver.add(ethers.utils.parseEther('101')))
+    })
+  })
+
   describe('Admin tests', () => {
     before(async () => {
       signer = (await ethers.getSigners())[0]
