@@ -18,10 +18,10 @@ import { ContentCopyOutlined } from '@mui/icons-material'
 import { IconButton, Tooltip } from '@mui/material'
 
 type CopyType = {
-  value?: string
+  value?: string | null
 }
 
-const Copy = ({ value = '' }: CopyType): JSX.Element => {
+const Copy = ({ value }: CopyType): JSX.Element => {
   const [open, setOpen] = useState(false)
 
   const handdleCopy = (text: string) => {
@@ -36,6 +36,10 @@ const Copy = ({ value = '' }: CopyType): JSX.Element => {
       }, 1500)
     }
   }, [open, setOpen])
+
+  if (!value) {
+    return <></>
+  }
 
   return (
     <div onClick={() => handdleCopy(value)}>
