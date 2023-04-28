@@ -478,7 +478,8 @@ contract Teleportation is PausableUpgradeable {
         onlyAltL2s()
     {
         uint256 _balance = address(this).balance;
-        payable(owner).transfer(_balance);
+        (bool sent,) = owner.call{gas: 2300, value: _balance}("");
+        require(sent, "Failed to send Ether");
         emit NativeBOBABalanceWithdrawn(owner, _balance);
     }
 

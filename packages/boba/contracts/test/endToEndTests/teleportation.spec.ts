@@ -59,7 +59,7 @@ describe('BOBA Teleportation Tests', async () => {
       await Proxy__Teleportation.initialize(
         L2Boba.address,
         ethers.utils.parseEther('1'),
-        ethers.utils.parseEther('10000000000')
+        ethers.utils.parseEther('100000')
       )
     })
 
@@ -68,7 +68,7 @@ describe('BOBA Teleportation Tests', async () => {
         Proxy__Teleportation.initialize(
           L2Boba.address,
           ethers.utils.parseEther('1'),
-          ethers.utils.parseEther('10000000000')
+          ethers.utils.parseEther('100000') // maxTransferAmountPerDay is set to 100000
         )
       ).to.be.revertedWith('Contract has been initialized')
     })
@@ -378,7 +378,7 @@ describe('BOBA Teleportation Tests', async () => {
       await Proxy__Teleportation.initialize(
         '0x4200000000000000000000000000000000000006',
         ethers.utils.parseEther('1'),
-        ethers.utils.parseEther('10000000000')
+        ethers.utils.parseEther('100000')
       )
     })
 
@@ -387,7 +387,7 @@ describe('BOBA Teleportation Tests', async () => {
         Proxy__Teleportation.initialize(
           '0x4200000000000000000000000000000000000006',
           ethers.utils.parseEther('1'),
-          ethers.utils.parseEther('10000000000')
+          ethers.utils.parseEther('100000')
         )
       ).to.be.revertedWith('Contract has been initialized')
     })
@@ -702,7 +702,7 @@ describe('BOBA Teleportation Tests', async () => {
       await Proxy__Teleportation.initialize(
         L2Boba.address,
         ethers.utils.parseEther('1'),
-        ethers.utils.parseEther('10000000000')
+        ethers.utils.parseEther('100000')
       )
     })
 
@@ -720,6 +720,15 @@ describe('BOBA Teleportation Tests', async () => {
       ).to.be.revertedWith('Caller is not the owner')
     })
 
+    it('should not set minimum amount if caller is not owner', async () => {
+      const maxAmount = await Proxy__Teleportation.maxDepositAmount()
+      await expect(
+        Proxy__Teleportation.setMinAmount(
+          maxAmount.add(1)
+        )
+      ).to.be.revertedWith('incorrect min deposit amount')
+    })
+
     it('should set minimum amount', async () => {
       await Proxy__Teleportation.setMinAmount(ethers.utils.parseEther('1'))
       expect(
@@ -733,6 +742,15 @@ describe('BOBA Teleportation Tests', async () => {
           ethers.utils.parseEther('1')
         )
       ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it('should not set maximum amount if caller is not owner', async () => {
+      const minAmount = await Proxy__Teleportation.minDepositAmount()
+      await expect(
+        Proxy__Teleportation.setMaxAmount(
+          minAmount.sub(1)
+        )
+      ).to.be.revertedWith('incorrect max deposit amount')
     })
 
     it('should set maximum amount', async () => {
@@ -765,6 +783,47 @@ describe('BOBA Teleportation Tests', async () => {
           ethers.utils.parseEther('1')
         )
       ).to.be.revertedWith('Caller is not the owner')
+    })
+  })
+
+  describe('Init tests', () => {
+    before(async () => {
+      signer = (await ethers.getSigners())[0]
+      signer2 = (await ethers.getSigners())[1]
+      signerAddress = await signer.getAddress()
+      signer2Address = await signer2.getAddress()
+
+      L2Boba = await (
+        await ethers.getContractFactory('L1ERC20')
+      ).deploy(initialSupply, tokenName, tokenSymbol, 18)
+
+      const Factory__Teleportation = await ethers.getContractFactory(
+        'Teleportation'
+      )
+      Teleportation = await Factory__Teleportation.deploy()
+      await Teleportation.deployTransaction.wait()
+      const Factory__Proxy__Teleportation = await ethers.getContractFactory(
+        'Lib_ResolvedDelegateProxy'
+      )
+      Proxy__Teleportation = await Factory__Proxy__Teleportation.deploy(
+        Teleportation.address
+      )
+      await Proxy__Teleportation.deployTransaction.wait()
+      Proxy__Teleportation = new ethers.Contract(
+        Proxy__Teleportation.address,
+        Factory__Teleportation.interface,
+        signer
+      )
+    })
+
+    it('should not be able to set incorrect init values', async () => {
+      await expect(
+        Proxy__Teleportation.initialize(
+          L2Boba.address,
+          ethers.utils.parseEther('1'),
+          ethers.utils.parseEther('10000000000')
+        )
+      ).to.be.revertedWith('max deposit amount cannot be more than daily limit')
     })
   })
 })
