@@ -190,6 +190,7 @@ contract Teleportation is PausableUpgradeable {
         initializer()
     {
         require(_BobaTokenAddress != address(0), "zero address not allowed");
+        require(_minDepositAmount > 0 && _maxDepositAmount > 0 && _minDepositAmount <= _maxDepositAmount, "incorrect min/max deposit");
         minDepositAmount = _minDepositAmount;
         maxDepositAmount = _maxDepositAmount;
         BobaTokenAddress = _BobaTokenAddress;
@@ -199,6 +200,7 @@ contract Teleportation is PausableUpgradeable {
        // set maximum amount of tokens can be transferred in 24 hours
         transferTimestampCheckPoint = block.timestamp;
         maxTransferAmountPerDay = 100_000e18;
+        require(_maxDepositAmount <= maxTransferAmountPerDay, "max deposit amount cannot be more than daily limit");
 
         __Context_init_unchained();
         __Pausable_init_unchained();
@@ -533,6 +535,7 @@ contract Teleportation is PausableUpgradeable {
      * @param _minDepositAmount The new minimum deposit amount.
      */
     function setMinAmount(uint256 _minDepositAmount) external onlyOwner() {
+        require(_minDepositAmount > 0 && _minDepositAmount <= maxDepositAmount, "incorrect min deposit amount");
         uint256 pastMinDepositAmount = minDepositAmount;
         minDepositAmount = _minDepositAmount;
         emit MinDepositAmountSet(pastMinDepositAmount, minDepositAmount);
@@ -544,6 +547,7 @@ contract Teleportation is PausableUpgradeable {
      * @param _maxDepositAmount The new maximum deposit amount.
      */
     function setMaxAmount(uint256 _maxDepositAmount) external onlyOwner() {
+        require(_maxDepositAmount > 0 && minDepositAmount <= _maxDepositAmount, "incorrect max deposit amount");
         uint256 pastMaxDepositAmount = maxDepositAmount;
         maxDepositAmount = _maxDepositAmount;
         emit MaxDepositAmountSet(pastMaxDepositAmount, maxDepositAmount);
