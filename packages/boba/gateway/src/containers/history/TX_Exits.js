@@ -23,7 +23,7 @@ import { selectLoading, selectTokens, selectActiveNetworkName } from 'selectors'
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import networkService from 'services/networkService'
 

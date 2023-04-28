@@ -5,7 +5,6 @@ export const Text = styled.p`
   margin: 0px;
   font-weight: 400;
   font-size: 0.9rem;
-  text-transform: uppercase;
   line-height: 1.25;
 `
 export const Small = styled.p`
