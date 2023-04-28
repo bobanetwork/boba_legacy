@@ -13,14 +13,13 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
   const banxaUrl = () => {
     const banxaUrl = BANXA_URL;
     const config = {
-      coinType: 'ETH',
+      coinType: 'BOBA',
       fiatType: 'USD',
       fiatAmount: '',
-      blockChain: 'BOBA',
+      blockChain: 'Boba Network',
       walletAddress: walletAddress
     }
-
-    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&fiatAmount=${config.fiatAmount}&blockchain=${config.blockChain}&walletAddress=${walletAddress}`
+    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&blockchain=${config.blockChain}&walletAddress=${walletAddress}`
   }
 
   useEffect(() => {
