@@ -165,7 +165,7 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
           <NetworkSwitcher />
           {!!accountEnabled ? (
             <>
-              <Copy value={networkService.account} />
+              <Copy value={networkService.account || ''} />
               <Disconnect />
             </>
           ) : null}
