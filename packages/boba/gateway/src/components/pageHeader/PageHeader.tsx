@@ -52,6 +52,7 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
   const layer: 'L1' | 'L2' = useSelector(selectLayer())
   const monsterNumber: number = useSelector(selectMonster())
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const account = networkService.account || ''
 
   const Logo = monsterNumber > 0 ? BobaLogoM : BobaLogo
 
@@ -165,7 +166,7 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
           <NetworkSwitcher />
           {!!accountEnabled ? (
             <>
-              <Copy value={networkService.account} />
+              <Copy value={account} />
               <Disconnect />
             </>
           ) : null}

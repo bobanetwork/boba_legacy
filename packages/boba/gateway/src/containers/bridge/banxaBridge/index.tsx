@@ -105,7 +105,7 @@ const ButtonContainer = styled(Column)`
 const BanxaBridge = () => {
   const [value, setValue] = useState('')
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value)
   }
 
@@ -151,7 +151,7 @@ const BanxaBridge = () => {
         <OptionContainer>
           <Option>
             <div>
-              <img src={Banxa} />
+              <img src={Banxa} alt="banxa" />
               Banxa
             </div>{' '}
             <Fees>
@@ -161,11 +161,19 @@ const BanxaBridge = () => {
         </OptionContainer>
         <ButtonContainer>
           <Button
+            style={{}}
+            disabled={false}
+            loading={false}
+            pulsate={false}
+            tooltip=""
+            size="medium"
+            className=""
             sx={{ width: '150px', margin: '0px auto' }}
             fullWidth={true}
             onClick={() => console.log('here')}
             color="primary"
             variant="contained"
+            triggerTime={1000}
           >
             Buy Eth Now
           </Button>
