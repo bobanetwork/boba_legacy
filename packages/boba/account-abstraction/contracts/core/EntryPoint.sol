@@ -16,9 +16,10 @@ import "../utils/Exec.sol";
 import "./StakeManager.sol";
 import "./SenderCreator.sol";
 import "./Helpers.sol";
+import "./NonceManager.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EntryPoint is IEntryPoint, StakeManager, ReentrancyGuard {
+contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard {
 
     using UserOperationLib for UserOperation;
 
@@ -353,7 +354,8 @@ contract EntryPoint is IEntryPoint, StakeManager, ReentrancyGuard {
      * @param initCode the constructor code to be passed into the UserOperation.
      */
     function getSenderAddress(bytes calldata initCode) public {
-        revert SenderAddressResult(senderCreator.createSender(initCode));
+        address sender = senderCreator.createSender(initCode);
+        revert SenderAddressResult(sender);
     }
 
     function _simulationOnlyValidations(UserOperation calldata userOp) internal view {
@@ -515,6 +517,11 @@ contract EntryPoint is IEntryPoint, StakeManager, ReentrancyGuard {
         uint256 gasUsedByValidateAccountPrepayment;
         (uint256 requiredPreFund) = _getRequiredPrefund(mUserOp);
         (gasUsedByValidateAccountPrepayment, validationData) = _validateAccountPrepayment(opIndex, userOp, outOpInfo, requiredPreFund);
+
+        if (!_validateAndUpdateNonce(mUserOp.sender, mUserOp.nonce)) {
+            revert FailedOp(opIndex, "AA25 invalid account nonce");
+        }
+
         //a "marker" where account opcode validation is done and paymaster opcode validation is about to start
         // (used only by off-chain simulateValidation)
         numberMarker();
