@@ -1,26 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import * as S from './availableBridges.styles'
+import {useSelector } from 'react-redux'
+
+import { selectActiveNetwork } from 'selectors'
 
 import { Link, Typography } from '@mui/material'
 
 import networkService from 'services/networkService'
 import { BANXA_URL } from 'util/constant'
+import { NETWORK } from 'util/network/network.util'
 
 function AvailableBridges({ token = null, walletAddress = "" }) {
 
-  const [ bridges, setBridges ] = useState([])
+  const currentNetwork = useSelector(selectActiveNetwork());
+  const isAvailableOnBanxa = token?.symbol === 'ETH' || token?.symbol === 'BOBA'
 
+  const [ bridges, setBridges ] = useState([])
   const banxaUrl = () => {
     const banxaUrl = BANXA_URL;
     const config = {
-      coinType: 'ETH',
+      coinType: 'BOBA',
       fiatType: 'USD',
       fiatAmount: '',
-      blockChain: 'BOBA',
+      blockChain: 'Boba Network',
       walletAddress: walletAddress
     }
-
-    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&fiatAmount=${config.fiatAmount}&blockchain=${config.blockChain}&walletAddress=${walletAddress}`
+    return `${banxaUrl}coinType=${config.coinType}&fiatType=${config.fiatType}&blockchain=${config.blockChain}&walletAddress=${walletAddress}`
   }
 
   useEffect(() => {
@@ -37,17 +42,20 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
       </Typography>
     </S.LabelContainer>
     <S.Wrapper>
-      <S.BridgeContent key={'banxa'}>
-        <Link color="inherit"
-          variant="body2"
-          href={banxaUrl()}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ textDecoration: 'none' }}
-        >
-          <Typography variant="body1" component="span" my={1}> Banxa</Typography>
-        </Link>
-      </S.BridgeContent>
+      {currentNetwork === NETWORK.ETHEREUM && isAvailableOnBanxa && (
+        <S.BridgeContent key={'banxa'}>
+          <Link color="inherit"
+            variant="body2"
+            href={banxaUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ textDecoration: 'none' }}
+          >
+            <Typography variant="body1" component="span" my={1}> Banxa</Typography>
+          </Link>
+        </S.BridgeContent>
+        )
+      }
       {bridges.map((bridge) => {
         return <S.BridgeContent key={bridge.type}>
           <Link color="inherit"
