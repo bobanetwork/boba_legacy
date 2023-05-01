@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.9;
+pragma solidity 0.8.9;
 
 /* External Imports */
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
@@ -31,6 +31,11 @@ contract Teleportation is PausableUpgradeable {
         uint256 depositId;
     }
 
+    struct FailedNativeDisbursement {
+        bool failed;
+        Disbursement disbursement;
+    }
+
     /*************
      * Variables *
      *************/
@@ -56,6 +61,8 @@ contract Teleportation is PausableUpgradeable {
     uint256 public transferredAmount;
     // The timestamp of the checkpoint
     uint256 public transferTimestampCheckPoint;
+    // depositId to failed status and disbursement info
+    mapping (uint256 => FailedNativeDisbursement) public failedNativeDisbursements;
 
     /********************
      *       Events     *
@@ -121,6 +128,13 @@ contract Teleportation is PausableUpgradeable {
         bool supported
     );
 
+    event DisbursementRetrySuccess(
+        uint256 indexed depositId,
+        address indexed to,
+        uint256 amount,
+        uint256 sourceChainId
+    );
+
     /**********************
      * Function Modifiers *
      **********************/
@@ -176,6 +190,7 @@ contract Teleportation is PausableUpgradeable {
         initializer()
     {
         require(_BobaTokenAddress != address(0), "zero address not allowed");
+        require(_minDepositAmount > 0 && _maxDepositAmount > 0 && _minDepositAmount <= _maxDepositAmount, "incorrect min/max deposit");
         minDepositAmount = _minDepositAmount;
         maxDepositAmount = _maxDepositAmount;
         BobaTokenAddress = _BobaTokenAddress;
@@ -185,6 +200,7 @@ contract Teleportation is PausableUpgradeable {
        // set maximum amount of tokens can be transferred in 24 hours
         transferTimestampCheckPoint = block.timestamp;
         maxTransferAmountPerDay = 100_000e18;
+        require(_maxDepositAmount <= maxTransferAmountPerDay, "max deposit amount cannot be more than daily limit");
 
         __Context_init_unchained();
         __Pausable_init_unchained();
@@ -339,7 +355,10 @@ contract Teleportation is PausableUpgradeable {
             // slither-disable-next-line calls-loop,reentrancy-events
             (bool success, ) = _addr.call{ gas: 3000, value: _amount }("");
             if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
-            else emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
+            else {
+                failedNativeDisbursements[_depositId] = FailedNativeDisbursement(true, _disbursements[i]);
+                emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
+            }
         }
     }
 
@@ -385,14 +404,44 @@ contract Teleportation is PausableUpgradeable {
             require(supportedChains[_sourceChainId], "Source chain is not supported");
             totalDisbursements[_sourceChainId] += 1;
 
-            // Deliver the dispursement amount to the receiver. If the
-            // disbursement fails, the amount will be kept by the contract
-            // rather than reverting to prevent blocking progress on other
-            // disbursements.
-
             // slither-disable-next-line calls-loop,reentrancy-events
             IERC20(BobaTokenAddress).safeTransfer(_addr, _amount);
             emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
+        }
+    }
+
+    /**
+     * @dev Retry native Boba disbursement if it failed previously
+     *
+     * @param _depositIds A list of DepositIds to process.
+     */
+    function retryDisburseNativeBOBA(uint256[] memory _depositIds)
+        external
+        payable
+        onlyDisburser()
+        onlyAltL2s()
+        whenNotPaused()
+    {
+        // Ensure there are disbursements to process.
+        uint256 _numDisbursements = _depositIds.length;
+        require(_numDisbursements > 0, "No disbursements");
+
+        // Failed Disbursement amounts should remain in the contract
+
+        // Process disbursements.
+        for (uint256 i = 0; i < _numDisbursements; i++) {
+            FailedNativeDisbursement storage failedDisbursement = failedNativeDisbursements[_depositIds[i]];
+            require(failedDisbursement.failed, "DepositId is not a failed disbursement");
+            uint256 _amount = failedDisbursement.disbursement.amount;
+            address _addr = failedDisbursement.disbursement.addr;
+            uint256 _sourceChainId = failedDisbursement.disbursement.sourceChainId;
+
+            // slither-disable-next-line calls-loop,reentrancy-events
+            (bool success, ) = _addr.call{ gas: 3000, value: _amount }("");
+            if (success) {
+                failedNativeDisbursements[_depositIds[i]].failed = false;
+                emit DisbursementRetrySuccess(_depositIds[i], _addr, _amount, _sourceChainId);
+            }
         }
     }
 
@@ -424,7 +473,8 @@ contract Teleportation is PausableUpgradeable {
         onlyAltL2s()
     {
         uint256 _balance = address(this).balance;
-        payable(owner).transfer(_balance);
+        (bool sent,) = owner.call{gas: 2300, value: _balance}("");
+        require(sent, "Failed to send Ether");
         emit NativeBOBABalanceWithdrawn(owner, _balance);
     }
 
@@ -481,6 +531,7 @@ contract Teleportation is PausableUpgradeable {
      * @param _minDepositAmount The new minimum deposit amount.
      */
     function setMinAmount(uint256 _minDepositAmount) external onlyOwner() {
+        require(_minDepositAmount > 0 && _minDepositAmount <= maxDepositAmount, "incorrect min deposit amount");
         uint256 pastMinDepositAmount = minDepositAmount;
         minDepositAmount = _minDepositAmount;
         emit MinDepositAmountSet(pastMinDepositAmount, minDepositAmount);
@@ -492,6 +543,7 @@ contract Teleportation is PausableUpgradeable {
      * @param _maxDepositAmount The new maximum deposit amount.
      */
     function setMaxAmount(uint256 _maxDepositAmount) external onlyOwner() {
+        require(_maxDepositAmount > 0 && minDepositAmount <= _maxDepositAmount, "incorrect max deposit amount");
         uint256 pastMaxDepositAmount = maxDepositAmount;
         maxDepositAmount = _maxDepositAmount;
         emit MaxDepositAmountSet(pastMaxDepositAmount, maxDepositAmount);
