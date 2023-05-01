@@ -6,7 +6,7 @@ description: Debugging with Tenderly
 [Tenderly](https://tenderly.co/) is a great platform that supports your Web3 development efforts. It helps developers to build, test, monitor and operate their smart contracts.
 
 ## What you can do
-Tenderly is enabled on all active Boba networks.
+Tenderly development platform (Web3 Gateway just for Ethereum, for now) is enabled on all active Boba networks.
 
 Here are some core features you may want to have a look at:
 - [Monitoring](https://tenderly.co/monitoring)
