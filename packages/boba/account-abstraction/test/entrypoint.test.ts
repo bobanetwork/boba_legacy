@@ -42,7 +42,8 @@ import {
   simulationResultCatch,
   createAccount,
   getAggregatedAccountInitCode,
-  simulationResultWithAggregationCatch
+  simulationResultWithAggregationCatch,
+  decodeRevertReason
 } from './testutils'
 import { DefaultsForUserOp, fillAndSign, getUserOpHash } from './UserOp'
 import { UserOperation } from './UserOperation'
@@ -715,6 +716,24 @@ describe('EntryPoint', function () {
 
         console.log('rcpt.gasUsed=', rcpt.gasUsed.toString(), rcpt.transactionHash)
         await calcGasUsage(rcpt, entryPoint, beneficiaryAddress)
+      })
+
+      it('should fail to call recursively into handleOps', async () => {
+        const beneficiaryAddress = createAddress()
+
+        const callHandleOps = entryPoint.interface.encodeFunctionData('handleOps', [[], beneficiaryAddress])
+        const execHandlePost = account.interface.encodeFunctionData('execute', [entryPoint.address, 0, callHandleOps])
+        const op = await fillAndSign({
+          sender: account.address,
+          callData: execHandlePost
+        }, accountOwner, entryPoint)
+
+        const rcpt = await entryPoint.handleOps([op], beneficiaryAddress, {
+          gasLimit: 1e7
+        }).then(async r => r.wait())
+
+        const error = rcpt.events?.find(ev => ev.event === 'UserOperationRevertReason')
+        expect(decodeRevertReason(error?.args?.revertReason)).to.eql('Error(ReentrancyGuard: reentrant call)', 'execution of handleOps inside a UserOp should revert')
       })
 
       it('should report failure on insufficient verificationGas after creation', async () => {
