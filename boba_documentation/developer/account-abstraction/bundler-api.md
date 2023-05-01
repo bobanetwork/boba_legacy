@@ -9,6 +9,7 @@ This section lists the Ethereum JSON-RPC API endpoints for a basic EIP-4337 "bun
 - `eth_sendUserOperation`
 - `eth_supportedEntryPoints`
 - `eth_chainId`
+- `eth_estimateUserOperationGas` (currently not supported)
 
 
 ## eth_sendUserOperation
