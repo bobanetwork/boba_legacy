@@ -1,12 +1,12 @@
 import React from 'react'
-import { styled } from '@mui/material/styles'
-import { useTheme } from '@emotion/react'
 
 import { Row } from 'components/global/containers'
 import { Text } from 'components/global/text'
 import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import { styled } from '@mui/system'
 
 const TableHeaderContainer = styled(Row)(({ theme }) => ({
   padding: '20px',

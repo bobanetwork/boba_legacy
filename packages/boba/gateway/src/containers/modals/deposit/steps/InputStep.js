@@ -9,7 +9,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { selectLoading, selectLookupPrice, selectActiveNetworkName, selectActiveNetwork } from 'selectors'
+import { selectLoading, selectLookupPrice, selectActiveNetworkName } from 'selectors'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { useTheme } from '@emotion/react'
@@ -35,7 +35,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   const depositLoading = useSelector(selectLoading([ 'DEPOSIT/CREATE' ]))
 
   const networkName = useSelector(selectActiveNetworkName())
-  const activeNetwork = useSelector(selectActiveNetwork())
   const lookupPrice = useSelector(selectLookupPrice)
 
   const maxValue = logAmount(token.balance, token.decimals)
