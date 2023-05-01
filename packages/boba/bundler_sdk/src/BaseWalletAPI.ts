@@ -262,7 +262,7 @@ export abstract class BaseWalletAPI {
 
     const partialUserOp: any = {
       sender: this.getWalletAddress(),
-      nonce: this.getNonce(),
+      nonce: info.nonce ?? this.getNonce(),
       initCode,
       callData,
       callGasLimit,

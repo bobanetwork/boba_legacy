@@ -78,7 +78,7 @@ export class SimpleAccountAPI extends BaseWalletAPI {
       return BigNumber.from(0)
     }
     const walletContract = await this._getWalletContract()
-    return await walletContract.nonce()
+    return await walletContract.getNonce()
   }
 
   /**
