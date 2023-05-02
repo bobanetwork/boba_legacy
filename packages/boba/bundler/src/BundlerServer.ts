@@ -15,13 +15,11 @@ import { BundlerConfig } from './BundlerConfig'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import { Server } from 'http'
 import { RpcError } from './utils'
-import {
-  EntryPoint__factory,
-  UserOperationStruct,
-} from '@boba/accountabstraction'
+import { UserOperationStruct } from '@boba/accountabstraction'
 import { DebugMethodHandler } from './DebugMethodHandler'
 
 import Debug from 'debug'
+import { ExecutionErrors } from './modules/Types'
 
 const debug = Debug('aa.rpc')
 export class BundlerServer {
@@ -64,6 +62,10 @@ export class BundlerServer {
       this.fatal(`entrypoint not deployed at ${this.config.entryPoint}`)
     }
 
+    if ((await this.provider.getCode(this.config.entryPointWrapper)) === '0x') {
+      this.fatal(`entrypoint wrapper not deployed at ${this.config.entryPointWrapper}`)
+    }
+
     // minimal UserOp to revert with "FailedOp"
     const emptyUserOp: UserOperationStruct = {
       sender: AddressZero,
@@ -78,19 +80,12 @@ export class BundlerServer {
       maxPriorityFeePerGas: 0,
       signature: '0x',
     }
-    // await EntryPoint__factory.connect(this.config.entryPoint,this.provider).callStatic.addStake(0)
-
-    // const err = await EntryPoint__factory.connect(
-    //   this.config.entryPoint,
-    //   this.provider
-    // )
-    //   .callStatic.simulateValidation(emptyUserOp)
-    //   .catch((e) => e)
-    // console.log(err)
+    // TODO: https://github.com/bobanetwork/boba/issues/759
+    // // await EntryPoint__factory.connect(this.config.entryPoint,this.provider).callStatic.addStake(0)
+    // const err = await EntryPoint__factory.connect(this.config.entryPoint, this.provider).callStatic.simulateValidation(emptyUserOp)
+    //   .catch(e => e)
     // if (err?.errorName !== 'FailedOp') {
-    //   this.fatal(
-    //     `Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`
-    //   )
+    //   this.fatal(`Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`)
     // }
     const bal = await this.provider.getBalance(this.wallet.address)
     console.log(
@@ -166,13 +161,19 @@ export class BundlerServer {
           params[1]
         )
         break
-      // custom errors post bedrock!
-      // case 'eth_estimateUserOperationGas':
-      //   result = await this.methodHandler.estimateUserOperationGas(
-      //     params[0],
-      //     params[1]
-      //   )
-      //   break
+      // this uses custom errors that will work post bedrock. for now they need to be handled via wrapper
+      // https://github.com/bobanetwork/boba/issues/752
+      case 'eth_estimateUserOperationGas':
+        // result = await this.methodHandler.estimateUserOperationGas(
+        //   params[0],
+        //   params[1]
+        // )
+        //break
+        // remove after https://github.com/bobanetwork/boba/issues/752
+        throw new RpcError(
+          'eth_estimateUserOperationGas not supported',
+          ExecutionErrors.UserOperationNotSupported
+        )
       case 'eth_getUserOperationReceipt':
         result = await this.methodHandler.getUserOperationReceipt(params[0])
         break
@@ -182,34 +183,35 @@ export class BundlerServer {
       case 'web3_clientVersion':
         result = this.methodHandler.clientVersion()
         break
-      case 'debug_bundler_clearState':
-        this.debugHandler.clearState()
-        result = 'ok'
-        break
-      case 'debug_bundler_dumpMempool':
-        result = await this.debugHandler.dumpMempool()
-        break
-      case 'debug_bundler_setReputation':
-        await this.debugHandler.setReputation(params[0])
-        result = 'ok'
-        break
-      case 'debug_bundler_dumpReputation':
-        result = await this.debugHandler.dumpReputation()
-        break
-      case 'debug_bundler_setBundlingMode':
-        await this.debugHandler.setBundlingMode(params[0])
-        result = 'ok'
-        break
-      case 'debug_bundler_setBundleInterval':
-        await this.debugHandler.setBundleInterval(params[0], params[1])
-        result = 'ok'
-        break
-      case 'debug_bundler_sendBundleNow':
-        result = await this.debugHandler.sendBundleNow()
-        if (result == null) {
-          result = 'ok'
-        }
-        break
+      //TODO https://github.com/bobanetwork/boba/issues/761
+      // case 'debug_bundler_clearState':
+      //   this.debugHandler.clearState()
+      //   result = 'ok'
+      //   break
+      // case 'debug_bundler_dumpMempool':
+      //   result = await this.debugHandler.dumpMempool()
+      //   break
+      // case 'debug_bundler_setReputation':
+      //   await this.debugHandler.setReputation(params[0])
+      //   result = 'ok'
+      //   break
+      // case 'debug_bundler_dumpReputation':
+      //   result = await this.debugHandler.dumpReputation()
+      //   break
+      // case 'debug_bundler_setBundlingMode':
+      //   await this.debugHandler.setBundlingMode(params[0])
+      //   result = 'ok'
+      //   break
+      // case 'debug_bundler_setBundleInterval':
+      //   await this.debugHandler.setBundleInterval(params[0], params[1])
+      //   result = 'ok'
+      //   break
+      // case 'debug_bundler_sendBundleNow':
+      //   result = await this.debugHandler.sendBundleNow()
+      //   if (result == null) {
+      //     result = 'ok'
+      //   }
+      //   break
       default:
         throw new RpcError(`Method ${method} is not supported`, -32601)
     }
