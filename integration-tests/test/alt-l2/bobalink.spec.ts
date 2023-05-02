@@ -14,6 +14,7 @@ const fetch = require('node-fetch')
 
 import { OptimismEnv } from './shared/env'
 import { waitForAndExecute } from './shared/utils'
+import { Server } from "http";
 
 describe('BobaLink Test\n', async () => {
   let env: OptimismEnv
@@ -43,6 +44,12 @@ describe('BobaLink Test\n', async () => {
       )
     }
   }
+
+  let server: Server
+
+  after(async () => {
+    await server.close(console.error)
+  })
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -107,7 +114,7 @@ describe('BobaLink Test\n', async () => {
     const http = require('http')
     const ip = require("ip")
     // start local server
-    const server = module.exports = http.createServer(async function (req, res) {
+    server = module.exports = http.createServer(async function (req, res) {
 
       if (req.headers['content-type'] === 'application/json') {
 
