@@ -195,7 +195,7 @@ describe('UserOpMethodHandler', function () {
       expect(rcpt?.success).to.be.true
     })
 
-    it.only('should expose FailedOp errors as text messages', async () => {
+    it('should expose FailedOp errors as text messages', async () => {
       const smartAccountAPI = new SimpleAccountAPI({
         provider,
         entryPointAddress: entryPoint.address,

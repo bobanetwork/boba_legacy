@@ -37,9 +37,7 @@ services:
       L2_NODE_WEB3_URL: http://l2geth:8545
       GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : *gas-price-oracle_pk #same as the deployer
-      << : *relayer_pk
-      << : *fast-relayer_pk
+      << : [*gas-price-oracle_pk, *relayer_pk, *fast-relayer_pk]
       SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
       PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
       GAS_PRICE_ORACLE_FLOOR_PRICE: 1
