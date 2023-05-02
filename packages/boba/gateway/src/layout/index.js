@@ -26,16 +26,17 @@ import {
 } from '@mui/material/styles'
 
 import { setTheme } from 'actions/uiAction'
-import { selectModalState } from 'selectors/uiSelector'
+import { selectTheme } from 'selectors'
 
 import Notification from 'containers/notification/Notification'
 
 import Router from './routes'
+import Theme from 'themes'
 
 function App() {
   const dispatch = useDispatch()
 
-  const theme = useSelector(selectModalState('theme'))
+  const theme = useSelector(selectTheme)
   const light = theme === 'light'
 
   const radioGreen = '#BAE21A'
@@ -97,7 +98,7 @@ function App() {
       },
     },
     typography: {
-      fontFamily: ['MrEavesXL', 'Roboto'].join(','),
+      fontFamily: [ 'MrEavesXL', 'Roboto' ].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,
@@ -134,7 +135,7 @@ function App() {
       },
     },
     components: {
-      ReactSelect : {
+      ReactSelect: {
         styleOverrides: {
           root: {
             borderRadius: '12px',
@@ -195,9 +196,9 @@ function App() {
             props: { variant: 'contained', color: 'primary' },
             style: {
               // background: 'linear-gradient(131.81deg, #4A6FEF 2.66%, #4251F0 124.21%)',
-              background: !light? radioGreen: buttonColorLightmode,
+              background: !light ? radioGreen : buttonColorLightmode,
               borderWidth: '1.4px',
-              borderColor: !light? radioGreen: buttonColorLightmode,
+              borderColor: !light ? radioGreen : buttonColorLightmode,
               fontWeight: 500,
               fontSize: '16px',
               font: 'Roboto',
@@ -205,22 +206,22 @@ function App() {
               '&:hover': {
                 boxShadow: 'inset 0px 0px 0px 3px rgba(255, 255, 255, 0.2)',
                 transition: 'box-shadow 0.3s ease-in-out',
-                backgroundColor: !light? radioGreen: buttonColorLightmode,
+                backgroundColor: !light ? radioGreen : buttonColorLightmode,
               },
             },
           },
           {
             props: { variant: 'outlined', color: 'primary' },
             style: {
-              color: !light? radioGreen: buttonColorLightmode,
-              borderColor: !light? radioGreen: buttonColorLightmode,
+              color: !light ? radioGreen : buttonColorLightmode,
+              borderColor: !light ? radioGreen : buttonColorLightmode,
               background: light ? '#fff' : 'none',
               borderWidth: '1.4px',
               fontWeight: 700,
               '&:hover': {
                 color: '#000',
-                borderColor: !light? radioGreen: buttonColorLightmode,
-                backgroundColor: !light? radioGreen: buttonColorLightmode,
+                borderColor: !light ? radioGreen : buttonColorLightmode,
+                backgroundColor: !light ? radioGreen : buttonColorLightmode,
                 borderWidth: '1.4px',
                 boxShadow: 'inset 2px 2px 13px rgba(0, 0, 0, 0.15)',
               },
@@ -258,7 +259,7 @@ function App() {
               borderWidth: '1.4px',
               borderColor: buttonColor,
               '&:hover': {
-                color: !light ? buttonColor: buttonColorLightmode,
+                color: !light ? buttonColor : buttonColorLightmode,
                 boxShadow: 'none',
               },
             },
@@ -292,7 +293,7 @@ function App() {
             style: {
               color: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               borderWidth: '1.4px',
-              borderColor: light ?  'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
               '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',
@@ -373,31 +374,33 @@ function App() {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-  }, [dispatch])
+  }, [ dispatch ])
 
   return (
     <ThemeProvider theme={MUItheme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Box
-          sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flex: '1 0',
-              flexDirection: 'column',
-              minHeight: `100vh`,
-              backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
-            }}
+      <Theme>
+        <CssBaseline />
+        <BrowserRouter>
+          <Box
+            sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
           >
-            <Notification />
-            <Suspense fallback={<>Loading...</>}>
-              <Router />
-            </Suspense>
-          </div>
-        </Box>
-      </BrowserRouter>
+            <div
+              style={{
+                display: 'flex',
+                flex: '1 0',
+                flexDirection: 'column',
+                minHeight: `100vh`,
+                backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
+              }}
+            >
+              <Notification />
+              <Suspense fallback={<>Loading...</>}>
+                <Router />
+              </Suspense>
+            </div>
+          </Box>
+        </BrowserRouter>
+      </Theme>
     </ThemeProvider>
   )
 }

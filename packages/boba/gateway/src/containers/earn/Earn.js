@@ -22,10 +22,16 @@ import { useTheme } from '@emotion/react';
 import { Box, FormControlLabel, Checkbox, Typography, useMediaQuery } from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
 
-import { selectUserInfo, selectPoolInfo } from 'selectors/earnSelector'
-import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectBaseEnabled, selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
+import { 
+  selectUserInfo, 
+  selectPoolInfo,
+  selectlayer1Balance,
+  selectlayer2Balance,
+  selectBaseEnabled,
+  selectAccountEnabled,
+  selectLayer,
+  selectActiveNetworkName
+} from 'selectors'
 
 import { getEarnInfo } from 'actions/earnAction'
 
@@ -35,13 +41,15 @@ import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 
 import networkService from 'services/networkService'
 
 import * as S from './Earn.styles'
 import * as G from 'containers/Global.styles'
 import { fetchBalances } from 'actions/networkAction';
+
+import { TableHeader } from 'components/global/table'
 
 function Earn() {
   const [showMDO, setShowMDO] = useState(false)
@@ -64,7 +72,6 @@ function Earn() {
   const layer = useSelector(selectLayer())
 
   const activeNetworkName = useSelector(selectActiveNetworkName())
-
   useEffect(() => {
     if (baseEnabled) {
       dispatch(getEarnInfo())
@@ -75,30 +82,25 @@ function Earn() {
     }
   }, [dispatch, baseEnabled, accountEnabled])
 
+
   function getBalance(address, chain) {
-    if (typeof (layer1Balance) === 'undefined') return [ 0, 0 ]
-    if (typeof (layer2Balance) === 'undefined') return [ 0, 0 ]
-
-    if (chain === 'L1') {
-      let tokens = Object.entries(layer1Balance)
-      for (let i = 0; i < tokens.length; i++) {
-        if (tokens[ i ][ 1 ].address.toLowerCase() === address.toLowerCase()) {
-          return [ tokens[ i ][ 1 ].balance, tokens[ i ][ 1 ].decimals ]
-        }
-      }
-    }
-    else if (chain === 'L2') {
-      let tokens = Object.entries(layer2Balance)
-      for (let i = 0; i < tokens.length; i++) {
-        if (tokens[ i ][ 1 ].address.toLowerCase() === address.toLowerCase()) {
-          return [ tokens[ i ][ 1 ].balance, tokens[ i ][ 1 ].decimals ]
-        }
-      }
-    }
-
-    return [ 0, 0 ]
+    const tokens = chain === 'L1' ? Object.values(layer1Balance) : chain === 'L2' ? Object.values(layer2Balance) : []
+    const token = tokens.find(t => t.address.toLowerCase() === address.toLowerCase())
+    return token ? [token.balance, token.decimals] : [0, 0]
   }
 
+  const tableHeaderOptions = [
+    {name:'Token', width:225},
+    {name:'Available Balance', tooltip: 'Available Balance refers to the amount of funds currently in each pool.',width:145},
+    {name:'Total Staked', tooltip: 'Total staked denotes the funds staked by liquidity providers.', width:115},
+    {name:'APR', tooltip: 'The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.',width:85},
+    {name:'Your Stake',width:90},
+    {name:'Earned',width:110},
+  ]
+
+  const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP;
+  const selectedNetworkConfig = lpChoice === 'L1LP' ? networkService?.networkConfig?.L1?.chainIdHex : networkService?.networkConfig?.L2?.chainIdHex;
+  
   return (
     <S.EarnPageContainer>
       <PageTitle title={'Earn'} />
@@ -107,35 +109,17 @@ function Earn() {
         accountEnabled={accountEnabled}
       />
 
-      {layer === 'L2' && lpChoice === 'L1LP' &&
+      {((layer === 'L2' && lpChoice === 'L1LP') || (layer === 'L1' && lpChoice === 'L2LP')) && (
         <S.LayerAlert>
           <S.AlertInfo>
             <AlertIcon sx={{ flex: 1 }} />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              You are on L2. To transact on L1, SWITCH LAYER to L1
-            </S.AlertText>
-          </S.AlertInfo>
-          <LayerSwitcher isButton={true}/>
-        </S.LayerAlert>
-      }
-
-      {layer === 'L1' && lpChoice === 'L2LP' &&
-        <S.LayerAlert>
-          <S.AlertInfo>
-            <AlertIcon />
-            <S.AlertText
-              variant="body2"
-              component="p"
-            >
-              You are on L1. To transact on L2, SWITCH LAYER to L2
+            <S.AlertText variant="body2" component="p">
+              You are on {layer}. To transact on {layer === 'L1' ? 'L2' : 'L1'}, SWITCH LAYER to {layer === 'L1' ? 'L2' : 'L1'}
             </S.AlertText>
           </S.AlertInfo>
           <LayerSwitcher isButton={true} />
         </S.LayerAlert>
-      }
+      )}
 
       <Box sx={{ my: 1, width: '100%' }}>
         <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
@@ -223,108 +207,30 @@ function Earn() {
           </Tooltip>
         </S.Help>
 
-
-        {!isMobile ? (
-          <S.TableHeading>
-            <S.GridItemTagContainer
-              container spacing={1} direction="row" alignItems="center"
-              sx={{
-                justifyContent: "space-around"
-              }}
-            >
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Token</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Available Balance
-                </Typography>
-                <Tooltip title="Available Balance refers to the amount of funds currently in each pool.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Total Staked
-                </Typography>
-                <Tooltip title="Total staked denotes the funds staked by liquidity providers.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={4} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Past APR %
-                </Typography>
-                <Tooltip title="The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.">
-                  <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-                </Tooltip>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={2}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }} whiteSpace="nowrap">Your Stake</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={1}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Earned</Typography>
-              </S.GridItemTag>
-              <S.GridItemTag item xs={3} md={1}>
-                <Typography variant="body2" sx={{
-                  opacity: 0.65
-                }}>Actions</Typography>
-              </S.GridItemTag>
-            </S.GridItemTagContainer>
-          </S.TableHeading>
-        ) : (null)}
-
-        {lpChoice === 'L1LP' &&
-          <S.EarnListContainer>
-            {Object.keys(poolInfo.L1LP).map((v, i) => {
-              const ret = getBalance(v, 'L1')
-              if (showMDO && Number(ret[ 0 ]) === 0) return null
-              return (
-                <ListEarn
-                  key={i}
-                  poolInfo={poolInfo.L1LP[ v ]}
-                  userInfo={userInfo.L1LP[ v ]}
-                  L1orL2Pool={lpChoice}
-                  balance={ret[ 0 ]}
-                  decimals={ret[ 1 ]}
-                  isMobile={isMobile}
-                  showStakesOnly={showMSO}
-                  accountEnabled={accountEnabled}
-                />
-              )
-            })}
-          </S.EarnListContainer>}
-
-        {lpChoice === 'L2LP' &&
-          <S.EarnListContainer>
-            {Object.keys(poolInfo.L2LP).map((v, i) => {
-              const ret = getBalance(v, 'L2')
-              if (showMDO && Number(ret[ 0 ]) === 0) return null
-              return (
-                <ListEarn
-                  key={i}
-                  poolInfo={poolInfo.L2LP[ v ]}
-                  userInfo={userInfo.L2LP[ v ]}
-                  L1orL2Pool={lpChoice}
-                  balance={ret[ 0 ]}
-                  decimals={ret[ 1 ]}
-                  isMobile={isMobile}
-                  showStakesOnly={showMSO}
-                  accountEnabled={accountEnabled}
-                />
-              )
-            })}
-          </S.EarnListContainer>
-        }
+      { !isMobile && (
+        <TableHeader options={tableHeaderOptions} />
+        )
+      }
+        <S.EarnListContainer>
+          {Object.keys(selectedPoolInfo).map((v, i) => {
+            const ret = getBalance(v, lpChoice === 'L1LP' ? 'L1' : 'L2');
+            if (showMDO && Number(ret[0]) === 0) return null;
+            return (
+              <ListEarn
+                chain={selectedNetworkConfig}
+                key={i}
+                poolInfo={selectedPoolInfo[v]}
+                userInfo={lpChoice === 'L1LP' ? userInfo.L1LP[v] : userInfo.L2LP[v]}
+                L1orL2Pool={lpChoice}
+                balance={ret[0]}
+                decimals={ret[1]}
+                isMobile={isMobile}
+                showStakesOnly={showMSO}
+                accountEnabled={accountEnabled}
+              />
+            );
+          })}
+        </S.EarnListContainer>
       </Box>
     </S.EarnPageContainer>
   )

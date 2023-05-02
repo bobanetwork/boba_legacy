@@ -18,8 +18,8 @@ import { Grid, Box } from '@mui/material'
 import { useSelector } from 'react-redux'
 import {formatDate} from 'util/dates'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import Pager from 'components/pager/Pager'
+import { selectLoading } from 'selectors'
+import { Pager } from 'components'
 import Seven from 'components/seven/Seven'
 
 import * as styles from './Transactions.module.scss'

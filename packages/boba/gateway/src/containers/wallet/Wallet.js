@@ -19,9 +19,14 @@ import * as G from '../Global.styles'
 
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectAccountEnabled, 
+  selectLayer,
+  selectlayer2Balance,
+  selectActiveNetwork,
+  selectActiveNetworkName,
+} from 'selectors'
 
-import { selectlayer2Balance } from 'selectors/balanceSelector'
 
 import { isEqual } from 'util/lodash';
 
@@ -30,14 +35,11 @@ import useInterval from 'hooks/useInterval'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
-import {
-  selectActiveNetwork,
-  selectActiveNetworkName,
-} from 'selectors/networkSelector'
+
 import networkService from 'services/networkService'
 import { NETWORK } from 'util/network/network.util'
 import Connect from "../connect/Connect";
-import PageTitle from "../../components/pageTitle/PageTitle";
+import {PageTitle} from 'components'
 
 function Wallet() {
   const [page, setPage] = useState('Token')

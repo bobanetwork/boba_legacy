@@ -18,18 +18,16 @@ import {Grid, Box} from '@mui/material'
 import {formatDate, isAfterDate} from 'util/dates'
 import { useSelector } from 'react-redux'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import { selectLoading, selectTokens, selectActiveNetworkName } from 'selectors'
 
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import networkService from 'services/networkService'
 
 import * as S from './History.styles'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 const PER_PAGE = 8
 

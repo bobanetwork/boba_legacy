@@ -14,7 +14,7 @@ import {
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { selectLookupPrice } from 'selectors'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
@@ -186,7 +186,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
                       tooltip="A multi-chain bridge to Alt L1."
                       fullWidth
                     >
-                      Bridge
+                      Bridge to L1
                     </Button>
                   )}
                 </>
@@ -504,7 +504,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading,
                   variant="contained"
                   fullWidth
                 >
-                  Bridge
+                  Bridge to L1
                 </Button>
               )}
             </>

@@ -29,15 +29,16 @@ import * as S from './bobaBridge.styles'
 
 import BridgeTransfer from './bridgeTransfer/bridgeTransfer'
 
-import { selectAccountEnabled, selectLayer, selectWalletAddress } from 'selectors/setupSelector'
 import {
+  selectAccountEnabled,
+  selectLayer,
+  selectWalletAddress,
   selectBridgeTokens,
   selectMultiBridgeMode,
-} from 'selectors/bridgeSelector'
-import {
   selectActiveNetworkIcon,
   selectActiveNetworkName,
-} from 'selectors/networkSelector'
+} from 'selectors'
+
 
 import { resetToken, setMultiBridgeMode } from 'actions/bridgeAction'
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
@@ -166,7 +167,7 @@ function BobaBridge() {
           </Box>
         </S.BobaContentWrapper>
       </S.BobaContent>
-      {!userWallet &&
+      {!accountEnabled &&
         <Box alignSelf="center">
           <Button
             fullWidth={true}

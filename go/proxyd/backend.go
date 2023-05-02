@@ -78,13 +78,26 @@ var (
 		Message:       "over rate limit",
 		HTTPErrorCode: 429,
 	}
+	ErrOverSenderRateLimit = &RPCErr{
+		Code:          JSONRPCErrorInternal - 17,
+		Message:       "sender is over rate limit",
+		HTTPErrorCode: 429,
+	}
 
 	ErrBackendUnexpectedJSONRPC = errors.New("backend returned an unexpected JSON-RPC response")
 )
 
 func ErrInvalidRequest(msg string) *RPCErr {
 	return &RPCErr{
-		Code:          -32601,
+		Code:          -32600,
+		Message:       msg,
+		HTTPErrorCode: 400,
+	}
+}
+
+func ErrInvalidParams(msg string) *RPCErr {
+	return &RPCErr{
+		Code:          -32602,
 		Message:       msg,
 		HTTPErrorCode: 400,
 	}
@@ -582,16 +595,16 @@ func NewWSProxier(backend *Backend, clientConn, backendConn *websocket.Conn, met
 	}
 }
 
-func (w *WSProxier) Proxy(ctx context.Context) error {
+func (w *WSProxier) Proxy(ctx context.Context, proxyServerLimiter *WSServerLimiter) error {
 	errC := make(chan error, 2)
-	go w.clientPump(ctx, errC)
+	go w.clientPump(ctx, proxyServerLimiter, errC)
 	go w.backendPump(ctx, errC)
 	err := <-errC
 	w.close()
 	return err
 }
 
-func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
+func (w *WSProxier) clientPump(ctx context.Context, proxyServerLimiter *WSServerLimiter, errC chan error) {
 	for {
 		// Block until we get a message.
 		msgType, msg, err := w.clientConn.ReadMessage()
@@ -618,15 +631,24 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 
 		rpcRequestsTotal.Inc()
 
+		// truncate message if it's too big
+		if len(msg) > int(proxyServerLimiter.maxBodySize) {
+			msg = msg[:proxyServerLimiter.maxBodySize]
+		}
+
 		// Don't bother sending invalid requests to the backend,
 		// just handle them here.
 		req, err := w.prepareClientMsg(msg)
-		if err != nil {
+		isRateLimit := proxyServerLimiter.isLimited("")
+		if err != nil || isRateLimit {
 			var id json.RawMessage
 			method := MethodUnknown
 			if req != nil {
 				id = req.ID
 				method = req.Method
+			}
+			if err == nil {
+				err = errors.New(ErrOverRateLimit.Message)
 			}
 			log.Info(
 				"error preparing client message",
@@ -656,6 +678,19 @@ func (w *WSProxier) clientPump(ctx context.Context, errC chan error) {
 				return
 			}
 			continue
+		}
+
+		if req.Method == "eth_sendRawTransaction" {
+			if err := proxyServerLimiter.isRateLimitSender(ctx, req); err != nil {
+				RecordRPCError(ctx, BackendProxyd, "eth_sendRawTransaction", err)
+				msg = mustMarshalJSON(NewRPCErrorRes(req.ID, err))
+				err = w.writeClientConn(msgType, msg)
+				if err != nil {
+					errC <- err
+					return
+				}
+				continue
+			}
 		}
 
 		RecordRPCForward(ctx, w.backend.Name, req.Method, RPCRequestSourceWS)
@@ -696,6 +731,11 @@ func (w *WSProxier) backendPump(ctx context.Context, errC chan error) {
 				return
 			}
 			continue
+		}
+
+		// truncate message if it's too big
+		if len(msg) > int(w.backend.maxResponseSize) {
+			msg = msg[:w.backend.maxResponseSize]
 		}
 
 		res, err := w.parseBackendMsg(msg)
@@ -746,6 +786,10 @@ func (w *WSProxier) close() {
 func (w *WSProxier) prepareClientMsg(msg []byte) (*RPCReq, error) {
 	req, err := ParseRPCReq(msg)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = ValidateRPCReq(req); err != nil {
 		return nil, err
 	}
 

@@ -2118,7 +2118,7 @@ describe('Liquidity Pool Test', async () => {
           ],
           { gasLimit: 9000000 }
         )
-      ).to.be.revertedWith('Invaild Token')
+      ).to.be.revertedWith('Invalid Token')
     })
 
     it('should deposit ETH', async () => {

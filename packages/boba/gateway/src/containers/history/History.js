@@ -27,11 +27,14 @@ import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
-import { selectActiveHistoryTab } from 'selectors/uiSelector'
+import { 
+  selectActiveHistoryTab,
+  selectTransactions,
+  selectAccountEnabled,
+  selectLayer
+} from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
-import { selectTransactions } from 'selectors/transactionSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
 
 import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
@@ -43,12 +46,12 @@ import * as S from './History.styles'
 import * as styles from './TX_All.module.scss'
 
 import useInterval from 'hooks/useInterval'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
+import { selectActiveNetworkName } from 'selectors'
 
 function History() {
 

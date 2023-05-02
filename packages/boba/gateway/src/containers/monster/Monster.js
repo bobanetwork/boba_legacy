@@ -10,7 +10,7 @@ import * as G from "containers/Global.styles";
 
 import { Box, Typography, Grid } from "@mui/material"
 
-import PageTitle from "components/pageTitle/PageTitle"
+import {PageTitle} from 'components'
 import networkService from "services/networkService"
 import BobaGlassIcon from "components/icons/BobaGlassIcon"
 import Connect from "containers/connect/Connect"

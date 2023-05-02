@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.7.5;
+pragma solidity 0.8.9;
 
 import "./interfaces/iL1LiquidityPool.sol";
 
@@ -103,6 +103,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
 
     address public DAO;
 
+    // this is unused, however is a part of the contract to preserve the storage layout
     uint256 public extraGasRelay;
 
     uint256 public userRewardMaxFeeRate;
@@ -305,38 +306,6 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
     }
 
     /**
-     * @dev Configure fee of the L1LP contract
-     * @dev Each fee rate is scaled by 10^3 for precision, eg- a fee rate of 50 would mean 5%
-     * @param _userRewardMinFeeRate minimum fee rate that users get
-     * @param _userRewardMaxFeeRate maximum fee rate that users get
-     * @param _ownerRewardFeeRate fee rate that contract owner gets
-     */
-    function configureFeeExits(
-        uint256 _userRewardMinFeeRate,
-        uint256 _userRewardMaxFeeRate,
-        uint256 _ownerRewardFeeRate
-    )
-        external
-        onlyDAO()
-        onlyInitialized()
-    {
-        require(_userRewardMinFeeRate <= _userRewardMaxFeeRate && _userRewardMinFeeRate > 0 && _userRewardMaxFeeRate <= 50 && _ownerRewardFeeRate <= 50, 'user and owner fee rates should be lower than 5 percent each');
-        bytes memory data = abi.encodeWithSelector(
-            iL1LiquidityPool.configureFee.selector,
-            _userRewardMinFeeRate,
-            _userRewardMaxFeeRate,
-            _ownerRewardFeeRate
-        );
-
-        // Send calldata into L1
-        sendCrossDomainMessage(
-            address(L1LiquidityPoolAddress),
-            getFinalizeDepositL1Gas(),
-            data
-        );
-    }
-
-    /**
      * @dev Configure gas.
      *
      * @param _l1GasFee default finalized withdraw L1 Gas
@@ -534,6 +503,8 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
      * Client deposit ERC20 from their account to this contract, which then releases funds on the L1 side
      * @param _amount amount that client wants to transfer.
      * @param _tokenAddress L2 token address
+     * @dev user should approve the billingContract.feeTokenAddress() token with at least the
+     * billingContract.exitFee() amount before calling this function.
      */
     function clientDepositL2(
         uint256 _amount,
@@ -614,6 +585,7 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
+        require(_amount != 0, "Incorrect Amount");
         require(user.amount >= _amount, "Requested amount exceeds amount staked");
 
         // Update accUserRewardPerShare
@@ -809,6 +781,9 @@ contract L2LiquidityPoolAltL1 is CrossDomainEnabled, ReentrancyGuardUpgradeable,
     /**
      * Move funds in batch from L1 to L2, and pay out from the right liquidity pool
      * @param _tokens tokens in batch
+     *
+     * finalization of the batch deposit depends on the available pool balance
+     * If any transfer in the batch fails, the same tokens are returned on the other layer
      */
     function clientPayL2Batch(
         ClientPayToken [] calldata _tokens

@@ -27,14 +27,14 @@ export function selectError (state) {
   return state.ui.error
 }
 
-export function selectLedger (state) {
-  return state.ui.ledger
-}
-
 export function selectActiveHistoryTab (state) {
   return state.ui.activeHistoryTab
 }
 
 export function selectActiveDataTab (state) {
   return state.ui.activeDataTab
+}
+
+export function selectTheme (state) {
+  return state.ui.theme
 }

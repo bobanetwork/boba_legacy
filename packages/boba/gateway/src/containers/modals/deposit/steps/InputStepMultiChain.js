@@ -8,14 +8,13 @@ import { openAlert, setActiveHistoryTab } from 'actions/uiAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { selectLoading } from 'selectors/loadingSelector'
+import { selectLoading, selectLookupPrice,selectAltL1DepositCost, selectL1FeeBalance  } from 'selectors'
 import {
   amountToUsd, logAmount,
   // toWei_String
 } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 
-import { selectLookupPrice } from 'selectors/lookupSelector'
 import { Box, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
@@ -23,7 +22,6 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 import BN from 'bignumber.js'
 import parse from 'html-react-parser'
 import Select from 'components/select/Select'
-import { selectAltL1DepositCost, selectL1FeeBalance } from 'selectors/balanceSelector'
 import { fetchAltL1DepositFee, fetchL1FeeBalance } from 'actions/balanceAction'
 
 import networkService from 'services/networkService'

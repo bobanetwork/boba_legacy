@@ -35,7 +35,7 @@ function DepositModal({ open, token, fast }) {
   }
 
   return (
-    <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={!!fast ? "" : "500px"}>
+    <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={!!fast ? "fit-content" : "500px"}>
 
       {
         BRIDGE_TYPE.FAST_BRIDGE === fast ? <InputStepFast handleClose={handleClose} token={token}/> : null

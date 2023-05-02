@@ -18,12 +18,11 @@ import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import { selectLoading, selectTokens } from 'selectors'
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import * as S from './History.styles'
 

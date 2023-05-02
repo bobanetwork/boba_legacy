@@ -25,13 +25,21 @@ import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { selectDaoBalance, selectDaoBalanceX, selectDaoVotes, selectDaoVotesX, selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectDaoBalance, 
+  selectDaoBalanceX, 
+  selectDaoVotes, 
+  selectDaoVotesX, 
+  selectProposals, 
+  selectProposalThreshold,
+  selectLoading,
+  selectAccountEnabled, 
+  selectLayer
+} from 'selectors'
 
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 
 const PROPOSAL_STATES = [
