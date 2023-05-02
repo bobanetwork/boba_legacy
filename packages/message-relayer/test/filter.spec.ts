@@ -1,6 +1,7 @@
 import { expect } from './setup'
 import { ethers } from 'hardhat'
 import { MessageRelayerService } from '../src'
+import { Server } from "http";
 
 describe('message relayer filter tests', () => {
   const Proxy__L1StandardBridge = ethers.Wallet.createRandom().address
@@ -10,16 +11,21 @@ describe('message relayer filter tests', () => {
   const L1Message = ethers.Wallet.createRandom().address
 
   let messageRelayerService: any
+  let server: Server
 
   const apiPort = 3000
   let apiEndpoint: string
+
+  after(async () => {
+    await server.close(console.error)
+  })
 
   before(async () => {
     /* eslint-disable */
     const http = require('http')
     const ip = require("ip")
     // start local server
-    const server = module.exports = http.createServer(async function (req, res) {
+    server = module.exports = http.createServer(async function (req, res) {
       req.on('data', () => {})
       req.on('end', async () => {
         if (req.url === "/boba-addr.json") {
