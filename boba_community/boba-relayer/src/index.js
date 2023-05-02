@@ -146,7 +146,10 @@ const main = async () => {
       console.log(`Estimated gas fee: ${gasFee.toString()}`)
 
       // Relay the message
-      const tx = await messenger.finalizeMessage(message)
+      const overrideOptions = { gasLimit: estimateGas.mul(11).div(10) }
+      const tx = await messenger.finalizeMessage(message, {
+        overrides: overrideOptions,
+      })
       await tx.wait()
     }
   }
