@@ -11,7 +11,6 @@ import { BANXA_URL } from 'util/constant'
 import { NETWORK } from 'util/network/network.util'
 
 function AvailableBridges({ token = null, walletAddress = "" }) {
-
   const currentNetwork = useSelector(selectActiveNetwork());
   const isAvailableOnBanxa = token?.symbol === 'ETH' || token?.symbol === 'BOBA'
 
@@ -19,7 +18,7 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
   const banxaUrl = () => {
     const banxaUrl = BANXA_URL;
     const config = {
-      coinType: 'BOBA',
+      coinType: token?.symbol,
       fiatType: 'USD',
       fiatAmount: '',
       blockChain: 'Boba Network',
