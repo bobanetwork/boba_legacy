@@ -61,21 +61,11 @@ describe('AA Wallet Test\n', async () => {
     await accountFactory.createAccount(env.l2Wallet.address, 0)
     const account = await accountFactory.getAddress(env.l2Wallet.address, 0)
     console.log('Account deployed to:', account)
-    const SenderCreator__factory = new ContractFactory(
-        SenderCreatorJson.abi,
-        SenderCreatorJson.bytecode,
-        env.l2Wallet
-      )
-    const senderCreator = await SenderCreator__factory.deploy({ gasLimit: 9_500_000 })
-
-    console.log('Sender Creator Factory deployed to:', senderCreator.address)
 
     const accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        senderCreatorAddress: senderCreator.address,
         owner: env.l2Wallet,
-        factoryAddress: accountFactory.address,
         accountAddress: account
       })
 
@@ -88,7 +78,6 @@ describe('AA Wallet Test\n', async () => {
       to: await op.sender,
     })
 
-    //what is this supposed to be?
     expect(await op.sender).to.be.eq(account)
 
     const requestId = await bundlerProvider.sendUserOpToBundler(op)
@@ -186,10 +175,6 @@ describe('AA Wallet Test\n', async () => {
     const op = await accountAPI.createSignedUserOp({
       target: recipient.address,
       data: recipient.interface.encodeFunctionData('something', ['hello']),
-    })
-    await env.l2Wallet.sendTransaction({
-      value: utils.parseEther('2'),
-      to: await op.sender,
     })
 
     expect(await op.sender).to.be.eq(accountAddress)

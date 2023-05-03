@@ -234,6 +234,30 @@ var (
 	// OpGoerliChainID is the ID of Boba's Goerli testnet chain.
 	OpGoerliChainID = big.NewInt(2888)
 
+	// OpMoonbeamChainID is the ID of Boba's Moonbeam mainnet chain.
+	OpMoonbeamChainID = big.NewInt(1294)
+
+	// OpMoonbaseChainID is the ID of Boba's Moonbase testnet chain.
+	OpMoonbaseChainID = big.NewInt(1297)
+
+	// OpAvaxChainID is the ID of Boba's Avalanche mainnet chain.
+	OpAvaxChainID = big.NewInt(43288)
+
+	// OpFujiChainID is the ID of Boba's Fuji testnet chain.
+	OpFujiChainID = big.NewInt(4328)
+
+	// OpBnbChainID is the ID of Boba's Binance Smart Chain mainnet chain.
+	OpBnbChainID = big.NewInt(56288)
+
+	// OpBnbTestnetChainID is the ID of Boba's Binance Smart Chain testnet chain.
+	OpBnbTestnetChainID = big.NewInt(9728)
+
+	// OpOperaChainID is the ID of Boba's Opera mainnet chain.
+	OpOperaChainID = big.NewInt(301)
+
+	// OpOperaTestnetChainID is the ID of Boba's Opera testnet chain.
+	OpOperaTestnetChainID = big.NewInt(4051)
+
 	// OpMainnetSDUpdateForkNum is the height at which the SD update fork activates on Mainnet.
 	OpMainnetSDUpdateForkNum = big.NewInt(310215)
 
@@ -251,6 +275,36 @@ var (
 
 	// BobaGoerliFeeUpdatedForkNum is the height at which the fee update fork activates on Goerli.
 	BobaGoerliFeeUpdatedForkNum = big.NewInt(0)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaMainnetTuringChargeForkNum = big.NewInt(1003000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaGoerliTuringChargeForkNum = big.NewInt(8000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaMoonbeamTuringChargeForkNum = big.NewInt(1580000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaMoonbaseTuringChargeForkNum = big.NewInt(350000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaAvaxTuringChargeForkNum = big.NewInt(72000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaFujiTuringChargeForkNum = big.NewInt(3000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaBnbTuringChargeForkNum = big.NewInt(1550000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaBnbTestnetTuringChargeForkNum = big.NewInt(204000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaOperaTuringChargeForkNum = big.NewInt(80000)
+
+	// Enable the conditional logic to prevent Turing balances from reaching zero
+	BobaOperaTestnetTuringChargeForkNum = big.NewInt(3000)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -472,6 +526,43 @@ func (c *ChainConfig) IsFeeTokenUpdate(num *big.Int) bool {
 	}
 	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
 		return isForked(BobaGoerliFeeUpdatedForkNum, num)
+	}
+	return true
+}
+
+func (c *ChainConfig) IsTuringChargeFork(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
+	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
+		return isForked(BobaMainnetTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
+		return isForked(BobaGoerliTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpMoonbeamChainID) == 0 {
+		return isForked(BobaMoonbeamTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpMoonbaseChainID) == 0 {
+		return isForked(BobaMoonbaseTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpBnbChainID) == 0 {
+		return isForked(BobaBnbTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpBnbTestnetChainID) == 0 {
+		return isForked(BobaBnbTestnetTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpAvaxChainID) == 0 {
+		return isForked(BobaAvaxTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpFujiChainID) == 0 {
+		return isForked(BobaFujiTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpOperaChainID) == 0 {
+		return isForked(BobaOperaTuringChargeForkNum, num)
+	}
+	if c.ChainID.Cmp(OpOperaTestnetChainID) == 0 {
+		return isForked(BobaOperaTestnetTuringChargeForkNum, num)
 	}
 	return true
 }

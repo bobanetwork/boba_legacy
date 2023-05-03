@@ -15,8 +15,7 @@ export enum ValidationErrors {
 }
 
 export enum ExecutionErrors {
-  UserOperationReverted = -32521,
-  UserOperationNotSupported = -404404
+  UserOperationReverted = -32521
 }
 
 export interface StakeInfo {
