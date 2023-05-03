@@ -2,16 +2,17 @@ import React, { useEffect, useState } from 'react'
 import * as S from './availableBridges.styles'
 import {useSelector } from 'react-redux'
 
-import { selectActiveNetwork } from 'selectors'
+import { selectActiveNetwork, selectActiveNetworkType } from 'selectors'
 
 import { Link, Typography } from '@mui/material'
 
 import networkService from 'services/networkService'
 import { BANXA_URL } from 'util/constant'
-import { NETWORK } from 'util/network/network.util'
+import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 
 function AvailableBridges({ token = null, walletAddress = "" }) {
   const currentNetwork = useSelector(selectActiveNetwork());
+  const currentNetworkType = useSelector(selectActiveNetworkType());
   const isAvailableOnBanxa = token?.symbol === 'ETH' || token?.symbol === 'BOBA'
 
   const [ bridges, setBridges ] = useState([])
@@ -41,7 +42,9 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
       </Typography>
     </S.LabelContainer>
     <S.Wrapper>
-      {currentNetwork === NETWORK.ETHEREUM && isAvailableOnBanxa && (
+      {currentNetwork === NETWORK.ETHEREUM
+        && currentNetworkType === NETWORK_TYPE.MAINNET
+        && isAvailableOnBanxa && (
         <S.BridgeContent key={'banxa'}>
           <Link color="inherit"
             variant="body2"
