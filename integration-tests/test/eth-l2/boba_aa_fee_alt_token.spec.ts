@@ -22,7 +22,7 @@ import ManualDepositPaymasterJson from '@boba/accountabstraction/artifacts/contr
 
 describe('AA Alt Fee Token Test\n', async () => {
   let env: OptimismEnv
-  let SimpleAccount__factory: ContractFactory
+  let SimpleAccountFactory__factory: ContractFactory
   let recipient: Contract
 
   let bundlerProvider: HttpRpcClient
@@ -120,12 +120,12 @@ describe('AA Alt Fee Token Test\n', async () => {
 
     before('the user approves the paymaster to spend their $BOBA token', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
-      SimpleAccount__factory = new ContractFactory(
+      SimpleAccountFactory__factory = new ContractFactory(
         SimpleAccountFactoryJson.abi,
         SimpleAccountFactoryJson.bytecode,
         env.l2Wallet
       )
-      accountFactory = await SimpleAccount__factory.deploy(
+      accountFactory = await SimpleAccountFactory__factory.deploy(
         entryPointAddress
       )
       await accountFactory.deployed()
@@ -133,13 +133,13 @@ describe('AA Alt Fee Token Test\n', async () => {
       await accountFactory.createAccount(env.l2Wallet.address, 0)
       account = await accountFactory.getAddress(env.l2Wallet.address, 0)
       console.log('Account deployed to:', account)
-      const SenderCreator__factory = new ContractFactory(
-          SenderCreatorJson.abi,
-          SenderCreatorJson.bytecode,
-          env.l2Wallet
-        )
-      const senderCreator = await SenderCreator__factory.deploy()
-      console.log('Sender Creator Factory deployed to:', senderCreator.address)
+      // const SenderCreator__factory = new ContractFactory(
+      //     SenderCreatorJson.abi,
+      //     SenderCreatorJson.bytecode,
+      //     env.l2Wallet
+      //   )
+      // const senderCreator = await SenderCreator__factory.deploy()
+      // console.log('Sender Creator Factory deployed to:', senderCreator.address)
 
       await L2ERC20Token.transfer(account, utils.parseEther('1'))
 
@@ -156,7 +156,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        senderCreatorAddress: senderCreator.address,
+        //senderCreatorAddress: senderCreator.address,
         owner: env.l2Wallet,
         accountAddress: account
       })
@@ -204,7 +204,6 @@ describe('AA Alt Fee Token Test\n', async () => {
       expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
       // msg.sender is the 4337 wallet
       console.log(log.args.msgSender)
-      console.log(account)
       expect(log.args.msgSender).to.eq(account)
       // message is received and emitted
       expect(log.args.message).to.eq('hello')

@@ -29,11 +29,11 @@ describe('#deterministicDeployer', () => {
     await ethers.provider.getSigner().sendTransaction({ to: testWallet.address, value: ethers.utils.parseEther('0.01') })
 
     const ctr = hexValue(new SampleRecipient__factory(ethers.provider.getSigner()).getDeployTransaction().data!)
-    console.log(DeterministicDeployer.init(ethers.provider, testWallet))
+    DeterministicDeployer.init(ethers.provider, testWallet)
     const addr = await DeterministicDeployer.getAddress(ctr, 1)
     expect(await deployer.isContractDeployed(addr)).to.equal(false)
     const preWalletBalance = await ethers.provider.getBalance(testWallet.address)
-    console.log(await DeterministicDeployer.deploy(ctr, 1))
+    await DeterministicDeployer.deploy(ctr, 1)
     const postWalletBalance = await ethers.provider.getBalance(testWallet.address)
     expect(await deployer.isContractDeployed(addr)).to.equal(true)
     // wallet deploys contract

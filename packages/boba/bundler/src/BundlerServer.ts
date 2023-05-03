@@ -170,10 +170,7 @@ export class BundlerServer {
         // )
         //break
         // remove after https://github.com/bobanetwork/boba/issues/752
-        throw new RpcError(
-          'eth_estimateUserOperationGas not supported',
-          ExecutionErrors.UserOperationNotSupported
-        )
+        throw new RpcError(`Method ${method} is not supported`, -32601)
       case 'eth_getUserOperationReceipt':
         result = await this.methodHandler.getUserOperationReceipt(params[0])
         break
