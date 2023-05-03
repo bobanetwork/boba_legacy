@@ -91,9 +91,10 @@ import { Create2Factory } from './Create2Factory'
   const testCounter = TestCounter__factory.connect(testCounterAddress, aasigner)
 
   const prebalance = await provider.getBalance(myAddress)
+  const testCounterConnected = testCounter.connect(ethersSigner)
   console.log('balance=', prebalance.div(1e9).toString(), 'deposit=', preDeposit.div(1e9).toString())
-  console.log('estimate direct call', { gasUsed: await testCounter.connect(ethersSigner).estimateGas.justemit().then(t => t.toNumber()) })
-  const ret = await testCounter.justemit()
+  console.log('estimate direct call', { gasUsed: await testCounterConnected.estimateGas.justemit().then(t => t.toNumber()) })
+  const ret = await testCounterConnected.justemit()
   console.log('waiting for mine, hash (reqId)=', ret.hash)
   const rcpt = await ret.wait()
   const netname = await provider.getNetwork().then(net => net.name)
@@ -107,7 +108,7 @@ import { Create2Factory } from './Create2Factory'
   console.log(logs.map((e: any) => ({ ev: e.event, ...objdump(e.args!) })))
   console.log('1st run gas used:', await evInfo(rcpt))
 
-  const ret1 = await testCounter.justemit()
+  const ret1 = await testCounterConnected.justemit()
   const rcpt2 = await ret1.wait()
   console.log('2nd run:', await evInfo(rcpt2))
 
