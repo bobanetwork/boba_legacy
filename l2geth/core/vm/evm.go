@@ -110,10 +110,12 @@ type Context struct {
 	L1BlockNumber *big.Int // Provides information for L1BLOCKNUMBER
 
 	// Turing information
-	Turing       []byte
-	TuringDepth  int
-	TuringGasMul float64 // L1/L2 price ratio for Turing calldata charge
-	Sequencer    bool
+	Turing        []byte
+	TuringDepth   int
+	TuringGasMul  float64 // L1/L2 price ratio for Turing calldata charge
+	Sequencer     bool
+	TuringInput   []byte
+	TuringVMDepth int
 }
 
 // Maximum allowed length of the modified calldata (selector + req + response).
@@ -665,12 +667,18 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			log.Trace("TURING ERROR: DEPTH > 1", "evm.Context.TuringDepth", evm.Context.TuringDepth)
 			return nil, gas, ErrTuringDepth
 		}
+		// Check 1A - can't call Turing in a staticcall() context because the Credit payment alters statedb
+		if evm.interpreter.ReadOnly() {
+			log.Debug("TURING ERROR: called within staticcall readOnly context")
+			return nil, gas, ErrTuringDepth
+		}
 		// Check 2. if we are verifier/replica AND (isTuring2 || isGetRand2), then Turing must have run previously
 		if !evm.Context.Sequencer && len(evm.Context.Turing) < 2 {
 			log.Error("TURING ERROR: NO PAYLOAD", "evm.Context.Turing", evm.Context.Turing)
 			return nil, gas, ErrTuringEmpty
 		}
-		if evm.StateDB.TuringCheck(caller.Address()) != nil {
+		isTuringChargeFork := evm.ChainConfig().IsTuringChargeFork(evm.BlockNumber)
+		if evm.StateDB.TuringCheck(caller.Address(), isTuringChargeFork) != nil {
 			log.Trace("TURING bobaTuringCall:Insufficient credit")
 			return nil, gas, ErrInsufficientBalance
 		}
@@ -679,6 +687,10 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// We sometimes use a short evm.Context.Turing payload for debug purposes, hence the < 2.
 			// A real modified callData is always much much > 1 byte
 			// This case _should_ never happen in Verifier/Replica mode, since the sequencer will already have run the Turing call
+			// Need to save a copy of the original input here to support a workaround in the following code.
+			evm.Context.TuringInput = make([]byte, len(input))
+			copy(evm.Context.TuringInput, input)
+			evm.Context.TuringVMDepth = evm.depth
 			if isTuring2 {
 				// If called from the real sequencer thread, Turing must find a cache entry to avoid blocking other users.
 				// As a hack, look for a zero GasPrice to infer that we are in an eth_estimateGas call stack.
@@ -707,6 +719,14 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// and now, provide the updated_input to the context so that the data can be sent to L1 and the CTC
 			evm.Context.Turing = updated_input
 			evm.Context.TuringDepth++
+		} else if isTuringChargeFork && evm.Context.Sequencer && (!bytes.Equal(input, evm.Context.TuringInput) || evm.depth != evm.Context.TuringVMDepth) {
+			// Turing has been called more than once in a Sequencer transaction. Previously this ended up
+			// mistakenly following the Verifier/Replica path below. It is now handled as an error. However,
+			// to support already-deployed applications we continue to allow repeated calls with identical
+			// input and coming from the same EVM depth.
+			// For simplicity this new logic activates at the same blocknum as the TuringCharge/SubRefund fork.
+			log.Debug("TURING ERROR: evm.Context.Turing already set")
+			return nil, gas, ErrTuringDepth
 		} else {
 			// We are in Verifier/Replica mode
 			// Turing for this Transaction has already been run elsewhere - replay using
@@ -714,7 +734,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Trace("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
 		}
-		if evm.StateDB.TuringCharge(caller.Address()) != nil {
+		if evm.StateDB.TuringCharge(caller.Address(), isTuringChargeFork) != nil {
 			log.Info("TURING bobaTuringCall:Insufficient credit")
 			return nil, gas, ErrInsufficientBalance
 		}
