@@ -1,5 +1,4 @@
 import { HardhatUserConfig } from 'hardhat/types'
-
 // Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
