@@ -8,6 +8,7 @@ chai.use(solidity)
 
 import { OptimismEnv } from './shared/env'
 import { verifyStateRoots } from './shared/state-root-verification'
+import { Server } from "http";
 
 describe('Turing 256 Bit Random Number Test', async () => {
   let env: OptimismEnv
@@ -22,6 +23,12 @@ describe('Turing 256 Bit Random Number Test', async () => {
 
   const apiPort = 5123
   let URL: string
+
+  let server: Server
+
+  after(async () => {
+    await server.close(console.error)
+  })
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -79,7 +86,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const http = require('http')
     const ip = require("ip")
     // start local server
-    const server = module.exports = http.createServer(async function (req, res) {
+    server = module.exports = http.createServer(async function (req, res) {
 
       if (req.headers['content-type'] === 'application/json') {
 
