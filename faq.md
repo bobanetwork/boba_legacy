@@ -41,9 +41,7 @@ The high gas fees of Ethereum itself is a pretty strong incentive for developers
 
 Many wallets now allow applications to trigger a popup to switch between networks. If your wallet supports this feature, you will be automatically prompted to switch networks when an application wants to use the Boba Ethereum network. You can use these bridges to add the Boba network to your wallet:
 
-\* [The Boba **production** Network Ethereum](https://gateway.boba.network).
-
-\* [The Boba **test** Goerli Network](https://gateway.boba.network).
+\* [Universal gateway](https://gateway.boba.network).
 
 If your wallet does not support this feature, you will have to connect manually. The exact process for connecting your wallet to a Boba Ethereum network depends on the specific wallet software you are using. To get started on Boba/Ethereum, you can use the available [community RPC endpoint](https://docs.boba.network/for-developers/network-parameters).
 
