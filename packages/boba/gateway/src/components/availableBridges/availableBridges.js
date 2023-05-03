@@ -35,6 +35,10 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
     }
   }, [ token ])
 
+  if (currentNetworkType === NETWORK_TYPE.TESTNET) {
+    return <></>
+  }
+
   return <S.BridgesContainer>
     <S.LabelContainer>
       <Typography variant="body2">
@@ -43,7 +47,6 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
     </S.LabelContainer>
     <S.Wrapper>
       {currentNetwork === NETWORK.ETHEREUM
-        && currentNetworkType === NETWORK_TYPE.MAINNET
         && isAvailableOnBanxa && (
         <S.BridgeContent key={'banxa'}>
           <Link color="inherit"
