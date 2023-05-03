@@ -56,16 +56,16 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Bobabase Links and Endpoints
 
-|                   |                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| ChainID           | 1297                                                                                       |
-| RPC               | [https://bobabase.boba.network](https://bobabase.boba.network)                             |
-| Replica RPC       | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network)             |
-| Gateway           | [https://gateway.bobabase.boba.network](https://gateway.bobabase.boba.network)             |
+|                   |                                                                                          |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| ChainID           | 1297                                                                                     |
+| RPC               | [https://bobabase.boba.network](https://bobabase.boba.network)                           |
+| Replica RPC       | [https://replica.bobabase.boba.network](https://replica.bobabase.boba.network)           |
+| Gateway           | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer     | [https://blockexplorer.bobabase.boba.network](https://blockexplorer.bobabase.boba.network) |
-| Websocket         | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                         |
-| Replica Websocket | [wss://replica-wss.bobabeam.boba.network](wss://replica-wss.bobabeam.boba.network)         |
-| Gas Cap           | 50000000                                                                                   |
+| Websocket         | [wss://wss.bobabase.boba.network](wss://wss.bobabase.boba.network)                       |
+| Replica Websocket | [wss://replica-wss.bobabeam.boba.network](wss://replica-wss.bobabeam.boba.network)       |
+| Gas Cap           | 50000000                                                                                 |
 
 
 
@@ -98,13 +98,13 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Bobabeam Links and Endpoints
 
-|                   |                                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| ChainID           | 1294                                                                                       |
-| RPC               | [https://bobabeam.boba.network](https://bobabeam.boba.network)                             |
-| Replica RPC       | [https://replica.bobabeam.boba.network](https://replica.bobabeam.boba.network)             |
-| Gateway           | [https://gateway.bobabeam.boba.network](https://gateway.bobabeam.boba.network)             |
+|                   |                                                                                          |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| ChainID           | 1294                                                                                     |
+| RPC               | [https://bobabeam.boba.network](https://bobabeam.boba.network)                           |
+| Replica RPC       | [https://replica.bobabeam.boba.network](https://replica.bobabeam.boba.network)           |
+| Gateway           | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer     | [https://blockexplorer.bobabeam.boba.network](https://blockexplorer.bobabeam.boba.network) |
-| Websocket         | [wss://wss.bobabeam.boba.network](wss://wss.bobabeam.boba.network)                         |
-| Replica Websocket | [wss://replica-wss.bobabeam.boba.network](wss://replica-wss.bobabeam.boba.network)         |
-| Gas Cap           | 50000000                                                                                   |
+| Websocket         | [wss://wss.bobabeam.boba.network](wss://wss.bobabeam.boba.network)                       |
+| Replica Websocket | [wss://replica-wss.bobabeam.boba.network](wss://replica-wss.bobabeam.boba.network)       |
+| Gas Cap           | 50000000                                                                                 |

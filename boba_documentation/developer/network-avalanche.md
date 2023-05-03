@@ -21,7 +21,7 @@ description: A collection of links and addresses to get started on Boba-Avalanch
 
 ### Testnet Fountain for Developers on Boba Avalanche Testnet L2
 
-There is a Boba Avalanche testnet [fountain](https://gateway.testnet.avax.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba Avalanche Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Boba Avalanche testnet [fountain](https://gateway.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba Avalanche Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 
@@ -56,15 +56,15 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Boba Avalanche Testnet Links and Endpoints
 
-|               |                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------- |
-| ChainID       | 4328                                                                                               |
-| RPC           | [https://testnet.avax.boba.network](https://testnet.avax.boba.network)                             |
-| Replica RPC   | [https://replica.testnet.avax.boba.network](https://replica.testnet.avax.boba.network)             |
-| Gateway       | [https://gateway.testnet.avax.boba.network](https://gateway.testnet.avax.boba.network)             |
+|               |                                                                                  |
+| ------------- | -------------------------------------------------------------------------------- |
+| ChainID       | 4328                                                                             |
+| RPC           | [https://testnet.avax.boba.network](https://testnet.avax.boba.network)           |
+| Replica RPC   | [https://replica.testnet.avax.boba.network](https://replica.testnet.avax.boba.network) |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer | [https://blockexplorer.testnet.avax.boba.network](https://blockexplorer.testnet.avax.boba.network) |
-| Websocket     | [wss://wss.testnet.avax.boba.network](wss://wss.testnet.avax.boba.network)                         |
-| Gas Cap       | 50000000                                                                                           |
+| Websocket     | [wss://wss.testnet.avax.boba.network](wss://wss.testnet.avax.boba.network)       |
+| Gas Cap       | 50000000                                                                         |
 
 
 
@@ -97,12 +97,12 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Boba Avalanche Links and Endpoints
 
-|               |                                                                                    |
-| ------------- | ---------------------------------------------------------------------------------- |
-| ChainID       | 43288                                                                              |
-| RPC Read      | [https://avax.boba.network](https://avax.boba.network)                             |
-| Write RPC     | [https://replica.avax.boba.network](https://replica.avax.boba.network)             |
-| Gateway       | [https://gateway.avax.boba.network](https://gateway.avax.boba.network)             |
+|               |                                                                                  |
+| ------------- | -------------------------------------------------------------------------------- |
+| ChainID       | 43288                                                                            |
+| RPC Read      | [https://avax.boba.network](https://avax.boba.network)                           |
+| Write RPC     | [https://replica.avax.boba.network](https://replica.avax.boba.network)           |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer | [https://blockexplorer.avax.boba.network](https://blockexplorer.avax.boba.network) |
-| Websocket     | [wss://wss.avax.boba.network](wss://wss.avax.boba.network)                         |
-| Gas Cap       | 50000000                                                                           |
+| Websocket     | [wss://wss.avax.boba.network](wss://wss.avax.boba.network)                       |
+| Gas Cap       | 50000000                                                                         |

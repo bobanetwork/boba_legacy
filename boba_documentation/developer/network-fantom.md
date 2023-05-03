@@ -21,7 +21,7 @@ description: A collection of links and addresses to get started on Boba-Fantom
 
 ### Testnet Fountain for Developers on Bobaopera Testnet L2
 
-There is a Bobaopera testnet [fountain](https://gateway.testnet.bobaopera.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Bobaopera Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Bobaopera testnet [fountain](https://gateway.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Bobaopera Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 
@@ -56,15 +56,15 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Bobaopera Testnet Links and Endpoints
 
-|               |                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------ |
-| ChainID       | 4051                                                                                                         |
-| RPC           | [https://testnet.bobaopera.boba.network](https://testnet.bobaopera.boba.network)                             |
-| Replica RPC   | [https://replica.testnet.bobaopera.boba.network](https://replica.testnet.bobaopera.boba.network)             |
-| Gateway       | [https://gateway.testnet.bobaopera.boba.network](https://gateway.testnet.bobaopera.boba.network)             |
+|               |                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| ChainID       | 4051                                                                                       |
+| RPC           | [https://testnet.bobaopera.boba.network](https://testnet.bobaopera.boba.network)           |
+| Replica RPC   | [https://replica.testnet.bobaopera.boba.network](https://replica.testnet.bobaopera.boba.network) |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer | [https://blockexplorer.testnet.bobaopera.boba.network](https://blockexplorer.testnet.bobaopera.boba.network) |
-| Websocket     | [wss://wss.testnet.bobaopera.boba.network](wss://wss.testnet.bobaopera.boba.network)                         |
-| Gas Cap       | 50000000                                                                                                     |
+| Websocket     | [wss://wss.testnet.bobaopera.boba.network](wss://wss.testnet.bobaopera.boba.network)       |
+| Gas Cap       | 50000000                                                                                   |
 
 
 
@@ -97,12 +97,12 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Bobaopera Links and Endpoints (tbd)
 
-|               |                                                                                              |
-| ------------- | -------------------------------------------------------------------------------------------- |
-| ChainID       | 301                                                                                          |
-| RPC           | [https://bobaopera.boba.network](https://bobaopera.boba.network)                             |
-| Replica RPC   | [https://replica.bobaopera.boba.network](https://replica.bobaopera.boba.network)             |
-| Gateway       | [https://gateway.bobaopera.boba.network](https://gateway.bobaopera.boba.network)             |
+|               |                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| ChainID       | 301                                                                                        |
+| RPC           | [https://bobaopera.boba.network](https://bobaopera.boba.network)                           |
+| Replica RPC   | [https://replica.bobaopera.boba.network](https://replica.bobaopera.boba.network)           |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer | [https://blockexplorer.bobaopera.boba.network](https://blockexplorer.bobaopera.boba.network) |
-| Websocket     | [wss://wss.bobaopera.boba.network](wss://wss.bobaopera.boba.network)                         |
-| Gas Cap       | 50000000                                                                                     |
+| Websocket     | [wss://wss.bobaopera.boba.network](wss://wss.bobaopera.boba.network)                       |
+| Gas Cap       | 50000000                                                                                   |
