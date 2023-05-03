@@ -1,24 +1,25 @@
 {
   "name": "@boba/bundler_sdk",
   "version": "0.2.3",
-  "main": "./dist/src/index.js",
+  "main": "./dist/index.js",
   "license": "MIT",
   "files": [
     "dist/src",
     "README.md"
   ],
   "scripts": {
-    "build:stopp": "tsc -p ./tsconfig.json",
+    "build": "hardhat compile && tsc",
     "clean": "rimraf  dist/ cache node_modules ./tsconfig.tsbuildinfo",
     "lint": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
     "test": "hardhat test",
-    "test:coverage:stop": "COVERAGE=1 hardhat coverage",
+    "test:coverage": "COVERAGE=1 hardhat coverage",
     "hardhat-test": "hardhat test",
     "tsc": "tsc",
     "watch-tsc": "tsc -w --preserveWatchOutput"
   },
   "dependencies": {
+    "@ethersproject/abi": "^5.7.0",
     "@boba/accountabstraction": "^1.0.0",
     "@boba/bundler_utils": "^0.2.3",
     "@ethersproject/abstract-provider": "^5.7.0",
@@ -28,14 +29,22 @@
     "@ethersproject/providers": "^5.7.0",
     "@types/debug": "^4.1.7",
     "debug": "^4.3.4",
-    "ethers": "^5.7.0"
+    "ethers": "^5.7.0",
+    "hardhat-gas-reporter": "^1.0.8"
   },
   "devDependencies": {
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.2",
+    "@types/mocha": "^9.1.0",
+    "@nomiclabs/hardhat-etherscan": "^3.0.0",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "chai": "^4.3.6",
-    "hardhat": "^2.12.5"
+    "hardhat": "^2.12.5",
+    "solidity-coverage": "^0.7.21",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.1.0"
   }
 }
