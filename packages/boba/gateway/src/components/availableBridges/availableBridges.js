@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import * as S from './availableBridges.styles'
 import {useSelector } from 'react-redux'
 
-import { selectActiveNetwork } from 'selectors'
+import { selectActiveNetwork , selectActiveNetworkType} from 'selectors'
 
 import { Link, Typography } from '@mui/material'
 
@@ -13,10 +13,10 @@ import { NETWORK } from 'util/network/network.util'
 function AvailableBridges({ token = null, walletAddress = "" }) {
   const currentNetwork = useSelector(selectActiveNetwork());
   const isAvailableOnBanxa = token?.symbol === 'ETH' || token?.symbol === 'BOBA'
-
+  const networkType = useSelector(selectActiveNetworkType());
   const [ bridges, setBridges ] = useState([])
   const banxaUrl = () => {
-    const banxaUrl = BANXA_URL;
+    const banxaUrl = BANXA_URL[networkType];
     const config = {
       coinType: token?.symbol,
       fiatType: 'USD',
