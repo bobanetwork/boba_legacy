@@ -43,7 +43,7 @@ Many wallets now allow applications to trigger a popup to switch between network
 
 \* [The Boba **production** Network Ethereum](https://gateway.boba.network).
 
-\* [The Boba **test** Goerli Network](https://gateway.goerli.boba.network).
+\* [The Boba **test** Goerli Network](https://gateway.boba.network).
 
 If your wallet does not support this feature, you will have to connect manually. The exact process for connecting your wallet to a Boba Ethereum network depends on the specific wallet software you are using. To get started on Boba/Ethereum, you can use the available [community RPC endpoint](https://docs.boba.network/for-developers/network-parameters).
 
@@ -174,7 +174,7 @@ First, download MetaMask on your browser as a plug-in and set up a MetaMask wall
 
 ![Welcome to Metamask](./boba_documentation/.gitbook/assets/WELCOME-TO-METAMASK.png)
 
-After you’ve set up your MetaMask account, you can [connect to the Goerli network Testnet](https://gateway.goerli.boba.network). After connecting, follow these steps:
+After you’ve set up your MetaMask account, you can [connect to the Goerli network Testnet](https://gateway.boba.network). After connecting, follow these steps:
 
 * view your connection status displayed in the upper-right corner, along with a button that will allow you to select a chain to connect to.
 * click on the Boba icon. MetaMask will prompt you to connect to the Rinkeby Boba network.

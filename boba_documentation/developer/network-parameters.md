@@ -14,14 +14,14 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 
 ### Goerli Links and Endpoints
 
-|                |                                                                            |
-| -------------- | -------------------------------------------------------------------------- |
-| Goerli ChainID | 2888                                                                       |
-| Goerli RPC     | [https://goerli.boba.network](https://goerli.boba.network)                 |
-| Gateway        | [https://gateway.goerli.boba.network](https://gateway.goerli.boba.network) |
-| Blockexplorer  | [https://testnet.bobascan.com](https://testnet.bobascan.com)               |
-| Websocket      | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)             |
-| Gas Cap        | 50000000                                                                   |
+|                |                                                                          |
+| -------------- | ------------------------------------------------------------------------ |
+| Goerli ChainID | 2888                                                                     |
+| Goerli RPC     | [https://goerli.boba.network](https://goerli.boba.network)               |
+| Gateway        | [https://gateway.boba.network](https://gateway.boba.network) |
+| Blockexplorer  | [https://testnet.bobascan.com](https://testnet.bobascan.com)             |
+| Websocket      | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)           |
+| Gas Cap        | 50000000                                                                 |
 
 
 
