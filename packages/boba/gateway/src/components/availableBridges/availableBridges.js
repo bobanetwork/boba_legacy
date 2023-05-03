@@ -35,9 +35,7 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
     }
   }, [ token ])
 
-  if (currentNetworkType === NETWORK_TYPE.TESTNET) {
-    return <></>
-  }
+
 
   return <S.BridgesContainer>
     <S.LabelContainer>
@@ -61,7 +59,8 @@ function AvailableBridges({ token = null, walletAddress = "" }) {
         </S.BridgeContent>
         )
       }
-      {bridges.map((bridge) => {
+      {currentNetworkType !== NETWORK_TYPE.TESTNET &&
+        bridges.map((bridge) => {
         return <S.BridgeContent key={bridge.type}>
           <Link color="inherit"
             variant="body2"
