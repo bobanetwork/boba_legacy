@@ -22,6 +22,69 @@ Make sure you understand both of them, to use the one that is suited best for yo
 
 An abstract [base-class](https://github.com/bobanetwork/boba/blob/develop/packages/boba/bundler_sdk/src/BaseAccountAPI.ts) to create UserOperations for a contract wallet.
 
+### SimpleAccountAPI
+
+An implementation of the `BaseAccountAPI`, for the SimpleAccount sample of account-abstraction.
+
+#### constructor()
+```ts
+interface SimpleAccountApiParams {
+    factoryAddress?: string;
+    owner: Signer;
+    index: number; // default: 0
+
+    // inherited from BaseAccountApiParams
+    provider: Provider; // @ethersproject/providers
+    entryPointAddress: string;
+    senderCreatorAddress?: string;
+    accountAddress?: string;
+    overheads?: Partial<GasOverheads>;
+    paymasterAPI?: PaymasterAPI;
+}
+```
+
+#### Usage
+
+Note that SimpleAccountAPI either needs the `accountAddress` or the `factoryAddress` to be supplied. If the `factoryAddress` is supplied, also supply a `senderCreatorAddress`. Custom reverts are not supported and the sdk would use this senderCreatorAddress to compute the account address that will be deployed.
+
+If `accountAddress` is passed, the account is used as a sender when generating the userOp
+If `factoryAddress` is passed, the account will be generated on the fly. The userOp will include initCode and the precomputed address of the account and include it in the userOp.
+
+
+
+The low-level approach above can be used as follows:
+
+```typescript
+owner = provider.getSigner()
+const walletAPI = new SimpleAccountAPI({
+    provider,
+    entryPointAddress,
+    owner,
+    accountAddress
+})
+const op = await walletAPI.createSignedUserOp({
+  target: recipient.address,
+  data: recipient.interface.encodeFunctionData('something', ['hello'])
+})
+```
+
+or with a SimpleAccountFactory-
+
+```typescript
+owner = provider.getSigner()
+const walletAPI = new SimpleAccountAPI({
+    provider,
+    entryPointAddress,
+    owner,
+    senderCreatorAddress,
+    factoryAddress
+})
+const op = await walletAPI.createSignedUserOp({
+  target: recipient.address,
+  data: recipient.interface.encodeFunctionData('something', ['hello'])
+})
+```
+
 
 #### getAccountInitCode()
 Return the value to put into the "initCode" field, if the contract is not yet deployed.
@@ -73,7 +136,7 @@ getCounterFactualAddress (): Promise<string>
 
 
 #### getInitCode()
-Return initCode value to into the UserOp.
+Return initCode value to add into the UserOp.
 (either deployment code, or empty hex if contract already deployed)
 
 ```ts
@@ -150,43 +213,6 @@ getUserOpReceipt (userOpHash: string, timeout = 30000, interval = 5000): Promise
 
 ---
 
-### SimpleAccountAPI
-
-An implementation of the `BaseAccountAPI`, for the SimpleAccount sample of account-abstraction. Parent methods are documented in BaseAccountAPI above.
-
-#### constructor()
-```ts
-interface SimpleAccountApiParams {
-    factoryAddress?: string;
-    owner: Signer;
-    index: number; // default: 0
-
-    // inherited from BaseAccountApiParams
-    provider: Provider; // @ethersproject/providers
-    entryPointAddress: string;
-    senderCreatorAddress?: string;
-    accountAddress?: string;
-    overheads?: Partial<GasOverheads>;
-    paymasterAPI?: PaymasterAPI;
-}
-```
-
-#### Usage
-The low-level approach above can be used as follows:
-
-```typescript
-owner = provider.getSigner()
-const walletAPI = new SimpleAccountAPI({
-    provider,
-    entryPointAddress,
-    owner,
-    factoryAddress
-})
-const op = await walletAPI.createSignedUserOp({
-  target: recipient.address,
-  data: recipient.interface.encodeFunctionData('something', ['hello'])
-})
-```
 
 ## High-Level Provider API
 
@@ -204,8 +230,8 @@ async function wrapProvider(
   originalProvider: JsonRpcProvider, // @ethersproject/providers
   config: ClientConfig,
   originalSigner: Signer = originalProvider.getSigner(), // @ethersproject/abstract-signer
-  wallet?: Wallet, // ethers
-  senderCreatorAddress?: string
+  wallet?: Wallet, // ethers, must be passed
+  senderCreatorAddress?: string // must be passed
 ): Promise<ERC4337EthersProvider>
 ```
 
@@ -234,6 +260,12 @@ interface ClientConfig {
 ```
 
 ### Usage
+Since-
+a) using a remote signer with eth_sendTransaction is not supported on Boba, transactions would need to be sent from an ethers.wallet (object), for the deterministic deployment of SimpleAccountFactory. This is not a requirement if the SimpleAccountFactory has already been deployed
+b) wrapProvider uses the low level API internally, custom reverts are not supported and the sdk would use the senderCreatorAddress to compute the account address that will be deployed
+
+wrapProvider must be passed the parameters `wallet` and `senderCreatorAddress` on Boba
+
 The high-level provider api can be used as follows:
 
 ```typescript
@@ -246,7 +278,7 @@ const config = {
   entryPointAddress,
   bundlerUrl: 'http://localhost:3000/rpc'
 }
-const aaProvider = await wrapProvider(provider, config, aasigner)
+const aaProvider = await wrapProvider(provider, config, aasigner, wallet, senderCreatorAddress)
 const walletAddress = await aaProvider.getSigner().getAddress()
 
 // send some eth to the wallet Address: wallet should have some balance to pay for its own creation, and for calling methods.
