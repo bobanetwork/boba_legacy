@@ -9,11 +9,17 @@ import {
   LogDb,
   LogFrameResult,
   LogStep,
-  LogTracer
+  LogTracer,
 } from './GethTracer'
 
-// toHex is available in a context of geth tracer
-declare function toHex (a: any): string
+// functions available in a context of geth tracer
+declare function toHex(a: any): string
+
+declare function toWord(a: any): string
+
+declare function toAddress(a: any): string
+
+declare function isPrecompiled(addr: any): boolean
 
 /**
  * return type of our BundlerCollectorTracer.
@@ -24,23 +30,42 @@ export interface BundlerCollectorReturn {
   /**
    * storage and opcode info, collected between "NUMBER" opcode calls (which is used as our "level marker")
    */
-  numberLevels: { [numberOpcodeLevel: string]: NumberLevelInfo }
+  numberLevels: NumberLevelInfo[]
   /**
    * values passed into KECCAK opcode
    */
   keccak: string[]
-  calls: Array<{ type: string, from: string, to: string, value: any }>
+  calls: Array<ExitInfo | MethodInfo>
   logs: LogInfo[]
   debug: any[]
 }
 
+export interface MethodInfo {
+  type: string
+  from: string
+  to: string
+  method: string
+  value: any
+  gas: number
+}
+
+export interface ExitInfo {
+  type: 'REVERT' | 'RETURN'
+  gasUsed: number
+  data: string
+}
+
 export interface NumberLevelInfo {
-  opcodes: { [opcode: string]: number | undefined }
-  access: { [address: string]: AccessInfo | undefined }
+  opcodes: { [opcode: string]: number }
+  access: { [address: string]: AccessInfo }
+  contractSize: { [addr: string]: number }
+  oog?: boolean
 }
 
 export interface AccessInfo {
-  reads: { [slot: string]: number }
+  // slot value, just prior this operation
+  reads: { [slot: string]: string }
+  // count of writes.
   writes: { [slot: string]: number }
 }
 
@@ -70,9 +95,9 @@ interface BundlerCollectorTracer extends LogTracer, BundlerCollectorReturn {
  *  calls: for each call, an array of [type, from, to, value]
  *  slots: accessed slots (on any address)
  */
-export function bundlerCollectorTracer (): BundlerCollectorTracer {
+export function bundlerCollectorTracer(): BundlerCollectorTracer {
   return {
-    numberLevels: {},
+    numberLevels: [],
     currentLevel: null as any,
     keccak: [],
     calls: [],
@@ -81,58 +106,103 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
     lastOp: '',
     numberCounter: 0,
 
-    fault (log: LogStep, db: LogDb): void {
-      this.debug.push(['fault', log.getError()])
+    fault(log: LogStep, db: LogDb): void {
+      this.debug.push(
+        'fault depth=',
+        log.getDepth(),
+        ' gas=',
+        log.getGas(),
+        ' cost=',
+        log.getCost(),
+        ' err=',
+        log.getError()
+      )
     },
 
-    result (ctx: LogContext, db: LogDb): any {
+    result(ctx: LogContext, db: LogDb): BundlerCollectorReturn {
       return {
         numberLevels: this.numberLevels,
         keccak: this.keccak,
         logs: this.logs,
         calls: this.calls,
-        debug: this.debug // for internal debugging.
+        debug: this.debug, // for internal debugging.
       }
     },
 
-    enter (frame: LogCallFrame): void {
-      this.debug.push([
-        'enter ' +
-          frame.getType() +
-          ' ' +
-          toHex(frame.getTo()) +
-          ' ' +
-          toHex(frame.getInput()).slice(0, 100)
-      ])
+    enter(frame: LogCallFrame): void {
+      // this.debug.push('enter gas=', frame.getGas(), ' type=', frame.getType(), ' to=', toHex(frame.getTo()), ' in=', toHex(frame.getInput()).slice(0, 500))
       this.calls.push({
         type: frame.getType(),
         from: toHex(frame.getFrom()),
         to: toHex(frame.getTo()),
-        value: frame.getValue()
+        method: toHex(frame.getInput()).slice(0, 10),
+        gas: frame.getGas(),
+        value: frame.getValue(),
       })
     },
-    exit (frame: LogFrameResult): void {
-      this.debug.push(
-        `exit err=${frame.getError() as string}, gas=${frame.getGasUsed()}`
-      )
+    exit(frame: LogFrameResult): void {
+      this.calls.push({
+        type: frame.getError() != null ? 'REVERT' : 'RETURN',
+        gasUsed: frame.getGasUsed(),
+        data: toHex(frame.getOutput()).slice(0, 1000),
+      })
     },
 
     // increment the "key" in the list. if the key is not defined yet, then set it to "1"
-    countSlot (list: { [key: string]: number | undefined }, key: any) {
+    countSlot(list: { [key: string]: number | undefined }, key: any) {
       list[key] = (list[key] ?? 0) + 1
     },
-    step (log: LogStep, db: LogDb): any {
+    step(log: LogStep, db: LogDb): any {
       const opcode = log.op.toString()
-      // this.debug.push(this.lastOp + '-' + opcode + '-' + log.getDepth())
-      if (opcode === 'NUMBER') this.numberCounter++
-      if (this.numberLevels[this.numberCounter] == null) {
-        this.currentLevel = this.numberLevels[this.numberCounter] = {
-          access: {},
-          opcodes: {}
+      // this.debug.push(this.lastOp + '-' + opcode + '-' + log.getDepth() + '-' + log.getGas() + '-' + log.getCost())
+      if (log.getGas() < log.getCost()) {
+        this.currentLevel.oog = true
+      }
+
+      if (opcode === 'REVERT' || opcode === 'RETURN') {
+        if (log.getDepth() === 1) {
+          // exit() is not called on top-level return/revent, so we reconstruct it
+          // from opcode
+          const ofs = parseInt(log.stack.peek(0).toString())
+          const len = parseInt(log.stack.peek(1).toString())
+          const data = toHex(log.memory.slice(ofs, ofs + len)).slice(0, 1000)
+          // this.debug.push(opcode + ' ' + data)
+          this.calls.push({
+            type: opcode,
+            gasUsed: 0,
+            data,
+          })
+        }
+      }
+
+      if (
+        opcode.match(/^(EXT.*|CALL|CALLCODE|DELEGATECALL|STATICCALL)$/) != null
+      ) {
+        // this.debug.push('op=' + opcode + ' last=' + this.lastOp + ' stacksize=' + log.stack.length())
+        const idx = opcode.startsWith('EXT') ? 0 : 1
+        const addr = toAddress(log.stack.peek(idx).toString(16))
+        const addrHex = toHex(addr)
+        if (
+          (this.currentLevel.contractSize[addrHex] ?? 0) === 0 &&
+          !isPrecompiled(addr)
+        ) {
+          this.currentLevel.contractSize[addrHex] = db.getCode(addr).length
         }
       }
 
       if (log.getDepth() === 1) {
+        // NUMBER opcode at top level split levels
+        if (opcode === 'NUMBER') {
+          this.numberCounter++
+        }
+        if (this.numberLevels[this.numberCounter] == null) {
+          this.currentLevel = this.numberLevels[this.numberCounter] = {
+            access: {},
+            opcodes: {},
+            contractSize: {},
+          }
+        }
+        this.lastOp = ''
         return
       }
 
@@ -153,32 +223,37 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
       this.lastOp = opcode
 
       if (opcode === 'SLOAD' || opcode === 'SSTORE') {
-        const slot = log.stack.peek(0).toString(16)
-        const addr = toHex(log.contract.getAddress())
-        let access
-        if ((access = this.currentLevel.access[addr]) == null) {
-          this.currentLevel.access[addr] = access = {
+        const slot = toWord(log.stack.peek(0).toString(16))
+        const slotHex = toHex(slot)
+        const addr = log.contract.getAddress()
+        const addrHex = toHex(addr)
+        let access = this.currentLevel.access[addrHex] as any
+        if (access == null) {
+          access = {
             reads: {},
-            writes: {}
+            writes: {},
           }
+          this.currentLevel.access[addrHex] = access
         }
-        this.countSlot(opcode === 'SLOAD' ? access.reads : access.writes, slot)
+        if (opcode === 'SLOAD') {
+          // read slot values before this UserOp was created
+          // (so saving it if it was written before the first read)
+          if (access.reads[slotHex] == null && access.writes[slotHex] == null) {
+            access.reads[slotHex] = toHex(db.getState(addr, slot))
+          }
+        } else {
+          this.countSlot(access.writes, slotHex)
+        }
       }
 
-      if (opcode === 'REVERT' || opcode === 'RETURN') {
-        const ofs = parseInt(log.stack.peek(0).toString())
-        const len = parseInt(log.stack.peek(1).toString())
-        this.debug.push(
-          opcode + ' ' + toHex(log.memory.slice(ofs, ofs + len)).slice(0, 100)
-        )
-      } else if (opcode === 'KECCAK256') {
+      if (opcode === 'KECCAK256') {
         // collect keccak on 64-byte blocks
         const ofs = parseInt(log.stack.peek(0).toString())
         const len = parseInt(log.stack.peek(1).toString())
         // currently, solidity uses only 2-word (6-byte) for a key. this might change..
         // still, no need to return too much
-        if (len < 512) {
-          // if (len == 64) {
+        if (len > 20 && len < 512) {
+          // if (len === 64) {
           this.keccak.push(toHex(log.memory.slice(ofs, ofs + len)))
         }
       } else if (opcode.startsWith('LOG')) {
@@ -193,9 +268,9 @@ export function bundlerCollectorTracer (): BundlerCollectorTracer {
         const data = toHex(log.memory.slice(ofs, ofs + len))
         this.logs.push({
           topics,
-          data
+          data,
         })
       }
-    }
+    },
   }
 }

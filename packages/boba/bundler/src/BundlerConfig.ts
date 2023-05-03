@@ -4,12 +4,21 @@ import ow from 'ow'
 export interface BundlerConfig {
   beneficiary: string
   entryPoint: string
+  entryPointWrapper?: string
   gasFactor: string
-  helper: string
   minBalance: string
   mnemonic: string
   network: string
   port: string
+  unsafe: boolean
+  conditionalRpc: boolean
+  whitelist?: string[]
+  blacklist?: string[]
+  maxBundleGas: number
+  minStake: string
+  minUnstakeDelay: number
+  autoBundleInterval: number
+  autoBundleMempoolSize: number
   addressManager: string
   l1NodeWeb3Url: string
 }
@@ -18,20 +27,34 @@ export interface BundlerConfig {
 export const BundlerConfigShape = {
   beneficiary: ow.string,
   entryPoint: ow.string,
+  entryPointWrapper: ow.optional.string,
   gasFactor: ow.string,
-  helper: ow.string,
   minBalance: ow.string,
   mnemonic: ow.string,
   network: ow.string,
   port: ow.string,
+  unsafe: ow.boolean,
+  conditionalRpc: ow.boolean,
+  whitelist: ow.optional.array.ofType(ow.string),
+  blacklist: ow.optional.array.ofType(ow.string),
+  maxBundleGas: ow.number,
+  minStake: ow.string,
+  minUnstakeDelay: ow.number,
+  autoBundleInterval: ow.number,
+  autoBundleMempoolSize: ow.number,
   addressManager: ow.string,
-  l1NodeWeb3Url: ow.string
+  l1NodeWeb3Url: ow.string,
 }
 
 // TODO: consider if we want any default fields at all
 // TODO: implement merging config (args -> config.js -> default) and runtime shape validation
 export const bundlerConfigDefault: Partial<BundlerConfig> = {
   port: '3000',
-  helper: '0xdD747029A0940e46D20F17041e747a7b95A67242',
-  entryPoint: '0x602aB3881Ff3Fa8dA60a8F44Cf633e91bA1FdB69'
+  entryPoint: '0x1306b01bC3e4AD202612D3843387e94737673F53',
+  unsafe: false,
+  conditionalRpc: false,
+  minStake: '1',
+  minUnstakeDelay: 60,
+  autoBundleInterval: 1,
+  autoBundleMempoolSize: 1,
 }
