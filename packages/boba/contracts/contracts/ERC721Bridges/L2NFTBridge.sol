@@ -545,6 +545,8 @@ contract L2NFTBridge is iL2NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 _to,
                 _tokenId
             );
+            exits[_l2Contract][_tokenId] = address(0);
+
             emit DepositFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
         }
     }

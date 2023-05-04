@@ -16,7 +16,7 @@ import { Signer, Wallet } from 'ethers'
 import { DeterministicDeployer, SimpleAccountAPI } from '@boba/bundler_sdk'
 import { postExecutionDump } from '@boba/bundler_utils/dist/postExecCheck'
 import {
-  SampleRecipient, TestRuleAccount, TestRulesAccount__factory
+  SampleRecipient, TestRulesAccount, TestRulesAccount__factory
 } from '../dist/src/types'
 import { resolveHexlify } from '@boba/bundler_utils'
 import { UserOperationEventEvent } from '@boba/accountabstraction'
@@ -196,7 +196,7 @@ describe('UserOpMethodHandler', function () {
       expect(rcpt?.success).to.be.true
     })
 
-    it.only('should expose FailedOp errors as text messages', async () => {
+    it('should expose FailedOp errors as text messages', async () => {
       const smartAccountAPI = new SimpleAccountAPI({
         provider,
         entryPointAddress: entryPoint.address,

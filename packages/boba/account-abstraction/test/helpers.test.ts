@@ -1,3 +1,6 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-shadow */
 import './aa.init'
 import { BigNumber } from 'ethers'
 import { AddressZero } from './testutils'

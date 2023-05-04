@@ -432,6 +432,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer
             IERC721(_l1Contract).safeTransferFrom(address(this), _to, _tokenId);
 
+            deposits[_l1Contract][_tokenId] = address(0);
+
             emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
         } else {
             // replyNeeded helps store the status if a message needs to be sent back to the other layer
