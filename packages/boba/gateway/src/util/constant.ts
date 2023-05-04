@@ -176,7 +176,4 @@ export const MM_EXTENTION_URL: string =
 
 export const MIN_NATIVE_L1_BALANCE: number = 0.002
 
-export enum BANXA_URL {
-  Mainnet = 'https://boba.banxa.com/?',
-  Testnet = 'https://boba.banxa-sandbox.com/?',
-}
+export const BANXA_URL: string = 'https://boba.banxa.com/?'
