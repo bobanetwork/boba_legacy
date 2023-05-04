@@ -164,11 +164,11 @@ export class ValidationManager {
     )
     requireCond(
       res.returnInfo.validUntil == null ||
-        res.returnInfo.validUntil + 30 > Date.now() / 1000,
+        res.returnInfo.validUntil > (Date.now() / 1000) + 30,
       'expires too soon',
       ValidationErrors.ExpiresShortly
     )
-  
+
     if (
       res.aggregatorInfo.addr !== AddressZero &&
       !BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
