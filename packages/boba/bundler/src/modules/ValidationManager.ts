@@ -166,7 +166,14 @@ export class ValidationManager {
       res.returnInfo.validUntil == null ||
         res.returnInfo.validUntil > (Date.now() / 1000) + 30,
       'expires too soon',
-      ValidationErrors.ExpiresShortly
+      ValidationErrors.ExpiresShortly,
+    )
+    requireCond(
+      res.returnInfo.validAfter == null ||
+        // not adding "buffer" here
+        res.returnInfo.validAfter < Date.now() / 1000,
+      'not valid yet',
+      ValidationErrors.NotValidYet,
     )
 
     if (
