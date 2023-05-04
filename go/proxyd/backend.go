@@ -438,7 +438,7 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	var debugRes interface{}
 	if isSingleElementBatch {
 		var singleRes RPCRes
-		if err := json.Unmarshal(resB, debugRes); err != nil {
+		if err := json.Unmarshal(resB, &debugRes); err != nil {
 			log.Error("error unmarshaling response", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
 			return nil, ErrBackendBadResponse
 		}
@@ -450,7 +450,7 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 			&singleRes,
 		}
 	} else {
-		if err := json.Unmarshal(resB, debugRes); err != nil {
+		if err := json.Unmarshal(resB, &debugRes); err != nil {
 			log.Error("error unmarshaling response", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
 			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
 			if responseIsNotBatched(resB) {
