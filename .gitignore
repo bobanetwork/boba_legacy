@@ -6,6 +6,8 @@ temp
 coverage.json
 *.tsbuildinfo
 
+integration-tests/result/output.xml
+
 env.yml
 env.yaml
 .aws-sam/
