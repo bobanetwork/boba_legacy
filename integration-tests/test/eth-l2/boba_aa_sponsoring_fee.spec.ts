@@ -194,7 +194,7 @@ describe('Sponsoring Tx\n', async () => {
       expect(res.validUntil).to.eq(validUntil)
       signedOp = await accountAPI.signUserOp(op)
 
-      expect(bundlerProvider.sendUserOpToBundler(signedOp)).to.throw(
+      expect(bundlerProvider.sendUserOpToBundler(signedOp)).throws(
         /expires too soon/
       )
     })
@@ -221,7 +221,8 @@ describe('Sponsoring Tx\n', async () => {
       expect(res.validUntil).to.eq(validUntil)
       signedOp = await accountAPI.signUserOp(op)
 
-      expect(bundlerProvider.sendUserOpToBundler(signedOp)).to.throw(
+      expect(bundlerProvider.sendUserOpToBundler(signedOp))
+      expect(bundlerProvider.sendUserOpToBundler(signedOp)).throw(
         /not valid yet/
       )
     })
