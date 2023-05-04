@@ -168,10 +168,7 @@ export class ValidationManager {
       'expires too soon',
       ValidationErrors.ExpiresShortly
     )
-    console.log(`res.aggregatorInfo ${res.aggregatorInfo}`)
-    console.log(res.aggregatorInfo.addr)
-    console.log(res.aggregatorInfo.stake)
-    console.log(res.aggregatorInfo.unstakeDelaySec)
+  
     if (
       res.aggregatorInfo.addr !== AddressZero &&
       !BigNumber.from(0).eq(res.aggregatorInfo.stake) &&
