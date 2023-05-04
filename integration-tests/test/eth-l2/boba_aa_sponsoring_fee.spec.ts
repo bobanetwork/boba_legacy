@@ -172,7 +172,7 @@ describe('Sponsoring Tx\n', async () => {
       expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
     })
 
-    it.only('should not be able to submit a userOp to the bundler and trigger tx when signature expired', async () => {
+    it('should not be able to submit a userOp to the bundler and trigger tx when signature expired', async () => {
       const validUntil = (await env.l2Provider.getBlock('latest')).timestamp - 300
       const validAfter = (await env.l2Provider.getBlock('latest')).timestamp - 600
       const op = await accountAPI.createSignedUserOp({
@@ -194,12 +194,12 @@ describe('Sponsoring Tx\n', async () => {
       expect(res.validUntil).to.eq(validUntil)
       signedOp = await accountAPI.signUserOp(op)
 
-      expect(bundlerProvider.sendUserOpToBundler(signedOp)).throws(
-        /expires too soon/
+      await expect(bundlerProvider.sendUserOpToBundler(signedOp)).to.be.rejectedWith(
+        Error, /expires too soon/
       )
     })
 
-    it.only('should not be able to submit a userOp to the bundler and trigger tx when signature is not valid yet', async () => {
+    it('should not be able to submit a userOp to the bundler and trigger tx when signature is not valid yet', async () => {
       const validUntil = (await env.l2Provider.getBlock('latest')).timestamp + 800
       const validAfter = (await env.l2Provider.getBlock('latest')).timestamp + 600
       const op = await accountAPI.createSignedUserOp({
@@ -221,9 +221,8 @@ describe('Sponsoring Tx\n', async () => {
       expect(res.validUntil).to.eq(validUntil)
       signedOp = await accountAPI.signUserOp(op)
 
-      expect(bundlerProvider.sendUserOpToBundler(signedOp))
-      expect(bundlerProvider.sendUserOpToBundler(signedOp)).throw(
-        /not valid yet/
+      await expect(bundlerProvider.sendUserOpToBundler(signedOp)).to.be.rejectedWith(
+        Error, /not valid yet/
       )
     })
   })
