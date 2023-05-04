@@ -16,7 +16,7 @@ import { Signer, Wallet } from 'ethers'
 import { DeterministicDeployer, SimpleAccountAPI } from '@boba/bundler_sdk'
 import { postExecutionDump } from '@boba/bundler_utils/dist/postExecCheck'
 import {
-  SampleRecipient, TestRuleAccount, TestOpcodesAccount__factory
+  SampleRecipient, TestRulesAccount, TestRulesAccount__factory
 } from '../dist/src/types'
 import { resolveHexlify } from '@boba/bundler_utils'
 import { UserOperationEventEvent } from '@boba/accountabstraction'
@@ -166,20 +166,21 @@ describe('UserOpMethodHandler', function () {
       const transactionReceipt = await event!.getTransactionReceipt()
       assert.isNotNull(transactionReceipt)
       const logs = transactionReceipt.logs.filter(log => log.address === entryPoint.address)
-      const deployedEvent = entryPoint.interface.parseLog(logs[0])
-      const depositedEvent = entryPoint.interface.parseLog(logs[1])
+      .map(log => entryPoint.interface.parseLog(log))
+      expect(logs.map(log => log.name)).to.eql([
+        'AccountDeployed',
+        'Deposited',
+        'BeforeExecution',
+        'UserOperationEvent'
+      ])
       const [senderEvent] = await sampleRecipient.queryFilter(sampleRecipient.filters.Sender(), transactionReceipt.blockHash)
-      const userOperationEvent = entryPoint.interface.parseLog(logs[2])
+      const userOperationEvent = logs[3]
 
-      assert.equal(deployedEvent.args.sender, userOperation.sender)
-      assert.equal(userOperationEvent.name, 'UserOperationEvent')
       assert.equal(userOperationEvent.args.success, true)
 
       const expectedTxOrigin = await methodHandler.signer.getAddress()
       assert.equal(senderEvent.args.txOrigin, expectedTxOrigin, 'sample origin should be bundler')
       assert.equal(senderEvent.args.msgSender, accountAddress, 'sample msgsender should be account address')
-
-      assert.equal(depositedEvent.name, 'Deposited')
     })
 
     it('getUserOperationByHash should return submitted UserOp', async () => {
@@ -292,14 +293,15 @@ describe('UserOpMethodHandler', function () {
   describe('#getUserOperationReceipt', function () {
     let userOpHash: string
     let receipt: UserOperationReceipt
-    let acc: TestRuleAccount
+    let acc: TestRulesAccount
     before(async () => {
-      acc = await new TestOpcodesAccount__factory(signer).deploy()
+      acc = await new TestRulesAccount__factory(signer).deploy()
+      const callData = acc.interface.encodeFunctionData('execSendMessage')
       const op: UserOperationStruct = {
         sender: acc.address,
         initCode: '0x',
         nonce: 0,
-        callData: '0x',
+        callData,
         callGasLimit: 1e6,
         verificationGasLimit: 1e6,
         preVerificationGas: 50000,
@@ -324,10 +326,9 @@ describe('UserOpMethodHandler', function () {
       expect(await methodHandler.getUserOperationReceipt(ethers.constants.HashZero)).to.equal(null)
     })
 
-    it('receipt should contain only userOp-specific events..', async () => {
+    it('receipt should contain only userOp execution events..', async () => {
       expect(receipt.logs.length).to.equal(1)
-      const evParams = acc.interface.decodeEventLog('TestMessage', receipt.logs[0].data, receipt.logs[0].topics)
-      expect(evParams.eventSender).to.equal(acc.address)
+      acc.interface.decodeEventLog('TestMessage', receipt.logs[0].data, receipt.logs[0].topics)
     })
     it('general receipt fields', () => {
       expect(receipt.success).to.equal(true)
@@ -337,8 +338,22 @@ describe('UserOpMethodHandler', function () {
       // filter out BOR-specific events..
       const logs = receipt.receipt.logs
         .filter(log => log.address !== '0x0000000000000000000000000000000000001010')
-      // one UserOperationEvent, and one op-specific event.
-      expect(logs.length).to.equal(2)
+        const eventNames = logs
+        // .filter(l => l.address == entryPoint.address)
+        .map(l => {
+          try {
+            return entryPoint.interface.parseLog(l)
+          } catch (e) {
+            return acc.interface.parseLog(l)
+          }
+        })
+        .map(l => l.name)
+      expect(eventNames).to.eql([
+        'TestFromValidation', // account validateUserOp
+        'BeforeExecution', // entryPoint marker
+        'TestMessage', // account execution event
+        'UserOperationEvent' // post-execution event
+      ])
     })
   })
 })
