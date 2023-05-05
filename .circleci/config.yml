@@ -46,6 +46,9 @@ commands:
       docker_compose_file:
         description: Docker compose file to use
         type: string
+      l1_url:
+        description: L1 rpc url to use
+        type: string
       test_folder:
         description: Folder to run tests in
         type: string
