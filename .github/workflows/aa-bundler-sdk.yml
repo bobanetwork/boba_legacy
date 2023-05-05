@@ -2,7 +2,7 @@ name: Publish AA-Bundler to NPM
 on:
   push:
     branches:
-      - wsdt/bundlersdk-release-opt #develop
+      - develop
     paths:
       # only on change
       - 'packages/boba/bundler_sdk/**/*'
