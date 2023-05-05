@@ -20,7 +20,9 @@ export const TableBody = styled(Box)(({ theme }) => ({
   },
 }))
 
-export const TableCell = styled(Box)(({ theme, isMobile }) => ({
+export const TableCell = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isMobile'
+})(({ theme, isMobile }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

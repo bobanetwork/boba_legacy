@@ -18,15 +18,16 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { transfer } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { 
+  selectLoading, 
+  selectLookupPrice,
+  selectBobaFeeChoice,
+  selectBobaPriceRatio,
+} from 'selectors'
 
 import { BigNumber, utils } from 'ethers'
 
-import {
-   selectBobaFeeChoice,
-   selectBobaPriceRatio,
-} from 'selectors/setupSelector'
+
 
 import BN from 'bignumber.js'
 

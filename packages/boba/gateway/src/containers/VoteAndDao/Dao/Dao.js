@@ -18,19 +18,23 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
 import { openError, openModal } from 'actions/uiAction'
-import { orderBy } from 'lodash'
+import { orderBy } from 'util/lodash';
 
 import Button from 'components/button/Button'
 import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { selectLatestProposalState, selectProposals } from 'selectors/daoSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectLatestProposalState, 
+  selectProposals,
+  selectLoading,
+  selectAccountEnabled, 
+  selectLayer,
+  selectLockRecords
+} from 'selectors'
 
 import { fetchLockRecords } from 'actions/veBobaAction'
-import { selectLockRecords } from 'selectors/veBobaSelector'
 
 
 import {DividerLine} from 'containers/Global.styles'

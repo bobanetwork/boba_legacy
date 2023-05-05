@@ -27,12 +27,18 @@ import { setCDMCompletion } from 'actions/transactionAction'
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
-import CounterButton from 'components/counterButton/CounterButton'
+import { CounterButton } from 'components';
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_depositLP } from 'selectors/signatureSelector'
+import { 
+  selectLoading, 
+  selectSignatureStatus_depositLP,
+  selectlayer1Balance,
+  selectFastDepositBatchCost,
+  selectL1FeeBalance,
+  selectUserAndL2LPBalanceBatch,
+ } from 'selectors'
 
 import networkService from 'services/networkService'
 
@@ -45,12 +51,6 @@ import {
   fetchFastDepositBatchCost,
  } from 'actions/balanceAction'
 
-import {
-  selectlayer1Balance,
-  selectFastDepositBatchCost,
-  selectL1FeeBalance,
-  selectUserAndL2LPBalanceBatch,
-} from 'selectors/balanceSelector'
 
 function InputStepBatch({ isBridge, handleClose }) {
 

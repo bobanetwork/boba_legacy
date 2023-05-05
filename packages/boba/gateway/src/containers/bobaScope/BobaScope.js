@@ -15,7 +15,9 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
+import { isEqual,orderBy } from 'util/lodash';
+
+
 import { useSelector } from 'react-redux'
 
 import "react-datepicker/dist/react-datepicker.css"
@@ -23,13 +25,11 @@ import "react-datepicker/dist/react-datepicker.css"
 import { setActiveDataTab } from 'actions/uiAction'
 import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
-import { selectBaseEnabled } from 'selectors/setupSelector'
-import { selectActiveDataTab } from 'selectors/uiSelector'
-import { selectSevens, selectFastExits } from 'selectors/dataSelector'
+import { selectBaseEnabled, selectActiveDataTab,selectSevens, selectFastExits } from 'selectors'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
-import PageTitle from 'components/pageTitle/PageTitle'
+import { PageTitle }  from 'components'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'

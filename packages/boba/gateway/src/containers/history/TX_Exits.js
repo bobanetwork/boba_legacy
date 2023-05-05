@@ -15,21 +15,19 @@ limitations under the License. */
 
 import React, { useState } from 'react'
 import {Grid, Box} from '@mui/material'
-import moment from 'moment'
+import {formatDate, isAfterDate} from 'util/dates'
 import { useSelector } from 'react-redux'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import { selectLoading, selectTokens, selectActiveNetworkName } from 'selectors'
 
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import networkService from 'services/networkService'
 
 import * as S from './History.styles'
-import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 const PER_PAGE = 8
 
@@ -63,7 +61,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
     let isExitable = false
     let details = null
 
-    let timeLabel = moment.unix(i.timeStamp).format('lll')
+    let timeLabel = formatDate(i.timeStamp,'lll')
 
     const to = i.to.toLowerCase()
 
@@ -81,15 +79,15 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
     //are we dealing with a traditional exit?
     if (to === allAddresses.L2StandardBridgeAddress.toLowerCase()) {
 
-      isExitable = moment().isAfter(moment.unix(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime))
+      isExitable = isAfterDate(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime)
 
       if (isExitable) {
-        timeLabel = 'Funds were exited to L1 after ' + moment.unix(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime).format('lll')
+        timeLabel = 'Funds were exited to L1 after ' + formatDate(i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime,'lll')
       } else {
         const secondsToGo = i.crossDomainMessage.crossDomainMessageEstimateFinalizedTime - Math.round(Date.now() / 1000)
         const daysToGo = Math.floor(secondsToGo / (3600 * 24))
         const hoursToGo = Math.round((secondsToGo % (3600 * 24)) / 3600)
-        const time = moment.unix(i.timeStamp).format('MM/DD/YYYY hh:mm a')//.format("mm/dd hh:mm")
+        const time = formatDate(i.timeStamp)
         timeLabel = `7 day window started ${time}. ${daysToGo} days and ${hoursToGo} hours remaining`
       }
 
@@ -111,7 +109,7 @@ function TX_Exits({ searchHistory, transactions, chainLink }) {
         chain={`${networkName['l2']} to ${networkName['l1']}`}
         title={`${chain} Hash: ${i.hash}`}
         blockNumber={`Block ${i.blockNumber}`}
-        time={timeLabel}
+        timeLabel={timeLabel}
         button={undefined}
         typeTX={`TX Type: ${metaData}`}
         detail={details}

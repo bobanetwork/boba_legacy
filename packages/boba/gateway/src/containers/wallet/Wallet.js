@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import Button from 'components/button/Button'
 
 import { Info } from '@mui/icons-material'
-import { Box, Icon, Typography } from '@mui/material'
+import { Box, Checkbox, FormControlLabel, Icon, Typography } from '@mui/material'
 
 import { getETHMetaTransaction } from 'actions/setupAction'
 import { openAlert, openError } from 'actions/uiAction'
@@ -19,30 +19,33 @@ import * as G from '../Global.styles'
 
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectAccountEnabled, 
+  selectLayer,
+  selectlayer2Balance,
+  selectActiveNetwork,
+  selectActiveNetworkName,
+} from 'selectors'
 
-import { selectlayer2Balance } from 'selectors/balanceSelector'
 
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash';
 
 import { DEFAULT_NETWORK, LAYER, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
-import {
-  selectActiveNetwork,
-  selectActiveNetworkName,
-} from 'selectors/networkSelector'
+
 import networkService from 'services/networkService'
 import { NETWORK } from 'util/network/network.util'
 import Connect from "../connect/Connect";
-import PageTitle from "../../components/pageTitle/PageTitle";
+import {PageTitle} from 'components'
 
 function Wallet() {
   const [page, setPage] = useState('Token')
   const [tooSmallSec, setTooSmallSec] = useState(false)
   const [tooSmallBOBA, setTooSmallBOBA] = useState(false)
+  const [ balanceToken, setBalanceToken ] = useState(false);
 
   const dispatch = useDispatch()
   const network = useSelector(selectActiveNetwork())
@@ -178,6 +181,17 @@ function Wallet() {
                 {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2} Wallet
               </Typography>
             </G.PageSwitcher>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={balanceToken}
+                  onChange={e => setBalanceToken(e.target.checked)}
+                  name="my tokens only"
+                  color="primary"
+                />
+              }
+              label="My tokens only"
+            />
           </S.WalletActionContainer>
           {network === NETWORK.ETHEREUM ? (
             <>
@@ -189,10 +203,10 @@ function Wallet() {
                   tabs={[ 'Token', 'NFT' ]}
                 />
               </Box>
-              {page === 'Token' ? <Token /> : <Nft />}
+              {page === 'Token' ? <Token balanceToken={balanceToken} /> : <Nft />}
             </>
           ) : (
-            <Token />
+            <Token balanceToken={balanceToken} />
           )}
         </>
       ) : ('')}

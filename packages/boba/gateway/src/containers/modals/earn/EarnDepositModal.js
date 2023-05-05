@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash';
 
 import { closeModal, openAlert } from 'actions/uiAction'
 import { addLiquidity, getEarnInfo } from 'actions/earnAction'

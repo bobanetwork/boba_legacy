@@ -17,17 +17,16 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import "react-datepicker/dist/react-datepicker.css"
 import { Grid, Box } from '@mui/material'
-import { orderBy } from 'lodash'
-import moment from 'moment'
+import { orderBy } from 'util/lodash';
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import { selectLoading, selectTokens } from 'selectors'
 import { logAmount } from 'util/amountConvert'
 
 import Transaction from 'components/transaction/Transaction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 import * as S from './History.styles'
+import { formatDate } from 'util/dates';
 
 const PER_PAGE = 8
 
@@ -177,7 +176,7 @@ function TX_Pending({ searchHistory, transactions }) {
                 let completionTime = 'Not available'
 
                 if(i.completion)
-                    completionTime = moment.unix(i.completion).format('lll')
+                    completionTime = formatDate(i.completion,'lll')
 
                 const chain = (i.chain === 'L1pending') ? 'L1' : i.chain
 
@@ -211,13 +210,11 @@ function TX_Pending({ searchHistory, transactions }) {
                   completion = i.labelStatus + ' - Completion time: ' + completionTime
                 }
 
-                const time = moment.unix(i.timeStamp).format('lll')
-
                 return (
                     <Transaction
                       key={index}
                       title={`${chain} Hash: ${i.hash}`}
-                      time={time}
+                      time={i.timeStamp}
                       blockNumber={`Block ${i.blockNumber}`}
                       chain={`${chain} Chain`}
                       typeTX={annotation === '' ? `` : `TX Type: ${annotation}`}

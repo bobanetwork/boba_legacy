@@ -51,11 +51,13 @@ import {
 import {
   selectBaseEnabled,
   selectAccountEnabled,
-} from 'selectors/setupSelector'
+  selectAlert,
+  selectError,
+  selectModalState,
+  selectActiveNetwork,
+  selectActiveNetworkType
+} from 'selectors'
 
-
-import { selectAlert, selectError } from 'selectors/uiSelector'
-import { selectModalState } from 'selectors/uiSelector'
 
 /******** MODALs ********/
 import DepositModal from 'containers/modals/deposit/DepositModal'
@@ -79,21 +81,21 @@ import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionMod
 import SwitchNetworkModal from 'containers/modals/switchNetwork/SwitchNetworkModal'
 
 /******** COMPONENTS ********/
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import PageHeader from 'components/pageHeader/PageHeader'
 import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 /******** UTILS ********/
-import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
+import { APP_STATUS, BOBABEAM_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
-import { selectActiveNetwork, selectActiveNetworkType } from 'selectors/networkSelector'
 import useNetwork from 'hooks/useNetwork'
 import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import useWalletSwitch from 'hooks/useWalletSwitch'
+import NotificationBanner from 'components/notificationBanner'
 
 
 function Home() {
@@ -255,6 +257,16 @@ function Home() {
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
       {!!switchNetworkModalState && <SwitchNetworkModal open={switchNetworkModalState} />}
 
+      {
+        !!Number(BOBABEAM_STATUS)
+        && activeNetwork === 'MOONBEAM'
+        && <NotificationBanner
+          message='Bobabeam is being wound down & will no longer be available, starting May 25th'
+          content='Bobabeam is being wound down & will no longer be available, starting May 25th.
+          For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam.'
+          open={true}
+        />}
+
       <Alert
         type='error'
         duration={0}
@@ -330,7 +342,7 @@ function Home() {
         <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
           <Container maxWidth={false} sx={{
-            minHeight: 'calc(100vh - 64px)',
+            minHeight: 'calc(100vh - 200px)',
             width: '100vw',
             marginLeft: 'unset',
             marginRight: 'unset'

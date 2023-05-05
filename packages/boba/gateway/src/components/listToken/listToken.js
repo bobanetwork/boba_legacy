@@ -14,13 +14,16 @@ import {
 import Button from 'components/button/Button'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { selectLookupPrice } from 'selectors'
 import { amountToUsd, logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './listToken.styles'
 import { BRIDGE_TYPE } from 'util/constant'
+import { BN } from 'bn.js'
 
-function ListToken({ token, chain, networkLayer, disabled, loading }) {
+function ListToken({ token, chain, networkLayer, disabled, loading,
+  showBalanceToken
+}) {
   const [dropDownBox, setDropDownBox] = useState(false)
 
   const theme = useTheme()
@@ -73,6 +76,10 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
 
   async function doSettle_v3OLO() {
     await dispatch(settle_v3OLO())
+  }
+
+  if (showBalanceToken && token.balance.lte(new BN(1000000))) {
+    return null;
   }
 
   if (isMobile) {
@@ -140,7 +147,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                         BRIDGE_TYPE.CLASSIC_BRIDGE
                       )
                     }}
-                    color="secondary"
+                    color="primary"
                     variant="outlined"
                     disabled={disabled}
                     tooltip="Classic Bridge to Boba L2. This option is always available but is generally more expensive than the swap-based system ('Fast Bridge')."
@@ -179,7 +186,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                       tooltip="A multi-chain bridge to Alt L1."
                       fullWidth
                     >
-                      Bridge
+                      Bridge to L1
                     </Button>
                   )}
                 </>
@@ -497,7 +504,7 @@ function ListToken({ token, chain, networkLayer, disabled, loading }) {
                   variant="contained"
                   fullWidth
                 >
-                  Bridge
+                  Bridge to L1
                 </Button>
               )}
             </>

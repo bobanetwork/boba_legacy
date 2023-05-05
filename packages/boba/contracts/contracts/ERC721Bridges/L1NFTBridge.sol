@@ -39,7 +39,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
  * Runtime target: EVM
  */
 contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, ReentrancyGuardUpgradeable, PausableUpgradeable {
-    using SafeMath for uint;
+    using SafeMath for uint256;
 
     /********************************
      * External Contract References *
@@ -63,6 +63,20 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     mapping(address => mapping (uint256 => address)) public deposits;
     // Maps L1 NFT address to NFTInfo
     mapping(address => PairNFTInfo) public pairNFTInfo;
+
+    event OwnershipTransferred(
+        address newOwner
+    );
+
+    event GasConfigured(
+        uint32 newDepositGas
+    );
+
+    event NFTPairRegistered(
+        address l1Contract,
+        address l2Contract,
+        string baseNetwork
+    );
 
     /***************
      * Constructor *
@@ -103,7 +117,9 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         onlyOwner()
         onlyInitialized()
     {
+        require(_newOwner != address(0), "New owner cannot be the zero address");
         owner = _newOwner;
+        emit OwnershipTransferred(owner);
     }
 
     /**
@@ -119,6 +135,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         onlyInitialized()
     {
         depositL2Gas = _depositL2Gas;
+        emit GasConfigured(depositL2Gas);
     }
 
     /**
@@ -160,6 +177,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         public
         onlyOwner()
     {
+        require(_l2Contract != address(0), "L2 NFT cannot be zero address");
         //create2 would prevent this check
         //require(_l1Contract != _l2Contract, "Contracts should not be the same");
         bytes4 erc721 = 0x80ac58cd;
@@ -178,7 +196,9 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             baseNetwork = Network.L1;
         }
         else {
+            // check the IL1StandardERC721 interface is supported
             require(ERC165Checker.supportsInterface(_l1Contract, 0xec88b5ce), "L1 contract is not bridgable");
+            require(IL1StandardERC721(_l1Contract).l2Contract() == _l2Contract, "L1 contract is not compatible with L2 contract");
             baseNetwork = Network.L2;
         }
 
@@ -188,6 +208,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
                 l2Contract: _l2Contract,
                 baseNetwork: baseNetwork
             });
+
+        emit NFTPairRegistered(_l1Contract, _l2Contract, _baseNetwork);
     }
 
     /**************
@@ -208,6 +230,9 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         _initiateNFTDeposit(_l1Contract, msg.sender, msg.sender, _tokenId, _l2Gas, "");
     }
 
@@ -243,6 +268,9 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
         nonReentrant()
         whenNotPaused()
     {
+        //  This check could be bypassed by a malicious contract via initcode,
+        // but it takes care of the user error we want to avoid.
+        require(!Address.isContract(msg.sender), "Account not EOA");
         bytes memory extraData;
         // if token has base on this layer
         if (pairNFTInfo[_l1Contract].baseNetwork == Network.L1) {
@@ -314,14 +342,12 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
     {
         PairNFTInfo storage pairNFT = pairNFTInfo[_l1Contract];
         require(pairNFT.l2Contract != address(0), "Can't Find L2 NFT Contract");
+        require(_from == msg.sender, "Sender does not have token priviledges");
 
         if (pairNFT.baseNetwork == Network.L1) {
-            //  This check could be bypassed by a malicious contract via initcode,
-            // but it takes care of the user error we want to avoid.
-            require(!Address.isContract(msg.sender), "Account not EOA");
             // When a deposit is initiated on L1, the L1 Bridge transfers the funds to itself for future
-            // withdrawals. safeTransferFrom also checks if the contract has code, so this will fail if
-            // _from is an EOA or address(0).
+            // withdrawals. safeTransferFrom would fail if it’s address(0).
+            // And the call fails if it’s not an EOA
             IERC721(_l1Contract).safeTransferFrom(
                 _from,
                 address(this),
@@ -348,9 +374,6 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
 
             deposits[_l1Contract][_tokenId] = pairNFT.l2Contract;
         } else {
-            address l2Contract = IL1StandardERC721(_l1Contract).l2Contract();
-            require(pairNFT.l2Contract == l2Contract, "L2 NFT Contract Address Error");
-
             // When a withdrawal is initiated, we burn the withdrawer's funds to prevent subsequent L2
             // usage
             address NFTOwner = IL1StandardERC721(_l1Contract).ownerOf(_tokenId);
@@ -367,7 +390,7 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
             message = abi.encodeWithSelector(
                 iL2NFTBridge.finalizeDeposit.selector,
                 _l1Contract,
-                l2Contract,
+                pairNFT.l2Contract,
                 _from,
                 _to,
                 _tokenId,
@@ -408,6 +431,8 @@ contract L1NFTBridge is iL1NFTBridge, CrossDomainEnabled, ERC721Holder, Reentran
 
             // When a withdrawal is finalized on L1, the L1 Bridge transfers the funds to the withdrawer
             IERC721(_l1Contract).safeTransferFrom(address(this), _to, _tokenId);
+
+            deposits[_l1Contract][_tokenId] = address(0);
 
             emit NFTWithdrawalFinalized(_l1Contract, _l2Contract, _from, _to, _tokenId, _data);
         } else {

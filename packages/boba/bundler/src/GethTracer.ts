@@ -1,3 +1,5 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable prettier/prettier */
 import { JsonRpcProvider, TransactionRequest } from '@ethersproject/providers'
 import { BigNumber } from 'ethers'
 import { Deferrable } from '@ethersproject/properties'
@@ -15,41 +17,27 @@ import { resolveProperties } from 'ethers/lib/utils'
 type LogTracerFunc = () => LogTracer
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export async function debug_traceCall (
-  provider: JsonRpcProvider,
-  tx: Deferrable<TransactionRequest>,
-  options: TraceOptions
-): Promise<TraceResult | any> {
+export async function debug_traceCall (provider: JsonRpcProvider, tx: Deferrable<TransactionRequest>, options: TraceOptions): Promise<TraceResult | any> {
   const tx1 = await resolveProperties(tx)
-  const ret = await provider.send('debug_traceCall', [
-    tx1,
-    'latest',
-    tracer2string(options)
-  ])
+  const traceOptions = tracer2string(options)
+  const ret = await provider.send('debug_traceCall', [tx1, 'latest', traceOptions]).catch(e => {
+    console.log('ex=', e.message)
+    console.log('tracer=', traceOptions.tracer?.toString().split('\n').map((line, index) => `${index + 1}: ${line}`).join('\n'))
+    throw e
+  })
   // return applyTracer(ret, options)
   return ret
 }
 
 // a hack for network that doesn't have traceCall: mine the transaction, and use debug_traceTransaction
-export async function execAndTrace (
-  provider: JsonRpcProvider,
-  tx: Deferrable<TransactionRequest>,
-  options: TraceOptions
-): Promise<TraceResult | any> {
+export async function execAndTrace (provider: JsonRpcProvider, tx: Deferrable<TransactionRequest>, options: TraceOptions): Promise<TraceResult | any> {
   const hash = await provider.getSigner().sendUncheckedTransaction(tx)
   return await debug_traceTransaction(provider, hash, options)
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export async function debug_traceTransaction (
-  provider: JsonRpcProvider,
-  hash: string,
-  options: TraceOptions
-): Promise<TraceResult | any> {
-  const ret = await provider.send('debug_traceTransaction', [
-    hash,
-    tracer2string(options)
-  ])
+export async function debug_traceTransaction (provider: JsonRpcProvider, hash: string, options: TraceOptions): Promise<TraceResult | any> {
+  const ret = await provider.send('debug_traceTransaction', [hash, tracer2string(options)])
   // const tx = await provider.getTransaction(hash)
   // return applyTracer(tx, ret, options)
   return ret
@@ -58,20 +46,26 @@ export async function debug_traceTransaction (
 /**
  * extract the body of "LogTracerFunc".
  * note that we extract the javascript body, even if the function was created as typescript
- *
  * @param func
  */
 export function getTracerBodyString (func: LogTracerFunc): string {
   const tracerFunc = func.toString()
   // function must return a plain object:
   //  function xyz() { return {...}; }
-  const regexp =
-    /function \w+\s*\(\s*\)\s*{\s*return\s*(\{[\s\S]+\});?\s*\}\s*$/ // (\{[\s\S]+\}); \} $/
+  const regexp = /function\w*\s*\(\s*\)\s*{\s*return\s*(\{[\s\S]+\});?\s*\}\s*$/ // (\{[\s\S]+\}); \} $/
   const match = tracerFunc.match(regexp)
   if (match == null) {
     throw new Error('Not a simple method returning value')
   }
-  return match[1]
+
+  let ret = match[1]
+  console.log(ret)
+  ret = ret
+    // .replace(/\/\/.*\n/g,'\n')
+    // .replace(/\n\s*\n/g, '\n')
+    .replace(/\b(?:const|let)\b/g, '')
+  // console.log('== tracer source',ret.split('\n').map((line,index)=>`${index}: ${line}`).join('\n'))
+  return ret
 }
 
 function tracer2string (options: TraceOptions): TraceOptions {
@@ -156,39 +150,19 @@ export interface LogTracer {
   exit?: (frame: LogFrameResult) => void
 }
 
-export class LogCallFrame {
-  constructor (
-    readonly type: string,
-    readonly caller: string,
-    readonly address: string,
-    readonly value: BigNumber,
-    readonly input: string,
-    readonly gas: BigNumber
-  ) {}
-
-  getType (): string {
-    return this.type
-  } // - returns a string which has the type of the call frame
-
-  getFrom (): string {
-    return this.caller
-  } // - returns the address of the call frame sender
-
-  getTo (): string {
-    return this.address
-  } // - returns the address of the call frame target
-
-  getInput (): string {
-    return this.input
-  } // - returns the input as a buffer
-
-  getGas (): BigNumber {
-    return this.gas
-  } // - returns a Number which has the amount of gas provided for the frame
-
-  getValue (): BigNumber {
-    return this.value
-  } // - returns a big.Int with the amount to be transferred only if available, otherwise undefined
+export interface LogCallFrame {
+  // - returns a string which has the type of the call frame
+  getType: () => string
+  // - returns the address of the call frame sender
+  getFrom: () => string
+  // - returns the address of the call frame target
+  getTo: () => string
+  // - returns the input as a buffer
+  getInput: () => string
+  // - returns a Number which has the amount of gas provided for the frame
+  getGas: () => number
+  // - returns a big.Int with the amount to be transferred only if available, otherwise undefined
+  getValue: () => BigNumber
 }
 
 export interface LogFrameResult {
@@ -232,7 +206,7 @@ export interface LogStep {
   getCost: () => number // returns the cost of the opcode as a Number
   getDepth: () => number // returns the execution depth as a Number
   getRefund: () => number // returns the amount to be refunded as a Number
-  getError: () => any //  returns information about the error if one occured, otherwise returns undefined
+  getError: () => string | undefined //  returns information about the error if one occured, otherwise returns undefined
   // If error is non-empty, all other fields should be ignored.
 }
 

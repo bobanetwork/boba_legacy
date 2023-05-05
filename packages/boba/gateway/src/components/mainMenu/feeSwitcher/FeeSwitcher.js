@@ -21,23 +21,22 @@ import {
   selectAccountEnabled,
   selectBobaFeeChoice,
   selectLayer,
-} from 'selectors/setupSelector'
+  selectlayer2Balance,
+  selectActiveNetworkName
+} from 'selectors'
 
-import { selectlayer2Balance } from 'selectors/balanceSelector'
 
 import { switchFee } from 'actions/setupAction.js'
 
 import * as S from './FeeSwitcher.styles.js'
 import Select from 'components/select/Select'
 import Tooltip from 'components/tooltip/Tooltip.js'
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash';
 
 import BN from 'bignumber.js'
 import { logAmount } from 'util/amountConvert.js'
 import networkService from 'services/networkService.js'
-import {
-  selectActiveNetworkName,
-} from 'selectors/networkSelector.js'
+
 import {FeeSwitcherIcon, FeeSwitcherLabel} from "./FeeSwitcher.styles.js";
 
 

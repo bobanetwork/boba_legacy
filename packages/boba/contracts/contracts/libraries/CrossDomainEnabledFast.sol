@@ -9,6 +9,8 @@ import { ICrossDomainMessenger } from "@eth-optimism/contracts/contracts/librari
  *
  * Compiler used: defined by inheriting contract
  * Runtime target: defined by inheriting contract
+ * If this contract is inherited by an upgradeable contract, do not add new storage slots to this contract
+ * this contract does not include a reserved storage field (__gap)
  */
 contract CrossDomainEnabledFast {
 

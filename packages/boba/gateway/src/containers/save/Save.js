@@ -17,7 +17,7 @@
 */
 import React from 'react'
 import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash';
 
 import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
 import { openAlert } from 'actions/uiAction'
@@ -26,7 +26,7 @@ import * as S from './Save.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'

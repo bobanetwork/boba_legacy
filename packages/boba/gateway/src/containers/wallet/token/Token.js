@@ -4,16 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   selectlayer1Balance,
   selectlayer2Balance,
-} from 'selectors/balanceSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import {
+  selectLoading,
   selectAccountEnabled,
   selectBaseEnabled,
   selectLayer,
-} from 'selectors/setupSelector'
-import { selectNetwork } from 'selectors/networkSelector'
-import { selectTokens } from 'selectors/tokenSelector'
-import { selectTransactions } from 'selectors/transactionSelector'
+  selectNetwork,
+  selectTokens,
+  selectTransactions
+} from 'selectors'
+
 
 import { fetchBalances, fetchLookUpPrice } from 'actions/networkAction'
 import { setActiveHistoryTab } from 'actions/uiAction'
@@ -29,7 +28,8 @@ import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
 import Pulse from 'components/pulse/PulsingBadge'
 
-import { isEqual, orderBy } from 'lodash'
+
+import { isEqual,orderBy } from 'util/lodash';
 
 import networkService from 'services/networkService'
 
@@ -37,7 +37,9 @@ import { useNavigate } from 'react-router-dom'
 
 import Faucet from 'components/faucet/Faucet'
 
-function TokenPage() {
+function TokenPage({
+  balanceToken
+}) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -277,6 +279,7 @@ function TokenPage() {
                 l2Balance.map((i) => {
                   return (
                     <ListToken
+                      showBalanceToken={balanceToken}
                       key={i.currency}
                       token={i}
                       chain={'L2'}
@@ -296,6 +299,7 @@ function TokenPage() {
                 l1Balance.map((i) => {
                   return (
                     <ListToken
+                      showBalanceToken={balanceToken}
                       key={i.currency}
                       token={i}
                       chain={'L1'}

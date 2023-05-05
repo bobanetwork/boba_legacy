@@ -21,8 +21,7 @@ import {
   ToggleButton,
   IconButton,
 } from '@mui/material'
-import { useTheme } from '@mui/styles'
-import { setConnect, setConnectBOBA, setConnectETH, setLayer, setWalletConnected } from 'actions/setupAction.js'
+import { useTheme } from '@mui/material/styles'
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -35,27 +34,34 @@ import {
   selectConnect,
   selectWalletConnected,
   selectChainIdChanged,
-} from 'selectors/setupSelector'
-
-import {
   selectActiveNetwork,
   selectActiveNetworkIcon,
   selectActiveNetworkName,
   selectActiveNetworkType,
-} from 'selectors/networkSelector'
+} from 'selectors'
+
+
 import * as S from './LayerSwitcher.styles.js'
 
 import networkService from 'services/networkService'
 import truncate from 'truncate-middle'
 
-import { setEnableAccount, setWalletAddress } from 'actions/setupAction'
+import {
+  setEnableAccount,
+  setWalletAddress,
+  setConnect,
+  setConnectBOBA,
+  setConnectETH,
+  setLayer,
+  setWalletConnected
+} from 'actions/setupAction'
 
 import { fetchTransactions } from 'actions/networkAction'
 
 import { closeModal, openModal } from 'actions/uiAction'
-import Button from 'components/button/Button.js'
-import { L1_ICONS, L2_ICONS } from 'util/network/network.util.js'
-import { LAYER, DISABLE_WALLETCONNECT } from 'util/constant.js'
+import Button from 'components/button/Button'
+import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
+import { LAYER, DISABLE_WALLETCONNECT } from 'util/constant'
 
 function LayerSwitcher({ visisble = true, isButton = false }) {
   const dispatch = useDispatch()
@@ -128,7 +134,7 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
       try {
         if (networkService.walletService.provider) {
           if (await networkService.switchChain(layer)) {
-            if (layer === 'L1') {
+            if (layer === 'L2') {
               dispatch(setConnectBOBA(false))
             } else {
               dispatch(setConnectETH(false))

@@ -2,25 +2,26 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import * as S from './GasSwitcher.styles.js'
+import * as S from './GasSwitcher.styles'
 
-import { selectGas } from 'selectors/balanceSelector'
-import { selectVerifierStatus } from 'selectors/verifierSelector'
-import { selectBaseEnabled } from 'selectors/setupSelector.js'
-import {
-  selectActiveNetwork,
+import { 
+  selectGas, 
+  selectVerifierStatus, 
+  selectBaseEnabled, 
+  selectActiveNetwork, 
   selectActiveNetworkName
-} from 'selectors/networkSelector.js'
+} from 'selectors'
 
-import { fetchGas } from 'actions/networkAction.js'
-import { fetchVerifierStatus } from 'actions/verifierAction.js'
 
-import networkService from 'services/networkService.js'
+import { fetchGas } from 'actions/networkAction'
+import { fetchVerifierStatus } from 'actions/verifierAction'
 
-import useInterval from 'hooks/useInterval.js'
+import networkService from 'services/networkService'
 
-import { GAS_POLL_INTERVAL } from 'util/constant.js'
-import { NETWORK, NETWORK_TYPE } from 'util/network/network.util.js'
+import useInterval from 'hooks/useInterval'
+
+import { GAS_POLL_INTERVAL } from 'util/constant'
+import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 
 function GasSwitcher() {
   const dispatch = useDispatch()

@@ -16,18 +16,15 @@ limitations under the License. */
 import React, { useState, useEffect } from 'react'
 import { Grid, Box } from '@mui/material'
 import { useSelector } from 'react-redux'
-import moment from 'moment'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import { selectLoading, selectTokens, selectActiveNetworkName } from 'selectors'
 
 import { logAmount } from 'util/amountConvert'
 
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 import Transaction from 'components/transaction/Transaction'
 
 import * as S from './History.styles';
-import { selectActiveNetworkName } from 'selectors/networkSelector'
 
 const PER_PAGE = 10
 
@@ -125,7 +122,7 @@ function TX_Deposits({ searchHistory, transactions }) {
                   <Transaction
                     key={index}
                     title={`Hash: ${i.hash}`}
-                    time={moment.unix(i.timeStamp).format('lll')}
+                    time={i.timeStamp}
                     blockNumber={`Block ${i.blockNumber}`}
                     chain={`${networkName['l1']} to ${networkName['l2']} ${i.activity === 'ClientDepositL1Batch' ? 'in Batch' : ''}`}
                     typeTX={`TX Type: ${metaData}`}
