@@ -9,11 +9,11 @@ import { getFilteredLogIndex, l2Wallet } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
 // use local sdk
-import { SimpleAccountAPI, wrapProvider } from '@boba/bundler_sdk'
+import { SimpleAccountAPI, wrapProvider } from '@bobanetwork/bundler_sdk'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
+import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 
 describe('AA Wallet Test\n', async () => {
   let env: OptimismEnv

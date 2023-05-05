@@ -10,14 +10,14 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleAccountAPI } from '@boba/bundler_sdk'
+import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
+import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 
 import BobaDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
 
