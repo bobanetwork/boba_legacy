@@ -80,7 +80,6 @@ export class BundlerServer {
       maxPriorityFeePerGas: 0,
       signature: '0x',
     }
-    // TODO: https://github.com/bobanetwork/boba/issues/759
     const ret = await EntryPointWrapper__factory.connect(this.config.entryPointWrapper, this.wallet).callStatic.simulateValidation(emptyUserOp)
     const [failedOpStatus, _]: [EntryPointWrapper.FailedOpStatusStructOutput, any] = ret
     if (failedOpStatus?.status !== true) {
