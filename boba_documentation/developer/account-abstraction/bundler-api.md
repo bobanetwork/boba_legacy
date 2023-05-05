@@ -35,6 +35,7 @@ Otherwise it returns an error object with `code` and `message`. (and sometimes `
 | -32505   | Transaction rejected because paymaster (or signature aggregator) stake or unstake-delay is too low                                  |
 | -32506   | Transaction rejected because wallet specified unsupported signature aggregator                                                      |
 | -32507   | Transaction rejected because of wallet signature check failed (or paymaster siganture, if the paymaster uses its data as signature) |
+| -32508   | UserOperation not in valid time-range: either wallet or paymaster returned a time-range, and it is valid in the future  |
 
 
 ### Usage
