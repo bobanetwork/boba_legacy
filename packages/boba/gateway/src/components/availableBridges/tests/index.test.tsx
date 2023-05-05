@@ -33,7 +33,7 @@ const renderAvailableBridges = ({
   )
 }
 
-describe('Avaialble Bridges', () => {
+describe('Available Bridges', () => {
   let token = {
     symbol: 'ETH',
   }
