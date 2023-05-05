@@ -25,6 +25,7 @@ import { isGeth } from '../src/utils'
 import { TestRecursionAccount__factory } from '../dist/src/types/factories/contracts/tests/TestRecursionAccount__factory'
 // import { resolveNames } from './testUtils'
 import { UserOperation } from '../src/modules/Types'
+import { BytesLike } from "ethers";
 
 const cEmptyUserOp: UserOperation = {
   sender: AddressZero,
@@ -51,9 +52,9 @@ describe('#ValidationManager', () => {
   let rulesAccount: TestRulesAccount
   let storageAccount: TestStorageAccount
 
-  async function testUserOp (validateRule: string = '', pmRule?: string, initFunc?: string, factoryAddress = opcodeFactory.address): Promise<ValidateUserOpResult & { userOp: UserOperation }> {
-    const userOp = await createTestUserOp(validateRule, pmRule, initFunc, factoryAddress)
-    return { userOp, ...await vm.validateUserOp(userOp) }
+  async function testUserOp (validateRule: string = '', pmRule?: string, initFunc?: string, factoryAddress = opcodeFactory.address, paymasterData?: BytesLike[]): Promise<ValidateUserOpResult & { userOp: UserOperation }> {
+    const userOp = await createTestUserOp(validateRule, pmRule, initFunc, factoryAddress, paymasterData)
+      return { userOp, ...await vm.validateUserOp(userOp) }
   }
 
   async function testExistingUserOp (validateRule: string = '', pmRule = ''): Promise<ValidateUserOpResult & { userOp: UserOperation }> {
@@ -75,7 +76,7 @@ describe('#ValidationManager', () => {
     }
   }
 
-  async function createTestUserOp (validateRule: string = '', pmRule?: string, initFunc?: string, factoryAddress = opcodeFactory.address): Promise<UserOperation> {
+  async function createTestUserOp (validateRule: string = '', pmRule?: string, initFunc?: string, factoryAddress = opcodeFactory.address, paymasterData?: BytesLike[]): Promise<UserOperation> {
     if (initFunc === undefined) {
       initFunc = opcodeFactory.interface.encodeFunctionData('create', [''])
     }
@@ -84,7 +85,11 @@ describe('#ValidationManager', () => {
       factoryAddress,
       initFunc
     ])
-    const paymasterAndData = pmRule == null ? '0x' : hexConcat([paymaster.address, Buffer.from(pmRule)])
+
+    if (!paymasterData || !paymasterData.length) {
+      paymasterData.push(Buffer.from(pmRule))
+    }
+    const paymasterAndData = pmRule == null ? '0x' : hexConcat([paymaster.address, ...paymasterData ])
     const signature = hexlify(Buffer.from(validateRule))
     const callinitCodeForAddr = await provider.call({
       to: factoryAddress,
@@ -183,6 +188,24 @@ describe('#ValidationManager', () => {
     expect(await testUserOp('balance-self', undefined, storageFactory.interface.encodeFunctionData('create', [0, '']), storageFactory.address)
       .catch(e => e)
     ).to.match(/unstaked account accessed/)
+  })
+  it('should fail with expired signature in validation', async () => {
+    const currBlockTimestamp = (await provider.getBlock()).timestamp
+    const validUntil = currBlockTimestamp - 300
+    const validAfter = currBlockTimestamp - 600
+    const paymasterData = [defaultAbiCoder.encode(['uint48', 'uint48'], [validUntil, validAfter]), '0x' + '00'.repeat(65)]
+
+    expect(await testUserOp('expired-sig', undefined, undefined, undefined, paymasterData)
+      .catch(e => e.message)).to.match(/expires too soon/)
+  })
+  it('should fail with signature that is only valid in future in validation', async () => {
+    const currBlockTimestamp = (await provider.getBlock()).timestamp
+    const validUntil = currBlockTimestamp + 800
+    const validAfter = currBlockTimestamp + 600
+    const paymasterData = [defaultAbiCoder.encode(['uint48', 'uint48'], [validUntil, validAfter]), '0x' + '00'.repeat(65)]
+
+    expect(await testUserOp('not-yet-valid-sig', undefined, undefined, undefined, paymasterData)
+      .catch(e => e.message)).to.match(/not valid yet/)
   })
 
   it('account succeeds referencing its own balance (after wallet creation)', async () => {
