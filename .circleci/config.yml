@@ -46,6 +46,9 @@ commands:
       docker_compose_file:
         description: Docker compose file to use
         type: string
+      l1_url:
+        description: L1 rpc url to use
+        type: string
       test_folder:
         description: Folder to run tests in
         type: string
@@ -79,7 +82,7 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
+            L1_NODE_WEB3_URL=<<l1_url>> docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
@@ -174,6 +177,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose.yml"
+          l1_url: "http://l1_chain:8545"
           test_folder: "eth-l2"
       - report-integration-tests
 
@@ -184,6 +188,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-moonbeam.yml"
+          l1_url: "http://l1_chain:9933"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -194,6 +199,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-avalanche.yml"
+          l1_url: "http://l1_chain:9650/ext/bc/C/rpc"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -204,6 +210,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-bnb.yml"
+          l1_url: "http://l1_chain:8545"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -214,6 +221,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-fantom.yml"
+          l1_url: "http://l1_chain:18545"
           test_folder: "alt-l2"
       - report-integration-tests
 
