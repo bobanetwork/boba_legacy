@@ -15,7 +15,7 @@ import { BundlerConfig } from './BundlerConfig'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import { Server } from 'http'
 import { RpcError } from './utils'
-import { UserOperationStruct } from '@boba/accountabstraction'
+import { EntryPointWrapper__factory, EntryPointWrapper, UserOperationStruct } from '@boba/accountabstraction'
 import { DebugMethodHandler } from './DebugMethodHandler'
 
 import Debug from 'debug'
@@ -81,12 +81,11 @@ export class BundlerServer {
       signature: '0x',
     }
     // TODO: https://github.com/bobanetwork/boba/issues/759
-    // // await EntryPoint__factory.connect(this.config.entryPoint,this.provider).callStatic.addStake(0)
-    // const err = await EntryPoint__factory.connect(this.config.entryPoint, this.provider).callStatic.simulateValidation(emptyUserOp)
-    //   .catch(e => e)
-    // if (err?.errorName !== 'FailedOp') {
-    //   this.fatal(`Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`)
-    // }
+    const ret = await EntryPointWrapper__factory.connect(this.config.entryPointWrapper, this.wallet).callStatic.simulateValidation(emptyUserOp)
+    const [failedOpStatus, _]: [EntryPointWrapper.FailedOpStatusStructOutput, any] = ret
+    if (failedOpStatus?.status !== true) {
+      this.fatal(`Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`)
+    }
     const bal = await this.provider.getBalance(this.wallet.address)
     console.log(
       'signer',
