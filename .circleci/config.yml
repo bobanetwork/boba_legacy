@@ -82,7 +82,7 @@ commands:
       - run:
           name: Bring up services
           command: |
-            L1_NODE_WEB3_URL=<<l1_url>> docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
+            L1_NODE_WEB3_URL=<<parameters.l1_url>> docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
