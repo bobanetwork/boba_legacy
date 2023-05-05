@@ -45,7 +45,7 @@ import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 
 import { DEFAULT_NETWORK, LAYER } from 'util/constant'
-import { AvailableBridges } from 'components/availableBridges'
+import { AvailableBridges } from 'components'
 
 
 function BobaBridge() {

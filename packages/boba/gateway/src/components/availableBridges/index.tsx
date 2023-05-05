@@ -1,7 +1,7 @@
-import { Text } from 'components/global'
+import { Text } from 'components/global/text'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { bridgeByToken } from 'components/availableBridges/bobaBridges'
+import { bridgeByToken } from './bobaBridges'
 import { useSelector } from 'react-redux'
 import { selectActiveNetwork, selectActiveNetworkType } from 'selectors'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
@@ -69,6 +69,7 @@ export const AvailableBridges = ({
   }, [token, walletAddress])
 
   if (
+    !token ||
     networkType === NETWORK_TYPE.TESTNET ||
     network !== NETWORK.ETHEREUM ||
     (!isBanxaEnable && !bridges.length)
@@ -82,6 +83,7 @@ export const AvailableBridges = ({
       {network === NETWORK.ETHEREUM && isBanxaEnable && (
         <Link
           key="banxa"
+          data-testid="banxa"
           href={banxaUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -91,6 +93,7 @@ export const AvailableBridges = ({
       )}
       {bridges.map((bridge: any) => (
         <Link
+          data-testid="bridge"
           key={bridge.name}
           href={bridge.link}
           target="_blank"
