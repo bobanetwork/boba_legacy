@@ -171,5 +171,59 @@ describe('Sponsoring Tx\n', async () => {
       expect(postUserBalance).to.eq(preUserBalance)
       expect(postPaymasterDeposit).to.eq(prePaymasterDeposit.sub(logEP.args.actualGasCost))
     })
+
+    it('should not be able to submit a userOp to the bundler and trigger tx when signature expired', async () => {
+      const validUntil = (await env.l2Provider.getBlock('latest')).timestamp - 300
+      const validAfter = (await env.l2Provider.getBlock('latest')).timestamp - 600
+      const op = await accountAPI.createSignedUserOp({
+        target: recipient.address,
+        data: recipient.interface.encodeFunctionData('something', ['hello']),
+      })
+
+      // add preverificaiton gas to account for paymaster signature
+      op.paymasterAndData = hexConcat([VerifyingPaymaster.address, defaultAbiCoder.encode(['uint48', 'uint48'], [validUntil, validAfter]), '0x' + '00'.repeat(65)])
+      op.preVerificationGas = BigNumber.from(await op.preVerificationGas).add(3000)
+      const hash = await VerifyingPaymaster.getHash(op, validUntil, validAfter)
+      const sig = await offchainSigner.signMessage(utils.arrayify(hash))
+
+      op.paymasterAndData = hexConcat([VerifyingPaymaster.address, defaultAbiCoder.encode(['uint48', 'uint48'], [validUntil, validAfter]), sig])
+      const res = await VerifyingPaymaster.parsePaymasterAndData(op.paymasterAndData)
+
+      expect(res.signature).to.eq(sig)
+      expect(res.validAfter).to.eq(validAfter)
+      expect(res.validUntil).to.eq(validUntil)
+      signedOp = await accountAPI.signUserOp(op)
+
+      await expect(bundlerProvider.sendUserOpToBundler(signedOp)).to.be.rejectedWith(
+        Error, /expires too soon/
+      )
+    })
+
+    it('should not be able to submit a userOp to the bundler and trigger tx when signature is not valid yet', async () => {
+      const validUntil = (await env.l2Provider.getBlock('latest')).timestamp + 800
+      const validAfter = (await env.l2Provider.getBlock('latest')).timestamp + 600
+      const op = await accountAPI.createSignedUserOp({
+        target: recipient.address,
+        data: recipient.interface.encodeFunctionData('something', ['hello']),
+      })
+
+      // add preverificaiton gas to account for paymaster signature
+      op.paymasterAndData = hexConcat([VerifyingPaymaster.address, defaultAbiCoder.encode(['uint48', 'uint48'], [validUntil, validAfter]), '0x' + '00'.repeat(65)])
+      op.preVerificationGas = BigNumber.from(await op.preVerificationGas).add(3000)
+      const hash = await VerifyingPaymaster.getHash(op, validUntil, validAfter)
+      const sig = await offchainSigner.signMessage(utils.arrayify(hash))
+
+      op.paymasterAndData = hexConcat([VerifyingPaymaster.address, defaultAbiCoder.encode(['uint48', 'uint48'], [validUntil, validAfter]), sig])
+      const res = await VerifyingPaymaster.parsePaymasterAndData(op.paymasterAndData)
+
+      expect(res.signature).to.eq(sig)
+      expect(res.validAfter).to.eq(validAfter)
+      expect(res.validUntil).to.eq(validUntil)
+      signedOp = await accountAPI.signUserOp(op)
+
+      await expect(bundlerProvider.sendUserOpToBundler(signedOp)).to.be.rejectedWith(
+        Error, /not valid yet/
+      )
+    })
   })
 })

@@ -12,6 +12,7 @@ export enum ValidationErrors {
   InsufficientStake = -32505,
   UnsupportedSignatureAggregator = -32506,
   InvalidSignature = -32507,
+  NotValidYet = -32508,
 }
 
 export enum ExecutionErrors {
