@@ -16,7 +16,7 @@
     "pre-commit": "lint-staged --allow-empty",
     "prebuild": "./bin/release.sh",
     "start": "react-scripts start",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll=false",
     "test:coverage": "yarn test --coverage",
     "test:u": "yarn test -u",
     "test:w": "yarn test --watchAll=true"
