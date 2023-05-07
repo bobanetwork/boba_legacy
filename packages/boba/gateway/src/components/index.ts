@@ -4,4 +4,5 @@ export { default as CounterButton } from 'components/counterButton/CounterButton
 export { default as Pager } from 'components/pager/Pager'
 export { default as PageTitle } from 'components/pageTitle/PageTitle'
 
+export * from 'components/availableBridges'
 export * from 'components/mainMenu/'
