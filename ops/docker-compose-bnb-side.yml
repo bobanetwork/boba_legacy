@@ -50,7 +50,7 @@ services:
       BOBA_URL: http://dtl:8081/boba-addr.json
       # DO NOT use in production
       << : *deployer_pk
-      RETRIES: 200
+      RETRIES: 500
       DTL_REGISTRY_URL: http://dtl:8081/aa-addr.json
       # skip compilation when run in docker-compose, since the contracts
       # were already compiled in the builder step

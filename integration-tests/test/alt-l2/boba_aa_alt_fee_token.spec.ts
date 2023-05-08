@@ -201,7 +201,8 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       // no ether is used when calling the recipient with the help of the paymaster, users boba token is used to pay
       expect(postApproveEtherBalance).to.eq(postCallEtherBalance)
       expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
-      expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.0001'))
+      // account for l1 submission cost too
+      expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.3'))
     })
   })
 })
