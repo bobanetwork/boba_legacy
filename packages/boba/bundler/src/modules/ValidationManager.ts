@@ -162,17 +162,20 @@ export class ValidationManager {
       'Invalid UserOp signature or paymaster signature',
       ValidationErrors.InvalidSignature
     )
-//TODO
-//     requireCond(
-//       res.returnInfo.validUntil == null ||
-//         res.returnInfo.validUntil + 30 < Date.now() / 1000,
-//       'expires too soon',
-//       ValidationErrors.ExpiresShortly
-//     )
-console.log(`res.aggregatorInfo ${res.aggregatorInfo}`)
-console.log(res.aggregatorInfo.addr)
-console.log(res.aggregatorInfo.stake)
-console.log(res.aggregatorInfo.unstakeDelaySec)
+    requireCond(
+      res.returnInfo.validUntil == null ||
+        res.returnInfo.validUntil > (Date.now() / 1000) + 30,
+      'expires too soon',
+      ValidationErrors.ExpiresShortly,
+    )
+    requireCond(
+      res.returnInfo.validAfter == null ||
+        // not adding "buffer" here
+        res.returnInfo.validAfter < Date.now() / 1000,
+      'not valid yet',
+      ValidationErrors.NotValidYet,
+    )
+
     if (
       res.aggregatorInfo.addr !== AddressZero &&
       !BigNumber.from(0).eq(res.aggregatorInfo.stake) &&

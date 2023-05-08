@@ -91,7 +91,6 @@ import GraphQLService from "./graphql.service"
 
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
-import { bobaBridges } from 'util/bobaBridges'
 import { MIN_NATIVE_L1_BALANCE } from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
@@ -4048,15 +4047,6 @@ class NetworkService {
       this.L2Provider,
     )
     return ethers.utils.formatEther(await L2BillingContract.exitFee())
-  }
-
-
-  /***********************************************/
-  /*****            Boba Bridges             *****/
-  /***********************************************/
-
-  getTokenSpecificBridges(tokenSymbol) {
-    return bobaBridges.filter((bridge) => bridge.tokens.includes(tokenSymbol))
   }
 
   /***********************************************/
