@@ -46,8 +46,8 @@ commands:
       docker_compose_file:
         description: Docker compose file to use
         type: string
-      l1_url:
-        description: L1 rpc url to use
+      docker_compose_side_file:
+        description: Docker compose side file to use
         type: string
       test_folder:
         description: Folder to run tests in
@@ -82,13 +82,13 @@ commands:
       - run:
           name: Bring up services
           command: |
-            L1_NODE_WEB3_URL=<<parameters.l1_url>> docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
+            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml logs --follow
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
@@ -103,7 +103,7 @@ commands:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml down -v
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> down -v
           working_directory: ops
   report-integration-tests:
     steps:
@@ -177,7 +177,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose.yml"
-          l1_url: "http://l1_chain:8545"
+          docker_compose_side_file: "docker-compose-side.yml"
           test_folder: "eth-l2"
       - report-integration-tests
 
@@ -188,7 +188,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-moonbeam.yml"
-          l1_url: "http://l1_chain:9933"
+          docker_compose_side_file: "docker-compose-moonbeam-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -199,7 +199,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-avalanche.yml"
-          l1_url: "http://l1_chain:9650/ext/bc/C/rpc"
+          docker_compose_side_file: "docker-compose-avalanche-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -210,7 +210,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-bnb.yml"
-          l1_url: "http://l1_chain:8545"
+          docker_compose_side_file: "docker-compose-bnb-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -221,7 +221,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-fantom.yml"
-          l1_url: "http://l1_chain:18545"
+          docker_compose_side_file: "docker-compose-fantom-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 

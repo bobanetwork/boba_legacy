@@ -2,7 +2,7 @@ version: "3"
 
 # Account #0
 x-deployer_pk: &deployer_pk
-  DEPLOYER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  DEPLOYER_PRIVATE_KEY: '0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027'
 
 # Account #6 - bobalink test
 x-bobalink_pk: &bobalink_pk
@@ -10,66 +10,10 @@ x-bobalink_pk: &bobalink_pk
 
 # Account #19
 x-gas-price-oracle_pk: &gas-price-oracle_pk
-  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e'
-
-# Account #8
-x-relayer_pk: &relayer_pk
-  RELAYER_PRIVATE_KEY: '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97'
-
-# Account #18
-x-fast-relayer_pk: &fast-relayer_pk
-  FAST_RELAYER_PRIVATE_KEY: '0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0'
+  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de'
 
 
 services:
-  gas_oracle:
-    depends_on:
-      - l1_chain
-      - l2geth
-    image: bobanetwork/boba_gas-price-oracle:latest
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.packages
-      target: gas_oracle
-    environment:
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      L1_NODE_WEB3_URL: http://l1_chain:8545
-      L2_NODE_WEB3_URL: http://l2geth:8545
-      GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
-      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : [*gas-price-oracle_pk, *relayer_pk, *fast-relayer_pk]
-      SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
-      PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
-      GAS_PRICE_ORACLE_FLOOR_PRICE: 1
-      GAS_PRICE_ORACLE_ROOF_PRICE: 5
-      GAS_PRICE_ORACLE_MIN_PERCENT_CHANGE:
-      POLLING_INTERVAL:
-      RETRIES: 200
-    deploy:
-      replicas: 0
-
-  monitor:
-    depends_on:
-     - l1_chain
-     - l2geth
-    image: bobanetwork/monitor:latest
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.monitor
-    deploy:
-      replicas: 0
-
-  teleportation:
-    depends_on:
-     - l2geth
-    image: bobanetwork/teleportation:latest
-    build:
-      context: ..
-      dockerfile: ./ops/docker/Dockerfile.packages
-      target: teleportation
-    deploy:
-      replicas: 0
-
   bobalink:
     depends_on:
      - l2geth
@@ -100,7 +44,7 @@ services:
       dockerfile: ./ops/docker/Dockerfile.packages
       target: aa_deployer
     environment:
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
@@ -140,10 +84,10 @@ services:
       MIN_BALANCE: 0
       URL: http://dtl:8081/addresses.json
       AA_DEPLOYER: http://dtl:8081/aa-addr.json
-      MNEMONIC_OR_PK: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-      L1_NODE_WEB3_URL: http://l1_chain:8545
+      MNEMONIC_OR_PK: "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
       L2_NODE_WEB3_URL: http://l2geth:8545
-      BENEFICIARY: "0xcd3b766ccdd6ae721141f452c550ca635964ce71"
+      BENEFICIARY: "0xb57255024fa928e3d296c41528171b5f67e8d447"
       MAX_BUNDLE_GAS: 5000000
       #should be set to false in prod!
       UNSAFE: 'true'
