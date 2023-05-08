@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Avaialble Bridges should match snapshot connected on mainnet 1`] = `
+<DocumentFragment>
+  .c1 {
+  padding: 0px;
+  margin: 0px;
+  font-weight: 400;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.c0 {
+  background: rgba(255,255,255,0.04);
+  -webkit-filter: drop-shadow(0px 4px 20px rgba(35,92,41,0.06));
+  filter: drop-shadow(0px 4px 20px rgba(35,92,41,0.06));
+  border-radius: 20px;
+  border: none;
+  -webkit-backdrop-filter: blur(50px);
+  backdrop-filter: blur(50px);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  min-height: -webkit-fit-content;
+  min-height: -moz-fit-content;
+  min-height: fit-content;
+  padding: 20px 24px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.c2 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.c3 {
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  color: inherit;
+}
+
+.c4 {
+  border-radius: 12px;
+  background: rgba(255,255,255,0.14);
+  border: solid 1px #2d2f3a;
+  line-height: 1.5;
+  padding: 10px;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+<div
+    class="c0"
+  >
+    <p
+      class="c1 c2"
+    >
+      Third party bridges
+    </p>
+    <a
+      class="c3"
+      data-testid="banxa"
+      href="https://boba.banxa.com/?coinType=ETH&fiatType=USD&blockchain=Boba Network&walletAddress=random-code"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <p
+        class="c1 c4"
+      >
+        Banxa
+      </p>
+    </a>
+    <a
+      class="c3"
+      data-testid="bridge"
+      href="https://synapseprotocol.com/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <p
+        class="c1 c4"
+      >
+        Synapse
+      </p>
+    </a>
+    <a
+      class="c3"
+      data-testid="bridge"
+      href="https://cbridge.celer.network/#/transfer"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <p
+        class="c1 c4"
+      >
+        Celer
+      </p>
+    </a>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Avaialble Bridges should match snapshot network type is TESTNET 1`] = `<DocumentFragment />`;
+
+exports[`Avaialble Bridges should match snapshot selected network is not ETHEREUM 1`] = `<DocumentFragment />`;
+
+exports[`Avaialble Bridges should match snapshot token value is null 1`] = `<DocumentFragment />`;
