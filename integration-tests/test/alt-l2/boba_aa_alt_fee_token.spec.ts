@@ -9,6 +9,7 @@ import { getFilteredLogIndex } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
+import { predeploys } from '@eth-optimism/contracts'
 // use local sdk
 import { SimpleAccountAPI } from '@boba/bundler_sdk'
 import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
@@ -37,13 +38,6 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
 
   let EntryPoint: Contract
 
-  const priceRatio = 100
-  const priceRatioDecimals = 2
-  const minRatio = 1
-  const maxRatio = 500
-
-  const L2_L1NativeTokenAddress = '0x4200000000000000000000000000000000000023'
-
   before(async () => {
     env = await OptimismEnv.new()
     entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
@@ -57,7 +51,7 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
     recipient = await SampleRecipient__factory.deploy()
 
     L2_L1NativeToken = new Contract(
-      L2_L1NativeTokenAddress,
+      predeploys.L2_L1NativeToken_ALT_L1,
       L2StandardERC20Json.abi,
       env.l2Wallet
     )
@@ -78,7 +72,7 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       entryPointAddress,
       L2_L1NativeToken.address,
       await L2_L1NativeToken.decimals(),
-      env.addressesBOBA.Proxy__Boba_GasPriceOracle,
+      predeploys.Proxy__Boba_GasPriceOracle,
     )
 
     EntryPoint = new Contract(
