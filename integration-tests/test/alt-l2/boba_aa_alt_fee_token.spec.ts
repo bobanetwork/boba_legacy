@@ -12,16 +12,17 @@ import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@boba/bundler_sdk'
 import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
+import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
 
 import GPODepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/GPODepositPaymaster.sol/GPODepositPaymaster.json'
 
 describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
   let env: OptimismEnv
-  let SimpleAccount__factory: ContractFactory
+  let SimpleAccountFactory__factory: ContractFactory
   let recipient: Contract
 
   let bundlerProvider: HttpRpcClient
@@ -89,6 +90,7 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
   describe('A user without native token pays for a tx using an alt token through a paymaster', async () => {
     let accountAPI: SimpleAccountAPI
     let account
+    let accountFactory
     let preApproveTokenBalance
     let preApproveDepositAmount
     let preApproveEtherBalance
@@ -106,32 +108,35 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
 
     before('the user approves the paymaster to spend their $BOBA token', async () => {
       // deploy a 4337 Wallet and send operation to this wallet
-      SimpleAccount__factory = new ContractFactory(
-        SimpleAccountJson.abi,
-        SimpleAccountJson.bytecode,
+      SimpleAccountFactory__factory = new ContractFactory(
+        SimpleAccountFactoryJson.abi,
+        SimpleAccountFactoryJson.bytecode,
         env.l2Wallet
       )
-      account = await SimpleAccount__factory.deploy(
-        entryPointAddress,
-        env.l2Wallet.address
+      accountFactory = await SimpleAccountFactory__factory.deploy(
+        entryPointAddress
       )
-      await account.deployed()
+      await accountFactory.deployed()
+      console.log('Account Factory deployed to:', accountFactory.address)
+      await accountFactory.createAccount(env.l2Wallet.address, 0)
+      account = await accountFactory.getAddress(env.l2Wallet.address, 0)
+      console.log('Account deployed to:', account)
 
-      await L2_L1NativeToken.transfer(account.address, utils.parseEther('1'))
+      await L2_L1NativeToken.transfer(account, utils.parseEther('1'))
 
       await L2_L1NativeToken.approve(GPODepositPaymaster.address, constants.MaxUint256)
-      await GPODepositPaymaster.addDepositFor(account.address, utils.parseEther('2'))
+      await GPODepositPaymaster.addDepositFor(account, utils.parseEther('2'))
 
       await env.l2Wallet.sendTransaction({
         value: utils.parseEther('2'),
-        to: account.address,
+        to: account,
       })
 
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
         owner: env.l2Wallet,
-        walletAddress: account.address,
+        accountAddress: account,
       })
 
       const approveOp = await accountAPI.createSignedUserOp({
@@ -139,17 +144,17 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
           data: L2_L1NativeToken.interface.encodeFunctionData('approve', [GPODepositPaymaster.address, constants.MaxUint256]),
       })
 
-      preApproveTokenBalance = await L2_L1NativeToken.balanceOf(account.address)
-      preApproveDepositAmount = (await GPODepositPaymaster.depositInfo(account.address)).amount
-      preApproveEtherBalance = await env.l2Provider.getBalance(account.address)
+      preApproveTokenBalance = await L2_L1NativeToken.balanceOf(account)
+      preApproveDepositAmount = (await GPODepositPaymaster.depositInfo(account)).amount
+      preApproveEtherBalance = await env.l2Provider.getBalance(account)
 
       const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
       const txid = await accountAPI.getUserOpReceipt(requestId)
       console.log('reqId', requestId, 'txid=', txid)
 
-      postApproveTokenBalance = await L2_L1NativeToken.balanceOf(account.address)
-      postApproveDepositAmount = (await GPODepositPaymaster.depositInfo(account.address)).amount
-      postApproveEtherBalance = await env.l2Provider.getBalance(account.address)
+      postApproveTokenBalance = await L2_L1NativeToken.balanceOf(account)
+      postApproveDepositAmount = (await GPODepositPaymaster.depositInfo(account)).amount
+      postApproveEtherBalance = await env.l2Provider.getBalance(account)
     })
 
     it('should be able to submit a userOp including the paymaster to the bundler and trigger tx', async () => {
@@ -178,12 +183,12 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       // tx.origin is the bundler
       expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
       // msg.sender is the 4337 wallet
-      expect(log.args.msgSender).to.eq(account.address)
+      expect(log.args.msgSender).to.eq(account)
       // message is received and emitted
       expect(log.args.message).to.eq('hello')
-      const postCallTokenBalance = await L2_L1NativeToken.balanceOf(account.address)
-      const postCallDepositAmount = (await GPODepositPaymaster.depositInfo(account.address)).amount
-      const postCallEtherBalance = await env.l2Provider.getBalance(account.address)
+      const postCallTokenBalance = await L2_L1NativeToken.balanceOf(account)
+      const postCallDepositAmount = (await GPODepositPaymaster.depositInfo(account)).amount
+      const postCallEtherBalance = await env.l2Provider.getBalance(account)
 
       const returnedEPlogIndex = await getFilteredLogIndex(
         receipt,

@@ -8,14 +8,11 @@ import { Contract, ContractFactory, utils } from 'ethers'
 import { getFilteredLogIndex, l2Wallet } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
-// use local sdk
 import { SimpleAccountAPI, wrapProvider } from '@boba/bundler_sdk'
-// change this to using factory
-import SimpleAccountDeployerJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountDeployer.sol/SimpleAccountDeployer.json'
-import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
+import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/src/HttpRpcClient'
+import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
 
 describe('AA Wallet Test\n', async () => {
   let env: OptimismEnv
@@ -32,8 +29,8 @@ describe('AA Wallet Test\n', async () => {
     entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
     SimpleAccount__factory = new ContractFactory(
-      SimpleAccountJson.abi,
-      SimpleAccountJson.bytecode,
+      SimpleAccountFactoryJson.abi,
+      SimpleAccountFactoryJson.bytecode,
       env.l2Wallet
     )
 
@@ -54,23 +51,26 @@ describe('AA Wallet Test\n', async () => {
   })
   it('should be able to send a userOperation to a wallet through the bundler (low level api)', async () => {
     // deploy a 4337 Wallet and send operation to this wallet
-    const account = await SimpleAccount__factory.deploy(
+    const accountFactory = await SimpleAccount__factory.deploy(
       entryPointAddress,
-      env.l2Wallet.address
+      { gasLimit: 9_500_000 }
     )
-    await account.deployed()
-    console.log('Account deployed to:', account.address)
+    await accountFactory.deployed()
+    console.log('Account Factory deployed to:', accountFactory.address)
+    await accountFactory.createAccount(env.l2Wallet.address, 0)
+    const account = await accountFactory.getAddress(env.l2Wallet.address, 0)
+    console.log('Account deployed to:', account)
 
     await env.l2Wallet.sendTransaction({
       value: utils.parseEther('2'),
-      to: account.address,
+      to: account,
     })
 
     const accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
       entryPointAddress,
       owner: env.l2Wallet,
-      walletAddress: account.address,
+      accountAddress: account,
     })
 
     const op = await accountAPI.createSignedUserOp({
@@ -78,7 +78,7 @@ describe('AA Wallet Test\n', async () => {
       data: recipient.interface.encodeFunctionData('something', ['hello']),
     })
 
-    expect(await op.sender).to.be.eq(account.address)
+    expect(await op.sender).to.be.eq(account)
 
     const requestId = await bundlerProvider.sendUserOpToBundler(op)
     const txid = await accountAPI.getUserOpReceipt(requestId)
@@ -94,7 +94,7 @@ describe('AA Wallet Test\n', async () => {
     // tx.origin is the bundler
     expect(log.args.txOrigin).to.eq(env.l2Wallet.address)
     // msg.sender is the 4337 wallet
-    expect(log.args.msgSender).to.eq(account.address)
+    expect(log.args.msgSender).to.eq(account)
     // message is received and emitted
     expect(log.args.message).to.eq('hello')
   })
@@ -142,13 +142,9 @@ describe('AA Wallet Test\n', async () => {
   })
   it('should deploy a wallet if it does not exist through initCode', async () => {
     // Deploy WalletDeployer
-    const SimpleAccountDeployer__factory = new ContractFactory(
-      SimpleAccountDeployerJson.abi,
-      SimpleAccountDeployerJson.bytecode,
-      env.l2Wallet_2
-    )
-    const SimpleAccountDeployer = await SimpleAccountDeployer__factory.deploy()
-    console.log('factory deployed to', SimpleAccountDeployer.address)
+    const accountFactory = await SimpleAccount__factory.deploy(entryPointAddress)
+    await accountFactory.deployed()
+    console.log('Account Factory deployed to:', accountFactory.address)
 
     // deploy a senderCreator contract to get the create2 address on the provide
     const SenderCreator__factory = new ContractFactory(
@@ -164,12 +160,12 @@ describe('AA Wallet Test\n', async () => {
       entryPointAddress,
       senderCreatorAddress: senderCreator.address,
       owner: env.l2Wallet_2,
-      factoryAddress: SimpleAccountDeployer.address,
+      factoryAddress: accountFactory.address,
     })
 
-    const accountAddress = await accountAPI.getWalletAddress()
+    const accountAddress = await accountAPI.getAccountAddress()
     // computed address is correct
-    expect(accountAddress).to.be.eq(await SimpleAccountDeployer.getAddress(entryPointAddress, env.l2Wallet_2.address, 0))
+    expect(accountAddress).to.be.eq(await accountFactory.getAddress(env.l2Wallet_2.address, 0))
 
     await env.l2Wallet.sendTransaction({
       value: utils.parseEther('2'),
