@@ -1,2 +1,4 @@
 .idea
 coverage
+.env.prod
+.env.stage

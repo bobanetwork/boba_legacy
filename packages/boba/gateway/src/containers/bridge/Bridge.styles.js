@@ -12,33 +12,11 @@ export const PageContainer = styled(Box)(({ theme }) => ({
   width: '70%',
   [ theme.breakpoints.between('md', 'lg') ]: {
     width: '90%',
-    padding: '0px',
-    '::after': {
-      content: '" "',
-      position: 'absolute',
-      left: '-5%',
-      bottom: '10%',
-      width: '130%',
-      height: '100%',
-      background: `url(${bobaBridgeBg}) no-repeat`,
-      backgroundSize: '85%',
-      zIndex: '-1',
-    }
+    padding: '0px'
   },
   [ theme.breakpoints.between('sm', 'md') ]: {
     width: '90%',
-    padding: '0px',
-    '::after': {
-      content: '" "',
-      position: 'absolute',
-      left: '-5%',
-      bottom: '10%',
-      width: '130%',
-      height: '100%',
-      background: `url(${bobaBridgeBg}) no-repeat`,
-      backgroundSize: '85%',
-      zIndex: '-1',
-    }
+    padding: '0px'
   },
   [ theme.breakpoints.down('sm') ]: {
     width: '100%',

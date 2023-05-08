@@ -23,7 +23,6 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Typography, Switch, useTheme } from '@mui/material'
 
 import Button from 'components/button/Button.js'
-import AvailableBridges from 'components/availableBridges/availableBridges.js'
 
 import * as S from './bobaBridge.styles'
 
@@ -46,6 +45,8 @@ import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 
 import { DEFAULT_NETWORK, LAYER } from 'util/constant'
+import { AvailableBridges } from 'components'
+
 
 function BobaBridge() {
   const layer = useSelector(selectLayer())
