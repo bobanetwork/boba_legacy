@@ -7,7 +7,6 @@
     "packages": [
       "packages/*",
       "packages/boba/*",
-      "packages/boba/bundler/packages/*",
       "l2geth",
       "integration-tests",
       "specs",
