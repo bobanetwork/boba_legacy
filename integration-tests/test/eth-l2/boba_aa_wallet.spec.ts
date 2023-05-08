@@ -11,7 +11,7 @@ import { OptimismEnv } from './shared/env'
 // use local sdk
 import { SimpleAccountAPI, wrapProvider } from '@boba/bundler_sdk'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
-import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
+import EntryPointWrapperJson from '@boba/accountabstraction/artifacts/contracts/bundler/EntryPointWrapper.sol/EntryPointWrapper.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
 
@@ -98,14 +98,14 @@ describe('AA Wallet Test\n', async () => {
     expect(log.args.message).to.eq('hello')
   })
   it('should be able to send a userOperation to a wallet through the bundler (high level api)', async () => {
-    // deploy a senderCreator contract to get the create2 address on the provide
-    const SenderCreator__factory = new ContractFactory(
-        SenderCreatorJson.abi,
-        SenderCreatorJson.bytecode,
-        env.l2Wallet
-    )
+    // deploy an entryPointWrapper contract to get the create2 address on the provide
+    const EntryPointWrapper__factory = new ContractFactory(
+      EntryPointWrapperJson.abi,
+      EntryPointWrapperJson.bytecode,
+      env.l2Wallet
+  )
 
-    const senderCreator = await SenderCreator__factory.deploy()
+  const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
 
     const aasigner = env.l2Provider.getSigner()
     const config = {
@@ -114,7 +114,7 @@ describe('AA Wallet Test\n', async () => {
     bundlerUrl: env.bundlerUrl
     }
 
-    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet_3, senderCreator.address)
+    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet_3, entryPointWrapper.address)
 
     const walletAddress = await aaProvider.getSigner().getAddress()
     await env.l2Wallet.sendTransaction({
@@ -145,19 +145,19 @@ describe('AA Wallet Test\n', async () => {
     await accountFactory.deployed()
     console.log('Account Factory deployed to:', accountFactory.address)
 
-    // deploy a senderCreator contract to get the create2 address on the provide
-    const SenderCreator__factory = new ContractFactory(
-        SenderCreatorJson.abi,
-        SenderCreatorJson.bytecode,
-        env.l2Wallet
-    )
+    // deploy an entryPointWrapper contract to get the create2 address on the provide
+    const EntryPointWrapper__factory = new ContractFactory(
+      EntryPointWrapperJson.abi,
+      EntryPointWrapperJson.bytecode,
+      env.l2Wallet
+  )
 
-    const senderCreator = await SenderCreator__factory.deploy()
+  const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
 
     const accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
       entryPointAddress,
-      senderCreatorAddress: senderCreator.address,
+      entryPointWrapperAddress: entryPointWrapper.address,
       owner: env.l2Wallet_2,
       factoryAddress: accountFactory.address,
     })
