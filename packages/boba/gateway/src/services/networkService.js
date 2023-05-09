@@ -1172,7 +1172,9 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on Goerli and Mainnet
-    if (this.networkGateway === 'local') return
+    if(this.networkGateway !== NETWORK.ETHEREUM){
+      return
+    }
 
     try {
 
@@ -1210,7 +1212,11 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
+    if(this.networkGateway !== NETWORK.ETHEREUM
+      && this.networkType !== NETWORK_TYPE.MAINNET)
+    {
+      return
+    }
 
     try {
 
@@ -1252,7 +1258,11 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
+    if(this.networkGateway !== NETWORK.ETHEREUM
+      && this.networkType !== NETWORK_TYPE.MAINNET)
+    {
+      return
+    }
 
     try {
 
@@ -1294,7 +1304,11 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
+    if(this.networkGateway !== NETWORK.ETHEREUM
+      && this.networkType !== NETWORK_TYPE.MAINNET)
+    {
+      return
+    }
 
     try {
 
@@ -1336,7 +1350,11 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
+    if(this.networkGateway !== NETWORK.ETHEREUM
+      && this.networkType !== NETWORK_TYPE.MAINNET)
+    {
+      return
+    }
 
     try {
 
@@ -1380,7 +1398,11 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
+    if(this.networkGateway !== NETWORK.ETHEREUM
+      && this.networkType !== NETWORK_TYPE.MAINNET)
+    {
+      return
+    }
 
     try {
 
@@ -1422,7 +1444,11 @@ class NetworkService {
     if( this.L1orL2 !== 'L2' ) return
 
     // ONLY SUPPORTED on MAINNET
-    if (this.networkGateway !== 'mainnet') return
+    if(this.networkGateway !== NETWORK.ETHEREUM
+      && this.networkType !== NETWORK_TYPE.MAINNET)
+    {
+      return
+    }
 
     try {
 
