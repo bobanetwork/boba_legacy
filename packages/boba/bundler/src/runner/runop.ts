@@ -240,7 +240,7 @@ async function main(): Promise<void> {
   }
 
   const dest = addr
-  const data = keccak256(Buffer.from('nonce()')).slice(0, 10)
+  const data = keccak256(Buffer.from('entryPoint()')).slice(0, 10)
   console.log('data=', data)
   await client.runUserOp(dest, data)
   console.log('after run1')
