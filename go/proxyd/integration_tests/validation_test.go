@@ -229,6 +229,108 @@ func TestBatchRPCValidation(t *testing.T) {
 	}
 }
 
+func TestRevertedRPC(t *testing.T) {
+	tests := []struct {
+		name string
+		body string
+		res  string
+		code int
+	}{
+		{
+			"JSON-RPC reverted legacy",
+			"{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}",
+			"{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\"}}",
+			200,
+		},
+		{
+			"JSON-RPC reverted legacy",
+			"{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}",
+			"{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":\"0xdeadbeef\"}}",
+			200,
+		},
+		{
+			"JSON-RPC reverted",
+			"{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}",
+			"{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":{\"code\": \"ok\"}}}",
+			200,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			goodBackend := NewMockBackend(BatchedResponseHandler(200, tt.res))
+			defer goodBackend.Close()
+
+			require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", goodBackend.URL()))
+
+			config := ReadConfig("whitelist")
+			client := NewProxydClient("http://127.0.0.1:8545")
+			shutdown, err := proxyd.Start(config)
+			require.NoError(t, err)
+			defer shutdown()
+
+			res, code, err := client.SendRequest([]byte(tt.body))
+			require.NoError(t, err)
+			RequireEqualJSON(t, []byte(tt.res), res)
+			require.Equal(t, tt.code, code)
+			require.Equal(t, 1, len(goodBackend.Requests()))
+		})
+	}
+}
+
+func TestRevertedBatchRPC(t *testing.T) {
+	tests := []struct {
+		name   string
+		body   string
+		res    string
+		expect string
+		code   int
+	}{
+		{
+			"JSON-RPC reverted legacy",
+			"[{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}, {\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}]",
+			"{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\"}}",
+			"[{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\"}},{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\"}}]",
+			200,
+		},
+		{
+			"JSON-RPC reverted legacy",
+			"[{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999},{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}]",
+			"{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":\"0xdeadbeef\"}}",
+			"[{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":\"0xdeadbeef\"}},{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":\"0xdeadbeef\"}}]",
+			200,
+		},
+		{
+			"JSON-RPC reverted",
+			"[{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999},{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [42, 23], \"id\": 999}]",
+			"{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":{\"code\": \"ok\"}}}",
+			"[{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":{\"code\": \"ok\"}}},{\"jsonrpc\":\"2.0\",\"id\":999,\"error\":{\"code\":-32000,\"message\":\"reverted\",\"data\":{\"code\": \"ok\"}}}]",
+			200,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			goodBackend := NewMockBackend(BatchedResponseHandler(200, tt.res))
+			defer goodBackend.Close()
+
+			require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", goodBackend.URL()))
+
+			config := ReadConfig("whitelist")
+			client := NewProxydClient("http://127.0.0.1:8545")
+			shutdown, err := proxyd.Start(config)
+			require.NoError(t, err)
+			defer shutdown()
+
+			res, code, err := client.SendRequest([]byte(tt.body))
+			require.NoError(t, err)
+			RequireEqualJSON(t, []byte(tt.expect), res)
+			require.Equal(t, tt.code, code)
+			require.Equal(t, 2, len(goodBackend.Requests()))
+		})
+	}
+}
+
 func asArray(in ...string) string {
 	return "[" + strings.Join(in, ",") + "]"
 }

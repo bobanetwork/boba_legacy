@@ -55,10 +55,10 @@ func (r *RPCRes) MarshalJSON() ([]byte, error) {
 }
 
 type RPCErr struct {
-	Code          int    `json:"code"`
-	Message       string `json:"message"`
-	Data          string `json:"data,omitempty"`
-	HTTPErrorCode int    `json:"-"`
+	Code          int         `json:"code"`
+	Message       string      `json:"message"`
+	Data          interface{} `json:"data,omitempty"`
+	HTTPErrorCode int         `json:"-"`
 }
 
 func (r *RPCErr) Error() string {

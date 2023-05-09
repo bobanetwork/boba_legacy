@@ -434,36 +434,40 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 		return nil, wrapErr(err, "error reading response body")
 	}
 
-	var res []*RPCRes
-	var debugRes interface{}
+	var (
+		res            []*RPCRes
+		debugRes       []interface{}
+		singleRes      RPCRes
+		singleDebugRes interface{}
+	)
 	if isSingleElementBatch {
-		var singleRes RPCRes
-		if err := json.Unmarshal(resB, &debugRes); err != nil {
-			log.Error("error unmarshaling response", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
-			return nil, ErrBackendBadResponse
+		err := json.Unmarshal(resB, &singleDebugRes)
+		if err != nil {
+			log.Error("error unmarshaling singleRes debug response", "err", err, "singleDebugRes", singleDebugRes, "method", method, "auth", auth)
+		} else {
+			log.Debug("unmarshaling single response", "singleDebugRes", singleDebugRes, "method", method, "auth", auth)
 		}
-		log.Info("marshaling response good!", "debugRes", debugRes, "method", method, "auth", auth)
 		if err := json.Unmarshal(resB, &singleRes); err != nil {
+			log.Error("error unmarshaling singleRes response", "err", err, "singleRes", singleRes, "method", method, "auth", auth)
 			return nil, ErrBackendBadResponse
 		}
 		res = []*RPCRes{
 			&singleRes,
 		}
 	} else {
-		if err := json.Unmarshal(resB, &debugRes); err != nil {
-			log.Error("error unmarshaling response", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
-			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
-			if responseIsNotBatched(resB) {
-				return nil, ErrBackendUnexpectedJSONRPC
-			}
-			return nil, ErrBackendBadResponse
+		err := json.Unmarshal(resB, &debugRes)
+		if err != nil {
+			log.Error("error unmarshaling batch response ", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
+		} else {
+			log.Debug("unmarshaling batch response", "debugRes", debugRes, "method", method, "auth", auth)
 		}
-		log.Info("marshaling response good!", "debugRes", debugRes, "method", method, "auth", auth)
 		if err := json.Unmarshal(resB, &res); err != nil {
 			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
 			if responseIsNotBatched(resB) {
+				log.Error("response is not batched", "err", err, "res", res, "method", method, "auth", auth)
 				return nil, ErrBackendUnexpectedJSONRPC
 			}
+			log.Error("error unmarshaling batch response", "err", err, "res", res, "method", method, "auth", auth)
 			return nil, ErrBackendBadResponse
 		}
 	}
