@@ -378,12 +378,16 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	if isSingleElementBatch {
 		body = mustMarshalJSON(rpcReqs[0])
 		method = rpcReqs[0].Method
-		json.Unmarshal(body, &bodyReader)
+		if err := json.Unmarshal(body, &bodyReader); err != nil {
+			return nil, wrapErr(err, "error unmarshaling body payload")
+		}
 		log.Debug("doForward body", "method", method, "payload", rpcReqs[0], "auth", auth, "payload", bodyReader)
 	} else {
 		body = mustMarshalJSON(rpcReqs)
 		for _, req := range rpcReqs {
-			json.Unmarshal(body, &bodyReader)
+			if err := json.Unmarshal(body, &bodyReader); err != nil {
+				return nil, wrapErr(err, "error unmarshaling body payload")
+			}
 			method += req.Method + ","
 			log.Debug("doForward body", "method", req.Method, "payload", bodyReader, "auth", auth)
 		}
