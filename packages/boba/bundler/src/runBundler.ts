@@ -33,10 +33,12 @@ export let showStackTraces = false
 
 export async function connectContracts(
   wallet: Wallet,
-  entryPointAddress: string
-): Promise<EntryPoint> {
+  entryPointAddress: string,
+  entryPointWrapperAddress: string
+): Promise<{ entryPoint: EntryPoint, entryPointWrapper: EntryPointWrapper }> {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
-  return entryPoint
+  const entryPointWrapper = EntryPointWrapper__factory.connect(entryPointWrapperAddress, wallet)
+  return { entryPoint, entryPointWrapper }
 }
 
 export async function connectContractsViaAddressManager (
@@ -48,7 +50,7 @@ export async function connectContractsViaAddressManager (
   const entryPointWrapperAddress = await addressManager.getAddress('L2_EntryPointWrapper')
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
   const entryPointWrapper = EntryPointWrapper__factory.connect(entryPointWrapperAddress, wallet)
-  return { entryPoint: entryPoint, entryPointWrapper }
+  return { entryPoint, entryPointWrapper }
 }
 
 function getAddressManager (provider: any, addressManagerAddress: any): ethers.Contract {
@@ -176,8 +178,19 @@ export async function runBundler(
     entryPoint = eP
     entryPointWrapper = epW
   } else {
-    const eP = await connectContracts(wallet, config.entryPoint)
+    const { entryPoint: eP, entryPointWrapper: epW } = await connectContracts(wallet, config.entryPoint, config.entryPointWrapper)
+    config.entryPoint = eP.address
     entryPoint = eP
+    config.entryPointWrapper = epW.address
+    entryPointWrapper = epW
+  }
+
+  const entryPointFromWrapper = await entryPointWrapper.entryPoint()
+  if (
+    entryPointFromWrapper.toLowerCase() !== entryPoint.address.toLowerCase()
+  ) {
+    console.error('WARN: entryPointWrapper may be incompatible with entryPoint')
+    process.exit(1)
   }
   // bundleSize=1 replicate current immediate bundling mode
   const execManagerConfig = {
