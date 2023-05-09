@@ -23,7 +23,7 @@ export function createAction (key, asyncAction) {
 
     try {
       const response = await asyncAction()
-      debugger;
+
       if( response === false ) {
         return false
       }
