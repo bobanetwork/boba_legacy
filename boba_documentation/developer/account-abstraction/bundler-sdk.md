@@ -230,8 +230,8 @@ async function wrapProvider(
   originalProvider: JsonRpcProvider, // @ethersproject/providers
   config: ClientConfig,
   originalSigner: Signer = originalProvider.getSigner(), // @ethersproject/abstract-signer
+  entryPointWrapperAddress: string, // must be passed
   wallet?: Wallet, // ethers, must be passed
-  entryPointWrapperAddress?: string // must be passed
 ): Promise<ERC4337EthersProvider>
 ```
 
@@ -264,7 +264,7 @@ Since-
 a) using a remote signer with eth_sendTransaction is not supported on Boba, transactions would need to be sent from an ethers.wallet (object), for the deterministic deployment of SimpleAccountFactory. This is not a requirement if the SimpleAccountFactory has already been deployed
 b) wrapProvider uses the low level API internally, custom reverts are not supported and the sdk would use the entryPointWrapperAddress to compute the account address that will be deployed
 
-wrapProvider must be passed the parameters `wallet` and `entryPointWrapperAddress` on Boba
+wrapProvider must be passed the parameters `entryPointWrapperAddress` and `wallet` on Boba
 
 The high-level provider api can be used as follows:
 
@@ -278,7 +278,7 @@ const config = {
   entryPointAddress,
   bundlerUrl: 'http://localhost:3000/rpc'
 }
-const aaProvider = await wrapProvider(provider, config, aasigner, wallet, entryPointWrapperAddress)
+const aaProvider = await wrapProvider(provider, config, aasigner, entryPointWrapperAddress, wallet)
 const walletAddress = await aaProvider.getSigner().getAddress()
 
 // send some eth to the wallet Address: wallet should have some balance to pay for its own creation, and for calling methods.
