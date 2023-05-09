@@ -114,7 +114,7 @@ describe('AA Wallet Test\n', async () => {
     bundlerUrl: env.bundlerUrl
     }
 
-    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, env.l2Wallet_3, entryPointWrapper.address)
+    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, entryPointWrapper.address, env.l2Wallet_3)
 
     const walletAddress = await aaProvider.getSigner().getAddress()
     await env.l2Wallet.sendTransaction({
