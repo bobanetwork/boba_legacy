@@ -381,10 +381,10 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 		body = mustMarshalJSON(rpcReqs)
 		for _, req := range rpcReqs {
 			method += req.Method + ","
-			log.Info("doForward: body", "method", req.Method, "payload", req.Params, "auth", auth)
+			log.Debug("doForward body", "method", req.Method, "payload", req.Params, "auth", auth)
 		}
 	}
-	log.Info("doForward: body", "method", method, "auth", auth)
+	log.Debug("doForward body", "method", method, "auth", auth)
 
 	httpReq, err := http.NewRequestWithContext(ctx, "POST", b.rpcURL, bytes.NewReader(body))
 	if err != nil {
@@ -445,7 +445,7 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 		if err != nil {
 			log.Error("error unmarshaling singleRes debug response", "err", err, "singleDebugRes", singleDebugRes, "method", method, "auth", auth)
 		} else {
-			log.Debug("unmarshaling single response", "singleDebugRes", singleDebugRes, "method", method, "auth", auth)
+			log.Debug("unmarshaling single debug response", "singleDebugRes", singleDebugRes, "method", method, "auth", auth)
 		}
 		if err := json.Unmarshal(resB, &singleRes); err != nil {
 			log.Error("error unmarshaling singleRes response", "err", err, "singleRes", singleRes, "method", method, "auth", auth)
@@ -457,9 +457,9 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	} else {
 		err := json.Unmarshal(resB, &debugRes)
 		if err != nil {
-			log.Error("error unmarshaling batch response ", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
+			log.Error("error unmarshaling batch debug response ", "err", err, "debugRes", debugRes, "method", method, "auth", auth)
 		} else {
-			log.Debug("unmarshaling batch response", "debugRes", debugRes, "method", method, "auth", auth)
+			log.Debug("unmarshaling batch debug response", "debugRes", debugRes, "method", method, "auth", auth)
 		}
 		if err := json.Unmarshal(resB, &res); err != nil {
 			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
