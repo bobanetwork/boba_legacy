@@ -373,18 +373,21 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 
 	var body []byte
 	var method string
+	var bodyReader interface{}
 	auth := GetAuthCtx(ctx)
 	if isSingleElementBatch {
 		body = mustMarshalJSON(rpcReqs[0])
 		method = rpcReqs[0].Method
+		json.Unmarshal(body, &bodyReader)
+		log.Debug("doForward body", "method", method, "payload", rpcReqs[0], "auth", auth, "payload", bodyReader)
 	} else {
 		body = mustMarshalJSON(rpcReqs)
 		for _, req := range rpcReqs {
+			json.Unmarshal(body, &bodyReader)
 			method += req.Method + ","
-			log.Debug("doForward body", "method", req.Method, "payload", req.Params, "auth", auth)
+			log.Debug("doForward body", "method", req.Method, "payload", bodyReader, "auth", auth)
 		}
 	}
-	log.Debug("doForward body", "method", method, "auth", auth)
 
 	httpReq, err := http.NewRequestWithContext(ctx, "POST", b.rpcURL, bytes.NewReader(body))
 	if err != nil {
