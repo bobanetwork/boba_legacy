@@ -16,6 +16,7 @@ import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/En
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
+import EntryPointWrapperJson from '@boba/accountabstraction/artifacts/contracts/bundler/EntryPointWrapper.sol/EntryPointWrapper.json'
 
 import VerifyingPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/VerifyingPaymaster.sol/VerifyingPaymaster.json'
 
@@ -98,19 +99,18 @@ describe('Sponsoring Tx\n', async () => {
       await accountFactory.deployed()
       console.log('Account Factory deployed to:', accountFactory.address)
 
-        // deploy a senderCreator contract to get the create2 address on the provide
-      const SenderCreator__factory = new ContractFactory(
-          SenderCreatorJson.abi,
-          SenderCreatorJson.bytecode,
+      const EntryPointWrapper__factory = new ContractFactory(
+          EntryPointWrapperJson.abi,
+          EntryPointWrapperJson.bytecode,
           env.l2Wallet_4
       )
 
-      const senderCreator = await SenderCreator__factory.deploy()
+      const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
 
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        senderCreatorAddress: senderCreator.address,
+        entryPointWrapperAddress: entryPointWrapper.address,
         owner: env.l2Wallet_4,
         factoryAddress: accountFactory.address,
       })

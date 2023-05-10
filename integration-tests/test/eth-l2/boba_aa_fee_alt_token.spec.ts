@@ -133,13 +133,6 @@ describe('AA Alt Fee Token Test\n', async () => {
       await accountFactory.createAccount(env.l2Wallet.address, 0)
       account = await accountFactory.getAddress(env.l2Wallet.address, 0)
       console.log('Account deployed to:', account)
-      // const SenderCreator__factory = new ContractFactory(
-      //     SenderCreatorJson.abi,
-      //     SenderCreatorJson.bytecode,
-      //     env.l2Wallet
-      //   )
-      // const senderCreator = await SenderCreator__factory.deploy()
-      // console.log('Sender Creator Factory deployed to:', senderCreator.address)
 
       await L2ERC20Token.transfer(account, utils.parseEther('1'))
 
@@ -156,7 +149,6 @@ describe('AA Alt Fee Token Test\n', async () => {
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        //senderCreatorAddress: senderCreator.address,
         owner: env.l2Wallet,
         accountAddress: account
       })

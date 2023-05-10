@@ -48,7 +48,7 @@ const config = {
   entryPointAddress,
   bundlerUrl: 'http://localhost:3000/rpc'
 }
-const aaProvider = await wrapProvider(provider, config, aasigner)
+const aaProvider = await wrapProvider(provider, config, aasigner, entryPointWrapperAddress)
 const walletAddress = await aaProvider.getSigner().getAddress()
 
 // send some eth to the wallet Address: wallet should have some balance to pay for its own creation, and for calling methods.
