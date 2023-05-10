@@ -11,7 +11,6 @@ import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@boba/bundler_sdk'
-import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
@@ -136,13 +135,6 @@ describe('AA Boba as Fee token Test\n', async () => {
       await accountFactory.createAccount(env.l2Wallet.address, 0)
       account = await accountFactory.getAddress(env.l2Wallet.address, 0)
       console.log('Account deployed to:', account)
-      const SenderCreator__factory = new ContractFactory(
-          SenderCreatorJson.abi,
-          SenderCreatorJson.bytecode,
-          env.l2Wallet
-        )
-      const senderCreator = await SenderCreator__factory.deploy()
-      console.log('Sender Creator Factory deployed to:', senderCreator.address)
 
       await L2BOBAToken.transfer(account, utils.parseEther('1'))
 
@@ -159,7 +151,6 @@ describe('AA Boba as Fee token Test\n', async () => {
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        senderCreatorAddress: senderCreator.address,
         owner: env.l2Wallet,
         accountAddress: account
       })
