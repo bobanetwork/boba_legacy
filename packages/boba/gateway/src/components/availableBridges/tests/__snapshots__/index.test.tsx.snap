@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Avaialble Bridges should match snapshot connected on mainnet 1`] = `
+exports[`Available Bridges should match snapshot connected on mainnet 1`] = `
 <DocumentFragment>
   .c1 {
   padding: 0px;
@@ -101,8 +101,8 @@ exports[`Avaialble Bridges should match snapshot connected on mainnet 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Avaialble Bridges should match snapshot network type is TESTNET 1`] = `<DocumentFragment />`;
+exports[`Available Bridges should match snapshot network type is TESTNET 1`] = `<DocumentFragment />`;
 
-exports[`Avaialble Bridges should match snapshot selected network is not ETHEREUM 1`] = `<DocumentFragment />`;
+exports[`Available Bridges should match snapshot selected network is not ETHEREUM 1`] = `<DocumentFragment />`;
 
-exports[`Avaialble Bridges should match snapshot token value is null 1`] = `<DocumentFragment />`;
+exports[`Available Bridges should match snapshot token value is null 1`] = `<DocumentFragment />`;

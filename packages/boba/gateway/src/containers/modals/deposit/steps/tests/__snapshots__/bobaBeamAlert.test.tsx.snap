@@ -26,3 +26,5 @@ exports[`BobaBeamAlert should match the snapshot when active network is moonbeam
   </p>
 </DocumentFragment>
 `;
+
+exports[`BobaBeamAlert should match the snapshot when active network is moonbeam and status is 0 1`] = `<DocumentFragment />`;
