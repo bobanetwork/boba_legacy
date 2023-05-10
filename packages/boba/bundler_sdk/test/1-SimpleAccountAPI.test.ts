@@ -2,6 +2,7 @@ import {
   EntryPoint,
   EntryPoint__factory,
   SimpleAccountFactory__factory,
+  EntryPointWrapper__factory,
   UserOperationStruct
 } from '@boba/accountabstraction'
 import { Wallet } from 'ethers'
@@ -126,5 +127,37 @@ describe('SimpleAccountAPI', () => {
     })
     await expect(entryPoint.handleOps([op1], beneficiary)).to.emit(recipient, 'Sender')
       .withArgs(anyValue, accountAddress, 'world')
+  })
+
+  it('should use entryPointWrapper to get counterfactual address', async function () {
+    const entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
+    const owner2 = Wallet.createRandom()
+    const factoryAddress = await DeterministicDeployer.deploy(new SimpleAccountFactory__factory(), 0, [entryPoint.address])
+    const api1 = new SimpleAccountAPI({
+      provider,
+      entryPointAddress: entryPoint.address,
+      entryPointWrapperAddress: entryPointWrapper.address,
+      owner: owner2,
+      factoryAddress
+    })
+
+    const initCode = await api1.getAccountInitCode()
+    const addressFromEPW = await entryPointWrapper.callStatic.getSenderAddress(initCode)
+    accountAddress = await api1.getCounterFactualAddress()
+    expect(addressFromEPW).to.deep.eq(accountAddress)
+    expect(await provider.getCode(accountAddress).then(code => code.length)).to.equal(2)
+
+    await signer.sendTransaction({
+      to: accountAddress,
+      value: parseEther('0.1')
+    })
+    const op1 = await api1.createSignedUserOp({
+      target: recipient.address,
+      data: recipient.interface.encodeFunctionData('something', ['hello'])
+    })
+
+    await expect(entryPoint.handleOps([op1], beneficiary)).to.emit(recipient, 'Sender')
+      .withArgs(anyValue, accountAddress, 'hello')
+    expect(await provider.getCode(accountAddress).then(code => code.length)).to.greaterThan(1000)
   })
 })

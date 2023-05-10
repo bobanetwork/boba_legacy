@@ -3,7 +3,11 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, utils } from 'ethers'
-import { getBobaContractAt, getBobaContractABI, deployBobaContractCore } from '@boba/contracts'
+import {
+  getBobaContractAt,
+  getBobaContractABI,
+  deployBobaContractCore,
+} from '@boba/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -1011,7 +1015,7 @@ describe('ERC1155 Bridge Test', async () => {
       const L2ERC1155Test = await deployBobaContractCore(
         'L1ERC1155',
         [DUMMY_URI_1],
-        env.l2Wallet,
+        env.l2Wallet
       )
 
       const mintTx = await L2ERC1155Test.mint(
