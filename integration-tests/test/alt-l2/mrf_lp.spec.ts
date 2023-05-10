@@ -4,7 +4,11 @@ chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, BigNumber, utils } from 'ethers'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
-import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
+import {
+  deployBobaContractCore,
+  getBobaContractABI,
+  getBobaContractAt,
+} from '@boba/contracts'
 
 import { expectLogs, getGasLimitOption } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -60,26 +64,31 @@ describe('Liquidity Pool Test', async () => {
     L1ERC20 = await deployBobaContractCore(
       'L1ERC20',
       [initialSupply, tokenName, tokenSymbol, 18],
-      env.l1Wallet,
+      env.l1Wallet
     )
 
     OMGLIkeToken = await deployBobaContractCore(
       'OMGLikeToken',
       [],
-      env.l1Wallet,
+      env.l1Wallet
     )
 
-    const Factory__L2ERC20 = getContractFactory(
-      'L2StandardERC20',
-      env.l2Wallet
-    )
+    const Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
     L2ERC20 = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress, L1ERC20.address, tokenName, tokenSymbol, 18,
+      L2StandardBridgeAddress,
+      L1ERC20.address,
+      tokenName,
+      tokenSymbol,
+      18
     )
     await L2ERC20.deployTransaction.wait()
 
     L2OMGLikeToken = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress, OMGLIkeToken.address, 'OMG', 'OMG', 18,
+      L2StandardBridgeAddress,
+      OMGLIkeToken.address,
+      'OMG',
+      'OMG',
+      18
     )
     await L2OMGLikeToken.deployTransaction.wait()
 
@@ -254,7 +263,9 @@ describe('Liquidity Pool Test', async () => {
       '0x0000000000000000000000000000000000000000'
     )
     // console.log(poolETHInfo.l2TokenAddress)
-    expect(poolETHInfo.l2TokenAddress).to.deep.eq(predeploys.L2_L1NativeToken_ALT_L1)
+    expect(poolETHInfo.l2TokenAddress).to.deep.eq(
+      predeploys.L2_L1NativeToken_ALT_L1
+    )
   })
 
   it('should register L2 the pool', async () => {
@@ -276,7 +287,9 @@ describe('Liquidity Pool Test', async () => {
     expect(poolETHInfo.l1TokenAddress).to.deep.eq(
       '0x0000000000000000000000000000000000000000'
     )
-    expect(poolETHInfo.l2TokenAddress).to.deep.eq(predeploys.L2_L1NativeToken_ALT_L1)
+    expect(poolETHInfo.l2TokenAddress).to.deep.eq(
+      predeploys.L2_L1NativeToken_ALT_L1
+    )
   })
 
   it('shouldnt update the pool', async () => {
@@ -1684,7 +1697,11 @@ describe('Liquidity Pool Test', async () => {
         env.l2Wallet
       )
       L2ERC20 = await Factory__L2ERC20.deploy(
-        L2StandardBridgeAddress, L1ERC20.address, tokenName, tokenSymbol, 18
+        L2StandardBridgeAddress,
+        L1ERC20.address,
+        tokenName,
+        tokenSymbol,
+        18
       )
       await L2ERC20.deployTransaction.wait()
 

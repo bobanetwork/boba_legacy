@@ -22,6 +22,7 @@ import GasOracleJson from "../../../packages/contracts/artifacts/contracts/L2/pr
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import { Server } from "http";
 
 let Factory__Hello: ContractFactory
 let hello: Contract
@@ -44,12 +45,18 @@ const oracleWallet = new Wallet("0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1
 if (hre.network.name === "boba_local") {
   describe("Basic Math", function () {
 
+    var server: Server
+
+    after(async () => {
+      await server.close(console.error)
+    })
+
       before(async () => {
 
       var http = require('http')
       var ip = require("ip")
 
-      var server = module.exports = http.createServer(async function (req, res) {
+      server = module.exports = http.createServer(async function (req, res) {
 
         if (req.headers['content-type'] === 'application/json') {
 

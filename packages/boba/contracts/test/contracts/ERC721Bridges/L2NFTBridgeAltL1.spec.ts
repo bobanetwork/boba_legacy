@@ -202,7 +202,11 @@ describe('L2NFTBridgeAltL1 Tests', () => {
         'baseTokenUri'
       )
       await expect(
-        L2NFTBridge.registerNFTPair(ERC721.address, IncorrectL2StandardERC721.address, 'L1')
+        L2NFTBridge.registerNFTPair(
+          ERC721.address,
+          IncorrectL2StandardERC721.address,
+          'L1'
+        )
       ).to.be.revertedWith('L2 contract is not compatible with L1 contract')
     })
     it('can register a NFT with L2 creation', async () => {

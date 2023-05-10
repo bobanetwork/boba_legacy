@@ -267,11 +267,7 @@ describe('SSTORE tests', async () => {
   before(async () => {
     env = await OptimismEnv.new()
 
-    SSTORETest = await ethers.deployContract(
-      'TestDeleteSlot',
-      [],
-      env.l2Wallet
-    )
+    SSTORETest = await ethers.deployContract('TestDeleteSlot', [], env.l2Wallet)
 
     Boba_GasPriceOracle = getContractFactory('Boba_GasPriceOracle')
       .attach(predeploys.Proxy__Boba_GasPriceOracle)
