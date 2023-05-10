@@ -1,5 +1,7 @@
 ---
-description: Learn how to use basic features of Boba (e.g. bridges, basic L2 ops) through examples
+description: >-
+  Learn how to use basic features of Boba (e.g. bridges, basic L2 ops) through
+  examples
 ---
 
 # Basic Operations
@@ -9,7 +11,8 @@ Below, we provide code snippets for several typical operations on the L2, such a
 To see examples of how to perform dozens of basic operations on Boba, you can also look at the react code for the [Boba Gateway](../../packages/boba/gateway/src/services/networkService.js).
 
 
-## Check the Current Gas Price
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (1) (2).png" alt=""><figcaption></figcaption></figure>
 
 The Gas Price on L2 changes every **30 seconds**, with some smoothing to reduce sharp discontinuities in the price from one moment to the next. The maximum percentage change of the L2 gas price is 5% in the gas price oracle. Like on mainchain, the current gas price can be obtained via `.getGasPrice()`:
 
@@ -27,7 +30,9 @@ The Gas Price on L2 changes every **30 seconds**, with some smoothing to reduce 
 
 Typical values are 3 to 10 Gwei.
 
-## Estimate the cost of a contract call
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (7).png" alt=""><figcaption></figcaption></figure>
 
 Like on mainchain, the cost of a L2 transaction is the product of the current gas price and the 'complexity' of the contract call, with some calls being much more expensive than others. The contract call complexity is quantified via the `gas`. For example, the cost of an approval on L2 is about 0.0004 ETH, or about $1.70 (Oct. 2021):
 
@@ -102,7 +107,9 @@ NOTE: To protect users, _overpaying by more than a 10% percent will also revert 
 
 **Gas Price tolerance band** : The `gasPrice` you use should be **within 10% of the value** reported by `.getGasPrice()`. Let’s say the gasPrice is 100 Gwei. Then, the l2geth will accept any `gasPrice` between 90 Gwei to 110 Gwei.
 
-## An L2->L2 transfer
+
+
+<figure><img src="../../.gitbook/assets/Artboard 3 (2) (2).png" alt=""><figcaption></figcaption></figure>
 
 ```javascript
 //Transfer funds from one account to another, on the L2
@@ -144,10 +151,11 @@ async transfer(address, value_Wei_String, currency) {
 	  return error
 	}
 }
-
 ```
 
-## An L1->L2 Classic Bridge Operation
+
+
+<figure><img src="../../.gitbook/assets/Artboard 4 (8).png" alt=""><figcaption></figcaption></figure>
 
 ```javascript
   //Move ERC20 Tokens from L1 to L2
@@ -197,11 +205,13 @@ async transfer(address, value_Wei_String, currency) {
   }
 ```
 
-## Accessing latest L1 Block number
+
+
+<figure><img src="../../.gitbook/assets/Artboard 5 (1).png" alt=""><figcaption></figcaption></figure>
 
 The hex value that corresponds to the `L1BLOCKNUMBER` opcode (`0x4B`) may be changed in the future. **We strongly discourage direct use of this opcode within your contracts.** Instead, if you want to access the latest L1 block number, please use the `OVM_L1BlockNumber` contract as described below.
 
-The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so there is a simple contract located at [`0x4200000000000000000000000000000000000013` that will allow you to trigger this opcode. You can use this contract as follows:
+The block number of the latest L1 block seen by the L2 system can be accessed via the `L1BLOCKNUMBER` opcode. Solidity doesn't make it easy to use non-standard opcodes, so there is a simple contract located at \[`0x4200000000000000000000000000000000000013` that will allow you to trigger this opcode. You can use this contract as follows:
 
 ```javascript
 import { iOVM_L1BlockNumber } from "@eth-optimism/contracts/L2/predeploys/iOVM_L1BlockNumber.sol";
@@ -220,7 +230,9 @@ contract MyContract {
 }
 ```
 
-## Block Numbers and Timestamps
+
+
+<figure><img src="../../.gitbook/assets/Artboard 6.png" alt=""><figcaption></figcaption></figure>
 
 ### Block production is not constant
 

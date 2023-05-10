@@ -2,28 +2,31 @@
 description: Contract deployment examples
 ---
 
+# Contract Deployment Example
+
 Please refer to the `./boba_examples` folder. Contract examples include:
 
 1. **hardhat-simple-storage** - shows how to deploy a storage contract to Goerli Boba
-
 2. **init-fund-l2** - shows how to deposit funds from L1 to L2, on Goerli Boba
-
 3. **truffle-erc20** Simple ERC20 Token Truffle Tutorial
 
 We'll work though one of those examples in more detail.
 
-## Simple ERC20 Token Truffle Tutorial
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (5) (1).png" alt=""><figcaption></figcaption></figure>
 
 Welcome to our ERC20 Truffle example. If you're interested in writing your first L2 smart contract using Truffle as your smart contract testing framework, then you've come to the right place. This repo serves as an example for how go through and compile/test/deploy your contracts on Ethereum and the Boba L2.
 
 Let's begin.
 
-### Step 1: Compile your contracts
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (6).png" alt=""><figcaption></figcaption></figure>
 
 Compiling a contract for Boba is identical to compiling a contract for Ethereum mainchain. Notably, all standard solidity compiler versions can be used. For this ERC20, we will use `0.6.12`. Create a `truffle-config.js` and add the following to it:
 
 ```js
-
 const HDWalletProvider = require('@truffle/hdwallet-provider')
 
 require('dotenv').config()
@@ -52,29 +55,29 @@ module.exports = {
     },
   },
 }
-
 ```
 
 Now add a `.env` file that follows the format of `env.example` with two private keys. **NOTE: these accounts must be funded, i.e. contain enough Goerli ETH to cover the cost of the deployment.** Then,
 
-```sh
+```
 yarn compile
 ```
 
 Yep, it's that easy. You can verify that everything went well by looking for the `build` directory that contains your new JSON files. Now let's move on to testing!
 
-### Step 2: Testing your contract
+
+
+<figure><img src="../../.gitbook/assets/Artboard 3 (8).png" alt=""><figcaption></figcaption></figure>
 
 Woot! It's time to test our contract. Since the JSON RPC provider URL (for Boba Goerli) has already been specified in your Truffle config file, all we need to do next is run the test command. Run:
 
-```sh
+```
 yarn test:integration
 ```
 
 You should see a set of passing tests for your ERC20 contract.
 
 ```bash
-
 $ truffle test ./test/erc20.spec.js --network boba_goerli --config truffle-config.js
 Using network 'boba_goerli'.
 
@@ -100,12 +103,13 @@ Compiling your contracts...
   12 passing (43s)
 
 ✨  Done in 53.27s.
-
 ```
 
 If so, congrats! You're ready to deploy an application to Boba. It really is that easy.
 
-### Step 3: Deploying your Contract
+
+
+<figure><img src="../../.gitbook/assets/Artboard 4 (6).png" alt=""><figcaption></figcaption></figure>
 
 Now we're going to deploy a contract using `truffle`. For Truffle based deployments, we're going to use Truffle's `migrate` command to run a migrations file for us that will deploy the contract we specify.
 
@@ -114,7 +118,6 @@ First, let's create that migrations file. Create a new directory called `migrati
 Next, within `1_deploy_ERC20_contract.js`, we're going to add the following logic:
 
 ```js
-
 const ERC20 = artifacts.require('ERC20')
 
 module.exports = function (deployer, accounts) {
@@ -131,19 +134,17 @@ module.exports = function (deployer, accounts) {
     tokenSymbol
   )
 }
-
 ```
 
 Now we're ready to run our migrations file! Let's go ahead and deploy this contract:
 
-```sh
+```
 yarn deploy
 ```
 
 After a few seconds your contract should be deployed. Now you'll see this in your terminal:
 
 ```bash
-
 $ yarn deploy
 yarn run v1.22.15
 $ truffle migrate --network boba_goerli --config truffle-config
@@ -190,11 +191,12 @@ Summary
 
 
 ✨  Done in 10.11s.
-
-````
+```
 
 That's pretty much it. Contracts deployed! Tutorial complete. Hopefully now you know the basics of working with Boba!
 
-### Troubleshooting
+
+
+<figure><img src="../../.gitbook/assets/Artboard 5 (6).png" alt=""><figcaption></figcaption></figure>
 
 Example project not working? [Create a Github Issue](https://github.com/bobanetwork/boba/issues).

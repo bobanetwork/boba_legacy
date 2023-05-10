@@ -1,6 +1,8 @@
 # Token Addresses
 
-## Mainnet
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (18) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Ethereum <> BOBA L2
 
@@ -74,7 +76,9 @@
 | USDC  | 0x04068DA6C83AFCFA0e13ba15A6696662335D5B75 | 0xb7629EF94B991865940E8A840Aa7d68fa88c3Fe8 |
 | DAI   | 0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E | 0x31223A147fF76C3fC43d67F8BC36F11E034c484e |
 
-## Testnet
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (18) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Ethereum <> BOBA L2
 

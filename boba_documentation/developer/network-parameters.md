@@ -2,39 +2,44 @@
 description: A collection of links and addresses to get started on Boba-Ethereum
 ---
 
-# Goerli (2888)
+# Contract Addresses Boba/Ethereum
 
-## Goerli Addresses
+<figure><img src="../../.gitbook/assets/Artboard 1 (8) (1).png" alt=""><figcaption></figcaption></figure>
 
-For **primary network contracts and addresses** see [packages/contracts/deployments/goerli/README.md](../../packages/contracts/deployments/goerli/README.md)
+### Goerli Addresses
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Goerli address registration dump](../../packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json).
+For **primary network contracts and addresses** see [packages/contracts/deployments/goerli/README.md](../../packages/contracts/deployments/goerli/)
 
-## Goerli Links and Endpoints
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Goerli address registration dump](../../packages/boba/register/addresses/addressesGoerli\_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json).
 
-|                 |                                                                                          |
-| --------------- | ---------------------------------------------------------------------------------------- |
-| Goerli ChainID  | 2888                                                                                       |
-| Goerli RPC      | [https://goerli.boba.network](https://goerli.boba.network)                             |
-| Gateway         | [https://gateway.goerli.boba.network](https://gateway.goerli.boba.network)             |
-| Blockexplorer   | [https://testnet.bobascan.com](https://testnet.bobascan.com) |
-| Websocket       | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)                   |
+### Goerli Links and Endpoints
 
-# Mainnet (288)
+|                |                                                                          |
+| -------------- | ------------------------------------------------------------------------ |
+| Goerli ChainID | 2888                                                                     |
+| Goerli RPC     | [https://goerli.boba.network](https://goerli.boba.network)               |
+| Gateway        | [https://gateway.boba.network](https://gateway.boba.network) |
+| Blockexplorer  | [https://testnet.bobascan.com](https://testnet.bobascan.com)             |
+| Websocket      | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)           |
+| Gas Cap        | 50000000                                                                 |
 
-## Mainnet Addresses
 
-For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/mainnet/README.md)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json).
+<figure><img src="../../.gitbook/assets/Artboard 2 (12) (1).png" alt=""><figcaption></figcaption></figure>
 
-## Mainnet Links and Endpoints
+### Mainnet Addresses
 
-|                   |                                                                                  |
-| ----------------- | -------------------------------------------------------------------------------- |
-| Mainnet ChainID   | 288                                                                              |
-| Mainnet RPC Read  | [https://lightning-replica.boba.network](https://lightning-replica.boba.network) |
-| Mainnet Write RPC | [https://mainnet.boba.network](https://mainnet.boba.network)                     |
-| Gateway           | [https://gateway.boba.network](https://gateway.boba.network)                     |
-| Blockexplorer     | [https://bobascan.com](https://bobascan.com)         |
-| Websocket         | [wss://ws.mainnet.boba.network](wss://wss.mainnet.boba.network)                  |
+For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/mainnet/)
+
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json).
+
+### Mainnet Links and Endpoints
+
+|                    |                                                                                                                                                                                                                                                                                                                                                                          |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Mainnet ChainID    | 288                                                                                                                                                                                                                                                                                                                                                                      |
+| Mainnet Write RPCs | [https://mainnet.boba.network](https://mainnet.boba.network)<br/><br/>We have partnered with Tenderly (ip-based rate limiting, subscribe to Tenderly if you need more): <br/>[http://boba-ethereum.gateway.tenderly.co](http://boba-ethereum.gateway.tenderly.co)<br/>[http://gateway.tenderly.co/public/boba-ethereum](http://gateway.tenderly.co/public/boba-ethereum) |
+| Gateway            | [https://gateway.boba.network](https://gateway.boba.network)                                                                                                                                                                                                                                                                                                             |
+| Blockexplorer      | [https://bobascan.com](https://bobascan.com)                                                                                                                                                                                                                                                                                                                             |
+| Websocket          | [wss://boba-ethereum.gateway.tenderly.co](wss://boba-ethereum.gateway.tenderly.co)<br/>[wss://gateway.tenderly.co/public/boba-ethereum](wss://gateway.tenderly.co/public/boba-ethereum)                                                                                         |
+| Gas Cap            | 50000000                                                                                                                                                                                                                                                                                                                                                                 |

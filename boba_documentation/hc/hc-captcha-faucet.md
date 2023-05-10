@@ -2,9 +2,13 @@
 description: Turing Example - CAPTCHA-based token faucet
 ---
 
+# BOBA Faucet
+
 Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's implemented using Turing hybrid compute. Before claiming tokens, users answer a CAPTCHA. Their answer is hashed and compared off-chain to the correct answer via Turing. Once their answer is verified, the smart contract releases the funds.
 
-## Directory Structure
+
+
+<figure><img src="../../.gitbook/assets/Artboard 1 (2) (2).png" alt=""><figcaption></figcaption></figure>
 
 * `boba_community/turing-captcha-faucet/packages`: Contains all the typescript packages and contracts
   * `contracts`: Smart contracts implementing the Boba Faucet
@@ -12,34 +16,36 @@ Boba Faucet is a system for distributing Rinkeby ETH and Rinkeby BOBA. It's impl
   * `deployment`: Boba faucet Rinkeby contract addresses
   * `api`: Boba faucet backend API
 
-## Specification
+
+
+<figure><img src="../../.gitbook/assets/Artboard 2 (5) (1).png" alt=""><figcaption></figcaption></figure>
 
 The token-claiming process takes place in five steps:
 
-### 1. User obtains the CAPTCHA image and the image UUID
+#### 1. User obtains the CAPTCHA image and the image UUID
 
 The API GET request is sent to `https://api-turing.boba.network/get.catcha` on the frontend. The returned payload is
 
-   ```js
-   {
-     "UUID": "BYTES32",
-     "imageBase64": "CAPTCHA IMAGE"
-   }
-   ```
+```js
+{
+  "UUID": "BYTES32",
+  "imageBase64": "CAPTCHA IMAGE"
+}
+```
 
 The UUID and hashed CAPTCHA answer are stored in AWS Redis.
 
-### 2. User sends a transaction to the `Boba Faucet` contract with the UUID and CAPTCHA answer
+#### 2. User sends a transaction to the `Boba Faucet` contract with the UUID and CAPTCHA answer
 
-   ```javascript
-   const BobaFaucet = new ethers.Contract(
-     BOBA_FAUCET_CONTRACE_ADDRESS,
-     BobaFaucetJson.abi,
-     this.provider.getSigner()
-   )
-   const tx = await BobaFaucet.getBobaFaucet(uuid, answer)
-   await tx.wait()
-   ```
+```javascript
+const BobaFaucet = new ethers.Contract(
+  BOBA_FAUCET_CONTRACE_ADDRESS,
+  BobaFaucetJson.abi,
+  this.provider.getSigner()
+)
+const tx = await BobaFaucet.getBobaFaucet(uuid, answer)
+await tx.wait()
+```
 
 The answer is hashed in the `Boba Faucet` contract first before sending it to backend API.
 
@@ -49,41 +55,41 @@ The answer is hashed in the `Boba Faucet` contract first before sending it to ba
     bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
 ```
 
-### 3. Geth sends a request to the backend and retrieves the result
+#### 3. Geth sends a request to the backend and retrieves the result
 
 The POST request with the hashed answer is sent to `https://api-turing.boba.network/verify.captcha`. It decodes the input and verifies the UUID with the hashed answer.
 
-   ```python
-   paramsHexString = body['params'][0]
-   # Select uuid and answer
-   # paramsHexString[0: 66] is the length of input data
-   uuid = '0x' + paramsHexString[66: 130]
-   answer = '0x' + paramsHexString[130:]
-   # Get answer from Redis
-   keyInRedis = db.get(uuid)
-   # Return the payload
-   return returnPayload(keyInRedis.decode('utf-8') == key)
+```python
+paramsHexString = body['params'][0]
+# Select uuid and answer
+# paramsHexString[0: 66] is the length of input data
+uuid = '0x' + paramsHexString[66: 130]
+answer = '0x' + paramsHexString[130:]
+# Get answer from Redis
+keyInRedis = db.get(uuid)
+# Return the payload
+return returnPayload(keyInRedis.decode('utf-8') == key)
 
-   # Payload is built based on the result
-   def returnPayload(result):
-       # We return 0 or 1 using uint256
-       payload = '0x' + '{0:0{1}x}'.format(int(32), 64)
-       if result:
-           # Add UINT256 1 if the result is correct
-           payload += '{0:0{1}x}'.format(int(1), 64)
-       else:
-           # Add UINT256 0 if the result is wrong
-           payload += '{0:0{1}x}'.format(int(0), 64)
+# Payload is built based on the result
+def returnPayload(result):
+    # We return 0 or 1 using uint256
+    payload = '0x' + '{0:0{1}x}'.format(int(32), 64)
+    if result:
+        # Add UINT256 1 if the result is correct
+        payload += '{0:0{1}x}'.format(int(1), 64)
+    else:
+        # Add UINT256 0 if the result is wrong
+        payload += '{0:0{1}x}'.format(int(0), 64)
 
-       returnPayload = {
-           'statusCode': 200,
-           'body': json.dumps({ 'result': payload })
-       }
+    returnPayload = {
+        'statusCode': 200,
+        'body': json.dumps({ 'result': payload })
+    }
 
-       return returnPayload
-   ```
+    return returnPayload
+```
 
-### 4. Geth atomically revises the calldata
+#### 4. Geth atomically revises the calldata
 
 On the contract level, we decode the result from the Turing request and release the funds if the answer is correct.
 
@@ -98,17 +104,17 @@ On the contract level, we decode the result from the Turing request and release 
     IERC20(BobaAddress).safeTransfer(msg.sender, BobaFaucetAmount);
 ```
 
-### 5. User obtains the funds if the answer is correct or sees an error message
+#### 5. User obtains the funds if the answer is correct or sees an error message
 
-<img width="873" alt="image" src="https://user-images.githubusercontent.com/46272347/153475813-f4ffd103-3b95-4df7-a951-a321b84ff34a.png">
+<figure><img src="../../.gitbook/assets/client-geth-aws.png" alt=""><figcaption></figcaption></figure>
 
-## Implementation
+<figure><img src="../../.gitbook/assets/Artboard 3 (4).png" alt=""><figcaption></figcaption></figure>
 
-### Step 1: Creating API endpoints
+#### Step 1: Creating API endpoints
 
 Two simple API endpoints are created.
 
-#### get.captcha
+**get.captcha**
 
 ```python
 image = ImageCaptcha(width=280, height=90)
@@ -143,7 +149,7 @@ db.set(keyBytes, imageStrBytes, ex=600)
 payload = {'uuid': keyBytes, 'imageBase64': imageBase64.decode('utf-8') }
 ```
 
-#### verify.captcha
+**verify.captcha**
 
 ```python
 paramsHexString = body['params'][0]
@@ -169,11 +175,13 @@ with open("env.yml", 'r') as ymlfile:
     return returnPayload(False)
 ```
 
-### Step 2: Creating the Boba Faucet Contract
+#### Step 2: Creating the Boba Faucet Contract
 
-# BOBA Faucet Smart Contracts
 
-## Deployment
+
+<figure><img src="../../.gitbook/assets/Artboard 4 (11) (1).png" alt=""><figcaption></figcaption></figure>
+
+### Deployment
 
 Create a `.env` file in the root directory of the contracts folder. Add environment-specific variables on new lines in the form of `NAME=VALUE`. Examples are given in the `.env.example` file. Just pick which net you want to work on and copy either the "Rinkeby" _or_ the "Local" envs to your `.env`.
 
@@ -247,7 +255,7 @@ contract BobaFaucet is Ownable {
 }
 ```
 
-### Step 3: Funding Turing Helper Contract
+#### Step 3: Funding Turing Helper Contract
 
 We charge 0.01 BOBA for each Turing request and it's based on the Turing Helper Contract.
 
@@ -288,4 +296,3 @@ const addPermissionTx = await TuringHelper.addPermittedCaller(
 )
 await addPermissionTx.wait()
 ```
-

@@ -10,13 +10,15 @@ The Standard Bridge is composed of two main contracts the [`L1StandardBridge` (o
 
 Here we'll go over the basics of using this bridge to move ERC20 and ETH assets between Layer 1 and Layer 2.
 
-## Deposits
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 1.png" alt=""><figcaption></figcaption></figure>
 
 > Note: **We currently block smart contract wallets from calling the `depositETH` and `depositERC20` functions for security reasons**. If you want to deposit not using an EOA accounts and you know what are doing, you can use `depositETHTo` and `depositERC20To` functions instead.
 
 ### Deposit ERC20s
 
-ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the  [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
+ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the [`L1StandardBridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
 ```js
 const PRIVATE_KEY, L1_NODE_WEB3_URL, PROXY_L1_STANDARD_BRIDGE_ADDRESS
@@ -91,7 +93,9 @@ const depositToTx = await Proxy__L1StandardBridge.depositETHTo(
 await depositToTx.wait()
 ```
 
-## Withdrawals
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 2 (13).png" alt=""><figcaption></figcaption></figure>
 
 ### Withdraw tokens (ERC20s and ETH)
 
@@ -156,28 +160,31 @@ const withdrawToTx = await Proxy__L2StandardBridge.withdrawTo(
 await withdrawToTx.wait()
 ```
 
-## The Boba token list
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 3 (2).png" alt=""><figcaption></figcaption></figure>
 
 The Standard bridge allows a one-to-many mapping between L1 and L2 tokens, meaning that there can be many Boba implementations of an L1 token. However there is always a one-to-one mapping between L1 and L2 tokens in the Boba token list.
 
-| Network | URL                                                          |
-| ------- | ------------------------------------------------------------ |
-| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
-| Goerli | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json) |
+| Network | URL                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mainnet | [Mainnet Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json) |
+| Goerli  | [Goerli Boba Token List](https://github.com/bobanetwork/boba/blob/develop/packages/boba/register/addresses/addressesGoerli\_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json)   |
 
-## Links
+
+
+<figure><img src="../../../.gitbook/assets/Artboard 4 (14).png" alt=""><figcaption></figcaption></figure>
 
 ### Mainnet
 
-| Contract Name           | Contract Address                           |
-| ----------------------- | ------------------------------------------ |
-| Proxy__L1StandardBridge | 0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00 |
-| L2StandardBridge | 0x4200000000000000000000000000000000000010 |
+| Contract Name             | Contract Address                           |
+| ------------------------- | ------------------------------------------ |
+| Proxy\_\_L1StandardBridge | 0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00 |
+| L2StandardBridge          | 0x4200000000000000000000000000000000000010 |
 
 ### Goerli
 
-| Contract Name           | Contract Address                           |
-| ----------------------- | ------------------------------------------ |
-| Proxy__L1StandardBridge | 0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2 |
-| L2StandardBridge | 0x4200000000000000000000000000000000000010 |
-
+| Contract Name             | Contract Address                           |
+| ------------------------- | ------------------------------------------ |
+| Proxy\_\_L1StandardBridge | 0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2 |
+| L2StandardBridge          | 0x4200000000000000000000000000000000000010 |
