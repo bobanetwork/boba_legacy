@@ -1,5 +1,9 @@
 import { Deferrable, defineReadOnly } from '@ethersproject/properties'
-import { Provider, TransactionRequest, TransactionResponse } from '@ethersproject/providers'
+import {
+  Provider,
+  TransactionRequest,
+  TransactionResponse,
+} from '@ethersproject/providers'
 import { Signer } from '@ethersproject/abstract-signer'
 
 import { Bytes } from 'ethers'
@@ -7,16 +11,17 @@ import { ERC4337EthersProvider } from './ERC4337EthersProvider'
 import { ClientConfig } from './ClientConfig'
 import { HttpRpcClient } from './HttpRpcClient'
 import { UserOperationStruct } from '@boba/accountabstraction'
-import { BaseWalletAPI } from './BaseWalletAPI'
+import { BaseAccountAPI } from './BaseAccountAPI'
 
 export class ERC4337EthersSigner extends Signer {
   // TODO: we have 'erc4337provider', remove shared dependencies or avoid two-way reference
-  constructor (
+  constructor(
     readonly config: ClientConfig,
     readonly originalSigner: Signer,
     readonly erc4337provider: ERC4337EthersProvider,
     readonly httpRpcClient: HttpRpcClient,
-    readonly smartWalletAPI: BaseWalletAPI) {
+    readonly smartAccountAPI: BaseAccountAPI
+  ) {
     super()
     defineReadOnly(this, 'provider', erc4337provider)
   }
@@ -24,16 +29,21 @@ export class ERC4337EthersSigner extends Signer {
   address?: string
 
   // This one is called by Contract. It signs the request and passes in to Provider to be sent.
-  async sendTransaction (transaction: Deferrable<TransactionRequest>): Promise<TransactionResponse> {
+  async sendTransaction(
+    transaction: Deferrable<TransactionRequest>
+  ): Promise<TransactionResponse> {
     const tx: TransactionRequest = await this.populateTransaction(transaction)
     await this.verifyAllNecessaryFields(tx)
-    const userOperation = await this.smartWalletAPI.createSignedUserOp({
+    const userOperation = await this.smartAccountAPI.createSignedUserOp({
       target: tx.to ?? '',
       data: tx.data?.toString() ?? '',
       value: tx.value,
-      gasLimit: tx.gasLimit
+      gasLimit: tx.gasLimit,
     })
-    const transactionResponse = await this.erc4337provider.constructUserOpTransactionResponse(userOperation)
+    const transactionResponse =
+      await this.erc4337provider.constructUserOpTransactionResponse(
+        userOperation
+      )
     try {
       await this.httpRpcClient.sendUserOpToBundler(userOperation)
     } catch (error: any) {
@@ -44,7 +54,7 @@ export class ERC4337EthersSigner extends Signer {
     return transactionResponse
   }
 
-  unwrapError (errorIn: any): Error {
+  unwrapError(errorIn: any): Error {
     if (errorIn.body != null) {
       const errorBody = JSON.parse(errorIn.body)
       let paymasterInfo: string = ''
@@ -58,14 +68,18 @@ export class ERC4337EthersSigner extends Signer {
           failedOpMessage = split[2]
         }
       }
-      const error = new Error(`The bundler has failed to include UserOperation in a batch: ${failedOpMessage} ${paymasterInfo})`)
+      const error = new Error(
+        `The bundler has failed to include UserOperation in a batch: ${failedOpMessage} ${paymasterInfo})`
+      )
       error.stack = errorIn.stack
       return error
     }
     return errorIn
   }
 
-  async verifyAllNecessaryFields (transactionRequest: TransactionRequest): Promise<void> {
+  async verifyAllNecessaryFields(
+    transactionRequest: TransactionRequest
+  ): Promise<void> {
     if (transactionRequest.to == null) {
       throw new Error('Missing call target')
     }
@@ -75,27 +89,29 @@ export class ERC4337EthersSigner extends Signer {
     }
   }
 
-  connect (provider: Provider): Signer {
+  connect(provider: Provider): Signer {
     throw new Error('changing providers is not supported')
   }
 
-  async getAddress (): Promise<string> {
+  async getAddress(): Promise<string> {
     if (this.address == null) {
-      this.address = await this.erc4337provider.getSenderWalletAddress()
+      this.address = await this.erc4337provider.getSenderAccountAddress()
     }
     return this.address
   }
 
-  async signMessage (message: Bytes | string): Promise<string> {
+  async signMessage(message: Bytes | string): Promise<string> {
     return await this.originalSigner.signMessage(message)
   }
 
-  async signTransaction (transaction: Deferrable<TransactionRequest>): Promise<string> {
+  async signTransaction(
+    transaction: Deferrable<TransactionRequest>
+  ): Promise<string> {
     throw new Error('not implemented')
   }
 
-  async signUserOperation (userOperation: UserOperationStruct): Promise<string> {
-    const message = await this.smartWalletAPI.getUserOpHash(userOperation)
+  async signUserOperation(userOperation: UserOperationStruct): Promise<string> {
+    const message = await this.smartAccountAPI.getUserOpHash(userOperation)
     return await this.originalSigner.signMessage(message)
   }
 }

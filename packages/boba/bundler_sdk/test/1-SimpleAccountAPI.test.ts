@@ -1,7 +1,8 @@
 import {
   EntryPoint,
   EntryPoint__factory,
-  SimpleAccountDeployer__factory,
+  SimpleAccountFactory__factory,
+  EntryPointWrapper__factory,
   UserOperationStruct
 } from '@boba/accountabstraction'
 import { Wallet } from 'ethers'
@@ -23,8 +24,8 @@ describe('SimpleAccountAPI', () => {
   let entryPoint: EntryPoint
   let beneficiary: string
   let recipient: SampleRecipient
-  let walletAddress: string
-  let walletDeployed = false
+  let accountAddress: string
+  let accountDeployed = false
 
   before('init', async () => {
     entryPoint = await new EntryPoint__factory(signer).deploy()
@@ -32,7 +33,8 @@ describe('SimpleAccountAPI', () => {
 
     recipient = await new SampleRecipient__factory(signer).deploy()
     owner = Wallet.createRandom()
-    const factoryAddress = await DeterministicDeployer.deploy(SimpleAccountDeployer__factory.bytecode)
+    DeterministicDeployer.init(ethers.provider)
+    const factoryAddress = await DeterministicDeployer.deploy(new SimpleAccountFactory__factory(), 0, [entryPoint.address])
     api = new SimpleAccountAPI({
       provider,
       entryPointAddress: entryPoint.address,
@@ -61,11 +63,11 @@ describe('SimpleAccountAPI', () => {
   })
 
   it('should deploy to counterfactual address', async () => {
-    walletAddress = await api.getWalletAddress()
-    expect(await provider.getCode(walletAddress).then(code => code.length)).to.equal(2)
+    accountAddress = await api.getAccountAddress()
+    expect(await provider.getCode(accountAddress).then(code => code.length)).to.equal(2)
 
     await signer.sendTransaction({
-      to: walletAddress,
+      to: accountAddress,
       value: parseEther('0.1')
     })
     const op = await api.createSignedUserOp({
@@ -74,9 +76,9 @@ describe('SimpleAccountAPI', () => {
     })
 
     await expect(entryPoint.handleOps([op], beneficiary)).to.emit(recipient, 'Sender')
-      .withArgs(anyValue, walletAddress, 'hello')
-    expect(await provider.getCode(walletAddress).then(code => code.length)).to.greaterThan(1000)
-    walletDeployed = true
+      .withArgs(anyValue, accountAddress, 'hello')
+    expect(await provider.getCode(accountAddress).then(code => code.length)).to.greaterThan(1000)
+    accountDeployed = true
   })
 
   context('#rethrowError', () => {
@@ -93,7 +95,7 @@ describe('SimpleAccountAPI', () => {
       await expect(
         entryPoint.handleOps([userOp], beneficiary)
           .catch(rethrowError))
-        .to.revertedWith('FailedOp: ECDSA: invalid signature length')
+        .to.revertedWith('FailedOp: AA23 reverted: ECDSA: invalid signature length')
     })
     it('should parse Error(message) error', async () => {
       await expect(
@@ -109,14 +111,14 @@ describe('SimpleAccountAPI', () => {
     })
   })
 
-  it('should use wallet API after creation without a factory', async function () {
-    if (!walletDeployed) {
+  it('should use account API after creation without a factory', async function () {
+    if (!accountDeployed) {
       this.skip()
     }
     const api1 = new SimpleAccountAPI({
       provider,
       entryPointAddress: entryPoint.address,
-      walletAddress,
+      accountAddress,
       owner
     })
     const op1 = await api1.createSignedUserOp({
@@ -124,6 +126,38 @@ describe('SimpleAccountAPI', () => {
       data: recipient.interface.encodeFunctionData('something', ['world'])
     })
     await expect(entryPoint.handleOps([op1], beneficiary)).to.emit(recipient, 'Sender')
-      .withArgs(anyValue, walletAddress, 'world')
+      .withArgs(anyValue, accountAddress, 'world')
+  })
+
+  it('should use entryPointWrapper to get counterfactual address', async function () {
+    const entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
+    const owner2 = Wallet.createRandom()
+    const factoryAddress = await DeterministicDeployer.deploy(new SimpleAccountFactory__factory(), 0, [entryPoint.address])
+    const api1 = new SimpleAccountAPI({
+      provider,
+      entryPointAddress: entryPoint.address,
+      entryPointWrapperAddress: entryPointWrapper.address,
+      owner: owner2,
+      factoryAddress
+    })
+
+    const initCode = await api1.getAccountInitCode()
+    const addressFromEPW = await entryPointWrapper.callStatic.getSenderAddress(initCode)
+    accountAddress = await api1.getCounterFactualAddress()
+    expect(addressFromEPW).to.deep.eq(accountAddress)
+    expect(await provider.getCode(accountAddress).then(code => code.length)).to.equal(2)
+
+    await signer.sendTransaction({
+      to: accountAddress,
+      value: parseEther('0.1')
+    })
+    const op1 = await api1.createSignedUserOp({
+      target: recipient.address,
+      data: recipient.interface.encodeFunctionData('something', ['hello'])
+    })
+
+    await expect(entryPoint.handleOps([op1], beneficiary)).to.emit(recipient, 'Sender')
+      .withArgs(anyValue, accountAddress, 'hello')
+    expect(await provider.getCode(accountAddress).then(code => code.length)).to.greaterThan(1000)
   })
 })

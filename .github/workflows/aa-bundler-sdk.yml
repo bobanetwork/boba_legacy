@@ -1,0 +1,30 @@
+name: Publish AA-Bundler to NPM
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      # only on change
+      - 'packages/boba/bundler_sdk/**/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies and build 🔧
+        run: yarn install --frozen-lockfile --legacy-peer-deps && yarn run build
+      - name: Increment patch version
+        working-directory: ./packages/boba/bundler_sdk
+        run: npm version minor --legacy-peer-deps
+      - name: Publish package on NPM 📦
+        working-directory: ./packages/boba/bundler_sdk
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOBA_FOUNDATION }}

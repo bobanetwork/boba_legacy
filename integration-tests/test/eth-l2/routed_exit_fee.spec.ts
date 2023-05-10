@@ -43,7 +43,7 @@ describe('Standard Exit Fee', async () => {
     ExitFeeContract = await deployBobaContractCore(
       'DiscretionaryExitFee',
       [L2StandardBridgeAddress],
-      env.l2Wallet,
+      env.l2Wallet
     )
 
     await ExitFeeContract.configureBillingContractAddress(
@@ -54,13 +54,13 @@ describe('Standard Exit Fee', async () => {
     L1ERC20 = await deployBobaContractCore(
       'L1ERC20',
       [initialSupply, tokenName, tokenSymbol, 18],
-      env.l1Wallet,
+      env.l1Wallet
     )
 
     OMGLIkeToken = await deployBobaContractCore(
       'OMGLikeToken',
       [],
-      env.l1Wallet,
+      env.l1Wallet
     )
     Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
 

@@ -1,12 +1,11 @@
 import { SampleRecipient, SampleRecipient__factory } from '@boba/bundler_utils/dist/src/types'
 import { ethers } from 'hardhat'
 import { ClientConfig, ERC4337EthersProvider, wrapProvider } from '../src'
-import { EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
+import { EntryPoint, EntryPoint__factory, EntryPointWrapper, EntryPointWrapper__factory } from '@boba/accountabstraction'
 import { expect } from 'chai'
 import { parseEther } from 'ethers/lib/utils'
 import { Wallet } from 'ethers'
 import { anyValue } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
-
 const provider = ethers.provider
 const signer = provider.getSigner()
 
@@ -14,15 +13,17 @@ describe('ERC4337EthersSigner, Provider', function () {
   let recipient: SampleRecipient
   let aaProvider: ERC4337EthersProvider
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
   before('init', async () => {
     const deployRecipient = await new SampleRecipient__factory(signer).deploy()
     entryPoint = await new EntryPoint__factory(signer).deploy()
+    entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
     const config: ClientConfig = {
       entryPointAddress: entryPoint.address,
       bundlerUrl: ''
     }
     const aasigner = Wallet.createRandom()
-    aaProvider = await wrapProvider(provider, config, aasigner)
+    aaProvider = await wrapProvider(provider, config, aasigner, entryPointWrapper.address)
 
     const beneficiary = provider.getSigner().getAddress()
     // for testing: bypass sending through a bundler, and send directly to our entrypoint..
@@ -47,19 +48,19 @@ describe('ERC4337EthersSigner, Provider', function () {
       await recipient.something('hello', { gasLimit: 1e6 })
       throw new Error('should revert')
     } catch (e: any) {
-      expect(e.message).to.eq('FailedOp(0,0x0000000000000000000000000000000000000000,account didn\'t pay prefund)')
+      expect(e.message).to.eq('FailedOp(0,AA21 didn\'t pay prefund)')
     }
   })
 
   it('should use ERC-4337 Signer and Provider to send the UserOperation to the bundler', async function () {
-    const walletAddress = await aaProvider.getSigner().getAddress()
+    const accountAddress = await aaProvider.getSigner().getAddress()
     await signer.sendTransaction({
-      to: walletAddress,
+      to: accountAddress,
       value: parseEther('0.1')
     })
     const ret = await recipient.something('hello')
     await expect(ret).to.emit(recipient, 'Sender')
-      .withArgs(anyValue, walletAddress, 'hello')
+      .withArgs(anyValue, accountAddress, 'hello')
   })
 
   it('should revert if on-chain userOp execution reverts', async function () {

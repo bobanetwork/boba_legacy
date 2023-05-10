@@ -1,5 +1,4 @@
 import { HardhatUserConfig } from 'hardhat/types'
-
 // Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
@@ -13,7 +12,7 @@ const config: HardhatUserConfig = {
     },
     boba: {
       url: process.env.L2_URL || 'http://localhost:8545',
-      gas: "auto"
+      gas: 'auto',
     },
   },
   mocha: {

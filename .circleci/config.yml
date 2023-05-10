@@ -46,6 +46,9 @@ commands:
       docker_compose_file:
         description: Docker compose file to use
         type: string
+      docker_compose_side_file:
+        description: Docker compose side file to use
+        type: string
       test_folder:
         description: Folder to run tests in
         type: string
@@ -79,13 +82,13 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer
+            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml logs --follow
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
@@ -100,7 +103,7 @@ commands:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml down -v
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> down -v
           working_directory: ops
   report-integration-tests:
     steps:
@@ -167,31 +170,6 @@ jobs:
                 command: make <<parameters.binary_name>>
                 working_directory: <<parameters.working_directory>>
 
-  test_flow_bundler_and_depcheck:
-    docker: # run the steps with Docker
-      - image: cimg/node:16.6.2
-    steps: # a collection of executable commands
-      - checkout
-      - attach_workspace:
-          at: .
-      - run: # run hardhat-node as standalone process fork
-          command: yarn && yarn build
-          working_directory: ./
-      - run: # run hardhat-node as standalone process fork
-          name: hardhat-node-process
-          command: yarn hardhat-node
-          background: true
-          working_directory: ./packages/boba/bundler
-      - run: # run tests
-          name: test
-          command: yarn test-flows | tee /tmp/test-flows-results.log
-          working_directory: ./packages/boba/bundler
-      - run:
-          name: depcheck
-          command: yarn depcheck
-          working_directory: ./packages/boba/bundler
-      - store_test_results: # special step to upload test results for display in Test Summary
-          path: /tmp/test-flow-results.log
   integration-tests:
     executor: intergration-tests-executor
     parallelism: 4
@@ -199,6 +177,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose.yml"
+          docker_compose_side_file: "docker-compose-side.yml"
           test_folder: "eth-l2"
       - report-integration-tests
 
@@ -209,6 +188,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-moonbeam.yml"
+          docker_compose_side_file: "docker-compose-moonbeam-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -219,6 +199,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-avalanche.yml"
+          docker_compose_side_file: "docker-compose-avalanche-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -229,6 +210,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-bnb.yml"
+          docker_compose_side_file: "docker-compose-bnb-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -239,6 +221,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-fantom.yml"
+          docker_compose_side_file: "docker-compose-fantom-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -254,5 +237,4 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-      # - test_flow_bundler_and_depcheck
 

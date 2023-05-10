@@ -3,7 +3,11 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, utils, BigNumber } from 'ethers'
-import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
+import {
+  deployBobaContractCore,
+  getBobaContractABI,
+  getBobaContractAt,
+} from '@boba/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -95,8 +99,14 @@ describe('NFT Bridge Test', async () => {
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
 
+      const depositMap = await L1Bridge.deposits(
+        L1ERC721.address,
+        DUMMY_TOKEN_ID
+      )
+
       expect(ownerL1).to.deep.eq(L1Bridge.address)
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
+      expect(depositMap).to.deep.eq(L2ERC721.address)
     })
 
     it('should be able to transfer NFT on L2', async () => {
@@ -155,6 +165,12 @@ describe('NFT Bridge Test', async () => {
 
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       expect(ownerL1).to.be.deep.eq(env.l2Wallet_2.address)
+
+      const depositMap = await L1Bridge.deposits(
+        L1ERC721.address,
+        DUMMY_TOKEN_ID
+      )
+      expect(depositMap).to.deep.eq(ethers.constants.AddressZero)
     })
 
     it('should deposit NFT to another L2 wallet', async () => {
@@ -410,8 +426,11 @@ describe('NFT Bridge Test', async () => {
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
 
+      const exitsMap = await L2Bridge.exits(L2ERC721.address, DUMMY_TOKEN_ID)
+
       expect(ownerL1).to.deep.eq(env.l2Wallet.address)
       expect(ownerL2).to.deep.eq(L2Bridge.address)
+      expect(exitsMap).to.deep.eq(L1ERC721.address)
     })
 
     it('should be able to transfer NFT on L1', async () => {
@@ -462,6 +481,9 @@ describe('NFT Bridge Test', async () => {
 
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
+
+      const exitsMap = await L2Bridge.exits(L2ERC721.address, DUMMY_TOKEN_ID)
+      expect(exitsMap).to.deep.eq(ethers.constants.AddressZero)
     })
 
     it('should fail to exit NFT to another L1 wallet if not paying enough Boba', async () => {
@@ -472,7 +494,7 @@ describe('NFT Bridge Test', async () => {
           env.l2Wallet_2.address,
           DUMMY_TOKEN_ID,
           9999999,
-          { value: exitFee.sub(BigNumber.from('1'))}
+          { value: exitFee.sub(BigNumber.from('1')) }
         )
       ).to.be.revertedWith('Insufficient Boba amount')
     })
@@ -769,7 +791,10 @@ describe('NFT Bridge Test', async () => {
     })
 
     it('should deposit NFT to L2 when approved for all', async () => {
-      const approveTx = await L1ERC721.setApprovalForAll(env.l1Wallet_2.address, true)
+      const approveTx = await L1ERC721.setApprovalForAll(
+        env.l1Wallet_2.address,
+        true
+      )
       await approveTx.wait()
 
       await env.waitForXDomainTransaction(
@@ -2022,7 +2047,9 @@ describe('NFT Bridge Test', async () => {
 
       const exitFee = await BOBABillingContract.exitFee()
       await env.waitForRevertXDomainTransactionL1(
-        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999, { value: exitFee })
+        L2Bridge.withdraw(L2ERC721.address, DUMMY_TOKEN_ID, 9999999, {
+          value: exitFee,
+        })
       )
 
       await expect(L1ERC721.ownerOf(DUMMY_TOKEN_ID)).to.be.revertedWith(
