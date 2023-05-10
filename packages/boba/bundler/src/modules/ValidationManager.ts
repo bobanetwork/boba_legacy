@@ -4,7 +4,7 @@ import { ReputationManager } from './ReputationManager'
 import { BigNumber, BigNumberish, BytesLike, ethers } from 'ethers'
 import { requireCond, RpcError } from '../utils'
 import { AddressZero } from '@boba/bundler_utils'
-import { calcPreVerificationGas } from '@boba/bundler_sdk/dist/calcPreVerificationGas'
+import { calcPreVerificationGas } from '@bobanetwork/bundler_sdk/dist/calcPreVerificationGas'
 
 import Debug from 'debug'
 import { GetCodeHashes__factory } from '../../dist/src/types'
