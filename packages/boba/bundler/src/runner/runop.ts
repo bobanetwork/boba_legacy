@@ -16,7 +16,7 @@ import {
   DeterministicDeployer,
   HttpRpcClient,
   SimpleAccountAPI,
-} from '@boba/bundler_sdk'
+} from '@bobanetwork/bundler_sdk'
 import { runBundler } from '../runBundler'
 import { BundlerServer } from '../BundlerServer'
 

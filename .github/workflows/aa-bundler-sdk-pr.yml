@@ -1,0 +1,18 @@
+name: Will trigger release of AA-Bundler to NPM (PR comment)
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ⚠️ **This PR triggers a minor release of the Bundler SDK** (Account Abstraction) to NPM as you made changes in the corresponding `bundler_sdk` directory.
+
+            Please make sure this is intentional.
+
+            The package that is going to be updated is `@bobanetwork/bundler_sdk`.
