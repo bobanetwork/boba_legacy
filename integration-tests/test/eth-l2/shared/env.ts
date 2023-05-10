@@ -342,7 +342,9 @@ export class OptimismEnv {
     tx: Promise<TransactionResponse> | TransactionResponse
   ) {
     const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
-    const backTx = await this.messenger.l2Provider.getTransaction(remoteReceipt.transactionHash)
+    const backTx = await this.messenger.l2Provider.getTransaction(
+      remoteReceipt.transactionHash
+    )
     await this.waitForXDomainTransaction(backTx)
   }
 
@@ -350,7 +352,9 @@ export class OptimismEnv {
     tx: Promise<TransactionResponse> | TransactionResponse
   ) {
     const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
-    const backTx = await this.messenger.l1Provider.getTransaction(remoteReceipt.transactionHash)
+    const backTx = await this.messenger.l1Provider.getTransaction(
+      remoteReceipt.transactionHash
+    )
     await this.waitForXDomainTransaction(backTx)
   }
 }

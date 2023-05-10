@@ -63,11 +63,11 @@ describe('AA Wallet Test\n', async () => {
     console.log('Account deployed to:', account)
 
     const accountAPI = new SimpleAccountAPI({
-        provider: env.l2Provider,
-        entryPointAddress,
-        owner: env.l2Wallet,
-        accountAddress: account
-      })
+      provider: env.l2Provider,
+      entryPointAddress,
+      owner: env.l2Wallet,
+      accountAddress: account,
+    })
 
     const op = await accountAPI.createSignedUserOp({
       target: recipient.address,
@@ -105,21 +105,29 @@ describe('AA Wallet Test\n', async () => {
       env.l2Wallet
     )
 
-    const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
+    const entryPointWrapper = await EntryPointWrapper__factory.deploy(
+      entryPointAddress
+    )
 
     const aasigner = env.l2Provider.getSigner()
     const config = {
-    chainId: await env.l2Provider.getNetwork().then(net => net.chainId),
-    entryPointAddress,
-    bundlerUrl: env.bundlerUrl
+      chainId: await env.l2Provider.getNetwork().then((net) => net.chainId),
+      entryPointAddress,
+      bundlerUrl: env.bundlerUrl,
     }
 
-    const aaProvider = await wrapProvider(env.l2Provider, config, aasigner, entryPointWrapper.address, env.l2Wallet_3)
+    const aaProvider = await wrapProvider(
+      env.l2Provider,
+      config,
+      aasigner,
+      entryPointWrapper.address,
+      env.l2Wallet_3
+    )
 
     const walletAddress = await aaProvider.getSigner().getAddress()
     await env.l2Wallet.sendTransaction({
-        value: utils.parseEther('2'),
-        to: walletAddress,
+      value: utils.parseEther('2'),
+      to: walletAddress,
     })
 
     recipient = recipient.connect(aaProvider.getSigner())
@@ -140,8 +148,9 @@ describe('AA Wallet Test\n', async () => {
     expect(log.args.message).to.eq('hello')
   })
   it('should deploy a wallet if it does not exist through initCode', async () => {
-
-    const accountFactory = await SimpleAccount__factory.deploy(entryPointAddress)
+    const accountFactory = await SimpleAccount__factory.deploy(
+      entryPointAddress
+    )
     await accountFactory.deployed()
     console.log('Account Factory deployed to:', accountFactory.address)
 
@@ -152,7 +161,9 @@ describe('AA Wallet Test\n', async () => {
       env.l2Wallet
     )
 
-    const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
+    const entryPointWrapper = await EntryPointWrapper__factory.deploy(
+      entryPointAddress
+    )
 
     const accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
@@ -165,7 +176,9 @@ describe('AA Wallet Test\n', async () => {
     const accountAddress = await accountAPI.getAccountAddress()
 
     // computed address is correct
-    expect(accountAddress).to.be.eq(await accountFactory.getAddress(env.l2Wallet_2.address, 0))
+    expect(accountAddress).to.be.eq(
+      await accountFactory.getAddress(env.l2Wallet_2.address, 0)
+    )
 
     await env.l2Wallet.sendTransaction({
       value: utils.parseEther('2'),
