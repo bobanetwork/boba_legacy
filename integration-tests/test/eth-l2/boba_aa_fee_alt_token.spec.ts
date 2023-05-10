@@ -11,7 +11,6 @@ import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@boba/bundler_sdk'
-import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
@@ -133,13 +132,6 @@ describe('AA Alt Fee Token Test\n', async () => {
       await accountFactory.createAccount(env.l2Wallet.address, 0)
       account = await accountFactory.getAddress(env.l2Wallet.address, 0)
       console.log('Account deployed to:', account)
-      // const SenderCreator__factory = new ContractFactory(
-      //     SenderCreatorJson.abi,
-      //     SenderCreatorJson.bytecode,
-      //     env.l2Wallet
-      //   )
-      // const senderCreator = await SenderCreator__factory.deploy()
-      // console.log('Sender Creator Factory deployed to:', senderCreator.address)
 
       await L2ERC20Token.transfer(account, utils.parseEther('1'))
 
@@ -156,7 +148,6 @@ describe('AA Alt Fee Token Test\n', async () => {
       accountAPI = new SimpleAccountAPI({
         provider: env.l2Provider,
         entryPointAddress,
-        //senderCreatorAddress: senderCreator.address,
         owner: env.l2Wallet,
         accountAddress: account
       })

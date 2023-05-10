@@ -19,15 +19,15 @@ const debug = Debug('aa.wrapProvider')
  * @param originalProvider the normal provider
  * @param config see ClientConfig for more info
  * @param originalSigner use this signer as the owner. of this wallet. By default, use the provider's signer
+ * @param entryPointWrapperAddress boba does not return revert data for custom errors, if on boba pass an entryPointWrapperAddress to compute account address
  * @param wallet optional, boba does not allow eth_sendTransaction from a remote signer, if on boba pass wallet
- * @param senderCreatorAddress optional, boba does not return revert data for custom errors, if on boba pass a senderCreator to compute account address
  */
 export async function wrapProvider (
   originalProvider: JsonRpcProvider,
   config: ClientConfig,
   originalSigner: Signer = originalProvider.getSigner(),
-  wallet?: Wallet,
-  senderCreatorAddress?: string
+  entryPointWrapperAddress: string,
+  wallet?: Wallet
 ): Promise<ERC4337EthersProvider> {
   const entryPoint = EntryPoint__factory.connect(config.entryPointAddress, originalProvider)
   // Initial SimpleAccount instance is not deployed and exists just for the interface
@@ -43,7 +43,7 @@ export async function wrapProvider (
     provider: originalProvider,
     entryPointAddress: entryPoint.address,
     owner: smartWalletAPIOwner,
-    senderCreatorAddress: senderCreatorAddress,
+    entryPointWrapperAddress: entryPointWrapperAddress,
     factoryAddress: SimpleAccountFactory,
     paymasterAPI: config.paymasterAPI
   })
