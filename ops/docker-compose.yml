@@ -252,6 +252,7 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      FORCE_PUSH_PERIOD_S: 604800
 
   # a second relay system for messages that need to get to L1 quickly
   # NOTE - all withdrawal messages use the standard relayer with its 7 day window
@@ -279,6 +280,7 @@ services:
       FILTER_POLLING_INTERVAL: 30000
       MAX_WAIT_TIME_S: 5
       MAX_WAIT_TX_TIME_S: 5
+      FORCE_PUSH_PERIOD_S: 604800
       FAST_RELAYER: 'true'
 
   batch_submitter:

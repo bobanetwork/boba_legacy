@@ -80,6 +80,8 @@ interface MessageRelayerOptions {
 
   maxWaitTxTimeS: number
 
+  forcePushPeriodS: number
+
   isFastRelayer: boolean
 
   enableRelayerFilter: boolean
@@ -118,6 +120,9 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       maxWaitTxTimeS: {
         default: 180,
       },
+      forcePushPeriodS: {
+        default: 604800,
+      },
     })
   }
 
@@ -133,6 +138,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     messageBuffer: Array<any>
     timeOfLastPendingRelay: any
     didWork: boolean
+    highGasPriceInGwei: number
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -144,6 +150,7 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
       getLogsInterval: this.options.getLogsInterval,
       minBatchSize: this.options.minBatchSize,
       maxWaitTimeS: this.options.maxWaitTimeS,
+      forcePushPeriodS: this.options.forcePushPeriodS,
       isFastRelayer: this.options.isFastRelayer,
     })
 
@@ -167,6 +174,8 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
     this.state.timeOfLastRelayS = Date.now()
     this.state.messageBuffer = []
     this.state.timeOfLastPendingRelay = false
+
+    this.state.highGasPriceInGwei = 150
   }
 
   protected async _start(): Promise<void> {
@@ -241,32 +250,31 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
           (bufferFull || timeOut) &&
           pendingTXTimeOut
         ) {
-          if (gasPriceAcceptable) {
+          if (bufferFull) {
+            console.log('Buffer full: flushing')
+          }
+          if (timeOut) {
+            console.log('Buffer timeout: flushing')
+          }
+
+          // Filter out messages which have been processed
+          const newMB = []
+          for (const cur of this.state.messageBuffer) {
+            const status =
+              await this.state.messenger.getMessageStatusFromContracts(cur, {
+                fromBlock: this.options.l1StartOffset,
+              })
+            if (
+              // check failed message here too
+              status !== MessageStatus.RELAYED &&
+              status !== MessageStatus.RELAYED_FAILED
+            ) {
+              newMB.push(cur)
+            }
+          }
+          this.state.messageBuffer = newMB
+          if (gasPriceAcceptable || this._forcePush(this.state.messageBuffer)) {
             this.state.didWork = true
-            if (bufferFull) {
-              console.log('Buffer full: flushing')
-            }
-            if (timeOut) {
-              console.log('Buffer timeout: flushing')
-            }
-
-            // Filter out messages which have been processed
-            const newMB = []
-            for (const cur of this.state.messageBuffer) {
-              const status =
-                await this.state.messenger.getMessageStatusFromContracts(cur, {
-                  fromBlock: this.options.l1StartOffset,
-                })
-              if (
-                // check failed message here too
-                status !== MessageStatus.RELAYED &&
-                status !== MessageStatus.RELAYED_FAILED
-              ) {
-                newMB.push(cur)
-              }
-            }
-            this.state.messageBuffer = newMB
-
             if (this.state.messageBuffer.length === 0) {
               this.state.timeOfLastPendingRelay = false
             } else {
@@ -305,12 +313,23 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
               const minGasPrice = await this._getGasPriceInGwei(
                 this.options.l1Wallet
               )
+
+              // find max gas Price
+              let maxGasPrice = this.options.maxGasPriceInGwei
+              if (
+                gasPriceGwei >= this.options.maxGasPriceInGwei &&
+                gasPriceGwei <= this.state.highGasPriceInGwei
+              ) {
+                maxGasPrice = gasPriceGwei + 10
+              }
+
               let receipt
               try {
+                // if through force push, check condition and set maxGasPrice accordingly
                 receipt = await ynatm.send({
                   sendTransactionFunction: sendTxAndWaitForReceipt,
                   minGasPrice: ynatm.toGwei(minGasPrice),
-                  maxGasPrice: ynatm.toGwei(this.options.maxGasPriceInGwei),
+                  maxGasPrice: ynatm.toGwei(maxGasPrice),
                   gasPriceScalingFunction: ynatm.LINEAR(
                     this.options.gasRetryIncrement
                   ),
@@ -556,5 +575,39 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
   private async _getGasPriceInGwei(signer): Promise<number> {
     return parseInt(utils.formatUnits(await signer.getGasPrice(), 'gwei'), 10)
+  }
+
+  private async _forcePush(messageBuffer: Array<any>): Promise<boolean> {
+    // add condition for message relayer fast
+    // check state root time, check if now > state root time + challengePerioFromSDK + options.forcePushTime
+    // if yes, return true otherwise return false
+
+    const stateRoot = await this.state.messenger.getMessageStateRoot(
+      messageBuffer[0],
+      {
+        fromBlock: this.options.l1StartOffset,
+      }
+    )
+    // this should never happen
+    if (stateRoot === null) {
+      return false
+    }
+
+    // this should handle the fast-relayer condition
+    const challengePeriod =
+      await this.state.messenger.getChallengePeriodSeconds()
+    const targetBlock = await this.state.messenger.l1Provider.getBlock(
+      stateRoot.batch.blockNumber
+    )
+    const latestBlock = await this.state.messenger.l1Provider.getBlock('latest')
+
+    if (
+      latestBlock.timestamp >
+      targetBlock.timestamp + challengePeriod + this.options.forcePushPeriodS
+    ) {
+      return true
+    } else {
+      return false
+    }
   }
 }

@@ -68,6 +68,10 @@ const main = async () => {
     'max-wait-tx-time-s',
     parseInt(env.MAX_WAIT_TX_TIME_S, 10) || 180
   )
+  const FORCE_PUSH_PERIOD_S = config.uint(
+    'force-push-period-s',
+    parseInt(env.FORCE_PUSH_PERIOD_S, 10) || 604800
+  )
   const RELAY_GAS_LIMIT = config.uint(
     'relay-gas-limit',
     parseInt(env.RELAY_GAS_LIMIT, 10) || 4000000
@@ -177,6 +181,7 @@ const main = async () => {
     isFastRelayer: FAST_RELAYER,
     enableRelayerFilter: ENABLE_RELAYER_FILTER,
     relayerFilterWhitelist: RELAYER_FILTER_WHITELIST,
+    forcePushPeriodS: FORCE_PUSH_PERIOD_S,
   })
 
   await service.start()
