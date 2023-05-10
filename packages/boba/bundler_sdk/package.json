@@ -1,5 +1,5 @@
 {
-  "name": "@boba/bundler_sdk",
+  "name": "@bobanetwork/bundler_sdk",
   "version": "0.2.3",
   "main": "./dist/index.js",
   "license": "MIT",

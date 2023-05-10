@@ -5,7 +5,7 @@ import { BundlerReputationParams, ReputationManager } from '../src/modules/Reput
 import { UserOperation } from '../src/modules/moduleUtils'
 import { AddressZero } from '@boba/bundler_utils'
 import { isGeth } from '../src/utils'
-import { DeterministicDeployer } from '@boba/bundler_sdk'
+import { DeterministicDeployer } from '@bobanetwork/bundler_sdk'
 import { MempoolManager } from '../src/modules/MempoolManager'
 import { BundleManager } from '../src/modules/BundleManager'
 import { ethers } from 'hardhat'
