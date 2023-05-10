@@ -55,7 +55,7 @@ private async _updateGasPrice(): Promise<void> {
 
 * History support for the **webwallet**. Also, for mainnet, the webwallet now shows more information about transactions, so that wallet users can see the status of their transactions including block data, hashes, and cross-chain timestamps and receipts.
 
-* Name change for the **webwallet**. Reflecting its broad actual use (wallet, earn/stake, NFT minting, transaction histories, DAO interface, and more...) the webwallet will be renamed to **gateway**. The current endpoints will keep working, but in the near future, https://gateway.rinkeby.boba.network (and https://gateway.mainnet.boba.network) will serve as the main initial points of contact with the Boba L2.
+* Name change for the **webwallet**. Reflecting its broad actual use (wallet, earn/stake, NFT minting, transaction histories, DAO interface, and more...) the webwallet will be renamed to **gateway**. The current endpoints will keep working, but in the near future, https://gateway.boba.network will serve as the main initial points of contact with the Boba L2.
 
 ## 2. Hybrid Compute
 

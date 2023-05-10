@@ -21,7 +21,7 @@ description: A collection of links and addresses to get started on Boba-BNB
 
 ### Testnet Fountain for Developers on BNB Testnet L2
 
-There is a Boba BNB testnet [fountain](https://gateway.testnet.bnb.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba BNB testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Boba BNB testnet [fountain](https://gateway.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba BNB testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 
@@ -56,15 +56,15 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Boba BNB Testnet Links and Endpoints
 
-|               |                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| ChainID       | 9728                                                                                             |
-| RPC           | [https://testnet.bnb.boba.network](https://testnet.bnb.boba.network)                             |
-| Replica RPC   | [https://replica.testnet.bnb.boba.network](https://replica.testnet.bnb.boba.network)             |
-| Gateway       | [https://gateway.testnet.bnb.boba.network](https://gateway.testnet.bnb.boba.network)             |
+|               |                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------- |
+| ChainID       | 9728                                                                                    |
+| RPC           | [https://testnet.bnb.boba.network](https://testnet.bnb.boba.network)                    |
+| Replica RPC   | [https://replica.testnet.bnb.boba.network](https://replica.testnet.bnb.boba.network)    |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer | [https://blockexplorer.testnet.bnb.boba.network](https://blockexplorer.testnet.bnb.boba.network) |
-| Websocket     | [wss://wss.testnet.bnb.boba.network](wss://wss.testnet.bnb.boba.network)                         |
-| Gas Cap       | 50000000                                                                                         |
+| Websocket     | [wss://wss.testnet.bnb.boba.network](wss://wss.testnet.bnb.boba.network)                |
+| Gas Cap       | 50000000                                                                                |
 
 
 
@@ -97,12 +97,12 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 
 ### Boba BNB Links and Endpoints (tbd)
 
-|               |                                                                                  |
-| ------------- | -------------------------------------------------------------------------------- |
-| ChainID       | 56288                                                                            |
-| RPC           | [https://bnb.boba.network](https://bnb.boba.network)                             |
-| Replica RPC   | [https://replica.bnb.boba.network](https://replica.bnb.boba.network)             |
-| Gateway       | [https://gateway.bnb.boba.network](https://gateway.bnb.boba.network)             |
+|               |                                                                                |
+| ------------- | ------------------------------------------------------------------------------ |
+| ChainID       | 56288                                                                          |
+| RPC           | [https://bnb.boba.network](https://bnb.boba.network)                           |
+| Replica RPC   | [https://replica.bnb.boba.network](https://replica.bnb.boba.network)           |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
 | Blockexplorer | [https://blockexplorer.bnb.boba.network](https://blockexplorer.bnb.boba.network) |
-| Websocket     | [wss://wss.bnb.boba.network](wss://wss.bnb.boba.network)                         |
-| Gas Cap       | 50000000                                                                         |
+| Websocket     | [wss://wss.bnb.boba.network](wss://wss.bnb.boba.network)                       |
+| Gas Cap       | 50000000                                                                       |

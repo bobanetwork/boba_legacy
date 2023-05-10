@@ -91,7 +91,7 @@ Example code can be found here: [bridgeFromEthereumToAltL.js](https://github.com
 
 <figure><img src="../../../.gitbook/assets/Artboard 2 (19).png" alt=""><figcaption></figcaption></figure>
 
-For normal users, you can go to [Alt L1 Gateway](https:/gateway.\[CHAIN\_NAME].boba.network) first, then head to [wallet](https:/gateway.\[CHAIN\_NAME].boba.network/wallet/) page. After connecting to it on Alt L1, you can click the `Bridge To Ethereum` button to bridge your BOBA tokens from Alt L1 to Ethereum.
+For normal users, you can go to [Alt L1 Gateway](https://gateway.boba.network) first, then head to [wallet](https://gateway.boba.network/wallet/) page. After connecting to it on Alt L1, you can click the `Bridge To Ethereum` button to bridge your BOBA tokens from Alt L1 to Ethereum.
 
 For developers, you can interact with [`AltL1Bridge` (opens new window)](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/lzTokenBridge/AltL1Bridge.sol) to deposit BOBA tokens from Alt L1 to Ethereum.
 
