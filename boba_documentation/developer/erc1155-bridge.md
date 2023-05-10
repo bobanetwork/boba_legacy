@@ -7,6 +7,8 @@ BOBA ERC1155 bridges consists of two bridge contracts. The [L1ERC1155Bridge](htt
 
 Bridging a token to Boba takes several minutes, and bridging a token from Boba to Layer 1 takes 7 days. **Not all tokens are bridgeable - developers must use specialized token contracts (e.g. L2StandardERC1155.sol) to enable this functionality.**
 
+When deploying your L2StandardERC1155, please take caution if you extend the contract with more features, as an incorrect implementation may result in loss of tokens.
+For instance, do not add a method that would allow updating the corresponding 'l1Contract' address for an L2StandardERC1155. An update in between operation would deem the previous tokens to be locked on the bridge. Furthermore, The ERC1155Bridge contracts use the information at the time of registration to obtain the l1Token information and send messages between the bridges.
 
 
 <figure><img src="../../.gitbook/assets/Artboard 1 (14).png" alt=""><figcaption></figcaption></figure>
