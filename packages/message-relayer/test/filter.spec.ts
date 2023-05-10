@@ -1,7 +1,7 @@
 import { expect } from './setup'
 import { ethers } from 'hardhat'
 import { MessageRelayerService } from '../src'
-import { Server } from "http";
+import { Server } from 'http'
 
 describe('message relayer filter tests', () => {
   const Proxy__L1StandardBridge = ethers.Wallet.createRandom().address

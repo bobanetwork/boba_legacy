@@ -5,7 +5,11 @@ import {
   TransactionReceipt,
 } from '@ethersproject/providers'
 import { sleep } from '@eth-optimism/core-utils'
-import { CrossChainMessenger, MessageStatus, MessageDirection } from '@eth-optimism/sdk'
+import {
+  CrossChainMessenger,
+  MessageStatus,
+  MessageDirection,
+} from '@eth-optimism/sdk'
 
 /* Imports: Internal */
 import {
@@ -318,7 +322,9 @@ export class OptimismEnv {
     tx: Promise<TransactionResponse> | TransactionResponse
   ) {
     const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
-    const backTx = await this.messenger.l2Provider.getTransaction(remoteReceipt.transactionHash)
+    const backTx = await this.messenger.l2Provider.getTransaction(
+      remoteReceipt.transactionHash
+    )
     await this.waitForXDomainTransaction(backTx)
   }
 
@@ -326,7 +332,9 @@ export class OptimismEnv {
     tx: Promise<TransactionResponse> | TransactionResponse
   ) {
     const { remoteReceipt } = await this.waitForXDomainTransaction(tx)
-    const backTx = await this.messenger.l1Provider.getTransaction(remoteReceipt.transactionHash)
+    const backTx = await this.messenger.l1Provider.getTransaction(
+      remoteReceipt.transactionHash
+    )
     await this.waitForXDomainTransaction(backTx)
   }
 
