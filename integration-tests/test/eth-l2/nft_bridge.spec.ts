@@ -3,7 +3,11 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, utils } from 'ethers'
-import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
+import {
+  deployBobaContractCore,
+  getBobaContractABI,
+  getBobaContractAt,
+} from '@boba/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -102,7 +106,10 @@ describe('NFT Bridge Test', async () => {
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       const ownerL2 = await L2ERC721.ownerOf(DUMMY_TOKEN_ID)
 
-      const depositMap = await L1Bridge.deposits(L1ERC721.address, DUMMY_TOKEN_ID)
+      const depositMap = await L1Bridge.deposits(
+        L1ERC721.address,
+        DUMMY_TOKEN_ID
+      )
 
       expect(ownerL1).to.deep.eq(L1Bridge.address)
       expect(ownerL2).to.deep.eq(env.l2Wallet.address)
@@ -189,7 +196,10 @@ describe('NFT Bridge Test', async () => {
       const ownerL1 = await L1ERC721.ownerOf(DUMMY_TOKEN_ID)
       expect(ownerL1).to.be.deep.eq(env.l2Wallet_2.address)
 
-      const depositMap = await L1Bridge.deposits(L1ERC721.address, DUMMY_TOKEN_ID)
+      const depositMap = await L1Bridge.deposits(
+        L1ERC721.address,
+        DUMMY_TOKEN_ID
+      )
       expect(depositMap).to.deep.eq(ethers.constants.AddressZero)
     })
 

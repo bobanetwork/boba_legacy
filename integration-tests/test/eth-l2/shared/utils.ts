@@ -8,7 +8,7 @@ import {
   utils,
   constants,
 } from 'ethers'
-import { getContractInterface,predeploys } from '@eth-optimism/contracts'
+import { getContractInterface, predeploys } from '@eth-optimism/contracts'
 import { remove0x, sleep } from '@eth-optimism/core-utils'
 import {
   CrossChainMessenger,
@@ -443,7 +443,8 @@ export const getFilteredLogIndex = async (
     (log) =>
       log.topics.length > 0 &&
       log.topics[0] === eventTopic &&
-      (!emitterAddress || log.address.toLowerCase() === emitterAddress.toLowerCase())
+      (!emitterAddress ||
+        log.address.toLowerCase() === emitterAddress.toLowerCase())
   )
 
   return filteredLogs[0].logIndex
@@ -452,7 +453,7 @@ export const getFilteredLogIndex = async (
 export const waitForAndExecute = async (
   fn: () => Promise<any>,
   repeat: number,
-  intervalMs?: number,
+  intervalMs?: number
 ) => {
   while (repeat > 0) {
     try {
