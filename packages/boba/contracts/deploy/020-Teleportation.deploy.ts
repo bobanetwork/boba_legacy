@@ -25,7 +25,8 @@ const deployFn: DeployFunction = async (hre) => {
     [],
     (hre as any).deployConfig.deployer_l2
   )
-  const TeleportationDeploymentSubmission = getDeploymentSubmission(Teleportation)
+  const TeleportationDeploymentSubmission =
+    getDeploymentSubmission(Teleportation)
   await hre.deployments.save('Teleportation', TeleportationDeploymentSubmission)
   console.log(`Teleportation deployed to: ${Teleportation.address}`)
 
@@ -35,7 +36,8 @@ const deployFn: DeployFunction = async (hre) => {
     [Teleportation.address],
     (hre as any).deployConfig.deployer_l2
   )
-  const Proxy__TeleportationDeploymentSubmission = getDeploymentSubmission(Proxy__Teleportation)
+  const Proxy__TeleportationDeploymentSubmission =
+    getDeploymentSubmission(Proxy__Teleportation)
   await hre.deployments.save(
     'Proxy__Teleportation',
     Proxy__TeleportationDeploymentSubmission

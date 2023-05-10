@@ -26,7 +26,8 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
 
-  const L2LiquidityPoolDeploymentSubmission = getDeploymentSubmission(L2LiquidityPool)
+  const L2LiquidityPoolDeploymentSubmission =
+    getDeploymentSubmission(L2LiquidityPool)
 
   await registerBobaAddress(
     addressManager,
@@ -49,7 +50,8 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l1
   )
 
-  const L1LiquidityPoolDeploymentSubmission = getDeploymentSubmission(L1LiquidityPool)
+  const L1LiquidityPoolDeploymentSubmission =
+    getDeploymentSubmission(L1LiquidityPool)
 
   await registerBobaAddress(
     addressManager,

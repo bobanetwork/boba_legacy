@@ -199,7 +199,11 @@ describe('L1NFTBridge Tests', () => {
         'baseTokenUri'
       )
       await expect(
-        L1NFTBridge.registerNFTPair(IncorrectL1StandardERC721.address, ERC721.address, 'L2')
+        L1NFTBridge.registerNFTPair(
+          IncorrectL1StandardERC721.address,
+          ERC721.address,
+          'L2'
+        )
       ).to.be.revertedWith('L1 contract is not compatible with L2 contract')
     })
     it('cant register if not owner', async () => {
