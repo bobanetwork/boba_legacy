@@ -103,9 +103,9 @@ describe('AA Wallet Test\n', async () => {
       EntryPointWrapperJson.abi,
       EntryPointWrapperJson.bytecode,
       env.l2Wallet
-  )
+    )
 
-  const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
+    const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
 
     const aasigner = env.l2Provider.getSigner()
     const config = {
@@ -150,9 +150,9 @@ describe('AA Wallet Test\n', async () => {
       EntryPointWrapperJson.abi,
       EntryPointWrapperJson.bytecode,
       env.l2Wallet
-  )
+    )
 
-  const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
+    const entryPointWrapper = await EntryPointWrapper__factory.deploy(entryPointAddress)
 
     const accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
