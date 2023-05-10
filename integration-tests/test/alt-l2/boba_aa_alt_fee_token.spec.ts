@@ -11,13 +11,13 @@ import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 import { predeploys } from '@eth-optimism/contracts'
 // use local sdk
-import { SimpleAccountAPI } from '@boba/bundler_sdk'
+import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
+import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 
 import GPODepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/GPODepositPaymaster.sol/GPODepositPaymaster.json'
 
