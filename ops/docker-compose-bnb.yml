@@ -99,8 +99,7 @@ services:
       FRAUD_PROOF_WINDOW_SECONDS: 0
       L1_NODE_WEB3_URL: http://l1_chain:8545
       # these keys are hardhat's first 2 accounts, DO NOT use in production
-      << : *deployer_pk
-      << : *relayer_pk
+      << : [*deployer_pk, *relayer_pk]
       SEQUENCER_ADDRESS: "0xA2bC4Cf857f3D7a22b29c71774B4d8f25cc7edD0"
       PROPOSER_ADDRESS: "0x59b02D4d2F94ea5c55230715a58EBb0b703bCD4B"
       # setting the whitelist owner to address(0) disables the whitelist
@@ -145,9 +144,7 @@ services:
       ADDRESS_MANAGER_ADDRESS: "0xC194E4CFa59D2DfC520217dA22E23DF8D4658a37"
       URL: http://dtl:8081/addresses.json
       # DO NOT use in production
-      << : *deployer_pk
-      << : *relayer_pk
-      << : *fast-relayer_pk
+      << : [*deployer_pk, *relayer_pk, *fast-relayer_pk]
       RETRIES: 500
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
       # skip compilation when run in docker-compose, since the contracts
@@ -341,10 +338,7 @@ services:
       NO_NETWORK: 1
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
       RETRIES: 500
-      << : *integration_pk
-      << : *integration_2_pk
-      << : *integration_3_pk
-      << : *integration_4_pk
+      << : [*integration_pk, *integration_2_pk, *integration_3_pk, *integration_4_pk]
     volumes:
        - ~/result:/opt/optimism/integration-tests/result
     networks:

@@ -1,7 +1,7 @@
 import { SampleRecipient, SampleRecipient__factory } from '@boba/bundler_utils/dist/src/types'
 import { ethers } from 'hardhat'
 import { ClientConfig, ERC4337EthersProvider, wrapProvider } from '../src'
-import { EntryPoint, EntryPoint__factory } from '@boba/accountabstraction'
+import { EntryPoint, EntryPoint__factory, EntryPointWrapper, EntryPointWrapper__factory } from '@boba/accountabstraction'
 import { expect } from 'chai'
 import { parseEther } from 'ethers/lib/utils'
 import { Wallet } from 'ethers'
@@ -13,15 +13,17 @@ describe('ERC4337EthersSigner, Provider', function () {
   let recipient: SampleRecipient
   let aaProvider: ERC4337EthersProvider
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
   before('init', async () => {
     const deployRecipient = await new SampleRecipient__factory(signer).deploy()
     entryPoint = await new EntryPoint__factory(signer).deploy()
+    entryPointWrapper = await new EntryPointWrapper__factory(signer).deploy(entryPoint.address)
     const config: ClientConfig = {
       entryPointAddress: entryPoint.address,
       bundlerUrl: ''
     }
     const aasigner = Wallet.createRandom()
-    aaProvider = await wrapProvider(provider, config, aasigner)
+    aaProvider = await wrapProvider(provider, config, aasigner, entryPointWrapper.address)
 
     const beneficiary = provider.getSigner().getAddress()
     // for testing: bypass sending through a bundler, and send directly to our entrypoint..
