@@ -12,6 +12,7 @@ import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
 import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
+import { connectToDB, dbPool, disconnectDB } from './db'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -34,7 +35,9 @@ interface TeleportationOptions {
 
   blockRangePerPolling: number
 
-  dbPath: string
+  dbHost: string
+
+  dbPassword: string
 }
 
 const optionSettings = {}
@@ -123,7 +126,13 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
   }
 
+  protected async _stop(): Promise<void> {
+    await disconnectDB()
+  }
+
   protected async _start(): Promise<void> {
+    await connectToDB()
+
     while (this.running) {
       for (const depositTeleportation of this.state.depositTeleportations) {
         // search BobaReceived events
@@ -295,32 +304,37 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     chainId: number | string,
     latestBlock: number
   ): Promise<void> {
-    const dumpsPath = path.resolve(__dirname, this.options.dbPath)
-    if (!fs.existsSync(dumpsPath)) {
-      fs.mkdirSync(dumpsPath)
-    }
-    try {
-      const addrsPath = path.resolve(dumpsPath, `depositInfo-${chainId}.json`)
-      await fsPromise.writeFile(addrsPath, JSON.stringify({ latestBlock }))
-    } catch (error) {
-      this.logger.error(`Failed to put depositInfo! - ${error}`)
+    const err = await dbPool.query(
+      'INSERT INTO HistoryData (block_no, chain_id) VALUES ($1, $2) ON CONFLICT (chain_id) DO UPDATE SET block_no = $1',
+      [latestBlock, chainId]
+    )
+    if (err) {
+      this.logger.error(`Failed to put depositInfo! - ${err}`)
+    } else {
+      this.logger.info(
+        `DepositInfo saved successfully - ${latestBlock}, for chainId: ${chainId}`
+      )
     }
   }
 
   async _getDepositInfo(chainId: number | string): Promise<any> {
-    const dumpsPath = path.resolve(
-      __dirname,
-      `${this.options.dbPath}/depositInfo-${chainId}.json`
+    const [res, err] = await dbPool.query(
+      'SELECT MAX(block_no) FROM HistoryData WHERE chain_id = $1',
+      [chainId]
     )
-    if (fs.existsSync(dumpsPath)) {
-      const historyJsonRaw = await fsPromise.readFile(dumpsPath)
-      const historyJSON = JSON.parse(historyJsonRaw.toString())
-      if (historyJSON.latestBlock) {
-        return historyJSON.latestBlock
-      } else {
-        throw new Error("Can't find latestBlock in depositInfo")
-      }
+    if (err) {
+      console.error(err)
+      throw new Error("Can't find latestBlock in depositInfo")
     }
-    throw new Error("Can't find latestBlock in depositInfo")
+    let latestBlock
+    if (res) {
+      latestBlock = res.rows.block_no[0]
+    }
+
+    if (latestBlock) {
+      return latestBlock
+    } else {
+      throw new Error("Can't find latestBlock in depositInfo")
+    }
   }
 }

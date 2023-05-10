@@ -37,7 +37,7 @@ services:
       L2_NODE_WEB3_URL: http://l2geth:8545
       GAS_PRICE_ORACLE_ADDRESS: "0x420000000000000000000000000000000000000F"
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : [*gas-price-oracle_pk, *relayer_pk, *fast-relayer_pk]
+      <<: [ *gas-price-oracle_pk, *relayer_pk, *fast-relayer_pk ]
       SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
       PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
       GAS_PRICE_ORACLE_FLOOR_PRICE: 1
@@ -50,8 +50,8 @@ services:
 
   monitor:
     depends_on:
-     - l1_chain
-     - l2geth
+      - l1_chain
+      - l2geth
     image: bobanetwork/monitor:latest
     build:
       context: ..
@@ -61,7 +61,8 @@ services:
 
   teleportation:
     depends_on:
-     - l2geth
+      - l2geth
+      - teleportation_db
     image: bobanetwork/teleportation:latest
     build:
       context: ..
@@ -70,9 +71,24 @@ services:
     deploy:
       replicas: 0
 
+  teleportation_db:
+    image: postgres
+    deploy:
+      replicas: 0
+    volumes:
+      - type: bind
+        source: ./scripts/teleportation-init.sql
+        # make sure server is properly booted up before
+        target: /docker-entrypoint-initdb.d/10-init.sql
+    environment:
+      POSTGRES_PASSWORD: abcdef
+      POSTGRES_DB: teleportation
+    ports:
+      - "5432:5432"
+
   bobalink:
     depends_on:
-     - l2geth
+      - l2geth
     image: bobanetwork/bobalink:latest
     build:
       context: ..
@@ -82,7 +98,7 @@ services:
       L1_NODE_WEB3_URL: http://l2geth:8545
       L2_NODE_WEB3_URL: http://l2geth:8545
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
-      << : *bobalink_pk
+      <<: *bobalink_pk
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       POLLING_INTERVAL: 1000
@@ -105,7 +121,7 @@ services:
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       # DO NOT use in production
-      << : *deployer_pk
+      <<: *deployer_pk
       RETRIES: 200
       DTL_REGISTRY_URL: http://dtl:8081/aa-addr.json
       # skip compilation when run in docker-compose, since the contracts

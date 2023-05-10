@@ -34,7 +34,6 @@ describe('teleportation', () => {
   let selectedBobaChains: ChainInfo[]
   const pollingInterval: number = 1000
   const blockRangePerPolling = 1000
-  const dbPath = './db'
 
   before(async () => {
     ;[signer] = await ethers.getSigners()
@@ -122,7 +121,8 @@ describe('teleportation', () => {
       selectedBobaChains,
       pollingInterval,
       blockRangePerPolling,
-      dbPath,
+      dbHost: 'localhost',
+      dbPassword: 'abcdef',
     })
     return teleportationService
   }

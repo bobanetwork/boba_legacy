@@ -39,9 +39,13 @@ const main = async () => {
     'block-range-per-polling',
     parseInt(env.BLOCK_RANGE_PER_POLLING, 10) || 1000
   )
-  const DATABASE_PATH = config.str(
-    'database-path',
-    env.DATABASE_PATH || '../db'
+  const DATABASE_PASSWORD = config.str(
+    'database-password',
+    env.DATABASE_PASSWORD || '../db'
+  )
+  const DATABASE_HOST = config.str(
+    'database-host',
+    env.DATABASE_HOST || '../db'
   )
 
   if (!L2_NODE_WEB3_URL) {
@@ -80,7 +84,8 @@ const main = async () => {
     selectedBobaChains,
     pollingInterval: POLLING_INTERVAL,
     blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
-    dbPath: DATABASE_PATH,
+    dbHost: DATABASE_HOST,
+    dbPassword: DATABASE_PASSWORD,
   })
 
   await service.start()
