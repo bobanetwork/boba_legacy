@@ -47,6 +47,7 @@
     * [Using the Standard Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/standard-bridge.md)
     * [Using the Fast Token Bridge](boba\_documentation/developer/bridge-l1-and-l2/fast-bridge.md)
     * [Using the BOBA Token Bridge Between L1s](boba\_documentation/developer/bridge-l1-and-l2/boba-token-bridge.md)
+  * [Custom Relayer](boba\_documentation/developer/relay-message.md)
   * [Token Addresses](boba\_documentation/developer/token-addresses.md)
 * [Other](other/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
