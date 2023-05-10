@@ -36,7 +36,7 @@ interface SimpleAccountApiParams {
     // inherited from BaseAccountApiParams
     provider: Provider; // @ethersproject/providers
     entryPointAddress: string;
-    senderCreatorAddress?: string;
+    entryPointWrapperAddress?: string;
     accountAddress?: string;
     overheads?: Partial<GasOverheads>;
     paymasterAPI?: PaymasterAPI;
@@ -45,7 +45,7 @@ interface SimpleAccountApiParams {
 
 #### Usage
 
-Note that SimpleAccountAPI either needs the `accountAddress` or the `factoryAddress` to be supplied. If the `factoryAddress` is supplied, also supply a `senderCreatorAddress`. Custom reverts are not supported and the sdk would use this senderCreatorAddress to compute the account address that will be deployed.
+Note that SimpleAccountAPI either needs the `accountAddress` or the `factoryAddress` to be supplied. If the `factoryAddress` is supplied, also supply a `entryPointWrapperAddress`. Custom reverts are not supported and the sdk would route the call through the entryPointWrapperAddress to compute the account address that will be deployed.
 
 If `accountAddress` is passed, the account is used as a sender when generating the userOp
 If `factoryAddress` is passed, the account will be generated on the fly. The userOp will include initCode and the precomputed address of the account and include it in the userOp.
@@ -76,7 +76,7 @@ const walletAPI = new SimpleAccountAPI({
     provider,
     entryPointAddress,
     owner,
-    senderCreatorAddress,
+    entryPointWrapperAddress,
     factoryAddress
 })
 const op = await walletAPI.createSignedUserOp({
@@ -230,8 +230,8 @@ async function wrapProvider(
   originalProvider: JsonRpcProvider, // @ethersproject/providers
   config: ClientConfig,
   originalSigner: Signer = originalProvider.getSigner(), // @ethersproject/abstract-signer
+  entryPointWrapperAddress: string, // must be passed
   wallet?: Wallet, // ethers, must be passed
-  senderCreatorAddress?: string // must be passed
 ): Promise<ERC4337EthersProvider>
 ```
 
@@ -262,9 +262,9 @@ interface ClientConfig {
 ### Usage
 Since-
 a) using a remote signer with eth_sendTransaction is not supported on Boba, transactions would need to be sent from an ethers.wallet (object), for the deterministic deployment of SimpleAccountFactory. This is not a requirement if the SimpleAccountFactory has already been deployed
-b) wrapProvider uses the low level API internally, custom reverts are not supported and the sdk would use the senderCreatorAddress to compute the account address that will be deployed
+b) wrapProvider uses the low level API internally, custom reverts are not supported and the sdk would use the entryPointWrapperAddress to compute the account address that will be deployed
 
-wrapProvider must be passed the parameters `wallet` and `senderCreatorAddress` on Boba
+wrapProvider must be passed the parameters `entryPointWrapperAddress` and `wallet` on Boba
 
 The high-level provider api can be used as follows:
 
@@ -278,7 +278,7 @@ const config = {
   entryPointAddress,
   bundlerUrl: 'http://localhost:3000/rpc'
 }
-const aaProvider = await wrapProvider(provider, config, aasigner, wallet, senderCreatorAddress)
+const aaProvider = await wrapProvider(provider, config, aasigner, entryPointWrapperAddress, wallet)
 const walletAddress = await aaProvider.getSigner().getAddress()
 
 // send some eth to the wallet Address: wallet should have some balance to pay for its own creation, and for calling methods.
