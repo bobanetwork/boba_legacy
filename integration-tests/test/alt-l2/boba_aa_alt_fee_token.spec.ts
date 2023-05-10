@@ -72,7 +72,7 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       entryPointAddress,
       L2_L1NativeToken.address,
       await L2_L1NativeToken.decimals(),
-      predeploys.Proxy__Boba_GasPriceOracle,
+      predeploys.Proxy__Boba_GasPriceOracle
     )
 
     EntryPoint = new Contract(
@@ -93,70 +93,85 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
     let postApproveEtherBalance
     let signedOp
 
-    before('the paymaster operator sets up the paymaster by staking and adding deposits', async () => {
-      await GPODepositPaymaster.addStake(1, { value: utils.parseEther('2') })
-      await EntryPoint.depositTo(GPODepositPaymaster.address, {
-        value: utils.parseEther('1')
-      })
-    })
+    before(
+      'the paymaster operator sets up the paymaster by staking and adding deposits',
+      async () => {
+        await GPODepositPaymaster.addStake(1, { value: utils.parseEther('2') })
+        await EntryPoint.depositTo(GPODepositPaymaster.address, {
+          value: utils.parseEther('1'),
+        })
+      }
+    )
 
-    before('the user approves the paymaster to spend their $BOBA token', async () => {
-      // deploy a 4337 Wallet and send operation to this wallet
-      SimpleAccountFactory__factory = new ContractFactory(
-        SimpleAccountFactoryJson.abi,
-        SimpleAccountFactoryJson.bytecode,
-        env.l2Wallet
-      )
-      accountFactory = await SimpleAccountFactory__factory.deploy(
-        entryPointAddress
-      )
-      await accountFactory.deployed()
-      console.log('Account Factory deployed to:', accountFactory.address)
-      await accountFactory.createAccount(env.l2Wallet.address, 0)
-      account = await accountFactory.getAddress(env.l2Wallet.address, 0)
-      console.log('Account deployed to:', account)
+    before(
+      'the user approves the paymaster to spend their $BOBA token',
+      async () => {
+        // deploy a 4337 Wallet and send operation to this wallet
+        SimpleAccountFactory__factory = new ContractFactory(
+          SimpleAccountFactoryJson.abi,
+          SimpleAccountFactoryJson.bytecode,
+          env.l2Wallet
+        )
+        accountFactory = await SimpleAccountFactory__factory.deploy(
+          entryPointAddress
+        )
+        await accountFactory.deployed()
+        console.log('Account Factory deployed to:', accountFactory.address)
+        await accountFactory.createAccount(env.l2Wallet.address, 0)
+        account = await accountFactory.getAddress(env.l2Wallet.address, 0)
+        console.log('Account deployed to:', account)
 
-      await L2_L1NativeToken.transfer(account, utils.parseEther('1'))
+        await L2_L1NativeToken.transfer(account, utils.parseEther('1'))
 
-      await L2_L1NativeToken.approve(GPODepositPaymaster.address, constants.MaxUint256)
-      await GPODepositPaymaster.addDepositFor(account, utils.parseEther('2'))
+        await L2_L1NativeToken.approve(
+          GPODepositPaymaster.address,
+          constants.MaxUint256
+        )
+        await GPODepositPaymaster.addDepositFor(account, utils.parseEther('2'))
 
-      await env.l2Wallet.sendTransaction({
-        value: utils.parseEther('2'),
-        to: account,
-      })
+        await env.l2Wallet.sendTransaction({
+          value: utils.parseEther('2'),
+          to: account,
+        })
 
-      accountAPI = new SimpleAccountAPI({
-        provider: env.l2Provider,
-        entryPointAddress,
-        owner: env.l2Wallet,
-        accountAddress: account,
-      })
+        accountAPI = new SimpleAccountAPI({
+          provider: env.l2Provider,
+          entryPointAddress,
+          owner: env.l2Wallet,
+          accountAddress: account,
+        })
 
-      const approveOp = await accountAPI.createSignedUserOp({
+        const approveOp = await accountAPI.createSignedUserOp({
           target: L2_L1NativeToken.address,
-          data: L2_L1NativeToken.interface.encodeFunctionData('approve', [GPODepositPaymaster.address, constants.MaxUint256]),
-      })
+          data: L2_L1NativeToken.interface.encodeFunctionData('approve', [
+            GPODepositPaymaster.address,
+            constants.MaxUint256,
+          ]),
+        })
 
-      preApproveTokenBalance = await L2_L1NativeToken.balanceOf(account)
-      preApproveDepositAmount = (await GPODepositPaymaster.depositInfo(account)).amount
-      preApproveEtherBalance = await env.l2Provider.getBalance(account)
+        preApproveTokenBalance = await L2_L1NativeToken.balanceOf(account)
+        preApproveDepositAmount = (
+          await GPODepositPaymaster.depositInfo(account)
+        ).amount
+        preApproveEtherBalance = await env.l2Provider.getBalance(account)
 
-      const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
-      const txid = await accountAPI.getUserOpReceipt(requestId)
-      console.log('reqId', requestId, 'txid=', txid)
+        const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
+        const txid = await accountAPI.getUserOpReceipt(requestId)
+        console.log('reqId', requestId, 'txid=', txid)
 
-      postApproveTokenBalance = await L2_L1NativeToken.balanceOf(account)
-      postApproveDepositAmount = (await GPODepositPaymaster.depositInfo(account)).amount
-      postApproveEtherBalance = await env.l2Provider.getBalance(account)
-    })
+        postApproveTokenBalance = await L2_L1NativeToken.balanceOf(account)
+        postApproveDepositAmount = (
+          await GPODepositPaymaster.depositInfo(account)
+        ).amount
+        postApproveEtherBalance = await env.l2Provider.getBalance(account)
+      }
+    )
 
     it('should be able to submit a userOp including the paymaster to the bundler and trigger tx', async () => {
       const op = await accountAPI.createUnsignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
-
 
       op.paymasterAndData = GPODepositPaymaster.address
       op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
@@ -181,7 +196,9 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       // message is received and emitted
       expect(log.args.message).to.eq('hello')
       const postCallTokenBalance = await L2_L1NativeToken.balanceOf(account)
-      const postCallDepositAmount = (await GPODepositPaymaster.depositInfo(account)).amount
+      const postCallDepositAmount = (
+        await GPODepositPaymaster.depositInfo(account)
+      ).amount
       const postCallEtherBalance = await env.l2Provider.getBalance(account)
 
       const returnedEPlogIndex = await getFilteredLogIndex(
@@ -190,7 +207,9 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
         entryPointAddress,
         'UserOperationEvent'
       )
-      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+      const logEP = EntryPoint.interface.parseLog(
+        receipt.logs[returnedEPlogIndex]
+      )
 
       // no token is used when approving, ether balance is used to pay approval fees
       expect(preApproveTokenBalance).to.eq(postApproveTokenBalance)
@@ -202,7 +221,12 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       expect(postApproveEtherBalance).to.eq(postCallEtherBalance)
       expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
       // account for l1 submission cost too
-      expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.3'))
+      expect(
+        BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)
+      ).to.closeTo(
+        BigNumber.from(postApproveTokenBalance),
+        utils.parseEther('0.3')
+      )
     })
   })
 })
