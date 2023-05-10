@@ -6,7 +6,7 @@ description: Learn more about manually relaying messages from L2 to L1
 
 The boba relayer provides a simple interface for relaying messages from L2 to L1. The relayer is a simple node.js application that can be run locally. The relayer is designed to be used with the [Boba Bridge](./bridge-l1-and-l2/standard-bridge.md) and [Boba Fast Bridge](./bridge-l1-and-l2/fast-bridge.md) but can be used with any L2 contract that sends a message to L1.
 
-The boba relayer can be find in the [boba repo](https://github.com/bobanetwork/boba/tree/develop/boba_community/boba-relayer).
+The boba relayer can be found in the [boba repo](https://github.com/bobanetwork/boba/tree/develop/boba_community/boba-relayer).
 
 To use the relayer you will need to have a node.js environment setup. You can find instructions on how to do that [here](https://nodejs.org/en/download/).
 
