@@ -5,11 +5,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
-      - uses: mshick/add-pr-comment@v2
-        with:
+     - uses: actions/checkout@v3
+     - uses: dorny/paths-filter@v2
+       id: filter
+       with:
+        filters: |
+          bundler_sdk:
+            - 'packages/boba/bundler_sdk/**/*'
+            - 'packages/boba/bundler_utils/**/*'
+     - name: PR commenter
+       if: steps.filter.outputs.bundler_sdk == 'true'
+       uses: mshick/add-pr-comment@v2
+       with:
           message: |
             ⚠️ **This PR triggers a minor release of the Bundler SDK** (Account Abstraction) to NPM as you made changes in the corresponding `bundler_sdk` directory.
 
