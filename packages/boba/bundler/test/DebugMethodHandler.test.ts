@@ -53,6 +53,7 @@ describe('#DebugMethodHandler', () => {
       minUnstakeDelay: 0,
       addressManager: '',
       l1NodeWeb3Url: '',
+      enableDebugMethods: false,
     }
 
 
