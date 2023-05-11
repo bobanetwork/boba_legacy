@@ -119,6 +119,7 @@ export async function runBundler(
     .option('--addressManager <string>', 'address of the Address Manager', '')
     .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
     .option('--maxBundleGas <number>', 'Max Bundle Gas available to use', '5000000')
+    .option('--enableDebugMethods', 'debug_* methods available', false)
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
