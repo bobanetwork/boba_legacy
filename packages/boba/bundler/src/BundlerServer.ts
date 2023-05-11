@@ -35,8 +35,7 @@ export class BundlerServer {
     readonly debugHandler: DebugMethodHandler,
     readonly config: BundlerConfig,
     readonly provider: Provider,
-    readonly wallet: Wallet,
-    readonly enableDebugMethods: boolean = false
+    readonly wallet: Wallet
   ) {
     this.app = express()
     this.app.use(cors())
@@ -50,6 +49,10 @@ export class BundlerServer {
 
     this.httpServer = this.app.listen(this.config.port)
     this.startingPromise = this._preflightCheck()
+
+    if (this.config.enableDebugMethods) {
+      console.warn('WARNING: DebugMode is activated, debug_* will be available.')
+    }
   }
 
   startingPromise: Promise<void>
@@ -194,7 +197,7 @@ export class BundlerServer {
         result = this.methodHandler.clientVersion()
         break
       default:
-        if (this.enableDebugMethods) {
+        if (this.config.enableDebugMethods) {
           // Also check debug_* methods if enabled
           switch (method) {
             case 'debug_bundler_clearState':

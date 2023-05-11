@@ -227,8 +227,7 @@ export async function runBundler(
     debugHandler,
     config,
     provider,
-    wallet,
-    programOpts.enableDebugMethods ?? false
+    wallet
   )
   console.log('bundlerServer...')
   void bundlerServer.asyncStart().then(async () => {
