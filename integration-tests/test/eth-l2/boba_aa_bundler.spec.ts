@@ -23,11 +23,11 @@ import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/S
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 import { resolveHexlify } from '@boba/bundler_utils'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import EntryPointWrapperJson from '@boba/accountabstraction/artifacts/contracts/bundler/EntryPointWrapper.sol/EntryPointWrapper.json'
 import {
   EntryPoint,
-  EntryPoint__factory,
-  EntryPointWrapper__factory,
-} from '@boba/accountabstraction/types'
+  EntryPointWrapper,
+} from "@boba/accountabstraction/types";
 import {
   BundleManager,
   BundlerReputationParams,
@@ -55,17 +55,36 @@ describe('AA Bundler Test\n', async () => {
   let accountAPI: SimpleAccountAPI
 
   let entryPoint: EntryPoint
+  let entryPointWrapper: EntryPointWrapper
   let methodHandler: UserOpMethodHandler
 
   before(async () => {
     env = await OptimismEnv.new()
     const entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
-    entryPoint = new Contract(
+   /* entryPoint = new Contract(
       entryPointAddress,
       EntryPointJson.abi,
       env.l2Wallet
-    ) as EntryPoint
+    ) as EntryPoint*/
+
+    const EntryPoint__factory = new ContractFactory(
+      EntryPointJson.abi,
+      EntryPointJson.bytecode,
+      env.l2Wallet
+    )
+
+    entryPoint = (await EntryPoint__factory.deploy() as EntryPoint)
+
+    const EntryPointWrapper__factory = new ContractFactory(
+      EntryPointWrapperJson.abi,
+      EntryPointWrapperJson.bytecode,
+      env.l2Wallet
+    )
+
+    entryPointWrapper = (await EntryPointWrapper__factory.deploy(
+      entryPointAddress
+    ) as EntryPointWrapper)
 
     SampleRecipient__factory = new ContractFactory(
       SampleRecipientJson.abi,
@@ -117,7 +136,7 @@ describe('AA Bundler Test\n', async () => {
       // minstake zero, since we don't fund deployer.
       minStake: '0',
       minUnstakeDelay: 0,
-      //entryPointWrapper: entryPointWrapper.address,
+      entryPointWrapper: entryPointWrapper.address,
       enableDebugMethods: true,
       l1NodeWeb3Url: '',
       addressManager: '',
@@ -132,8 +151,8 @@ describe('AA Bundler Test\n', async () => {
     const validMgr = new ValidationManager(
       entryPoint,
       repMgr,
-      config.unsafe
-      //entryPointWrapper
+      config.unsafe,
+      entryPointWrapper
     )
     const evMgr = new EventsManager(entryPoint, mempoolMgr, repMgr)
     const bundleMgr = new BundleManager(
@@ -146,8 +165,8 @@ describe('AA Bundler Test\n', async () => {
       parseEther(config.minBalance),
       config.maxBundleGas,
       false,
-      false
-      //entryPointWrapper
+      false,
+      entryPointWrapper
     )
     const execManager = new ExecutionManager(
       repMgr,
@@ -160,13 +179,13 @@ describe('AA Bundler Test\n', async () => {
       ethers.provider,
       recipient.signer,
       config,
-      entryPoint
-      //entryPointWrapper
+      entryPoint,
+      entryPointWrapper
     )
   })
 
   describe('query rpc calls: eth_estimateUserOperationGas, eth_callUserOperation', async () => {
-    it('estimateUserOperationGas should estimate even without eth', async () => {
+    it.only('estimateUserOperationGas should estimate even without eth', async () => {
       const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
@@ -176,6 +195,7 @@ describe('AA Bundler Test\n', async () => {
         await resolveHexlify(op),
         entryPoint.address
       )
+
       // verification gas should be high - it creates this wallet
       expect(ret.verificationGas).to.be.closeTo(300000, 100000)
       // execution should be quite low.
