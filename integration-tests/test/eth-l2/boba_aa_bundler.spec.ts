@@ -3,20 +3,43 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-import { Contract, ContractFactory, utils, constants, BigNumber } from 'ethers'
+import {
+  Contract,
+  ContractFactory,
+  utils,
+  constants,
+  BigNumber,
+  Wallet,
+} from 'ethers'
 
 import { getFilteredLogIndex } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
-import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
+import { HDNode, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
-import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 import { resolveHexlify } from '@boba/bundler_utils'
-import { UserOpMethodHandler } from "@boba/bundler";
+import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import {
+  EntryPoint,
+  EntryPoint__factory,
+  EntryPointWrapper__factory,
+} from '@boba/accountabstraction/types'
+import {
+  BundleManager,
+  BundlerReputationParams,
+  EventsManager,
+  ExecutionManager,
+  MempoolManager,
+  ReputationManager,
+  ValidationManager,
+  UserOpMethodHandler,
+  BundlerConfig,
+} from '@boba/bundler'
+import { ethers } from 'hardhat'
 
 describe('AA Bundler Test\n', async () => {
   let env: OptimismEnv
@@ -24,7 +47,6 @@ describe('AA Bundler Test\n', async () => {
   let recipient: Contract
 
   let bundlerProvider: HttpRpcClient
-  let entryPointAddress: string
 
   let SampleRecipient__factory: ContractFactory
 
@@ -32,12 +54,18 @@ describe('AA Bundler Test\n', async () => {
   let account
   let accountAPI: SimpleAccountAPI
 
-  let EntryPoint: Contract
+  let entryPoint: EntryPoint
   let methodHandler: UserOpMethodHandler
 
   before(async () => {
     env = await OptimismEnv.new()
-    entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
+    const entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
+
+    entryPoint = new Contract(
+      entryPointAddress,
+      EntryPointJson.abi,
+      env.l2Wallet
+    ) as EntryPoint
 
     SampleRecipient__factory = new ContractFactory(
       SampleRecipientJson.abi,
@@ -49,14 +77,8 @@ describe('AA Bundler Test\n', async () => {
 
     bundlerProvider = new HttpRpcClient(
       env.bundlerUrl,
-      entryPointAddress,
+      entryPoint.address,
       await env.l2Wallet.provider.getNetwork().then((net) => net.chainId)
-    )
-
-    EntryPoint = new Contract(
-      entryPointAddress,
-      EntryPointJson.abi,
-      env.l2Wallet
     )
 
     SimpleAccountFactory__factory = new ContractFactory(
@@ -65,7 +87,7 @@ describe('AA Bundler Test\n', async () => {
       env.l2Wallet
     )
     accountFactory = await SimpleAccountFactory__factory.deploy(
-      entryPointAddress
+      entryPoint.address
     )
     await accountFactory.deployed()
     console.log('Account Factory deployed to:', accountFactory.address)
@@ -74,20 +96,85 @@ describe('AA Bundler Test\n', async () => {
 
     accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
-      entryPointAddress,
+      entryPointAddress: entryPoint.address,
       owner: env.l2Wallet,
       accountAddress: account,
     })
+
+    const config: BundlerConfig = {
+      beneficiary: await recipient.signer.getAddress(),
+      entryPoint: entryPoint.address,
+      gasFactor: '0.2',
+      minBalance: '0',
+      mnemonic: '',
+      network: '',
+      port: '3000',
+      unsafe: false,
+      conditionalRpc: false,
+      autoBundleInterval: 0,
+      autoBundleMempoolSize: 0,
+      maxBundleGas: 5e6,
+      // minstake zero, since we don't fund deployer.
+      minStake: '0',
+      minUnstakeDelay: 0,
+      //entryPointWrapper: entryPointWrapper.address,
+      enableDebugMethods: true,
+      l1NodeWeb3Url: '',
+      addressManager: '',
+    }
+
+    const repMgr = new ReputationManager(
+      BundlerReputationParams,
+      parseEther(config.minStake),
+      config.minUnstakeDelay
+    )
+    const mempoolMgr = new MempoolManager(repMgr)
+    const validMgr = new ValidationManager(
+      entryPoint,
+      repMgr,
+      config.unsafe
+      //entryPointWrapper
+    )
+    const evMgr = new EventsManager(entryPoint, mempoolMgr, repMgr)
+    const bundleMgr = new BundleManager(
+      entryPoint,
+      evMgr,
+      mempoolMgr,
+      validMgr,
+      repMgr,
+      config.beneficiary,
+      parseEther(config.minBalance),
+      config.maxBundleGas,
+      false,
+      false
+      //entryPointWrapper
+    )
+    const execManager = new ExecutionManager(
+      repMgr,
+      mempoolMgr,
+      bundleMgr,
+      validMgr
+    )
+    methodHandler = new UserOpMethodHandler(
+      execManager,
+      ethers.provider,
+      recipient.signer,
+      config,
+      entryPoint
+      //entryPointWrapper
+    )
   })
+
   describe('query rpc calls: eth_estimateUserOperationGas, eth_callUserOperation', async () => {
     it('estimateUserOperationGas should estimate even without eth', async () => {
       const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
-        data: '0xdeadface',
+        data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
+
       const ret = await methodHandler.estimateUserOperationGas(
         await resolveHexlify(op),
-        entryPointAddress
+        entryPoint.address
       )
       // verification gas should be high - it creates this wallet
       expect(ret.verificationGas).to.be.closeTo(300000, 100000)

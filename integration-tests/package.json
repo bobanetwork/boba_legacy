@@ -21,7 +21,6 @@
     "@babel/eslint-parser": "^7.18.2",
     "@boba/accountabstraction": "1.0.0",
     "@boba/api": "0.0.1",
-    "@boba/bundler": "0.2.0",
     "@boba/contracts": "0.0.1",
     "@bobanetwork/bundler_sdk": "*",
     "@eth-optimism/contracts": "^0.5.11",
@@ -71,6 +70,7 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
+    "@boba/bundler": "0.2.0",
     "@boba/bundler_utils": "^0.2.3"
   }
 }
