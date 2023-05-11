@@ -6,6 +6,7 @@ import BobaDepositPaymasterJson from '../artifacts/contracts/samples/BobaDeposit
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
 
 let Factory__BobaDepositPaymaster: ContractFactory
+let BobaDepositPaymaster: Contract
 
 const deployFn: DeployFunction = async (hre) => {
   Factory__BobaDepositPaymaster = new ContractFactory(
@@ -19,25 +20,18 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`Eth Price Oracle is located at: ${ethPriceOracle}`)
   const entryPointFromAM = await (hre as any).deployConfig.addressManager.getAddress('L2_Boba_EntryPoint')
   if (entryPoint.address.toLowerCase() === entryPointFromAM.toLowerCase()) {
-    const bobaDepositPaymasterConstructorArgs = ethers.utils.defaultAbiCoder.encode(
-      ["address", "address"],
-      [entryPoint.address, ethPriceOracle]
-    )
-    const bobaDepositPaymasterCreationCode = ethers.utils.solidityPack(
-      ["bytes", "bytes"],
-      [Factory__BobaDepositPaymaster.bytecode, bobaDepositPaymasterConstructorArgs]
-    )
-    const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
-    const BobaDepositPaymasterAddress = await dep.deterministicDeploy(bobaDepositPaymasterCreationCode)
-    console.log('Boba Deposit Paymaster at', BobaDepositPaymasterAddress)
+    BobaDepositPaymaster = await Factory__BobaDepositPaymaster.deploy(entryPoint.address, ethPriceOracle)
+    await BobaDepositPaymaster.deployTransaction.wait()
+
+    console.log('Boba Deposit Paymaster at', BobaDepositPaymaster.address)
 
     const BobaDepositPaymasterDeploymentSubmission: DeploymentSubmission = {
-      address: BobaDepositPaymasterAddress,
+      address: BobaDepositPaymaster.address,
       abi: BobaDepositPaymasterJson.abi
     }
     await hre.deployments.save('BobaDepositPaymaster', BobaDepositPaymasterDeploymentSubmission)
 
-    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_BobaDepositPaymaster', BobaDepositPaymasterAddress )
+    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_BobaDepositPaymaster', BobaDepositPaymaster.address )
   }
 }
 
