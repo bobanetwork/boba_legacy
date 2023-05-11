@@ -6,6 +6,7 @@ on:
     paths:
       # only on change
       - 'packages/boba/bundler_sdk/**/*'
+      - 'packages/boba/bundler_utils/**/*'
 
 jobs:
   build:
