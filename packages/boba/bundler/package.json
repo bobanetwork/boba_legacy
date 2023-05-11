@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "hardhat compile && tsc -p ./tsconfig.json",
-    "bundler": "ts-node ./src/exec.ts --config ./localconfig/bundler.config.json",
+    "bundler": "ts-node ./src/exec.ts --config ./localconfig/bundler.config.json --enableDebugMethods true",
     "clean": "rimraf artifacts cache node_modules dist dockers/bundler ./tsconfig.tsbuildinfo",
     "test:coverage": "yarn test",
     "test": "hardhat test",
