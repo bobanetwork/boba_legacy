@@ -21,6 +21,7 @@
     "@openzeppelin/test-helpers": "^0.5.15",
     "@boba/api": "0.0.1",
     "@boba/contracts": "0.0.1",
+    "@boba/bundler": "0.2.0",
     "@boba/accountabstraction": "1.0.0",
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
