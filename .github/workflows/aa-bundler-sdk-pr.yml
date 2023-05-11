@@ -13,6 +13,7 @@ jobs:
         filters: |
           bundler_sdk:
             - 'packages/boba/bundler_sdk/**/*'
+            - 'packages/boba/bundler_utils/**/*'
      - name: PR commenter
        if: steps.filter.outputs.bundler_sdk == 'true'
        uses: mshick/add-pr-comment@v2
