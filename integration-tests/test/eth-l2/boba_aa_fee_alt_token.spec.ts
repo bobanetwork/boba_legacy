@@ -280,7 +280,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       await expect(
         ManualDepositPaymaster.connect(env.l2Wallet_2).withdrawTokensTo(L2ERC20Token.address, env.l2Wallet_2.address, ownerDeposits)
       ).to.be.reverted
-    }
+    })
     it('should allow the paymaster owner to withdraw paymaster tokens', async () => {
       const ownerDeposits = await ManualDepositPaymaster.balances(L2ERC20Token.address, env.l2Wallet.address)
       expect(ownerDeposits).to.be.eq(tokenDifference)
@@ -292,6 +292,6 @@ describe('AA Alt Fee Token Test\n', async () => {
       expect(postTokenBalance).to.be.eq(preTokenBalance.add(ownerDeposits))
       const currentOwnerDeposits = await ManualDepositPaymaster.balances(L2ERC20Token.address, env.l2Wallet.address)
       expect(currentOwnerDeposits).to.be.eq(0)
-    }
+    })
   })
 })
