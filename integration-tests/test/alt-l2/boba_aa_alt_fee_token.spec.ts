@@ -207,23 +207,23 @@ describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
       expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.3'))
     })
     it('should not allow a non-owner to withdraw paymaster tokens', async () => {
-      const ownerDeposits = await GPODepositPaymaster.balances(L2_L1NativeToken.address, env.l2Wallet.address)
+      const ownerDeposits = await GPODepositPaymaster.balances(env.l2Wallet.address)
       expect (ownerDeposits).to.be.eq(tokenDifference)
 
       await expect(
-        GPODepositPaymaster.connect(env.l2Wallet_2).withdrawTokensTo(L2_L1NativeToken.address, env.l2Wallet_2.address, ownerDeposits)
+        GPODepositPaymaster.connect(env.l2Wallet_2).withdrawTokensTo(env.l2Wallet_2.address, ownerDeposits)
       ).to.be.reverted
     })
     it('should allow the paymaster owner to withdraw paymaster tokens', async () => {
-      const ownerDeposits = await GPODepositPaymaster.balances(L2_L1NativeToken.address, env.l2Wallet.address)
+      const ownerDeposits = await GPODepositPaymaster.balances(env.l2Wallet.address)
       expect(ownerDeposits).to.be.eq(tokenDifference)
 
       const preTokenBalance = await L2_L1NativeToken.balanceOf(env.l2Wallet.address)
-      await GPODepositPaymaster.connect(env.l2Wallet).withdrawTokensTo(L2_L1NativeToken.address, env.l2Wallet.address, ownerDeposits)
+      await GPODepositPaymaster.connect(env.l2Wallet).withdrawTokensTo(env.l2Wallet.address, ownerDeposits)
       const postTokenBalance = await L2_L1NativeToken.balanceOf(env.l2Wallet.address)
 
       expect(postTokenBalance).to.be.eq(preTokenBalance.add(ownerDeposits))
-      const currentOwnerDeposits = await GPODepositPaymaster.balances(L2_L1NativeToken.address, env.l2Wallet.address)
+      const currentOwnerDeposits = await GPODepositPaymaster.balances(env.l2Wallet.address)
       expect(currentOwnerDeposits).to.be.eq(0)
     })
   })
