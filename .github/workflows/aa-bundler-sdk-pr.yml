@@ -2,11 +2,17 @@ name: Will trigger release of AA-Bundler to NPM (PR comment)
 on:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
      - uses: actions/checkout@v3
+       with:
+         ref: ${{ github.event.pull_request.head.ref }}
+
      - uses: dorny/paths-filter@v2
        id: filter
        with:
@@ -24,3 +30,26 @@ jobs:
             Please make sure this is intentional.
 
             The package that is going to be updated is `@bobanetwork/bundler_sdk`.
+
+      # TODO: Just do once
+
+
+     - name: Increment patch version
+       if: steps.filter.outputs.bundler_sdk == 'true'
+       working-directory: ./packages/boba/bundler_sdk
+       run: npm version minor --legacy-peer-deps
+
+     - name: setup git config
+       if: steps.filter.outputs.bundler_sdk == 'true'
+       run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+
+     - name: commit
+       if: steps.filter.outputs.bundler_sdk == 'true'
+       run: |
+         # Stage the file, commit and push
+         git add packages/boba/bundler_sdk/package.json
+         git commit -am "Bump Bundler SDK version"
+         git push
+      # $GITHUB_HEAD_REF
