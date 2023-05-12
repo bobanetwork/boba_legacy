@@ -19,6 +19,24 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Increment patch version
+        working-directory: ./packages/boba/bundler_sdk
+        run: npm version minor --legacy-peer-deps
+
+      - name: setup git config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
+      - name: commit
+        run: |
+          # Stage the file, commit and push
+          git add packages/boba/bundler_sdk/package.json
+          git commit -am "Bump Bundler SDK version"
+          git push
+          # $GITHUB_HEAD_REF
+
       - name: Install dependencies and build 🔧
         run: yarn install --frozen-lockfile --legacy-peer-deps && yarn run build
 
