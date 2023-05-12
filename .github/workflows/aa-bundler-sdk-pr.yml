@@ -39,4 +39,4 @@ jobs:
          # Stage the file, commit and push
          git add packages/boba/bundler_sdk/package.json
          git commit -m "Bump Bundler SDK version"
-         git push
+         git push origin $GITHUB_HEAD_REF
