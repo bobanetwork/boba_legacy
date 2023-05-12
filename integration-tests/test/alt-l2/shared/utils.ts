@@ -24,13 +24,9 @@ export const isLiveNetwork = () => {
 }
 
 export const HARDHAT_CHAIN_ID = 31337
-export const MOONBEAM_CHAIN_ID = 1281
-export const FANTOM_CHAIN_ID = 4003
 export const AVALANCHE_CHAIN_ID = 43112
 export const BNB_CHAIN_ID = 99
 export const NON_ETHEREUM_CHAIN = [
-  MOONBEAM_CHAIN_ID,
-  FANTOM_CHAIN_ID,
   AVALANCHE_CHAIN_ID,
   BNB_CHAIN_ID,
 ]
