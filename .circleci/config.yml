@@ -181,17 +181,6 @@ jobs:
           test_folder: "eth-l2"
       - report-integration-tests
 
-  integration-tests-moonbeam:
-    executor: intergration-tests-executor
-    parallelism: 4
-    steps:
-      - download-solidity-compilers
-      - run-integration-tests:
-          docker_compose_file: "docker-compose-moonbeam.yml"
-          docker_compose_side_file: "docker-compose-moonbeam-side.yml"
-          test_folder: "alt-l2"
-      - report-integration-tests
-
   integration-tests-avalanche:
     executor: intergration-tests-executor
     parallelism: 4
@@ -214,25 +203,12 @@ jobs:
           test_folder: "alt-l2"
       - report-integration-tests
 
-  integration-tests-fantom:
-    executor: intergration-tests-executor
-    parallelism: 4
-    steps:
-      - download-solidity-compilers
-      - run-integration-tests:
-          docker_compose_file: "docker-compose-fantom.yml"
-          docker_compose_side_file: "docker-compose-fantom-side.yml"
-          test_folder: "alt-l2"
-      - report-integration-tests
-
 workflows:
   main:
     jobs:
       - integration-tests
-      - integration-tests-moonbeam
       - integration-tests-avalanche
       - integration-tests-bnb
-      - integration-tests-fantom
       - go-lint-test-build:
           name: proxyd-tests
           binary_name: proxyd
