@@ -2,6 +2,9 @@ name: Will trigger release of AA-Bundler to NPM (PR comment)
 on:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,6 +28,9 @@ jobs:
 
             The package that is going to be updated is `@bobanetwork/bundler_sdk`.
 
+      # TODO: Just do once
+
+
      - name: Increment patch version
        # TODO: if: steps.filter.outputs.bundler_sdk == 'true'
        working-directory: ./packages/boba/bundler_sdk
@@ -41,5 +47,6 @@ jobs:
        run: |
          # Stage the file, commit and push
          git add packages/boba/bundler_sdk/package.json
-         git commit -m "Bump Bundler SDK version"
-         git push origin ${{ github.ref }}
+         git commit -am "Bump Bundler SDK version"
+         git push
+      # $GITHUB_HEAD_REF
