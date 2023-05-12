@@ -24,3 +24,19 @@ jobs:
             Please make sure this is intentional.
 
             The package that is going to be updated is `@bobanetwork/bundler_sdk`.
+
+     - name: Increment patch version
+       working-directory: ./packages/boba/bundler_sdk
+       run: npm version minor --legacy-peer-deps
+
+     - name: setup git config
+       run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+
+     - name: commit
+       run: |
+         # Stage the file, commit and push
+         git add packages/boba/bundler_sdk/package.json
+         git commit -m "Bump Bundler SDK version"
+         git push
