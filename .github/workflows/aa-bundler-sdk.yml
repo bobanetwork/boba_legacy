@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - develop
-      - wsdt/bundler-release-versioning-info
     paths:
       # only on change
       - 'packages/boba/bundler_sdk/**/*'
