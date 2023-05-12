@@ -1080,7 +1080,8 @@ describe('ERC1155 Bridge Test', async () => {
           DUMMY_TOKEN_ID_1,
           DUMMY_TOKEN_AMOUNT_1,
           '0x',
-          999999
+          999999,
+          { gasLimit: 9440000 }
         )
       )
 
