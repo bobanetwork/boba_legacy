@@ -1,8 +1,15 @@
 {
   "name": "@bobanetwork/bundler_sdk",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "main": "./dist/index.js",
-  "keywords": ["boba", "account abstraction", "bundler", "sdk", "smart wallets", "web3"],
+  "keywords": [
+    "boba",
+    "account abstraction",
+    "bundler",
+    "sdk",
+    "smart wallets",
+    "web3"
+  ],
   "repository": "https://github.com/bobanetwork/boba/tree/develop/packages/boba/bundler_sdk",
   "homepage": "https://boba.network",
   "bugs": {
