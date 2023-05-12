@@ -26,17 +26,20 @@ jobs:
             The package that is going to be updated is `@bobanetwork/bundler_sdk`.
 
      - name: Increment patch version
+       # TODO: if: steps.filter.outputs.bundler_sdk == 'true'
        working-directory: ./packages/boba/bundler_sdk
        run: npm version minor --legacy-peer-deps
 
      - name: setup git config
+       # TODO: if: steps.filter.outputs.bundler_sdk == 'true'
        run: |
         git config user.name "GitHub Actions Bot"
         git config user.email "<>"
 
      - name: commit
+       # TODO: if: steps.filter.outputs.bundler_sdk == 'true'
        run: |
          # Stage the file, commit and push
          git add packages/boba/bundler_sdk/package.json
          git commit -m "Bump Bundler SDK version"
-         git push origin $GITHUB_HEAD_REF
+         git push origin ${{ github.ref }}
