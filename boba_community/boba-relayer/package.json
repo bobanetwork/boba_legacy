@@ -1,0 +1,16 @@
+{
+  "name": "@boba/boba-relayer",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "postinstall": "patch-package"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@eth-optimism/sdk": "1.0.1",
+    "dotenv": "^16.0.0",
+    "ethers": "^5.5.4",
+    "node-fetch": "2.6.0",
+    "patch-package": "^6.5.1"
+  }
+}
