@@ -1,7 +1,12 @@
 name: Publish AA-Bundler to NPM
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - develop
+    paths:
+      # only on change
+      - 'packages/boba/bundler_sdk/**/*'
+      - 'packages/boba/bundler_utils/**/*'
 
 jobs:
   build:
@@ -16,6 +21,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies and build 🔧
         run: yarn install --frozen-lockfile --legacy-peer-deps && yarn run build
+      - name: Increment patch version
+        working-directory: ./packages/boba/bundler_sdk
+        run: npm version minor --legacy-peer-deps
       - name: Publish package on NPM 📦
         working-directory: ./packages/boba/bundler_sdk
         run: npm publish --access public

@@ -4,7 +4,11 @@ chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { deployBobaContractCore, getBobaContractABI, getBobaContractAt } from '@boba/contracts'
+import {
+  deployBobaContractCore,
+  getBobaContractABI,
+  getBobaContractAt,
+} from '@boba/contracts'
 
 import { expectLogs } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -58,31 +62,35 @@ describe('Liquidity Pool Test', async () => {
     L1ERC20 = await deployBobaContractCore(
       'L1ERC20',
       [initialSupply, tokenName, tokenSymbol, 18],
-      env.l1Wallet,
+      env.l1Wallet
     )
     await L1ERC20.deployTransaction.wait()
 
     OMGLIkeToken = await deployBobaContractCore(
       'OMGLikeToken',
       [],
-      env.l1Wallet,
+      env.l1Wallet
     )
     await OMGLIkeToken.deployTransaction.wait()
 
-    const Factory__L2ERC20 = getContractFactory(
-      'L2StandardERC20',
-      env.l2Wallet
-    )
+    const Factory__L2ERC20 = getContractFactory('L2StandardERC20', env.l2Wallet)
     L2ERC20 = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress, L1ERC20.address, tokenName, tokenSymbol, 18,
+      L2StandardBridgeAddress,
+      L1ERC20.address,
+      tokenName,
+      tokenSymbol,
+      18
     )
     await L2ERC20.deployTransaction.wait()
 
     L2OMGLikeToken = await Factory__L2ERC20.deploy(
-      L2StandardBridgeAddress, OMGLIkeToken.address, 'OMG', 'OMG', 18,
+      L2StandardBridgeAddress,
+      OMGLIkeToken.address,
+      'OMG',
+      'OMG',
+      18
     )
     await L2OMGLikeToken.deployTransaction.wait()
-
 
     L1LiquidityPool = await getBobaContractAt(
       'L1LiquidityPool',

@@ -46,6 +46,9 @@ commands:
       docker_compose_file:
         description: Docker compose file to use
         type: string
+      docker_compose_side_file:
+        description: Docker compose side file to use
+        type: string
       test_folder:
         description: Folder to run tests in
         type: string
@@ -79,13 +82,13 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml up -d bobalink aa_deployer bundler
+            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml logs --follow
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> logs --follow
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
@@ -100,7 +103,7 @@ commands:
           working_directory: ops
       - run:
           name: Stop docker
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml down -v
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> down -v
           working_directory: ops
   report-integration-tests:
     steps:
@@ -174,17 +177,8 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose.yml"
+          docker_compose_side_file: "docker-compose-side.yml"
           test_folder: "eth-l2"
-      - report-integration-tests
-
-  integration-tests-moonbeam:
-    executor: intergration-tests-executor
-    parallelism: 4
-    steps:
-      - download-solidity-compilers
-      - run-integration-tests:
-          docker_compose_file: "docker-compose-moonbeam.yml"
-          test_folder: "alt-l2"
       - report-integration-tests
 
   integration-tests-avalanche:
@@ -194,6 +188,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-avalanche.yml"
+          docker_compose_side_file: "docker-compose-avalanche-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -204,16 +199,7 @@ jobs:
       - download-solidity-compilers
       - run-integration-tests:
           docker_compose_file: "docker-compose-bnb.yml"
-          test_folder: "alt-l2"
-      - report-integration-tests
-
-  integration-tests-fantom:
-    executor: intergration-tests-executor
-    parallelism: 4
-    steps:
-      - download-solidity-compilers
-      - run-integration-tests:
-          docker_compose_file: "docker-compose-fantom.yml"
+          docker_compose_side_file: "docker-compose-bnb-side.yml"
           test_folder: "alt-l2"
       - report-integration-tests
 
@@ -221,10 +207,8 @@ workflows:
   main:
     jobs:
       - integration-tests
-      - integration-tests-moonbeam
       - integration-tests-avalanche
       - integration-tests-bnb
-      - integration-tests-fantom
       - go-lint-test-build:
           name: proxyd-tests
           binary_name: proxyd

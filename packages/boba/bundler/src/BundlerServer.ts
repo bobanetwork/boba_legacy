@@ -15,7 +15,11 @@ import { BundlerConfig } from './BundlerConfig'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import { Server } from 'http'
 import { RpcError } from './utils'
-import { EntryPointWrapper__factory, EntryPointWrapper, UserOperationStruct } from '@boba/accountabstraction'
+import {
+  EntryPointWrapper__factory,
+  EntryPointWrapper,
+  UserOperationStruct,
+} from '@boba/accountabstraction'
 import { DebugMethodHandler } from './DebugMethodHandler'
 
 import Debug from 'debug'
@@ -45,6 +49,10 @@ export class BundlerServer {
 
     this.httpServer = this.app.listen(this.config.port)
     this.startingPromise = this._preflightCheck()
+
+    if (this.config.enableDebugMethods) {
+      console.warn('WARNING: DebugMode is activated, debug_* will be available.')
+    }
   }
 
   startingPromise: Promise<void>
@@ -63,7 +71,9 @@ export class BundlerServer {
     }
 
     if ((await this.provider.getCode(this.config.entryPointWrapper)) === '0x') {
-      this.fatal(`entrypoint wrapper not deployed at ${this.config.entryPointWrapper}`)
+      this.fatal(
+        `entrypoint wrapper not deployed at ${this.config.entryPointWrapper}`
+      )
     }
 
     // minimal UserOp to revert with "FailedOp"
@@ -80,10 +90,18 @@ export class BundlerServer {
       maxPriorityFeePerGas: 0,
       signature: '0x',
     }
-    const ret = await EntryPointWrapper__factory.connect(this.config.entryPointWrapper, this.wallet).callStatic.simulateValidation(emptyUserOp)
-    const [failedOpStatus, _]: [EntryPointWrapper.FailedOpStatusStructOutput, any] = ret
+    const ret = await EntryPointWrapper__factory.connect(
+      this.config.entryPointWrapper,
+      this.wallet
+    ).callStatic.simulateValidation(emptyUserOp)
+    const [failedOpStatus, _]: [
+      EntryPointWrapper.FailedOpStatusStructOutput,
+      any
+    ] = ret
     if (failedOpStatus?.status !== true) {
-      this.fatal(`Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`)
+      this.fatal(
+        `Invalid entryPoint contract at ${this.config.entryPoint}. wrong version?`
+      )
     }
     const bal = await this.provider.getBalance(this.wallet.address)
     console.log(
@@ -178,37 +196,44 @@ export class BundlerServer {
       case 'web3_clientVersion':
         result = this.methodHandler.clientVersion()
         break
-      //TODO https://github.com/bobanetwork/boba/issues/761
-      // case 'debug_bundler_clearState':
-      //   this.debugHandler.clearState()
-      //   result = 'ok'
-      //   break
-      // case 'debug_bundler_dumpMempool':
-      //   result = await this.debugHandler.dumpMempool()
-      //   break
-      // case 'debug_bundler_setReputation':
-      //   await this.debugHandler.setReputation(params[0])
-      //   result = 'ok'
-      //   break
-      // case 'debug_bundler_dumpReputation':
-      //   result = await this.debugHandler.dumpReputation()
-      //   break
-      // case 'debug_bundler_setBundlingMode':
-      //   await this.debugHandler.setBundlingMode(params[0])
-      //   result = 'ok'
-      //   break
-      // case 'debug_bundler_setBundleInterval':
-      //   await this.debugHandler.setBundleInterval(params[0], params[1])
-      //   result = 'ok'
-      //   break
-      // case 'debug_bundler_sendBundleNow':
-      //   result = await this.debugHandler.sendBundleNow()
-      //   if (result == null) {
-      //     result = 'ok'
-      //   }
-      //   break
       default:
-        throw new RpcError(`Method ${method} is not supported`, -32601)
+        if (this.config.enableDebugMethods) {
+          // Also check debug_* methods if enabled
+          switch (method) {
+            case 'debug_bundler_clearState':
+              this.debugHandler.clearState()
+              result = 'ok'
+              break
+            case 'debug_bundler_dumpMempool':
+              result = await this.debugHandler.dumpMempool()
+              break
+            case 'debug_bundler_setReputation':
+              await this.debugHandler.setReputation(params[0])
+              result = 'ok'
+              break
+            case 'debug_bundler_dumpReputation':
+              result = await this.debugHandler.dumpReputation()
+              break
+            case 'debug_bundler_setBundlingMode':
+              await this.debugHandler.setBundlingMode(params[0])
+              result = 'ok'
+              break
+            case 'debug_bundler_setBundleInterval':
+              await this.debugHandler.setBundleInterval(params[0], params[1])
+              result = 'ok'
+              break
+            case 'debug_bundler_sendBundleNow':
+              result = await this.debugHandler.sendBundleNow()
+              if (result == null) {
+                result = 'ok'
+              }
+              break
+            default:
+              throw new RpcError(`Method ${method} is not supported`, -32601)
+          }
+        } else {
+          throw new RpcError(`Method ${method} is not supported`, -32601)
+        }
     }
     return result
   }

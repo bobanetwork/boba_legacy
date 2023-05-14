@@ -10,14 +10,14 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleAccountAPI } from '@boba/bundler_sdk'
+import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
-import { HttpRpcClient } from '@boba/bundler_sdk/dist/HttpRpcClient'
+import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 
 import BobaDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
 
@@ -54,9 +54,9 @@ describe('AA Boba as Fee token Test\n', async () => {
     recipient = await SampleRecipient__factory.deploy()
 
     L2BOBAToken = new Contract(
-        env.addressesBOBA.TOKENS.BOBA.L2,
-        L2GovernanceERC20Json.abi,
-        env.l2Wallet
+      env.addressesBOBA.TOKENS.BOBA.L2,
+      L2GovernanceERC20Json.abi,
+      env.l2Wallet
     )
 
     bundlerProvider = new HttpRpcClient(
@@ -87,11 +87,11 @@ describe('AA Boba as Fee token Test\n', async () => {
 
     // add boba token
     await BobaDepositPaymaster.addToken(
-        L2BOBAToken.address,
-        // tokenPrice oracle
-        PriceOracle.address,
-        L2BOBAToken.address,
-        18
+      L2BOBAToken.address,
+      // tokenPrice oracle
+      PriceOracle.address,
+      L2BOBAToken.address,
+      18
     )
 
     EntryPoint = new Contract(
@@ -114,73 +114,83 @@ describe('AA Boba as Fee token Test\n', async () => {
     let postApproveEtherBalance
     let signedOp
 
-    before('the paymaster operator sets up the paymaster by staking and adding deposits', async () => {
-      await BobaDepositPaymaster.addStake(1, { value: utils.parseEther('2') })
-      await EntryPoint.depositTo(BobaDepositPaymaster.address, {
-        value: utils.parseEther('1')
-      })
-    })
+    before(
+      'the paymaster operator sets up the paymaster by staking and adding deposits',
+      async () => {
+        await BobaDepositPaymaster.addStake(1, { value: utils.parseEther('2') })
+        await EntryPoint.depositTo(BobaDepositPaymaster.address, {
+          value: utils.parseEther('1'),
+        })
+      }
+    )
 
-    before('the user approves the paymaster to spend their $BOBA token', async () => {
-      // deploy a 4337 Wallet and send operation to this wallet
-      SimpleAccount__factory = new ContractFactory(
-        SimpleAccountFactoryJson.abi,
-        SimpleAccountFactoryJson.bytecode,
-        env.l2Wallet
-      )
-      accountFactory = await SimpleAccount__factory.deploy(
-        entryPointAddress
-      )
-      await accountFactory.deployed()
-      console.log('Account Factory deployed to:', accountFactory.address)
-      await accountFactory.createAccount(env.l2Wallet.address, 0)
-      account = await accountFactory.getAddress(env.l2Wallet.address, 0)
-      console.log('Account deployed to:', account)
-      const SenderCreator__factory = new ContractFactory(
-          SenderCreatorJson.abi,
-          SenderCreatorJson.bytecode,
+    before(
+      'the user approves the paymaster to spend their $BOBA token',
+      async () => {
+        // deploy a 4337 Wallet and send operation to this wallet
+        SimpleAccount__factory = new ContractFactory(
+          SimpleAccountFactoryJson.abi,
+          SimpleAccountFactoryJson.bytecode,
           env.l2Wallet
         )
-      const senderCreator = await SenderCreator__factory.deploy()
-      console.log('Sender Creator Factory deployed to:', senderCreator.address)
+        accountFactory = await SimpleAccount__factory.deploy(entryPointAddress)
+        await accountFactory.deployed()
+        console.log('Account Factory deployed to:', accountFactory.address)
+        await accountFactory.createAccount(env.l2Wallet.address, 0)
+        account = await accountFactory.getAddress(env.l2Wallet.address, 0)
+        console.log('Account deployed to:', account)
 
-      await L2BOBAToken.transfer(account, utils.parseEther('1'))
+        await L2BOBAToken.transfer(account, utils.parseEther('1'))
 
-      await L2BOBAToken.approve(BobaDepositPaymaster.address, constants.MaxUint256)
-      await BobaDepositPaymaster.addDepositFor(L2BOBAToken.address, account, utils.parseEther('2'))
+        await L2BOBAToken.approve(
+          BobaDepositPaymaster.address,
+          constants.MaxUint256
+        )
+        await BobaDepositPaymaster.addDepositFor(
+          L2BOBAToken.address,
+          account,
+          utils.parseEther('2')
+        )
 
-      //the account approves the paymaster to use its tokens (in order for the paymaster to deduct fees from the account)
-      // this approve operation needs gas (in eth) because this step does not involve a paymaster
-      await env.l2Wallet.sendTransaction({
-        value: utils.parseEther('2'),
-        to: account,
-      })
+        //the account approves the paymaster to use its tokens (in order for the paymaster to deduct fees from the account)
+        // this approve operation needs gas (in eth) because this step does not involve a paymaster
+        await env.l2Wallet.sendTransaction({
+          value: utils.parseEther('2'),
+          to: account,
+        })
 
-      accountAPI = new SimpleAccountAPI({
-        provider: env.l2Provider,
-        entryPointAddress,
-        senderCreatorAddress: senderCreator.address,
-        owner: env.l2Wallet,
-        accountAddress: account
-      })
+        accountAPI = new SimpleAccountAPI({
+          provider: env.l2Provider,
+          entryPointAddress,
+          owner: env.l2Wallet,
+          accountAddress: account,
+        })
 
-      const approveOp = await accountAPI.createSignedUserOp({
+        const approveOp = await accountAPI.createSignedUserOp({
           target: L2BOBAToken.address,
-          data: L2BOBAToken.interface.encodeFunctionData('approve', [BobaDepositPaymaster.address, constants.MaxUint256]),
-      })
+          data: L2BOBAToken.interface.encodeFunctionData('approve', [
+            BobaDepositPaymaster.address,
+            constants.MaxUint256,
+          ]),
+        })
 
-      preApproveTokenBalance = await L2BOBAToken.balanceOf(account)
-      preApproveDepositAmount = (await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account)).amount
-      preApproveEtherBalance = await env.l2Provider.getBalance(account)
+        preApproveTokenBalance = await L2BOBAToken.balanceOf(account)
+        preApproveDepositAmount = (
+          await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account)
+        ).amount
+        preApproveEtherBalance = await env.l2Provider.getBalance(account)
 
-      const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
-      const txid = await accountAPI.getUserOpReceipt(requestId)
-      console.log('reqId', requestId, 'txid=', txid)
+        const requestId = await bundlerProvider.sendUserOpToBundler(approveOp)
+        const txid = await accountAPI.getUserOpReceipt(requestId)
+        console.log('reqId', requestId, 'txid=', txid)
 
-      postApproveTokenBalance = await L2BOBAToken.balanceOf(account)
-      postApproveDepositAmount = (await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account)).amount
-      postApproveEtherBalance = await env.l2Provider.getBalance(account)
-    })
+        postApproveTokenBalance = await L2BOBAToken.balanceOf(account)
+        postApproveDepositAmount = (
+          await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account)
+        ).amount
+        postApproveEtherBalance = await env.l2Provider.getBalance(account)
+      }
+    )
     it('should be able to submit a userOp including the paymaster to the bundler and trigger tx', async () => {
       const op = await accountAPI.createUnsignedUserOp({
         target: recipient.address,
@@ -188,7 +198,10 @@ describe('AA Boba as Fee token Test\n', async () => {
       })
 
       // TODO: check why paymasterAndData does not work when added to the walletAPI
-      op.paymasterAndData = hexConcat([BobaDepositPaymaster.address, hexZeroPad(L2BOBAToken.address, 20)])
+      op.paymasterAndData = hexConcat([
+        BobaDepositPaymaster.address,
+        hexZeroPad(L2BOBAToken.address, 20),
+      ])
       op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
 
       signedOp = await accountAPI.signUserOp(op)
@@ -211,7 +224,9 @@ describe('AA Boba as Fee token Test\n', async () => {
       // message is received and emitted
       expect(log.args.message).to.eq('hello')
       const postCallTokenBalance = await L2BOBAToken.balanceOf(account)
-      const postCallDepositAmount = (await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account)).amount
+      const postCallDepositAmount = (
+        await BobaDepositPaymaster.depositInfo(L2BOBAToken.address, account)
+      ).amount
       const postCallEtherBalance = await env.l2Provider.getBalance(account)
 
       const returnedEPlogIndex = await getFilteredLogIndex(
@@ -220,7 +235,9 @@ describe('AA Boba as Fee token Test\n', async () => {
         entryPointAddress,
         'UserOperationEvent'
       )
-      const logEP = EntryPoint.interface.parseLog(receipt.logs[returnedEPlogIndex])
+      const logEP = EntryPoint.interface.parseLog(
+        receipt.logs[returnedEPlogIndex]
+      )
 
       // no token is used when approving, ether balance is used to pay approval fees
       expect(preApproveTokenBalance).to.eq(postApproveTokenBalance)
@@ -231,7 +248,12 @@ describe('AA Boba as Fee token Test\n', async () => {
       // no ether is used when calling the recipient with the help of the paymaster, users boba token is used to pay
       expect(postApproveEtherBalance).to.eq(postCallEtherBalance)
       expect(postApproveTokenBalance).to.gt(postCallTokenBalance)
-      expect(BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)).to.closeTo(BigNumber.from(postApproveTokenBalance), utils.parseEther('0.0001'))
+      expect(
+        BigNumber.from(postCallTokenBalance).add(logEP.args.actualGasCost)
+      ).to.closeTo(
+        BigNumber.from(postApproveTokenBalance),
+        utils.parseEther('0.0001')
+      )
     })
   })
 })

@@ -37,6 +37,9 @@ packages/boba/gas-price-oracle/data
 .env
 *.log
 
+# boba_community
+boba_community/boba-relayer/yarn.lock
+
 # boba_examples
 boba_examples/init-fund-l2/yarn.lock
 boba_examples/boba-fee/yarn.lock

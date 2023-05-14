@@ -100,7 +100,7 @@ describe('NFT Test\n', async () => {
         BigNumber.from(String(0)), //starting index for the tokenIDs
         ERC721.address,
         UUID,
-        'BOBA_Goerli_2888'
+        'BOBA_Goerli_2888',
       ],
       env.l2Wallet
     )
