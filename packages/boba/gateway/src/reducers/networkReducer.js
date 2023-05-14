@@ -16,11 +16,6 @@ limitations under the License. */
 import { NETWORK, NETWORK_TYPE } from "util/network/network.util"
 
 /**
- * network : ethereum, bnb, fantom, avax, moonbase, moonbeam
- * networkType : mainnet, testnet.
- **/
-
-/**
  * NOTE:
  * 3. enable switch once selected !== current.
  * 4. on selection dispatch event.

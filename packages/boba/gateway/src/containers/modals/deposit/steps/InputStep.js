@@ -18,7 +18,6 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
-import BobaBeamAlert from './bobaBeamAlert'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -106,7 +105,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
-        <BobaBeamAlert />
+
         <Typography variant="body2" sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}>
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
@@ -127,7 +126,7 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <BobaBeamAlert />
+
         {!isBridge &&
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
             Classic Bridge {token && token.symbol ? token.symbol : ''} to L2

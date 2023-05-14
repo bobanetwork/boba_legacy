@@ -4323,7 +4323,6 @@ class NetworkService {
         let ALT_L1_BOBA_ADDRESS = this.addresses[`Proxy__EthBridgeTo${type}`];
         let PROXY_ETH_L1_BRIDGE_ADDRESS_TO = this.addresses[`${type}_TK_BOBA`];
 
-        // Layer zero doesn't support moonbase
         // return 0 for those bridges that haven't been implemented yet
         if (typeof ALT_L1_BOBA_ADDRESS === 'undefined' || typeof PROXY_ETH_L1_BRIDGE_ADDRESS_TO === 'undefined') {
           return {type, fee: '0' }

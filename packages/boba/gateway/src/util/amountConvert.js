@@ -65,9 +65,7 @@ const amountToUseConfig = {
   'AVAX': { provider: 'avalanche-2' },
   'FTM': { provider: 'fantom' },
   'BNB': { provider: 'binancecoin' },
-  'tBNB': { provider: 'binancecoin' },
-  'DEV': { provider: 'moonbeam' },
-  'GLMR': { provider: 'moonbeam' }
+  'tBNB': { provider: 'binancecoin' }
 }
 
 export function amountToUsd(amount, lookupPrice, token) {
