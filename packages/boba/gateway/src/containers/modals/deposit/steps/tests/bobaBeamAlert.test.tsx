@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import Theme from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import BobaBeamAlert from '../bobaBeamAlert'
+import BobaBeamAlert from '../BridgeAlert'
 import { NETWORK } from 'util/network/network.util'
 import * as constants from 'util/constant'
 
