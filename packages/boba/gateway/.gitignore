@@ -1,2 +1,5 @@
 .idea
 coverage
+key.pem
+cert.pem
+csr.pem
