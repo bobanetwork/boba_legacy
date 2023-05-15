@@ -185,7 +185,7 @@ describe('AA Bundler Test\n', async () => {
   })
 
   describe('query rpc calls: eth_estimateUserOperationGas, eth_callUserOperation', async () => {
-    it.only('estimateUserOperationGas should estimate even without eth', async () => {
+    it('estimateUserOperationGas should estimate even without eth', async () => {
       const op = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
