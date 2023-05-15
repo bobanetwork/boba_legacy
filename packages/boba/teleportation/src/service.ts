@@ -3,6 +3,7 @@ import { Contract, Wallet, BigNumber, providers, EventFilter } from 'ethers'
 import { orderBy } from 'lodash'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
+import 'reflect-metadata'
 
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
