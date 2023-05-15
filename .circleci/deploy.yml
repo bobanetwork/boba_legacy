@@ -1,0 +1,26 @@
+version: "3"
+
+jobs:
+  build-and-deploy:
+    executor: intergration-tests-executor
+    parallelism: 1
+    steps:
+      - checkout
+      - run:
+          name: Build image
+          command: docker-compose -f ops/docker/docker-compose-side.yml build
+      - run:
+          name: Push image to ECR
+          command: docker push bobanetwork/bundler:latest
+      - run:
+          name: Deploy to ECS
+          command: aws ecs run-task --cluster optimism-cluster --task-definition bundler-task-definition --region us-east-1
+
+workflows:
+  main:
+    jobs:
+      - build-and-deploy:
+          filters:
+            branches:
+              only:
+                - deploy-bundler_placeholder
