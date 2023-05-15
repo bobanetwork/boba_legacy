@@ -6,6 +6,7 @@ import BobaVerifyingPaymasterJson from '../artifacts/contracts/samples/BobaVerif
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
 
 let Factory__BobaVerifyingPaymaster: ContractFactory
+let BobaVerifyingPaymaster: Contract
 
 const deployFn: DeployFunction = async (hre) => {
   Factory__BobaVerifyingPaymaster = new ContractFactory(
@@ -25,26 +26,18 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`Boba is located at: ${bobaToken}`)
   const entryPointFromAM = await (hre as any).deployConfig.addressManager.getAddress('L2_Boba_EntryPoint')
   if (entryPoint.address.toLowerCase() === entryPointFromAM.toLowerCase()) {
-    const bobaVerifyingPaymasterConstructorArgs = ethers.utils.defaultAbiCoder.encode(
-      ["address", "address","address", "address"],
-      [entryPoint.address, verifyingSignerAddress, bobaDepositPaymaster.address, bobaToken]
-    )
-    const bobaVerifyingPaymasterCreationCode = ethers.utils.solidityPack(
-      ["bytes", "bytes"],
-      [Factory__BobaVerifyingPaymaster.bytecode, bobaVerifyingPaymasterConstructorArgs]
-    )
-    const dep = new DeterministicDeployer((hre as any).deployConfig.l2Provider, (hre as any).deployConfig.deployer_l2, 'local')
+    BobaVerifyingPaymaster = await Factory__BobaVerifyingPaymaster.deploy(entryPoint.address, verifyingSignerAddress, bobaDepositPaymaster.address, bobaToken)
+    await BobaVerifyingPaymaster.deployTransaction.wait()
 
-    const BobaVerifyingPaymasterAddress = await dep.deterministicDeploy(bobaVerifyingPaymasterCreationCode)
-    console.log('Boba Verifying Paymaster at', BobaVerifyingPaymasterAddress)
+    console.log('Boba Verifying Paymaster at', BobaVerifyingPaymaster.address)
 
     const BobaVerifyingPaymasterDeploymentSubmission: DeploymentSubmission = {
-      address: BobaVerifyingPaymasterAddress,
+      address: BobaVerifyingPaymaster.address,
       abi: BobaVerifyingPaymasterJson.abi
     }
     await hre.deployments.save('BobaVerifyingPaymaster', BobaVerifyingPaymasterDeploymentSubmission)
 
-    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_BobaVerifyingPaymaster', BobaVerifyingPaymasterAddress )
+    await registerBobaAddress( (hre as any).deployConfig.addressManager, 'L2_BobaVerifyingPaymaster', BobaVerifyingPaymaster.address )
   }
 }
 
