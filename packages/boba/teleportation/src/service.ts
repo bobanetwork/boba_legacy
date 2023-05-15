@@ -1,8 +1,6 @@
 /* Imports: External */
 import { Contract, Wallet, BigNumber, providers, EventFilter } from 'ethers'
 import { orderBy } from 'lodash'
-import fs, { promises as fsPromise } from 'fs'
-import path from 'path'
 import 'reflect-metadata'
 
 /* Imports: Internal */
@@ -13,6 +11,8 @@ import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
 import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
+import { HistoryData } from './entity/HistoryData'
+import { AppDataSource } from './data-source'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -180,7 +180,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     // parse events
     if (events.length === 0) {
       // update the deposit info if no events are found
-      this._putDepositInfo(chainId, latestBlock)
+      await this._putDepositInfo(chainId, latestBlock)
     } else {
       const lastDisbursement =
         await this.state.Teleportation.totalDisbursements(chainId)
@@ -294,32 +294,25 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     chainId: number | string,
     latestBlock: number
   ): Promise<void> {
-    const dumpsPath = path.resolve(__dirname, this.options.dbPath)
-    if (!fs.existsSync(dumpsPath)) {
-      fs.mkdirSync(dumpsPath)
-    }
     try {
-      const addrsPath = path.resolve(dumpsPath, `depositInfo-${chainId}.json`)
-      await fsPromise.writeFile(addrsPath, JSON.stringify({ latestBlock }))
+      const historyData = new HistoryData()
+      historyData.chainId = chainId
+      historyData.blockNo = latestBlock
+      await AppDataSource.manager.save(historyData)
     } catch (error) {
       this.logger.error(`Failed to put depositInfo! - ${error}`)
     }
   }
 
   async _getDepositInfo(chainId: number | string): Promise<any> {
-    const dumpsPath = path.resolve(
-      __dirname,
-      `${this.options.dbPath}/depositInfo-${chainId}.json`
-    )
-    if (fs.existsSync(dumpsPath)) {
-      const historyJsonRaw = await fsPromise.readFile(dumpsPath)
-      const historyJSON = JSON.parse(historyJsonRaw.toString())
-      if (historyJSON.latestBlock) {
-        return historyJSON.latestBlock
-      } else {
-        throw new Error("Can't find latestBlock in depositInfo")
-      }
+    const latestBlock = await AppDataSource.manager.findOneBy(HistoryData, {
+      chainId,
+    })
+
+    if (latestBlock) {
+      return latestBlock
+    } else {
+      throw new Error("Can't find latestBlock in depositInfo")
     }
-    throw new Error("Can't find latestBlock in depositInfo")
   }
 }

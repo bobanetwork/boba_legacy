@@ -10,8 +10,6 @@ import {
   Wallet,
   utils,
 } from 'ethers'
-import fs, { promises as fsPromise } from 'fs'
-import path from 'path'
 import { orderBy } from 'lodash'
 
 /* Imports: Artifacts */
@@ -22,7 +20,9 @@ import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC2
 import { ChainInfo } from '../src/utils/types'
 
 /* Imports: Core */
-import { TeleportationService } from '../dist/service'
+import { TeleportationService } from '../src/service'
+import { AppDataSource } from "../src/data-source";
+import { HistoryData } from "../src/entity/HistoryData";
 
 describe('teleportation', () => {
   let signer: Signer
@@ -37,6 +37,10 @@ describe('teleportation', () => {
   const dbPath = './db'
 
   before(async () => {
+    await AppDataSource.initialize()
+    // empty db
+    await AppDataSource.manager.delete(HistoryData, {})
+
     ;[signer] = await ethers.getSigners()
     signerAddr = await signer.getAddress()
     wallet1 = ethers.Wallet.createRandom().connect(ethers.provider)
@@ -54,14 +58,6 @@ describe('teleportation', () => {
   let L2BOBA: Contract
 
   before(async () => {
-    // Remove file if it exists
-    const dumpsPath = path.resolve(
-      __dirname,
-      '../dist/src/db/depositInfo-31337.json'
-    )
-    if (fs.existsSync(dumpsPath)) {
-      fs.unlinkSync(dumpsPath)
-    }
     const chainId = (await ethers.provider.getNetwork()).chainId
 
     Factory__Teleportation = new ethers.ContractFactory(
@@ -122,7 +118,6 @@ describe('teleportation', () => {
       selectedBobaChains,
       pollingInterval,
       blockRangePerPolling,
-      dbPath,
     })
     return teleportationService
   }
@@ -498,19 +493,13 @@ describe('teleportation', () => {
       expect(storedBlock).to.be.eq(latestBlock)
     }).retries(3)
 
-    it('should not disbure BOBA token if the data is reset', async () => {
-      // Remove file if it exists
-      const dumpsPath = path.resolve(
-        __dirname,
-        '../dist/src/db/depositInfo-31337.json'
-      )
-      if (fs.existsSync(dumpsPath)) {
-        fs.unlinkSync(dumpsPath)
-      }
+    it('should not disburse BOBA token if the data is reset', async () => {
 
       const chainId = (await ethers.provider.getNetwork()).chainId
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
+
+      await AppDataSource.manager.delete(HistoryData, { chainId })
 
       const latestBlock = await ethers.provider.getBlockNumber()
       const depositTeleportations = {

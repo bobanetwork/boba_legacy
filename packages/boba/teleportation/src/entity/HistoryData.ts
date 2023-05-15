@@ -3,9 +3,9 @@ import { PrimaryColumn } from 'typeorm/decorator/columns/PrimaryColumn'
 
 @Entity()
 export class HistoryData {
-  @Column({ type: 'bigint' })
-  blockNo: string
+  @Column({ type: 'int' })
+  blockNo: number
 
   @PrimaryColumn({ type: 'int' })
-  chainId: string
+  chainId: string | number
 }
