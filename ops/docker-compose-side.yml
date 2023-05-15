@@ -48,6 +48,21 @@ services:
     deploy:
       replicas: 0
 
+  teleportation_db:
+    image: postgres
+    deploy:
+      replicas: 0
+    volumes:
+      - type: bind
+        source: ./scripts/teleportation-init.sql
+        # make sure server is properly booted up before
+        target: /docker-entrypoint-initdb.d/10-init.sql
+    environment:
+      POSTGRES_PASSWORD: abcdef
+      POSTGRES_DB: teleportation
+    ports:
+      - "5432:5432"
+
   monitor:
     depends_on:
      - l1_chain

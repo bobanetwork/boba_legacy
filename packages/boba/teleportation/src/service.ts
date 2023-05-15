@@ -34,8 +34,6 @@ interface TeleportationOptions {
   pollingInterval: number
 
   blockRangePerPolling: number
-
-  dbPath: string
 }
 
 const optionSettings = {}
