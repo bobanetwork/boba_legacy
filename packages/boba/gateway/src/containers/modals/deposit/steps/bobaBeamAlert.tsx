@@ -19,9 +19,9 @@ const BobaBeamAlert = () => {
   if (!!Number(BOBABEAM_STATUS) && activeNetwork === NETWORK.MOONBEAM) {
     return (
       <AlertText>
-        Deposits are disabled. For users of Bobabeam or Bobabeam applications
-        you will need to transfer all your funds to Moonbeam mainnet before May
-        15th or risk permanently losing access to any assets on Bobabeam
+        For users of Bobabeam or Bobabeam applications you will need to transfer
+        all your funds to Moonbeam mainnet before May 15th or risk permanently
+        losing access to any assets on Bobabeam
       </AlertText>
     )
   }

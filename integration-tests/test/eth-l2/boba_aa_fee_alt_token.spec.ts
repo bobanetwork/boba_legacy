@@ -119,6 +119,7 @@ describe('AA Alt Fee Token Test\n', async () => {
     let postApproveDepositAmount
     let postApproveEtherBalance
     let signedOp
+    let tokenDifference
 
     before(
       'the paymaster operator sets up the paymaster by staking and adding deposits',
@@ -240,6 +241,7 @@ describe('AA Alt Fee Token Test\n', async () => {
       // message is received and emitted
       expect(log.args.message).to.eq('hello')
       const postCallTokenBalance = await L2ERC20Token.balanceOf(account)
+      tokenDifference = postApproveTokenBalance.sub(postCallTokenBalance)
       const postCallDepositAmount = (
         await ManualDepositPaymaster.depositInfo(L2ERC20Token.address, account)
       ).amount
@@ -270,6 +272,26 @@ describe('AA Alt Fee Token Test\n', async () => {
         BigNumber.from(postApproveTokenBalance),
         utils.parseEther('0.0001')
       )
+    })
+    it('should not allow a non-owner to withdraw paymaster tokens', async () => {
+      const ownerDeposits = await ManualDepositPaymaster.balances(L2ERC20Token.address, env.l2Wallet.address)
+      expect (ownerDeposits).to.be.eq(tokenDifference)
+
+      await expect(
+        ManualDepositPaymaster.connect(env.l2Wallet_2).withdrawTokensTo(L2ERC20Token.address, env.l2Wallet_2.address, ownerDeposits)
+      ).to.be.reverted
+    })
+    it('should allow the paymaster owner to withdraw paymaster tokens', async () => {
+      const ownerDeposits = await ManualDepositPaymaster.balances(L2ERC20Token.address, env.l2Wallet.address)
+      expect(ownerDeposits).to.be.eq(tokenDifference)
+
+      const preTokenBalance = await L2ERC20Token.balanceOf(env.l2Wallet.address)
+      await ManualDepositPaymaster.connect(env.l2Wallet).withdrawTokensTo(L2ERC20Token.address, env.l2Wallet.address, ownerDeposits)
+      const postTokenBalance = await L2ERC20Token.balanceOf(env.l2Wallet.address)
+
+      expect(postTokenBalance).to.be.eq(preTokenBalance.add(ownerDeposits))
+      const currentOwnerDeposits = await ManualDepositPaymaster.balances(L2ERC20Token.address, env.l2Wallet.address)
+      expect(currentOwnerDeposits).to.be.eq(0)
     })
   })
 })
