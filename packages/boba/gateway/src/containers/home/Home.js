@@ -341,9 +341,8 @@ function Home() {
       {! maintenance &&
         <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
-          <Container maxWidth={false} sx={{
+          <Container maxWidth={false} className='demo' sx={{
             minHeight: 'calc(100vh - 200px)',
-            width: '100vw',
             marginLeft: 'unset',
             marginRight: 'unset'
           }}>
