@@ -299,7 +299,6 @@ function Home() {
             height: 'calc(100% - 150px)',
             minHeight: '500px',
             marginLeft: 'unset',
-            width: '100vw',
             marginRight: 'unset',
             paddingTop: '50px'
           }}>
@@ -341,7 +340,7 @@ function Home() {
       {! maintenance &&
         <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
-          <Container maxWidth={false} className='demo' sx={{
+          <Container maxWidth={false} sx={{
             minHeight: 'calc(100vh - 200px)',
             marginLeft: 'unset',
             marginRight: 'unset'
