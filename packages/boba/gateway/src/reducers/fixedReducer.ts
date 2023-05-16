@@ -13,20 +13,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-const initialState = {
+type State = {
+  stakeCount: number
+  stakeInfo: Record<string, unknown>
+}
+
+type Action = {
+  type: string
+  payload: Partial<State>
+}
+
+const initialState: State = {
   stakeCount: 0,
   stakeInfo: {},
 }
 
-function fixedReducer (state = initialState, action) {
-  switch (action.type) {
-    case 'GET/FS_SAVES/SUCCESS':
-      return {...state, ...action.payload}
-    case 'GET/FS_INFO/SUCCESS':
-      return {...state, ...action.payload}
-    default:
-      return state
+const actionHandlers: Record<string, (state: State, action: Action) => State> =
+  {
+    'GET/FS_SAVES/SUCCESS': (state, action) => ({
+      ...state,
+      ...action.payload,
+    }),
+    'GET/FS_INFO/SUCCESS': (state, action) => ({ ...state, ...action.payload }),
   }
+
+const fixedReducer = (state: State = initialState, action: Action): State => {
+  const handler = actionHandlers[action.type]
+  return handler ? handler(state, action) : state
 }
 
 export default fixedReducer

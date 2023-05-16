@@ -13,15 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-const initialState = {}
+type State = Record<string, unknown>
+type Action = {
+  type: string
+  payload: any
+}
 
-function lookupReducer(state = initialState, action) {
-  switch (action.type) {
-    case 'PRICE/GET/SUCCESS':
-      return { ...state, ...action.payload };
-    default:
-      return state;
+const initialState: State = {}
+
+const actionHandlers: Record<string, (state: State, action: Action) => State> =
+  {
+    'PRICE/GET/SUCCESS': (state, action) => ({ ...state, ...action.payload }),
   }
+
+const lookupReducer = (state: State = initialState, action: Action): State => {
+  const handler = actionHandlers[action.type]
+  return handler ? handler(state, action) : state
 }
 
 export default lookupReducer
