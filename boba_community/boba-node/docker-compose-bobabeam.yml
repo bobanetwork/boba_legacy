@@ -15,7 +15,6 @@ services:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
-
       DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://replica.bobabeam.boba.network'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'

@@ -8,7 +8,7 @@ import {
   utils,
   constants,
 } from 'ethers'
-import { getContractInterface,predeploys } from '@eth-optimism/contracts'
+import { getContractInterface, predeploys } from '@eth-optimism/contracts'
 import { remove0x, sleep } from '@eth-optimism/core-utils'
 import { asL2Provider } from '@eth-optimism/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
@@ -24,13 +24,9 @@ export const isLiveNetwork = () => {
 }
 
 export const HARDHAT_CHAIN_ID = 31337
-export const MOONBEAM_CHAIN_ID = 1281
-export const FANTOM_CHAIN_ID = 4003
 export const AVALANCHE_CHAIN_ID = 43112
 export const BNB_CHAIN_ID = 99
 export const NON_ETHEREUM_CHAIN = [
-  MOONBEAM_CHAIN_ID,
-  FANTOM_CHAIN_ID,
   AVALANCHE_CHAIN_ID,
   BNB_CHAIN_ID,
 ]
@@ -212,6 +208,26 @@ if (!process.env.BASE_URL) {
 export const BASE_URL =
   process.env.BASE_URL || 'http://127.0.0.1:8080/addresses.json'
 
+if (!process.env.AA_BOBA_URL) {
+  console.log(`!!You did not set process.env.AA_BOBA_URL!!`)
+  console.log(`Setting to default value of http://127.0.0.1:8080/aa-addr.json`)
+} else {
+  console.log(`process.env.AA_BOBA_URL set to:`, process.env.AA_BOBA_URL)
+}
+
+export const AA_BOBA_URL =
+  process.env.AA_BOBA_URL || 'http://127.0.0.1:8080/aa-addr.json'
+
+if (!process.env.BUNDLER_URL) {
+  console.log(`!!You did not set process.env.BUNDLER_URL!!`)
+  console.log(`Setting to default value of http://localhost:3000/rpc`)
+} else {
+  console.log(`process.env.BUNDLER_URL set to:`, process.env.BUNDLER_URL)
+}
+
+export const BUNDLER_URL =
+  process.env.BUNDLER_URL || 'http://localhost:3000/rpc'
+
 // Gets the bridge contract
 export const getL1Bridge = async (wallet: Wallet, bridgeAddress: string) => {
   const l1BridgeInterface = getContractInterface('L1StandardBridgeAltL1')
@@ -348,6 +364,14 @@ export const getBOBADeployerAddresses = async () => {
   return JSON.parse(result)
 }
 
+export const getAABOBADeployerAddresses = async () => {
+  const options = {
+    uri: AA_BOBA_URL,
+  }
+  const result = await request.get(options)
+  return JSON.parse(result)
+}
+
 export const expectLogs = async (
   receipt,
   emitterAbi,
@@ -414,7 +438,7 @@ export const getFilteredLogIndex = async (
     (log) =>
       log.topics.length > 0 &&
       log.topics[0] === eventTopic &&
-      (!emitterAddress || log.address === emitterAddress)
+      (!emitterAddress || log.address.toLowerCase() === emitterAddress.toLowerCase())
   )
 
   return filteredLogs[0].logIndex

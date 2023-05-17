@@ -90,6 +90,11 @@ contract EntryPointWrapper {
         StakeInfo senderInfo, StakeInfo factoryInfo, StakeInfo paymasterInfo,
         AggregatorStakeInfo aggregatorInfo);
 
+    /**
+     * return value of getSenderAddress
+     */
+    error SenderAddressResult(address sender);
+
     IEntryPoint public entryPoint;
 
     StakeInfo private emptyStakeInfo = StakeInfo(0, 0);
@@ -204,5 +209,19 @@ contract EntryPointWrapper {
         }
         bytes memory data = abi.encode(hashes);
         return (keccak256(data));
+    }
+
+    function getSenderAddress(bytes calldata initCode) external returns (address) {
+        try entryPoint.getSenderAddress(initCode) {}
+        catch (bytes memory revertData) {
+            bytes4 receivedSelector = bytes4(revertData);
+
+            if (receivedSelector == SenderAddressResult.selector) {
+                address sender = abi.decode(slice(revertData, 4, revertData.length - 4), (address));
+                return sender;
+            } else {
+                revert ("Invalid initCode");
+            }
+        }
     }
 }

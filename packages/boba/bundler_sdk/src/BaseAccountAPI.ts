@@ -1,9 +1,10 @@
-import { ethers, BigNumber, BigNumberish, Contract } from 'ethers'
+import { ethers, BigNumber, BigNumberish } from 'ethers'
 import { Provider } from '@ethersproject/providers'
 import {
-  EntryPoint, EntryPoint__factory,
+  EntryPoint,
+  EntryPoint__factory,
+  EntryPointWrapper__factory,
   UserOperationStruct,
-  SenderCreator__factory
 } from '@boba/accountabstraction'
 
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp'
@@ -15,7 +16,7 @@ import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas'
 export interface BaseApiParams {
   provider: Provider
   entryPointAddress: string
-  senderCreatorAddress?: string
+  entryPointWrapperAddress?: string
   accountAddress?: string
   overheads?: Partial<GasOverheads>
   paymasterAPI?: PaymasterAPI
@@ -48,7 +49,7 @@ export abstract class BaseAccountAPI {
   provider: Provider
   overheads?: Partial<GasOverheads>
   entryPointAddress: string
-  senderCreatorAddress?: string
+  entryPointWrapperAddress?: string
   accountAddress?: string
   paymasterAPI?: PaymasterAPI
 
@@ -60,7 +61,7 @@ export abstract class BaseAccountAPI {
     this.provider = params.provider
     this.overheads = params.overheads
     this.entryPointAddress = params.entryPointAddress
-    this.senderCreatorAddress = params.senderCreatorAddress
+    this.entryPointWrapperAddress = params.entryPointWrapperAddress
     this.accountAddress = params.accountAddress
     this.paymasterAPI = params.paymasterAPI
 
@@ -127,9 +128,9 @@ export abstract class BaseAccountAPI {
     const initCode = this.getAccountInitCode()
     // use entryPoint to query account address (factory can provide a helper method to do the same, but
     // this method attempts to be generic
-    if (this.senderCreatorAddress != null) {
-       const senderCreator = new Contract(this.senderCreatorAddress, SenderCreator__factory.abi, this.provider)
-       return senderCreator.callStatic.createSender(initCode)
+    if (this.entryPointWrapperAddress != null) {
+       const accountAddr = await EntryPointWrapper__factory.connect(this.entryPointWrapperAddress, this.provider).callStatic.getSenderAddress(initCode)
+      return accountAddr
      } else {
        try {
          await this.entryPointView.callStatic.getSenderAddress(initCode)

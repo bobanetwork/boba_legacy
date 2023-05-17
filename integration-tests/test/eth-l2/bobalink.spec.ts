@@ -37,14 +37,15 @@ describe('BobaLink Test\n', async () => {
     gasLimit: 1000000,
   }
 
-  const addOracle = async (contract: Contract, oracleAddr: string, adminAddr: string, roundId = 0) => {
+  const addOracle = async (
+    contract: Contract,
+    oracleAddr: string,
+    adminAddr: string,
+    roundId = 0
+  ) => {
     const admin = await contract.getAdmin()
     if (admin === '0x0000000000000000000000000000000000000000') {
-      await contract.setOracle(
-        oracleAddr,
-        adminAddr,
-        roundId
-      )
+      await contract.setOracle(oracleAddr, adminAddr, roundId)
     }
   }
 
@@ -101,10 +102,26 @@ describe('BobaLink Test\n', async () => {
     await EthOracleHC.updateHCChainLinkPriceFeedAddr(EthChainLinkOracle.address)
     await BtcOracleHC.updateHCChainLinkPriceFeedAddr(BtcChainLinkOracle.address)
 
-    await addOracle(EthOracleHC, EthChainLinkOracle.address, env.l2BobalinkWallet.address)
-    await addOracle(BtcOracleHC, BtcChainLinkOracle.address, env.l2BobalinkWallet.address)
-    await addOracle(EthChainLinkOracle, EthChainLinkOracle.address, env.l2Wallet.address)
-    await addOracle(BtcChainLinkOracle, BtcChainLinkOracle.address, env.l2Wallet.address)
+    await addOracle(
+      EthOracleHC,
+      EthChainLinkOracle.address,
+      env.l2BobalinkWallet.address
+    )
+    await addOracle(
+      BtcOracleHC,
+      BtcChainLinkOracle.address,
+      env.l2BobalinkWallet.address
+    )
+    await addOracle(
+      EthChainLinkOracle,
+      EthChainLinkOracle.address,
+      env.l2Wallet.address
+    )
+    await addOracle(
+      BtcChainLinkOracle,
+      BtcChainLinkOracle.address,
+      env.l2Wallet.address
+    )
 
     await TuringHelper.addPermittedCaller(EthOracleHC.address)
     await TuringHelper.addPermittedCaller(BtcOracleHC.address)
@@ -295,8 +312,13 @@ describe('BobaLink Test\n', async () => {
   it('should get quote via Hybrid Compute', async () => {
     const lastRoundId = (await EthChainLinkOracle.latestRound()).toNumber()
     await EthOracleHC.updateHCUrl(`${URL}/fake`)
-    await EthOracleHC.connect(env.l2BobalinkWallet).estimateGas.getChainLinkQuote(lastRoundId)
-    await EthOracleHC.connect(env.l2BobalinkWallet).getChainLinkQuote(lastRoundId, gasOverride)
+    await EthOracleHC.connect(
+      env.l2BobalinkWallet
+    ).estimateGas.getChainLinkQuote(lastRoundId)
+    await EthOracleHC.connect(env.l2BobalinkWallet).getChainLinkQuote(
+      lastRoundId,
+      gasOverride
+    )
     const block = await env.l2Provider.getBlockNumber()
     const chainLinkQuoteEvents = await EthOracleHC.queryFilter(
       EthOracleHC.filters.ChainLinkQuoteGot(),
@@ -325,7 +347,9 @@ describe('BobaLink Test\n', async () => {
       )
       expect(latestAnswer).to.be.eq(price)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 1)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 1)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 1
+      )
     }
     await waitForAndExecute(test, 10)
   })
@@ -371,7 +395,9 @@ describe('BobaLink Test\n', async () => {
       expect(prevAnswer.answer).to.be.eq(price1)
       expect(latestAnswer.answer).to.be.eq(price2)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 2)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 2
+      )
     }
     await waitForAndExecute(test, 10)
   })
@@ -394,7 +420,9 @@ describe('BobaLink Test\n', async () => {
       )
       expect(latestAnswer).to.be.eq(price)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 1)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 1)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 1
+      )
     }
     await waitForAndExecute(test, 10)
   })
@@ -421,7 +449,9 @@ describe('BobaLink Test\n', async () => {
       expect(prevAnswer.answer).to.be.eq(price1)
       expect(latestAnswer.answer).to.be.eq(price2)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 2)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 2
+      )
     }
     await waitForAndExecute(test, 10)
   })

@@ -28,7 +28,7 @@ const main = async () => {
 
   // get address
   const BobaGasPriceOracleAddress = await addressManager.getAddress(
-    'Boba_GasPriceOracle'
+    'Proxy__Boba_GasPriceOracle'
   )
 
   const BobaGasPriceOracleInterface = new utils.Interface([

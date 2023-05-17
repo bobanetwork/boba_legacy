@@ -197,7 +197,11 @@ describe('L1ERC1155Bridge Tests', () => {
         'uri'
       )
       await expect(
-        L1ERC1155Bridge.registerPair(IncorrectL1StandardERC1155.address, ERC1155.address, 'L2')
+        L1ERC1155Bridge.registerPair(
+          IncorrectL1StandardERC1155.address,
+          ERC1155.address,
+          'L2'
+        )
       ).to.be.revertedWith('L1 contract is not compatible with L2 contract')
     })
     it('cant register if not owner', async () => {

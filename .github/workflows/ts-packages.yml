@@ -51,6 +51,7 @@ jobs:
         env:
           FORCE_COLOR: 1
           ENABLE_GAS_REPORT: 1
+          SKIP_PREFLIGHT_CHECK: true
 
       - uses: codecov/codecov-action@v1
         with:
