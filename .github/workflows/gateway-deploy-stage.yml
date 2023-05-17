@@ -41,7 +41,6 @@ jobs:
         env:
           SKIP_PREFLIGHT_CHECK: true
           REACT_APP_POLL_INTERVAL: 15000
-          REACT_APP_WALLET_VERSION: 0.6.1
           REACT_APP_STATUS: 'normal'
           REACT_APP_DISABLE_VE_DAO: 1
           REACT_APP_BOBA_BEAM_STATUS: 1
