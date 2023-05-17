@@ -3,7 +3,7 @@ on:
   pull_request:
     branches:
       - master
-      - develop # remove
+      - develop # TODO remove
 
 permissions:
   contents: write
