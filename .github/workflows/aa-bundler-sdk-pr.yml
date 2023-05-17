@@ -1,6 +1,8 @@
 name: Will trigger release of AA-Bundler to NPM (PR comment)
 on:
   pull_request:
+    branches:
+      - master
 
 permissions:
   contents: write
@@ -29,3 +31,28 @@ jobs:
             Please make sure this is intentional.
 
             The package that is going to be updated is `@bobanetwork/bundler_sdk`.
+
+     - uses: MontyD/package-json-updated-action
+       id: version-updated
+       with:
+          path: packages/boba/bundler_sdk/package.json
+
+     - name: Increment patch version
+       if: steps.version-updated.outputs.has-updated == 'false'
+       working-directory: ./packages/boba/bundler_sdk
+       run: npm version minor --legacy-peer-deps
+
+     - name: setup git config
+       if: steps.version-updated.outputs.has-updated == 'false'
+       run: |
+         git config user.name "GitHub Actions Bot"
+         git config user.email "<>"
+
+     - name: commit
+       if: steps.version-updated.outputs.has-updated == 'false'
+       run: |
+         # Stage the file, commit and push
+         git add packages/boba/bundler_sdk/package.json yarn.lock
+         git commit -am "Bump Bundler SDK version"
+         git push
+         # $GITHUB_HEAD_REF
