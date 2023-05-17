@@ -273,7 +273,10 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
             }
           }
           this.state.messageBuffer = newMB
-          if (gasPriceAcceptable || this._forcePush(this.state.messageBuffer)) {
+          if (
+            gasPriceAcceptable ||
+            (await this._forcePush(this.state.messageBuffer)) === true
+          ) {
             this.state.didWork = true
             if (this.state.messageBuffer.length === 0) {
               this.state.timeOfLastPendingRelay = false
@@ -325,7 +328,6 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
 
               let receipt
               try {
-                // if through force push, check condition and set maxGasPrice accordingly
                 receipt = await ynatm.send({
                   sendTransactionFunction: sendTxAndWaitForReceipt,
                   minGasPrice: ynatm.toGwei(minGasPrice),
@@ -578,9 +580,11 @@ export class MessageRelayerService extends BaseService<MessageRelayerOptions> {
   }
 
   private async _forcePush(messageBuffer: Array<any>): Promise<boolean> {
-    // add condition for message relayer fast
-    // check state root time, check if now > state root time + challengePerioFromSDK + options.forcePushTime
-    // if yes, return true otherwise return false
+    // if messageBuffer is empty, return true and reset timeOfLastPendingRelay
+    if (messageBuffer.length === 0) {
+      console.log(messageBuffer.length)
+      return true
+    }
 
     const stateRoot = await this.state.messenger.getMessageStateRoot(
       messageBuffer[0],
