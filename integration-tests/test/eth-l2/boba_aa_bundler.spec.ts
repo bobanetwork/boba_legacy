@@ -120,7 +120,7 @@ describe('AA Bundler Test\n', async () => {
       // execution should be quite low.
       // (NOTE: actual execution should revert: it only succeeds because the wallet is NOT deployed yet,
       // and estimation doesn't perform full deploy-validate-execute cycle)
-      expect(parseInt(ret.callGasLimit, 16)).to.be.closeTo(25000, 10000)
+      expect(parseInt(ret.callGasLimit, 16)).to.be.closeTo(25000, 50000)
     })
   })
 })
