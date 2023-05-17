@@ -1,30 +1,31 @@
-version: "3"
-
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: https://rpc.ankr.com/eth
 
 x-l1_node_web3_url: &l1_node_web3_url
-  L1_NODE_WEB3_URL: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+  L1_NODE_WEB3_URL: https://rpc.ankr.com/eth
+
+version: "3.9"
 
 services:
   verifier_dtl:
-    image: bobanetwork/data-transport-layer:release
+    image: bobanetwork/data-transport-layer:${RELEASE_VERSION}
     env_file:
       -  ../../ops/envs/dtl.env
     environment:
-        <<: *l1_rpc_dtl
-        DATA_TRANSPORT_LAYER__CONFIRMATIONS: 8
-        DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'true'
-        DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'false'
-        DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 288
-        DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
-        DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
-        DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
-        DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 381145
-        DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 381145
-        DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 381145
+      <<: *l1_rpc_dtl
+      DATA_TRANSPORT_LAYER__CONFIRMATIONS: 8
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'true'
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'false'
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 288
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 13502893
+      DATA_TRANSPORT_LAYER__POLLING_INTERVAL: 10000
+      DATA_TRANSPORT_LAYER__ADDRESS_MANAGER: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
+      DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 381145
+      DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 381145
+      DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 381145
     volumes:
-      - ./:/opt/optimism/packages/data-transport-layer/state-dumps/
+      - ./state-dumps/mainnet/:/opt/optimism/packages/data-transport-layer/state-dumps/
+    #  - ./<YOUR PERSISTED STORAGE>:/db/
     logging:
       driver: "json-file"
       options:
@@ -37,29 +38,31 @@ services:
   verifier_l2geth:
     depends_on:
       - verifier_dtl
-    image: bobanetwork/l2geth:release
+    image: bobanetwork/l2geth:${RELEASE_VERSION}
     deploy:
       replicas: 1
     entrypoint: sh ./geth.sh
     env_file:
       - ../../ops/envs/geth.env
+    #volumes:
+    #  - ./<YOUR PERSISTED STORAGE>:/root/.ethereum/
     environment:
-        ROLLUP_TIMESTAMP_REFRESH: 5s
-        ROLLUP_STATE_DUMP_PATH: http://verifier_dtl:8081/state-dump.latest.json
-        ROLLUP_CLIENT_HTTP: http://verifier_dtl:7878
-        ROLLUP_BACKEND: 'l1'
-        ROLLUP_VERIFIER_ENABLE: 'true'
-        RETRIES: 60
-        # no need to keep this secret, only used internally to sign blocks
-        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-        ROLLUP_POLL_INTERVAL_FLAG: "10s"
-        ROLLUP_ENFORCE_FEES: 'true'
-        # turing credit contract
-        TURING_CREDIT_ADDRESS: "0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf"
-        # fee token
-        L2_BOBA_TOKEN_ADDRESS: "0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7"
-        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51"
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://verifier_dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://verifier_dtl:7878
+      ROLLUP_BACKEND: 'l1'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      ROLLUP_ENFORCE_FEES: 'true'
+      # turing
+      TURING_CREDIT_ADDRESS: "0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf"
+      # fee token
+      L2_BOBA_TOKEN_ADDRESS: "0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51"
     logging:
       driver: "json-file"
       options:
@@ -73,7 +76,7 @@ services:
     depends_on:
      - verifier_dtl
      - verifier_l2geth
-    image: bobanetwork/fraud-detector:release
+    image: bobanetwork/fraud-detector:${RELEASE_VERSION}
     deploy:
       replicas: 1
     environment:
