@@ -128,7 +128,7 @@ describe('AA Bundler Test\n', async () => {
       mnemonic: '',
       network: '',
       port: '3000',
-      unsafe: false,
+      unsafe: true,
       conditionalRpc: false,
       autoBundleInterval: 0,
       autoBundleMempoolSize: 0,

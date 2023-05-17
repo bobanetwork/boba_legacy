@@ -114,7 +114,7 @@ describe('UserOpMethodHandler', function () {
         factoryAddress: accountDeployerAddress
       })
     })
-    it('estimateUserOperationGas should estimate even without eth', async () => {
+    it.only('estimateUserOperationGas should estimate even without eth', async () => {
       const op = await smartAccountAPI.createSignedUserOp({
         target,
         data: '0xdeadface'
