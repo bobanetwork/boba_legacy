@@ -382,7 +382,7 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 		if err := json.Unmarshal(body, &bodyReader); err != nil {
 			return nil, wrapErr(err, "error unmarshaling body payload")
 		}
-		log.Debug("doForward body", "method", method, "payload", rpcReqs[0], "auth", auth, "payload", bodyReader)
+		log.Debug("doForward body", "method", method, "payload", rpcReqs[0], "auth", auth, "req_id", reqID, "payload", bodyReader)
 	} else {
 		body = mustMarshalJSON(rpcReqs)
 		for _, req := range rpcReqs {
@@ -390,7 +390,7 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 				return nil, wrapErr(err, "error unmarshaling body payload")
 			}
 			method += req.Method + ","
-			log.Debug("doForward body", "method", req.Method, "payload", bodyReader, "auth", auth)
+			log.Debug("doForward body", "method", req.Method, "payload", bodyReader, "auth", auth, "req_id", reqID)
 		}
 	}
 
