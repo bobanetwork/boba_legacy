@@ -24,11 +24,20 @@ type State = {
   isBeginner: boolean
   invitationCodeGood: boolean
   invitationCodeVerifyLoad: boolean
-  invitationCodeVerifyError: null | string
+  invitationCodeVerifyError: null | boolean
+}
+
+enum ActionType {
+  PROVIDE_PASSWORD = 'PROVIDE_PASSWORD',
+  LOGIN = 'LOGIN',
+  UPDATE_USER_TYPE = 'UPDATE_USER_TYPE',
+  VERIFY_INVITATION_CODE = 'VERIFY_INVITATION_CODE',
+  VERIFY_INVITATION_CODE_SUCCESS = 'VERIFY_INVITATION_CODE_SUCCESS',
+  VERIFY_INVITATION_CODE_FAILURE = 'VERIFY_INVITATION_CODE_FAILURE',
 }
 
 type Action = {
-  type: string
+  type: ActionType
   payload: any
 }
 
@@ -43,38 +52,41 @@ const initialState: State = {
 }
 
 const actionHandlers = {
-  PROVIDE_PASSWORD: (state: State, action: Action) => ({
+  [ActionType.PROVIDE_PASSWORD]: (state: State, action: Action) => ({
     ...state,
     AESKey: action.payload.AESKey,
     FHEseed: action.payload.FHEseed,
   }),
-  LOGIN: (state: State) => ({
+  [ActionType.LOGIN]: (state: State) => ({
     ...state,
     loggedIn: true,
   }),
-  UPDATE_USER_TYPE: (state: State, action: Action) => ({
+  [ActionType.UPDATE_USER_TYPE]: (state: State, action: Action) => ({
     ...state,
     isBeginner: action.payload,
   }),
-  VERIFY_INVITATION_CODE: (state: State) => ({
+  [ActionType.VERIFY_INVITATION_CODE]: (state: State) => ({
     ...state,
     invitationCodeGood: false,
     invitationCodeVerifyLoad: true,
     invitationCodeVerifyError: null,
   }),
-  VERIFY_INVITATION_CODE_SUCCESS: (state: State) => ({
+  [ActionType.VERIFY_INVITATION_CODE_SUCCESS]: (state: State) => ({
     ...state,
     invitationCodeGood: true,
     invitationCodeVerifyLoad: false,
-    invitationCodeVerifyError: false,
+    invitationCodeVerifyError: null,
   }),
-  VERIFY_INVITATION_CODE_FAILURE: (state: State, action: Action) => ({
+  [ActionType.VERIFY_INVITATION_CODE_FAILURE]: (
+    state: State,
+    action: Action
+  ) => ({
     ...state,
     invitationCodeGood: false,
     invitationCodeVerifyLoad: false,
     invitationCodeVerifyError: action.payload,
   }),
-}
+} as Record<ActionType, (state: State, action: Action) => State>
 
 const loginReducer = (state: State = initialState, action: Action): State => {
   const handler = actionHandlers[action.type]
