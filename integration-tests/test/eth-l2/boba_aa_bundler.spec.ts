@@ -79,7 +79,7 @@ describe('AA Bundler Test\n', async () => {
     const EntryPointWrapper__factory = new ContractFactory(
       EntryPointWrapperJson.abi,
       EntryPointWrapperJson.bytecode,
-      env.l2Wallet_4
+      env.l2Wallet
     )
 
     entryPointWrapper = (await EntryPointWrapper__factory.deploy(
@@ -103,7 +103,7 @@ describe('AA Bundler Test\n', async () => {
     SimpleAccountFactory__factory = new ContractFactory(
       SimpleAccountFactoryJson.abi,
       SimpleAccountFactoryJson.bytecode,
-      env.l2Wallet_4
+      env.l2Wallet
     )
     accountFactory = await SimpleAccountFactory__factory.deploy(
       entryPoint.address
@@ -115,8 +115,8 @@ describe('AA Bundler Test\n', async () => {
 
     accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
-      entryPointAddress: entryPoint.address,
-      owner: env.l2Wallet_4,
+      entryPointAddress,
+      owner: env.l2Wallet,
       accountAddress: account,
     })
 
