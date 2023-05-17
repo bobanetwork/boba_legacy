@@ -180,7 +180,7 @@ export class UserOpMethodHandler {
 
     const callGasLimit = await this.provider
       .estimateGas({
-        from: this.entryPointWrapper.address,
+        from: this.entryPoint.address,
         to: userOp.sender,
         data: userOp.callData,
       })

@@ -116,6 +116,7 @@ describe('AA Bundler Test\n', async () => {
     accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
       entryPointAddress,
+      entryPointWrapperAddress: entryPointWrapper.address,
       owner: env.l2Wallet,
       accountAddress: account,
     })
@@ -129,19 +130,14 @@ describe('AA Bundler Test\n', async () => {
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
 
-      const ret = await bundlerProvider.estimateUserOpGas(
-        //await resolveHexlify(op),
-        op
-      )
-
-      console.error(ret)
+      const ret: any = await bundlerProvider.estimateUserOpGas(op)
 
       // verification gas should be high - it creates this wallet
-      //expect(ret.verificationGas).to.be.closeTo(300000, 100000)
+      expect(parseInt(ret.verificationGas, 16)).to.be.closeTo(30000, 100000)
       // execution should be quite low.
       // (NOTE: actual execution should revert: it only succeeds because the wallet is NOT deployed yet,
       // and estimation doesn't perform full deploy-validate-execute cycle)
-      //expect(ret.callGasLimit).to.be.closeTo(25000, 10000)
+      expect(parseInt(ret.callGasLimit, 16)).to.be.closeTo(25000, 10000)
     })
   })
 })
