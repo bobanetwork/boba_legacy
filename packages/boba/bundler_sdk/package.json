@@ -8,8 +8,7 @@
     "bundler",
     "sdk",
     "smart wallets",
-    "web3",
-    "crypto"
+    "web3"
   ],
   "repository": "https://github.com/bobanetwork/boba/tree/develop/packages/boba/bundler_sdk",
   "homepage": "https://boba.network",
