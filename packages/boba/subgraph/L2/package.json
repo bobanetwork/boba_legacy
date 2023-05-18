@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:goerli": "mustache config/goerli.json subgraph.template.yaml > subgraph.yaml",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
-    "create:subgraph:rinkeby": "graph create --node https://graph.rinkeby.boba.network:8020 boba/Bridges",
-    "deploy:subgraph:rinkeby": "graph deploy boba/Bridges --ipfs https://graph.rinkeby.boba.network:5001 --node https://graph.rinkeby.boba.network:8020",
+    "create:subgraph:goerli": "graph create --node https://graph.goerli.boba.network:8020 boba/Bridges",
+    "deploy:subgraph:goerli": "graph deploy boba/Bridges --ipfs https://graph.goerli.boba.network:5001 --node https://graph.goerli.boba.network:8020",
     "deploy:subgraph:mainnet": "graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph"
   },
   "devDependencies": {
