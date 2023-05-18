@@ -70,6 +70,9 @@ const config: HardhatUserConfig = {
     bobabnb: {
       url: 'https://bnb.boba.network',
     },
+    bnbTestnet: {
+      url: 'https://data-seed-prebsc-2-s3.binance.org:8545',
+    },
     bobabnbTestnet: {
       url: 'https://testnet.bnb.boba.network',
     },
@@ -150,6 +153,7 @@ const config: HardhatUserConfig = {
       bobabase: 'DEFAULT_KEY',
       bnb: process.env.BSCSCAN_KEY,
       bobabnb: 'DEFAULT_KEY',
+      bnbTestnet: process.env.BSCSCAN_KEY,
       bobabnbTestnet: 'DEFAULT_KEY',
       snowtrace: process.env.SNOWTRACE_KEY,
       bobaavax: 'DEFAULT_KEY',
@@ -237,6 +241,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.bnb.boba.network/api',
           browserURL: 'https://blockexplorer.bnb.boba.network',
+        },
+      },
+      {
+        network: 'bnbTestnet',
+        chainId: 97,
+        urls: {
+          apiURL: 'https://api-testnet.bscscan.com/api',
+          browserURL: 'https://testnet.bscscan.com/',
         },
       },
       {
