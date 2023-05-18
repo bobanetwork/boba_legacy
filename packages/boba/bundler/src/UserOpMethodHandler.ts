@@ -155,28 +155,25 @@ export class UserOpMethodHandler {
     // todo: checks the existence of parameters, but since we hexlify the inputs, it fails to validate
     await this._validateParameters(deepHexlify(userOp), entryPointInput)
     // todo: validation manager duplicate?
-    let errorResult = await this.entryPointWrapper.callStatic
+    const errorResult = await this.entryPointWrapper.callStatic
       .simulateValidation(userOp)
       .catch((e) => e)
 
-    errorResult = {
-      errorName: errorResult[1][0],
-      errorArgs: errorResult[1],
-    }
+    const failedOp = errorResult[0]
+    const resp = errorResult[1]
+    const errorName = resp[0]
 
-    if (errorResult.errorName === 'FailedOp') {
+    if (failedOp.status) {
       throw new RpcError(
-        errorResult.errorArgs.at(-1),
+        failedOp?.reason,
         ValidationErrors.SimulateValidation
       )
     }
-    // todo throw valid rpc error
-    if (errorResult.errorName !== 'ValidationResult') {
+    if (errorName !== 'ValidationResult') {
       throw errorResult
     }
 
-    const { returnInfo } = errorResult.errorArgs
-    let { preOpGas, validAfter, validUntil } = returnInfo
+    let { preOpGas, validAfter, validUntil } = resp[1]
 
     const callGasLimit = await this.provider
       .estimateGas({

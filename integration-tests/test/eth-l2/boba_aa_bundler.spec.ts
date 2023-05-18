@@ -21,16 +21,10 @@ import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
-import { resolveHexlify } from '@boba/bundler_utils'
 import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
-import EntryPointWrapperJson from '@boba/accountabstraction/artifacts/contracts/bundler/EntryPointWrapper.sol/EntryPointWrapper.json'
 import {
   EntryPoint,
-  EntryPointWrapper,
 } from "@boba/accountabstraction/types";
-import {
-  UserOpMethodHandler,
-} from '@boba/bundler'
 
 describe('AA Bundler Test\n', async () => {
   let env: OptimismEnv
