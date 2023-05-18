@@ -170,7 +170,7 @@ export class UserOpMethodHandler {
       )
     }
     if (errorName !== 'ValidationResult') {
-      throw errorResult
+      throw resp
     }
 
     let { preOpGas, validAfter, validUntil } = resp[1]
