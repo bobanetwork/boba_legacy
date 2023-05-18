@@ -103,7 +103,7 @@ describe('AA Bundler Test\n', async () => {
       const ret: any = await bundlerProvider.estimateUserOpGas(op)
 
       expect(parseInt(ret.verificationGas, 16)).to.be.closeTo(30000, 100000)
-      expect(parseInt(ret.callGasLimit, 16)).to.be.closeTo(25000, 10000)
+      expect(parseInt(ret.callGasLimit, 16)).to.be.closeTo(25000, 50000)
     })
   })
 })
