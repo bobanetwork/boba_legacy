@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:14-buster
+FROM --platform=linux/amd64 node:20.1-buster
 
 RUN apt-get update && apt-get install -y bash git python build-essential
 

@@ -15,7 +15,7 @@
     "@graphprotocol/graph-ts": "^0.26.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "3.4.1",
+    "@openzeppelin/contracts": "4.3.1",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
     "mustache": "^4.2.0",
