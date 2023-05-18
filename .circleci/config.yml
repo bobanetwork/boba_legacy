@@ -1,4 +1,3 @@
-#adapted from https://raw.githubusercontent.com/ethereum-optimism/optimism/develop/.circleci/config.yml
 version: 2.1
 
 executors:
@@ -203,6 +202,43 @@ jobs:
           test_folder: "alt-l2"
       - report-integration-tests
 
+  deploy-to-ecs:
+    executor: intergration-tests-executor
+    environment:
+      IMAGE_NAME: bobanetwork/bundler:latest
+      AWS_REGION: us-east-1
+      AWS_ECR_REPOSITORY: <your-ecr-repository>
+      AWS_ECS_CLUSTER: <ecs-cluster>
+      AWS_ECS_SERVICE: <ecs-service>
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Login to Amazon ECR
+          command: |
+            echo $(aws ecr get-login-password --region $AWS_REGION) | docker login --username AWS --password-stdin $AWS_ECR_REPOSITORY
+      - run:
+          name: Pull Docker image
+          command: |
+            docker pull bobanetwork/bundler:latest
+      - run:
+          name: Tag and Push Docker image
+          command: |
+            docker tag $IMAGE_NAME $AWS_ECR_REPOSITORY:$CIRCLE_SHA1
+            docker push $AWS_ECR_REPOSITORY:$CIRCLE_SHA1
+      - run:
+          name: Deploy Docker image to ECS
+          command: |
+            aws ecs update-service --cluster $AWS_ECS_CLUSTER --service $AWS_ECS_SERVICE --force-new-deployment
+
+
+
 workflows:
   main:
     jobs:
@@ -213,4 +249,3 @@ workflows:
           name: proxyd-tests
           binary_name: proxyd
           working_directory: go/proxyd
-
