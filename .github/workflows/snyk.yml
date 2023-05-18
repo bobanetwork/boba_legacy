@@ -7,6 +7,6 @@ jobs:
       - uses: actions/checkout@master
       - name: Node - Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
-        continue-on-error: true
+        #continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
