@@ -52,6 +52,9 @@ const config: HardhatUserConfig = {
     bobabeam: {
       url: 'https://bobabeam.boba.network',
     },
+    moonbase: {
+      url: 'https://rpc.testnet.moonbeam.network',
+    },
     bobabase: {
       url: 'https://bobabase.boba.network',
     },
@@ -84,6 +87,9 @@ const config: HardhatUserConfig = {
     },
     bobaopera: {
       url: 'https://bobaopera.boba.network',
+    },
+    fantomTestnet: {
+      url: 'https://rpc.testnet.fantom.network',
     },
     bobaoperaTestnet: {
       url: 'https://testnet.bobaopera.boba.network',
@@ -153,6 +159,7 @@ const config: HardhatUserConfig = {
       'boba-goerli': process.env.BOBA_MAINNET_KEY,
       moonbeam: process.env.MOONBEAM_KEY,
       bobabeam: 'DEFAULT_KEY',
+      moonbase: process.env.MOONBEAM_KEY,
       bobabase: 'DEFAULT_KEY',
       bnb: process.env.BSCSCAN_KEY,
       bobabnb: 'DEFAULT_KEY',
@@ -164,6 +171,7 @@ const config: HardhatUserConfig = {
       bobaavaxTestnet: 'DEFAULT_KEY',
       fantom: process.env.FTMSCAN_KEY,
       bobaopera: 'DEFAULT_KEY',
+      fantomTestnet: process.env.FTMSCAN_KEY,
       bobaoperaTestnet: 'DEFAULT_KEY',
     },
     customChains: [
@@ -197,6 +205,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.bobabeam.boba.network/api',
           browserURL: 'https://blockexplorer.bobabeam.boba.network',
+        },
+      },
+      {
+        network: 'moonbase',
+        chainId: 1287,
+        urls: {
+          apiURL: 'https://api-moonbase.moonscan.io/api',
+          browserURL: 'https://moonbase.moonscan.io/',
         },
       },
       {
@@ -285,6 +301,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.bobaopera.boba.network/api',
           browserURL: 'https://blockexplorer.bobaopera.boba.network/',
+        },
+      },
+      {
+        network: 'fantomTestnet',
+        chainId: 4002,
+        urls: {
+          apiURL: 'https://api-testnet.ftmscan.com/api',
+          browserURL: 'https://testnet.ftmscan.com',
         },
       },
       {
