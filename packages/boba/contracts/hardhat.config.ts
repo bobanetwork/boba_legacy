@@ -61,6 +61,9 @@ const config: HardhatUserConfig = {
     bobaavax: {
       url: 'https://avax.boba.network',
     },
+    avaxTestnet: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+    },
     bobaavaxTestnet: {
       url: 'https://testnet.avax.boba.network',
     },
@@ -157,6 +160,7 @@ const config: HardhatUserConfig = {
       bobabnbTestnet: 'DEFAULT_KEY',
       snowtrace: process.env.SNOWTRACE_KEY,
       bobaavax: 'DEFAULT_KEY',
+      avaxTestnet: process.env.SNOWTRACE_KEY,
       bobaavaxTestnet: 'DEFAULT_KEY',
       fantom: process.env.FTMSCAN_KEY,
       bobaopera: 'DEFAULT_KEY',
@@ -217,6 +221,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.avax.boba.network/api',
           browserURL: 'https://blockexplorer.avax.boba.network',
+        },
+      },
+      {
+        network: 'avaxTestnet',
+        chainId: 43113,
+        urls: {
+          apiURL: 'https://api-testnet.snowtrace.io/api',
+          browserURL: 'https://testnet.snowtrace.io',
         },
       },
       {
