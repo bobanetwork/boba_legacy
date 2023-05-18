@@ -4,13 +4,6 @@
   "version": "0.2.0",
   "author": "Dror Tirosh",
   "license": "MIT",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index",
-  "files": [
-    "dist/**/*",
-    "contracts/**/*",
-    "README.md"
-  ],
   "workspaces": {
     "nohoist": [
       "**eslint**"
