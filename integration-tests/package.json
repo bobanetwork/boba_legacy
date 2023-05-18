@@ -68,9 +68,5 @@
     "prom-client": "^14.0.1",
     "request-promise-native": "^1.0.5",
     "rimraf": "^3.0.2"
-  },
-  "dependencies": {
-    "@boba/bundler": "0.2.0",
-    "@boba/bundler_utils": "^0.2.3"
   }
 }

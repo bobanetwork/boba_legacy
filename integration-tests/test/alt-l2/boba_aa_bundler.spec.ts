@@ -45,8 +45,6 @@ describe('AA Bundler Test\n', async () => {
   let accountAPI: SimpleAccountAPI
 
   let entryPoint: EntryPoint
-  let entryPointWrapper: EntryPointWrapper
-  let methodHandler: UserOpMethodHandler
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -57,16 +55,6 @@ describe('AA Bundler Test\n', async () => {
       EntryPointJson.abi,
       env.l2Wallet
     ) as EntryPoint
-
-    const EntryPointWrapper__factory = new ContractFactory(
-      EntryPointWrapperJson.abi,
-      EntryPointWrapperJson.bytecode,
-      env.l2Wallet
-    )
-
-    entryPointWrapper = (await EntryPointWrapper__factory.deploy(
-      entryPointAddress
-    ) as EntryPointWrapper)
 
     SampleRecipient__factory = new ContractFactory(
       SampleRecipientJson.abi,
@@ -98,7 +86,6 @@ describe('AA Bundler Test\n', async () => {
     accountAPI = new SimpleAccountAPI({
       provider: env.l2Provider,
       entryPointAddress,
-      entryPointWrapperAddress: entryPointWrapper.address,
       owner: env.l2Wallet,
       accountAddress: account,
     })
@@ -114,11 +101,7 @@ describe('AA Bundler Test\n', async () => {
 
       const ret: any = await bundlerProvider.estimateUserOpGas(op)
 
-      // verification gas should be high - it creates this wallet
       expect(parseInt(ret.verificationGas, 16)).to.be.closeTo(30000, 100000)
-      // execution should be quite low.
-      // (NOTE: actual execution should revert: it only succeeds because the wallet is NOT deployed yet,
-      // and estimation doesn't perform full deploy-validate-execute cycle)
       expect(parseInt(ret.callGasLimit, 16)).to.be.closeTo(25000, 50000)
     })
   })
