@@ -54,6 +54,8 @@ For **primary contracts and addresses** see [packages/contracts/deployments/boba
 
 For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB testnet address registration dump](../../packages/boba/register/addresses/addressBobaBnbTestnet\_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa.json).
 
+For **account abstraction** contract addresses, please refer the list [here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/account-abstraction/deployments/boba_bnb_testnet/addresses.json).
+
 ### Boba BNB Testnet Links and Endpoints
 
 |               |                                                                                         |
