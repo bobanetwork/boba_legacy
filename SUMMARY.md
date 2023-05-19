@@ -36,6 +36,7 @@
   * [Account Abstraction](boba\_documentation/developer/account-abstraction/aa-basics.md)
     * [Bundler SDK](boba\_documentation/developer/account-abstraction/bundler-sdk.md)
     * [Bundler API](boba\_documentation/developer/account-abstraction/bundler-api.md)
+    * [Bundler Config](boba\_documentation/developer/account-abstraction/bundler-configuration.md)
     * [Paymasters](boba\_documentation/developer/account-abstraction/aa-paymasters.md)
     * [Contract Addresses](boba\_documentation/developer/account-abstraction/contract-addresses.md)
   * [Using The Graph](packages/boba/subgraph/README.md)
