@@ -352,11 +352,9 @@ export const getAddressSetEventsFromGraph = async (
     return []
   }
   const entity = formatAddressSetEvent(data.data.addressSetEntities)
-  console.log('entity check: ', entity)
   if (entity.length === 0) {
     return []
   }
-  console.log('return result', entity)
   const events: ethers.Event[] = addEventMethods(addArgs(entity), provider)
   return events
 }
