@@ -280,6 +280,44 @@ export const getAddressSetEventsFromGraph = async (
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
+
+  if (chainID === 56) {
+    let result
+    if (name === 'CanonicalTransactionChain') {
+      if (!(fromBlock <= 21305675 && toBlock >= 21305675)) {
+        return []
+      }
+      result = [
+        {
+          _name:
+            '0x02b616af23339f1e031e76333e2d5b1c3067beb78578c961911872cc2127ef8b',
+          _newAddress: '0xa0e38a8fe293e9e95c6a4a882f396f1c80e9e2e4',
+          _oldAddress: '0x0000000000000000000000000000000000000000',
+          blockNumber: 21305675,
+          transactionHash:
+            '0x48bcd443d5e9393f0a2768f6abd3da97bfef26efd00e149ac88bcd9614364b4a',
+        },
+      ]
+    }
+    if (name === 'StateCommitmentChain') {
+      if (!(fromBlock <= 21305682 && toBlock >= 21305682)) {
+        return []
+      }
+      result = [
+        {
+          _name:
+            '0x1f4bc4e5d7310c25aa09ee4da07a62cebfee1bc1db64685202011f3d451dafc5',
+          _newAddress: '0xef85fa550e6ec5486121313c895ede1005e2397f',
+          _oldAddress: '0x0000000000000000000000000000000000000000',
+          blockNumber: 21305682,
+          transactionHash:
+            '0xf071228f794b68c730dfdd5fb63286d0f3edf3c397cf262b407728e37ccb2be7',
+        },
+      ]
+    }
+    return addEventMethods(addArgs(result), provider)
+  }
+
   const response = await fetch(GRAPH_API_URL[chainID].addressManager, {
     method: 'POST',
     headers: {
@@ -314,9 +352,11 @@ export const getAddressSetEventsFromGraph = async (
     return []
   }
   const entity = formatAddressSetEvent(data.data.addressSetEntities)
+  console.log('entity check: ', entity)
   if (entity.length === 0) {
     return []
   }
+  console.log('return result', entity)
   const events: ethers.Event[] = addEventMethods(addArgs(entity), provider)
   return events
 }
