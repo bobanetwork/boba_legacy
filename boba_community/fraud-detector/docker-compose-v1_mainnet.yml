@@ -1,10 +1,10 @@
+version: "3"
+
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: https://rpc.ankr.com/eth
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.gateway.tenderly.co'
 
 x-l1_node_web3_url: &l1_node_web3_url
-  L1_NODE_WEB3_URL: https://rpc.ankr.com/eth
-
-version: "3.9"
+  L1_NODE_WEB3_URL: 'https://mainnet.gateway.tenderly.co'
 
 services:
   verifier_dtl:

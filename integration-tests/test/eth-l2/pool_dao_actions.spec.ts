@@ -114,7 +114,7 @@ describe('Dao Action Test', async () => {
     )
 
     // set admin Timelock
-    // set eta to be the current timestamp for local and rinkeby
+    // set eta to be the current timestamp for local and goerli
     const eta1 = (await getTimestamp()) + eta_delay_s
 
     const setPendingAdminData = utils.defaultAbiCoder.encode(
@@ -133,7 +133,7 @@ describe('Dao Action Test', async () => {
 
     await setPendingAdminTx.wait()
     // call initiate() to complete setAdmin
-    // set eta to be the current timestamp for local and rinkeby
+    // set eta to be the current timestamp for local and goerli
     const eta2 = (await getTimestamp()) + eta_delay_s
 
     const initiateData = utils.defaultAbiCoder.encode(

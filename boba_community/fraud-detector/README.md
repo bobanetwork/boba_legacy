@@ -35,6 +35,7 @@ $ docker-compose build
 
 Next, navigate to `boba_community/fraud-detector` and set the RELEASE_VERSION environment variable:
 
+
 ```
 $ cd boba_community/fraud-detector
 $ export RELEASE_VERSION=latest
@@ -42,7 +43,15 @@ $ export RELEASE_VERSION=latest
 
 The 'latest' tag should resolve to the images you built locally in the previous step.
 
-Inspect the docker-compose.yml file, and if necessary edit the DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT and L1_NODE_WEB3_URL items to point to your desired RPC endpoint for the Ethereum mainnet. If using Infura, you will have to obtain a key from [Infura](https://infura.io).
+Then, check the RPC endpoints in `boba_community/fraud-detector/docker-compose-fraud-detector.yml`.
+
+```bash
+x-l1_rpc_dtl: &l1_rpc_dtl
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.gateway.tenderly.co'
+
+x-l1_node_web3_url: &l1_node_web3_url
+  L1_NODE_WEB3_URL: 'https://mainnet.gateway.tenderly.co'
+```
 
 Next, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
 
