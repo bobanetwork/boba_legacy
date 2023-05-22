@@ -88,7 +88,7 @@ services:
       ADDRESS_MANAGER_ADDRESS: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
       L1_DEPLOYMENT_BLOCK: 13502893
       L2_START_BLOCK: 1
-    volumes:
+    #volumes:
     #  - ./<YOUR PERSISTED STORAGE>:/db/
     logging:
       driver: "json-file"

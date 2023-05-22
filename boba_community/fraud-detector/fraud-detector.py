@@ -32,7 +32,8 @@ logger.debug (os.environ['ADDRESS_MANAGER_ADDRESS'])
 logger.debug (os.environ['L1_DEPLOYMENT_BLOCK'])
 logger.debug (os.environ['L2_START_BLOCK'])
 logger.debug (os.environ['L2_CHECK_INTERVAL'])
-logger.debug (os.environ['SCC_NAME'])
+if 'SCC_NAME' in os.environ:
+  logger.debug (os.environ['SCC_NAME'])
 
 l1_confirmations = int(os.environ['L1_CONFIRMATIONS'])
 # These can be changed from the defaults to start at a previously verified
@@ -131,7 +132,7 @@ def loadContract(rpc, addr, abiPath):
   return c
 
 address_manager = loadContract(rpc[1],os.environ['ADDRESS_MANAGER_ADDRESS'],'./contracts/Lib_AddressManager.json')
-if len(os.environ['SCC_NAME']) > 0:
+if 'SCC_NAME' in os.environ:
   # V1 overrides this to "OVM_StateCommitmentChain"
   scc_addr = address_manager.functions.getAddress(os.environ['SCC_NAME']).call()
 else:

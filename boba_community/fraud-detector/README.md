@@ -133,4 +133,3 @@ verifier_dtl_1     | {"level":30,"time":1636134645380,"highestSyncedL1Block":135
 * For the first 10 blocks of the V1 chain (between L1 heights of 13011896 and 13502893), the chainID was set (incorrectly) to 28 rather than 288. Therefore, the EIP155 signatures fail for those blocks, and the Verifier cannot sync those blocks. This has been addressed by overriding the chain ID of those blocks in a modified DTL (the rc1.0-surgery tag). In the fraud-detector log, these 10 blocks will show a mismatch but the stateroots should re-synchronize at block 11.
 
 * There is one state root mismatch at L2 block 155, arising from a two second discrepancy in a timestamp, that was ultimately caused by a too-small setting for the number of confirmations (DATA_TRANSPORT_LAYER__CONFIRMATIONS). This value was therefore increased. This is also handled by the rc1.0-surgery DTL.
-

@@ -1,10 +1,10 @@
+version: "3"
+
 x-l1_rpc_dtl: &l1_rpc_dtl
   DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: https://rpc.ankr.com/eth_goerli
 
 x-l1_node_web3_url: &l1_node_web3_url
   L1_NODE_WEB3_URL: https://rpc.ankr.com/eth_goerli
-
-version: "3.9"
 
 services:
   verifier_dtl:
@@ -88,6 +88,8 @@ services:
       ADDRESS_MANAGER_ADDRESS: '0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148'
       L1_DEPLOYMENT_BLOCK: 7867494
       L2_START_BLOCK: 1
+    #volumes:
+    #  - ./<YOUR PERSISTED STORAGE>:/db/
     logging:
       driver: "json-file"
       options:
