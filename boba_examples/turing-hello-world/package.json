@@ -9,7 +9,7 @@
     "build:contracts": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
     "test:local": "hardhat --network boba_local test",
-    "test:rinkeby": "hardhat --network boba_rinkeby test test/hello-world.spec.ts",
+    "test:goerli": "hardhat --network boba_goerli test test/hello-world.spec.ts",
     "test:mainnet": "hardhat --network boba_mainnet test test/hello-world.spec.ts"
   },
   "devDependencies": {

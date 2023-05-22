@@ -89,7 +89,8 @@ describe('UserOpMethodHandler', function () {
       provider,
       signer,
       config,
-      entryPoint
+      entryPoint,
+      entryPointWrapper,
     )
   })
 

@@ -1,7 +1,7 @@
 {
   "name": "@boba/Truffle-ERC20-Example",
   "version": "1.0.0",
-  "description": "Example of using Truffle to deploy an ERC20 to Boba Rinkeby",
+  "description": "Example of using Truffle to deploy an ERC20",
   "homepage": "https://github.com/bobanetwork/boba/develop/boba_examples/truffle-erc20#readme",
   "license": "MIT",
   "author": "OMG",
@@ -12,8 +12,8 @@
   "scripts": {
     "clean": "rimraf build",
     "compile": "truffle compile --config truffle-config.js",
-    "test:integration": "truffle test ./test/erc20.spec.js --network boba_rinkeby --config truffle-config.js",
-    "deploy": "truffle migrate --network boba_rinkeby --config truffle-config"
+    "test:integration": "truffle test ./test/erc20.spec.js --network boba_goerli --config truffle-config.js",
+    "deploy": "truffle migrate --network boba_goerli --config truffle-config"
   },
   "keywords": [
     "optimism",
