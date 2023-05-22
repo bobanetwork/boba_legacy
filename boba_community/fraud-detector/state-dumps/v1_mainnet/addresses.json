@@ -1,0 +1,11 @@
+{
+  "AddressManager":"0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089",
+  "CanonicalTransactionChain":"0x4B5D9E5A6B1a514eba15A2f949531DcCd7c272F2",
+  "ChainStorageContainer-CTC-batches":"0xA7557b676EA0D9406459409B5ad01c14b5522c46",
+  "ChainStorageContainer-CTC-queue":"0x33938f8E5F2c36e3Ca2B01E878b3322E280d4c50",
+  "ChainStorageContainer-SCC-batches":"0x318d4dAb7D3793E40139b496c3B89422Ae5372D1",
+  "Deployer":"0x1f2414D0af8741Bc822dBc2f88069c2b2907a840",
+  "Proxy__OVM_L1CrossDomainMessenger":"0x6D4528d192dB72E282265D6092F4B872f9Dff69e",
+  "Proxy__OVM_L1StandardBridge":"0xdc1664458d2f0B6090bEa60A8793A4E66c2F1c00",
+  "StateCommitmentChain":"0x17834b754e2f09946CE48D7B5beB4D7D94D98aB6"
+}
