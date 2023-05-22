@@ -5,6 +5,6 @@ export const bridgeAlerts = {
   you will need to transfer all your funds to Moonbeam mainnet before May
   15th or risk permanently losing access to any assets on Bobabeam`,
   [NETWORK.FANTOM]: `For users of BobaOpera or BobaOpera applications
-  you will need to transfer all your funds to Fantom mainnet as earliest possible
+  you will need to transfer all your funds to Fantom mainnet before June 15th
   or risk permanently losing access to any assets on BobaOpera`,
 }
