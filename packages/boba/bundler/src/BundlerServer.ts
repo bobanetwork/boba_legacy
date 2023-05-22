@@ -180,13 +180,11 @@ export class BundlerServer {
       // this uses custom errors that will work post bedrock. for now they need to be handled via wrapper
       // https://github.com/bobanetwork/boba/issues/752
       case 'eth_estimateUserOperationGas':
-        // result = await this.methodHandler.estimateUserOperationGas(
-        //   params[0],
-        //   params[1]
-        // )
-        //break
-        // remove after https://github.com/bobanetwork/boba/issues/752
-        throw new RpcError(`Method ${method} is not supported`, -32601)
+        result = await this.methodHandler.estimateUserOperationGas(
+           params[0],
+           params[1]
+        )
+        break
       case 'eth_getUserOperationReceipt':
         result = await this.methodHandler.getUserOperationReceipt(params[0])
         break
