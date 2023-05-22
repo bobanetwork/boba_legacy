@@ -120,6 +120,10 @@ export async function runBundler(
     .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
     .option('--maxBundleGas <number>', 'Max Bundle Gas available to use', '5000000')
     .option('--enableDebugMethods', 'debug_* methods available', false)
+    .option('--minStake', 'Min stake for Entrypoint', '0.0001')
+    .option('--minUnstakeDelay', 'Minimum unstake delay in seconds', '300')
+    .option('--autoBundleInterval', 'Auto Bundle interval', '3')
+    .option('--autoBundleMempoolSize', 'Auto Bundle Mempool Size', '10')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
