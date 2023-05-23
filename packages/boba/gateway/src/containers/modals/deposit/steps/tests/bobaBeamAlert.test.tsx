@@ -32,6 +32,10 @@ describe('BobaBeamAlert', () => {
       value: 1,
       writable: true,
     })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
+      value: 1,
+      writable: true,
+    })
     const { asFragment } = renderComponent({
       network: {
         activeNetwork: NETWORK.ETHEREUM,
@@ -45,6 +49,10 @@ describe('BobaBeamAlert', () => {
       value: 1,
       writable: true,
     })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
+      value: 1,
+      writable: true,
+    })
     const { asFragment } = renderComponent({
       network: {
         activeNetwork: NETWORK.MOONBEAM,
@@ -53,14 +61,35 @@ describe('BobaBeamAlert', () => {
     expect(asFragment()).toMatchSnapshot()
   })
 
-  test('should match the snapshot when active network is moonbeam and status is 0', () => {
+  test('should match the snapshot when active network is opera', () => {
     Object.defineProperty(constants, 'BOBABEAM_STATUS', {
+      value: 1,
+      writable: true,
+    })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
+      value: 1,
+      writable: true,
+    })
+    const { asFragment } = renderComponent({
+      network: {
+        activeNetwork: NETWORK.FANTOM,
+      },
+    })
+    expect(asFragment()).toMatchSnapshot()
+  })
+
+  test('should match the snapshot disabled from env params', () => {
+    Object.defineProperty(constants, 'BOBABEAM_STATUS', {
+      value: 0,
+      writable: true,
+    })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
       value: 0,
       writable: true,
     })
     const { asFragment } = renderComponent({
       network: {
-        activeNetwork: NETWORK.MOONBEAM,
+        activeNetwork: NETWORK.FANTOM,
       },
     })
     expect(asFragment()).toMatchSnapshot()
