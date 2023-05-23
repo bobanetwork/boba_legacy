@@ -57,7 +57,7 @@ Here are five fully worked out examples for you to build on:
 * Use Hybrid Compute to build a [CAPTCHA-gated token faucet](../hc/hc-captcha-faucet.md)
 * Use Hybrid Compute to [mint NFTs with random attributives](../hc/monsters.md)
 * Do all [stableswap quadratic math off-chain, just in time](https://github.com/bobanetwork/boba/tree/develop/boba\_examples/turing-lending)
-* Query [centralized off-chain price feeds](price-feeds.md#3-bobalink)
+* Query [centralized off-chain price feeds](../../for-developers/features/price-feeds.md#3-bobalink)
 * Connect [on-chain events with commercial KYC providers](../hc/kyc.md)
 
 There is more information on setting up your own servers and compute endpoints here:

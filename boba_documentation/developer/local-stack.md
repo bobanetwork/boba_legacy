@@ -10,7 +10,7 @@ For most test uses, it's simpler to use [https://goerli.boba.network](https://go
 
 ```bash
 $ git clone git@github.com:bobanetwork/boba.git
-$ cd optimism-v2
+$ cd boba
 $ yarn clean
 $ yarn
 $ yarn build

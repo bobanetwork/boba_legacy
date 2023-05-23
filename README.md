@@ -15,6 +15,8 @@ Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.
 * native [NFT bridging](broken-reference)
 * automatically relaying classical 7-day exit messages to L1 for you, rather than this being a separate step
 
+
+
 <figure><img src=".gitbook/assets/1-Welcome-to-Boba---Documentation.png" alt=""><figcaption></figcaption></figure>
 
 User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [`./boba_documentation`](https://github.com/bobanetwork/boba/blob/develop/boba\_documentation) and within the service and contract directories. If you have questions or feel like something is missing check out our [Discord server](https://discord.com/invite/YFweUKCb8a) where we are actively responding, or [open an issue](https://github.com/bobanetwork/boba/issues) in the GitHub repo for this site.
@@ -24,6 +26,8 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 [Telegram for Developers](https://t.me/bobadev)\
 [Project Telegram](https://t.me/bobanetwork)\
 [Discord](https://discord.com/invite/YFweUKCb8a)
+
+
 
 <figure><img src=".gitbook/assets/Artboard 2 (14) (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -55,7 +59,9 @@ User focused documentation is available [on the Boba docs website](http://docs.b
   * [`gateway`](packages/boba/gateway/): The Boba Web gateway
   * [`message-relayer-fast`](packages/message-relayer/): A batch message relayer that can be run for the fast mode without a 7 day delay
   * [`register`](packages/boba/register/): Code for registering addresses in the AddressManager
-  * [`subgraph`](packages/boba/subgraph/): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
+  * [`subgraph`](for-developers/features/subgraph.md): Subgraphs for indexing the **StandardBridge** and **LiquidityPool** contracts
+
+
 
 <figure><img src=".gitbook/assets/Artboard 3 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -90,6 +96,8 @@ $ cd ops
 $ BUILD=1 DAEMON=0 ./up_local.sh
 ```
 
+
+
 <figure><img src=".gitbook/assets/Artboard 4 (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialization. Recommended settings in docker - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
@@ -106,11 +114,15 @@ If the command returns with no log output, the sequencer is up. Once the sequenc
 
 When the command returns with `Pass: Found L2 Liquidity Pool contract address`, the entire Boba stack has come up correctly.
 
+
+
 <figure><img src=".gitbook/assets/Artboard 5 (3).png" alt=""><figcaption></figcaption></figure>
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
 * _To (re)build individual Boba ts services_: `docker-compose build -- builder` then `docker-compose build -- dtl`, for example
+
+
 
 <figure><img src=".gitbook/assets/Artboard 6 (3) (1).png" alt=""><figcaption></figcaption></figure>
 
@@ -120,6 +132,8 @@ To run unit tests for a specific package:
 cd packages/package-to-test
 yarn test
 ```
+
+
 
 <figure><img src=".gitbook/assets/Artboard 7 (2).png" alt=""><figcaption></figcaption></figure>
 
@@ -131,6 +145,8 @@ docker-compose run integration_tests
 
 Expect the full test suite with more than 110 tests including load tests to complete in between _30 minutes_ to _two hours_ depending on your computer hardware.
 
+
+
 <figure><img src=".gitbook/assets/Artboard 8 (2).png" alt=""><figcaption></figcaption></figure>
 
 By default, the `docker-compose up` command will show logs from all services, and that can be hard to filter through. In order to view the logs from a specific service, you can run:
@@ -138,6 +154,8 @@ By default, the `docker-compose up` command will show logs from all services, an
 ```bash
 docker-compose logs --follow <service name>
 ```
+
+
 
 <figure><img src=".gitbook/assets/Artboard 9.png" alt=""><figcaption></figcaption></figure>
 
