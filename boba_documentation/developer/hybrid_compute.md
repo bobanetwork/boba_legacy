@@ -54,15 +54,15 @@ The first mechanism prevents unauthorized use of your on-chain resources and the
 
 Here are five fully worked out examples for you to build on:
 
-* Use Hybrid Compute to build a [CAPTCHA-gated token faucet](../hc/hc-captcha-faucet.md)
-* Use Hybrid Compute to [mint NFTs with random attributives](../hc/monsters.md)
+* Use Hybrid Compute to build a [CAPTCHA-gated token faucet](../../hybrid\_compute/examples/hc-captcha-faucet.md)
+* Use Hybrid Compute to [mint NFTs with random attributives](../../hybrid\_compute/examples/monsters.md)
 * Do all [stableswap quadratic math off-chain, just in time](https://github.com/bobanetwork/boba/tree/develop/boba\_examples/turing-lending)
 * Query [centralized off-chain price feeds](../../for-developers/features/price-feeds.md#3-bobalink)
-* Connect [on-chain events with commercial KYC providers](../hc/kyc.md)
+* Connect [on-chain events with commercial KYC providers](../../hybrid\_compute/examples/kyc.md)
 
 There is more information on setting up your own servers and compute endpoints here:
 
-* [Hybrid Compute API Endpoints](../hc/AWS\_lambda\_setup.md)
+* [Hybrid Compute API Endpoints](../../hybrid\_compute/examples/aws\_lambda\_setup.md)
 
 Separately, there is a new system to help you deploy all the right contracts and set up a working test system at [\[Mainnet: turing.boba.network\]](https://turing.boba.network).
 
