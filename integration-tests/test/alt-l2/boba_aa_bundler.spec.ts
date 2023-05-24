@@ -43,7 +43,7 @@ describe('AA Bundler Test\n', async () => {
 
   before(async () => {
     env = await OptimismEnv.new()
-    const entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
+    const entryPointAddress = env.addressesAABOBA.L2_Boba_EntryPoint
 
     entryPoint = new Contract(
       entryPointAddress,
