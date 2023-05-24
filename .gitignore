@@ -52,6 +52,7 @@ packages/regenesis-surgery/state-dump
 
 # monitor
 ops_boba/api/watcher-api/env-rinkeby.yml
+ops_boba/api/watcher-api/env-goerli.yml
 ops_boba/api/watcher-api/env-mainnet.yml
 ops_boba/api/watcher-api/env.yml
 ops_boba/monitor/yarn.lock

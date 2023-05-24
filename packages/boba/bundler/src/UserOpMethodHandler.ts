@@ -135,7 +135,6 @@ export class UserOpMethodHandler {
 
   /**
    * eth_estimateUserOperationGas RPC api.
-   * TODO: gonna work post bedrock!
    * @param userOp1
    * @param entryPointInput
    */
@@ -156,22 +155,25 @@ export class UserOpMethodHandler {
     // todo: checks the existence of parameters, but since we hexlify the inputs, it fails to validate
     await this._validateParameters(deepHexlify(userOp), entryPointInput)
     // todo: validation manager duplicate?
-    const errorResult = await this.entryPoint.callStatic
+    const errorResult = await this.entryPointWrapper.callStatic
       .simulateValidation(userOp)
       .catch((e) => e)
-    if (errorResult.errorName === 'FailedOp') {
+
+    const failedOp = errorResult[0]
+    const resp = errorResult[1]
+    const errorName = resp[0]
+
+    if (failedOp.status) {
       throw new RpcError(
-        errorResult.errorArgs.at(-1),
+        failedOp?.reason,
         ValidationErrors.SimulateValidation
       )
     }
-    // todo throw valid rpc error
-    if (errorResult.errorName !== 'ValidationResult') {
-      throw errorResult
+    if (errorName !== 'ValidationResult') {
+      throw resp
     }
 
-    const { returnInfo } = errorResult.errorArgs
-    let { preOpGas, validAfter, validUntil } = returnInfo
+    let { preOpGas, validAfter, validUntil } = resp[1]
 
     const callGasLimit = await this.provider
       .estimateGas({
