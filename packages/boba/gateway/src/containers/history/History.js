@@ -43,7 +43,7 @@ import Pending from './TX_Pending'
 import Transfers from './TX_Transfers'
 
 import * as S from './History.styles'
-import * as styles from './TX_All.module.scss'
+import styles from './TX_All.module.scss'
 
 import useInterval from 'hooks/useInterval'
 import {PageTitle} from 'components'

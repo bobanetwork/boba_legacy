@@ -19,7 +19,7 @@ import { isEqual } from 'util/lodash';
 import React from 'react'
 import { connect } from 'react-redux'
 import ReactCardFlip from 'react-card-flip'
-import * as styles from './listNFT.module.scss'
+import styles from './listNFT.module.scss'
 import * as S from './listNFT.styles'
 import { removeNFT } from 'actions/nftAction'
 import Button from 'components/button/Button'

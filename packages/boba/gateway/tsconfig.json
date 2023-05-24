@@ -9,7 +9,7 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
     ],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
@@ -18,7 +18,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "types": ["jest", "testing-library__jest-dom"],
   },
   "include": [
     "src"

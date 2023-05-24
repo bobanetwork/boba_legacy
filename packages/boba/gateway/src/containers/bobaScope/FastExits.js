@@ -22,7 +22,7 @@ import { selectLoading } from 'selectors'
 import { Pager } from 'components'
 import FastExit from 'components/seven/FastExit'
 
-import * as styles from './Transactions.module.scss'
+import styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 const PER_PAGE = 10
