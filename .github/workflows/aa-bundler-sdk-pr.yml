@@ -1,8 +1,8 @@
 name: Will trigger release of AA-Bundler to NPM (PR comment)
 on:
-  pull_request:
-    branches:
-      - master
+  push:
+    tags:
+    - '*'
 
 permissions:
   contents: write
