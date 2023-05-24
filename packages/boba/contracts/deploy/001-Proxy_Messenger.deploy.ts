@@ -1,16 +1,17 @@
-import { getContractFactory } from '@eth-optimism/contracts'
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
-import { registerBobaAddress } from './000-Messenger.deploy'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { DeployFunction } from 'hardhat-deploy/dist/types'
+import {
+  getDeploymentSubmission,
+  registerBobaAddress,
+  getBobaContractAt,
+} from '../src/hardhat-deploy-ethers'
 
 /* eslint-disable */
 require('dotenv').config()
 
-import L1_MessengerJson from '../artifacts/contracts/L1CrossDomainMessengerFast.sol/L1CrossDomainMessengerFast.json'
-
-let Factory__Proxy_L1_Messenger: ContractFactory
-let Factory__L1_Messenger: ContractFactory
-let Proxy_L1_Messenger: Contract
+let Factory__Proxy__L1CrossDomainMessengerFast: ContractFactory
+let Proxy__L1CrossDomainMessengerFast: Contract
 
 const deployFn: DeployFunction = async (hre) => {
 
@@ -18,47 +19,32 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__L1_Messenger = new ContractFactory(
-    L1_MessengerJson.abi,
-    L1_MessengerJson.bytecode,
-    (hre as any).deployConfig.deployer_l1
-  )
-
-  Factory__Proxy_L1_Messenger = getContractFactory(
+  Factory__Proxy__L1CrossDomainMessengerFast = getContractFactory(
     'Lib_ResolvedDelegateProxy',
     (hre as any).deployConfig.deployer_l1
   )
-
-  Proxy_L1_Messenger = await Factory__Proxy_L1_Messenger.deploy(
-    addressManager.address,
-    'L1CrossDomainMessengerFast'
+  Proxy__L1CrossDomainMessengerFast = await Factory__Proxy__L1CrossDomainMessengerFast.deploy(
+    addressManager.address, 'L1CrossDomainMessengerFast',
   )
 
-  await Proxy_L1_Messenger.deployTransaction.wait()
-
-  const Proxy_L1_MessengerDeploymentSubmission: DeploymentSubmission = {
-    ...Proxy_L1_Messenger,
-    receipt: Proxy_L1_Messenger.receipt,
-    address: Proxy_L1_Messenger.address,
-    abi: Proxy_L1_Messenger.abi,
-  }
-
-  await registerBobaAddress( addressManager, 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_Messenger.address )
-  await hre.deployments.save( 'Proxy__L1CrossDomainMessengerFast', Proxy_L1_MessengerDeploymentSubmission )
-  console.log(`Proxy__L1CrossDomainMessengerFast deployed to: ${Proxy_L1_Messenger.address}`)
-
-  const Proxy_L1_Messenger_Deployed = Factory__L1_Messenger.attach(
-    Proxy_L1_Messenger.address
-  )
+  const Proxy__L1CrossDomainMessengerFastDeploymentSubmission = getDeploymentSubmission(Proxy__L1CrossDomainMessengerFast)
+  await registerBobaAddress( addressManager, 'Proxy__L1CrossDomainMessengerFast', Proxy__L1CrossDomainMessengerFast.address )
+  await hre.deployments.save( 'Proxy__L1CrossDomainMessengerFast', Proxy__L1CrossDomainMessengerFastDeploymentSubmission )
+  console.log(`Proxy__L1CrossDomainMessengerFast deployed to: ${Proxy__L1CrossDomainMessengerFast.address}`)
 
   // initialize with the address of the address_manager
-  const ProxyL1MessengerTX = await Proxy_L1_Messenger_Deployed.initialize(
+  Proxy__L1CrossDomainMessengerFast = await getBobaContractAt(
+    'L1CrossDomainMessengerFast',
+    Proxy__L1CrossDomainMessengerFast.address,
+    (hre as any).deployConfig.deployer_l1
+  )
+  const initializeTx = await Proxy__L1CrossDomainMessengerFast.initialize(
     addressManager.address
   )
-  await ProxyL1MessengerTX.wait()
-  console.log(`Proxy Fast L1 Messenger initialized: ${ProxyL1MessengerTX.hash}`)
+  await initializeTx.wait()
+  console.log(`Proxy__L1CrossDomainMessengerFast initialized: ${initializeTx.hash}`)
 
 }
 
-deployFn.tags = ['Proxy_FastMessenger', 'required']
+deployFn.tags = ['Proxy__L1CrossDomainMessengerFast', 'required']
 export default deployFn

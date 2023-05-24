@@ -46,6 +46,54 @@ const config: HardhatUserConfig = {
     'boba-goerli': {
       url: 'https://goerli.boba.network',
     },
+    moonbeam: {
+      url: 'https://rpc.api.moonbeam.network',
+    },
+    bobabeam: {
+      url: 'https://bobabeam.boba.network',
+    },
+    moonbase: {
+      url: 'https://rpc.testnet.moonbeam.network',
+    },
+    bobabase: {
+      url: 'https://bobabase.boba.network',
+    },
+    snowtrace: {
+      url: 'https://api.avax.network/ext/bc/C/rpc',
+    },
+    bobaavax: {
+      url: 'https://avax.boba.network',
+    },
+    avaxTestnet: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc',
+    },
+    bobaavaxTestnet: {
+      url: 'https://testnet.avax.boba.network',
+    },
+    bnb: {
+      url: 'https://bscrpc.com',
+    },
+    bobabnb: {
+      url: 'https://bnb.boba.network',
+    },
+    bnbTestnet: {
+      url: 'https://data-seed-prebsc-2-s3.binance.org:8545',
+    },
+    bobabnbTestnet: {
+      url: 'https://testnet.bnb.boba.network',
+    },
+    fantom: {
+      url: 'https://rpc.fantom.network',
+    },
+    bobaopera: {
+      url: 'https://bobaopera.boba.network',
+    },
+    fantomTestnet: {
+      url: 'https://rpc.testnet.fantom.network',
+    },
+    bobaoperaTestnet: {
+      url: 'https://testnet.bobaopera.boba.network',
+    },
   },
   solidity: {
     compilers: [
@@ -109,6 +157,22 @@ const config: HardhatUserConfig = {
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
       goerli: process.env.ETHERSCAN_GOERLI_KEY,
       'boba-goerli': process.env.BOBA_MAINNET_KEY,
+      moonbeam: process.env.MOONBEAM_KEY,
+      bobabeam: 'DEFAULT_KEY',
+      moonbase: process.env.MOONBEAM_KEY,
+      bobabase: 'DEFAULT_KEY',
+      bnb: process.env.BSCSCAN_KEY,
+      bobabnb: 'DEFAULT_KEY',
+      bnbTestnet: process.env.BSCSCAN_KEY,
+      bobabnbTestnet: 'DEFAULT_KEY',
+      snowtrace: process.env.SNOWTRACE_KEY,
+      bobaavax: 'DEFAULT_KEY',
+      avaxTestnet: process.env.SNOWTRACE_KEY,
+      bobaavaxTestnet: 'DEFAULT_KEY',
+      fantom: process.env.FTMSCAN_KEY,
+      bobaopera: 'DEFAULT_KEY',
+      fantomTestnet: process.env.FTMSCAN_KEY,
+      bobaoperaTestnet: 'DEFAULT_KEY',
     },
     customChains: [
       {
@@ -125,6 +189,134 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-testnet.bobascan.com/api',
           browserURL: 'https://testnet.bobascan.com',
+        },
+      },
+      {
+        network: 'moonbeam',
+        chainId: 1284,
+        urls: {
+          apiURL: 'https://api-moonbeam.moonscan.io/api',
+          browserURL: 'https://moonscan.io/',
+        },
+      },
+      {
+        network: 'bobabeam',
+        chainId: 1294,
+        urls: {
+          apiURL: 'https://blockexplorer.bobabeam.boba.network/api',
+          browserURL: 'https://blockexplorer.bobabeam.boba.network',
+        },
+      },
+      {
+        network: 'moonbase',
+        chainId: 1287,
+        urls: {
+          apiURL: 'https://api-moonbase.moonscan.io/api',
+          browserURL: 'https://moonbase.moonscan.io/',
+        },
+      },
+      {
+        network: 'bobabase',
+        chainId: 1297,
+        urls: {
+          apiURL: 'https://blockexplorer.bobabase.boba.network/api',
+          browserURL: 'https://blockexplorer.bobabase.boba.network',
+        },
+      },
+      {
+        network: 'snowtrace',
+        chainId: 43114,
+        urls: {
+          apiURL: 'https://api.snowtrace.io/api',
+          browserURL: 'https://snowtrace.io',
+        },
+      },
+      {
+        network: 'bobaavax',
+        chainId: 43288,
+        urls: {
+          apiURL: 'https://blockexplorer.avax.boba.network/api',
+          browserURL: 'https://blockexplorer.avax.boba.network',
+        },
+      },
+      {
+        network: 'avaxTestnet',
+        chainId: 43113,
+        urls: {
+          apiURL: 'https://api-testnet.snowtrace.io/api',
+          browserURL: 'https://testnet.snowtrace.io',
+        },
+      },
+      {
+        network: 'bobaavaxTestnet',
+        chainId: 4328,
+        urls: {
+          apiURL: 'https://blockexplorer.testnet.avax.boba.network/api',
+          browserURL: 'https://blockexplorer.testnet.avax.boba.network',
+        },
+      },
+      {
+        network: 'bnb',
+        chainId: 56,
+        urls: {
+          apiURL: 'https://api.bscscan.com/api',
+          browserURL: 'https://bscscan.com/',
+        },
+      },
+      {
+        network: 'bobabnb',
+        chainId: 56288,
+        urls: {
+          apiURL: 'https://blockexplorer.bnb.boba.network/api',
+          browserURL: 'https://blockexplorer.bnb.boba.network',
+        },
+      },
+      {
+        network: 'bnbTestnet',
+        chainId: 97,
+        urls: {
+          apiURL: 'https://api-testnet.bscscan.com/api',
+          browserURL: 'https://testnet.bscscan.com/',
+        },
+      },
+      {
+        network: 'bobabnbTestnet',
+        chainId: 9728,
+        urls: {
+          apiURL: 'https://blockexplorer.testnet.bnb.boba.network/api',
+          browserURL: 'https://blockexplorer.testnet.bnb.boba.network',
+        },
+      },
+      {
+        network: 'fantom',
+        chainId: 250,
+        urls: {
+          apiURL: 'https://api.ftmscan.com/api',
+          browserURL: 'https://ftmscan.com',
+        },
+      },
+      {
+        network: 'bobaopera',
+        chainId: 301,
+        urls: {
+          apiURL: 'https://blockexplorer.bobaopera.boba.network/api',
+          browserURL: 'https://blockexplorer.bobaopera.boba.network/',
+        },
+      },
+      {
+        network: 'fantomTestnet',
+        chainId: 4002,
+        urls: {
+          apiURL: 'https://api-testnet.ftmscan.com/api',
+          browserURL: 'https://testnet.ftmscan.com',
+        },
+      },
+      {
+        network: 'bobaoperaTestnet',
+        chainId: 4051,
+        urls: {
+          apiURL: 'https://blockexplorer.testnet.bobaopera.boba.network/api',
+          browserURL: 'https://blockexplorer.testnet.bobaopera.boba.network/',
         },
       },
     ],

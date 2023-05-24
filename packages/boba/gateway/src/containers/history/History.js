@@ -14,23 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { batch, useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'lodash'
+import { useDispatch } from 'react-redux'
+import { isEqual,orderBy } from 'util/lodash';
+
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css"
+import 'react-datepicker/dist/react-datepicker.css'
 
 import { useMediaQuery, useTheme } from '@mui/material'
 
-import moment from 'moment'
+import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
-import { selectActiveHistoryTab } from 'selectors/uiSelector'
+import { 
+  selectActiveHistoryTab,
+  selectTransactions,
+  selectAccountEnabled,
+  selectLayer
+} from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
-import { selectTransactions } from 'selectors/transactionSelector'
-import { selectLayer } from 'selectors/setupSelector'
 
 import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
@@ -42,11 +46,12 @@ import * as S from './History.styles'
 import * as styles from './TX_All.module.scss'
 
 import useInterval from 'hooks/useInterval'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
+import { selectActiveNetworkName } from 'selectors'
 
 function History() {
 
@@ -56,35 +61,46 @@ function History() {
   const dispatch = useDispatch()
 
   const now = new Date()
-  const last_6months = new Date(now.getFullYear(), now.getMonth()-6, now.getDate())
+  const last_6months = new Date(
+    now.getFullYear(),
+    now.getMonth() - 6,
+    now.getDate()
+  )
 
   const [startDate, setStartDate] = useState(last_6months)
   const [endDate, setEndDate] = useState(now)
   const layer = useSelector(selectLayer())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
   const [searchHistory, setSearchHistory] = useState('')
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
+  const networkName = useSelector(selectActiveNetworkName())
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
-  const orderedTransactions = orderBy(unorderedTransactions, i => i.timeStamp, 'desc')
+  const orderedTransactions = orderBy(
+    unorderedTransactions,
+    (i) => i.timeStamp,
+    'desc'
+  )
 
   const transactions = orderedTransactions.filter((i) => {
     if (startDate && endDate) {
-      return (moment.unix(i.timeStamp).isSameOrAfter(startDate) && moment.unix(i.timeStamp).isSameOrBefore(endDate))
+      return (
+        isSameOrAfterDate(i.timeStamp, startDate) &&
+        isSameOrBeforeDate(i.timeStamp,endDate)
+      )
     }
     return true
   })
 
   useInterval(() => {
-    batch(()=>{
+    if (accountEnabled) {
       dispatch(fetchTransactions())
-    })
+    }
   }, POLL_INTERVAL)
 
   return (
-
     <S.HistoryPageContainer>
-
       <PageTitle title={'History'} />
 
       <Connect
@@ -92,95 +108,109 @@ function History() {
         accountEnabled={layer}
       />
 
-      {layer && <>
-      <S.Header>
-        <div className={styles.searchInput}>
-          <Input
-            size='small'
-            placeholder='Search by hash'
-            value={searchHistory}
-            onChange={i=>{setSearchHistory(i.target.value)}}
-            className={styles.searchBar}
-          />
-        </div>
-        <div className={styles.actions}>
-          {!isMobile ? (
-            <div style={{ margin: '0px 10px', opacity: 0.7 }}>Show period from</div>
-          ) : null}
-          <DatePicker
-            wrapperClassName={styles.datePickerInput}
-            popperClassName={styles.popperStyle}
-            selected={startDate}
-            onChange={(date)=>setStartDate(date)}
-            selectsStart
-            endDate={new Date(endDate)}
-            maxDate={new Date(endDate)}
-            calendarClassName={theme.palette.mode}
-            placeholderText={isMobile ? "From" : ""}
-          />
-          {!isMobile ? (
-            <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
-          ) : null}
-          <DatePicker
-            wrapperClassName={styles.datePickerInput}
-            popperClassName={styles.popperStyle}
-            selected={endDate}
-            onChange={(date)=>setEndDate(date)}
-            selectsEnd
-            startDate={new Date(startDate)}
-            minDate={new Date(startDate)}
-            calendarClassName={theme.palette.mode}
-            placeholderText={isMobile ? "To" : ""}
-          />
-        </div>
-      </S.Header>
-      <div className={styles.data}>
-        <div className={styles.section}>
-          <Tabs
-            onClick={tab => {dispatch(setActiveHistoryTab(tab))}}
-            activeTab={activeTab}
-            tabs={['All', 'Ethereum to Boba Ethereum L2', 'Boba Ethereum L2 to Ethereum', 'Bridge between L1s', 'Pending']}
-          />
+      {layer && (
+        <>
+          <S.Header>
+            <div className={styles.searchInput}>
+              <Input
+                size="small"
+                placeholder="Search by hash"
+                value={searchHistory}
+                onChange={(i) => {
+                  setSearchHistory(i.target.value)
+                }}
+                className={styles.searchBar}
+              />
+            </div>
+            <div className={styles.actions}>
+              {!isMobile ? (
+                <div style={{ margin: '0px 10px', opacity: 0.7 }}>
+                  Show period from
+                </div>
+              ) : null}
+              <DatePicker
+                wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
+                popperClassName={styles.popperStyle}
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                selectsStart
+                endDate={new Date(endDate)}
+                maxDate={new Date(endDate)}
+                calendarClassName={theme.palette.mode}
+                placeholderText={isMobile ? 'From' : ''}
+              />
+              {!isMobile ? (
+                <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
+              ) : null}
+              <DatePicker
+                wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
+                popperClassName={styles.popperStyle}
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                selectsEnd
+                startDate={new Date(startDate)}
+                minDate={new Date(startDate)}
+                calendarClassName={theme.palette.mode}
+                placeholderText={isMobile ? 'To' : ''}
+              />
+            </div>
+          </S.Header>
+          <div className={styles.data}>
+            <div className={styles.section}>
+              <Tabs
+                onClick={(tab) => {
+                  dispatch(setActiveHistoryTab(tab))
+                }}
+                activeTab={activeTab}
+                tabs={[
+                  'All',
+                  `${networkName['l1']} to ${networkName['l2']}`,
+                  `${networkName['l2']} to ${networkName['l1']}`,
+                  'Bridge between L1s',
+                  'Pending',
+                ]}
+              />
 
-          {activeTab === 'All' && (
-            <All
-              searchHistory={searchHistory}
-              transactions={transactions}
-            />
-          )}
+              {activeTab === 'All' && (
+                <All
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
 
-          {activeTab === 'Ethereum to Boba Ethereum L2' &&
-            <Deposits
-              searchHistory={searchHistory}
-              transactions={transactions}
-            />
-          }
+              {activeTab === `${networkName['l1']} to ${networkName['l2']}` && (
+                <Deposits
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
 
-          {activeTab === 'Boba Ethereum L2 to Ethereum' &&
-            <Exits
-              searchHistory={searchHistory}
-              transactions={transactions}
-            />
-          }
+              {activeTab === `${networkName['l2']} to ${networkName['l1']}` && (
+                <Exits
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
 
-          {activeTab === 'Bridge between L1s' &&
-            <Transfers
-              searchHistory={searchHistory}
-              transactions={transactions}
-            />
-          }
+              {activeTab === 'Bridge between L1s' && (
+                <Transfers
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
 
-          {activeTab === 'Pending' &&
-            <Pending
-              searchHistory={searchHistory}
-              transactions={transactions}
-            />
-          }
-        </div>
-      </div>
-    </>}
+              {activeTab === 'Pending' && (
+                <Pending
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </S.HistoryPageContainer>
-  );
+  )
 }
 
 export default React.memo(History)

@@ -22,10 +22,10 @@ yarn build
 Add .env in `/boba-examples/boba-straw`
 
 ```bash
-# Rinkeby
+# Goerli
 ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
-L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/KEY
-L2_NODE_WEB3_URL=https://rinkeby.boba.network
+L1_NODE_WEB3_URL=https://goerli.gateway.tenderly.co
+L2_NODE_WEB3_URL=https://goerli.boba.network
 PRIV_KEY=
 ```
 

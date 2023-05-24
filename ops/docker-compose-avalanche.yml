@@ -1,0 +1,502 @@
+version: "3"
+
+# Since avalanche use IPv6, we need to turn on ipv6 for docker
+# 1. Add the following lines to daemon configuration
+# {
+#    "fixed-cidr-v6": "fd00::/80",
+#    "ipv6": true,
+# }
+#
+
+
+# Deployer
+# PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN
+# 0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027
+
+# Relayer
+# PUB KEY 7EdyWHDoMHykMKNSfRaFtxfCT7gDPuB8pifvrptdYiFojCAaTH
+# Ava ADDRESS C-custom1etenrecgr0lhywpcuvdc7crkgu4f7pdgx7qrdx
+# Ava PRIV KEY PrivateKey-8kqXG11uHXie4oWep5b4ivm2S5TRzSz6yfiamqeENnQT2rmXv
+# ETH Address 0x56faE09531C4985188BA78B7fB93739eaf1fBF98
+# C-Chain PrivKey 0x119c49b6a55123600ce73fbfad852f45c015d328b593fb20aca9a68f1588bd7e
+
+# Fast Relayer
+# PUB KEY 6c7qB6S7k6EPweWCfgfXMrC8SAJcss6rrjizjvALMYaJCZGYZJ
+# Ava ADDRESS C-custom17qjusw0fy9d52tgwpjpak2p6qgu9pc2y6qgpqy
+# Ava PRIV KEY PrivateKey-2M3bTSt99e24dwS7E6i7qkxyBxMZZsipBWQjBXBjVaabjyZJNM
+# ETH Address 0x4FC1c7D869fc4AE45FC8FC671c32f1E17f60A34F
+# C-Chain PrivKey 0xb135c8deb7e4f283ad3b8a5e8b557d88f32ccdca730a7d1ee6a02263d565c39c
+
+# Integration PK 2
+# PUB KEY 7nfXp7SfoWuexpuawJtyMiSTetUpSDWpR8pVT8bCuqFiQzGeYF
+# Ava ADDRESS C-custom1mp5hjf2vlpvk50e7ma4f8lss08w39y9m6gw43e
+# Ava PRIV KEY PrivateKey-2p38JqqbFQ3yruv22mFQFToPfMeZVKPa3Vud2wvorCkHetNxr9
+# ETH Address 0xdae74D7327d123a1E1732C14a75599ceAd1aeeC0
+# C-Chain PrivKey 0xee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437
+
+
+# Integration PK 3
+# PUB KEY 7wxExVLHmceCuno8pGuTy1zs5fqNFmwTdep3tXqrNB8SiYCCrn
+# ADDRESS C-custom1pckvggf8rl8pq6utu30psm7nd5m8c0uzd665ls
+# PRIV KEY PrivateKey-2UaBWxCEeVjzo2314c62CEcujuRocQxdQgcBoWbbQFsiD4DikJ
+# ETH Address 0xb57255024fa928e3d296c41528171b5f67e8d447
+# C-Chain PrivKey 0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c
+
+
+# Sequencer
+# PUB KEY 6D1Fs4Ty4PFLq5DnvymnMvtTnHxRWT3uPLqRZejd1WrkMavTc7
+# ADDRESS C-custom1eeftxyzhjlu6hx95ycvskcvwnj6vxx7rkaujas
+# PRIV KEY PrivateKey-Vmr4BTLYkPKcaw4nYW6SxEbr275chp3MBktoGkc5auUhjV7wM
+# ETH Address 0x91ef3b19cdb344c5010358718e9347dd5cb2f362
+# C-Chain PrivKey 0x4155448d8ac3d7054291ff85e091dbc43f6c12ca6cf5e3bcfbde1ede7acd564a
+
+
+# Proposer
+# PUB KEY 64h63VM7DaBc1t9QHg7kwqoLroSjrsZXyy7MwSxTo6eCseFQbn
+# ADDRESS C-custom1qq26q3pp2qrgyte0hquqdeh4pau82z0tk2l0pc
+# PRIV KEY PrivateKey-nnqZLTSthVBRQbc1kzLt7LMC68XiWcnVbDukKbJHrBSfBiFK6
+# ETH Address 0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea
+# C-Chain PrivKey 0x67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e
+
+
+# Gas Price Oracle
+# PUB KEY 4xpZF5yxqGc5ahLFRcRSDPYaQqR5rv3Pt2p5znLcRwdGrdrX68
+# Address C-custom1wq32vs9gfvhzrgle36tqdqc5pk5wres3f4fv3e
+# Private Key PrivateKey-23ZgZBmzqiBeJLKTCG2AAsvbAGExwZjyRvVNcqUAMVowQdTguP
+# ETH Address 0x8a4b16f666b4e91943c6d5bc9fea4274f57e8848
+# C-Chain PrivKey 0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de
+
+
+x-deployer_pk: &deployer_pk
+  DEPLOYER_PRIVATE_KEY: '0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027'
+
+x-relayer_pk: &relayer_pk
+  RELAYER_PRIVATE_KEY: '0x119c49b6a55123600ce73fbfad852f45c015d328b593fb20aca9a68f1588bd7e'
+
+# Account #9
+x-fast-relayer_pk: &fast-relayer_pk
+  FAST_RELAYER_PRIVATE_KEY: '0xb135c8deb7e4f283ad3b8a5e8b557d88f32ccdca730a7d1ee6a02263d565c39c'
+
+# Account #0 - allows the fee test
+x-integration_pk: &integration_pk
+  PRIVATE_KEY: '0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027'
+
+# Account #10 - allows the fee test
+x-integration_2_pk: &integration_2_pk
+  PRIVATE_KEY_2: '0xee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437'
+
+# Account #7 - allows the fee test
+x-integration_3_pk: &integration_3_pk
+  PRIVATE_KEY_3: '0xc24d497a9fb2501e120c756b12794fd34da92d15b8bbbed71564d8e497103e4c'
+
+x-integration_4_pk: &integration_4_pk
+  GAS_PRICE_ORACLE_PRIVATE_KEY: '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de'
+
+services:
+  l1_chain:
+    image: bobanetwork/avalanche:latest
+    container_name: l1_chain
+    # build:
+    #   context: ./docker
+    #   dockerfile: Dockerfile.avalanche
+    ports:
+      # expose the service to the host for integration testing
+      - "9650:9650"
+      - "9652:9652"
+      - "9654:9654"
+      - "9656:9656"
+      - "9658:9658"
+    networks:
+      - ava-network
+
+  deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: bobanetwork/deployer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: deployer
+    container_name: deployer
+    entrypoint: ./deployer.sh
+    environment:
+      FRAUD_PROOF_WINDOW_SECONDS: 0
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      # these keys are hardhat's first 2 accounts, DO NOT use in production
+      << : [*deployer_pk, *relayer_pk]
+      SEQUENCER_ADDRESS: "0x91ef3b19cdb344c5010358718e9347dd5cb2f362"
+      PROPOSER_ADDRESS: "0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea"
+      # setting the whitelist owner to address(0) disables the whitelist
+      WHITELIST_OWNER: "0x0000000000000000000000000000000000000000"
+      L1_FEE_WALLET_ADDRESS: "0x391716d440c151c42cdf1c95c1d83a5427bca52c"
+      L2_CHAIN_ID: 31338
+      L2_BLOCK_GAS_LIMIT: 11000000
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      GAS_PRICE_ORACLE_OWNER: "0x8a4b16f666b4e91943c6d5bc9fea4274f57e8848"
+      GAS_PRICE_ORACLE_OVERHEAD: "2750"
+      GAS_PRICE_ORACLE_SCALAR: "1500000"
+      GAS_PRICE_ORACLE_L1_BASE_FEE: "1"
+      GAS_PRICE_ORACLE_GAS_PRICE: "1000000000"
+      GAS_PRICE_ORACLE_DECIMALS: "6"
+      L1_NATIVE_TOKEN_NAME: "Avalanche"
+      L1_NATIVE_TOKEN_SYMBOL: "AVAX"
+      L1_NATIVE_TOKEN_DECIMALS: "18"
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+      DTL_REGISTRY_URL: http://dtl:8081/addresses.json
+      DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
+      RETRIES: 500
+    ports:
+        # expose the service to the host for getting the contract addrs
+      - ${DEPLOYER_PORT:-8077}:8082
+    networks:
+      - ava-network
+
+  # deploys boba contracts and serves contract addresses
+  boba_deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/boba_deployer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: boba_deployer
+    container_name: boba_deployer
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922"
+      URL: http://dtl:8081/addresses.json
+      # DO NOT use in production
+      << : [*deployer_pk, *relayer_pk, *fast-relayer_pk]
+      RETRIES: 500
+      DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+    networks:
+      - ava-network
+
+  dtl:
+    depends_on:
+      - l1_chain
+    image: bobanetwork/data-transport-layer:latest
+    container_name: dtl
+    entrypoint: ./dtl.sh
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: data-transport-layer
+    # override with the dtl script and the env vars required for it
+    env_file:
+      -  ./envs/dtl.env
+    # set the rest of the env vars for the network whcih do not
+    # depend on the docker-compose setup
+    environment:
+      URL: http://deployer:8082/addresses.json
+      # connect to the 2 layers
+      DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: http://l1_chain:9650/ext/bc/C/rpc
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: http://l2geth:8545
+      DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
+      DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 31338
+      DATA_TRANSPORT_LAYER__BSS_HARDFORK_1_INDEX: 0
+      DATA_TRANSPORT_LAYER__ETH1_CTC_DEPLOYMENT_HEIGHT: 0
+      RETRIES: 200
+      # if no need to support Turing v0 set height of v0 = v1
+      DATA_TRANSPORT_LAYER__TURING_V0_HEIGHT: 0
+      DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
+    ports:
+      - ${DTL_PORT:-7878}:7878
+      - ${REGISTRY_PORT:-8080}:8081
+    networks:
+      - ava-network
+
+  l2geth:
+    depends_on:
+      - l1_chain
+      - dtl
+    image: bobanetwork/l2geth:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    container_name: l2geth
+    # override with the geth script and the env vars required for it
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    restart: always
+    environment:
+      ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      # connecting to the DTL
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+      RETRIES: 200
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8545}:8545
+      - ${L2GETH_WS_PORT:-8546}:8546
+    networks:
+      - ava-network
+
+  relayer:
+    container_name: relayer
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/message-relayer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: message-relayer
+    entrypoint: ./relayer.sh
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      # a funded hardhat account
+      << : *relayer_pk
+      RETRIES: 500
+      POLLING_INTERVAL: 6000
+      GET_LOGS_INTERVAL: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json #this will fail early, but then start to work
+      FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
+      RESUBMISSION_TIMEOUT: 5
+      MULTI_RELAY_LIMIT: 5
+    networks:
+      - ava-network
+
+  # a second relay system for messages that need to get to L1 quickly
+  # NOTE - all withdrawal messages use the standard relayer with its 7 day window
+  boba_message-relayer-fast:
+    container_name: boba_message-relayer-fast
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+    image: bobanetwork/boba_message-relayer-fast:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: boba_message-relayer-fast
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      # This is who pays for the fast message relayer
+      << : *fast-relayer_pk
+      RETRIES: 500
+      POLLING_INTERVAL: 6000
+      GET_LOGS_INTERVAL: 500
+      FILTER_ENDPOINT: http://dtl:8081/boba-addr.json
+      FILTER_POLLING_INTERVAL: 30000
+      MAX_WAIT_TIME_S: 5
+      MAX_WAIT_TX_TIME_S: 5
+      RESUBMISSION_TIMEOUT: 5
+      MULTI_RELAY_LIMIT: 5
+      FAST_RELAYER: 'true'
+    networks:
+      - ava-network
+
+  batch_submitter:
+    container_name: batch_submitter
+    restart: always
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - kms
+    image: bobanetwork/go-batch-submitter:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.batch-submitter
+    entrypoint: ./batch-submitter.sh
+    env_file:
+      - ./envs/batch-submitter.env
+    environment:
+      L1_ETH_RPC: http://l1_chain:9650/ext/bc/C/rpc
+      L2_ETH_RPC: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      RETRIES: 200
+      #KMS access setup
+      AWS_ACCESS_KEY_ID: "1"
+      AWS_SECRET_ACCESS_KEY: "11"
+      BATCH_SUBMITTER_KMS_ENDPOINT: http://kms:8888/
+      BATCH_SUBMITTER_KMS_REGION: us-east-1
+      #aliases are setup, check seed.yml
+      BATCH_SUBMITTER_SEQUENCER_KEY_ID: "0x91ef3b19cdb344c5010358718e9347dd5cb2f362"
+      BATCH_SUBMITTER_PROPOSER_KEY_ID: "0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea"
+    networks:
+      - ava-network
+
+  integration_tests:
+    image: bobanetwork/integration-tests:latest
+    container_name: integration_tests
+    deploy:
+       replicas: 0
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: integration-tests
+    entrypoint: ./integration-tests.sh
+    environment:
+      VERIFIER_URL: http://verifier:8545
+      REPLICA_URL: http://replica:8545
+      L1_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BASE_URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      AA_BOBA_URL: http://dtl:8081/aa-addr.json
+      BUNDLER_URL: http://bundler:3000/rpc
+      ENABLE_GAS_REPORT: 1
+      NO_NETWORK: 1
+      L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
+      RETRIES: 200
+      << : [*integration_pk, *integration_2_pk, *integration_3_pk, *integration_4_pk]
+    volumes:
+      - ~/result:/opt/optimism/integration-tests/result
+    networks:
+      - ava-network
+
+  replica:
+    container_name: replica
+    depends_on:
+      - dtl
+      - l2geth
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+      ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l2'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 200
+      # CTC height
+      ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      SEQUENCER_CLIENT_HTTP: http://l2geth:8545
+      EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${L2GETH_HTTP_PORT:-8549}:8545
+      - ${L2GETH_WS_PORT:-8550}:8546
+    networks:
+      - ava-network
+
+
+  verifier:
+    container_name: verifier
+    depends_on:
+      - dtl
+    image: bobanetwork/l2geth:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.geth
+    entrypoint: sh ./geth.sh
+    env_file:
+      - ./envs/geth.env
+    environment:
+        ETH1_HTTP: http://l1_chain:9650/ext/bc/C/rpc
+        ROLLUP_TIMESTAMP_REFRESH: 5s
+        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+        ROLLUP_CLIENT_HTTP: http://dtl:7878
+        ROLLUP_BACKEND: 'l1'
+        ROLLUP_VERIFIER_ENABLE: 'true'
+        RETRIES: 200
+        # CTC height
+        ETH1_CTC_DEPLOYMENT_HEIGHT: 8
+        # no need to keep this secret, only used internally to sign blocks
+        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+        ROLLUP_POLL_INTERVAL_FLAG: "10s"
+        TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+        EMERGENCY_FORK_NUMBER: 0
+        L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+    ports:
+      - ${VERIFIER_HTTP_PORT:-8547}:8545
+      - ${VERIFIER_WS_PORT:-8548}:8546
+    networks:
+      - ava-network
+
+  fraud-detector:
+    container_name: fraud-detector
+    depends_on:
+     - verifier
+     - dtl
+    image: bobanetwork/fraud-detector:latest
+    deploy:
+      replicas: 1
+    build:
+      context: ..
+      dockerfile: ./boba_community/fraud-detector/docker/Dockerfile.fraud-detector
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L1_CONFIRMATIONS: 8
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      L2_CHECK_INTERVAL: 10
+      VERIFIER_WEB3_URL: http://verifier:8545
+      ADDRESS_MANAGER_ADDRESS: "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922"
+      L1_DEPLOYMENT_BLOCK: 8
+      L2_START_BLOCK: 1
+    ports:
+      - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
+    networks:
+      - ava-network
+
+  #in no way should this be running in production
+  kms:
+    container_name: kms
+    image: bobanetwork/local-kms:latest
+    environment:
+      PORT: "8888"
+      KMS_REGION: "us-east-1"
+    volumes:
+      - type: bind
+        source: ./seed-avalanche.yaml
+        target: /init/seed.yaml
+    ports:
+      - 8888:8888
+    networks:
+      - ava-network
+
+networks:
+  ava-network:
+    name: local-network
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: "fd00:1::/80"
+          # gateway: "fd00:1::1":w

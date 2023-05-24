@@ -194,6 +194,21 @@ describe('L2ERC1155Bridge Tests', () => {
         )
       ).to.be.revertedWith('L1 token address already registered')
     })
+    it('cant register a NFT with incorrect settings', async () => {
+      const SecondaryERC1155 = await deployERC1155('uri')
+      const IncorrectL2StandardERC1155 = await deployL2StandardERC11555(
+        L1ERC1155Bridge.address,
+        SecondaryERC1155.address,
+        'uri'
+      )
+      await expect(
+        L2ERC1155Bridge.registerPair(
+          ERC1155.address,
+          IncorrectL2StandardERC1155.address,
+          'L1'
+        )
+      ).to.be.revertedWith('L2 contract is not compatible with L1 contract')
+    })
     it('can register a token with L2 creation', async () => {
       const l2 = 1
       await L2ERC1155Bridge.registerPair(

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >0.7.5;
+pragma solidity 0.8.9;
 
 import "./interfaces/iL1LiquidityPool.sol";
 
@@ -103,6 +103,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
     address public DAO;
 
+    // this is unused, however is a part of the contract to preserve the storage layout
     uint256 public extraGasRelay;
 
     uint256 public userRewardMaxFeeRate;
@@ -426,6 +427,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     /***
      * @dev Add the new token pair to the pool
      * DO NOT add the same LP token more than once. Rewards will be messed up if you do.
+     * unlike the _l2TokenAddress, the _l1TokenAddress can be adddress(0),
+     * and is used to represent the native L1 token.
      *
      * @param _l1TokenAddress
      * @param _l2TokenAddress
@@ -613,9 +616,11 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     }
 
     /**
-     * Client deposit ERC20 from their account to this contract, which then releases funds on the L1 side
+     * Client deposit ERC20 or ETH from their account to this contract, which then releases funds on the L1 side
      * @param _amount amount that client wants to transfer.
      * @param _tokenAddress L2 token address
+     * @dev user should approve the billingContract.feeTokenAddress() token with at least the
+     * billingContract.exitFee() amount before calling this function.
      */
     function clientDepositL2(
         uint256 _amount,
@@ -689,6 +694,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         UserInfo storage user = userInfo[_tokenAddress][msg.sender];
 
         require(pool.l2TokenAddress != address(0), "Token Address Not Registered");
+        require(_amount != 0, "Incorrect Amount");
         require(user.amount >= _amount, "Requested amount exceeds amount staked");
 
         // Send initial xBOBA
@@ -715,15 +721,16 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
             _tokenAddress
         );
 
+
+        // burn xBOBA
+        burnXBOBA(_amount, _tokenAddress);
+
         if (_tokenAddress != Lib_PredeployAddresses.OVM_ETH) {
             IERC20(_tokenAddress).safeTransfer(_to, _amount);
         } else {
             (bool sent,) = _to.call{gas: SAFE_GAS_STIPEND, value: _amount}("");
             require(sent, "Failed to send ovm_Eth");
         }
-
-        // burn xBOBA
-        burnXBOBA(_amount, _tokenAddress);
     }
 
     /**
@@ -890,6 +897,9 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
     /**
      * Move funds in batch from L1 to L2, and pay out from the right liquidity pool
      * @param _tokens tokens in batch
+     *
+     * finalization of the batch deposit depends on the available pool balance
+     * If any transfer in the batch fails, the same tokens are returned on the other layer
      */
     function clientPayL2Batch(
         ClientPayToken [] calldata _tokens

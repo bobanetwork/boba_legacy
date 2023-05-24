@@ -4,11 +4,10 @@ import RecordItem from './RecordItem'
 
 import * as G from 'containers/Global.styles'
 import { useSelector } from 'react-redux'
-import { selectLockRecords } from 'selectors/veBobaSelector'
-import { selectLoading } from 'selectors/loadingSelector'
+import { selectLockRecords, selectLoading} from 'selectors'
 import { useDispatch } from 'react-redux'
 import { openModal } from 'actions/uiAction'
-import Pager from 'components/pager/Pager'
+import { Pager } from 'components'
 
 const PER_PAGE = 8
 

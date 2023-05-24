@@ -14,6 +14,7 @@ import {
   deployAndRegister,
   waitUntilTrue,
 } from '../src/hardhat-deploy-ethers'
+import { supportedLocalTestnet } from '../src/local-network-config'
 
 const deployFn: DeployFunction = async (hre) => {
   const { deployer } = await hre.getNamedAccounts()
@@ -21,12 +22,17 @@ const deployFn: DeployFunction = async (hre) => {
     hre,
     'Lib_AddressManager'
   )
+  const { chainId } = await hre.ethers.provider.getNetwork()
+  const networkConfig = supportedLocalTestnet[chainId]
+  const L1StandardBridgeInterfaceName = networkConfig.isLocalAltL1
+    ? 'L1StandardBridgeAltL1'
+    : 'L1StandardBridge'
 
   await deployAndRegister({
     hre,
     name: 'Proxy__L1StandardBridge',
     contract: 'L1ChugSplashProxy',
-    iface: 'L1StandardBridge',
+    iface: L1StandardBridgeInterfaceName,
     args: [deployer],
     postDeployAction: async (contract) => {
       // Because of the `iface` parameter supplied to the deployment function above, the `contract`
@@ -42,7 +48,9 @@ const deployFn: DeployFunction = async (hre) => {
 
       // First we need to set the correct implementation code. We'll set the code and then check
       // that the code was indeed correctly set.
-      const bridgeArtifact = getContractDefinition('L1StandardBridge')
+      const bridgeArtifact = getContractDefinition(
+        L1StandardBridgeInterfaceName
+      )
       const bridgeCode = bridgeArtifact.deployedBytecode
 
       console.log(`Setting bridge code...`)

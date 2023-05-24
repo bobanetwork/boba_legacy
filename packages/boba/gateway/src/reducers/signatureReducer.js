@@ -16,35 +16,25 @@ limitations under the License. */
 const initialState = {
   exitLPsigned: false,
   exitTRADsigned: false,
-  depositLPsigned: false,
-  depositTRADsigned: false
+  depositLPsigned: false
 }
 
 function signatureReducer (state = initialState, action) {
   switch (action.type) {
     case 'EXIT/LP/SIGNED':
-      console.log('exitLPsigned:',action.payload)
       return {
         ...state,
         exitLPsigned: action.payload
       }
       case 'EXIT/TRAD/SIGNED':
-      console.log('exitTRADsigned:',action.payload)
       return {
         ...state,
         exitTRADsigned: action.payload
       }
       case 'DEPOSIT/LP/SIGNED':
-      console.log('depositLPsigned:',action.payload)
       return {
         ...state,
         depositLPsigned: action.payload
-      }
-      case 'DEPOSIT/TRAD/SIGNED':
-      console.log('depositTRADsigned:',action.payload)
-      return {
-        ...state,
-        depositTRADsigned: action.payload
       }
     default:
       return state;

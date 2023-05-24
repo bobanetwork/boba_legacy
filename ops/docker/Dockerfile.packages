@@ -22,18 +22,19 @@ ARG BUILDPLATFORM
 RUN echo "Build Platform: $BUILDPLATFORM"
 
 RUN  if echo $BUILDPLATFORM | grep -i "amd64" ; then \
-          echo "Building for x86_64" ; \
-          apt-get update -y && apt-get install -y git curl bash jq ; \
-     elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
-          echo "Building for Mac ($BUILDPLATFORM)" ; \
-          apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config libc6-amd64-cross ; \
-     elif echo "\"`uname -a`\"" | grep -q -E -i "aarch" ; then \
-          apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
-          echo "Building for aarch64 GNU/Linux" ; \
-     else \
-         echo "Building for something else" ; \
-         apt-get update -y && apt-get install -y git curl bash jq ; \
-     fi
+  echo "Building for x86_64" ; \
+  apt-get update -y && apt-get install -y git curl bash jq ; \
+  elif echo $BUILDPLATFORM | grep -i "arm64" ; then \
+  echo "Building for Mac ($BUILDPLATFORM)" ; \
+  apt-get update -y && apt-get install -y git curl bash jq python3.7 make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config libc6-amd64-cross ; \
+  update-alternatives --install /usr/bin/python python /usr/bin/python3.7 10  ; \
+  elif echo "\"`uname -a`\"" | grep -q -E -i "aarch" ; then \
+  apt-get update -y && apt-get install -y git curl bash jq python make gcc libudev-dev libusb-1.0-0-dev g++ pkg-config ; \
+  echo "Building for aarch64 GNU/Linux" ; \
+  else \
+  echo "Building for something else" ; \
+  apt-get update -y && apt-get install -y git curl bash jq ; \
+  fi
 
 RUN ln -s /usr/x86_64-linux-gnu/lib64/ /lib64
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/lib64:/usr/x86_64-linux-gnu/lib"
@@ -59,6 +60,9 @@ COPY packages/boba/ve-boba/package.json ./packages/boba/ve-boba/package.json
 COPY packages/boba/bobalink/package.json ./packages/boba/bobalink/package.json
 COPY packages/boba/teleportation/package.json ./packages/boba/teleportation/package.json
 COPY packages/boba/account-abstraction/package.json ./packages/boba/account-abstraction/package.json
+COPY packages/boba/bundler/package.json ./packages/boba/bundler/package.json
+COPY packages/boba/bundler_sdk/package.json ./packages/boba/bundler_sdk/package.json
+COPY packages/boba/bundler_utils/package.json ./packages/boba/bundler_utils/package.json
 
 FROM base as builder
 WORKDIR /opt/optimism
@@ -94,6 +98,7 @@ COPY --from=builder /opt/optimism/node_modules ./node_modules
 COPY --from=builder /opt/optimism/packages/sdk/dist ./packages/sdk/dist
 COPY --from=builder /opt/optimism/packages/core-utils/dist ./packages/core-utils/dist
 COPY --from=builder /opt/optimism/packages/common-ts/dist ./packages/common-ts/dist
+COPY --from=builder /opt/optimism/packages/boba/bundler_sdk ./packages/boba/bundler_sdk
 
 # some packages need to access the bytecode of the contracts and deployment files
 COPY --from=builder /opt/optimism/packages/contracts ./packages/contracts
@@ -115,12 +120,16 @@ COPY --from=builder /opt/optimism/packages/data-transport-layer ./data-transport
 WORKDIR /opt/optimism/packages/data-transport-layer
 RUN mkdir ./state-dumps
 COPY ./ops/scripts/dtl.sh .
-CMD ["node", "dist/src/services/run.js"]
+CMD ["node", "dist/services/run.js"]
 
 FROM packages as integration-tests
 WORKDIR /opt/optimism/
 COPY --from=builder /opt/optimism/integration-tests ./integration-tests
 COPY --from=builder /opt/optimism/ops_boba/api ./ops_boba/api
+WORKDIR /opt/optimism/packages/boba
+COPY --from=builder /opt/optimism/packages/boba/account-abstraction ./account-abstraction
+COPY --from=builder /opt/optimism/packages/boba/bundler_sdk ./bundler_sdk
+COPY --from=builder /opt/optimism/packages/boba/bundler_utils ./bundler_utils
 WORKDIR /opt/optimism/integration-tests
 COPY ./ops/scripts/integration-tests.sh ./
 CMD ["yarn", "test:integration"]
@@ -168,3 +177,18 @@ WORKDIR /opt/optimism/packages/boba/account-abstraction
 RUN chmod +x ./scripts/wait-for-l1-and-l2.sh
 RUN chmod +x ./scripts/deployer.sh
 ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
+
+FROM packages as bundler
+COPY --from=builder /opt/optimism/packages/boba/bundler /opt/optimism/packages/boba/bundler
+COPY --from=builder /opt/optimism/packages/boba/account-abstraction /opt/optimism/packages/boba/account-abstraction
+COPY --from=builder /opt/optimism/packages/boba/bundler_sdk /opt/optimism/packages/boba/bundler_sdk
+COPY --from=builder /opt/optimism/packages/boba/bundler_utils /opt/optimism/packages/boba/bundler_utils
+WORKDIR /opt/optimism/packages/boba/bundler
+RUN npx webpack
+RUN rm -rf /opt/optimism/packages/boba/account-abstraction
+RUN rm -rf /opt/optimism/packages/boba/bundler_sdk
+RUN rm -rf /opt/optimism/packages/boba/bundler_utils
+RUN rm -rf /opt/optimism/packages/boba/bundler/node_modules
+RUN chmod +x ./wait-for-l1-and-l2.sh
+RUN chmod +x ./bundler.sh
+ENTRYPOINT ["./wait-for-l1-and-l2.sh", "./bundler.sh"]

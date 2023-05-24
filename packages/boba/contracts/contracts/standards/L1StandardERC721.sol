@@ -15,6 +15,7 @@ contract L1StandardERC721 is IL1StandardERC721, ERC721 {
      * @param _l2Contract Address of the corresponding L2 NFT contract.
      * @param _name ERC721 name.
      * @param _symbol ERC721 symbol.
+     * @param _baseTokenURI ERC721 baseTokenURI
      */
     constructor(
         address _l1Bridge,

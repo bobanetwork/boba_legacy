@@ -18,20 +18,28 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, Typography } from '@mui/material'
 import { openError, openModal } from 'actions/uiAction'
-import { orderBy } from 'lodash'
+import { orderBy } from 'util/lodash';
 
 import Button from 'components/button/Button'
 import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { selectDaoBalance, selectDaoBalanceX, selectDaoVotes, selectDaoVotesX, selectProposals, selectProposalThreshold } from 'selectors/daoSelector'
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
+import { 
+  selectDaoBalance, 
+  selectDaoBalanceX, 
+  selectDaoVotes, 
+  selectDaoVotesX, 
+  selectProposals, 
+  selectProposalThreshold,
+  selectLoading,
+  selectAccountEnabled, 
+  selectLayer
+} from 'selectors'
 
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
-import PageTitle from 'components/pageTitle/PageTitle'
+import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 
 const PROPOSAL_STATES = [
@@ -126,7 +134,7 @@ function OldDao() {
           }}>
             <Button
               fullWidth={true}
-              color="neutral"
+              color="primary"
               variant="outlined"
               disabled={!accountEnabled}
               onClick={() => {

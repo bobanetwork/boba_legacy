@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { isEqual } from "lodash";
+import { isEqual } from 'util/lodash';
 import Copy from "components/copy/Copy";
 import { Md5 } from "ts-md5/dist/md5";
 
@@ -10,7 +10,7 @@ import * as G from "containers/Global.styles";
 
 import { Box, Typography, Grid } from "@mui/material"
 
-import PageTitle from "components/pageTitle/PageTitle"
+import {PageTitle} from 'components'
 import networkService from "services/networkService"
 import BobaGlassIcon from "components/icons/BobaGlassIcon"
 import Connect from "containers/connect/Connect"

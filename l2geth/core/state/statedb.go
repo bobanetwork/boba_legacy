@@ -305,6 +305,13 @@ func (s *StateDB) GetBobaPriceRatio() *big.Int {
 	return value.Big()
 }
 
+// Retrieve the decimals of the price ratio
+func (s *StateDB) GetBobaPriceRatioDecimals() *big.Int {
+	keyPriceRatioDecimals := common.BigToHash(big.NewInt(11))
+	value := s.GetState(rcfg.OvmBobaGasPricOracle, keyPriceRatioDecimals)
+	return value.Big()
+}
+
 func (s *StateDB) GetNonce(addr common.Address) uint64 {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
@@ -420,7 +427,7 @@ func (s *StateDB) HasSuicided(addr common.Address) bool {
  */
 
 // TuringCharge moves Turing credits from a credit wallet to the operator
-func (s *StateDB) TuringCharge(userID common.Address) error {
+func (s *StateDB) TuringCharge(userID common.Address, isTuringChargeFork bool) error {
 	// Mutate two storage slots inside of OVM_ETH to transfer turing credits.
 	// userID is the address of that user's Turing Helper contract
 
@@ -436,12 +443,17 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 	valueOwner := s.GetState(rcfg.OvmTuringCreditAddress, keyOwner)
 	balOwner := valueOwner.Big()
 
-	log.Debug("TURING-CREDIT:Before", "balUser", balUser, "price", price)
+	log.Trace("TURING-CREDIT:Before", "balUser", balUser, "price", price)
 
 	if balUser.Cmp(price) < 0 {
 		log.Warn("TURING-CREDIT:Insufficient credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
+
+	if isTuringChargeFork && balUser.Cmp(price) == 0 && price.BitLen() > 0 {
+		// Discount the price slightly to ensure balUser stays positive
+		price.Sub(price, big.NewInt(1))
+	} // NOP if balance was > price, or if price was 0 and wouldn't change the statedb.
 
 	// perform the transfer
 	balUser = balUser.Sub(balUser, price)
@@ -457,7 +469,7 @@ func (s *StateDB) TuringCharge(userID common.Address) error {
 }
 
 // TuringCharge moves Turing credits from a credit wallet to the operator
-func (s *StateDB) TuringCheck(userID common.Address) error {
+func (s *StateDB) TuringCheck(userID common.Address, isTuringChargeFork bool) error {
 	// userID is the address of that user's Turing Helper contract
 	// checks for sufficient credit
 	keyUser := GetTuringPrepayKey(userID)
@@ -469,11 +481,15 @@ func (s *StateDB) TuringCheck(userID common.Address) error {
 	price := value.Big()
 
 	if balUser.Cmp(price) < 0 {
-		log.Warn("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
+		log.Trace("TURING-CREDIT-CHECK:User insufficient credit", "balUser", balUser, "price", price)
 		return errors.New("Insufficient Turing credit")
 	}
+	if isTuringChargeFork && balUser.Cmp(price) == 0 && price.BitLen() > 0 {
+		// Discount the price slightly to ensure balUser stays positive
+		price.Sub(price, big.NewInt(1))
+	} // NOP if balance was > price, or if price was 0 and wouldn't change the statedb.
 
-	log.Debug("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
+	log.Trace("TURING-CREDIT-CHECK:ok", "balUser", balUser, "price", price)
 
 	return nil
 }
@@ -543,9 +559,14 @@ func (s *StateDB) SetBobaAsFeeToken(addr common.Address) {
 	s.SetState(rcfg.OvmBobaGasPricOracle, key, common.BigToHash(common.Big1))
 }
 
-func (s *StateDB) SetBobaPriceRatio(priceRation *big.Int) {
+func (s *StateDB) SetBobaPriceRatio(priceRatio *big.Int) {
 	keyPriceRatio := common.BigToHash(big.NewInt(5))
-	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio, common.BigToHash(priceRation))
+	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatio, common.BigToHash(priceRatio))
+}
+
+func (s *StateDB) SetBobaPriceRatioDecimals(decimals *big.Int) {
+	keyPriceRatioDecimals := common.BigToHash(big.NewInt(11))
+	s.SetState(rcfg.OvmBobaGasPricOracle, keyPriceRatioDecimals, common.BigToHash(decimals))
 }
 
 func (s *StateDB) SetBalance(addr common.Address, amount *big.Int) {
@@ -718,8 +739,8 @@ func (s *StateDB) createObject(addr common.Address) (newobj, prev *stateObject) 
 // CreateAccount is called during the EVM CREATE operation. The situation might arise that
 // a contract does the following:
 //
-//   1. sends funds to sha(account ++ (nonce + 1))
-//   2. tx_create(sha(account ++ nonce)) (note that this gets the address of 1)
+//  1. sends funds to sha(account ++ (nonce + 1))
+//  2. tx_create(sha(account ++ nonce)) (note that this gets the address of 1)
 //
 // Carrying over the balance ensures that Ether doesn't disappear.
 func (s *StateDB) CreateAccount(addr common.Address) {

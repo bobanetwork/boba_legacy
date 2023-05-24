@@ -16,17 +16,17 @@ limitations under the License. */
 // we use BigNumber here for decimal support
 import BigNumber from 'bignumber.js';
 
-export function logAmount (amount, power, truncate = 0) {
+export function logAmount(amount, power, truncate = 0) {
 
   const x = new BigNumber(amount);
   const exp = new BigNumber(10).pow(power);
 
   const calculated = x.div(exp);
 
-  if(truncate > 0)
-  	return calculated.toFixed(truncate);
+  if (truncate > 0)
+    return calculated.toFixed(truncate);
   else
-  	return calculated.toFixed();
+    return calculated.toFixed();
 }
 
 /*Takes a value such as 3.92 and converts it into
@@ -37,7 +37,7 @@ Duplicates
 ethers.utils.parseUnits( valueString , decimalsOrUnitName )   =>   BigNumber
 */
 
-export function powAmount (amount, decimals) {
+export function powAmount(amount, decimals) {
 
   const x = new BigNumber(amount)
   const exp = new BigNumber(10).pow(decimals)
@@ -56,20 +56,37 @@ export function toWei_String(amount, decimals) {
   return calculated.toFixed(0)
 }
 
+const amountToUseConfig = {
+  'ETH': { provider: 'ethereum' },
+  'BOBA': { provider: 'boba-network' },
+  'OLO': { provider: 'oolongswap' },
+  'OMG': { provider: 'omisego' },
+  'USDC': { provider: 'usd-coin' },
+  'AVAX': { provider: 'avalanche-2' },
+  'FTM': { provider: 'fantom' },
+  'BNB': { provider: 'binancecoin' },
+  'tBNB': { provider: 'binancecoin' },
+  'DEV': { provider: 'moonbeam' },
+  'GLMR': { provider: 'moonbeam' }
+}
+
 export function amountToUsd(amount, lookupPrice, token) {
-  if (token.symbol === 'ETH' && !!lookupPrice['ethereum']) {
-    return amount * lookupPrice['ethereum'].usd
-  } else if (token.symbol === 'BOBA' && !!lookupPrice[ 'boba-network' ]) {
-    return amount * lookupPrice['boba-network'].usd
-  } else if (token.symbol === 'OLO' && !!lookupPrice[ 'oolongswap' ]) {
-    return amount * lookupPrice['oolongswap'].usd
-  } else if (token.symbol === 'OMG' && !!lookupPrice[ 'omisego' ]) {
-    return amount * lookupPrice['omisego'].usd
-  } else if (token.symbol === 'USDC' && !!lookupPrice[ 'usd-coin' ]) {
-    return amount * lookupPrice['usd-coin'].usd
-  } else if (!!lookupPrice[ token.symbol.toLowerCase() ]) {
-    return amount * lookupPrice[token.symbol.toLowerCase()].usd
+  const { symbol } = token;
+  const currencyInfo = amountToUseConfig[symbol];
+  if (!!currencyInfo && !!lookupPrice[currencyInfo.provider]) {
+    return amount * lookupPrice[currencyInfo.provider].usd;
+  } else if (!!lookupPrice[symbol.toLowerCase()]) {
+    return amount * lookupPrice[symbol.toLowerCase()].usd;
   } else {
-    return 0
+    return 0;
   }
+}
+
+
+export const formatLargeNumber = (num) => {
+  const exp = Math.floor(Math.log10(Math.abs(num)) / 3);
+  const scaledNum = Math.abs(num) / Math.pow(10, exp * 3);
+  const formattedNumber = scaledNum.toFixed(2);
+  const exponent = ['', 'k', 'M', 'B', 'T'][exp] || '';
+  return isNaN(formattedNumber) ? '0' : formattedNumber + exponent;
 }

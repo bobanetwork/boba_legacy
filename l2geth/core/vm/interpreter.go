@@ -62,6 +62,7 @@ type Interpreter interface {
 	// }
 	// ```
 	CanRun([]byte) bool
+	ReadOnly() bool
 }
 
 // keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
@@ -85,6 +86,8 @@ type EVMInterpreter struct {
 	readOnly   bool   // Whether to throw on stateful modifications
 	returnData []byte // Last CALL's return data for subsequent reuse
 }
+
+func (in *EVMInterpreter) ReadOnly() bool { return in.readOnly }
 
 // NewEVMInterpreter returns a new instance of the Interpreter.
 func NewEVMInterpreter(evm *EVM, cfg Config) *EVMInterpreter {

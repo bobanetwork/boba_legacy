@@ -189,6 +189,21 @@ describe('L1ERC1155Bridge Tests', () => {
         L1ERC1155Bridge.registerPair(ERC1155.address, ERC1155.address, 'L211')
       ).to.be.revertedWith('Invalid Network')
     })
+    it('cant register a NFT with incorrect settings', async () => {
+      const SecondaryERC1155 = await deployERC1155('uri')
+      const IncorrectL1StandardERC1155 = await deployL1StandardERC1155(
+        L1ERC1155Bridge.address,
+        SecondaryERC1155.address,
+        'uri'
+      )
+      await expect(
+        L1ERC1155Bridge.registerPair(
+          IncorrectL1StandardERC1155.address,
+          ERC1155.address,
+          'L2'
+        )
+      ).to.be.revertedWith('L1 contract is not compatible with L2 contract')
+    })
     it('cant register if not owner', async () => {
       const signer: Signer = (await ethers.getSigners())[1]
       await expect(

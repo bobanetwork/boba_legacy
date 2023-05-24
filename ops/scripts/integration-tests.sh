@@ -15,6 +15,12 @@ if [[ ! -z "$BOBA_URL" ]]; then
     ADDRESSES=$(curl --fail --show-error --silent --retry-connrefused --retry $RETRIES --retry-delay 5 $BOBA_URL)
     echo $ADDRESSES | jq -r '.L2LiquidityPool'
 fi
+echo "Calling: "$AA_BOBA_URL
+if [[ ! -z "$AA_BOBA_URL" ]]; then
+    # get the addrs from the URL provided
+    ADDRESSES=$(curl --fail --show-error --silent --retry-connrefused --retry $RETRIES --retry-delay 5 $AA_BOBA_URL)
+    echo $ADDRESSES | jq -r '.L2_Boba_EntryPoint'
+fi
 echo "Calling: "$L2_URL
 # wait for the sequencer to be up
 curl \
@@ -30,3 +36,4 @@ curl \
     $L2_URL
 
 npx hardhat test --network boba --no-compile --config ./hardhat.config.ts "$@"
+

@@ -1,5 +1,4 @@
 import { HardhatUserConfig } from 'hardhat/types'
-
 // Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
@@ -7,12 +6,17 @@ import 'mocha-multi-reporters'
 
 const config: HardhatUserConfig = {
   networks: {
+    default: {
+      url: 'http://localhost:8545',
+      gas: 'auto',
+    },
     boba: {
       url: process.env.L2_URL || 'http://localhost:8545',
+      gas: 'auto',
     },
   },
   mocha: {
-    timeout: 80000,
+    timeout: 400000,
     reporter: 'mocha-multi-reporters',
     reporterOptions: {
       configFile: './config.json',
@@ -36,6 +40,17 @@ const config: HardhatUserConfig = {
       },
       {
         version: '0.5.17', // Required for WETH9
+        settings: {
+          optimizer: { enabled: true, runs: 10_000 },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
+      },
+      {
+        version: '0.8.12', // Required for WETH9
         settings: {
           optimizer: { enabled: true, runs: 10_000 },
           outputSelection: {

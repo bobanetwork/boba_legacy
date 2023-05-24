@@ -1,14 +1,12 @@
 /* Imports: External */
+import { Contract } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
-import { Contract, ContractFactory } from 'ethers'
-import { registerBobaAddress } from './000-Messenger.deploy'
-
-import L1LiquidityPoolJson from '../artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LiquidityPoolJson from '../artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
-
-let Factory__L1LiquidityPool: ContractFactory
-let Factory__L2LiquidityPool: ContractFactory
+import { DeployFunction } from 'hardhat-deploy/dist/types'
+import {
+  deployBobaContract,
+  getDeploymentSubmission,
+  registerBobaAddress,
+} from '../src/hardhat-deploy-ethers'
 
 let L1LiquidityPool: Contract
 let L2LiquidityPool: Contract
@@ -18,30 +16,18 @@ const deployFn: DeployFunction = async (hre) => {
     .connect((hre as any).deployConfig.deployer_l1)
     .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
-  Factory__L1LiquidityPool = new ContractFactory(
-    L1LiquidityPoolJson.abi,
-    L1LiquidityPoolJson.bytecode,
-    (hre as any).deployConfig.deployer_l1
-  )
-
-  Factory__L2LiquidityPool = new ContractFactory(
-    L2LiquidityPoolJson.abi,
-    L2LiquidityPoolJson.bytecode,
+  console.log(`Deploying L2LP...`)
+  L2LiquidityPool = await deployBobaContract(
+    hre,
+    (hre as any).deployConfig.isLocalAltL1
+      ? 'L2LiquidityPoolAltL1'
+      : 'L2LiquidityPool',
+    [],
     (hre as any).deployConfig.deployer_l2
   )
 
-  console.log(`Deploying L2LP...`)
-
-  L2LiquidityPool = await Factory__L2LiquidityPool.deploy()
-
-  await L2LiquidityPool.deployTransaction.wait()
-
-  const L2LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
-    ...L2LiquidityPool,
-    receipt: L2LiquidityPool.receipt,
-    address: L2LiquidityPool.address,
-    abi: L1LiquidityPoolJson.abi,
-  }
+  const L2LiquidityPoolDeploymentSubmission =
+    getDeploymentSubmission(L2LiquidityPool)
 
   await registerBobaAddress(
     addressManager,
@@ -55,16 +41,17 @@ const deployFn: DeployFunction = async (hre) => {
   console.log(`L2LiquidityPool deployed to: ${L2LiquidityPool.address}`)
 
   console.log(`Deploying L1LP...`)
-  L1LiquidityPool = await Factory__L1LiquidityPool.deploy()
+  L1LiquidityPool = await deployBobaContract(
+    hre,
+    (hre as any).deployConfig.isLocalAltL1
+      ? 'L1LiquidityPoolAltL1'
+      : 'L1LiquidityPool',
+    [],
+    (hre as any).deployConfig.deployer_l1
+  )
 
-  await L1LiquidityPool.deployTransaction.wait()
-
-  const L1LiquidityPoolDeploymentSubmission: DeploymentSubmission = {
-    ...L1LiquidityPool,
-    receipt: L1LiquidityPool.receipt,
-    address: L1LiquidityPool.address,
-    abi: L2LiquidityPoolJson.abi,
-  }
+  const L1LiquidityPoolDeploymentSubmission =
+    getDeploymentSubmission(L1LiquidityPool)
 
   await registerBobaAddress(
     addressManager,

@@ -1,0 +1,33 @@
+{
+  "name": "@boba/bundler_utils",
+  "version": "0.2.3",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "types": "dist/index",
+  "private": true,
+  "files": [
+    "dist/*",
+    "contracts/*",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p ./tsconfig.json && hardhat compile",
+    "clean": "rimraf node_modules cache artifacts dist/ ./tsconfig.tsbuildinfo",
+    "hardhat-compile": "hardhat compile",
+    "lint-fix": "eslint -f unix . --fix",
+    "watch-tsc": "tsc -w --preserveWatchOutput",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@boba/accountabstraction": "^1.0.0",
+    "@ethersproject/abi": "^5.7.0",
+    "@ethersproject/providers": "^5.5.0",
+    "@openzeppelin/contracts": "^4.7.3",
+    "ethers": "^5.7.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "hardhat": "^2.12.5"
+  }
+}

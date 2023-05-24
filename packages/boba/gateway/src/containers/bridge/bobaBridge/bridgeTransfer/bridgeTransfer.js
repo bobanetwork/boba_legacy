@@ -20,9 +20,14 @@ import { openModal } from 'actions/uiAction'
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectBridgeTokens, selectMultiBridgeMode } from 'selectors/bridgeSelector'
-import { selectAccountEnabled, selectLayer } from 'selectors/setupSelector'
-import { selectTokens } from 'selectors/tokenSelector'
+import { 
+  selectBridgeTokens, 
+  selectMultiBridgeMode,
+  selectAccountEnabled,
+  selectLayer,
+  selectTokens
+} from 'selectors'
+
 
 import * as S from './bridgeTransfer.styles'
 
@@ -30,10 +35,12 @@ import DoExitStep from 'containers/modals/exit/steps/DoExitStep'
 import InputStep from 'containers/modals/deposit/steps/InputStep'
 import InputStepBatch from 'containers/modals/deposit/steps/InputStepBatch'
 import { fetchLookUpPrice } from 'actions/networkAction'
+import { LAYER } from 'util/constant'
 
 function BridgeTransfer() {
 
   const accountEnabled = useSelector(selectAccountEnabled())
+
   const layer = useSelector(selectLayer())
   //const bridgeType = useSelector(selectBridgeType())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
@@ -43,7 +50,6 @@ function BridgeTransfer() {
   const dispatch = useDispatch()
 
   const onReset = () => {
-    console.log([`RESET TOKEN onReset`])
     dispatch(resetToken())
   }
 
@@ -101,10 +107,10 @@ function BridgeTransfer() {
       }
 
       {tokens.length > 0 && !multibridgeMode && <>
-        {layer === 'L1' &&
+        {layer === LAYER.L1 &&
           <InputStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]} />
         }
-        {layer === 'L2' &&
+        {layer === LAYER.L2 &&
           <DoExitStep handleClose={onReset} openTokenPicker={openTokenPicker} isBridge={true} token={tokens[ 0 ]}/>
         }
         </>

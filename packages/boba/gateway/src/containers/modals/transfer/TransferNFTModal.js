@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { transferNFT } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
-import { selectLoading } from 'selectors/loadingSelector'
+import { selectLoading } from 'selectors'
 
 import { Box, Typography, useMediaQuery } from '@mui/material'
 import { useTheme } from '@emotion/react'
@@ -91,8 +91,9 @@ function TransferNFTModal ({ open, token, minHeight }) {
         {!isMobile ? (
           <Button
             onClick={handleClose}
-            color="neutral"
-            size="large"
+            color='primary'
+            size='large'
+            variant='outlined'
           >
             Cancel
           </Button>

@@ -18,11 +18,25 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { depositL2LP } from 'actions/networkAction'
-import { openAlert } from 'actions/uiAction'
+import { openModal } from 'actions/uiAction'
+import { setCDMCompletion } from 'actions/transactionAction'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import { selectSignatureStatus_exitLP } from 'selectors/signatureSelector'
-import { selectLookupPrice } from 'selectors/lookupSelector'
+import { 
+  selectLoading,
+  selectSignatureStatus_exitLP,
+  selectLookupPrice,
+  selectL1FeeRateN,
+  selectFastExitCost, //estimated total cost of this exit
+  selectL1LPBalanceString,
+  selectL1LPPendingString,
+  selectL2BalanceBOBA,
+  selectL2BalanceETH,
+  selectL1LPLiquidity,
+  selectExitFee,
+  selectBobaFeeChoice,
+   selectBobaPriceRatio,
+} from 'selectors'
+
 
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
@@ -48,24 +62,10 @@ import {
   fetchExitFee,
 } from 'actions/balanceAction'
 
-import {
-  selectL1FeeRateN,
-  selectFastExitCost, //estimated total cost of this exit
-  selectL1LPBalanceString,
-  selectL1LPPendingString,
-  selectL2BalanceBOBA,
-  selectL2BalanceETH,
-  selectL1LPLiquidity,
-  selectExitFee,
-} from 'selectors/balanceSelector'
 
-import {
-   selectBobaFeeChoice,
-   selectBobaPriceRatio,
-} from 'selectors/setupSelector'
+import networkService from 'services/networkService'
 
 function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
-  console.log([`DO EXIT STEP FAST`, token])
 
   const dispatch = useDispatch()
 
@@ -217,20 +217,23 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
   async function doExit() {
 
-    let res = await dispatch(
+    let receipt = await dispatch(
       depositL2LP(
         token.address,
         value_Wei_String
       )
     )
 
-    if (res) {
-      dispatch(
-          openAlert(
-            `${token.symbol} was bridged to L1. You will receive approximately
-            ${receivableAmount(value)} ${token.symbol} on L1.`
-          )
-        )
+    if (receipt) {
+      dispatch(setCDMCompletion({
+        CDMType: 'L2FastBridge',
+        CDMMessage: {
+          token: `${token.symbol}`,
+          receivedToken: `${receivableAmount(Number(value))} ${token.symbol}`
+        },
+        CDMTransaction: { transactionHash: receipt.hash }
+      }))
+      dispatch(openModal('CDMCompletionModal'))
       handleClose()
     }
 
@@ -283,7 +286,7 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
       const balance = Number(logAmount(token.balance, token.decimals))
 
       // because of MetaMask issue always have to limit ETH
-      if(token.symbol === 'ETH') {
+      if(token.symbol === networkService.L1NativeTokenSymbol) {
         if(balance - safeCost > 0.0)
           setMax_Float(balance - safeCost)
         else
@@ -319,15 +322,16 @@ function DoExitStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     if(feeUseBoba) {
       estGas = `${Number(feeBOBA).toFixed(4)} BOBA`
     } else {
-      estGas = `${Number(feeETH).toFixed(4)} ETH`
+      estGas = `${Number(feeETH).toFixed(4)} ${networkService.L1NativeTokenSymbol}`
     }
   }
 
   // prohibit ExitAll when paying with the token that is to be exited
   let allowUseAll = true
-  if(token.symbol === 'ETH') {
+  if(token.symbol === networkService.L1NativeTokenSymbol) {
     allowUseAll = false
   }
+
   else if (token.symbol === 'BOBA' && feeUseBoba) {
     allowUseAll = false
   }

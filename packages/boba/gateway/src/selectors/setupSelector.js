@@ -33,13 +33,6 @@ export function selectBaseEnabled () {
   }
 }
 
-// local, goerli, mainnet...
-export function selectNetwork () {
-  return function (state) {
-    return state.setup['network']
-  }
-}
-
 export function selectLayer () {
   return function (state) {
     return state.setup['netLayer']
@@ -91,5 +84,17 @@ export function selectMonster () {
 export function selectMonsterInfo () {
   return function (state) {
     return state.nft['monsterInfo']
+  }
+}
+
+export function selectWalletConnected () {
+  return function (state) {
+    return state.setup['walletConnected']
+  }
+}
+
+export function selectChainIdChanged () {
+  return function (state) {
+    return state.setup['chainIdChanged']
   }
 }

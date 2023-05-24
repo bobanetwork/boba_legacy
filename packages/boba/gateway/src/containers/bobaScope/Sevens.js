@@ -16,10 +16,10 @@ limitations under the License. */
 import React, { useState, useEffect } from 'react'
 import { Grid, Box } from '@mui/material'
 import { useSelector } from 'react-redux'
-import moment from 'moment'
+import {formatDate} from 'util/dates'
 
-import { selectLoading } from 'selectors/loadingSelector'
-import Pager from 'components/pager/Pager'
+import { selectLoading } from 'selectors'
+import { Pager } from 'components'
 import Seven from 'components/seven/Seven'
 
 import * as styles from './Transactions.module.scss'
@@ -75,7 +75,7 @@ function Sevens({ searchData, sevens }) {
                     title={`Hash: ${i.hash}`}
                     blockNumber={`Block ${i.blockNumber}`}
                     oriHash={i.hash}
-                    age={moment.unix(i.timestamp).format('lll')}
+                    age={formatDate(i.timestamp, 'lll')}
                     unixTime={i.timestamp}
                   />
                 )

@@ -1,13 +1,14 @@
 
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { updateToken } from 'actions/bridgeAction'
+import { fetchBalances } from 'actions/networkAction'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
-import { isEqual } from 'lodash'
-import React from 'react'
+import { isEqual } from 'util/lodash';
+
+import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectlayer1Balance, selectlayer2Balance } from 'selectors/balanceSelector'
-import { selectLayer } from 'selectors/setupSelector'
+import { selectlayer1Balance, selectlayer2Balance,selectLayer } from 'selectors'
 import { logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import * as S from './TokenPickerModal.styles'
@@ -33,6 +34,10 @@ function TokenPickerModal({ open, tokenIndex }) {
   if (layer === 'L2') {
     balances = l2Balance
   }
+
+  useEffect(() => {
+    dispatch(fetchBalances())
+  }, [dispatch]);
 
   const handleClose = () => {
     dispatch(closeModal('tokenPicker'))

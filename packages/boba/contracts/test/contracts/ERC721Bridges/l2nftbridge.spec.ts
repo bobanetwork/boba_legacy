@@ -192,6 +192,23 @@ describe('L2NFTBridge Tests', () => {
         )
       ).to.be.revertedWith('L1 NFT address already registered')
     })
+    it('cant register a NFT with incorrect settings', async () => {
+      const SecondaryERC721 = await deployNFT('name', 'symbol')
+      const IncorrectL2StandardERC721 = await deployL2StandardERC721(
+        L2NFTBridge.address,
+        SecondaryERC721.address,
+        'name',
+        'symbol',
+        'baseTokenUri'
+      )
+      await expect(
+        L2NFTBridge.registerNFTPair(
+          ERC721.address,
+          IncorrectL2StandardERC721.address,
+          'L1'
+        )
+      ).to.be.revertedWith('L2 contract is not compatible with L1 contract')
+    })
     it('can register a NFT with L2 creation', async () => {
       const l2 = 1
       await L2NFTBridge.registerNFTPair(
