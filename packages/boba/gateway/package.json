@@ -132,9 +132,6 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"
-    ],
-    "setupFilesAfterEnv": [
-      "src/setupTests.ts"
     ]
   },
   "resolutions": {
