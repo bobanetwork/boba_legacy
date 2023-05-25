@@ -30,8 +30,3 @@ Loading.args = {
   disable: false,
   label: 'Loading...',
 }
-
-export const Hover = Template.bind({})
-Hover.args = {
-  label: 'Hover Button',
-}
