@@ -14,6 +14,7 @@
       "lint": "yarn lint:fix && yarn lint:check",
       "lint:fix": "prettier --config .prettierrc.json --write \"{src,exec,test}/**/*.ts\"",
       "lint:check": "tslint --format stylish --project .",
+      "db:start": "docker run -e POSTGRES_DB=teleportation -e POSTGRES_PASSWORD=abcdef -p 5432:5432 postgres",
       "test": "hardhat test --show-stack-traces",
       "test:coverage": "nyc hardhat test && nyc merge .nyc_output coverage.json",
       "typeorm": "typeorm-ts-node-commonjs"

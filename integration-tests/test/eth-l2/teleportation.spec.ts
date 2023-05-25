@@ -1,4 +1,4 @@
-import { expect } from './setup'
+import { expect } from '@boba/teleportation/test/setup'
 
 /* External Imports */
 import { ethers } from 'hardhat'
@@ -17,14 +17,14 @@ import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
-import { ChainInfo } from '../src/utils/types'
+import { ChainInfo } from '@boba/teleportation/src/utils/types'
 
 /* Imports: Core */
-import { TeleportationService } from '../src/service'
-import { AppDataSource, historyDataRepository } from "../src/data-source";
-import { HistoryData } from "../src/entity/HistoryData";
+import { TeleportationService } from '@boba/teleportation/src/service'
+import { AppDataSource, historyDataRepository } from "@boba/teleportation/src/data-source";
+import { HistoryData } from '@boba/teleportation/src/entity/HistoryData'
 
-describe('teleportation', () => {
+describe.only('teleportation', () => {
   let signer: Signer
   let signerAddr: string
 
