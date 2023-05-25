@@ -8,9 +8,9 @@ description: A collection of links and addresses to get started on Boba-Ethereum
 
 ### Goerli Addresses
 
-For **primary network contracts and addresses** see [packages/contracts/deployments/goerli/README.md](../../packages/contracts/deployments/goerli/)
+For **primary network contracts and addresses** see [packages/contracts/deployments/goerli/README.md](https://github.com/bobanetwork/boba/tree/master/packages/contracts/deployments/goerli/)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Goerli address registration dump](../../packages/boba/register/addresses/addressesGoerli\_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json).
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Goerli address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json).
 
 ### Goerli Links and Endpoints
 
@@ -29,9 +29,9 @@ For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please 
 
 ### Mainnet Addresses
 
-For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](../../packages/contracts/deployments/mainnet/)
+For **primary network contracts and addresses** see [packages/contracts/deployments/mainnet/README.md](https://github.com/bobanetwork/boba/tree/master/packages/contracts/deployments/mainnet/)
 
-For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](../../packages/boba/register/addresses/addressesMainnet\_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json).
+For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Mainnet address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089.json).
 
 ### Mainnet Links and Endpoints
 
