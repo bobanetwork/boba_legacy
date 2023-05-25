@@ -12,7 +12,7 @@ import { getBobaContractAt } from '@boba/contracts'
 /* Imports: Interface */
 import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
 import { HistoryData } from './entity/HistoryData'
-import { AppDataSource } from './data-source'
+import { AppDataSource, historyDataRepository } from "./data-source";
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -294,26 +294,23 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     chainId: number | string,
     latestBlock: number
   ): Promise<void> {
-    console.log("///////////////////////// PUT INFO: ", chainId, latestBlock)
     try {
       const historyData = new HistoryData()
       historyData.chainId = chainId
       historyData.blockNo = latestBlock
-      await AppDataSource.manager.save(historyData)
+      await historyDataRepository.save(historyData)
     } catch (error) {
       this.logger.error(`Failed to put depositInfo! - ${error}`)
     }
   }
 
-  async _getDepositInfo(chainId: number | string): Promise<any> {
-    const latestBlock = await AppDataSource.manager.findOneBy(HistoryData, {
+  async _getDepositInfo(chainId: number | string): Promise<number> {
+    const historyData = await historyDataRepository.findOneBy({
       chainId,
     })
 
-    console.log("/////////////////////// GET INFO: ", chainId, latestBlock)
-
-    if (latestBlock) {
-      return latestBlock
+    if (historyData) {
+      return historyData.blockNo
     } else {
       throw new Error("Can't find latestBlock in depositInfo")
     }

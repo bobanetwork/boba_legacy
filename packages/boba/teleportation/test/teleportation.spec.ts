@@ -21,7 +21,7 @@ import { ChainInfo } from '../src/utils/types'
 
 /* Imports: Core */
 import { TeleportationService } from '../src/service'
-import { AppDataSource } from "../src/data-source";
+import { AppDataSource, historyDataRepository } from "../src/data-source";
 import { HistoryData } from "../src/entity/HistoryData";
 
 describe('teleportation', () => {
@@ -38,7 +38,8 @@ describe('teleportation', () => {
   before(async () => {
     await AppDataSource.initialize()
     // empty db
-    await AppDataSource.manager.delete(HistoryData, {})
+    const delRes = await historyDataRepository.delete({})
+    console.log(`Deleted ${delRes.affected}`)
 
     ;[signer] = await ethers.getSigners()
     signerAddr = await signer.getAddress()
@@ -171,7 +172,6 @@ describe('teleportation', () => {
       await teleportationService.init()
 
       const blockNumber = await ethers.provider.getBlockNumber()
-      console.log("BLOCK NUMBER PREV: ---------------------", blockNumber)
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.BobaReceived(),
@@ -181,7 +181,6 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        console.log("DEPOSIT_ID PREV: --------------------- ", event.args.depositId, event.args.sourceChainId)
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
@@ -199,8 +198,6 @@ describe('teleportation', () => {
       }
 
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-
-      console.log("DISBURSE-PREV: ", disbursement)
 
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
@@ -224,7 +221,6 @@ describe('teleportation', () => {
       await teleportationService.init()
 
       const blockNumber = await ethers.provider.getBlockNumber()
-      console.log("BLOCK NUMBER: ---------------------", blockNumber)
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.BobaReceived(),
@@ -234,7 +230,6 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        console.log("DEPOSIT_ID: --------------------- ", event.args.depositId, event.args.sourceChainId)
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
@@ -252,9 +247,6 @@ describe('teleportation', () => {
       }
 
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-
-
-      console.log("DISBURSE: ", disbursement)
 
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
@@ -507,7 +499,7 @@ describe('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      await AppDataSource.manager.delete(HistoryData, { chainId })
+      await historyDataRepository.delete({ chainId })
 
       const latestBlock = await ethers.provider.getBlockNumber()
       const depositTeleportations = {
@@ -530,6 +522,45 @@ describe('teleportation', () => {
       )
       const postBOBABalance = await L2BOBA.balanceOf(address1)
       expect(preBOBABalance.sub(postBOBABalance)).to.be.eq(0)
+    })
+  })
+
+  describe('database connection', () => {
+    const chainId = 123
+    const expectedLastBlock = 987
+
+    before(async () => {
+      await historyDataRepository.delete({})
+    })
+
+    it('insert latestBlock', async () => {
+      const data = new HistoryData()
+      data.chainId = chainId
+      data.blockNo = expectedLastBlock
+      await historyDataRepository.save(data)
+
+      const dbRes = await historyDataRepository.findOneByOrFail({ chainId })
+      expect(dbRes.chainId).to.be.eq(data.chainId)
+      expect(dbRes.blockNo).to.be.eq(data.blockNo)
+    })
+
+    it('getDepositInfo', async () => {
+      const teleportationService = await startTeleportationService()
+      await teleportationService.init()
+
+      const latestBlock = await teleportationService._getDepositInfo(chainId)
+      expect(latestBlock).to.be.eq(expectedLastBlock)
+    })
+
+    it('putDepositInfo', async () => {
+      const teleportationService = await startTeleportationService()
+      await teleportationService.init()
+
+      const newLastBlock = 55
+      await teleportationService._putDepositInfo(chainId, newLastBlock)
+      const latestBlock = await teleportationService._getDepositInfo(chainId)
+
+      expect(latestBlock).to.be.eq(newLastBlock)
     })
   })
 })

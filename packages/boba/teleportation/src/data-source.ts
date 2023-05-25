@@ -13,9 +13,11 @@ export const AppDataSource = new DataSource({
   username: process.env.POSTGRES_USER ?? 'postgres',
   password: process.env.POSTGRES_PASSWORD ?? 'abcdef',
   database: process.env.POSTGRES_DB ?? 'postgres',
-  synchronize: true,
-  logging: false,
+  synchronize: false,
+  logging: true,
   entities: [HistoryData],
   migrations: [],
   subscribers: [],
 })
+
+export const historyDataRepository = AppDataSource.getRepository(HistoryData)
