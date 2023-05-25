@@ -14,7 +14,7 @@ export const AppDataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD ?? 'abcdef',
   database: process.env.POSTGRES_DB ?? 'postgres',
   synchronize: false,
-  logging: true,
+  logging: false,
   entities: [HistoryData],
   migrations: [],
   subscribers: [],
