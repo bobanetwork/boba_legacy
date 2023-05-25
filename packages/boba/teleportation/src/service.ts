@@ -259,7 +259,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           disbursement
         )} - latestBlock: ${latestBlock}`
       )
-      this._putDepositInfo(chainId, latestBlock)
+      await this._putDepositInfo(chainId, latestBlock)
     } catch (e) {
       this.logger.error(e)
     }

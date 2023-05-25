@@ -34,7 +34,6 @@ describe('teleportation', () => {
   let selectedBobaChains: ChainInfo[]
   const pollingInterval: number = 1000
   const blockRangePerPolling = 1000
-  const dbPath = './db'
 
   before(async () => {
     await AppDataSource.initialize()
@@ -201,6 +200,8 @@ describe('teleportation', () => {
 
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
 
+      console.log("DISBURSE-PREV: ", disbursement)
+
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
 
@@ -251,6 +252,9 @@ describe('teleportation', () => {
       }
 
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+
+
+      console.log("DISBURSE: ", disbursement)
 
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)

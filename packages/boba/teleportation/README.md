@@ -19,3 +19,8 @@ All configuration is done via environment variables. See all variables at [.env.
 1. Make sure dependencies are installed - run `yarn` in the base directory
 2. Build `yarn build`
 3. Run `yarn start`
+
+## Postgresql
+
+Connect to Postgres on CLI:
+`psql --username postgres -d postgres --password`

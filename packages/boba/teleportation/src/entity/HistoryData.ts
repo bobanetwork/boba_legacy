@@ -3,7 +3,7 @@ import { PrimaryColumn } from 'typeorm/decorator/columns/PrimaryColumn'
 
 @Entity()
 export class HistoryData {
-  @Column({ type: 'int' })
+  @PrimaryColumn({ type: 'int' })
   blockNo: number
 
   @PrimaryColumn({ type: 'int' })
