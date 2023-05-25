@@ -21,7 +21,7 @@ description: A collection of links and addresses to get started on Boba-Avalanch
 
 ### Testnet Fountain for Developers on Boba Avalanche Testnet L2
 
-There is a Boba Avalanche testnet [fountain](https://gateway.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba Avalanche Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Boba Avalanche testnet [fountain](https://gateway.boba.network/?network=Testnet&chain=AVAX) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba Avalanche Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 

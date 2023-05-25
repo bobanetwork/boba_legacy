@@ -19,11 +19,11 @@ description: A collection of links and addresses to get started on Boba-BNB
 
 ### Testnet Fountain for Developers on BNB Testnet L2
 
-There is a Boba BNB testnet [fountain](https://gateway.boba.network) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba BNB testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Boba BNB testnet [fountain](https://gateway.boba.network/?network=Testnet&chain=BNB) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba BNB testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 
-The standard bridges for `GLMR` (aka `DEV` on Moonbase) and `BOBA` are active, so you can can both bridge and exit `GLMR` and `BOBA` from BNB testnet to Boba BNB testnet and back. The exit delay (the fraud proof window) has been set to 5 minutes (it's normally 7 days) to make development easier.
+The standard bridges for `BNB` and `BOBA` are active, so you can can both bridge and exit `BNB` and `BOBA` from BNB testnet to Boba BNB testnet and back. The exit delay (the fraud proof window) has been set to 5 minutes (it's normally 7 days) to make development easier.
 
 ### Analytics and eth\_getLogs
 
