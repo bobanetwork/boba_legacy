@@ -172,6 +172,7 @@ describe('teleportation', () => {
       await teleportationService.init()
 
       const blockNumber = await ethers.provider.getBlockNumber()
+      console.log("BLOCK NUMBER PREV: ---------------------", blockNumber)
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.BobaReceived(),
@@ -181,6 +182,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
+        console.log("DEPOSIT_ID PREV: --------------------- ", event.args.depositId, event.args.sourceChainId)
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
@@ -221,6 +223,7 @@ describe('teleportation', () => {
       await teleportationService.init()
 
       const blockNumber = await ethers.provider.getBlockNumber()
+      console.log("BLOCK NUMBER: ---------------------", blockNumber)
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.BobaReceived(),
@@ -230,6 +233,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
+        console.log("DEPOSIT_ID: --------------------- ", event.args.depositId, event.args.sourceChainId)
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount

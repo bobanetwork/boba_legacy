@@ -294,6 +294,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     chainId: number | string,
     latestBlock: number
   ): Promise<void> {
+    console.log("///////////////////////// PUT INFO: ", chainId, latestBlock)
     try {
       const historyData = new HistoryData()
       historyData.chainId = chainId
@@ -308,6 +309,8 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     const latestBlock = await AppDataSource.manager.findOneBy(HistoryData, {
       chainId,
     })
+
+    console.log("/////////////////////// GET INFO: ", chainId, latestBlock)
 
     if (latestBlock) {
       return latestBlock
