@@ -1,13 +1,16 @@
-name: Will trigger release of AA-Bundler to NPM (PR comment)
+name: Will trigger version bump of AA-Bundler for NPM
 on:
-  push:
-    branches:
-      - develop
-    paths:
-     # only on change
-     - 'packages/boba/bundler_sdk/**/*'
-     - 'packages/boba/bundler_utils/**/*'
-     - 'packages/boba/account-abstraction/**/*'
+  pull_request:
+
+# on:
+#   push:
+#     branches:
+#       - develop
+#     paths:
+#      # only on change
+#      - 'packages/boba/bundler_sdk/**/*'
+#      - 'packages/boba/bundler_utils/**/*'
+#      - 'packages/boba/account-abstraction/**/*'
 
 permissions:
   contents: write
@@ -16,50 +19,60 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-     - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-     - uses: dorny/paths-filter@v2
-       id: filter
-       with:
-        filters: |
-          bundler_sdk:
-            - 'packages/boba/bundler_sdk/**/*'
-            - 'packages/boba/bundler_utils/**/*'
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            bundler_sdk:
+              - 'packages/boba/bundler_sdk/**/*'
+              - 'packages/boba/bundler_utils/**/*'
 
-     - name: PR commenter
-       if: steps.filter.outputs.bundler_sdk == 'true'
-       uses: mshick/add-pr-comment@v2
-       with:
-          message: |
-            ⚠️ **This PR triggers a minor release of the Bundler SDK** (Account Abstraction) to NPM as you made changes in the corresponding `bundler_sdk` directory.
+      - name: PR commenter
+        if: steps.filter.outputs.bundler_sdk == 'true'
+        uses: mshick/add-pr-comment@v2
+        with:
+            message: |
+              ⚠️ **This PR triggers a minor release of the Bundler SDK** (Account Abstraction) to NPM as you made changes in the corresponding `bundler_sdk` directory.
 
-            Please make sure this is intentional.
+              Please make sure this is intentional.
 
-            The package that is going to be updated is `@bobanetwork/bundler_sdk`.
+              The package that is going to be updated is `@bobanetwork/bundler_sdk`.
 
-     - uses: MontyD/package-json-updated-action@1.0.1
-       id: version-updated
-       with:
-          path: packages/boba/bundler_sdk/package.json
-       env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: MontyD/package-json-updated-action@1.0.1
+        id: version-updated
+        with:
+            path: packages/boba/bundler_sdk/package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-     - name: Increment patch version
-       if: steps.version-updated.outputs.has-updated == 'false'
-       working-directory: ./packages/boba/bundler_sdk
-       run: npm version minor --legacy-peer-deps
+      - name: Increment patch version
+        if: steps.version-updated.outputs.has-updated == 'false'
+        working-directory: ./packages/boba/bundler_sdk
+        run: npm version minor --legacy-peer-deps
 
-     - name: setup git config
-       if: steps.version-updated.outputs.has-updated == 'false'
-       run: |
-         git config user.name "GitHub Actions Bot"
-         git config user.email "<>"
+      - name: Create Pull Request
+        if: steps.version-updated.outputs.has-updated == 'false'
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update SDK version
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: automated/bump_bundler_sdk_version
+          delete-branch: true
+          title: 'Bump Bundler SDK version'
+          body: |
+            Bump Bundler SDK version
+          labels: |
+            automated pr
+          reviewers: |
+            souradeep-das
+            wsdt
+            Boyuan-Chen
+            inomurko
+          draft: false
 
-     - name: commit
-       if: steps.version-updated.outputs.has-updated == 'false'
-       run: |
-         # Stage the file, commit and push
-         git add packages/boba/bundler_sdk/package.json yarn.lock
-         git commit -am "Bump Bundler SDK version"
-         git push
-         # $GITHUB_HEAD_REF
