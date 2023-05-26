@@ -1,8 +1,13 @@
 name: Will trigger release of AA-Bundler to NPM (PR comment)
 on:
   push:
-    tags:
-    - '*'
+    branches:
+      - develop
+    paths:
+     # only on change
+     - 'packages/boba/bundler_sdk/**/*'
+     - 'packages/boba/bundler_utils/**/*'
+     - 'packages/boba/account-abstraction/**/*'
 
 permissions:
   contents: write
