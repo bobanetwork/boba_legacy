@@ -37,14 +37,14 @@ $ yarn install
 $ yarn build
 ```
 
-Then, add your Infura key to `boba_community/fraud-detector/docker-compose-fraud-detector.yml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io).
+Then, check the RPC endpoints in `boba_community/fraud-detector/docker-compose-fraud-detector.yml`.
 
 ```bash
 x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.gateway.tenderly.co'
 
 x-l1_node_web3_url: &l1_node_web3_url
-  L1_NODE_WEB3_URL: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
+  L1_NODE_WEB3_URL: 'https://mainnet.gateway.tenderly.co'
 ```
 
 Next, navigate to `boba_community/fraud-detector` and build the needed Docker images:

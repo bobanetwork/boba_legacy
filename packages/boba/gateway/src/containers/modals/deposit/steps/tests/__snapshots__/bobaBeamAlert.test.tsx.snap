@@ -1,6 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BobaBeamAlert should match the snapshot when active network is ethereum 1`] = `<DocumentFragment />`;
+exports[`BobaBeamAlert should match the snapshot disabled from env params 1`] = `<DocumentFragment />`;
+
+exports[`BobaBeamAlert should match the snapshot when active network is ethereum 1`] = `
+<DocumentFragment>
+  .c0 {
+  padding: 0px;
+  margin: 0px;
+  font-weight: 400;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.c1 {
+  color: yellow;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 5px 0px;
+}
+
+<p
+    class="c0 c1"
+  />
+</DocumentFragment>
+`;
 
 exports[`BobaBeamAlert should match the snapshot when active network is moonbeam 1`] = `
 <DocumentFragment>
@@ -16,15 +39,42 @@ exports[`BobaBeamAlert should match the snapshot when active network is moonbeam
   color: yellow;
   font-size: 16px;
   font-weight: 700;
-  margin-bottom: 5px;
+  margin: 5px 0px;
 }
 
 <p
     class="c0 c1"
   >
-    For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam
+    For users of Bobabeam or Bobabeam applications
+  you will need to transfer all your funds to Moonbeam mainnet before May
+  15th or risk permanently losing access to any assets on Bobabeam
   </p>
 </DocumentFragment>
 `;
 
-exports[`BobaBeamAlert should match the snapshot when active network is moonbeam and status is 0 1`] = `<DocumentFragment />`;
+exports[`BobaBeamAlert should match the snapshot when active network is opera 1`] = `
+<DocumentFragment>
+  .c0 {
+  padding: 0px;
+  margin: 0px;
+  font-weight: 400;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.c1 {
+  color: yellow;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 5px 0px;
+}
+
+<p
+    class="c0 c1"
+  >
+    For users of BobaOpera or BobaOpera applications
+  you will need to transfer all your funds to Fantom mainnet before June 15th
+  or risk permanently losing access to any assets on BobaOpera
+  </p>
+</DocumentFragment>
+`;
