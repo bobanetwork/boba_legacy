@@ -36,11 +36,11 @@ const main = async () => {
   // Optional
   const POLLING_INTERVAL = config.uint(
     'polling-interval',
-    parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60
+    parseInt(env.TELEPORTATION_POLLING_INTERVAL, 10) || 1000 * 60
   )
   const BLOCK_RANGE_PER_POLLING = config.uint(
     'block-range-per-polling',
-    parseInt(env.BLOCK_RANGE_PER_POLLING, 10) || 1000
+    parseInt(env.TELEPORTATION_BLOCK_RANGE_PER_POLLING, 10) || 1000
   )
 
   if (!L2_NODE_WEB3_URL) {
