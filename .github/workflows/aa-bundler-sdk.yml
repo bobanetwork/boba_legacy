@@ -1,13 +1,8 @@
 name: Publish AA-Bundler to NPM
 on:
   push:
-    branches:
-      - master
-    paths:
-      # only on change
-      - 'packages/boba/bundler_sdk/**/*'
-      - 'packages/boba/bundler_utils/**/*'
-      - 'packages/boba/account-abstraction/**/*'
+    tags:
+    - '*'
 
 jobs:
   build:
