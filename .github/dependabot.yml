@@ -9,7 +9,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-     reviewers:
+    reviewers:
       - "souradeep-das"
       - "wsdt"
       - "Boyuan-Chen"
@@ -18,7 +18,7 @@ updates:
     directory: "/ops" # Location of package manifests
     schedule:
       interval: "weekly"
-     reviewers:
+    reviewers:
       - "souradeep-das"
       - "wsdt"
       - "Boyuan-Chen"
