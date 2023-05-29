@@ -6,38 +6,42 @@ export const ButtonContainer = styled.button<ButtonTypes>`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  min-width: 250px;
+  min-width: 290px;
   -webkit-appearance: none;
   border-radius: 12px;
   cursor: pointer;
   border: 0px;
   outline: none;
-  background: #aedb01;
+  background: ${(props) => props.theme.colors.green[300]};
   padding: 16px 25px;
 
   font-family: 'Montserrat';
   font-weight: 700;
-  font-size: 18px;
+  font-size: ${(props) => props.theme.text.heading1};
 
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
   transition: background-color 0.25s ease;
 
-  &:hover {
-    background: #90b406;
-  }
-
   ${(props) =>
     props.disable &&
     `
-    background:#637A0D
+    background:${props.theme.colors.green[500]};
     cursor:default;
   `}
 
   ${(props) =>
     props.loading &&
     `
-    background:#AEDB01
+    background:${props.theme.colors.green[300]};
     cursor:default;
+  `}
+
+  ${(props) =>
+    !props.disable &&
+    `
+    &:hover {
+      background: ${props.theme.colors.green[400]};
+    }
   `}
 `
 

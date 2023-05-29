@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/react-webpack5'
+import { StorybookConfig } from '@storybook/react-webpack5'
 
 const config: StorybookConfig = {
   features: {
@@ -9,7 +9,11 @@ const config: StorybookConfig = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    '@storybook/addon-toolbars',
+    '@storybook/addon-actions',
+    '@storybook/addon-styling',
   ],
+
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
