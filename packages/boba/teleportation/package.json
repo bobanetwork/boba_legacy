@@ -1,7 +1,7 @@
 {
    "name": "@boba/teleportation",
    "version": "1.0.0",
-   "description": "The teleportation between L2s",
+   "description": "The teleportation between L2s and L1s",
    "main": "dist/src/index",
    "files": [
       "dist/src/index",

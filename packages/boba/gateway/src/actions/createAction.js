@@ -55,7 +55,8 @@ export function createAction (key, asyncAction) {
         // provide more information in special cases
         // MetaMask user rejected sig - throw up a banner
         if ((response.code === 4001 ||
-          response.hasOwnProperty('reason')) && response?.reason?.includes('user rejected transaction')
+          response.hasOwnProperty('reason'))
+          && response?.reason?.includes('user rejected transaction')
           ) {
           console.log("MetaMask: user denied signature")
           errorMessage = 'MetaMask: Transaction was rejected by user - signature denied'

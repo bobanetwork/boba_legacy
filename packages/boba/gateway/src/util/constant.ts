@@ -30,6 +30,8 @@ export const DISABLE_WALLETCONNECT: EnvType =
   process.env.REACT_APP_DISABLE_WALLETCONNECT
 export const BOBABEAM_STATUS: EnvType =
   process.env.REACT_APP_BOBA_BEAM_STATUS || 0
+export const BOBAOPERA_STATUS: EnvType =
+  process.env.REACT_APP_BOBA_OPERA_STATUS || 0
 
 type BridgeType = {
   FAST_BRIDGE: string

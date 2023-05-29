@@ -13,20 +13,6 @@ if (mnemonicFileName != null && fs.existsSync(mnemonicFileName)) {
   mnemonic = fs.readFileSync(mnemonicFileName, 'ascii').trim()
 }
 
-const infuraUrl = (name: string): string => `https://${name}.infura.io/v3/${process.env.INFURA_ID}`
-
-function getNetwork (url: string): NetworkUserConfig {
-  return {
-    url,
-    accounts: {
-      mnemonic
-    }
-  }
-}
-
-function getInfuraNetwork (name: string): NetworkUserConfig {
-  return getNetwork(infuraUrl(name))
-}
 
 const config: HardhatUserConfig = {
   typechain: {
@@ -38,7 +24,12 @@ const config: HardhatUserConfig = {
       url: 'http://localhost:8545/',
       saveDeployments: false
     },
-    goerli: getInfuraNetwork('goerli')
+    goerli: {
+      url: 'https://goerli.gateway.tenderly.co',
+      accounts: {
+        mnemonic
+      }
+    }
   },
   solidity: {
     version: '0.8.15',
