@@ -299,7 +299,6 @@ function Home() {
             height: 'calc(100% - 150px)',
             minHeight: '500px',
             marginLeft: 'unset',
-            width: '100vw',
             marginRight: 'unset',
             paddingTop: '50px'
           }}>
@@ -343,7 +342,6 @@ function Home() {
           <PageHeader />
           <Container maxWidth={false} sx={{
             minHeight: 'calc(100vh - 200px)',
-            width: '100vw',
             marginLeft: 'unset',
             marginRight: 'unset'
           }}>
