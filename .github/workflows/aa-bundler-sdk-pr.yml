@@ -26,6 +26,7 @@ jobs:
         with:
           filters: |
             bundler_sdk:
+              - 'packages/boba/account-abstraction/**/*'
               - 'packages/boba/bundler_sdk/**/*'
               - 'packages/boba/bundler_utils/**/*'
 
@@ -48,12 +49,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Increment patch version
-        if: steps.version-updated.outputs.has-updated == 'false'
+        if: steps.version-updated.outputs.has-updated == 'true'
         working-directory: ./packages/boba/bundler_sdk
         run: npm version minor --legacy-peer-deps
 
       - name: Create Pull Request
-        if: steps.version-updated.outputs.has-updated == 'false'
+        if: steps.version-updated.outputs.has-updated == 'true'
         id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
