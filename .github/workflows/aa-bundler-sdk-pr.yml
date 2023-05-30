@@ -1,7 +1,6 @@
 name: Will trigger version bump of AA-Bundler for NPM
 on:
   pull_request:
-
 # on:
 #   push:
 #     branches:
@@ -51,7 +50,7 @@ jobs:
       - name: Increment patch version
         if: steps.version-updated.outputs.has-updated == 'true'
         working-directory: ./packages/boba/bundler_sdk
-        run: npm version minor --legacy-peer-deps
+        run: yarn version minor
 
       - name: Create Pull Request
         if: steps.version-updated.outputs.has-updated == 'true'
@@ -71,6 +70,9 @@ jobs:
             Bump Bundler SDK version
           labels: |
             automated pr
+            bundler
+            bundler sdk
+            account-abstraction
           reviewers: |
             souradeep-das
             wsdt
