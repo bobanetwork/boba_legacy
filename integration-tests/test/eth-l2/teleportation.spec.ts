@@ -24,7 +24,6 @@ import { TeleportationService } from '@boba/teleportation/src/service'
 import { AppDataSource, historyDataRepository } from "@boba/teleportation/src/data-source";
 import { HistoryData } from '@boba/teleportation/src/entity/HistoryData'
 import { OptimismEnv } from "./shared/env";
-import { getBobaContractAt } from "@boba/contracts";
 
 describe.only('teleportation', () => {
   let env: OptimismEnv
@@ -43,8 +42,7 @@ describe.only('teleportation', () => {
     await AppDataSource.initialize()
     await AppDataSource.synchronize(true) // drops database and recreates
 
-    //;[signer] = await ethers.getSigners()
-    signer = env.l2Wallet //env.l2Provider.getSigner()
+    signer = env.l2Wallet
     signerAddr = await signer.getAddress()
     wallet1 = env.l2Wallet_2
     address1 = wallet1.address
@@ -54,8 +52,6 @@ describe.only('teleportation', () => {
       to: wallet1.address,
       value: ethers.utils.parseEther('100'),
     })
-
-    console.log("########## AFTER SEND")
   })
 
   let Factory__Teleportation: ContractFactory
@@ -73,7 +69,6 @@ describe.only('teleportation', () => {
       wallet1
     )
 
-    console.log("############### --- TELEPORTATION -- ")
     Teleportation = await Factory__Teleportation.deploy()
     await Teleportation.deployTransaction.wait()
 
@@ -90,15 +85,7 @@ describe.only('teleportation', () => {
     )
     await L2BOBA.deployTransaction.wait()
 
-    // TODO: Commenting resolves watch teleporter test this way, but reduce L2Boba.transfer amount to 100000000
-    /*L2BOBA = await getBobaContractAt(
-      'L2GovernanceERC20',
-      env.addressesBOBA.TOKENS.BOBA.L2,
-      env.l2Wallet
-    )*/
-
-    console.log("CHIAN ID ############", chainId, await L2BOBA.balanceOf(address1))
-    await L2BOBA.transfer(address1, utils.parseEther('100000000')) // 1000 (new, but prob not working)
+    await L2BOBA.transfer(address1, utils.parseEther('100000000'))
 
     // intialize the teleportation contract
     await Teleportation.initialize(
@@ -202,8 +189,6 @@ describe.only('teleportation', () => {
       expect(events[0].args.depositId).to.be.eq(0, `Unexpected deposit ID: ${events[0].args.depositId}`)
       expect(events[0].args.emitter).to.be.eq(signerAddr)
       expect(events[0].args.amount).to.be.eq(utils.parseEther('10'), 'Amount unexpected')
-      console.log("EVENTS", events)
-
 
       let disbursement = []
       for (const event of events) {
@@ -211,8 +196,6 @@ describe.only('teleportation', () => {
         const depositId = event.args.depositId
         const amount = event.args.amount
         const emitter = event.args.emitter
-
-        console.log("DEPOSIT ID: ", depositId, amount, emitter, sourceChainId)
 
         disbursement = [
           ...disbursement,
@@ -230,8 +213,6 @@ describe.only('teleportation', () => {
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
 
-      console.log("DISBURSEMENT DEP ID: ", disbursement[0].depositId, disbursement)
-      // TODO: Unexpected next deposit ID (check parameters), rest same as original tests right?
       await teleportationService._disburseTx(disbursement, chainId, blockNumber)
 
       const postBOBABalance = await L2BOBA.balanceOf(address1)
@@ -244,13 +225,14 @@ describe.only('teleportation', () => {
         utils.parseEther('10')
       )
 
-      const amountDisbursements = await Teleportation.connect(signer)
+      const amountDisbursements = await Teleportation
+        .connect(signer)
         .totalDisbursements(chainId)
 
       expect(amountDisbursements).to.be.eq(1)
     })
 
-    it('should block the disbursement TX if it is already disbursed', async () =>{
+    it('should block the disbursement TX if it is already disbursed', async () => {
       const chainId = (await ethers.provider.getNetwork()).chainId
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
