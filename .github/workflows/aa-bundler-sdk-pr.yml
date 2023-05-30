@@ -1,16 +1,14 @@
 name: Will trigger version bump of AA-Bundler for NPM
-on:
-  pull_request:
 
-# on:
-#   push:
-#     branches:
-#       - develop
-#     paths:
-#      # only on change
-#      - 'packages/boba/bundler_sdk/**/*'
-#      - 'packages/boba/bundler_utils/**/*'
-#      - 'packages/boba/account-abstraction/**/*'
+on:
+  push:
+    branches:
+      - develop
+    paths:
+     # only on change
+     - 'packages/boba/bundler_sdk/**/*'
+     - 'packages/boba/bundler_utils/**/*'
+     - 'packages/boba/account-abstraction/**/*'
 
 permissions:
   contents: write
