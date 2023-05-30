@@ -12,7 +12,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (20).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (20) (1).png" alt=""><figcaption></figcaption></figure>
 
 > Please check the liquidity balance of the L2 Liquidity Pool first before depositing tokens on the L1 Liquidity Pool. If the L2 Liquidty Pool doesn't have enough balance to complete your swap, your funds would be returned back to you from L2 and the L1 Liquidity Pool would charge a certain percentage of the deposit amount.
 
@@ -55,7 +55,7 @@ await depositETHTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (20) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (13) (2).png" alt=""><figcaption></figcaption></figure>
 
 > Please check the liquidity balance of the L1 Liquidity Pool first before depositing tokens on the L2 Liquidity Pool. If the L1 Liquidty Pool doesn't have enough balance to complete your swap, your funds would be returned back to you from L1 and the L2 Liquidity Pool would charge a certain percentage of the exit amount.
 

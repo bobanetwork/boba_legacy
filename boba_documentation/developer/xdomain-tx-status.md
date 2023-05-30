@@ -14,7 +14,7 @@ There are 4 different mechanisms for following the status of a transaction. In a
 
 <figure><img src="../../.gitbook/assets/Artboard 1 (17).png" alt=""><figcaption></figcaption></figure>
 
-Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](../../packages/boba/subgraph/) for more information.
+Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](../../for-developers/features/subgraph.md) for more information.
 
 
 

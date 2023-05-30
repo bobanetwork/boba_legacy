@@ -1,17 +1,19 @@
 ---
 description: Frequently asked questions
 ---
+
 # FAQ
 
-![What is Boba Network](./boba_documentation/.gitbook/assets/what-is-boba-network.png)
+![What is Boba Network](<.gitbook/assets/Artboard 1 (2) (1) (1).png>)
 
-<br/>
+\
+
 
 [Boba](https://boba.network) is a compute-focused Layer 2 (L2) solution built on top of the Layer 1 blockchain, [Ethereum](https://ethereum.org/en). Ethereum is similar to L1 blockchains like Avalanche, BNB, and Moonbeam, and acts as a base blockchain platform that executes all on-chain transactions. Boba scales and augments the core _compute_ capabilities of Ethereum, reducing gas fees and improving transaction throughput - while retaining the security guarantees of Ethereum.
 
 The complexity of smart contract algorithms can make them expensive and slow to execute at speed. To solve this, Boba has designed a Hybrid Compute architecture that enables smart contracts to trigger much more complex algorithms off-chain (similar to running an app on AWS for example), and then bring the result back into the on-chain smart contract. Hence, the Boba Hybrid compute model runs both on-chain and off-chain.
 
-![The Boba Hybrid Compute architecture](./boba_documentation/.gitbook/assets/HYBRID-COMPUTE-GRAPH.png)
+![The Boba Hybrid Compute architecture](.gitbook/assets/HYBRID-COMPUTE-GRAPH.png)
 
 Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.io). Boba chose to build on Optimism because it is essentially a modified version of Ethereum that makes it relatively easy to ensure Ethereum Virtual Machine (EVM) and Solidity compatibility. This minimizes the efforts required to migrate smart contracts from L1 to L2.
 
@@ -47,9 +49,9 @@ If your wallet does not support this feature, you will have to connect manually.
 
 ## How do I move assets into or out of Boba Network?
 
-To move assets into or out of an Optimistic Ethereum network you can use the [**Boba Gateway**](https://gateway.boba.network). Detailed instructions in our [user documentation](./boba_documentation/user/001_how-to-bridge.md).
+To move assets into or out of an Optimistic Ethereum network you can use the [**Boba Gateway**](https://gateway.boba.network). Detailed instructions in our [user documentation](boba\_documentation/user/001\_how-to-bridge.md).
 
-If you are a developer, you can choose any of these two methods: [the **classical bridge**, or the **fast bridge**](./boba_documentation/developer/bridge-l1-and-l2/bridge-basics.md).
+If you are a developer, you can choose any of these two methods: [the **classical bridge**, or the **fast bridge**](for-developers/boba-basics/bridge-basics/).
 
 ## Can I cancel a withdrawal after it has been submitted?
 
@@ -61,7 +63,7 @@ Only if the centralized exchange supports Boba Network (at this time none of the
 
 ## Where can I find RPC endpoints and connection details?
 
-Connection details for our Mainnet and Goerli network are [here](./boba_documentation/developer/network-parameters.md).
+Connection details for our Mainnet and Goerli network are [here](for-developers/multichain/network-parameters.md).
 
 ## Are multicall contracts supported on Boba?
 
@@ -82,7 +84,7 @@ const decimals = await this.ERC20_Contract.attach(tokenAddress).connect(this.L2P
 
 ## Why is the incentive contract for verification proofs disabled?
 
-In the current release of the Boba Network protocol, there may be rare cases where the Sequencer submits a state root (transaction result), that is invalid and hence could be challenged. As a result, we have not yet deployed the [Bond Manager](./packages/contracts/contracts/L1/verification/BondManager.sol) contract which compensates Verifier nodes for gas spent when submitting state root challenges. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
+In the current release of the Boba Network protocol, there may be rare cases where the Sequencer submits a state root (transaction result), that is invalid and hence could be challenged. As a result, we have not yet deployed the [Bond Manager](packages/contracts/contracts/L1/verification/BondManager.sol) contract which compensates Verifier nodes for gas spent when submitting state root challenges. Additionally, our upgrade keys have the ability to directly remove state roots without going through an uncompensated state root challenge.
 
 ## Does Boba operate the only _Sequencer_ node?
 
@@ -98,7 +100,7 @@ Yes! [ERC-2470](https://eips.ethereum.org/EIPS/eip-2470) is deployed to `0xce004
 
 ## How do I follow cross domain (xDomain) transactions and their status?
 
-There are [four different methods](./boba_documentation/developer/xdomain-tx-status.md) you can use for following the status of a transaction. You can:
+There are [four different methods](boba\_documentation/developer/xdomain-tx-status.md) you can use for following the status of a transaction. You can:
 
 1. use the Boba Blockexplorer (for L2), and Etherscan (for L1)
 2. use the Boba `watcher-api`
@@ -107,9 +109,9 @@ There are [four different methods](./boba_documentation/developer/xdomain-tx-sta
 
 ## Are there any other documentation resources besides the docs on Boba Network?
 
-In addition to the docs in this [Boba Developer Docs](https://docs.boba.network/faq) space, we have some [examples](https://github.com/bobanetwork/boba/tree/develop/boba_examples) that could provide more context.
+In addition to the docs in this [Boba Developer Docs](https://docs.boba.network/faq) space, we have some [examples](https://github.com/bobanetwork/boba/tree/develop/boba\_examples) that could provide more context.
 
-Here is an example that shows a [user's journey setting up NFT Bridges](https://github.com/bobanetwork/boba/blob/develop/boba_examples/nft_bridging/README.md).
+Here is an example that shows a [user's journey setting up NFT Bridges](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/nft\_bridging/README.md).
 
 ## Boba is based on the work done by Optimism. Do you plan to support Optimism Bedrock?
 
@@ -119,15 +121,16 @@ Yes, we are working towards supporting Bedrock in the future.
 
 In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 ourselves. The contracts `DiscretionaryExitFee.sol` and `L2BillingContract.sol` are a way to compensate for the cost of relaying transactions on L1. However, they do not subsidize and take back the costs from the user.
 
-`DiscretionaryExitFee` is also a contract that we use to route Standard Exits through on our interface (the gateway). The purpose of this contract is to not burn native tokens for the compensation, but instead collect Boba token from the user. This contract uses the `L2BillingContract` to get the correct amount of `exitFee`, and then transfer the amount to the billing contract. The contract then proceeds with the withdrawal on the standard bridge.
-This again serves the purpose of voluntary collection.
+`DiscretionaryExitFee` is also a contract that we use to route Standard Exits through on our interface (the gateway). The purpose of this contract is to not burn native tokens for the compensation, but instead collect Boba token from the user. This contract uses the `L2BillingContract` to get the correct amount of `exitFee`, and then transfer the amount to the billing contract. The contract then proceeds with the withdrawal on the standard bridge. This again serves the purpose of voluntary collection.
 
-</br>
+\
 
-## ![Developer FAQ](./boba_documentation/.gitbook/assets/developer-faq.png)
----
 
-![Smart Contracts](./boba_documentation/.gitbook/assets/smart-contracts.png)
+## ![Developer FAQ](<.gitbook/assets/Artboard 2 (1) (1) (1).png>)
+
+***
+
+![Smart Contracts](<.gitbook/assets/Artboard 3 (1) (1).png>)
 
 ## Why am I getting the 'contract size exceeds limit' error?
 
@@ -151,8 +154,7 @@ Unfortunately no, not at the moment.
 
 ## Could you please explain the difference between the two mappings [mentioned in the token list](https://docs.boba.network/for-developers/exchange-integration#the-boba-token-list?)?
 
-Technically, an L1 token can have multiple representations on L2. This mean that an L1 token can be wrapped in distinct tokens: L2_token_A, or L2_token_B, both being valid and point to the same L1 token.
-But in order to standardize, the token list specifies only a single L2 token address for every corresponding L1 token.
+Technically, an L1 token can have multiple representations on L2. This mean that an L1 token can be wrapped in distinct tokens: L2\_token\_A, or L2\_token\_B, both being valid and point to the same L1 token. But in order to standardize, the token list specifies only a single L2 token address for every corresponding L1 token.
 
 ## Could you share more information on how cross-chain messages are relayed?
 
@@ -160,9 +162,10 @@ But in order to standardize, the token list specifies only a single L2 token add
 
 [And here's the relayer service Boba uses for relaying messages from L2 to L1](https://github.com/bobanetwork/boba/tree/develop/packages/message-relayer).
 
-</br>
+\
 
-![Testing and Testnet](./boba_documentation/.gitbook/assets/testing-and-testnet.png)
+
+![Testing and Testnet](<.gitbook/assets/Artboard 4 (4).png>)
 
 ## Does Boba Network Have a testnet/How do I get Testnet Boba or Eth?
 
@@ -170,7 +173,7 @@ Boba Network does have a testnet and it uses authentication through Twitter. Her
 
 First, download MetaMask on your browser as a plug-in and set up a MetaMask wallet (do not be surprised by the fox that will follow your cursor when you first launch the application. He’s friendly!)
 
-![Welcome to Metamask](./boba_documentation/.gitbook/assets/WELCOME-TO-METAMASK.png)
+![Welcome to Metamask](.gitbook/assets/WELCOME-TO-METAMASK.png)
 
 After you’ve set up your MetaMask account, you can [connect to the Goerli network Testnet](https://gateway.boba.network). After connecting, follow these steps:
 
@@ -181,11 +184,11 @@ After you’ve set up your MetaMask account, you can [connect to the Goerli netw
 * make sure that all of the network details such as the Network name, URL, and Chain ID have all been auto-filled.
 * Hit Approve.
 
-![Add to Network](./boba_documentation/.gitbook/assets/ALLOW-THIS-SITE-TO-ADD-NETWORK.png)
+![Add to Network](.gitbook/assets/ALLOW-THIS-SITE-TO-ADD-NETWORK.png)
 
 * now that you’re connected to the network, you can authenticate with Twitter:
 
-![Boba Wallet](./boba_documentation/.gitbook/assets/BOBA-WALLET-SCREENSHOT.png)
+![Boba Wallet](.gitbook/assets/BOBA-WALLET-SCREENSHOT.png)
 
 * hit the Tweet Now button to tweet your _Boba Bubble_ token.
 * once your tweet is shared, copy the link leading to it.
@@ -195,7 +198,7 @@ For more information on Boba’s testnet and fountain, [check out our documentat
 
 _NOTE: You can only make one fountain call per Twitter account, per day._
 
-## I am trying to run Boba Network locally and  I am able to run unit tests. However, integration tests give an error:
+## I am trying to run Boba Network locally and I am able to run unit tests. However, integration tests give an error:
 
 `./scripts/wait-for-sequencer.sh is getting timed out. Any Solutions?`
 
@@ -205,9 +208,10 @@ Please run `docker-compose logs`, as well as integration tests, and send us the 
 
 We have the graph node on Ethereum Mainnet L2 and Goerli L2. The Goerli graph node is public. The Mainnet graph node is hosted by The Graph team.
 
-<br/>
+\
 
-![Transactions](./boba_documentation/.gitbook/assets/Transactions.png)
+
+![Transactions](<.gitbook/assets/Artboard 5 (1) (1).png>)
 
 ## Why am I getting an error that says the gas limit is 1,000,000,000,000,000 Wei?
 
@@ -262,9 +266,10 @@ You can also [look into using compilers and optimization options](https://docs.s
 
 There are multiple bridges available and are listed on our ecosystem page:
 
-![Boba Bridges](./boba_documentation/.gitbook/assets/BOBA-ECOSYSTEM-BRIDGES.png)
+![Boba Bridges](.gitbook/assets/BOBA-ECOSYSTEM-BRIDGES.png)
 
-<br/>
+\
+
 
 [On the Boba Network page](https://gateway.boba.network/), click the Ecosystem link in the top menu to navigate to the list of available bridges.
 
@@ -286,18 +291,18 @@ Bridging multiple assets in one transaction and LP floating fee rate are two twe
 
 Bridging multiple assets in one transaction involves extending the LP1 contract to allow bridging eth, and/or multiple tokens, to L2 in a single transaction call. This primarily enables users to bridge gas token along with their desired token to L2 in one transaction. This is a method that is applicable only on bridging (on-ramp) through the Liquidity Pools, and works for only the tokens that the LPs support. Contract methods that enforce this bridging are: `clientDepositL1Batch()` on L1LP, and `clientPayL2Batch()` on L2LP.
 
-LP floating fee rate refers to the change in the fee logic on LPs. LP fee consists of `userRewardFee` (fee distributed to liquidity providers), and `ownerRewardFee` (fee for the owner of the contract).
-Before the change, LPs had a configurable fixed value for both these fees. After the change, the `userRewardFee` is a dynamic value that depends on the pool balance, which moves between configured min/max ranges. The `ownerRewardFeeRate` continues to be a configurable fixed value.
+LP floating fee rate refers to the change in the fee logic on LPs. LP fee consists of `userRewardFee` (fee distributed to liquidity providers), and `ownerRewardFee` (fee for the owner of the contract). Before the change, LPs had a configurable fixed value for both these fees. After the change, the `userRewardFee` is a dynamic value that depends on the pool balance, which moves between configured min/max ranges. The `ownerRewardFeeRate` continues to be a configurable fixed value.
 
-<br/>
+\
 
-![Hybrid Compute](./boba_documentation/.gitbook/assets/hybrid-compute.png)
+
+![Hybrid Compute](<.gitbook/assets/Artboard 6 (1) (1).png>)
 
 ## What are the limits on Hybrid Compute Web2 calls?
 
 Boba's Hybrid Compute Turing model:
 
-* limits strings returned from external endpoints to 322 characters (5*64+2=322).
+* limits strings returned from external endpoints to 322 characters (5\*64+2=322).
 * allows only one Turing call per execution.
 * imposes a 1200 ms timeout on API responses. Hence, please make sure that API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', and could result in persistent failure of the first call to your endpoint.
 
@@ -305,7 +310,7 @@ Boba's Hybrid Compute Turing model:
 
 Hybrid Compute calls need to execute estimateGas first. This puts the API response in a short lived cache, out of which the result is fetched in transaction processing.
 
-[Check out additional info in Boba examples](https://github.com/bobanetwork/boba/blob/develop/boba_examples/turing-lending/README.md).
+[Check out additional info in Boba examples](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/turing-lending/README.md).
 
 ## When using the Hybrid Compute feature, the transaction pops up on Metamask, and if I submit it within a few seconds, everything works. However, waiting longer and submitting results in failure. Why does this happen?
 
