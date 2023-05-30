@@ -56,10 +56,20 @@ elif [[ $BUILD == 0 ]]; then
 fi
 
 if [[ $DAEMON == 1 ]]; then
+    if [[ $DOCKER_FILE == *docker-compose-side.yml* ]]; then
+        docker-compose -f "$DIR/$DOCKER_FILE" \
+            up teleportation_db --no-build --detach -V
+    fi
+
   docker-compose \
     -f "$DIR/$DOCKER_FILE" \
     up --no-build --detach -V
 else
+   if [[ $DOCKER_FILE == *docker-compose-side.yml* ]]; then
+          docker-compose -f "$DIR/$DOCKER_FILE" \
+              up teleportation_db --no-build -V
+   fi
+
   docker-compose \
     -f "$DIR/$DOCKER_FILE" \
     up --no-build -V
