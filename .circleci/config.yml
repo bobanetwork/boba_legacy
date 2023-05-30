@@ -92,6 +92,7 @@ commands:
             else
               echo "Skipping Teleporter DB step"
             fi
+          working_directory: ops
       - run:
           name: Start background logging
           working_directory: ops
