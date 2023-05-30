@@ -12,6 +12,8 @@ For **primary network contracts and addresses** see [packages/contracts/deployme
 
 For **secondary addresses**, such as L2 Tokens, Messengers, and the DAO, please see the [Goerli address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148.json).
 
+For **account abstraction** contract addresses, please refer the list [here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/account-abstraction/deployments/boba_goerli/addresses.json).
+
 ### Goerli Links and Endpoints
 
 |                |                                                                          |

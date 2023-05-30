@@ -40,6 +40,7 @@
     * [Account Abstraction](for-developers/features/aa-basics/README.md)
       * [Bundler SDK](for-developers/features/aa-basics/bundler-sdk.md)
       * [Bundler API](for-developers/features/aa-basics/bundler-api.md)
+      * [Bundler Config](for-developers/features/aa-basics/bundler-configuration.md)
       * [Contract Addresses](for-developers/features/aa-basics/contract-addresses.md)
       * [Account Abstraction Paymasters](for-developers/features/aa-basics/aa-paymasters.md)
     * [ERC1155 NFT Bridging](for-developers/features/erc1155-bridge.md)
