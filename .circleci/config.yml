@@ -65,7 +65,7 @@ commands:
 
       - run:
           name: Build the side services
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ') teleportation_db
           working_directory: ops
 
       - run:
