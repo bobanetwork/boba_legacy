@@ -65,7 +65,7 @@ commands:
 
       - run:
           name: Build the side services
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ') teleportation_db
+          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
           working_directory: ops
 
       - run:
@@ -82,7 +82,7 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler teleportation_db
+            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
           name: Start background logging
