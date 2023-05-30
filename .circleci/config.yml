@@ -99,7 +99,7 @@ commands:
           working_directory: ops
       - run:
           name: Run integration tests
-          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up teleportation_db -d && docker-compose -f <<parameters.docker_compose_file>> run integration_tests $(cat splits.txt)
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d teleportation_db && docker-compose -f <<parameters.docker_compose_file>> run integration_tests $(cat splits.txt)
           working_directory: ops
       - run:
           name: Stop docker
