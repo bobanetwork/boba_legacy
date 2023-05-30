@@ -312,8 +312,6 @@ services:
 
   integration_tests:
     image: bobanetwork/integration-tests:latest
-    depends_on:
-      - teleportation_db
     deploy:
        replicas: 0
     build:
@@ -338,17 +336,6 @@ services:
       << : [*integration_pk, *integration_2_pk, *integration_3_pk, *bobalink_pk]
     volumes:
       - ~/result:/opt/optimism/integration-tests/result
-
-  # moved over to main compose for integration tests and to keep a linear dependency graph
-  teleportation_db:
-    image: postgres
-    deploy:
-      replicas: 1
-    environment:
-      POSTGRES_PASSWORD: abcdef
-      POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
 
   replica:
     depends_on:
