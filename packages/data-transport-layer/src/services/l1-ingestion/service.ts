@@ -97,10 +97,10 @@ const optionSettings = {
 }
 
 export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
-  constructor(options: L1IngestionServiceOptions) {
+  constructor(options: L1IngestionServiceOptions, _addrList: any) {
     super('L1_Ingestion_Service', options, optionSettings)
+    this.state.addrList = _addrList
   }
-
   private l1IngestionMetrics: L1IngestionMetrics
 
   private state: {
@@ -108,6 +108,7 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     contracts: OptimismContracts
     l1RpcProvider: BaseProvider
     startingL1BlockNumber: number
+    addrList: any
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -485,6 +486,12 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
         this.state.startingL1BlockNumber,
         blockNumber
       )
+    } else if (contractName in this.state.addrList) {
+      /* Workaround to avoid expensive queries for deployments where
+         the contract address has not changed, and the addrList value
+	 can be assumed to be correct.
+      */
+      return this.state.addrList[contractName]
     } else {
       events = await this.state.contracts.Lib_AddressManager.queryFilter(
         this.state.contracts.Lib_AddressManager.filters.AddressSet(
