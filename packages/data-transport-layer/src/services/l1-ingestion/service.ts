@@ -486,6 +486,11 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
         blockNumber
       )
     } else {
+      // import addresses_BobaBase from "@boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B"
+      // TODO: Instead look up from addresses.json file
+      const addrMgr = this.state.contracts.Lib_AddressManager.address
+      console.log("ADDDDDD", addrMgr)
+
       events = await this.state.contracts.Lib_AddressManager.queryFilter(
         this.state.contracts.Lib_AddressManager.filters.AddressSet(
           contractName
