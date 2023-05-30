@@ -33,7 +33,8 @@
     "smart",
     "contracts",
     "account-abstraction",
-    "eip-4337"
+    "eip-4337",
+    "boba"
   ],
   "license": "ISC",
   "devDependencies": {
