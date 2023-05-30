@@ -7,6 +7,7 @@ on:
       # only on change
       - 'packages/boba/bundler_sdk/**/*'
       - 'packages/boba/bundler_utils/**/*'
+      - 'packages/boba/account-abstraction/**/*'
 
 jobs:
   build:
