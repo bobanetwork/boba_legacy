@@ -85,6 +85,14 @@ commands:
             docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler
           working_directory: ops
       - run:
+          name: Run Teleporter DB
+          command: |
+            if [[ "<<parameters.docker_compose_file>>" == *"docker-compose.yml"* || "<<parameters.docker_compose_side_file>>" == *"docker-compose-side.yml"* ]]; then
+              docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d teleportation_db
+            else
+              echo "Skipping Teleporter DB step"
+            fi
+      - run:
           name: Start background logging
           working_directory: ops
           background: true
@@ -99,7 +107,7 @@ commands:
           working_directory: ops
       - run:
           name: Run integration tests
-          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d teleportation_db && docker-compose -f <<parameters.docker_compose_file>> run integration_tests $(cat splits.txt)
+          command: docker-compose -f <<parameters.docker_compose_file>> run integration_tests $(cat splits.txt)
           working_directory: ops
       - run:
           name: Stop docker
