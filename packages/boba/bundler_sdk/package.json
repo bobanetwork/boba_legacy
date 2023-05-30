@@ -1,7 +1,26 @@
 {
   "name": "@bobanetwork/bundler_sdk",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "main": "./dist/index.js",
+  "keywords": [
+    "boba",
+    "account abstraction",
+    "bundler",
+    "sdk",
+    "smart wallets",
+    "web3",
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "account-abstraction",
+    "eip-4337"
+  ],
+  "repository": "https://github.com/bobanetwork/boba/tree/develop/packages/boba/bundler_sdk",
+  "homepage": "https://boba.network",
+  "bugs": {
+    "url": "https://github.com/bobanetwork/issues"
+  },
   "license": "MIT",
   "files": [
     "dist/src",
