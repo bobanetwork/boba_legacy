@@ -23,8 +23,11 @@ import { ChainInfo } from '@boba/teleportation/src/utils/types'
 import { TeleportationService } from '@boba/teleportation/src/service'
 import { AppDataSource, historyDataRepository } from "@boba/teleportation/src/data-source";
 import { HistoryData } from '@boba/teleportation/src/entity/HistoryData'
+import { OptimismEnv } from "./shared/env";
+import { getBobaContractAt } from "@boba/contracts";
 
 describe.only('teleportation', () => {
+  let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
 
@@ -36,19 +39,23 @@ describe.only('teleportation', () => {
   const blockRangePerPolling = 1000
 
   before(async () => {
+    env = await OptimismEnv.new()
     await AppDataSource.initialize()
-    // empty db
-    const delRes = await historyDataRepository.delete({})
-    console.log(`Deleted ${delRes.affected}`)
+    await AppDataSource.synchronize(true) // drops database and recreates
 
-    ;[signer] = await ethers.getSigners()
+    //;[signer] = await ethers.getSigners()
+    signer = env.l2Wallet //env.l2Provider.getSigner()
     signerAddr = await signer.getAddress()
-    wallet1 = ethers.Wallet.createRandom().connect(ethers.provider)
+    wallet1 = env.l2Wallet_2
     address1 = wallet1.address
+
+
     await signer.sendTransaction({
       to: wallet1.address,
       value: ethers.utils.parseEther('100'),
     })
+
+    console.log("########## AFTER SEND")
   })
 
   let Factory__Teleportation: ContractFactory
@@ -65,6 +72,8 @@ describe.only('teleportation', () => {
       TeleportationJson.bytecode,
       wallet1
     )
+
+    console.log("############### --- TELEPORTATION -- ")
     Teleportation = await Factory__Teleportation.deploy()
     await Teleportation.deployTransaction.wait()
 
@@ -81,7 +90,15 @@ describe.only('teleportation', () => {
     )
     await L2BOBA.deployTransaction.wait()
 
-    await L2BOBA.transfer(address1, utils.parseEther('100000000'))
+    // TODO: Commenting resolves watch teleporter test this way, but reduce L2Boba.transfer amount to 100000000
+    /*L2BOBA = await getBobaContractAt(
+      'L2GovernanceERC20',
+      env.addressesBOBA.TOKENS.BOBA.L2,
+      env.l2Wallet
+    )*/
+
+    console.log("CHIAN ID ############", chainId, await L2BOBA.balanceOf(address1))
+    await L2BOBA.transfer(address1, utils.parseEther('100000000')) // 1000 (new, but prob not working)
 
     // intialize the teleportation contract
     await Teleportation.initialize(
@@ -179,12 +196,23 @@ describe.only('teleportation', () => {
         blockNumber
       )
 
+      expect(events.length).to.be.eq(1)
+      expect(events[0].args.sourceChainId).to.be.eq(chainId)
+      expect(events[0].args.toChainId).to.be.eq(chainId)
+      expect(events[0].args.depositId).to.be.eq(0, `Unexpected deposit ID: ${events[0].args.depositId}`)
+      expect(events[0].args.emitter).to.be.eq(signerAddr)
+      expect(events[0].args.amount).to.be.eq(utils.parseEther('10'), 'Amount unexpected')
+      console.log("EVENTS", events)
+
+
       let disbursement = []
       for (const event of events) {
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
         const emitter = event.args.emitter
+
+        console.log("DEPOSIT ID: ", depositId, amount, emitter, sourceChainId)
 
         disbursement = [
           ...disbursement,
@@ -202,6 +230,8 @@ describe.only('teleportation', () => {
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
 
+      console.log("DISBURSEMENT DEP ID: ", disbursement[0].depositId, disbursement)
+      // TODO: Unexpected next deposit ID (check parameters), rest same as original tests right?
       await teleportationService._disburseTx(disbursement, chainId, blockNumber)
 
       const postBOBABalance = await L2BOBA.balanceOf(address1)
@@ -213,6 +243,11 @@ describe.only('teleportation', () => {
       expect(postSignerBOBABalance.sub(preSignerBOBABalance)).to.be.eq(
         utils.parseEther('10')
       )
+
+      const amountDisbursements = await Teleportation.connect(signer)
+        .totalDisbursements(chainId)
+
+      expect(amountDisbursements).to.be.eq(1)
     })
 
     it('should block the disbursement TX if it is already disbursed', async () =>{

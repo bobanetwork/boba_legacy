@@ -47,16 +47,6 @@ services:
     deploy:
       replicas: 0
 
-  teleportation_db:
-    image: postgres
-    deploy:
-      replicas: 1
-    environment:
-      TELEPORTATION_POSTGRES_PASSWORD: abcdef
-      TELEPORTATION_POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
-
   monitor:
     depends_on:
      - l1_chain
