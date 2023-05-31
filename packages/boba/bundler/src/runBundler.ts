@@ -121,6 +121,7 @@ export async function runBundler(
     .option('--maxBundleGas <number>', 'Max Bundle Gas available to use', '5000000')
     .option('--enableDebugMethods', 'debug_* methods available', false)
     .option('--l2Offset <number>', 'l2 Offset to start from')
+    .option('--logsChunkSize <number>', 'eth_getLogs range supported by network')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces

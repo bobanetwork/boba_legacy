@@ -18,15 +18,18 @@ const debug = Debug('aa.events')
 export class EventsManager {
   provider: JsonRpcProvider
   lastBlock = 0
+  chunkSize = 5000
 
   constructor(
     readonly entryPoint: EntryPoint,
     readonly mempoolManager: MempoolManager,
     readonly reputationManager: ReputationManager,
-    readonly l2Offset: number
+    readonly l2Offset: number,
+    readonly logsChunkSize: number
   ) {
     this.provider = entryPoint.provider as JsonRpcProvider
     this.lastBlock = l2Offset
+    this.chunkSize = logsChunkSize > 0 ? logsChunkSize : 1
   }
 
   /**
@@ -48,17 +51,17 @@ export class EventsManager {
   async handlePastEvents(): Promise<void> {
     let startBlock = this.lastBlock
     const currentBlock = await this.provider.getBlockNumber()
-    if (currentBlock > startBlock + 5000) {
-      while (startBlock + 5000 < currentBlock) {
+    if (currentBlock > startBlock + this.chunkSize) {
+      while (startBlock + this.chunkSize < currentBlock) {
         const events = await this.entryPoint.queryFilter(
           { address: this.entryPoint.address },
           startBlock,
-          startBlock+4999
+          startBlock + (this.chunkSize - 1)
         )
         for (const ev of events) {
           this.handleEvent(ev)
         }
-        startBlock = startBlock + 5000
+        startBlock = startBlock + this.chunkSize
       }
       this.lastBlock = startBlock
     }
