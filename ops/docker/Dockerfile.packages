@@ -53,6 +53,7 @@ COPY packages/message-relayer/package.json ./packages/message-relayer/package.js
 COPY integration-tests/package.json ./integration-tests/package.json
 COPY ops_boba/api/package.json ./ops_boba/api/package.json
 
+COPY packages/boba/register/package.json ./packages/boba/register/package.json
 COPY packages/boba/contracts/package.json ./packages/boba/contracts/package.json
 COPY packages/boba/gas-price-oracle/package.json ./packages/boba/gas-price-oracle/package.json
 COPY packages/boba/turing/package.json ./packages/boba/turing/package.json
@@ -116,6 +117,7 @@ ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
 
 FROM packages as data-transport-layer
 WORKDIR /opt/optimism/packages
+COPY --from=builder /opt/optimism/packages/boba/register ./boba/register
 COPY --from=builder /opt/optimism/packages/data-transport-layer ./data-transport-layer
 WORKDIR /opt/optimism/packages/data-transport-layer
 RUN mkdir ./state-dumps

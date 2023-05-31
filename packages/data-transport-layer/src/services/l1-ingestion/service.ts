@@ -29,6 +29,7 @@ import {
 } from '../../utils'
 import { EventHandlerSet } from '../../types'
 import { L1DataTransportServiceOptions } from '../main/service'
+import { getAddress } from "./addresses";
 
 interface L1IngestionMetrics {
   highestSyncedL1Block: Gauge<string>
@@ -491,7 +492,14 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
       const addrMgr = this.state.contracts.Lib_AddressManager.address
       console.log("ADDDDDD", addrMgr)
 
-      events = await this.state.contracts.Lib_AddressManager.queryFilter(
+      const address = await getAddress(
+        this.state.contracts.Lib_AddressManager.address,
+        contractName
+      )
+      return address
+    }
+
+      /*events = await this.state.contracts.Lib_AddressManager.queryFilter(
         this.state.contracts.Lib_AddressManager.filters.AddressSet(
           contractName
         ),
@@ -504,7 +512,7 @@ export class L1IngestionService extends BaseService<L1IngestionServiceOptions> {
     } else {
       // Address wasn't set before this.
       return constants.AddressZero
-    }
+    }*/
   }
 
   private async _findStartingL1BlockNumber(): Promise<number> {
