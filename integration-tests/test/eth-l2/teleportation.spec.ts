@@ -1,5 +1,4 @@
 import { expect } from '@boba/teleportation/test/setup'
-import '@types/node'
 
 /* External Imports */
 import { ethers } from 'hardhat'
