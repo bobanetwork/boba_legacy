@@ -24,13 +24,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-      - name: Install dependencies
-        working-directory: ./packages/boba/gateway
-        run: yarn install --frozen-lockfile
-      - name: Lint
+      - name: Install dependencies at root
+        run: yarn install
+      - name: Build in root
+        run: yarn build
+      - name: Lint gateway
         working-directory: ./packages/boba/gateway
         run: yarn lint:check
-      - name: Get latest version
+      - name: Latest tag
         id: tag
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Print current tag
