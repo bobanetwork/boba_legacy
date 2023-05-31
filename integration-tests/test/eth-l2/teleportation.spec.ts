@@ -1,4 +1,5 @@
 import { expect } from '@boba/teleportation/test/setup'
+import '@types/node'
 
 /* External Imports */
 import { ethers } from 'hardhat'
@@ -25,7 +26,7 @@ import { AppDataSource, historyDataRepository } from "@boba/teleportation/src/da
 import { HistoryData } from '@boba/teleportation/src/entity/HistoryData'
 import { OptimismEnv } from "./shared/env";
 
-describe('teleportation', () => {
+describe.only('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
