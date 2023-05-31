@@ -107,9 +107,9 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
     this.state.arServer = this.state.addressRegistry.listen(this.options.arPort,this.options.hostname)
     this.logger.info("addressRegistry server listening", {hostname:this.options.hostname, port:this.options.arPort})
 
+    let addrList
     do {
-     let addrList
-     try {
+      try {
         addrList = JSON.parse(await this.state.db.get("address-list"))
         this.state.addressManager = addrList['AddressManager']
         this.options.addressManager = addrList['AddressManager']
@@ -137,7 +137,7 @@ export class L1DataTransportService extends BaseService<L1DataTransportServiceOp
         ...this.options,
         metrics: this.state.metrics,
         db: this.state.db,
-      })
+      }, addrList)
     }
 
     // Optionally enable sync from L2.
