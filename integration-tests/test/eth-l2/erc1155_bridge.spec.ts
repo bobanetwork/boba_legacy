@@ -383,7 +383,7 @@ describe('ERC1155 Bridge Test', async () => {
       ).to.be.revertedWith('Amount should be greater than 0')
     })
 
-    it('should be able to deposit token to another wallet on L2', async () => {
+    it('should be able to deposit token to another wallet on L2 (1)', async () => {
       const preOwnerL1Balance = await L1ERC1155.balanceOf(
         env.l1Wallet.address,
         DUMMY_TOKEN_ID_1
@@ -1116,7 +1116,7 @@ describe('ERC1155 Bridge Test', async () => {
       expect(postL1Balance).to.deep.eq(preL1Balance.add(DUMMY_TOKEN_AMOUNT_3))
     })
 
-    it('should be able to deposit token to another wallet on L2', async () => {
+    it('should be able to deposit token to another wallet on L2 (2)', async () => {
       const preOwnerL1Balance = await L1ERC1155.balanceOf(
         env.l1Wallet_2.address,
         DUMMY_TOKEN_ID_1
