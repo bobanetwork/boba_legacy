@@ -120,7 +120,7 @@ export async function runBundler(
     .option('--l1NodeWeb3Url <string>', 'L1 network url for Address Manager', '')
     .option('--maxBundleGas <number>', 'Max Bundle Gas available to use', '5000000')
     .option('--enableDebugMethods', 'debug_* methods available', false)
-    .option('--l1Offset <number>', 'l1 Offset to start from')
+    .option('--l2Offset <number>', 'l2 Offset to start from')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces

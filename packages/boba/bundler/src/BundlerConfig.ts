@@ -22,7 +22,7 @@ export interface BundlerConfig {
   addressManager: string
   l1NodeWeb3Url: string
   enableDebugMethods: boolean
-  l1Offset?: number
+  l2Offset?: number
 }
 
 // TODO: implement merging config (args -> config.js -> default) and runtime shape validation
@@ -47,7 +47,7 @@ export const BundlerConfigShape = {
   addressManager: ow.string,
   l1NodeWeb3Url: ow.string,
   enableDebugMethods: ow.boolean,
-  l1Offset: ow.optional.number,
+  l2Offset: ow.optional.number,
 }
 
 // TODO: consider if we want any default fields at all
@@ -62,5 +62,5 @@ export const bundlerConfigDefault: Partial<BundlerConfig> = {
   autoBundleInterval: 1,
   autoBundleMempoolSize: 1,
   enableDebugMethods: false,
-  l1Offset: 0,
+  l2Offset: 0,
 }

@@ -23,10 +23,10 @@ export class EventsManager {
     readonly entryPoint: EntryPoint,
     readonly mempoolManager: MempoolManager,
     readonly reputationManager: ReputationManager,
-    readonly l1Offset: number
+    readonly l2Offset: number
   ) {
     this.provider = entryPoint.provider as JsonRpcProvider
-    this.lastBlock = l1Offset
+    this.lastBlock = l2Offset
   }
 
   /**
