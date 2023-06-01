@@ -132,6 +132,9 @@
       "yarn lint:check"
     ]
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}"

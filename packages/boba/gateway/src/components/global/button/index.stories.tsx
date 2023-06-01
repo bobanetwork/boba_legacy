@@ -30,3 +30,11 @@ Loading.args = {
   disable: false,
   label: 'Loading...',
 }
+
+export const Small = Template.bind({})
+Small.args = {
+  disable: false,
+  loading: false,
+  small: true,
+  label: 'Default Button',
+}

@@ -8,7 +8,7 @@ export default {
   component: MaxInput,
 } as Meta
 
-const Template: StoryFn<MaxInputProps> = (args) => <MaxInput {...args} />
+const Template: StoryFn<MaxInputProps> = (args: any) => <MaxInput {...args} />
 
 export const Default = Template.bind({})
 Default.args = {

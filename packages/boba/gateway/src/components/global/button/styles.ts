@@ -43,6 +43,13 @@ export const ButtonContainer = styled.button<ButtonTypes>`
       background: ${props.theme.colors.green[400]};
     }
   `}
+    ${(props) =>
+      props.small &&
+      `
+    font-size: ${props.theme.text.body2};
+    border-radius: 33px;
+    min-width:auto;
+  `}
 `
 
 const nk_spinner = keyframes`
