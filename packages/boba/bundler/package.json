@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0",
-    "@openzeppelin/contracts-upgradeable": "4.3.2",
     "@boba/accountabstraction": "^1.0.0",
     "@boba/bundler_utils": "^0.2.3",
     "@bobanetwork/bundler_sdk": "*",

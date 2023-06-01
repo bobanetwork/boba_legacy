@@ -38,7 +38,7 @@ Many wallets now allow applications to trigger a popup to switch between network
 
 \* [Click here for Boba Network Ethereum, the **production** network](https://gateway.boba.network).
 
-\* [Click here for Boba Network Rinkeby, the **test** network](https://gateway.rinkeby.boba.network).
+\* [Click here for Boba Network Goerli, the **test** network](https://gateway.boba.network).
 
 If your wallet does not support this feature, you will have to connect manually. The exact process for connecting your wallet to a Boba Ethereum network depends on the specific wallet software you're using.
 

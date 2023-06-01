@@ -14,17 +14,11 @@ The `boba_community/fraud-detector` repo contains Docker scripts and python sour
 
 The central idea is that if two (or more) geths injects the same transactions, then they should write the same blocks with the same state roots. If they don't, then there is a problem somewhere. Fundamentally, the security of rollups has little to do with math or cryptography - rather, security arises from the operator publicly depositing transactions and their corresponding state roots, and then, **having many independent nodes check those data for possible discrepancies**.
 
-## Known Errors and State Root Mismatches in Boba
-
-* For the first 10 blocks, the chainID was set (incorrectly) to 28 rather than 288. Therefore, the EIP155 signatures fail for those blocks, and the Verifier cannot sync those blocks. This has been addressed by setting the L1_MAINNET_DEPLOYMENT_BLOCK to 10 blocks past the zero block.
-
-* There is one state root mismatch at L2 block 155, arising from a two second discrepancy in a timestamp, that was ultimately caused by a too-small setting for the number of confirmations (DATA_TRANSPORT_LAYER__CONFIRMATIONS). This value was therefore increased.
-
 ## What do when you discover a state root mismatch
 
 Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/bobanetwork/boba/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
 
-## Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL)
+## Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL) from local images
 
 **Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and *running*.
 
@@ -35,22 +29,28 @@ $ git clone git@github.com:bobanetwork/boba.git
 $ cd boba
 $ yarn install
 $ yarn build
+$ cd ops
+$ docker-compose build
 ```
 
-Then, add your Infura key to `boba_community/fraud-detector/docker-compose-fraud-detector.yml`. If you do not have an Infura key, you can obtain one for free from [Infura](https://infura.io).
+Next, navigate to `boba_community/fraud-detector` and set the RELEASE_VERSION environment variable:
 
-```bash
-x-l1_rpc_dtl: &l1_rpc_dtl
-  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
-
-x-l1_node_web3_url: &l1_node_web3_url
-  L1_NODE_WEB3_URL: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY'
-```
-
-Next, navigate to `boba_community/fraud-detector` and build the needed Docker images:
 
 ```
 $ cd boba_community/fraud-detector
+$ export RELEASE_VERSION=latest
+```
+
+The 'latest' tag should resolve to the images you built locally in the previous step.
+
+Then, check the RPC endpoints in `boba_community/fraud-detector/docker-compose-fraud-detector.yml`.
+
+```bash
+x-l1_rpc_dtl: &l1_rpc_dtl
+  DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.gateway.tenderly.co'
+
+x-l1_node_web3_url: &l1_node_web3_url
+  L1_NODE_WEB3_URL: 'https://mainnet.gateway.tenderly.co'
 ```
 
 Next, spin up the `Fraud Detector` and other neccessary services (the `Verifier L2 Geth` and the `Data Transport Layer`)
@@ -63,7 +63,7 @@ Finally, **Open another terminal window** and upload the `addresses.json` to the
 
 ```bash
 $ cd boba/boba_community/fraud-detector
-$ curl -H "Content-Type: application/json" -T ./addresses.json http://localhost:8080/addresses.json
+$ curl -H "Content-Type: application/json" -T state-dumps/mainnet/addresses.json http://localhost:8080/addresses.json
 ```
 
 The system will start and the `Verifier L2 Geth` will begin to sync with the Boba L2 via data it deposited into the core Boba contracts on Ethereum Mainnet. **The sync process can take several hours to complete**. During the sync process, you will see the Verifier gradually catch up with the Boba L2:
@@ -125,3 +125,11 @@ verifier_dtl_1     | {"level":30,"time":1636134645380,"highestSyncedL1Block":135
 ...
 
 ```
+
+## Known Errors and State Root Mismatches in Boba-V1
+
+* This directory contains a "docker-compose-v1_mainnet.yml" file which is configured to process the original chain prior to the October 2021 regenesis event. The DTL and l2geth images supporting this era are available from dockerhub, or may be built from the https://github.com/omgnetwork/optimism repository. The fraud-detector may be built from this repository or (if available) from a dockerhub image built after May 2023 which includes support for the V1 name of the OVM_StateCommitmentChain.
+
+* For the first 10 blocks of the V1 chain (between L1 heights of 13011896 and 13502893), the chainID was set (incorrectly) to 28 rather than 288. Therefore, the EIP155 signatures fail for those blocks, and the Verifier cannot sync those blocks. This has been addressed by overriding the chain ID of those blocks in a modified DTL (the rc1.0-surgery tag). In the fraud-detector log, these 10 blocks will show a mismatch but the stateroots should re-synchronize at block 11.
+
+* There is one state root mismatch at L2 block 155, arising from a two second discrepancy in a timestamp, that was ultimately caused by a too-small setting for the number of confirmations (DATA_TRANSPORT_LAYER__CONFIRMATIONS). This value was therefore increased. This is also handled by the rc1.0-surgery DTL.
