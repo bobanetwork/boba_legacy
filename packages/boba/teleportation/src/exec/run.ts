@@ -16,7 +16,9 @@ import { AppDataSource } from '../data-source'
 dotenv.config()
 
 const main = async () => {
-  await AppDataSource.initialize() // initialize DB connection
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize() // initialize DB connection
+  }
 
   const config: Bcfg = new Config('teleportation')
   config.load({

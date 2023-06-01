@@ -1128,7 +1128,7 @@ describe('ERC1155 Bridge Test', async () => {
 
       const approveTX = await L1ERC1155.connect(
         env.l2Wallet_2
-      ).setApprovalForAll(L1Bridge.address, true)
+      ).setApprovalForAll(L1Bridge.address, true, { gasLimit: 1000000 })
       await approveTX.wait()
 
       await env.waitForXDomainTransaction(
@@ -1138,7 +1138,8 @@ describe('ERC1155 Bridge Test', async () => {
           DUMMY_TOKEN_ID_1,
           DUMMY_TOKEN_AMOUNT_1,
           '0x',
-          999999
+          999999,
+          { gasLimit: 1000000 }
         )
       )
 
