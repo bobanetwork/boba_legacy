@@ -18,7 +18,7 @@ The token-claiming process takes place in five steps:
 
 ### 1. User obtains the CAPTCHA image and the image UUID
 
-The API GET request is sent to `https://api-turing.boba.network/get.catcha` on the frontend. The returned payload is 
+The API GET request is sent to `https://api-turing.boba.network/get.catcha` on the frontend. The returned payload is
 
    ```js
    {
@@ -63,7 +63,7 @@ The POST request with the hashed answer is sent to `https://api-turing.boba.netw
    keyInRedis = db.get(uuid)
    # Return the payload
    return returnPayload(keyInRedis.decode('utf-8') == key)
-   
+
    # Payload is built based on the result
    def returnPayload(result):
        # We return 0 or 1 using uint256
@@ -74,12 +74,12 @@ The POST request with the hashed answer is sent to `https://api-turing.boba.netw
        else:
            # Add UINT256 0 if the result is wrong
            payload += '{0:0{1}x}'.format(int(0), 64)
-   
+
        returnPayload = {
            'statusCode': 200,
            'body': json.dumps({ 'result': payload })
        }
-   
+
        return returnPayload
    ```
 
@@ -88,7 +88,7 @@ The POST request with the hashed answer is sent to `https://api-turing.boba.netw
 On the contract level, we decode the result from the Turing request and release the funds if the answer is correct.
 
 ```javascript
-    
+
 
     // Decode the response from outside API
     bytes memory encResponse = turing.TuringTx(turingUrl, encRequest);
@@ -179,9 +179,9 @@ Create a `.env` file in the root directory of the contracts folder. Add environm
 
 ```bash
 
-NETWORK=rinkeby
-L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/9844f35ff4a84003a7025a65a9412002
-L2_NODE_WEB3_URL=https://rinkeby.boba.network
+NETWORK=goerli
+L1_NODE_WEB3_URL=https://goerli.gateway.tenderly.co
+L2_NODE_WEB3_URL=https://goerli.boba.network
 ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
 DEPLOYER_PRIVATE_KEY=
 
@@ -206,7 +206,7 @@ contract BobaFaucet is Ownable {
     address public turingHelperAddress;
     string public turingUrl;
     TuringHelper public turing;
-    
+
     constructor(
         address _turingHelperAddress,
         string memory _turingUrl
@@ -215,13 +215,13 @@ contract BobaFaucet is Ownable {
         turing = TuringHelper(_turingHelperAddress);
         turingUrl = _turingUrl;
     }
-    
+
     function getBobaFaucet(
         bytes32 _uuid,
         string memory _key
     ) external {
         require(BobaClaimRecords[msg.sender] + waitingPeriod < block.timestamp, 'Invalid request');
-				
+
         // The key is hashed
         bytes32 hashedKey = keccak256(abi.encodePacked(_key));
         uint256 result = _verifyKey(_uuid, hashedKey);
@@ -232,7 +232,7 @@ contract BobaFaucet is Ownable {
 
         emit GetBobaFaucet(_uuid, hashedKey, msg.sender, BobaFaucetAmount, block.timestamp);
     }
-    
+
     // Call Turing contract to get the result from the outside API endpoint
     function _verifyKey(bytes32 _uuid, bytes32 _key) private returns (uint256) {
         bytes memory encRequest = abi.encodePacked(_uuid, _key);

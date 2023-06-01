@@ -257,15 +257,7 @@ function Home() {
       {!!CDMCompletionModalState && <CDMCompletionModal open={CDMCompletionModalState} />}
       {!!switchNetworkModalState && <SwitchNetworkModal open={switchNetworkModalState} />}
 
-      {
-        !!Number(BOBABEAM_STATUS)
-        && activeNetwork === 'MOONBEAM'
-        && <NotificationBanner
-          message='Bobabeam is being wound down & will no longer be available, starting May 25th'
-          content='Bobabeam is being wound down & will no longer be available, starting May 25th.
-          For users of Bobabeam or Bobabeam applications you will need to transfer all your funds to Moonbeam mainnet before May 15th or risk permanently losing access to any assets on Bobabeam.'
-          open={true}
-        />}
+      <NotificationBanner />
 
       <Alert
         type='error'
@@ -299,7 +291,6 @@ function Home() {
             height: 'calc(100% - 150px)',
             minHeight: '500px',
             marginLeft: 'unset',
-            width: '100vw',
             marginRight: 'unset',
             paddingTop: '50px'
           }}>
@@ -343,7 +334,6 @@ function Home() {
           <PageHeader />
           <Container maxWidth={false} sx={{
             minHeight: 'calc(100vh - 200px)',
-            width: '100vw',
             marginLeft: 'unset',
             marginRight: 'unset'
           }}>
