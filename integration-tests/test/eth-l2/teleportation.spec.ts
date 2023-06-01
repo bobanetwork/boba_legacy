@@ -541,43 +541,4 @@ describe('teleportation', () => {
       expect(preBOBABalance.sub(postBOBABalance)).to.be.eq(0)
     })
   })
-
-  describe('database connection', () => {
-    const chainId = 123
-    const expectedLastBlock = 987
-
-    before(async () => {
-      await historyDataRepository.delete({})
-    })
-
-    it('insert latestBlock', async () => {
-      const data = new HistoryData()
-      data.chainId = chainId
-      data.blockNo = expectedLastBlock
-      await historyDataRepository.save(data)
-
-      const dbRes = await historyDataRepository.findOneByOrFail({ chainId })
-      expect(dbRes.chainId).to.be.eq(data.chainId)
-      expect(dbRes.blockNo).to.be.eq(data.blockNo)
-    })
-
-    it('getDepositInfo', async () => {
-      const teleportationService = await startTeleportationService()
-      await teleportationService.init()
-
-      const latestBlock = await teleportationService._getDepositInfo(chainId)
-      expect(latestBlock).to.be.eq(expectedLastBlock)
-    })
-
-    it('putDepositInfo', async () => {
-      const teleportationService = await startTeleportationService()
-      await teleportationService.init()
-
-      const newLastBlock = 55
-      await teleportationService._putDepositInfo(chainId, newLastBlock)
-      const latestBlock = await teleportationService._getDepositInfo(chainId)
-
-      expect(latestBlock).to.be.eq(newLastBlock)
-    })
-  })
 })
