@@ -22,6 +22,8 @@ export interface BundlerConfig {
   addressManager: string
   l1NodeWeb3Url: string
   enableDebugMethods: boolean
+  l2Offset?: number
+  logsChunkSize?: number
 }
 
 // TODO: implement merging config (args -> config.js -> default) and runtime shape validation
@@ -46,6 +48,8 @@ export const BundlerConfigShape = {
   addressManager: ow.string,
   l1NodeWeb3Url: ow.string,
   enableDebugMethods: ow.boolean,
+  l2Offset: ow.optional.number,
+  logsChunkSize: ow.optional.number,
 }
 
 // TODO: consider if we want any default fields at all
@@ -60,4 +64,6 @@ export const bundlerConfigDefault: Partial<BundlerConfig> = {
   autoBundleInterval: 1,
   autoBundleMempoolSize: 1,
   enableDebugMethods: false,
+  l2Offset: 0,
+  logsChunkSize: 5000,
 }
