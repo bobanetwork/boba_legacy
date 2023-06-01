@@ -5,8 +5,6 @@
   "scripts": {
     "audit-check": "audit-ci --moderate",
     "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-scripts build",
-    "deploy:mainnet": "yarn build:prod && aws s3 rm s3://boba-gateway --recursive && aws s3 sync build s3://boba-gateway && aws s3 cp s3://boba-gateway/index.html s3://boba-gateway/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
-    "deploy:onegateway": "yarn build:prod && aws s3 rm s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31 --recursive && aws s3 sync build s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31 && aws s3 cp s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31/index.html s3://boba-gateway-staging-gatewaybucket-14ro8dd9i4p31/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html",
     "format:check": "prettier --config .prettierrc.json --check \"./src/**/*.{ts,tsx}\"",
     "format:fix": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
