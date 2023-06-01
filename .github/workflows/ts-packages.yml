@@ -126,7 +126,6 @@ jobs:
 
       - name: Check packages/boba/teleportation
         working-directory: ./packages/boba/teleportation
-        # needed by typeorm
         run: npx depcheck
 
       - name: Check integration-tests
