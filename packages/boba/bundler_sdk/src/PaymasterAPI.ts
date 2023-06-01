@@ -2,8 +2,7 @@ import { UserOperationStruct } from '@boba/accountabstraction'
 import { hexConcat, hexZeroPad } from 'ethers/lib/utils'
 
 export interface IPaymasterAPIConfig {
-  depositPaymasterAddress?: string
-  erc20TokenAddress?: string
+  paymasterAndData?: string
 }
 
 /**
@@ -19,12 +18,6 @@ export class PaymasterAPI {
    * @returns the value to put into the PaymasterAndData, undefined to leave it empty
    */
   async getPaymasterAndData (userOp: Partial<UserOperationStruct>): Promise<string | undefined> {
-    if (this.config.erc20TokenAddress && this.config.depositPaymasterAddress) {
-      return hexConcat([
-        this.config.depositPaymasterAddress,
-        hexZeroPad(this.config.erc20TokenAddress, 20),
-      ])
-    }
-    return '0x'
+    return this.config.paymasterAndData ?? '0x'
   }
 }

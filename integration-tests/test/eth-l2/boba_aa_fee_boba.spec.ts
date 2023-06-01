@@ -193,8 +193,10 @@ describe('AA Boba as Fee token Test\n', async () => {
     )
     it('should be able to submit a userOp including the paymaster to the bundler and trigger tx', async () => {
       accountAPI.paymasterAPI = new PaymasterAPI({
-        depositPaymasterAddress: BobaDepositPaymaster.address,
-        erc20TokenAddress: L2BOBAToken.address,
+        paymasterAndData: hexConcat([
+         BobaDepositPaymaster.address,
+          hexZeroPad(L2BOBAToken.address, 20),
+        ])
       })
 
       signedOp = await accountAPI.createSignedUserOp({

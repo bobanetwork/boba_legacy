@@ -1363,7 +1363,7 @@
     to-fast-properties "^2.0.0"
 
 "@bobanetwork/bundler_sdk@file:packages/boba/bundler_sdk":
-  version "0.3.0"
+  version "0.3.1"
   dependencies:
     "@boba/accountabstraction" "^1.0.0"
     "@boba/bundler_utils" "^0.2.3"
