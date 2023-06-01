@@ -3,7 +3,7 @@ import ow from 'ow'
 
 export interface BundlerConfig {
   beneficiary: string
-  entryPoint: string
+  entryPoint?: string
   entryPointWrapper?: string
   gasFactor: string
   minBalance: string
@@ -22,12 +22,14 @@ export interface BundlerConfig {
   addressManager: string
   l1NodeWeb3Url: string
   enableDebugMethods: boolean
+  l2Offset?: number
+  logsChunkSize?: number
 }
 
 // TODO: implement merging config (args -> config.js -> default) and runtime shape validation
 export const BundlerConfigShape = {
   beneficiary: ow.string,
-  entryPoint: ow.string,
+  entryPoint: ow.optional.string,
   entryPointWrapper: ow.optional.string,
   gasFactor: ow.string,
   minBalance: ow.string,
@@ -46,18 +48,22 @@ export const BundlerConfigShape = {
   addressManager: ow.string,
   l1NodeWeb3Url: ow.string,
   enableDebugMethods: ow.boolean,
+  l2Offset: ow.optional.number,
+  logsChunkSize: ow.optional.number,
 }
 
-// TODO: consider if we want any default fields at all
-// TODO: implement merging config (args -> config.js -> default) and runtime shape validation
+// Defaults taken from eth-infinitism repo
 export const bundlerConfigDefault: Partial<BundlerConfig> = {
   port: '3000',
-  entryPoint: '0x1306b01bC3e4AD202612D3843387e94737673F53',
+  entryPoint: '0xa6e2cbb294d3b84e7900daf0052ffe26bb1328ff',
   unsafe: false,
   conditionalRpc: false,
-  minStake: '1',
-  minUnstakeDelay: 60,
-  autoBundleInterval: 1,
-  autoBundleMempoolSize: 1,
+  minStake: '0.0001', // testnet default
+  minUnstakeDelay: 5 * 60, // in seconds, testnet default (5 min)
+  autoBundleInterval: 3,
+  autoBundleMempoolSize: 10,
   enableDebugMethods: false,
+  gasFactor: '1',
+  l2Offset: 0,
+  logsChunkSize: 5000,
 }

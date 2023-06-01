@@ -16,6 +16,9 @@ function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
   }
   console.log(params['maxBundleGas'])
   params['maxBundleGas'] = parseInt(params['maxBundleGas'], 10)
+  params['minUnstakeDelay'] = parseInt(params['minUnstakeDelay'], 10)
+  params['autoBundleInterval'] = parseInt(params['autoBundleInterval'], 10)
+  params['autoBundleMempoolSize'] = parseInt(params['autoBundleMempoolSize'], 10)
   return params as BundlerConfig
 }
 
