@@ -89,14 +89,14 @@ Then, register and fund your Turing Credit account:
 
 You can use Turing as a pipe to any other computer, such as APIs for social networks, weather and location data, or market data. Please keep in mind however that Turing differs sharply from established providers of market trading data, in particular, since **Turing does not provide a decentralized mechanism to verify the accuracy of the data**. **You should therefore not use Turing for production trading or lending use, but should use proven, decentralized data oracles**.
 
-**Data/Oracle best practices** Regardless of your specific use case, minimally, you will need to secure your pipe/contract against data outliers, temporary lack of data, and malicious attempts to distort the data. For example, you could average over multiple on-chain oracles and/or off-chain sources - in this case, the role of Turing could be to 'augment' or separately estimate the reliability and timeliness of on-chain oracles.
+**Data/Oracle best practices** Regardless of your specific use case, minimally, you will need to secure your pipe/contract against data outliers, temporary lack of data, and malicious attempts to distort the data. For example, you could average over multiple on-chain oracles and/or off-chain sources - in this case, the role of Turing could be to 'augment' or separately estimate the reliability and timeliness of on-chain oracles. 
 
 **Note - Boba does not provide endpoints for you** You are responsible for setting up an endpoint that Turing can access - read on for more information and example code. Assume you have an API access key to a provider of weather data. First, set up a server or endpoint that queries this API, and stores and analyzes the data, if needed. Your own server/endpoint contains your secrets and API access keys. Next, add a simple interface to allow Turing to interact with your server. Turing calls to your server  contain the address of the calling contract and there are multiple ways to control access to your server in very granular manner, if desired. See `.packages/boba/turing/AWS_code/turing_oracle.py` for a copy-paste example for querying data APIs via a wrapper at AWS Lambda:
 
 ```python
 /AWS_code/turing_oracle.py
 
-# Note - This code is running on YOUR server
+# Note - This code is running on YOUR server 
 
 ...
   api_key = 'YOUR_API_KEY' # Insert your API key here
@@ -189,13 +189,13 @@ $ cd packages/boba/turing
 $ yarn test:local
 ```
 
-**Note: Testing on Goerli**
+**Note: Testing on Rinkeby**
 
-To test on Goerli, you need a private key with both ETH and BOBA on the Boba L2; the private key needs to be provided in `hardhat.config.js`. Just replace all the zeros with your key:
+To test on Rinkeby, you need a private key with both ETH and BOBA on the Boba L2; the private key needs to be provided in `hardhat.config.js`. Just replace all the zeros with your key:
 
 ```javascript
-    boba_goerli: {
-      url: 'https://goerli.boba.network',
+    boba_rinkeby: {
+      url: 'https://rinkeby.boba.network',
       accounts: ['0x0000000000000000000000000000000000000000000000000000000000000000']
     },
 ```
@@ -204,7 +204,7 @@ Then, run:
 
 ```bash
 $ cd packages/boba/turing
-$ yarn test:goerli
+$ yarn test:rinkeby
 ```
 
 The tests will perform some basic floating point math, provide some random numbers, and get the latest BTC-USD exchange rate:

@@ -60,8 +60,7 @@ jobs:
 
       - uses: actions/checkout@v2
 
-      - name: yq - portable yaml processor
-        uses: mikefarah/yq@v4.34.1
+      - uses: chrisdickinson/setup-yq@latest
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -127,15 +126,13 @@ jobs:
 
       - name: Build the side services
         working-directory: ./ops
-        run: |
-          #standard yq setup: $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
-          docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq eval '(.services | keys)[]' < ./docker-compose-side.yml  | tr '\n' ' ')
+        run: docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
 
       - name: Print images
         working-directory: ./
         run: docker images
 
-      - name: Rename and retag images
+      - name: Rename and retag the Optimism images
         working-directory: ./ops
         run: |
           for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do
@@ -143,7 +140,7 @@ jobs:
           done
           docker images
 
-      - name: Push images
+      - name: Rename and retag the optimism images
         working-directory: ./ops
         run: |
           for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do

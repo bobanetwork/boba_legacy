@@ -135,6 +135,7 @@ export class UserOpMethodHandler {
 
   /**
    * eth_estimateUserOperationGas RPC api.
+   * TODO: gonna work post bedrock!
    * @param userOp1
    * @param entryPointInput
    */
@@ -155,25 +156,22 @@ export class UserOpMethodHandler {
     // todo: checks the existence of parameters, but since we hexlify the inputs, it fails to validate
     await this._validateParameters(deepHexlify(userOp), entryPointInput)
     // todo: validation manager duplicate?
-    const errorResult = await this.entryPointWrapper.callStatic
+    const errorResult = await this.entryPoint.callStatic
       .simulateValidation(userOp)
       .catch((e) => e)
-
-    const failedOp = errorResult[0]
-    const resp = errorResult[1]
-    const errorName = resp[0]
-
-    if (failedOp.status) {
+    if (errorResult.errorName === 'FailedOp') {
       throw new RpcError(
-        failedOp?.reason,
+        errorResult.errorArgs.at(-1),
         ValidationErrors.SimulateValidation
       )
     }
-    if (errorName !== 'ValidationResult') {
-      throw resp
+    // todo throw valid rpc error
+    if (errorResult.errorName !== 'ValidationResult') {
+      throw errorResult
     }
 
-    let { preOpGas, validAfter, validUntil } = resp[1]
+    const { returnInfo } = errorResult.errorArgs
+    let { preOpGas, validAfter, validUntil } = returnInfo
 
     const callGasLimit = await this.provider
       .estimateGas({
@@ -227,14 +225,11 @@ export class UserOpMethodHandler {
   }
 
   async _getUserOperationEvent(
-    userOpHash: string,
-    opts?: any
+    userOpHash: string
   ): Promise<UserOperationEventEvent> {
     // TODO: eth_getLogs is throttled. must be acceptable for finding a UserOperation by hash
     const event = await this.entryPoint.queryFilter(
-      this.entryPoint.filters.UserOperationEvent(userOpHash),
-      opts?.fromBlock,
-      opts?.toBlock
+      this.entryPoint.filters.UserOperationEvent(userOpHash)
     )
     return event[0]
   }
@@ -272,15 +267,14 @@ export class UserOpMethodHandler {
   }
 
   async getUserOperationByHash(
-    userOpHash: string,
-    opts?: any
+    userOpHash: string
   ): Promise<UserOperationByHashResponse | null> {
     requireCond(
       userOpHash?.toString()?.match(HEX_REGEX) != null,
       'Missing/invalid userOpHash',
       -32601
     )
-    const event = await this._getUserOperationEvent(userOpHash, opts)
+    const event = await this._getUserOperationEvent(userOpHash)
     if (event == null) {
       return null
     }
@@ -338,15 +332,14 @@ export class UserOpMethodHandler {
   }
 
   async getUserOperationReceipt(
-    userOpHash: string,
-    opts?: any
+    userOpHash: string
   ): Promise<UserOperationReceipt | null> {
     requireCond(
       userOpHash?.toString()?.match(HEX_REGEX) != null,
       'Missing/invalid userOpHash',
       -32601
     )
-    const event = await this._getUserOperationEvent(userOpHash, opts)
+    const event = await this._getUserOperationEvent(userOpHash)
     if (event == null) {
       return null
     }

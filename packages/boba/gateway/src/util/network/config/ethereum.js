@@ -13,7 +13,6 @@ export const ethereumConfig = {
       chainIdHex: '0x5',
       rpcUrl: [
         `https://goerli.infura.io/v3/${INFURA_ID}`,
-        `https://goerli.gateway.tenderly.co`,
         `https://rpc.ankr.com/eth_goerli`,
       ],
       transaction: `https://goerli.etherscan.io/tx/`,
@@ -62,7 +61,6 @@ export const ethereumConfig = {
       rpcUrl: [
         `https://mainnet.infura.io/v3/${INFURA_ID}`,
         `https://rpc.ankr.com/eth`,
-        `http://gateway.tenderly.co/public/boba-ethereum`,
         `https://cloudflare-eth.com`,
       ],
       transaction: ` https://etherscan.io/tx/`,

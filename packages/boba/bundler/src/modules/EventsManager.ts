@@ -7,7 +7,6 @@ import { ReputationManager } from './ReputationManager'
 import { EntryPoint } from '@boba/accountabstraction'
 import Debug from 'debug'
 import { TypedEvent } from '@boba/accountabstraction/dist/types/common'
-import { JsonRpcProvider } from '@ethersproject/providers'
 import { MempoolManager } from './MempoolManager'
 
 const debug = Debug('aa.events')
@@ -16,21 +15,13 @@ const debug = Debug('aa.events')
  * listen to events. trigger ReputationManager's Included
  */
 export class EventsManager {
-  provider: JsonRpcProvider
   lastBlock = 0
-  chunkSize = 5000
 
   constructor(
     readonly entryPoint: EntryPoint,
     readonly mempoolManager: MempoolManager,
-    readonly reputationManager: ReputationManager,
-    readonly l2Offset: number,
-    readonly logsChunkSize: number
-  ) {
-    this.provider = entryPoint.provider as JsonRpcProvider
-    this.lastBlock = l2Offset
-    this.chunkSize = logsChunkSize > 0 ? logsChunkSize : 1
-  }
+    readonly reputationManager: ReputationManager
+  ) {}
 
   /**
    * automatically listen to all UserOperationEvent events
@@ -49,26 +40,9 @@ export class EventsManager {
    * process all new events since last run
    */
   async handlePastEvents(): Promise<void> {
-    let startBlock = this.lastBlock
-    const currentBlock = await this.provider.getBlockNumber()
-    if (currentBlock > startBlock + this.chunkSize) {
-      while (startBlock + this.chunkSize < currentBlock) {
-        const events = await this.entryPoint.queryFilter(
-          { address: this.entryPoint.address },
-          startBlock,
-          startBlock + (this.chunkSize - 1)
-        )
-        for (const ev of events) {
-          this.handleEvent(ev)
-        }
-        startBlock = startBlock + this.chunkSize
-      }
-      this.lastBlock = startBlock
-    }
     const events = await this.entryPoint.queryFilter(
       { address: this.entryPoint.address },
-      this.lastBlock,
-      currentBlock
+      this.lastBlock
     )
     for (const ev of events) {
       this.handleEvent(ev)

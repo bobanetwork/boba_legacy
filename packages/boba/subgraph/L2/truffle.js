@@ -9,11 +9,11 @@ module.exports = {
       port: 8545,
       network_id: '*',
     },
-    goerli: {
+    ropsten: {
       provider: function() {
         return new HDWalletProvider(
           process.env.MNEMONIC,
-          `https://goerli.gateway.tenderly.co`
+          `https://ropsten.infura.io/v3/${process.env.ROPSTEN_INFURA_API_KEY}`
         )
       },
       network_id: '3',

@@ -5,7 +5,7 @@
   "scripts": {
     "compile": "hardhat compile",
     "start": "node src/index.js",
-    "start:goerli": "node src/quickStart-goerli.js"
+    "start:rinkeby": "node src/quickStart-rinkeby.js"
   },
   "license": "MIT",
   "dependencies": {

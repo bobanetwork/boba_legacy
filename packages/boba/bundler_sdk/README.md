@@ -5,10 +5,6 @@ This package provides 2 APIs for using UserOperations:
 - Low-level "walletAPI"
 - High-level Provider
 
-## Documentation
-You can find more documentation about Boba, the Bundler SDK, etc. here:
-- [Official Boba Documentation](https://docs.boba.network/for-developers)
-- [Official NPM Package](https://www.npmjs.com/package/@bobanetwork/bundler_sdk)
 
 ## LowLevel API:
 

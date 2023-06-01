@@ -52,7 +52,7 @@ const deployFn: DeployFunction = async (hre) => {
       governor_voting_delay = 172800 // 2 days
       governor_proposal_threshold = utils.parseEther('50000')
     } else {
-      // set config for local/goerli
+      // set config for local/rinkeby
       delay_before_execute_s = 0
       eta_delay_s = 5
       governor_voting_period = 259200 // 3 days in seconds
@@ -184,7 +184,7 @@ const deployFn: DeployFunction = async (hre) => {
 
     console.log('Queue Initiate...')
     // call initiate() to complete setAdmin
-    // set eta to be the current timestamp for local and goerli
+    // set eta to be the current timestamp for local and rinkeby
     const eta2 = (await getTimestamp(hre)) + eta_delay_s
 
     const initiateData = utils.defaultAbiCoder.encode(
@@ -207,7 +207,7 @@ const deployFn: DeployFunction = async (hre) => {
     console.log(`Time transaction was made: ${await getTimestamp(hre)}`)
     console.log(`Time at which transaction can be executed: ${eta2}`)
 
-    // if it's local/goerli attempt to execute transactions
+    // if it's local/rinkeby attempt to execute transactions
     if (process.env.NETWORK !== 'mainnet') {
       console.log('Execute setPendingAdmin...')
       // Execute the transaction that will set the admin of Timelock to the GovernorBravoDelegator contract
@@ -263,7 +263,7 @@ const deployFn: DeployFunction = async (hre) => {
 }
 
 const setPendingAdmin = async (hre, eta_delay_s) => {
-  // set eta to be the current timestamp for local and goerli
+  // set eta to be the current timestamp for local and rinkeby
   const eta1 = (await getTimestamp(hre)) + eta_delay_s
 
   const setPendingAdminData = utils.defaultAbiCoder.encode(

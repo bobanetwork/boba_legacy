@@ -1,7 +1,7 @@
 # Watcher API
 
-> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/
-> Goerli Endpoint: https://api-watcher.goerli.boba.network/
+> Mainnet Endpoint: https://api-watcher.mainnet.boba.network/   
+> Rinkeby Endpoint: https://api-watcher.rinkeby.boba.network/  
 
 ## Methods
 
@@ -221,7 +221,7 @@
 
 ### Airdrop
 
-#### get.l1.airdrop (POST) / get.l2.airdrop (POST)
+#### get.l1.airdrop (POST) / get.l2.airdrop (POST) 
 
 **Request Body**
 
@@ -252,7 +252,7 @@
 }
 ```
 
-#### send.l1.airdrop (POST) / send.l2.airdrop (POST)
+#### send.l1.airdrop (POST) / send.l2.airdrop (POST) 
 
 **Request Body**
 
@@ -266,7 +266,7 @@
 **Effect on DB entries**
 
 When `send.l_.airdrop` is called, the `claimed` flag should change to `true` and the `claimedTimestamp` should change to the `now` unix seconds timestamp, for example, `1636964190`.
-If `claimed` already === `true` then calling `send.l_.airdrop` should have no effect.
+If `claimed` already === `true` then calling `send.l_.airdrop` should have no effect.   
 
 **Response Body**
 
@@ -290,8 +290,8 @@ If `claimed` already === `true` then calling `send.l_.airdrop` should have no ef
 
 **Effect on DB entries**
 
-When `initiate.l1.airdrop` is called, the `claimUnlockTime` should change from `null` to a unix seconds timestamp = now + 30 days, for example, `1636964190`.
-If `claimUnlockTime` already !== `null` then calling `initiate.l1.airdrop` should have no effect.
+When `initiate.l1.airdrop` is called, the `claimUnlockTime` should change from `null` to a unix seconds timestamp = now + 30 days, for example, `1636964190`. 
+If `claimUnlockTime` already !== `null` then calling `initiate.l1.airdrop` should have no effect.  
 
 **Response Body**
 

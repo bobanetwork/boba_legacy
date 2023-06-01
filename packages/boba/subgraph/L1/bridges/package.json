@@ -4,9 +4,9 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:goerli": "mustache config/goerli.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:rinkeby": "mustache config/rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:subgraph:goerli": "graph deploy --studio boba-network-goerli",
+    "deploy:subgraph:rinkeby": "graph deploy --studio boba-network-rinkeby",
     "deploy:subgraph:mainnet": "graph deploy --studio boba-network-mainnet"
   },
   "devDependencies": {

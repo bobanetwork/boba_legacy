@@ -18,8 +18,8 @@ This script allows anyone to check the status of a cross chain message from L2 t
   Then, add `.env` in `boba/boba_community/boba-relayer`.
 
   ```yaml
-L1_NODE_WEB3_URL=https://mainnet.gateway.tenderly.co
-L2_NODE_WEB3_URL=http://gateway.tenderly.co/public/boba-ethereum
+L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/KEY
+L2_NODE_WEB3_URL=https://mainnet.boba.network
 PRIV_KEY=
 L2_TRANSACTION_HASH=
   ```

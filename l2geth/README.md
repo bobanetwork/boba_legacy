@@ -156,17 +156,17 @@ use separate accounts for play-money and real-money. Unless you manually move
 accounts, `geth` will by default correctly separate the two networks and will not make any
 accounts available between them.*
 
-### Full node on the Goerli test network
+### Full node on the Rinkeby test network
 
 The above test network is a cross-client one based on the ethash proof-of-work consensus
 algorithm. As such, it has certain extra overhead and is more susceptible to reorganization
 attacks due to the network's low difficulty/security. Go Ethereum also supports connecting
-to a proof-of-authority based test network called [*Goerli*](https://www.goerli.net)
+to a proof-of-authority based test network called [*Rinkeby*](https://www.rinkeby.io)
 (operated by members of the community). This network is lighter, more secure, but is only
 supported by go-ethereum.
 
 ```shell
-$ geth --goerli console
+$ geth --rinkeby console
 ```
 
 ### Configuration

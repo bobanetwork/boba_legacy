@@ -26,7 +26,7 @@ Boba Network accepts BOBA and ETH as fee tokens. The fee choice is recorded in t
   await Boba_GasPriceOracle.useBobaAsFeeToken()
   ```
 
-  To avoid any accident, we *only* allow EOA accounts to use BOBA as the fee token.
+  To avoid any accident, we *only* allow EOA accounts to use BOBA as the fee token. 
 
 *  The default fee token option is ETH. You can swith the fee token from BOBA to ETH calling the `Boba_GasPriceOracle` contract. Before switching to ETH, you have to have at least **0.002 ETH** in your wallet. Otherwise, you will get stuck due to lack of ETH. We provide a *meta transaction* option for you to swap BOBA for a small amount of ETH. You can see this is option in the offical [gateway](https://gateway.boba.network).
 
@@ -60,17 +60,17 @@ Boba Network accepts BOBA and ETH as fee tokens. The fee choice is recorded in t
   Then, add `.env` in `boba/boba_examples/boba-fee`.
 
   ```yaml
-  # Goerli
+  # Rinkeby
   ADDRESS_MANAGER_ADDRESS=0x93A96D6A5beb1F661cf052722A1424CDDA3e9418
-  L1_NODE_WEB3_URL=https://goerli.gateway.tenderly.co
-  L2_NODE_WEB3_URL=https://goerli.boba.network
+  L1_NODE_WEB3_URL=https://rinkeby.infura.io/v3/KEY
+  L2_NODE_WEB3_URL=https://rinkeby.boba.network
   PRIV_KEY=
-
-
+  
+  
   # Mainnet
   ADDRESS_MANAGER_ADDRESS=0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089
-  L1_NODE_WEB3_URL=https://mainnet.gateway.tenderly.co
-  L2_NODE_WEB3_URL=http://gateway.tenderly.co/public/boba-ethereum
+  L1_NODE_WEB3_URL=https://mainnet.infura.io/v3/KEY
+  L2_NODE_WEB3_URL=https://mainnet.boba.network
   PRIV_KEY=
   ```
 
@@ -78,8 +78,8 @@ Boba Network accepts BOBA and ETH as fee tokens. The fee choice is recorded in t
 
   ```bash
   # Use BOBA as the fee token
-  $ yarn use:boba
-
+  $ yarn use:boba 
+  
   # Use ETH as the fee token
   $ yarn use:eth
   ```

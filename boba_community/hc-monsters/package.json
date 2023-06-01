@@ -13,7 +13,7 @@
     "deploy": "hardhat run scripts/deploy.ts",
     "flatten": "npx hardhat flatten ./contracts/NFTMonsterV2.sol >> contracts/NFTMonsterV2Flat.sol",
     "test:local": "npx hardhat --network boba_local test",
-    "test:goerli": "hardhat --network boba_goerli test",
+    "test:rinkeby": "hardhat --network boba_rinkeby test",
     "test:mainnet": "hardhat --network boba_mainnet test"
   },
   "devDependencies": {

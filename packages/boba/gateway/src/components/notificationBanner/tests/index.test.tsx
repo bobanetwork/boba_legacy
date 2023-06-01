@@ -4,10 +4,11 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import Theme from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
-import { BannerConfig } from '../bannerConfig'
 
-const data = BannerConfig[NETWORK.FANTOM]
+const data = {
+  message: 'Mock test message data!',
+  content: 'Mock test message content goes here!',
+}
 
 const mockStore = configureStore()
 
@@ -17,10 +18,6 @@ const renderBanner = (props: any) => {
       store={mockStore({
         ui: {
           theme: 'dark',
-        },
-        network: {
-          activeNetwork: NETWORK.FANTOM,
-          activeNetworkType: NETWORK_TYPE.MAINNET,
         },
       })}
     >

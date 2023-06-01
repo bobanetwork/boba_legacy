@@ -7,8 +7,8 @@
     "test/**/*.ts"
   ],
   "scripts": {
-    "deploy": "hardhat deploy --network boba_goerli",
-    "test": "hardhat test --network boba_goerli"
+    "deploy": "hardhat deploy --network boba_rinkeby",
+    "test": "hardhat test --network boba_rinkeby"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.0.24",

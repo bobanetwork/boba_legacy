@@ -63,7 +63,7 @@ import {
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
 
-import BridgeAlert from './BridgeAlert'
+import BobaBeamAlert from './bobaBeamAlert'
 
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
@@ -295,7 +295,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
-        <BridgeAlert />
+        <BobaBeamAlert />
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
@@ -320,7 +320,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <BridgeAlert />
+        <BobaBeamAlert />
         {!isBridge && (
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
             Fast Bridge to L2

@@ -26,7 +26,7 @@ describe('AA Wallet Test\n', async () => {
 
   before(async () => {
     env = await OptimismEnv.new()
-    entryPointAddress = env.addressesAABOBA.L2_Boba_EntryPoint
+    entryPointAddress = env.addressesAABOBA.L2_BOBA_EntryPoint
 
     SimpleAccount__factory = new ContractFactory(
       SimpleAccountFactoryJson.abi,

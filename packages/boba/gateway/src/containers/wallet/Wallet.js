@@ -19,8 +19,8 @@ import * as G from '../Global.styles'
 
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 
-import {
-  selectAccountEnabled,
+import { 
+  selectAccountEnabled, 
   selectLayer,
   selectlayer2Balance,
   selectActiveNetwork,
@@ -114,19 +114,6 @@ function Wallet() {
     }
   }
 
-  const alertContent = () => {
-    if (NETWORK.ETHEREUM === network) {
-      return `Using BOBA requires a minimum ETH balance (of 0.002 ETH) regardless of your fee setting,
-      otherwise MetaMask may incorrectly reject transactions. If you ran out of ETH, use EMERGENCY SWAP to swap BOBA
-      for 0.005 ETH at market rates.`
-    } else {
-      return `Using ${networkService.L1NativeTokenSymbol} requires a minimum BOBA
-      balance (of 1 BOBA) regardless of your fee setting, otherwise
-      MetaMask may incorrectly reject transactions. If you ran out of
-      BOBA, use EMERGENCY SWAP to swap ${networkService.L1NativeTokenSymbol} for 1 BOBA at market rates.`
-    }
-  }
-
   return (
     <S.PageContainer>
       <PageTitle title={'Wallet'} />
@@ -145,7 +132,11 @@ function Wallet() {
               ml={2}
               style={{ opacity: '0.6' }}
             >
-             {alertContent()}
+              Using {networkService.L1NativeTokenSymbol} requires a minimum BOBA
+              balance (of 1 BOBA) regardless of your fee setting, otherwise
+              MetaMask may incorrectly reject transactions. If you ran out of
+              BOBA, use EMERGENCY SWAP to swap{' '}
+              {networkService.L1NativeTokenSymbol} for 1 BOBA at market rates.
             </Typography>
           </G.AlertInfo>
 
