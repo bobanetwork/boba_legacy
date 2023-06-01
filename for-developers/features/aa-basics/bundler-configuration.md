@@ -33,6 +33,8 @@ The complete list of configuration variables that can be customized
   addressManager: ow.string, // address manager contract address
   l1NodeWeb3Url: ow.string, // l1 rpc
   enableDebugMethods: ow.boolean, // flag to enable debug methods on bundler
+  l2Offset: ow.optional.number, // l2 block the bundler watches from, defaults to 0
+  logsChunkSize: ow.optional.number, // the maximum permissble eth_getLogs range supported by the network, defaults to 5000
 ```
 
 Note- EntryPointWrapper is a requirement for the bundler when it is run against Boba Network - beacuse Boba Network does not support custom errors. 
