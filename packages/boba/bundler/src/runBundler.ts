@@ -124,6 +124,8 @@ export async function runBundler(
     .option('--minUnstakeDelay <number>', 'Minimum unstake delay in seconds', '300')
     .option('--autoBundleInterval <number>', 'Auto Bundle interval', '3')
     .option('--autoBundleMempoolSize <number>', 'Auto Bundle Mempool Size', '10')
+    .option('--l2Offset <number>', 'l2 Offset to start from')
+    .option('--logsChunkSize <number>', 'eth_getLogs range supported by network')
 
   const programOpts = program.parse(argv).opts()
   showStackTraces = programOpts.showStackTraces
