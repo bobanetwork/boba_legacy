@@ -197,11 +197,10 @@ describe('AA Boba as Fee token Test\n', async () => {
         erc20TokenAddress: L2BOBAToken.address,
       })
 
-      const op = await accountAPI.createUnsignedUserOp({
+      signedOp = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
-      signedOp = await accountAPI.signUserOp(op)
 
       const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
       const txid = await accountAPI.getUserOpReceipt(requestId)

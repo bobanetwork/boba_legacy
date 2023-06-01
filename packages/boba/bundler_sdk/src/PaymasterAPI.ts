@@ -1,11 +1,5 @@
 import { UserOperationStruct } from '@boba/accountabstraction'
-import { hexConcat, hexZeroPad } from "ethers/lib/utils";
-import { calcPreVerificationGas } from "./calcPreVerificationGas";
-import { ethers } from "ethers";
-
-// TODO: Remove before merge if not needed
-export const DUMMY_PAYMASTER_AND_DATA =
-  '0x0101010101010101010101010101010101010101000000000000000000000000000000000000000000000000000001010101010100000000000000000000000000000000000000000000000000000000000000000101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101'
+import { hexConcat, hexZeroPad } from 'ethers/lib/utils'
 
 export interface IPaymasterAPIConfig {
   depositPaymasterAddress?: string
