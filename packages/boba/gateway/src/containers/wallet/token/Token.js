@@ -26,7 +26,7 @@ import { tokenTableHeads } from './token.tableHeads'
 import ListToken from 'components/listToken/listToken'
 import Button from 'components/button/Button'
 import Link from 'components/icons/LinkIcon'
-import Pulse from 'components/pulse/PulsingBadge'
+import PulseBadge from 'components/PulseBadge'
 
 
 import { isEqual,orderBy } from 'util/lodash';
@@ -247,9 +247,9 @@ function TokenPage({
                 navigate('/history')
               }}
             >
-              <span style={{ opacity: '0.9' }}>Bridge in progress:</span>{' '}
-              <span style={{ opacity: '0.6' }}>Click for detailed status</span>
-              <Pulse variant="success" />
+              <PulseBadge variant='success'>
+                <span style={{ opacity: '0.9' }}>Bridge in progress: <span style={{ opacity: '0.6' }}>Click for detailed status</span></span>
+              </PulseBadge>
             </Typography>
           </Box>
         )}
