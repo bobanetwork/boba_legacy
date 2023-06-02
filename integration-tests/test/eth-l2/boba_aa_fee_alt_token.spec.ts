@@ -10,7 +10,7 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
+import { PaymasterAPI, SimpleAccountAPI } from "@bobanetwork/bundler_sdk";
 import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
 import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
@@ -210,17 +210,16 @@ describe('AA Alt Fee Token Test\n', async () => {
     )
 
     it('should be able to submit a userOp including the paymaster to the bundler and trigger tx', async () => {
-      const op = await accountAPI.createUnsignedUserOp({
+      accountAPI.paymasterAPI = new PaymasterAPI({
+        paymasterAndData: hexConcat([
+          ManualDepositPaymaster.address,
+          hexZeroPad(L2ERC20Token.address, 20),
+        ]),
+      })
+      signedOp = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
-      op.paymasterAndData = hexConcat([
-        ManualDepositPaymaster.address,
-        hexZeroPad(L2ERC20Token.address, 20),
-      ])
-      op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
-
-      signedOp = await accountAPI.signUserOp(op)
 
       const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
       const txid = await accountAPI.getUserOpReceipt(requestId)
