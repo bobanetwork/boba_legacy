@@ -1362,6 +1362,22 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@bobanetwork/bundler_sdk@file:packages/boba/bundler_sdk":
+  version "0.3.1"
+  dependencies:
+    "@boba/accountabstraction" "^1.0.0"
+    "@boba/bundler_utils" "^0.2.3"
+    "@ethersproject/abi" "^5.7.0"
+    "@ethersproject/abstract-provider" "^5.7.0"
+    "@ethersproject/abstract-signer" "^5.7.0"
+    "@ethersproject/networks" "^5.7.0"
+    "@ethersproject/properties" "^5.7.0"
+    "@ethersproject/providers" "^5.7.0"
+    "@types/debug" "^4.1.7"
+    debug "^4.3.4"
+    ethers "^5.7.0"
+    hardhat-gas-reporter "^1.0.8"
+
 "@chainlink/contracts@0.3.1":
   version "0.3.1"
   resolved "https://registry.npmjs.org/@chainlink/contracts/-/contracts-0.3.1.tgz"
