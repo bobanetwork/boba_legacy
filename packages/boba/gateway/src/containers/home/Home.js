@@ -88,7 +88,7 @@ import Alert from 'components/alert/Alert'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 /******** UTILS ********/
-import { APP_STATUS, BOBABEAM_STATUS, POLL_INTERVAL } from 'util/constant'
+import { APP_STATUS, POLL_INTERVAL } from 'util/constant'
 import useInterval from 'hooks/useInterval'
 import useGoogleAnalytics from 'hooks/useGoogleAnalytics'
 import useNetwork from 'hooks/useNetwork'
