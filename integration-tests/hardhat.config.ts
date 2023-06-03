@@ -2,7 +2,6 @@ import { HardhatUserConfig } from 'hardhat/types'
 // Hardhat plugins
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import 'hardhat-gas-reporter'
 import 'mocha-multi-reporters'
 
 const config: HardhatUserConfig = {
