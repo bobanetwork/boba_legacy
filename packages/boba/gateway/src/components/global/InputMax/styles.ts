@@ -14,6 +14,8 @@ export const MaxButton = styled.button`
   right: 10px;
   padding: 4px 6px;
   border-radius: 6px;
+  font-family: inherit;
+
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -39,6 +41,7 @@ export const Input = styled.input`
   border-radius: 12px;
   transition: all 0.25s;
   outline: none;
+  font-family: inherit;
   font-size: ${(props) => props.theme.text.body1};
 
   ${(props) =>

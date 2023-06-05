@@ -13,7 +13,7 @@
     "postinstall": "patch-package",
     "pre-commit": "lint-staged --allow-empty",
     "prebuild": "./bin/release.sh",
-    "start": "react-app-rewired start",
+    "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
     "test": "react-scripts test --watchAll=false",
     "test:coverage": "yarn test --coverage",
     "test:u": "yarn test -u",
@@ -69,6 +69,7 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^5.0.0",
     "react-select": "^5.2.2",
+    "react-svg": "^16.1.14",
     "recharts": "^2.1.10",
     "redux": "^4.1.2",
     "redux-persist": "^6.0.0",
@@ -129,9 +130,6 @@
       "yarn format:fix",
       "yarn lint:check"
     ]
-  },
-  "engines": {
-    "node": ">=16.0.0"
   },
   "jest": {
     "collectCoverageFrom": [

@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react'
+import ArrowDown from '../../../images/icons/arrowdown.svg'
 import {
   DropdownContainer,
   Header,
@@ -7,6 +8,7 @@ import {
   DefaultIcon,
   DropdownBody,
   Icon,
+  DropdownContent,
 } from './styles'
 interface IDropdownItem {
   value: string
@@ -55,17 +57,23 @@ export const Dropdown: React.FC<IDropdownProps> = ({
           )}
           {selectedItem.label}
 
-          {isOpen ? ' ▲' : ' ▼'}
+          {isOpen ? <img src={ArrowDown} /> : <img src={ArrowDown} />}
         </Option>
       </Header>
       {isOpen && (
         <DropdownBody>
-          {items.map((item, index) => (
-            <Option key={index} onClick={() => selectItem(item)}>
-              {item.imgSrc && <img src={item.imgSrc} alt={item.label} />}
-              {item.label}
-            </Option>
-          ))}
+          <DropdownContent>
+            {items.map((item, index) => (
+              <Option key={index} onClick={() => selectItem(item)}>
+                {item.imgSrc && (
+                  <IconContainer>
+                    <img src={item.imgSrc} alt={item.label} />
+                  </IconContainer>
+                )}
+                {item.label}
+              </Option>
+            ))}
+          </DropdownContent>
         </DropdownBody>
       )}
     </DropdownContainer>

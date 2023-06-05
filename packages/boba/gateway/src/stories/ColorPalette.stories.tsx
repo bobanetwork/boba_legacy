@@ -10,7 +10,6 @@ const ColorBox = styled.div`
   border-radius: 8px;
   width: 100px;
   height: 100px;
-  border: 1px solid ${(props) => props.theme.defaultColorText};
 `
 
 const Title = styled.p`

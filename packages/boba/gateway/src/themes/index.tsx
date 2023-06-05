@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { selectTheme } from 'selectors'
 import light from './light'
 import dark from './dark'
+import { GlobalStyle } from './globalStyle'
 
 interface ThemeProps {
   children: ReactNode
@@ -22,7 +23,12 @@ const Theme = ({ children }: ThemeProps) => {
     }
   }, [theme])
 
-  return <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>
+  return (
+    <ThemeProvider theme={currentTheme}>
+      <GlobalStyle />
+      {children}
+    </ThemeProvider>
+  )
 }
 
 export default Theme

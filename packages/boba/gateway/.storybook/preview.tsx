@@ -4,6 +4,7 @@ import { Decorator } from '@storybook/react'
 import { Preview } from '@storybook/react'
 import light from '../src/themes/light'
 import dark from '../src/themes/dark'
+import { GlobalStyle } from '../src/themes/globalStyle'
 
 const ThemeBlock = styled.div<{ left?: boolean; fill?: boolean }>(
   ({ left, fill, theme }) =>
@@ -47,11 +48,13 @@ export const withTheme: Decorator = (StoryFn, context) => {
         <>
           <ThemeProvider theme={light}>
             <ThemeBlock left>
+              <GlobalStyle />
               <StoryFn />
             </ThemeBlock>
           </ThemeProvider>
           <ThemeProvider theme={dark}>
             <ThemeBlock>
+              <GlobalStyle />
               <StoryFn />
             </ThemeBlock>
           </ThemeProvider>
@@ -62,6 +65,7 @@ export const withTheme: Decorator = (StoryFn, context) => {
       return (
         <ThemeProvider theme={storyTheme}>
           <ThemeBlock fill>
+            <GlobalStyle />
             <StoryFn />
           </ThemeBlock>
         </ThemeProvider>

@@ -3,10 +3,29 @@ import styled, { css } from 'styled-components'
 export const DropdownContainer = styled.div`
   display: inline-flex;
   flex-direction: column;
-  min-width: 290px;
   position: relative;
   cursor: pointer;
+  transition: 0.25s all;
+  box-sizing: border-box;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[800]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[50]};
+    `}
+`
+
+export const Header = styled.div`
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  color: inherit;
   border-radius: 14px;
+  min-width: 290px;
   padding: 15px;
   transition: 0.25s all;
   ${(props) =>
@@ -30,21 +49,6 @@ export const DropdownContainer = styled.div`
     `}
 `
 
-export const Header = styled.div`
-  . position: relative;
-  z-index: 2;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      color: ${props.theme.colors.gray[800]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      color: ${props.theme.colors.gray[50]};
-    `}
-`
-
 export const IconContainer = styled.div`
   border-radius: 50%;
   width: 32px;
@@ -59,6 +63,7 @@ export const Option = styled.div`
   font-weight: bold;
   justify-content: flex-start;
   text-align: left;
+  color: inherit;
 `
 
 export const DefaultIcon = styled.div`
@@ -84,17 +89,62 @@ export const Icon = styled.img`
 
 export const DropdownBody = styled.div`
   padding-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px 0px;
+  transition: 0.25s all;
   background: inherit;
   position: absolute;
   width: 100%;
   left: 0px;
   top: 50px;
   z-index: 1;
-  padding: 10px 15px;
+  padding: 25px 0px 10px 0px;
   box-sizing: border-box;
   border: inherit;
+  border-top: 0px;
   border-radius: 0 0 14px 14px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      border: 1px solid ${props.theme.colors.gray[400]};
+      background: ${props.theme.colors.gray[100]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      border: 1px solid ${props.theme.colors.gray[300]};
+      background: ${props.theme.colors.gray[500]};
+    `}
+`
+export const DropdownContent = styled.div`
+  min-height: 80px;
+  padding: 0px 10px;
+  max-height: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px 0px;
+  overflow-y: auto;
+  & > ${Option} {
+    transition: 0.25s all;
+    border-radius: 14px;
+    padding: 5px;
+    box-sizing: border-box;
+    background: inherit;
+    ${(props) =>
+      props.theme.name === 'light' &&
+      css`
+        background: ${props.theme.colors.gray[100]};
+        &:hover {
+          background: ${props.theme.colors.gray[300]};
+        }
+      `}
+    ${(props) =>
+      props.theme.name === 'dark' &&
+      css`
+        border: 1px solid ${props.theme.colors.gray[500]};
+        background: ${props.theme.colors.gray[500]};
+        &:hover {
+          border: 1px solid ${props.theme.colors.gray[400]};
+          background: ${props.theme.colors.gray[400]};
+        }
+      `};
+  }
 `

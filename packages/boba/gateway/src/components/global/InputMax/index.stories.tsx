@@ -8,17 +8,19 @@ export default {
   component: MaxInput,
 } as Meta
 
-const Template: StoryFn<MaxInputProps> = (args: any) => <MaxInput {...args} />
+const Template: StoryFn<MaxInputProps> = (args: MaxInputProps) => (
+  <MaxInput {...args} />
+)
 
 export const Default = Template.bind({})
 Default.args = {
   max: 100,
-  onValueChange: (value) => console.log(`New value: ${value}`),
+  onValueChange: (value: number) => console.log(`New value: ${value}`),
 }
 
 export const WithInitialValue = Template.bind({})
 WithInitialValue.args = {
   max: 100,
-  onValueChange: (value) => console.log(`New value: ${value}`),
+  onValueChange: (value: number) => console.log(`New value: ${value}`),
   initialValue: 50,
 }

@@ -15,7 +15,6 @@ export const ButtonContainer = styled.button<ButtonTypes>`
   background: ${(props) => props.theme.colors.green[300]};
   padding: 16px 25px;
 
-  font-family: 'Montserrat';
   font-weight: 700;
   font-size: ${(props) => props.theme.text.heading1};
 
@@ -44,8 +43,8 @@ export const ButtonContainer = styled.button<ButtonTypes>`
     }
   `}
     ${(props) =>
-      props.small &&
-      `
+    props.small &&
+    `
     font-size: ${props.theme.text.body2};
     border-radius: 33px;
     min-width:auto;

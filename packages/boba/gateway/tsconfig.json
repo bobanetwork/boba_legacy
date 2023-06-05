@@ -21,6 +21,9 @@
     "baseUrl": "src",
     "types": ["jest", "testing-library__jest-dom"],
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": [
     "src"
   ]
