@@ -6,7 +6,6 @@ import Bridge from "containers/bridge/Bridge";
 import Home from "containers/home/Home";
 import Projects from 'containers/ecosystem/Projects';
 import Ecosystem from 'containers/ecosystem/Ecosystem';
-import Wallet from 'containers/wallet/Wallet';
 import OldDao from 'containers/dao/OldDao';
 import History from 'containers/history/History';
 import EarnWrapper from 'containers/earn/EarnWrapper';
@@ -45,11 +44,6 @@ export const ROUTE_LIST = [
         path: ROUTES_PATH.BRIDGE,
         element: <Bridge />,
         key: 'Bridge',
-      },
-      {
-        path: ROUTES_PATH.WALLET,
-        element: <Wallet />,
-        key: 'Wallet',
       },
       {
         path: ROUTES_PATH.HISTORY,
