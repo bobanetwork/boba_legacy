@@ -22,12 +22,13 @@ import {
   Container,
   Box,
   useMediaQuery,
-  Grid
+  Grid,
+  useTheme
 } from '@mui/material'
 
 import * as S from "./Modal.styles"
 import * as LayoutS from 'components/common/common.styles';
-import { useTheme } from '@emotion/react'
+
 import { HighlightOffOutlined } from '@mui/icons-material';
 import CloseIcon from 'components/icons/CloseIcon';
 

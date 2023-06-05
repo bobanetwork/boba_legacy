@@ -1,6 +1,6 @@
 
-import { useTheme } from '@emotion/react'
-import { useMediaQuery } from '@mui/material'
+
+import { useMediaQuery,useTheme } from '@mui/material'
 import React from 'react'
 import Monster from './Monster'
 
