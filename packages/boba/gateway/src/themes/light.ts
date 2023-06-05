@@ -9,6 +9,12 @@ const light = {
   screen,
   warning: 'yellow',
   border: 'solid 1px rgba(0, 0, 0, 0.12)',
+  colors: {
+    danger: 'red',
+    success: 'green',
+    info: 'blue',
+    warning: 'yellow',
+  },
   bg: {
     glassy: 'rgba(0,0,0, 0.09)',
     secondary: 'rgba(0, 0, 0, 0.08)',
