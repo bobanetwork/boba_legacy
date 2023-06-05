@@ -42,7 +42,7 @@
     "ethers": "^5.7.0",
     "hardhat": "^2.12.5",
     "nyc": "^15.1.0",
-    "typedoc": "^0.22.13",
+    "typedoc": "^0.24.7",
     "mocha": "^10.0.0",
     "chai": "^4.3.4",
     "@babel/eslint-parser": "^7.18.2",
