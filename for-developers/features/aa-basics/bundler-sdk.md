@@ -85,6 +85,29 @@ const op = await walletAPI.createSignedUserOp({
 })
 ```
 
+#### PaymasterAPI
+Add `paymasterAndData` to UserOp.
+
+```ts
+  accountAPI.paymasterAPI = new PaymasterAPI({
+    paymasterAndData: null // your value
+})
+```
+
+Exemplary `paymasterAndData` value:
+
+```ts
+paymasterAndData = hexConcat([
+      BobaDepositPaymaster.address,
+      hexZeroPad(L2BOBAToken.address, 20),
+    ])
+```
+
+After adding the PaymasterAPI you can sign your user operation as usual.
+
+##### PaymasterAPI:getPaymasterAndData(Partial\<UserOperationStruct\>)
+Returns `paymasterAndData` of given UserOp. Returns `0x` if empty.
+
 
 #### getAccountInitCode()
 Return the value to put into the "initCode" field, if the contract is not yet deployed.
