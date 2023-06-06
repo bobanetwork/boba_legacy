@@ -56,7 +56,17 @@ jobs:
           current_version: ${{ steps.get-latest-tag.outputs.sdk_current_version }}
           level: patch
 
-      - name: Increment patch version
+      - name: Increment patch version - AA
+        if: steps.version-updated.outputs.has-updated == 'true'
+        working-directory: ./packages/boba/account-abstraction
+        run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Increment patch version - BundlerUtils
+        if: steps.version-updated.outputs.has-updated == 'true'
+        working-directory: ./packages/boba/bundler_utils
+        run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Increment patch version - BundlerSDK
         if: steps.version-updated.outputs.has-updated == 'true'
         working-directory: ./packages/boba/bundler_sdk
         run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver.outputs.new_version }}
