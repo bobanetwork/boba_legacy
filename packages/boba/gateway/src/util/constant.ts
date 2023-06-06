@@ -84,14 +84,12 @@ export const ECOSYSTEM_CATEGORY: string[] = [
 type RoutesPathType = {
   BRIDGE: string
   ECOSYSTEM: string
-  WALLET: string
   HISTORY: string
   EARN: string
   LOCK: string
   STAKE: string
   HELP: string
   BOBASCOPE: string
-  MONSTER: string
   VOTE_DAO: string
   DAO: string
   DEV_TOOLS: string
@@ -100,14 +98,12 @@ type RoutesPathType = {
 export const ROUTES_PATH: RoutesPathType = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
-  WALLET: '/wallet',
   HISTORY: '/history',
   EARN: '/earn',
   LOCK: '/lock',
   STAKE: '/stake',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
-  MONSTER: '/monster',
   VOTE_DAO: '/votedao',
   DAO: '/DAO',
   DEV_TOOLS: '/devtools',
