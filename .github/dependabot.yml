@@ -14,6 +14,7 @@ updates:
       - "wsdt"
       - "Boyuan-Chen"
       - "InoMurko"
+    rebase-strategy: "disabled"
   - package-ecosystem: "docker" # See documentation for possible values
     directory: "/ops" # Location of package manifests
     schedule:
