@@ -64,6 +64,7 @@ For **account abstraction** contract addresses, please refer the list [here](htt
 | Gateway       | [https://gateway.boba.network](https://gateway.boba.network)                                     |
 | Blockexplorer | [https://blockexplorer.testnet.bnb.boba.network](https://blockexplorer.testnet.bnb.boba.network) |
 | Websocket     | [wss://wss.testnet.bnb.boba.network](wss://wss.testnet.bnb.boba.network)                         |
+| AA bundler    | [https://bundler.testnet.bnb.boba.network](https://bundler.testnet.bnb.boba.network)             |
 | Gas Cap       | 50000000                                                                                         |
 
 <figure><img src="../../.gitbook/assets/Artboard 2 (14) (2).png" alt=""><figcaption></figcaption></figure>

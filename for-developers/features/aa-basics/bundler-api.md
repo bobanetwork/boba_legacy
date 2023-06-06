@@ -1,6 +1,12 @@
 ---
 description: Learn more about the Bundler API for Account Abstraction on Boba Network
 ---
+# Bundler Endpoints
+
+|               |                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| ChainID       | 9728                                                                                             |
+| AA bundler    | [https://bundler.testnet.bnb.boba.network](https://bundler.testnet.bnb.boba.network)             |
 
 # Bundler API
 This section lists the Ethereum JSON-RPC API endpoints for a basic EIP-4337 "bundler".
