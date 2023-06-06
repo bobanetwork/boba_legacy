@@ -5,7 +5,7 @@ import {
   IEntryPoint__factory,
   IPaymaster__factory,
   SenderCreator__factory,
-} from '@boba/accountabstraction'
+} from '@bobanetwork/accountabstraction'
 import { hexZeroPad, Interface, keccak256 } from 'ethers/lib/utils'
 import { BundlerCollectorReturn } from './BundlerCollectorTracer'
 import { mapOf, requireCond } from './utils'

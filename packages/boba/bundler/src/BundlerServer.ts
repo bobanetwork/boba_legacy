@@ -9,7 +9,7 @@ import {
   AddressZero,
   deepHexlify,
   erc4337RuntimeVersion,
-} from '@boba/bundler_utils'
+} from '@bobanetwork/bundler_utils'
 
 import { BundlerConfig } from './BundlerConfig'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
@@ -19,7 +19,7 @@ import {
   EntryPointWrapper__factory,
   EntryPointWrapper,
   UserOperationStruct,
-} from '@boba/accountabstraction'
+} from '@bobanetwork/accountabstraction'
 import { DebugMethodHandler } from './DebugMethodHandler'
 
 import Debug from 'debug'
