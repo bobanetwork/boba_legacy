@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
       - name: Run
         run: |
           LAST_COMMIT=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/pulls/${{ github.event.inputs.last_release_pr }}/commits | jq '.[-1].commit.message' | grep -o -E -e "[0-9a-f]{40}")
