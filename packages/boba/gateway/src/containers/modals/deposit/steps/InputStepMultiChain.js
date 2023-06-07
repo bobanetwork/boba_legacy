@@ -15,8 +15,8 @@ import {
 } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { Box, Typography, useMediaQuery, useTheme} from '@mui/material'
+
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'

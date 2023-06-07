@@ -15,12 +15,10 @@ limitations under the License. */
 
 import React, { useState } from 'react'
 
-import { Typography, Fade, useMediaQuery } from '@mui/material'
+import { Typography, Fade, useMediaQuery, useTheme } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import * as S from './Transaction.styles'
-
-import { useTheme } from '@emotion/react'
 
 import truncate from 'truncate-middle'
 import networkService from 'services/networkService'
