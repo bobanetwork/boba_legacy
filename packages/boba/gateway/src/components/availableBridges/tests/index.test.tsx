@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-
-import Theme from 'themes'
+import CustomThemeProvider from 'themes'
 import { AvailableBridges } from '..'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 
@@ -27,9 +26,9 @@ const renderAvailableBridges = ({
         ...options,
       })}
     >
-      <Theme>
+      <CustomThemeProvider>
         <AvailableBridges {...{ token, walletAddress }} />
-      </Theme>
+      </CustomThemeProvider>
     </Provider>
   )
 }

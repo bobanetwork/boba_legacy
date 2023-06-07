@@ -5,12 +5,12 @@ import {
   EntryPoint__factory,
   EntryPointWrapper__factory,
   UserOperationStruct,
-} from '@boba/accountabstraction'
+} from '@bobanetwork/accountabstraction'
 
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp'
 import { resolveProperties } from 'ethers/lib/utils'
 import { PaymasterAPI } from './PaymasterAPI'
-import { getUserOpHash, NotPromise, packUserOp } from '@boba/bundler_utils'
+import { getUserOpHash, NotPromise, packUserOp } from '@bobanetwork/bundler_utils'
 import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas'
 
 export interface BaseApiParams {

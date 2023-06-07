@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { intersection } from 'util/lodash';
-
-import { selectMonster, selectActiveNetwork } from 'selectors'
+import { selectActiveNetwork } from 'selectors'
 import { MENU_LIST } from './menu.config'
 import { useLocation } from 'react-router-dom'
 
@@ -16,30 +15,16 @@ const MenuItems = ({
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const menuList = MENU_LIST;
 
-  const monsterNumber = useSelector(selectMonster())
   const network = useSelector(selectActiveNetwork())
-
   const [list, setList] = useState([])
   const location = useLocation()
 
   useEffect(() => {
-    let _menuList = menuList
 
-    if (monsterNumber > 0) {
-      _menuList = [
-        ...menuList,
-        {
-          key: 'Monster',
-          icon: 'MonsterIcon',
-          title: 'MonsterVerse',
-          url: '/monster',
-        },
-      ]
-    }
-
-    let fMenu = _menuList
+    let fMenu = menuList
       .filter(
         (m) =>
           intersection([m.key], PAGES_BY_NETWORK[network.toLowerCase()]).length
@@ -47,7 +32,7 @@ const MenuItems = ({
       .filter((m) => !m.disable)
 
     setList(fMenu)
-  }, [network, menuList, monsterNumber])
+  }, [network, menuList])
 
   return (
     <S.Nav>

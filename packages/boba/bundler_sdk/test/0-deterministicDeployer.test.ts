@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { SampleRecipient__factory } from '@boba/bundler_utils/dist/src/types'
+import { SampleRecipient__factory } from '@bobanetwork/bundler_utils/dist/src/types'
 import { ethers } from 'hardhat'
 import { hexValue } from 'ethers/lib/utils'
 import { DeterministicDeployer } from '../src/DeterministicDeployer'

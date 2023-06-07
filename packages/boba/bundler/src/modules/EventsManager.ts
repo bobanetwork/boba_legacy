@@ -2,11 +2,11 @@ import {
   AccountDeployedEvent,
   UserOperationEventEvent,
   SignatureAggregatorChangedEvent,
-} from '@boba/accountabstraction/dist/types/EntryPoint'
+} from '@bobanetwork/accountabstraction/dist/types/EntryPoint'
 import { ReputationManager } from './ReputationManager'
-import { EntryPoint } from '@boba/accountabstraction'
+import { EntryPoint } from '@bobanetwork/accountabstraction'
 import Debug from 'debug'
-import { TypedEvent } from '@boba/accountabstraction/dist/types/common'
+import { TypedEvent } from '@bobanetwork/accountabstraction/dist/types/common'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { MempoolManager } from './MempoolManager'
 

@@ -10,16 +10,16 @@ import {
   EntryPointWrapper__factory,
   SimpleAccountFactory__factory,
   UserOperationStruct
-} from '@boba/accountabstraction'
+} from '@bobanetwork/accountabstraction'
 
 import { Signer, Wallet } from 'ethers'
 import { DeterministicDeployer, SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
-import { postExecutionDump } from '@boba/bundler_utils/dist/postExecCheck'
+import { postExecutionDump } from '@bobanetwork/bundler_utils/dist/postExecCheck'
 import {
   SampleRecipient, TestRulesAccount, TestRulesAccount__factory
 } from '../dist/src/types'
-import { resolveHexlify } from '@boba/bundler_utils'
-import { UserOperationEventEvent } from '@boba/accountabstraction'
+import { resolveHexlify } from '@bobanetwork/bundler_utils'
+import { UserOperationEventEvent } from '@bobanetwork/accountabstraction'
 import { UserOperationReceipt } from '../src/RpcTypes'
 import { ExecutionManager } from '../src/modules/ExecutionManager'
 import { BundlerReputationParams, ReputationManager } from '../src/modules/ReputationManager'

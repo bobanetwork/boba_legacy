@@ -6,16 +6,21 @@ import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
-const TableHeaderContainer = styled(Row)`
-  display: flex;
-  padding: 20px;
-  border-radius: 6px 6px 0px 0px;
-  align-items: center;
-  justify-content: space-between;
-  background: ${(props) => props.theme.colors.gray[50]};
-`
+const TableHeaderContainer = styled(Row)(({ theme }) => ({
+  padding: '20px',
+  borderTopLeftRadius: '6px',
+  borderTopRightRadius: '6px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  // @ts-ignore
+  background: theme.palette.background.secondary,
+  [theme.breakpoints.down('md')]: {
+    marginBottom: '5px',
+  },
+}));
 
 const TableContentContainer = styled(Row)`
   justify-content: space-between;
@@ -29,17 +34,17 @@ const TableRow = styled(Row)`
     margin-right: 0px;
   }
 `
-type TableHeaderOptionType = {
-  name: string
-  tooltip: string
-  width: number
-}
+// type TableHeaderOptionType = {
+//   name: string
+//   tooltip: string
+//   width: number
+// }
 
-type TableHeaderType = {
-  options: TableHeaderOptionType[]
-}
+// type TableHeaderType = {
+//   options: TableHeaderOptionType[]
+// }
 
-export const TableHeader = ({ options }: TableHeaderType) => {
+export const TableHeader = ({ options }) => {
   return (
     <TableHeaderContainer>
       {options?.map((option) => {
@@ -61,18 +66,18 @@ export const TableHeader = ({ options }: TableHeaderType) => {
   )
 }
 
-type TableContentOptionType = {
-  content: any
-  width: number
-}
+// type TableContentOptionType = {
+//   content: any
+//   width: number
+// }
 
-type TableContentType = {
-  options: TableContentOptionType[]
-  mobileOptions?: number[]
-}
+// type TableContentType = {
+//   options: TableContentOptionType[]
+//   mobileOptions?: number[]
+// }
 
-export const TableContent = ({ options, mobileOptions }: TableContentType) => {
-  const theme = useTheme() as any
+export const TableContent = ({ options, mobileOptions }) => {
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const currentOptions =
     isMobile && mobileOptions ? mobileOptions.map((i) => options[i]) : options

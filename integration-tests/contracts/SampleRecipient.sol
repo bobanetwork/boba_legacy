@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@boba/accountabstraction/contracts/samples/SimpleAccount.sol";
+import "@bobanetwork/accountabstraction/contracts/samples/SimpleAccount.sol";
 
 contract SampleRecipient {
 

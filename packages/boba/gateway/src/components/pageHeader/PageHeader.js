@@ -43,20 +43,16 @@ const useStyles = makeStyles({
   },
 })
 
-type PageHeaderType = {
-  maintenance: boolean
-}
-
-const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
+const PageHeader = ({ maintenance }) => {
   const classes = useStyles()
-  const [open, setOpen] = useState<boolean>(false)
-  const [walletOpen, setWalletOpen] = useState<boolean>(false)
-  const [feeOpen, setFeeOpen] = useState<boolean>(false)
+  const [open, setOpen] = useState(false)
+  const [walletOpen, setWalletOpen] = useState(false)
+  const [feeOpen, setFeeOpen] = useState(false)
 
   const theme = useTheme()
-  const accountEnabled: boolean = useSelector(selectAccountEnabled())
-  const layer: 'L1' | 'L2' = useSelector(selectLayer())
-  const monsterNumber: number = useSelector(selectMonster())
+  const accountEnabled = useSelector(selectAccountEnabled())
+  const layer = useSelector(selectLayer())
+  const monsterNumber = useSelector(selectMonster())
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const Logo = monsterNumber > 0 ? BobaLogoM : BobaLogo

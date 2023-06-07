@@ -3,7 +3,7 @@ name: release-please
 on:
   push:
     branches:
-      - develop
+      - master
 jobs:
   release-please:
     permissions: write-all
@@ -11,5 +11,5 @@ jobs:
     steps:
       - uses: google-github-actions/release-please-action@v3
         with:
-          release-type: terraform-module # Multiple release types are supported
+          release-type: node # Multiple release types are supported
           default-branch: master

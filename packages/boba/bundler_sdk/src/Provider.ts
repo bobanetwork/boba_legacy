@@ -2,7 +2,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from 'ethers'
 
-import { EntryPoint__factory, SimpleAccountFactory__factory } from '@boba/accountabstraction'
+import { EntryPoint__factory, SimpleAccountFactory__factory } from '@bobanetwork/accountabstraction'
 
 import { ClientConfig } from './ClientConfig'
 import { SimpleAccountAPI } from './SimpleAccountAPI'

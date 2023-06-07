@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 // TODO: get hardhat types from '@account-abstraction' package directly
 // only to import the file in hardhat compilation
-import "@boba/accountabstraction/contracts/samples/SimpleAccount.sol";
+import "@bobanetwork/accountabstraction/contracts/samples/SimpleAccount.sol";
 
 contract SampleRecipient {
 

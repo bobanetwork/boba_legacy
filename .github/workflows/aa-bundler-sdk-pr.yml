@@ -1,7 +1,7 @@
 name: Will trigger version bump of AA-Bundler for NPM
 
 on:
-  push:
+  pull_request:
     branches:
       - develop
     paths:
@@ -39,53 +39,4 @@ jobs:
 
               The package that is going to be updated is `@bobanetwork/bundler_sdk`.
 
-      - uses: MontyD/package-json-updated-action@1.0.1
-        id: version-updated
-        with:
-            path: packages/boba/bundler_sdk/package.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - id: get-latest-tag
-        working-directory: ./packages/boba/bundler_sdk
-        run: echo "sdk_current_version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
-
-      - uses: actions-ecosystem/action-bump-semver@v1
-        id: bump-semver
-        with:
-          current_version: ${{ steps.get-latest-tag.outputs.sdk_current_version }}
-          level: patch
-
-      - name: Increment patch version
-        if: steps.version-updated.outputs.has-updated == 'true'
-        working-directory: ./packages/boba/bundler_sdk
-        run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver.outputs.new_version }}
-
-      - name: Create Pull Request
-        if: steps.version-updated.outputs.has-updated == 'true'
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          base: develop
-          token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          commit-message: Update SDK version
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          signoff: false
-          branch: automated/bump_bundler_sdk_version
-          delete-branch: true
-          title: 'Bump Bundler SDK version'
-          body: |
-            Bump Bundler SDK version
-          labels: |
-            automated pr
-            bundler
-            bundler sdk
-            account-abstraction
-          reviewers: |
-            souradeep-das
-            wsdt
-            Boyuan-Chen
-            inomurko
-          draft: false
 

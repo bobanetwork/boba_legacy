@@ -16,8 +16,9 @@ limitations under the License. */
 import React from 'react'
 import { NavigateNext, NavigateBefore } from '@mui/icons-material'
 
+import { useTheme } from '@mui/material'
+
 import * as S from './Pager.styles'
-import { useTheme } from '@emotion/react'
 
 interface PagerProps {
   currentPage: number
