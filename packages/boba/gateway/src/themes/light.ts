@@ -14,18 +14,6 @@ const light = {
     success: 'green',
     info: 'blue',
     warning: 'yellow',
-  },
-  bg: {
-    glassy: 'rgba(0,0,0, 0.09)',
-    secondary: 'rgba(0, 0, 0, 0.08)',
-  },
-
-  //new code
-  ...typography,
-
-  defaultColorText: '#22221E',
-  background: '#FFFFFF',
-  colors: {
     gray: {
       50: 'rgba(253, 255, 248, 0.9)',
       100: '#F0F1EA',
@@ -74,6 +62,17 @@ const light = {
       600: '#0F172C',
     },
   },
+  boxShadow: '2px 2px 30px rgba(0, 0, 0, 0.15)',
+  bg: {
+    glassy: 'rgba(0,0,0, 0.09)',
+    secondary: 'rgba(0, 0, 0, 0.08)',
+  },
+
+  //new code
+  ...typography,
+
+  defaultColorText: '#22221E',
+  background: '#FFFFFF',
 }
 
 export default light

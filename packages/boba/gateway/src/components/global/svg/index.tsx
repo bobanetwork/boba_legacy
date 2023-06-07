@@ -6,11 +6,12 @@ export interface SvgProps {
   fill: string
 }
 
-export const Svg = ({ src, fill }: SvgProps) => (
+export const Svg: React.FC<SvgProps> = ({ src, fill }) => (
+  // @ts-ignore
   <ReactSVG
     src={src}
-    beforeInjection={(svg) => {
-      svg.setAttribute('style', `fill: ${fill}`)
+    beforeInjection={(svg: SVGElement) => {
+      svg.setAttribute('fill', fill)
     }}
   />
 )

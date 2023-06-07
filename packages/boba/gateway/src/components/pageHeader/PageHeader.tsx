@@ -1,9 +1,15 @@
 import React, { useState } from 'react'
-import * as S from './PageHeader.styles'
 import BobaLogo from '../icons/BobaLogo'
 import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
 import { useSelector } from 'react-redux'
-
+import {
+  HeaderWrapper,
+  StyleDrawer,
+  HeaderActionButton,
+  DrawerHeader,
+  WrapperCloseIcon,
+  HeaderDivider,
+} from './PageHeader.styles'
 import {
   Box,
   Container,
@@ -57,10 +63,10 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
 
   if (maintenance) {
     return (
-      <S.HeaderWrapper>
+      <HeaderWrapper>
         <Logo style={{ maxWidth: '140px', paddingTop: '20px' }} />
         <ThemeSwitcher />
-      </S.HeaderWrapper>
+      </HeaderWrapper>
     )
   }
 
@@ -68,9 +74,9 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
     <>
       {isMobile ? (
         <Container>
-          <S.HeaderWrapper>
+          <HeaderWrapper>
             <Logo style={{ maxWidth: '100px', paddingLeft: '20px' }} />
-            <S.HeaderActionButton>
+            <HeaderActionButton>
               <Box
                 onClick={() => setFeeOpen(!feeOpen)}
                 sx={{ cursor: 'pointer' }}
@@ -88,36 +94,36 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
               <Box onClick={() => setOpen(!open)} sx={{ cursor: 'pointer' }}>
                 <NavIcon />
               </Box>
-            </S.HeaderActionButton>
+            </HeaderActionButton>
             <Drawer
               open={open}
               onClose={() => setOpen(false)}
               classes={{ paper: classes.root }}
             >
-              <S.StyleDrawer theme={theme}>
-                <S.DrawerHeader>
-                  <S.WrapperCloseIcon>
+              <StyleDrawer theme={theme}>
+                <DrawerHeader>
+                  <WrapperCloseIcon>
                     <Typography component="p" variant="h1" fontWeight={500}>
                       Menu
                     </Typography>
                     <IconButton size="small" onClick={() => setOpen(false)}>
                       <CloseIcon />
                     </IconButton>
-                  </S.WrapperCloseIcon>
-                </S.DrawerHeader>
-                <S.HeaderDivider />
+                  </WrapperCloseIcon>
+                </DrawerHeader>
+                <HeaderDivider />
                 <MenuItems setOpen={setOpen} />
                 <ThemeSwitcher />
-              </S.StyleDrawer>
+              </StyleDrawer>
             </Drawer>
             <Drawer
               open={walletOpen}
               onClose={() => setWalletOpen(false)}
               classes={{ paper: classes.root }}
             >
-              <S.StyleDrawer theme={theme}>
-                <S.DrawerHeader>
-                  <S.WrapperCloseIcon>
+              <StyleDrawer theme={theme}>
+                <DrawerHeader>
+                  <WrapperCloseIcon>
                     <Typography component="p" variant="h2" fontWeight={500}>
                       Connect wallet
                     </Typography>
@@ -127,36 +133,36 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
                     >
                       <CloseIcon />
                     </IconButton>
-                  </S.WrapperCloseIcon>
-                </S.DrawerHeader>
-                <S.HeaderDivider />
+                  </WrapperCloseIcon>
+                </DrawerHeader>
+                <HeaderDivider />
                 <NetworkSwitcher />
-              </S.StyleDrawer>
+              </StyleDrawer>
             </Drawer>
             <Drawer
               open={feeOpen}
               onClose={() => setFeeOpen(false)}
               classes={{ paper: classes.root }}
             >
-              <S.StyleDrawer theme={theme}>
-                <S.DrawerHeader>
-                  <S.WrapperCloseIcon>
+              <StyleDrawer theme={theme}>
+                <DrawerHeader>
+                  <WrapperCloseIcon>
                     <Typography component="p" variant="h1" fontWeight={500}>
                       Select Fee
                     </Typography>
                     <IconButton size="small" onClick={() => setFeeOpen(false)}>
                       <CloseIcon />
                     </IconButton>
-                  </S.WrapperCloseIcon>
-                </S.DrawerHeader>
-                <S.HeaderDivider />
+                  </WrapperCloseIcon>
+                </DrawerHeader>
+                <HeaderDivider />
                 {layer === LAYER.L2 ? <FeeSwitcher /> : null}
-              </S.StyleDrawer>
+              </StyleDrawer>
             </Drawer>
-          </S.HeaderWrapper>
+          </HeaderWrapper>
         </Container>
       ) : (
-        <S.HeaderWrapper>
+        <HeaderWrapper>
           <Logo
             style={{ width: '140px', paddingTop: '', paddingLeft: '15px' }}
           />
@@ -170,7 +176,7 @@ const PageHeader = ({ maintenance }: PageHeaderType): JSX.Element => {
             </>
           ) : null}
           <ThemeSwitcher />
-        </S.HeaderWrapper>
+        </HeaderWrapper>
       )}
     </>
   )

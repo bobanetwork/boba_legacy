@@ -12,16 +12,6 @@ const dark = {
     success: 'green',
     info: 'blue',
     warning: 'yellow',
-  },
-  bg: {
-    glassy: 'rgba(255, 255, 255, 0.04)',
-    secondary: 'rgba(255, 255, 255, 0.14)',
-  },
-  ...typography,
-  //new code
-  background: '#191919',
-  defaultColorText: '#FFFFFF',
-  colors: {
     gray: {
       50: '#EEEEEE',
       100: '#A8A8A8',
@@ -70,6 +60,15 @@ const dark = {
       600: '#0F172C',
     },
   },
+  boxShadow: 'none',
+  bg: {
+    glassy: 'rgba(255, 255, 255, 0.04)',
+    secondary: 'rgba(255, 255, 255, 0.14)',
+  },
+  ...typography,
+  //new code
+  background: '#191919',
+  defaultColorText: '#FFFFFF',
 }
 
 export default dark

@@ -6,21 +6,16 @@ import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import { useMediaQuery } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { styled } from '@mui/system'
+import styled from 'styled-components'
 
-const TableHeaderContainer = styled(Row)(({ theme }) => ({
-  padding: '20px',
-  borderTopLeftRadius: '6px',
-  borderTopRightRadius: '6px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  // @ts-ignore
-  background: theme.palette.background.secondary,
-  [theme.breakpoints.down('md')]: {
-    marginBottom: '5px',
-  },
-}))
+const TableHeaderContainer = styled(Row)`
+  display: flex;
+  padding: 20px;
+  border-radius: 6px 6px 0px 0px;
+  align-items: center;
+  justify-content: space-between;
+  background: ${(props) => props.theme.colors.gray[50]};
+`
 
 const TableContentContainer = styled(Row)`
   justify-content: space-between;
