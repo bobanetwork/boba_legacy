@@ -1,4 +1,4 @@
-name: Will trigger version bump of AA-Bundler for NPM
+name: Bump of AA-Bundler for NPM
 
 on:
   push:
