@@ -6,12 +6,10 @@ import Bridge from "containers/bridge/Bridge";
 import Home from "containers/home/Home";
 import Projects from 'containers/ecosystem/Projects';
 import Ecosystem from 'containers/ecosystem/Ecosystem';
-import Wallet from 'containers/wallet/Wallet';
 import OldDao from 'containers/dao/OldDao';
 import History from 'containers/history/History';
 import EarnWrapper from 'containers/earn/EarnWrapper';
 import SaveWrapper from 'containers/save/SaveWrapper';
-import MonsterWrapper from 'containers/monster/MonsterWrapper';
 import { Navigate } from 'react-router-dom';
 import Lock from 'containers/veboba/Lock';
 import Vote from 'containers/VoteAndDao/Vote/Vote';
@@ -47,11 +45,6 @@ export const ROUTE_LIST = [
         key: 'Bridge',
       },
       {
-        path: ROUTES_PATH.WALLET,
-        element: <Wallet />,
-        key: 'Wallet',
-      },
-      {
         path: ROUTES_PATH.HISTORY,
         element: <History />,
         key: 'History',
@@ -82,11 +75,6 @@ export const ROUTE_LIST = [
         element: <Vote />,
         key: 'DAO',
         disable: !!Number(DISABLE_VE_DAO),
-      },
-      {
-        path: ROUTES_PATH.MONSTER,
-        element: <MonsterWrapper />,
-        key: 'Monster',
       },
       {
         path: ROUTES_PATH.ECOSYSTEM,
