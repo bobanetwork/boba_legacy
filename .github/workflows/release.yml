@@ -29,12 +29,14 @@ jobs:
           git rev-list --reverse --ancestry-path $LAST_COMMIT..$TIP_OF_DEVELOP | sed 's/^/git cherry-pick -x /' > commits.txt
           echo $(cat commits.txt)
           while read -r line; do eval $line; done < commits.txt
-          while read -r line;
-          do
-            data=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/commits/$line | jq .author.login,.commit.message,.html_url);
-            release_content="$release_content\n\n$data"
-          done < commits.txt
-          echo $release_content
+
+          # while read -r line;
+          # do
+          #   data=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/commits/$line | jq .author.login,.commit.message,.html_url);
+          #   release_content="$release_content\n\n$data"
+          # done < commits.txt
+          # echo $release_content
+
           #while read -r line; do
           #  data=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/commits/$line | jq .author.login,.commit.message,.html_url);
           #  release_content="$release_content\n\n$data"
