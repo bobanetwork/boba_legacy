@@ -20,8 +20,8 @@ import { transferNFT } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
 import { selectLoading } from 'selectors'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
+
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'

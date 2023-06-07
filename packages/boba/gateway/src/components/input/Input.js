@@ -23,7 +23,8 @@ import { selectCustomStyles } from './Select.styles'
 import Button from 'components/button/Button'
 
 import { Box, Typography } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { useTheme } from "@mui/material";
+
 import { getCoinImage } from 'util/coinImage'
 
 function Input({

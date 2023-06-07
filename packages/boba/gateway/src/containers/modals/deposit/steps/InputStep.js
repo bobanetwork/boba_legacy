@@ -12,8 +12,8 @@ import Input from 'components/input/Input'
 import { selectLoading, selectLookupPrice, selectActiveNetworkName } from 'selectors'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
-import { useTheme } from '@emotion/react'
-import { Box, Checkbox, FormControlLabel, Typography, useMediaQuery } from '@mui/material'
+
+import { Box, Checkbox, FormControlLabel, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'

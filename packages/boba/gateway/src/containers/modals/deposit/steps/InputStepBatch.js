@@ -15,9 +15,9 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useTheme } from '@emotion/react'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
+
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
 
 import { depositL1LPBatch, approveFastDepositBatch, fetchBalances } from 'actions/networkAction'
 import { utils } from 'ethers'
@@ -31,8 +31,8 @@ import { CounterButton } from 'components';
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-import { 
-  selectLoading, 
+import {
+  selectLoading,
   selectSignatureStatus_depositLP,
   selectlayer1Balance,
   selectFastDepositBatchCost,
