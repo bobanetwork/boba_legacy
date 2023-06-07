@@ -1,9 +1,9 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import { EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
+import { EntryPoint, EntryPointWrapper } from '@bobanetwork/accountabstraction'
 import { ReputationManager } from './ReputationManager'
 import { BigNumber, BigNumberish, BytesLike, ethers } from 'ethers'
 import { requireCond, RpcError } from '../utils'
-import { AddressZero } from '@boba/bundler_utils'
+import { AddressZero } from '@bobanetwork/bundler_utils'
 import { calcPreVerificationGas } from '@bobanetwork/bundler_sdk/dist/calcPreVerificationGas'
 
 import Debug from 'debug'

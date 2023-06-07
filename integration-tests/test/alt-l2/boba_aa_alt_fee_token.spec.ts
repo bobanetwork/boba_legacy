@@ -12,14 +12,14 @@ import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 import { predeploys } from '@eth-optimism/contracts'
 // use local sdk
 import { PaymasterAPI, SimpleAccountAPI } from "@bobanetwork/bundler_sdk";
-import SimpleAccountJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
-import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
+import SimpleAccountJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
+import SimpleAccountFactoryJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
-import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import EntryPointJson from '@bobanetwork/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 
-import GPODepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/GPODepositPaymaster.sol/GPODepositPaymaster.json'
+import GPODepositPaymasterJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/GPODepositPaymaster.sol/GPODepositPaymaster.json'
 
 describe('AA Alt-L1 Alt Token as Paymaster Fee Test\n', async () => {
   let env: OptimismEnv

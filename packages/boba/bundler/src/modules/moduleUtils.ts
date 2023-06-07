@@ -5,7 +5,7 @@ import { BytesLike, ContractFactory } from 'ethers'
 import { hexlify, hexZeroPad, Result } from 'ethers/lib/utils'
 import { SlotMap, StorageMap, UserOperation } from './Types'
 import { Provider } from '@ethersproject/providers'
-import { EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
+import { EntryPoint, EntryPointWrapper } from '@bobanetwork/accountabstraction'
 
 // extract address from initCode or paymasterAndData
 export function getAddr(data?: BytesLike): string | undefined {
