@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import Theme from 'themes'
+import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import BobaBeamAlert from '../BridgeAlert'
@@ -19,9 +19,9 @@ const renderComponent = (state: any) => {
         ...state,
       })}
     >
-      <Theme>
+      <CustomThemeProvider>
         <BobaBeamAlert />
-      </Theme>
+      </CustomThemeProvider>
     </Provider>
   )
 }
