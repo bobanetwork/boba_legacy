@@ -1,0 +1,124 @@
+name: Will trigger version bump of AA-Bundler for NPM
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+     # only on change
+     - 'packages/boba/bundler_sdk/**/*'
+     - 'packages/boba/bundler_utils/**/*'
+     - 'packages/boba/account-abstraction/**/*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            bundler_sdk:
+              - 'packages/boba/account-abstraction/**/*'
+              - 'packages/boba/bundler_sdk/**/*'
+              - 'packages/boba/bundler_utils/**/*'
+
+      - uses: MontyD/package-json-updated-action@1.0.1
+        id: version-updated-aa
+        with:
+          path: packages/boba/account-abstraction/package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: MontyD/package-json-updated-action@1.0.1
+        id: version-updated-utils
+        with:
+          path: packages/boba/bundler_utils/package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: MontyD/package-json-updated-action@1.0.1
+        id: version-updated
+        with:
+            path: packages/boba/bundler_sdk/package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: get-latest-tag-aa
+        working-directory: ./packages/boba/account-abstraction
+        run: echo "aa_current_version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+
+      - id: get-latest-tag-utils
+        working-directory: ./packages/boba/bundler_utils
+        run: echo "utils_current_version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+
+      - id: get-latest-tag
+        working-directory: ./packages/boba/bundler_sdk
+        run: echo "sdk_current_version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver-aa
+        with:
+          current_version: ${{ steps.get-latest-tag-aa.outputs.aa_current_version }}
+          level: patch
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver-utils
+        with:
+          current_version: ${{ steps.get-latest-tag-utils.outputs.utils_current_version }}
+          level: patch
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        with:
+          current_version: ${{ steps.get-latest-tag.outputs.sdk_current_version }}
+          level: patch
+
+      - name: Increment patch version - AA
+        if: steps.version-updated-aa.outputs.has-updated == 'true'
+        working-directory: ./packages/boba/account-abstraction
+        run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver-aa.outputs.new_version }}
+
+      - name: Increment patch version - BundlerUtils
+        if: steps.version-updated-utils.outputs.has-updated == 'true'
+        working-directory: ./packages/boba/bundler_utils
+        run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver-utils.outputs.new_version }}
+
+      - name: Increment patch version - BundlerSDK
+        if: steps.version-updated.outputs.has-updated == 'true'
+        working-directory: ./packages/boba/bundler_sdk
+        run: yarn version patch --no-commit-hooks --no-git-tag-version --new-version ${{ steps.bump-semver.outputs.new_version }}
+
+      - name: Create Pull Request
+        if: steps.version-updated.outputs.has-updated == 'true'
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          base: develop
+          token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          commit-message: Update NPM versions
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: automated/bump_bundler_sdk_version
+          delete-branch: true
+          title: 'Bump Bundler SDK version'
+          body: |
+            Bump Bundler SDK version
+          labels: |
+            automated pr
+            bundler
+            bundler sdk
+            account-abstraction
+          reviewers: |
+            souradeep-das
+            wsdt
+            Boyuan-Chen
+            inomurko
+          draft: false
+
