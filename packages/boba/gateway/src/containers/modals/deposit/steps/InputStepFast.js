@@ -16,9 +16,9 @@ limitations under the License. */
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useTheme } from '@emotion/react'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
+
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
 
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 

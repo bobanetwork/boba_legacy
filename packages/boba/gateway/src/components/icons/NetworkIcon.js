@@ -1,5 +1,5 @@
-import { useTheme } from "@emotion/react";
 import * as React from "react"
+import { useTheme } from "@mui/material";
 
 function NetworkIcon() {
   const theme = useTheme();

@@ -18,8 +18,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { transfer } from 'actions/networkAction'
 import { closeModal, openAlert } from 'actions/uiAction'
-import { 
-  selectLoading, 
+import {
+  selectLoading,
   selectLookupPrice,
   selectBobaFeeChoice,
   selectBobaPriceRatio,
@@ -31,8 +31,8 @@ import { BigNumber, utils } from 'ethers'
 
 import BN from 'bignumber.js'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
+
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
