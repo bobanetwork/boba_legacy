@@ -39,8 +39,8 @@ export const Style = styled.div<StyleProps>`
   justify-content: space-between;
   background: ${(props) =>
     props.transparent
-      ? props.theme.palette.background.modalTransparent
-      : props.theme.palette.background.modal};
+      ? props.theme.colors.gray[50]
+      : props.theme.colors.gray[50]};
   backdrop-filter: ${(props) => (props.transparent ? 'none' : 'blur(66px)')};
   padding: 20px;
   border: 0;
