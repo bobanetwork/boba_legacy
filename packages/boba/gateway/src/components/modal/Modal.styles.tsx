@@ -1,7 +1,6 @@
-import React from 'react'
 import { Box, IconButton } from '@mui/material'
 import styled from 'styled-components'
-import { ModalUnstyled } from '@mui/base'
+import ModalUnstyled from '@mui/base/ModalUnstyled'
 
 export const StyledModal = styled(ModalUnstyled)`
   position: fixed;
