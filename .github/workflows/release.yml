@@ -21,7 +21,7 @@ jobs:
         id: make_rel
         run: |
           git fetch
-          LAST_COMMIT=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/branches/master | jq .commit.sha)
+          LAST_COMMIT=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/branches/master | jq .commit.sha | tr -d '"')
           echo $LAST_COMMIT
           TIP_OF_DEVELOP=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/commits?per_page=1 | jq '.[-1].sha' | tr -d '"')
           echo $TIP_OF_DEVELOP
