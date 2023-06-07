@@ -18,13 +18,13 @@ import { OptimismEnv } from './shared/env'
 import { HDNode, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
 import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
-import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
+import SimpleAccountFactoryJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
-import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import EntryPointJson from '@bobanetwork/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import {
   EntryPoint,
-} from "@boba/accountabstraction/types";
+} from "@bobanetwork/accountabstraction/types";
 
 describe('AA Bundler Test\n', async () => {
   let env: OptimismEnv
