@@ -1,7 +1,7 @@
 import React from 'react'
 import NotificationBanner from 'components/notificationBanner'
 import { render, screen, fireEvent } from '@testing-library/react'
-import Theme from 'themes'
+import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
@@ -24,9 +24,9 @@ const renderBanner = (props: any) => {
         },
       })}
     >
-      <Theme>
+      <CustomThemeProvider>
         <NotificationBanner {...props} />
-      </Theme>
+      </CustomThemeProvider>
     </Provider>
   )
 }
