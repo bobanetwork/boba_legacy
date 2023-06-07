@@ -31,7 +31,7 @@ import { selectTheme } from 'selectors'
 import Notification from 'containers/notification/Notification'
 
 import Router from './routes'
-import Theme from 'themes'
+import CustomThemeProvider from 'themes'
 
 function App() {
   const dispatch = useDispatch()
@@ -71,12 +71,16 @@ function App() {
         border: light
           ? 'solid 1px rgba(3, 19, 19, 0.06)'
           : 'solid 1px rgba(255, 255, 255, 0.06)',
-        gradient: light ? '#1CD6D1' : '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
+        gradient: light
+          ? '#1CD6D1'
+          : '-webkit-linear-gradient(0deg, #CBFE00 15.05%, #1CD6D1 79.66%)',
         text: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       },
       background: {
         default: light ? '#FFFFFF' : '#111315',
-        secondary: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.06)',
+        secondary: light
+          ? 'rgba(3, 19, 19, 0.04)'
+          : 'rgba(255, 255, 255, 0.06)',
         secondaryLight: light
           ? 'rgba(0, 0, 0, 0.08)'
           : 'rgba(255, 255, 255, 0.14)',
@@ -98,7 +102,7 @@ function App() {
       },
     },
     typography: {
-      fontFamily: [ 'MrEavesXL', 'Roboto' ].join(','),
+      fontFamily: ['MrEavesXL', 'Roboto'].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,
@@ -141,8 +145,12 @@ function App() {
             borderRadius: '12px',
             minWidth: '96px',
             boxShadow: 'none',
-            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
-            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backgroundColor: light
+              ? 'rgba(3, 19, 19, 0.04)'
+              : 'rgba(255, 255, 255, 0.04)',
+            border: light
+              ? '1px solid rgba(3, 19, 19, 0.06)'
+              : '1px solid rgba(255, 255, 255, 0.06)',
             backdropFilter: 'blur(50px)',
           },
         },
@@ -156,8 +164,12 @@ function App() {
             borderRadius: '12px',
             minWidth: '96px',
             boxShadow: 'none',
-            backgroundColor: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
-            border: light ? '1px solid rgba(3, 19, 19, 0.06)' : '1px solid rgba(255, 255, 255, 0.06)',
+            backgroundColor: light
+              ? 'rgba(3, 19, 19, 0.04)'
+              : 'rgba(255, 255, 255, 0.04)',
+            border: light
+              ? '1px solid rgba(3, 19, 19, 0.06)'
+              : '1px solid rgba(255, 255, 255, 0.06)',
             backdropFilter: 'blur(50px)',
           },
         },
@@ -291,9 +303,13 @@ function App() {
           {
             props: { variant: 'outlined', color: 'neutral' },
             style: {
-              color: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+              color: light
+                ? 'rgba(0, 0, 0, 0.85)'
+                : 'rgba(255, 255, 255, 0.85)',
               borderWidth: '1.4px',
-              borderColor: light ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+              borderColor: light
+                ? 'rgba(0, 0, 0, 0.85)'
+                : 'rgba(255, 255, 255, 0.85)',
               '&:hover': {
                 opacity: 0.9,
                 borderWidth: '1.4px',
@@ -361,9 +377,9 @@ function App() {
               lineHeight: '0.7em',
               color: light ? 'rgba(0,0,0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
             },
-          }
-        ]
-      }
+          },
+        ],
+      },
     },
   })
 
@@ -374,11 +390,11 @@ function App() {
   useEffect(() => {
     const themeFromLocalStorage = localStorage.getItem('theme')
     dispatch(setTheme(themeFromLocalStorage))
-  }, [ dispatch ])
+  }, [dispatch])
 
   return (
     <ThemeProvider theme={MUItheme}>
-      <Theme>
+      <CustomThemeProvider>
         <CssBaseline />
         <BrowserRouter>
           <Box
@@ -400,7 +416,7 @@ function App() {
             </div>
           </Box>
         </BrowserRouter>
-      </Theme>
+      </CustomThemeProvider>
     </ThemeProvider>
   )
 }
