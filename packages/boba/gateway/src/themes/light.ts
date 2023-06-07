@@ -9,12 +9,6 @@ const light = {
   screen,
   warning: 'yellow',
   border: 'solid 1px rgba(0, 0, 0, 0.12)',
-  colors: {
-    danger: 'red',
-    success: 'green',
-    info: 'blue',
-    warning: 'yellow',
-  },
   bg: {
     glassy: 'rgba(0,0,0, 0.09)',
     secondary: 'rgba(0, 0, 0, 0.08)',
@@ -26,6 +20,10 @@ const light = {
   defaultColorText: '#22221E',
   background: '#FFFFFF',
   colors: {
+    danger: 'red',
+    success: 'green',
+    info: 'blue',
+    warning: 'yellow',
     gray: {
       50: 'rgba(253, 255, 248, 0.9)',
       100: '#F0F1EA',
