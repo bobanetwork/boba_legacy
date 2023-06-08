@@ -9,6 +9,16 @@ const light = {
   screen,
   warning: 'yellow',
   border: 'solid 1px rgba(0, 0, 0, 0.12)',
+  bg: {
+    glassy: 'rgba(0,0,0, 0.09)',
+    secondary: 'rgba(0, 0, 0, 0.08)',
+  },
+
+  //new code
+  ...typography,
+
+  defaultColorText: '#22221E',
+  background: '#FFFFFF',
   colors: {
     danger: 'red',
     success: 'green',
@@ -63,16 +73,6 @@ const light = {
     },
   },
   boxShadow: '2px 2px 30px rgba(0, 0, 0, 0.15)',
-  bg: {
-    glassy: 'rgba(0,0,0, 0.09)',
-    secondary: 'rgba(0, 0, 0, 0.08)',
-  },
-
-  //new code
-  ...typography,
-
-  defaultColorText: '#22221E',
-  background: '#FFFFFF',
 }
 
 export default light
