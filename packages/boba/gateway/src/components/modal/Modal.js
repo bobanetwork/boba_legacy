@@ -23,16 +23,16 @@ import {
   Box,
   useMediaQuery,
   Grid,
-  useTheme
+  useTheme,
 } from '@mui/material'
 
-import * as S from "./Modal.styles"
-import * as LayoutS from 'components/common/common.styles';
+import * as S from './Modal.styles'
+import * as LayoutS from 'components/common/common.styles'
 
-import { HighlightOffOutlined } from '@mui/icons-material';
-import CloseIcon from 'components/icons/CloseIcon';
+import { HighlightOffOutlined } from '@mui/icons-material'
+import CloseIcon from 'components/icons/CloseIcon'
 
-function _Modal({
+const _Modal = ({
   children,
   open,
   onClose,
@@ -42,19 +42,19 @@ function _Modal({
   maxWidth,
   minHeight,
   newStyle = false
-}) {
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <S.StyledModal
-      aria-labelledby='transition-modal-title'
-      aria-describedby='transition-modal-description'
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
       open={open}
       onClose={onClose}
       ismobile={isMobile ? 1 : 0}
       slots={{
-        backdrop:S.Backdrop
+        backdrop: S.Backdrop,
       }}
       disableAutoFocus={true}
     >

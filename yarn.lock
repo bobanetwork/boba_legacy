@@ -2008,7 +2008,6 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-<<<<<<< HEAD
 "@babel/types@~7.21.2":
   version "7.21.5"
   resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.21.5.tgz#18dfbd47c39d3904d5db3d3dc2cc80bedb60e5b6"
@@ -2027,7 +2026,7 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
-=======
+
 "@bobanetwork/accountabstraction@file:packages/boba/account-abstraction":
   version "1.0.1"
   dependencies:
@@ -2046,7 +2045,6 @@
     source-map-support "^0.5.19"
     table "^6.8.0"
     typescript "^4.3.5"
->>>>>>> a2e75a655bfe965ab0d7397928ca4250759dd664
 
 "@bobanetwork/bundler_sdk@file:packages/boba/bundler_sdk":
   version "0.3.1"

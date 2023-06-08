@@ -1,5 +1,5 @@
 import { Box, IconButton } from '@mui/material'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import ModalUnstyled from '@mui/base/ModalUnstyled'
 
 export const StyledModal = styled(ModalUnstyled)`
@@ -13,19 +13,28 @@ export const StyledModal = styled(ModalUnstyled)`
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: ${(props) => (props.ismobile ? 'blur(20px)' : 'none')};
+  backdrop-filter: blur(10px);
+
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: rgba(0, 0, 0, 0.6);
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: rgba(0, 0, 0, 0.4);
+    `}
 `
 
-export const Backdrop = styled('div')`
+export const Backdrop = styled.div`
   z-index: -1;
   position: fixed;
   right: 0;
   bottom: 0;
   top: 0;
   left: 0;
-  background-color: #111315;
-  opacity: 0.8;
-  backdrop-filter: blur(10px);
+
   -webkit-tap-highlight-color: transparent;
 `
 interface StyleProps {
@@ -37,10 +46,30 @@ export const Style = styled.div<StyleProps>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: ${(props) =>
-    props.transparent
-      ? props.theme.colors.gray[50]
-      : props.theme.colors.gray[50]};
+
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[50]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: linear-gradient(
+        151.67deg,
+        rgba(48, 48, 48, 0.7) 7.91%,
+        rgba(48, 48, 48, 0.7) 45.81%,
+        rgba(37, 37, 37, 0.7) 85.18%
+      );
+    `}
+  ${(props) =>
+    props.transparent &&
+    css`
+      background: ${props.theme.palette.background.modalTransparent};
+    `}
+  
+
+
   backdrop-filter: ${(props) => (props.transparent ? 'none' : 'blur(66px)')};
   padding: 20px;
   border: 0;
