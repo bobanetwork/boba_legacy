@@ -1,8 +1,9 @@
 import { isTestEnv } from '@hc/react-app/src/utils/environment.utils'
 
 const addressesTestnet = {
-  HybridComputeHelper: '0xA00f82C6fe87E81ab3501A21c47227e84e3d9C48',
-  HybridComputeHelperFactory: '0x58dDFB37998584991d8b75F87baf0A3428dD095e',
+  // proxy at 0x701E03911e342Ca5Fa0950ce1680Af40e6171BA1
+  HybridComputeHelper: '0xBc8dd915c26F0e8A5416e0850450f2f0614f8617',
+  HybridComputeHelperFactory: '0xFeED2Dc24E3CCd9594B5122318F1b6c037492652',
   BobaToken: '0x4200000000000000000000000000000000000023',
 }
 
