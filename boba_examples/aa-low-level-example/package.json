@@ -1,5 +1,5 @@
 {
-  "name": "@boba/aa-general-example",
+  "name": "@boba/aa-general-example-2",
   "version": "0.1.0",
   "description": "AA example",
   "main": "index.js",
@@ -10,6 +10,7 @@
     "build": "yarn build:contracts",
     "build:contracts": "hardhat compile",
     "deploy": "hardhat run scripts/deploy.ts",
+    "start": "hardhat run scripts/index.ts",
     "test:local": "hardhat --network boba_local test",
     "test:bnb_testnet": "hardhat --network boba_bnb_testnet test"
   },
@@ -32,8 +33,8 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "@bobanetwork/accountabstraction": "file:../../packages/boba/account-abstraction",
-    "@bobanetwork/bundler_sdk": "file:../../packages/boba/bundler_sdk",
+    "@bobanetwork/accountabstraction": "^1.0.1",
+    "@bobanetwork/bundler_sdk": "^0.3.1",
     "base64-sol": "^1.1.0",
     "dotenv": "^16.0.0",
     "ip": "^1.1.5",

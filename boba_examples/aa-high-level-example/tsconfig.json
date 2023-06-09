@@ -15,8 +15,8 @@
     "outDir": "dist",
     "lib": [
       "es7"
-    ],
+    ]
   },
-    "include": ["./test"],
-    "files": ["./hardhat.config.ts"]
+    "include": ["./test", "./scripts/index.ts"],
+    "files": ["./hardhat.config.ts", "./scripts/index.ts"]
 }
