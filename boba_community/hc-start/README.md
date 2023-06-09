@@ -34,7 +34,7 @@ In this package you'll find the actual solidity smart contracts which have been 
 
 This package contains the react app the user actually navigates through.
 
-* **Rinkeby**: [hcb.goerli.boba.network](https://hcb.goerli.boba.network/)
+* **Goerli**: [hcb.goerli.boba.network](https://hcb.goerli.boba.network/)
 * **Mainnet**: [hcb.boba.network](https://hcb.boba.network/)
 
 
