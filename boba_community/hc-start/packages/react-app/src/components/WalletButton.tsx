@@ -34,7 +34,7 @@ const switchNetwork = async (chainConfig, chainName: string) => {
               chainId: `0x${chainConfig.readOnlyChainId.toString(16)}`,
               nativeCurrency: { name: "ETH", decimals: 18, symbol: "ETH" },
               rpcUrls: [
-                `https://${isTestEnv() ? "rinkeby" : "mainnet"}.boba.network`
+                `https://${isTestEnv() ? "goerli" : "mainnet"}.boba.network`
               ]
             }
           ]
@@ -70,7 +70,7 @@ export function WalletButton(props: IWalletButtonProps) {
   }, [error]);
 
   const isTestnet = isTestEnv();
-  const chainName = `Boba ${isTestnet ? "Rinkeby" : "Mainnet"}`;
+  const chainName = `Boba ${isTestnet ? "Testnet" : "Mainnet"}`;
   const chainConfig = getChainConfig();
 
   return <Stack direction="row" spacing={2} justifyContent="right" alignItems="center" marginRight={6}>
@@ -80,7 +80,7 @@ export function WalletButton(props: IWalletButtonProps) {
                 style={{borderTopRightRadius: 0, borderBottomRightRadius: 0, borderRight: 0}}
                 target="_blank"
                 href={isTestnet
-                  ? "https://gateway.rinkeby.boba.network/"
+                  ? "https://gateway.boba.network/"
                   : `https://oolongswap.com/#/swap?outputCurrency=${props.contractBobaToken.address}`}>
           {bobaTokenBalance.lte(0)
             ? <><FontAwesomeIcon bounce={true} icon={regular("credit-card")} />&nbsp;Get</>

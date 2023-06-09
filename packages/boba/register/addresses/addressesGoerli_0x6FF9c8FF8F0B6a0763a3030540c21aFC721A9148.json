@@ -69,5 +69,6 @@
   "AggregatorHCHepler": "0x45c5dB3F5AC1579DD43404e47562641b61A6AC77",
   "Proxy__ETHUSD_AggregatorHC": "0x9e28dE704435871af476460B456Ec741fE5DE24f",
   "ETHUSD_AggregatorHC": "0x300f35972189d5FbEe140E552Dac80df85E6521C",
-  "L2StandardTokenFactory": "0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826"
+  "L2StandardTokenFactory": "0xD2ae16D8c66ac7bc1Cf3c9e5d6bfE5f76BeDb826",
+  "HybridComputeHelperFactory": "0xFeED2Dc24E3CCd9594B5122318F1b6c037492652"
 }

@@ -37,31 +37,12 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "previousOwner",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address",
-      },
-    ],
-    name: "OwnershipTransferred",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
         name: "owner",
         type: "address",
       },
       {
         indexed: false,
-        internalType: "contract HybridComputeHelper",
+        internalType: "contract TuringHelper",
         name: "proxy",
         type: "address",
       },
@@ -73,6 +54,25 @@ const _abi = [
       },
     ],
     name: "HybridComputeHelperDeployed",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
     type: "event",
   },
   {
@@ -117,7 +117,7 @@ const _abi = [
     name: "deployMinimal",
     outputs: [
       {
-        internalType: "contract HybridComputeHelper",
+        internalType: "contract TuringHelper",
         name: "",
         type: "address",
       },
