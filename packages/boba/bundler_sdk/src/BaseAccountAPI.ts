@@ -316,10 +316,10 @@ export abstract class BaseAccountAPI {
    * @param interval time to wait between polls.
    * @return the transactionHash this userOp was mined, or null if not found.
    */
-  async getUserOpReceipt (userOpHash: string, timeout = 30000, interval = 5000): Promise<string | null> {
+  async getUserOpReceipt (userOpHash: string, timeout = 30000, interval = 5000, fromBlock = 0, toBlock = 'latest'): Promise<string | null> {
     const endtime = Date.now() + timeout
     while (Date.now() < endtime) {
-      const events = await this.entryPointView.queryFilter(this.entryPointView.filters.UserOperationEvent(userOpHash))
+      const events = await this.entryPointView.queryFilter(this.entryPointView.filters.UserOperationEvent(userOpHash), fromBlock, toBlock)
       if (events.length > 0) {
         return events[0].transactionHash
       }

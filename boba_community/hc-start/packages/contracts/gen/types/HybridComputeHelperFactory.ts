@@ -106,27 +106,15 @@ export interface HybridComputeHelperFactoryInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
     "HybridComputeHelperDeployed(address,address,uint256)": EventFragment;
+    "OwnershipTransferred(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "HybridComputeHelperDeployed"
   ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
-
-export interface OwnershipTransferredEventObject {
-  previousOwner: string;
-  newOwner: string;
-}
-export type OwnershipTransferredEvent = TypedEvent<
-  [string, string],
-  OwnershipTransferredEventObject
->;
-
-export type OwnershipTransferredEventFilter =
-  TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface HybridComputeHelperDeployedEventObject {
   owner: string;
@@ -140,6 +128,18 @@ export type HybridComputeHelperDeployedEvent = TypedEvent<
 
 export type HybridComputeHelperDeployedEventFilter =
   TypedEventFilter<HybridComputeHelperDeployedEvent>;
+
+export interface OwnershipTransferredEventObject {
+  previousOwner: string;
+  newOwner: string;
+}
+export type OwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  OwnershipTransferredEventObject
+>;
+
+export type OwnershipTransferredEventFilter =
+  TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface HybridComputeHelperFactory extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -254,15 +254,6 @@ export interface HybridComputeHelperFactory extends BaseContract {
   };
 
   filters: {
-    "OwnershipTransferred(address,address)"(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-    OwnershipTransferred(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
-    ): OwnershipTransferredEventFilter;
-
     "HybridComputeHelperDeployed(address,address,uint256)"(
       owner?: PromiseOrValue<string> | null,
       proxy?: null,
@@ -273,6 +264,15 @@ export interface HybridComputeHelperFactory extends BaseContract {
       proxy?: null,
       depositedBoba?: null
     ): HybridComputeHelperDeployedEventFilter;
+
+    "OwnershipTransferred(address,address)"(
+      previousOwner?: PromiseOrValue<string> | null,
+      newOwner?: PromiseOrValue<string> | null
+    ): OwnershipTransferredEventFilter;
+    OwnershipTransferred(
+      previousOwner?: PromiseOrValue<string> | null,
+      newOwner?: PromiseOrValue<string> | null
+    ): OwnershipTransferredEventFilter;
   };
 
   estimateGas: {

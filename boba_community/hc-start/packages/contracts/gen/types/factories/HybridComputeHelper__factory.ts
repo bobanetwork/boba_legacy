@@ -90,6 +90,25 @@ const _abi = [
         type: "uint256",
       },
     ],
+    name: "Offchain42",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "version",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "random",
+        type: "uint256",
+      },
+    ],
     name: "OffchainRandom",
     type: "event",
   },
@@ -170,6 +189,30 @@ const _abi = [
         type: "uint256",
       },
     ],
+    name: "Get42",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint32",
+        name: "rType",
+        type: "uint32",
+      },
+      {
+        internalType: "uint256",
+        name: "_random",
+        type: "uint256",
+      },
+    ],
     name: "GetRandom",
     outputs: [
       {
@@ -212,6 +255,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "Turing42",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "TuringRandom",
     outputs: [
       {
@@ -237,6 +293,30 @@ const _abi = [
       },
     ],
     name: "TuringTx",
+    outputs: [
+      {
+        internalType: "bytes",
+        name: "",
+        type: "bytes",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "_url",
+        type: "string",
+      },
+      {
+        internalType: "bytes",
+        name: "_payload",
+        type: "bytes",
+      },
+    ],
+    name: "TuringTxV2",
     outputs: [
       {
         internalType: "bytes",
