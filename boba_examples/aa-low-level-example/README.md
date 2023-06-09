@@ -1,6 +1,6 @@
 # Account Abstraction example
 
-Example for Boba BNB testnet to send userOperation to a wallet through the bundler (high level api).
+Example for Boba BNB testnet to send userOperation to a wallet through the bundler (low level api).
 This example conducts a simple ETH transfer.
 
 ## Boba BNB testnet
