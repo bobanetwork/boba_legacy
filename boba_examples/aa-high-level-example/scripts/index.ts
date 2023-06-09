@@ -30,6 +30,7 @@ const run = async () => {
     l2Wallet
   );
 
+  console.log("Deploying sample recipient..")
   recipient = await SampleRecipient__factory.deploy();
 
   const config = {
@@ -38,6 +39,7 @@ const run = async () => {
     bundlerUrl
   };
 
+  console.log("Wrapping providing for AA..")
   const aaProvider = await wrapProvider(
     local_provider,
     config, aasigner,
@@ -48,6 +50,7 @@ const run = async () => {
 
   const walletAddress = await aaProvider.getSigner().getAddress();
 
+  console.log("Sending transaction..")
   await l2Wallet.sendTransaction({
     value: utils.parseEther("0.02"),
     to: walletAddress,
