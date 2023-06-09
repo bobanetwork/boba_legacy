@@ -8,8 +8,8 @@ const BobaMainnetChain: Chain = {
   isLocalChain: false,
   multicallAddress: '0xC5042a76652770d696Cc434026C971fd4DDD27b9',
   multicall2Address: '0xaD652645014b6d8Ef023d62aF144aAefA08CeCa5',
-  getExplorerAddressLink: (address: string) => `https://blockexplorer.boba.network/address/${address}`,
-  getExplorerTransactionLink: (transactionHash: string) => `https://blockexplorer.boba.network/tx/${transactionHash}`,
+  getExplorerAddressLink: (address: string) => `https://bobascan.com/address/${address}`,
+  getExplorerTransactionLink: (transactionHash: string) => `https://bobascan.com/tx/${transactionHash}`,
 }
 
 const BobaGoerliChain: Chain = {
@@ -17,8 +17,8 @@ const BobaGoerliChain: Chain = {
   chainName: 'Boba Goerli',
   isTestChain: true,
   isLocalChain: false,
-  multicallAddress: '0x2D7a14384f4BeB2EDc33Ca4B43ea8028d1155E05',
-  multicall2Address: '0x3CA4f8c5730526aAE8F5e8F475af60EA2Ae6b9E0',
+  multicallAddress: '0x2576d6AB4B0A4e6CdCD939d5893330f7d0088245',
+  multicall2Address: '0x20F00ff289595614386A7E70738b80bCBEeAbFE6',
   getExplorerAddressLink: (address: string) => `https://testnet.bobascan.com/address/${address}`,
   getExplorerTransactionLink: (transactionHash: string) => `https://testnet.bobascan.com/tx/${transactionHash}`,
 }
