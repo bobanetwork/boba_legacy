@@ -43,6 +43,7 @@ const run = async () => {
   )
 
   // deploy a 4337 Wallet and send operation to this wallet
+  console.log("Deploying simple account factory..")
   const accountFactory = await SimpleAccount__factory
     .deploy(entryPointAddress, { gasLimit: 9_500_000 })
 
@@ -62,11 +63,13 @@ const run = async () => {
     accountAddress: account,
   })
 
+  console.log("Creating signed user operation..")
   const op = await accountAPI.createSignedUserOp({
     target: recipient.address,
     data: recipient.interface.encodeFunctionData('something', ['hello']),
   })
 
+  console.log("Sending user op to bundler..")
   const requestId = await bundlerProvider.sendUserOpToBundler(op)
   const txid = await accountAPI.getUserOpReceipt(requestId, 30000, 5000, currBlock)
   console.log('reqId', requestId, 'txid=', txid)
