@@ -25,7 +25,7 @@
     "@ethersproject/providers": "^5.6.5",
     "@ethersproject/solidity": "^5.6.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@openzeppelin/contracts": "^4.5.0",
+    "@openzeppelin/contracts": "^4.9.1",
     "@openzeppelin/contracts-upgradeable": "4.9.1",
     "@types/mocha": "^8.2.2",
     "chai": "^4.3.6",
