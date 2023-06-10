@@ -26,7 +26,7 @@ import { toWei_String } from 'util/amountConvert'
 import { openAlert } from 'actions/uiAction'
 
 import * as S from './CreateLock.styles'
-import * as Styles from './CreateLock.module.scss'
+import Styles from './CreateLock.module.scss'
 import "react-datepicker/dist/react-datepicker.css"
 import { useRef } from 'react'
 import { EXPIRY_OPTIONS } from 'util/constant'

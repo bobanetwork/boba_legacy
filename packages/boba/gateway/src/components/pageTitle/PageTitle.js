@@ -1,6 +1,6 @@
 import { Typography, Box } from '@mui/material'
 import React from 'react'
-import * as S from './PageTitle.styles'
+import {Wrapper} from './PageTitle.styles'
 
 // interface PageTitleProps {
 //   title: string
@@ -10,9 +10,9 @@ import * as S from './PageTitle.styles'
 const PageTitle = ({ title, sx }) => {
   return (
     <Box sx={{ my: 1 }}>
-      <S.Wrapper sx={sx}>
+      <Wrapper>
         <Typography variant="h1">{title}</Typography>
-      </S.Wrapper>
+      </Wrapper>
     </Box>
   )
 }

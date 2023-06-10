@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { selectTheme } from 'selectors'
 import light from './light'
 import dark from './dark'
+import { GlobalStyle } from './globalStyle'
 
 interface ThemeProps {
   children: ReactNode
