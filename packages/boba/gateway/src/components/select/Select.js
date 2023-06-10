@@ -16,7 +16,7 @@ limitations under the License. */
 import React from 'react';
 import ReactSelect from 'react-select';
 import { Select as MuiSelect, MenuItem, useTheme, Typography, Box } from '@mui/material';
-import * as styles from './Select.module.scss';
+import styles from './Select.module.scss';
 import * as S from './Select.style';
 import { ArrowDropDownOutlined } from '@mui/icons-material';
 import {
