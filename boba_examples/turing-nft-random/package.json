@@ -21,7 +21,7 @@
     "@ethersproject/solidity": "^5.0.11",
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "@openzeppelin/contracts": "4.3.2",
-    "@openzeppelin/contracts-upgradeable": "^4.6.0",
+    "@openzeppelin/contracts-upgradeable": "^4.9.1",
     "@openzeppelin/hardhat-upgrades": "^1.18.1",
     "@openzeppelin/truffle-upgrades": "^1.15.0",
     "@types/mocha": "^8.2.2",
