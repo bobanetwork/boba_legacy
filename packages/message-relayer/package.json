@@ -55,7 +55,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-unicorn": "^32.0.1",
-    "ethereum-waffle": "^3.3.0",
+    "ethereum-waffle": "^4.0.10",
     "hardhat": "^2.12.5",
     "lint-staged": "11.0.0",
     "prettier": "^2.3.1",
