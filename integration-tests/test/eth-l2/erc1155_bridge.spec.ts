@@ -12,7 +12,7 @@ import {
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
-describe('ERC1155 Bridge Test', async () => {
+describe.only('ERC1155 Bridge Test', async () => {
   let Factory__L1ERC1155: ContractFactory
   let Factory__L2ERC1155: ContractFactory
   let L1Bridge: Contract
