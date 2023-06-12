@@ -733,7 +733,7 @@ describe('ERC1155 Bridge Test', async () => {
     })
   })
 
-  describe.only('L2 native ERC1155 token tests', async () => {
+  describe('L2 native ERC1155 token tests', async () => {
     before(async () => {
       // deploy a L2 native token token each time if existing contracts are used for tests
       L2ERC1155 = await deployBobaContractCore(
