@@ -12,7 +12,7 @@ import {
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 
-describe.only('ERC1155 Bridge Test', async () => {
+describe('ERC1155 Bridge Test', async () => {
   let Factory__L1ERC1155: ContractFactory
   let Factory__L2ERC1155: ContractFactory
   let L1Bridge: Contract
@@ -733,7 +733,7 @@ describe.only('ERC1155 Bridge Test', async () => {
     })
   })
 
-  describe('L2 native ERC1155 token tests', async () => {
+  describe.only('L2 native ERC1155 token tests', async () => {
     before(async () => {
       // deploy a L2 native token token each time if existing contracts are used for tests
       L2ERC1155 = await deployBobaContractCore(
