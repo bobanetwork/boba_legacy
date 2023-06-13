@@ -6,8 +6,6 @@ export interface DefaultThemeProps {
 }
 
 export const GlobalStyle = createGlobalStyle<{ theme: DefaultThemeProps }>`
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
   body {
     font-family: 'Roboto', sans-serif;
     background: ${({ theme }) => theme.background};

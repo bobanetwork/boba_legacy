@@ -4,8 +4,8 @@ export type VariantType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
 export interface HeadingProps {
   variant: VariantType
-  color: string
-  children: ReactNode
+  color?: string
+  children?: ReactNode
   className?: string
 }
 

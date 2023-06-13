@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Typography should match snapshots body1 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  font-weight: 500;
+}
+
+<p
+    class="c0"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots body2 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+<p
+    class="c0"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots body3 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+}
+
+<p
+    class="c0"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots head 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+<p
+    class="c0"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots subtitle 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 400;
+}
+
+<p
+    class="c0"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots title 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 21px;
+  font-weight: 500;
+}
+
+<p
+    class="c0"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;

@@ -12,10 +12,10 @@ export type ComponentType = 'p' | 'span' | 'a'
 
 export interface TypographyProps {
   variant: VariantType
-  color: string
-  children: ReactNode
+  color?: string
+  children?: ReactNode
   className?: string
-  component: ComponentType
+  component?: ComponentType
 }
 
 export interface TypographyStyleProps {
