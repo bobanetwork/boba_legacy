@@ -40,7 +40,6 @@ const useNetwork = () => {
         networkIcon: icon,
       }));
     } else if (queryParams.network && queryParams.chain) {
-      console.log(NETWORK_TYPE)
       let type = Object.values(NETWORK_TYPE).includes(queryParams.network) ? queryParams.network : NETWORK_TYPE.MAINNET;
       let chain = Object.values(NETWORK).includes(queryParams.chain) ? queryParams.chain : NETWORK.ETHEREUM;
 
