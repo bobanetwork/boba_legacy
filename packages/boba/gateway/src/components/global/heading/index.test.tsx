@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { HeadingProps } from './types'
 import CustomThemeProvider from 'themes'
-import Heading from '.'
+import { Heading } from '.'
 import React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'

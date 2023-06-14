@@ -11,7 +11,7 @@ import { StyledText } from './style'
  * @returns react component.
  */
 
-const Typography: FC<TypographyProps> = ({
+export const Typography: FC<TypographyProps> = ({
   children,
   component = 'p',
   variant,
@@ -23,5 +23,3 @@ const Typography: FC<TypographyProps> = ({
     </StyledText>
   )
 }
-
-export default Typography

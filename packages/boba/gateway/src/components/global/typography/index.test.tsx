@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { TypographyProps } from './types'
 import CustomThemeProvider from 'themes'
-import Heading from '.'
+import { Typography } from '.'
 import React from 'react'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
@@ -18,7 +18,7 @@ const renderTypography = (props: TypographyProps) => {
       })}
     >
       <CustomThemeProvider>
-        <Heading {...props}>Text goes here</Heading>
+        <Typography {...props}>Text goes here</Typography>
       </CustomThemeProvider>
     </Provider>
   )

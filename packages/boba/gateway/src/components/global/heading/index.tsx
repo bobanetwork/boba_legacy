@@ -10,12 +10,10 @@ import { StyledHeading } from './style'
  * @returns react component.
  */
 
-const Heading: FC<HeadingProps> = ({ children, variant, ...rest }) => {
+export const Heading: FC<HeadingProps> = ({ children, variant, ...rest }) => {
   return (
     <StyledHeading {...rest} as={variant} variant={variant}>
       {children}
     </StyledHeading>
   )
 }
-
-export default Heading

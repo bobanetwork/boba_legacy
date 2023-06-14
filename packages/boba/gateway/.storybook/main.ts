@@ -1,4 +1,5 @@
 import { StorybookConfig } from '@storybook/react-webpack5'
+import path from 'path'
 
 const config: StorybookConfig = {
   features: {
@@ -17,6 +18,15 @@ const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
+  },
+  webpackFinal: async (cnf) => {
+    cnf.resolve = {
+      alias: {
+        ...cnf.resolve?.alias,
+        components: path.resolve(__dirname, '../src/components'),
+      },
+    }
+    return cnf
   },
   docs: {
     autodocs: true,

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 
-import Heading from '.'
+import { Heading } from '.'
 import { HeadingProps } from './types'
 
 export default {
