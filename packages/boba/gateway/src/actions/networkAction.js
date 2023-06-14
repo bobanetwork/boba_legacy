@@ -247,7 +247,7 @@ export function getAllAddresses() {
 /********************************/
 /**
  * @params
- *  network - ethereum, bnb, fantom, avax, moonbase, moonbeam
+ *  network - ethereum, bnb, fantom, avax
  *  networkType -  MAINNET, TESTNET
 */
 export function setNetwork(payload) {

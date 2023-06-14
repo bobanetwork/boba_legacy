@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { selectActiveNetwork } from 'selectors'
 import styled from 'styled-components'
-import { BOBABEAM_STATUS, BOBAOPERA_STATUS } from 'util/constant'
+import { BOBAOPERA_STATUS } from 'util/constant'
 import { bridgeAlerts } from './alertConfig'
 
 const AlertText = styled(Text)`
@@ -18,7 +18,7 @@ const BridgeAlert = () => {
 
   const alertCaption = bridgeAlerts[activeNetwork]
 
-  if (!!Number(BOBABEAM_STATUS) || !!Number(BOBAOPERA_STATUS)) {
+  if (!!Number(BOBAOPERA_STATUS)) {
     return <AlertText>{alertCaption}</AlertText>
   }
 
