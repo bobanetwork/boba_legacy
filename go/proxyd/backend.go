@@ -251,8 +251,8 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 		)
 
 		var (
-			err        error
 			res        []*RPCRes
+			err        error
 			defaultRes []*RPCRes
 			defaultErr error
 			debugRes   []*RPCRes
@@ -263,11 +263,18 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 			// We return the value of the debug endpoint if it is available
 			debugRes, debugErr = b.doDebugForward(ctx, reqs, isBatch)
 			res, err = debugRes, debugErr
-			for i, req := range reqs {
-				method := req.Method
-				if method == "eth_estimateGas" || method == "eth_call" {
-					debugResult(method, defaultRes[i], debugRes[i])
+			if defaultErr == nil && debugErr == nil {
+				for i, req := range reqs {
+					method := req.Method
+					if method == "eth_estimateGas" || method == "eth_call" {
+						debugResult(method, defaultRes[i], debugRes[i])
+					}
+					if method == "eth_getLogs" {
+						debugLogs(method, defaultRes[i], debugRes[i])
+					}
 				}
+			} else if (defaultErr == nil && debugErr != nil) || (defaultErr != nil && debugErr == nil) {
+				log.Error("One of response is error", "defaultErr", defaultErr, "debugErr", debugErr)
 			}
 		} else {
 			res, err = defaultRes, defaultErr

@@ -1,6 +1,11 @@
 package proxyd
 
-import "github.com/ethereum/go-ethereum/log"
+import (
+	"reflect"
+
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
+)
 
 func debugResult(method string, defaultRes *RPCRes, debugRes *RPCRes) {
 	debugResult, ok := debugRes.Result.(string)
@@ -15,6 +20,25 @@ func debugResult(method string, defaultRes *RPCRes, debugRes *RPCRes) {
 		log.Error("Found difference", "method", method, "debugResult", debugResult, "defaultResult", defaultResult)
 	} else {
 		log.Debug("Response matches", "method", method, "result", debugResult)
+	}
+	return
+}
+
+func debugLogs(method string, defaultRes *RPCRes, debugRes *RPCRes) {
+	var debugLogs *types.Log
+	var defaultLogs *types.Log
+	debugLogs, ok := debugRes.Result.(*types.Log)
+	if !ok {
+		log.Error("Failed to decode debugLogs", "method", method, "debugLogs", debugLogs)
+	}
+	defaultLogs, ok = defaultRes.Result.(*types.Log)
+	if !ok {
+		log.Error("Failed to decode defaultLogs", "method", method, "defaultLogs", defaultLogs)
+	}
+	if !reflect.DeepEqual(debugLogs, defaultLogs) {
+		log.Error("Found difference", "method", method, "debugLogs", debugLogs, "defaultLogs", defaultLogs)
+	} else {
+		log.Debug("Response matches", "method", method, "result", debugLogs)
 	}
 	return
 }
