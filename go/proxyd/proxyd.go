@@ -106,11 +106,18 @@ func Start(config *Config) (func(), error) {
 		if err != nil {
 			return nil, err
 		}
+		debugRpcURL, err := ReadFromEnvOrConfig(cfg.DEBUGRPCURL)
+		if err != nil {
+			return nil, err
+		}
 		if rpcURL == "" {
 			return nil, fmt.Errorf("must define an RPC URL for backend %s", name)
 		}
 		if wsURL == "" {
 			return nil, fmt.Errorf("must define a WS URL for backend %s", name)
+		}
+		if debugRpcURL == "" {
+			log.Info("warn", "no debug rpc url defined for backend %s", name)
 		}
 
 		if config.BackendOptions.ResponseTimeoutSeconds != 0 {
@@ -151,10 +158,10 @@ func Start(config *Config) (func(), error) {
 			opts = append(opts, WithStrippedTrailingXFF())
 		}
 		opts = append(opts, WithProxydIP(os.Getenv("PROXYD_IP")))
-		back := NewBackend(name, rpcURL, wsURL, lim, rpcRequestSemaphore, opts...)
+		back := NewBackend(name, rpcURL, wsURL, debugRpcURL, lim, rpcRequestSemaphore, opts...)
 		backendNames = append(backendNames, name)
 		backendsByName[name] = back
-		log.Info("configured backend", "name", name, "rpc_url", rpcURL, "ws_url", wsURL)
+		log.Info("configured backend", "name", name, "rpc_url", rpcURL, "ws_url", wsURL, "debug_rpc_url", debugRpcURL)
 	}
 
 	backendGroups := make(map[string]*BackendGroup)

@@ -107,6 +107,7 @@ type Backend struct {
 	Name                 string
 	rpcURL               string
 	wsURL                string
+	debugRpcURL          string
 	authUsername         string
 	authPassword         string
 	rateLimiter          BackendRateLimiter
@@ -191,6 +192,7 @@ func NewBackend(
 	name string,
 	rpcURL string,
 	wsURL string,
+	debugRpcURL string,
 	rateLimiter BackendRateLimiter,
 	rpcSemaphore *semaphore.Weighted,
 	opts ...BackendOpt,
@@ -199,6 +201,7 @@ func NewBackend(
 		Name:            name,
 		rpcURL:          rpcURL,
 		wsURL:           wsURL,
+		debugRpcURL:     debugRpcURL,
 		rateLimiter:     rateLimiter,
 		maxResponseSize: math.MaxInt64,
 		client: &LimitedHTTPClient{
@@ -247,7 +250,28 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 			),
 		)
 
-		res, err := b.doForward(ctx, reqs, isBatch)
+		var (
+			err        error
+			res        []*RPCRes
+			defaultRes []*RPCRes
+			defaultErr error
+			debugRes   []*RPCRes
+			debugErr   error
+		)
+		defaultRes, defaultErr = b.doForward(ctx, reqs, isBatch)
+		if b.debugRpcURL != "" {
+			// We return the value of the debug endpoint if it is available
+			debugRes, debugErr = b.doDebugForward(ctx, reqs, isBatch)
+			res, err = debugRes, debugErr
+			for i, req := range reqs {
+				method := req.Method
+				if method == "eth_estimateGas" || method == "eth_call" {
+					debugResult(method, defaultRes[i], debugRes[i])
+				}
+			}
+		} else {
+			res, err = defaultRes, defaultErr
+		}
 		switch err {
 		case nil: // do nothing
 		// ErrBackendUnexpectedJSONRPC occurs because infura responds with a single JSON-RPC object
@@ -398,6 +422,101 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	httpReq.Header.Set("X-Forwarded-For", xForwardedFor)
 
 	httpRes, err := b.client.DoLimited(httpReq)
+	if err != nil {
+		return nil, wrapErr(err, "error in backend request")
+	}
+
+	metricLabelMethod := rpcReqs[0].Method
+	if isBatch {
+		metricLabelMethod = "<batch>"
+	}
+	rpcBackendHTTPResponseCodesTotal.WithLabelValues(
+		GetAuthCtx(ctx),
+		b.Name,
+		metricLabelMethod,
+		strconv.Itoa(httpRes.StatusCode),
+		strconv.FormatBool(isBatch),
+	).Inc()
+
+	// Alchemy returns a 400 on bad JSONs, so handle that case
+	if httpRes.StatusCode != 200 && httpRes.StatusCode != 400 {
+		return nil, fmt.Errorf("response code %d", httpRes.StatusCode)
+	}
+
+	defer httpRes.Body.Close()
+	resB, err := io.ReadAll(io.LimitReader(httpRes.Body, b.maxResponseSize))
+	if err != nil {
+		return nil, wrapErr(err, "error reading response body")
+	}
+
+	var res []*RPCRes
+	if isSingleElementBatch {
+		var singleRes RPCRes
+		if err := json.Unmarshal(resB, &singleRes); err != nil {
+			return nil, ErrBackendBadResponse
+		}
+		res = []*RPCRes{
+			&singleRes,
+		}
+	} else {
+		if err := json.Unmarshal(resB, &res); err != nil {
+			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
+			if responseIsNotBatched(resB) {
+				return nil, ErrBackendUnexpectedJSONRPC
+			}
+			return nil, ErrBackendBadResponse
+		}
+	}
+
+	if len(rpcReqs) != len(res) {
+		return nil, ErrBackendUnexpectedJSONRPC
+	}
+
+	// capture the HTTP status code in the response. this will only
+	// ever be 400 given the status check on line 318 above.
+	if httpRes.StatusCode != 200 {
+		for _, res := range res {
+			res.Error.HTTPErrorCode = httpRes.StatusCode
+		}
+	}
+
+	sortBatchRPCResponse(rpcReqs, res)
+	return res, nil
+}
+
+func (b *Backend) doDebugForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool) ([]*RPCRes, error) {
+	isSingleElementBatch := len(rpcReqs) == 1
+
+	// Single element batches are unwrapped before being sent
+	// since Alchemy handles single requests better than batches.
+
+	var body []byte
+	if isSingleElementBatch {
+		body = mustMarshalJSON(rpcReqs[0])
+	} else {
+		body = mustMarshalJSON(rpcReqs)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", b.debugRpcURL, bytes.NewReader(body))
+	if err != nil {
+		return nil, wrapErr(err, "error creating backend request")
+	}
+
+	if b.authPassword != "" {
+		httpReq.SetBasicAuth(b.authUsername, b.authPassword)
+	}
+
+	xForwardedFor := GetXForwardedFor(ctx)
+	if b.stripTrailingXFF {
+		xForwardedFor = stripXFF(xForwardedFor)
+	} else if b.proxydIP != "" {
+		xForwardedFor = fmt.Sprintf("%s, %s", xForwardedFor, b.proxydIP)
+	}
+
+	httpReq.Header.Set("content-type", "application/json")
+	httpReq.Header.Set("X-Forwarded-For", xForwardedFor)
+
+	httpRes, err := b.client.Do(httpReq)
 	if err != nil {
 		return nil, wrapErr(err, "error in backend request")
 	}
