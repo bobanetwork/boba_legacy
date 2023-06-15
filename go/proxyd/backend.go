@@ -270,10 +270,10 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 				for i, req := range reqs {
 					method := req.Method
 					if slices.Contains(resultMethods, method) {
-						debugResult(method, defaultRes[i], debugRes[i])
+						debugResult(ctx, method, defaultRes[i], debugRes[i])
 					}
 					if method == "eth_getLogs" {
-						debugLogs(method, defaultRes[i], debugRes[i])
+						debugLogs(ctx, method, defaultRes[i], debugRes[i])
 					}
 				}
 			} else if (defaultErr == nil && debugErr != nil) || (defaultErr != nil && debugErr == nil) {
@@ -428,15 +428,13 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 		}
 	}
 
-	var (
-		httpReq *http.Request
-		err     error
-	)
+	var url string
 	if isDebug {
-		httpReq, err = http.NewRequestWithContext(ctx, "POST", b.debugRpcURL, bytes.NewReader(body))
+		url = b.debugRpcURL
 	} else {
-		httpReq, err = http.NewRequestWithContext(ctx, "POST", b.rpcURL, bytes.NewReader(body))
+		url = b.rpcURL
 	}
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(body))
 	if err != nil {
 		return nil, wrapErr(err, "error creating backend request")
 	}
@@ -493,12 +491,12 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	if isSingleElementBatch {
 		err := json.Unmarshal(resB, &singleDebugRes)
 		if err != nil {
-			log.Error("error unmarshaling singleRes debug response", "err", err, "singleDebugRes", singleDebugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader)
+			log.Error("error unmarshaling singleRes debug response", "err", err, "singleDebugRes", singleDebugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "url", url)
 		} else {
-			log.Debug("unmarshaling single debug response", "singleDebugRes", singleDebugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader)
+			log.Debug("unmarshaling single debug response", "singleDebugRes", singleDebugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "url", url)
 		}
 		if err := json.Unmarshal(resB, &singleRes); err != nil {
-			log.Error("error unmarshaling singleRes response", "err", err, "singleRes", singleRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "decodeOutput", singleDebugRes, "decodeInput", bodyReader)
+			log.Error("error unmarshaling singleRes response", "err", err, "singleRes", singleRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "decodeOutput", singleDebugRes, "decodeInput", bodyReader, "url", url)
 			return nil, ErrBackendBadResponse
 		}
 		res = []*RPCRes{
@@ -507,17 +505,17 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	} else {
 		err := json.Unmarshal(resB, &debugRes)
 		if err != nil {
-			log.Error("error unmarshaling batch debug response ", "err", err, "debugRes", debugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader)
+			log.Error("error unmarshaling batch debug response ", "err", err, "debugRes", debugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "url", url)
 		} else {
-			log.Debug("unmarshaling batch debug response", "debugRes", debugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader)
+			log.Debug("unmarshaling batch debug response", "debugRes", debugRes, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "url", url)
 		}
 		if err := json.Unmarshal(resB, &res); err != nil {
 			// Infura may return a single JSON-RPC response if, for example, the batch contains a request for an unsupported method
 			if responseIsNotBatched(resB) {
-				log.Error("response is not batched", "err", err, "res", res, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "decodeOutput", debugRes, "decodeInput", bodyReader)
+				log.Error("response is not batched", "err", err, "res", res, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "decodeOutput", debugRes, "decodeInput", bodyReader, "url", url)
 				return nil, ErrBackendUnexpectedJSONRPC
 			}
-			log.Error("error unmarshaling batch response", "err", err, "res", res, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "decodeOutput", debugRes, "decodeInput", bodyReader)
+			log.Error("error unmarshaling batch response", "err", err, "res", res, "method", method, "auth", auth, "req_id", reqID, "payload", bodyReader, "decodeOutput", debugRes, "decodeInput", bodyReader, "url", url)
 			return nil, ErrBackendBadResponse
 		}
 	}

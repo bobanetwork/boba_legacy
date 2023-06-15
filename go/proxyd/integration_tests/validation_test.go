@@ -273,7 +273,7 @@ func TestDebugEndpoints(t *testing.T) {
 			require.NoError(t, err)
 			RequireEqualJSON(t, []byte(tt.res), res)
 			require.Equal(t, tt.code, code)
-			require.Equal(t, 1, len(goodBackend.Requests()))
+			require.Equal(t, tt.reqCount, len(goodBackend.Requests()))
 		})
 	}
 }
