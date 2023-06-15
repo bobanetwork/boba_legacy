@@ -444,6 +444,14 @@ func (s *Server) handleBatchRPC(ctx context.Context, reqs []json.RawMessage, isL
 			}
 		}
 
+		log.Info(
+			"add RPC call to batch",
+			"source", "rpc",
+			"req_id", GetReqID(ctx),
+			"auth", GetAuthCtx(ctx),
+			"method", parsedReq.Method,
+		)
+
 		id := string(parsedReq.ID)
 		// If this is a duplicate Request ID, move the Request to a new batchGroup
 		ids[id]++
