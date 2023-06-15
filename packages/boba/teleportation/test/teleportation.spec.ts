@@ -192,14 +192,13 @@ describe('teleportation', () => {
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
+        const token = event.args.token
         const emitter = event.args.emitter
-
-        console.error(event)
 
         disbursement = [
           ...disbursement,
           {
-            token: L2BOBA.address,
+            token,
             amount: amount.toString(),
             addr: emitter,
             depositId: depositId.toNumber(),
@@ -315,6 +314,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
+        const token = event.args.token
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
@@ -324,6 +324,7 @@ describe('teleportation', () => {
           disbursement = [
             ...disbursement,
             {
+              token,
               amount: amount.toString(),
               addr: emitter,
               depositId: depositId.toNumber(),
@@ -383,6 +384,7 @@ describe('teleportation', () => {
         latestBlock
       )
       expect(events.length).to.be.eq(2)
+      expect(events[1].args.token).to.be.eq(L2BOBA.address)
       expect(events[1].args.sourceChainId).to.be.eq(chainId)
       expect(events[1].args.toChainId).to.be.eq(chainId)
       expect(events[1].args.depositId).to.be.eq(16)

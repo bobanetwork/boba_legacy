@@ -1,5 +1,5 @@
 /* Imports: External */
-import { Contract, Wallet, BigNumber, providers, EventFilter } from 'ethers'
+import { Contract, Wallet, BigNumber, providers, EventFilter, constants as ethersConstants } from 'ethers'
 import { orderBy } from 'lodash'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
@@ -192,6 +192,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const sourceChainId = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
+        const token = event.args.token
         const emitter = event.args.emitter
 
         // we disburse tokens only if depositId is greater or equal to the last disbursement
@@ -199,6 +200,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           disbursement = [
             ...disbursement,
             {
+              token,
               amount: amount.toString(),
               addr: emitter,
               depositId: depositId.toNumber(),
@@ -206,7 +208,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             },
           ]
           this.logger.info(
-            `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter}`
+            `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${token}`
           )
         }
       }
@@ -234,21 +236,23 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDisbursements = slicedDisbursement.reduce((acc, cur) => {
           return acc.add(BigNumber.from(cur.amount))
         }, BigNumber.from('0'))
-        if (this.options.bobaTokenAddress !== bobaTokenAddressOnAltL2s) {
+
+        // Checking for first only as tests cover mixed disbursements and contract reverts if mixed as well
+        if (slicedDisbursement[0].token === ethersConstants.AddressZero) {
+          const disburseTx = await this.state.Teleportation.disburseNative(
+            slicedDisbursement,
+            { value: totalDisbursements }
+          )
+          await disburseTx.wait()
+        } else {
           // approve BOBA token
           const approveTx = await this.state.BOBAToken.approve(
             this.state.Teleportation.address,
             totalDisbursements
           )
           await approveTx.wait()
-          const disburseTx = await this.state.Teleportation.disburseBOBA(
+          const disburseTx = await this.state.Teleportation.disburseERC20(
             slicedDisbursement
-          )
-          await disburseTx.wait()
-        } else {
-          const disburseTx = await this.state.Teleportation.disburseNativeBOBA(
-            slicedDisbursement,
-            { value: totalDisbursements }
           )
           await disburseTx.wait()
         }

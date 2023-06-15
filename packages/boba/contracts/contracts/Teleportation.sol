@@ -414,13 +414,15 @@ contract Teleportation is PausableUpgradeable {
             uint256 _depositId = _disbursements[i].depositId;
             address _token = _disbursements[i].token;
 
+            // implicitly contains addr(0) check through addSupportedToken()
+            require(supportedTokens[_token], "Token not supported");
+
             // ensure amount sent in the tx is equal to disbursement (moved into loop to ensure token flexibility)
             IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
             require(supportedChains[_sourceChainId], "Source chain is not supported");
-            require(supportedTokens[_token], "Token not supported"); // implicitly contains addr(0) check through addSupportedToken()
             totalDisbursements[_sourceChainId] += 1;
 
             // slither-disable-next-line calls-loop,reentrancy-events

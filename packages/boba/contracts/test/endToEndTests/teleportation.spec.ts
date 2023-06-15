@@ -27,8 +27,7 @@ const getGasFeeFromLastestBlock = async (provider: any): Promise<BigNumber> => {
   return gasUsed.mul(gasPrice)
 }
 
-// TODO: Remove
-describe.only('BOBA Teleportation Tests', async () => {
+describe('BOBA Teleportation Tests', async () => {
   describe('Ethereum L2 - BOBA is not the native token', () => {
     before(async () => {
       signer = (await ethers.getSigners())[0]
@@ -280,6 +279,47 @@ describe.only('BOBA Teleportation Tests', async () => {
       await expect(
         Proxy__Teleportation.disburseERC20(payload)
       ).to.be.revertedWith('Unexpected next deposit id')
+    })
+
+    it('should not disburse BOBA tokens if disbursement is native/zero address', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 3,
+        },
+      ]
+      await L2Boba.approve(Proxy__Teleportation.address, _amount)
+      await expect(
+        Proxy__Teleportation.disburseERC20(payload)
+      ).to.be.revertedWith('Token not supported')
+    })
+
+    it('should not disburse BOBA tokens if any disbursement is native/zero address', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          token: L2Boba.address,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 3,
+        },
+        {
+          token: ethers.constants.AddressZero,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 3,
+        },
+      ]
+      await L2Boba.approve(Proxy__Teleportation.address, _amount)
+      await expect(
+        Proxy__Teleportation.disburseERC20(payload)
+      ).to.be.revertedWith('Token not supported')
     })
 
     it('should not disburse tokens if it is not approved', async () => {
@@ -606,6 +646,45 @@ describe.only('BOBA Teleportation Tests', async () => {
       await expect(
         Proxy__Teleportation.disburseNative(payload, { value: _amount })
       ).to.be.revertedWith('Unexpected next deposit id')
+    })
+
+    it('should not disburse BOBA tokens if disbursement is not native', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          token: L2Boba.address,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 4,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseNative(payload, { value: _amount })
+      ).to.be.revertedWith('Expected native')
+    })
+
+    it('should not disburse BOBA tokens if any disbursement is not native', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 4,
+        },
+        {
+          token: L2Boba.address,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 4,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseNative(payload, { value: _amount })
+      ).to.be.revertedWith('Expected native')
     })
 
     it('should not disburse tokens if msg.value is wrong', async () => {
