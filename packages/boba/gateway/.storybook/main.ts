@@ -1,11 +1,11 @@
 import { StorybookConfig } from '@storybook/react-webpack5'
 import path from 'path'
 
-const config: StorybookConfig = {
+const storybookConfig: StorybookConfig = {
   features: {
     storyStoreV7: true,
   },
-  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
@@ -14,23 +14,37 @@ const config: StorybookConfig = {
     '@storybook/addon-actions',
     '@storybook/addon-styling',
   ],
+  webpackFinal: async (config) => {
+    if (!config.resolve) {
+      config.resolve = {}
+    }
+    config.resolve.fallback = {
+      process: require.resolve('process/browser'),
+      stream: require.resolve('stream-browserify'),
+      fs: require.resolve('browserify-fs'),
+      path: require.resolve('path-browserify'),
+      assert: require.resolve('assert'),
+      http: require.resolve('http-browserify'),
+      https: require.resolve('https-browserify'),
+      os: require.resolve('os-browserify'),
+      zlib: require.resolve('browserify-zlib'),
+      buffer: require.resolve('buffer'),
+    }
 
+    config.resolve.modules = [
+      ...(config.resolve.modules || []),
+      path.resolve(__dirname, '../src'),
+    ]
+
+    return config
+  },
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
-  },
-  webpackFinal: async (cnf) => {
-    cnf.resolve = {
-      alias: {
-        ...cnf.resolve?.alias,
-        components: path.resolve(__dirname, '../src/components'),
-      },
-    }
-    return cnf
   },
   docs: {
     autodocs: true,
   },
 }
 
-export default config
+export default storybookConfig

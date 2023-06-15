@@ -6,6 +6,14 @@ import light from '../src/themes/light'
 import dark from '../src/themes/dark'
 import { GlobalStyle } from '../src/themes/globalStyle'
 
+import { Buffer } from 'buffer'
+
+//@ts-ignore
+if (!window.Buffer) {
+  //@ts-ignore
+  window.Buffer = window.Buffer || Buffer
+}
+
 const ThemeBlock = styled.div<{ left?: boolean; fill?: boolean }>(
   ({ left, fill, theme }) =>
     css`
@@ -91,4 +99,4 @@ export const globalTypes = {
   },
 }
 
-export const decorators = [withTheme]
+export const decorators = []
