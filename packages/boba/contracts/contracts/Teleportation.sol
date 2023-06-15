@@ -93,16 +93,9 @@ contract Teleportation is PausableUpgradeable {
         uint256 balance
     );
 
-    event ERC20Received(
+    event AssetReceived(
+        /** @dev Must be ZeroAddress for nativeAsset */
         address token,
-        uint256 sourceChainId,
-        uint256 indexed toChainId,
-        uint256 indexed depositId,
-        address indexed emitter,
-        uint256 amount
-    );
-
-    event NativeReceived(
         uint256 sourceChainId,
         uint256 indexed toChainId,
         uint256 indexed depositId,
@@ -297,7 +290,7 @@ contract Teleportation is PausableUpgradeable {
 
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
-        emit ERC20Received(_token, block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
+        emit AssetReceived(_token, block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
         totalDeposits[_toChainId] += 1;
     }
 
@@ -329,7 +322,7 @@ contract Teleportation is PausableUpgradeable {
             transferTimestampCheckPoint = block.timestamp;
         }
 
-        emit NativeReceived(block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, msg.value);
+        emit AssetReceived(address(0), block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, msg.value);
         totalDeposits[_toChainId] += 1;
     }
 
@@ -357,6 +350,7 @@ contract Teleportation is PausableUpgradeable {
         // disbursements.
         uint256 _totalDisbursed = 0;
         for (uint256 i = 0; i < _numDisbursements; i++) {
+            require(_disbursements[i].token == address(0), "Expected native");
             _totalDisbursed += _disbursements[i].amount;
         }
 
@@ -418,18 +412,19 @@ contract Teleportation is PausableUpgradeable {
             address _addr = _disbursements[i].addr;
             uint256 _sourceChainId = _disbursements[i].sourceChainId;
             uint256 _depositId = _disbursements[i].depositId;
-            IERC20 _token = IERC20(_disbursements[i].token);
+            address _token = _disbursements[i].token;
 
             // ensure amount sent in the tx is equal to disbursement (moved into loop to ensure token flexibility)
-            _token.safeTransferFrom(msg.sender, address(this), _amount);
+            IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
             require(supportedChains[_sourceChainId], "Source chain is not supported");
+            require(supportedTokens[_token], "Token not supported"); // implicitly contains addr(0) check through addSupportedToken()
             totalDisbursements[_sourceChainId] += 1;
 
             // slither-disable-next-line calls-loop,reentrancy-events
-            _token.safeTransfer(_addr, _amount);
+            IERC20(_token).safeTransfer(_addr, _amount);
             emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
         }
     }

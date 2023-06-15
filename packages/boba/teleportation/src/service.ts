@@ -126,7 +126,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   protected async _start(): Promise<void> {
     while (this.running) {
       for (const depositTeleportation of this.state.depositTeleportations) {
-        // search BobaReceived events
+        // search AssetReceived events
         const latestBlock =
           await depositTeleportation.Teleportation.provider.getBlockNumber()
         try {
@@ -165,7 +165,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
     const events = await this._getEvents(
       depositTeleportation.Teleportation,
-      this.state.Teleportation.filters.BobaReceived(),
+      this.state.Teleportation.filters.AssetReceived(),
       lastBlock,
       latestBlock
     )

@@ -20,6 +20,8 @@ export interface DepositTeleportations {
 }
 
 export interface Disbursement {
+  /** @dev Ignored for native disbursements */
+  token: string
   amount: string
   addr: string
   sourceChainId: number | string

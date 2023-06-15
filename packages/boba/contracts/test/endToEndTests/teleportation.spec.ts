@@ -27,7 +27,7 @@ const getGasFeeFromLastestBlock = async (provider: any): Promise<BigNumber> => {
   return gasUsed.mul(gasPrice)
 }
 
-// TODO: REMOVE
+// TODO: Remove
 describe.only('BOBA Teleportation Tests', async () => {
   describe('Ethereum L2 - BOBA is not the native token', () => {
     before(async () => {
@@ -171,7 +171,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       const preBalance = await L2Boba.balanceOf(signerAddress)
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportERC20(L2Boba.address, _amount, 4))
-        .to.emit(Proxy__Teleportation, 'ERC20Received')
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
         .withArgs(L2Boba.address, 31337, 4, 0, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '1'
@@ -370,7 +370,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       const _amount = ethers.utils.parseEther('100')
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportERC20(L2Boba.address, _amount, 4))
-        .to.emit(Proxy__Teleportation, 'ERC20Received')
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
         .withArgs(L2Boba.address, 31337, 4, 2, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '3'
@@ -476,8 +476,15 @@ describe.only('BOBA Teleportation Tests', async () => {
       await expect(
         Proxy__Teleportation.teleportNative(4, { value: _amount })
       )
-        .to.emit(Proxy__Teleportation, 'NativeReceived')
-        .withArgs(31337, 4, 0, signerAddress, _amount)
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
+        .withArgs(
+          ethers.constants.AddressZero,
+          31337,
+          4,
+          0,
+          signerAddress,
+          _amount
+        )
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '1'
       )
@@ -537,14 +544,14 @@ describe.only('BOBA Teleportation Tests', async () => {
       const preSignerBalance = await ethers.provider.getBalance(signerAddress)
       const payload = [
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: ethers.utils.parseEther('100'),
           addr: signerAddress,
           sourceChainId: 4,
           depositId: 0,
         },
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: ethers.utils.parseEther('1'),
           addr: signerAddress,
           sourceChainId: 4,
@@ -571,7 +578,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: _amount,
           addr: signerAddress,
           sourceChainId: 4,
@@ -605,7 +612,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       const _amount = ethers.utils.parseEther('101')
       const payload = [
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: _amount,
           addr: signerAddress,
           sourceChainId: 4,
@@ -621,7 +628,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: _amount,
           addr: signerAddress,
           sourceChainId: 4,
@@ -691,14 +698,21 @@ describe.only('BOBA Teleportation Tests', async () => {
       await expect(
         Proxy__Teleportation.teleportNative(4, { value: _amount })
       )
-        .to.emit(Proxy__Teleportation, 'NativeReceived')
-        .withArgs(31337, 4, 2, signerAddress, _amount)
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
+        .withArgs(
+          ethers.constants.AddressZero,
+          31337,
+          4,
+          2,
+          signerAddress,
+          _amount
+        )
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '3'
       )
       const payload = [
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: _amount,
           addr: signerAddress,
           sourceChainId: 4,
@@ -764,7 +778,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       const _amount = ethers.utils.parseEther('100')
       const payload = [
         {
-          token: L2Boba.address,
+          token: ethers.constants.AddressZero,
           amount: _amount,
           addr: PausedReceiver.address, //tweaking recipient address to an address that cannot receive native tokens
           sourceChainId: 4,
