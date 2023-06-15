@@ -21,7 +21,6 @@ func debugResult(method string, defaultRes *RPCRes, debugRes *RPCRes) {
 	} else {
 		log.Debug("Response matches", "method", method, "result", debugResult)
 	}
-	return
 }
 
 func debugLogs(method string, defaultRes *RPCRes, debugRes *RPCRes) {
@@ -40,5 +39,4 @@ func debugLogs(method string, defaultRes *RPCRes, debugRes *RPCRes) {
 	} else {
 		log.Debug("Response matches", "method", method, "result", debugLogs)
 	}
-	return
 }
