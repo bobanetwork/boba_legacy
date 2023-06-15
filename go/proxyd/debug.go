@@ -9,6 +9,9 @@ import (
 )
 
 func debugResult(ctx context.Context, method string, defaultRes *RPCRes, debugRes *RPCRes) {
+	if defaultRes.Result == nil && debugRes.Result == nil {
+		return
+	}
 	reqID := GetReqID(ctx)
 	debugResult, ok := debugRes.Result.(string)
 	if !ok {
@@ -26,6 +29,9 @@ func debugResult(ctx context.Context, method string, defaultRes *RPCRes, debugRe
 }
 
 func debugLogs(ctx context.Context, method string, defaultRes *RPCRes, debugRes *RPCRes) {
+	if defaultRes.Result == nil && debugRes.Result == nil {
+		return
+	}
 	reqID := GetReqID(ctx)
 	var debugLogs *types.Log
 	var defaultLogs *types.Log
