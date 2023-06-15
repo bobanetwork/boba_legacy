@@ -262,11 +262,9 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 			resultMethods = []string{"eth_gasPrice", "eth_estimateGas", "eth_call", "eth_getBalance", "eth_chainId"}
 		)
 		defaultRes, defaultErr = b.doForward(ctx, reqs, isBatch, false)
-		fmt.Println("defaultRes", defaultRes, "defaultErr", defaultErr)
 		if b.debugRpcURL != "" {
 			// We return the value of the debug endpoint if it is available
 			debugRes, debugErr = b.doForward(ctx, reqs, isBatch, true)
-			fmt.Println("debugRes", debugRes, "debugErr", debugErr)
 			res, err = debugRes, debugErr
 			if defaultErr == nil && debugErr == nil {
 				for i, req := range reqs {
@@ -441,14 +439,7 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 	httpReq.Header.Set("content-type", "application/json")
 	httpReq.Header.Set("X-Forwarded-For", xForwardedFor)
 
-	var (
-		httpRes *http.Response
-	)
-	if isDebug {
-		httpRes, err = b.client.Do(httpReq)
-	} else {
-		httpRes, err = b.client.DoLimited(httpReq)
-	}
+	httpRes, err := b.client.DoLimited(httpReq)
 	if err != nil {
 		return nil, wrapErr(err, "error in backend request")
 	}
