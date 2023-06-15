@@ -5,6 +5,7 @@ pragma solidity 0.8.9;
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import '@openzeppelin/contracts/utils/Address.sol';
 
 /**
  * @title Teleportation
@@ -14,6 +15,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
  * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L2/teleportr/TeleportrDisburser.sol
  */
 contract Teleportation is PausableUpgradeable {
+    using Address for address;
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -91,7 +93,16 @@ contract Teleportation is PausableUpgradeable {
         uint256 balance
     );
 
-    event BobaReceived(
+    event ERC20Received(
+        address token,
+        uint256 sourceChainId,
+        uint256 indexed toChainId,
+        uint256 indexed depositId,
+        address indexed emitter,
+        uint256 amount
+    );
+
+    event NativeReceived(
         uint256 sourceChainId,
         uint256 indexed toChainId,
         uint256 indexed depositId,
@@ -213,9 +224,15 @@ contract Teleportation is PausableUpgradeable {
         emit ChainSupported(_chainId, true);
     }
 
+    /**
+    * @dev Add support of a specific token on this network.
+    *
+    * @param _token Token address to support.
+    */
     function addSupportedToken(address _token) external onlyOwner() onlyInitialized() {
         require(_token != address(0), "zero address not allowed");
         require(supportedTokens[_token] == false, "Already supported");
+        require(Address.isContract(_token), "Not a contract"); // doesn't ensure it's ERC20
         supportedTokens[_token] = true;
 
         emit TokenSupported(_token, true);
@@ -232,6 +249,21 @@ contract Teleportation is PausableUpgradeable {
 
         emit ChainSupported(_chainId, false);
     }
+
+    /**
+     * @dev remove the support for a specific token.
+     *
+     * @param _token The token not to support.
+     */
+    function removeSupportedToken(address _token) external onlyOwner() onlyInitialized() {
+        require(_token != address(0), "zero address not allowed");
+        require(supportedTokens[_token] == true, "Already not supported");
+        supportedTokens[_token] = false;
+
+        emit TokenSupported(_token, false);
+    }
+
+
 
     /**
      * @dev Accepts deposits that will be disbursed to the sender's address on target L2.
@@ -265,7 +297,7 @@ contract Teleportation is PausableUpgradeable {
 
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
-        emit BobaReceived(block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
+        emit ERC20Received(_token, block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
         totalDeposits[_toChainId] += 1;
     }
 
@@ -297,7 +329,7 @@ contract Teleportation is PausableUpgradeable {
             transferTimestampCheckPoint = block.timestamp;
         }
 
-        emit BobaReceived(block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, msg.value);
+        emit NativeReceived(block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, msg.value);
         totalDeposits[_toChainId] += 1;
     }
 

@@ -77,9 +77,36 @@ describe.only('BOBA Teleportation Tests', async () => {
       expect(await Proxy__Teleportation.supportedChains(4)).to.eq(true)
     })
 
+    it('should add a supported token', async () => {
+      await Proxy__Teleportation.addSupportedToken(L2Boba.address)
+      expect(await Proxy__Teleportation.supportedTokens(L2Boba.address)).to.eq(
+        true
+      )
+    })
+
     it('should not add the supported chain if it is added', async () => {
       await expect(
         Proxy__Teleportation.addSupportedChain(4)
+      ).to.be.revertedWith('Already supported')
+    })
+
+    it('should not add supported token if it is zero address', async () => {
+      await expect(
+        Proxy__Teleportation.addSupportedToken(ethers.constants.AddressZero)
+      ).to.be.revertedWith('zero address not allowed')
+    })
+
+    it('should not add supported token if it is not a contract address', async () => {
+      await expect(
+        Proxy__Teleportation.addSupportedToken(
+          signerAddress
+        )
+      ).to.be.revertedWith('Not a contract')
+    })
+
+    it('should not add supported token if it is already added', async () => {
+      await expect(
+        Proxy__Teleportation.addSupportedToken(L2Boba.address)
       ).to.be.revertedWith('Already supported')
     })
 
@@ -89,20 +116,51 @@ describe.only('BOBA Teleportation Tests', async () => {
       ).to.be.revertedWith('Caller is not the owner')
     })
 
+    it('should not add supported token if caller is not owner', async () => {
+      await expect(
+        Proxy__Teleportation.connect(signer2).addSupportedToken(L2Boba.address)
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
     it('should remove the supported chain', async () => {
       await Proxy__Teleportation.removeSupportedChain(4)
       expect(await Proxy__Teleportation.supportedChains(4)).to.eq(false)
     })
 
-    it('should not remove if it is already not supported', async () => {
+    it('should remove the supported token', async () => {
+      await Proxy__Teleportation.removeSupportedToken(L2Boba.address)
+      expect(await Proxy__Teleportation.supportedTokens(L2Boba.address)).to.eq(
+        false
+      )
+    })
+
+    it('should not remove chain if it is already not supported', async () => {
       await expect(
         Proxy__Teleportation.removeSupportedChain(4)
       ).to.be.revertedWith('Already not supported')
     })
 
+    it('should not remove token if it is already not supported', async () => {
+      await expect(
+        Proxy__Teleportation.removeSupportedToken(L2Boba.address)
+      ).to.be.revertedWith('Already not supported')
+    })
+
+    it('should not remove token if it is zero address', async () => {
+      await expect(
+        Proxy__Teleportation.removeSupportedToken(ethers.constants.AddressZero)
+      ).to.be.revertedWith('zero address not allowed')
+    })
+
     it('should not remove the supported chain if caller is not owner', async () => {
       await expect(
         Proxy__Teleportation.connect(signer2).removeSupportedChain(4)
+      ).to.be.revertedWith('Caller is not the owner')
+    })
+
+    it('should not remove the supported token if caller is not owner', async () => {
+      await expect(
+        Proxy__Teleportation.connect(signer2).removeSupportedToken(L2Boba.address)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
@@ -113,8 +171,8 @@ describe.only('BOBA Teleportation Tests', async () => {
       const preBalance = await L2Boba.balanceOf(signerAddress)
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportERC20(L2Boba.address, _amount, 4))
-        .to.emit(Proxy__Teleportation, 'BobaReceived')
-        .withArgs(31337, 4, 0, signerAddress, _amount)
+        .to.emit(Proxy__Teleportation, 'ERC20Received')
+        .withArgs(L2Boba.address, 31337, 4, 0, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '1'
       )
@@ -312,8 +370,8 @@ describe.only('BOBA Teleportation Tests', async () => {
       const _amount = ethers.utils.parseEther('100')
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportERC20(L2Boba.address, _amount, 4))
-        .to.emit(Proxy__Teleportation, 'BobaReceived')
-        .withArgs(31337, 4, 2, signerAddress, _amount)
+        .to.emit(Proxy__Teleportation, 'ERC20Received')
+        .withArgs(L2Boba.address, 31337, 4, 2, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '3'
       )
@@ -418,7 +476,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       await expect(
         Proxy__Teleportation.teleportNative(4, { value: _amount })
       )
-        .to.emit(Proxy__Teleportation, 'BobaReceived')
+        .to.emit(Proxy__Teleportation, 'NativeReceived')
         .withArgs(31337, 4, 0, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '1'
@@ -633,7 +691,7 @@ describe.only('BOBA Teleportation Tests', async () => {
       await expect(
         Proxy__Teleportation.teleportNative(4, { value: _amount })
       )
-        .to.emit(Proxy__Teleportation, 'BobaReceived')
+        .to.emit(Proxy__Teleportation, 'NativeReceived')
         .withArgs(31337, 4, 2, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
         '3'
