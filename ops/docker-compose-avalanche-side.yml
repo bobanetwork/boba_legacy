@@ -1,0 +1,103 @@
+version: "3"
+
+# Account #0
+x-deployer_pk: &deployer_pk
+  DEPLOYER_PRIVATE_KEY: '0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027'
+
+# Account #6 - bobalink test
+x-bobalink_pk: &bobalink_pk
+  BOBALINK_REPORTER_KEY: '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
+
+# Account #19
+x-gas-price-oracle_pk: &gas-price-oracle_pk
+  GAS_PRICE_ORACLE_OWNER_PRIVATE_KEY: '0x89844cbaab9ba74876f1033227926246cf9a312014c3293e466f2e3e91ebe0de'
+
+
+services:
+  bobalink:
+    depends_on:
+     - l2geth
+    image: bobanetwork/bobalink:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: bobalink
+    environment:
+      L1_NODE_WEB3_URL: http://l2geth:8545
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      << : *bobalink_pk
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      POLLING_INTERVAL: 1000
+
+  # deploys account abstraction contracts and serves contract addresses
+  aa_deployer:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - boba_deployer
+    image: bobanetwork/aa_deployer:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: aa_deployer
+    environment:
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      URL: http://dtl:8081/addresses.json
+      BOBA_URL: http://dtl:8081/boba-addr.json
+      # DO NOT use in production
+      << : *deployer_pk
+      RETRIES: 200
+      DTL_REGISTRY_URL: http://dtl:8081/aa-addr.json
+      # skip compilation when run in docker-compose, since the contracts
+      # were already compiled in the builder step
+      NO_COMPILE: 1
+
+  proxyd:
+    image: bobanetwork/proxyd:latest
+    build:
+      context: ../go/
+      dockerfile: ./proxyd/Dockerfile
+    deploy:
+      replicas: 0
+
+  bundler:
+    depends_on:
+      - l1_chain
+      - dtl
+      - l2geth
+      - boba_deployer
+      - aa_deployer
+    image: bobanetwork/bundler:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: bundler
+    deploy:
+      replicas: 1
+    ports: [ '3000:3000' ]
+    restart: on-failure
+    environment:
+      MIN_BALANCE: 0
+      URL: http://dtl:8081/addresses.json
+      AA_DEPLOYER: http://dtl:8081/aa-addr.json
+      MNEMONIC_OR_PK: "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
+      L1_NODE_WEB3_URL: http://l1_chain:9650/ext/bc/C/rpc
+      L2_NODE_WEB3_URL: http://l2geth:8545
+      BENEFICIARY: "0xb57255024fa928e3d296c41528171b5f67e8d447"
+      MAX_BUNDLE_GAS: 5000000
+      #should be set to false in prod!
+      UNSAFE: 'true'
+    mem_limit: 300M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "10"
+
+networks:
+  default:
+    name: local-network

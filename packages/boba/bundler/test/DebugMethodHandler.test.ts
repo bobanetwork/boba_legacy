@@ -9,10 +9,10 @@ import { ValidationManager } from '../src/modules/ValidationManager'
 import { BundleManager, SendBundleReturn } from '../src/modules/BundleManager'
 import { UserOpMethodHandler } from '../src/UserOpMethodHandler'
 import { ethers } from 'hardhat'
-import { EntryPoint, EntryPoint__factory, EntryPointWrapper, EntryPointWrapper__factory, SimpleAccountFactory__factory } from '@boba/accountabstraction'
-import { DeterministicDeployer, SimpleAccountAPI } from '@boba/bundler_sdk'
+import { EntryPoint, EntryPoint__factory, EntryPointWrapper, EntryPointWrapper__factory, SimpleAccountFactory__factory } from '@bobanetwork/accountabstraction'
+import { DeterministicDeployer, SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
 import { Signer, Wallet } from 'ethers'
-import { resolveHexlify } from '@boba/bundler_utils'
+import { resolveHexlify } from '@bobanetwork/bundler_utils'
 import { expect } from 'chai'
 import { createSigner } from './testUtils'
 import { EventsManager } from '../src/modules/EventsManager'
@@ -53,6 +53,7 @@ describe('#DebugMethodHandler', () => {
       minUnstakeDelay: 0,
       addressManager: '',
       l1NodeWeb3Url: '',
+      enableDebugMethods: false,
     }
 
 

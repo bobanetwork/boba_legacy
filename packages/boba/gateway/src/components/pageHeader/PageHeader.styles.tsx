@@ -1,55 +1,67 @@
-import { Box, Divider } from '@mui/material'
-import { styled } from '@mui/system'
+import styled, { css } from 'styled-components'
 
-export const HeaderWrapper = styled(Box)(({ theme }) => ({
-  width: '100%',
-  height: '64px',
-  gap: '10px',
-  display: 'flex',
-  justifyContent: 'space-around',
-  alignItems: 'center',
-  padding: '20px',
-  [theme.breakpoints.down('md')]: {
-    justifyContent: 'space-between',
-    padding: '20px 0',
-  },
-}))
+export const HeaderWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 64px;
+  gap: 10px;
+  justify-content: space-around;
+  align-items: center;
+  padding: '20px';
 
-export const HeaderActionButton = styled(Box)(({ theme }) => ({
-  gap: '10px',
-  display: 'flex',
-  justifyContent: 'space-around',
-  alignItems: 'center',
-}))
+  @media (max-width: 980px) {
+    justify-content: space-between;
+    padding: 20px 0;
+  }
+`
 
-export const DrawerHeader = styled(Box)`
+export const HeaderActionButton = styled.div`
+  gap: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`
+
+export const DrawerHeader = styled.div`
   display: flex;
   flex-direction: column;
   gap: 30px;
   padding: 20px 24px;
 `
 
-export const HeaderDivider = styled(Divider)(({ theme }) => ({
-  background: `${
-    theme.palette.mode === 'dark'
-      ? 'rgba(255, 255, 255, 0.04)'
-      : 'rgba(3, 19, 19, 0.04)'
-  }`,
-  boxSizing: 'border-box',
-  boxShadow: `${
-    theme.palette.mode === 'dark' ? '0px 4px 4px rgba(0, 0, 0, 0.25)' : 'none'
-  }`,
-  width: '100%',
-}))
+export const HeaderDivider = styled.div`
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: ${props.theme.colors.gray[800]};
+    `}
+  box-sizing: border-box;
+  box-shadow: ${(props) => props.theme.boxShadow};
+  width: 100%;
+`
 
-export const WrapperCloseIcon = styled(Box)`
+export const WrapperCloseIcon = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
 `
 
-export const StyleDrawer = styled(Box)`
-  background-color: ${(props) =>
-    props.theme.palette.mode === 'light' ? 'white' : '#111315'};
+export const StyleDrawer = styled.div`
   height: 100%;
+
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[50]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: ${props.theme.colors.gray[800]};
+    `}
 `

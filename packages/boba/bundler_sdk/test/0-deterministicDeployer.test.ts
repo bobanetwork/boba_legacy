@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { SampleRecipient__factory } from '@boba/bundler_utils/dist/src/types'
+import { SampleRecipient__factory } from '@bobanetwork/bundler_utils/dist/src/types'
 import { ethers } from 'hardhat'
 import { hexValue } from 'ethers/lib/utils'
 import { DeterministicDeployer } from '../src/DeterministicDeployer'
@@ -29,11 +29,11 @@ describe('#deterministicDeployer', () => {
     await ethers.provider.getSigner().sendTransaction({ to: testWallet.address, value: ethers.utils.parseEther('0.01') })
 
     const ctr = hexValue(new SampleRecipient__factory(ethers.provider.getSigner()).getDeployTransaction().data!)
-    DeterministicDeployer.init(ethers.provider, testWallet)
+    console.log(DeterministicDeployer.init(ethers.provider, testWallet))
     const addr = await DeterministicDeployer.getAddress(ctr, 1)
     expect(await deployer.isContractDeployed(addr)).to.equal(false)
     const preWalletBalance = await ethers.provider.getBalance(testWallet.address)
-    await DeterministicDeployer.deploy(ctr, 1)
+    console.log(await DeterministicDeployer.deploy(ctr, 1))
     const postWalletBalance = await ethers.provider.getBalance(testWallet.address)
     expect(await deployer.isContractDeployed(addr)).to.equal(true)
     // wallet deploys contract

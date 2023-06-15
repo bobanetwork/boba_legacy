@@ -30,6 +30,8 @@ export const DISABLE_WALLETCONNECT: EnvType =
   process.env.REACT_APP_DISABLE_WALLETCONNECT
 export const BOBABEAM_STATUS: EnvType =
   process.env.REACT_APP_BOBA_BEAM_STATUS || 0
+export const BOBAOPERA_STATUS: EnvType =
+  process.env.REACT_APP_BOBA_OPERA_STATUS || 0
 
 type BridgeType = {
   FAST_BRIDGE: string
@@ -82,14 +84,12 @@ export const ECOSYSTEM_CATEGORY: string[] = [
 type RoutesPathType = {
   BRIDGE: string
   ECOSYSTEM: string
-  WALLET: string
   HISTORY: string
   EARN: string
   LOCK: string
   STAKE: string
   HELP: string
   BOBASCOPE: string
-  MONSTER: string
   VOTE_DAO: string
   DAO: string
   DEV_TOOLS: string
@@ -98,14 +98,12 @@ type RoutesPathType = {
 export const ROUTES_PATH: RoutesPathType = {
   BRIDGE: '/bridge',
   ECOSYSTEM: '/ecosystem',
-  WALLET: '/wallet',
   HISTORY: '/history',
   EARN: '/earn',
   LOCK: '/lock',
   STAKE: '/stake',
   HELP: '/help',
   BOBASCOPE: '/bobascope',
-  MONSTER: '/monster',
   VOTE_DAO: '/votedao',
   DAO: '/DAO',
   DEV_TOOLS: '/devtools',

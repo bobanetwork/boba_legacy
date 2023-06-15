@@ -14,6 +14,7 @@ const fetch = require('node-fetch')
 
 import { OptimismEnv } from './shared/env'
 import { waitForAndExecute } from './shared/utils'
+import { Server } from 'http'
 
 describe('BobaLink Test\n', async () => {
   let env: OptimismEnv
@@ -33,16 +34,23 @@ describe('BobaLink Test\n', async () => {
     gasLimit: 1000000,
   }
 
-  const addOracle = async (contract: Contract, oracleAddr: string, adminAddr: string, roundId = 0) => {
+  const addOracle = async (
+    contract: Contract,
+    oracleAddr: string,
+    adminAddr: string,
+    roundId = 0
+  ) => {
     const admin = await contract.getAdmin()
     if (admin === '0x0000000000000000000000000000000000000000') {
-      await contract.setOracle(
-        oracleAddr,
-        adminAddr,
-        roundId
-      )
+      await contract.setOracle(oracleAddr, adminAddr, roundId)
     }
   }
+
+  let server: Server
+
+  after(async () => {
+    await server.close(console.error)
+  })
 
   before(async () => {
     env = await OptimismEnv.new()
@@ -80,10 +88,20 @@ describe('BobaLink Test\n', async () => {
     )
 
     await BobaOracleHC.updateHCHelper(TuringHelper.address)
-    await BobaOracleHC.updateHCChainLinkPriceFeedAddr(BobaChainLinkOracle.address)
+    await BobaOracleHC.updateHCChainLinkPriceFeedAddr(
+      BobaChainLinkOracle.address
+    )
 
-    await addOracle(BobaOracleHC, BobaChainLinkOracle.address, env.l2BobalinkWallet.address)
-    await addOracle(BobaChainLinkOracle, BobaChainLinkOracle.address, env.l2Wallet.address)
+    await addOracle(
+      BobaOracleHC,
+      BobaChainLinkOracle.address,
+      env.l2BobalinkWallet.address
+    )
+    await addOracle(
+      BobaChainLinkOracle,
+      BobaChainLinkOracle.address,
+      env.l2Wallet.address
+    )
 
     await TuringHelper.addPermittedCaller(BobaOracleHC.address)
 
@@ -107,7 +125,7 @@ describe('BobaLink Test\n', async () => {
     const http = require('http')
     const ip = require("ip")
     // start local server
-    const server = module.exports = http.createServer(async function (req, res) {
+    server = module.exports = http.createServer(async function (req, res) {
 
       if (req.headers['content-type'] === 'application/json') {
 
@@ -269,8 +287,13 @@ describe('BobaLink Test\n', async () => {
     await BobaOracleHC.updateHCUrl(`${URL}/fake`)
     const admin = await BobaOracleHC.getAdmin()
     const HCUrl = await BobaOracleHC.HCUrl()
-    await BobaOracleHC.connect(env.l2BobalinkWallet).estimateGas.getChainLinkQuote(lastRoundId)
-    await BobaOracleHC.connect(env.l2BobalinkWallet).getChainLinkQuote(lastRoundId, gasOverride)
+    await BobaOracleHC.connect(
+      env.l2BobalinkWallet
+    ).estimateGas.getChainLinkQuote(lastRoundId)
+    await BobaOracleHC.connect(env.l2BobalinkWallet).getChainLinkQuote(
+      lastRoundId,
+      gasOverride
+    )
     const block = await env.l2Provider.getBlockNumber()
     const chainLinkQuoteEvents = await BobaOracleHC.queryFilter(
       BobaOracleHC.filters.ChainLinkQuoteGot(),
@@ -299,7 +322,9 @@ describe('BobaLink Test\n', async () => {
       )
       expect(latestAnswer).to.be.eq(price)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 1)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 1)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 1
+      )
     }
     await waitForAndExecute(test, 10)
   })
@@ -345,7 +370,9 @@ describe('BobaLink Test\n', async () => {
       expect(prevAnswer.answer).to.be.eq(price1)
       expect(latestAnswer.answer).to.be.eq(price2)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 2)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 2
+      )
     }
     await waitForAndExecute(test, 10)
   })
@@ -368,7 +395,9 @@ describe('BobaLink Test\n', async () => {
       )
       expect(latestAnswer).to.be.eq(price)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 1)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 1)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 1
+      )
     }
     await waitForAndExecute(test, 10)
   })
@@ -395,7 +424,9 @@ describe('BobaLink Test\n', async () => {
       expect(prevAnswer.answer).to.be.eq(price1)
       expect(latestAnswer.answer).to.be.eq(price2)
       expect(chainLinkQuoteEvents[0].args.CLRoundId).to.equal(lastRoundId + 2)
-      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(lastRoundId + 2)
+      expect(chainLinkQuoteEvents[0].args.CLLatestRoundId).to.eq(
+        lastRoundId + 2
+      )
     }
     await waitForAndExecute(test, 10)
   })

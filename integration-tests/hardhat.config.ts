@@ -12,7 +12,7 @@ const config: HardhatUserConfig = {
     },
     boba: {
       url: process.env.L2_URL || 'http://localhost:8545',
-      gas: "auto"
+      gas: 'auto',
     },
   },
   mocha: {

@@ -81,6 +81,7 @@ type BackendConfig struct {
 	Username         string `toml:"username"`
 	Password         string `toml:"password"`
 	RPCURL           string `toml:"rpc_url"`
+	DEBUGRPCURL      string `toml:"debug_rpc_url"`
 	WSURL            string `toml:"ws_url"`
 	MaxRPS           int    `toml:"max_rps"`
 	MaxWSConns       int    `toml:"max_ws_conns"`

@@ -3,7 +3,11 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, utils } from 'ethers'
-import { getBobaContractAt, getBobaContractABI, deployBobaContractCore } from '@boba/contracts'
+import {
+  getBobaContractAt,
+  getBobaContractABI,
+  deployBobaContractCore,
+} from '@boba/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
@@ -249,7 +253,9 @@ describe('ERC1155 Bridge Test', async () => {
       await approveTX.wait()
 
       const exitFee = await BOBABillingContract.exitFee()
-      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155BridgeAltL1')
+      const L2ERC1155BridgeABI = await getBobaContractABI(
+        'L2ERC1155BridgeAltL1'
+      )
 
       const withdrawTx = await env.waitForXDomainTransaction(
         L2Bridge.connect(env.l2Wallet_2).withdraw(
@@ -954,7 +960,7 @@ describe('ERC1155 Bridge Test', async () => {
       const L2ERC1155Test = await deployBobaContractCore(
         'L1ERC1155',
         [DUMMY_URI_1],
-        env.l2Wallet,
+        env.l2Wallet
       )
 
       const mintTx = await L2ERC1155Test.mint(
@@ -1064,7 +1070,7 @@ describe('ERC1155 Bridge Test', async () => {
 
       const approveTX = await L1ERC1155.connect(
         env.l2Wallet_2
-      ).setApprovalForAll(L1Bridge.address, true)
+      ).setApprovalForAll(L1Bridge.address, true, { gasLimit: 1000000 })
       await approveTX.wait()
 
       await env.waitForXDomainTransaction(
@@ -1074,7 +1080,8 @@ describe('ERC1155 Bridge Test', async () => {
           DUMMY_TOKEN_ID_1,
           DUMMY_TOKEN_AMOUNT_1,
           '0x',
-          999999
+          999999,
+          { gasLimit: 1000000 }
         )
       )
 
@@ -1436,7 +1443,9 @@ describe('ERC1155 Bridge Test', async () => {
       )
       await env.waitForXDomainTransaction(backTx)
 
-      const L2ERC1155BridgeABI = await getBobaContractABI('L2ERC1155BridgeAltL1')
+      const L2ERC1155BridgeABI = await getBobaContractABI(
+        'L2ERC1155BridgeAltL1'
+      )
 
       // check event DepositFailed is emittted
       const returnedlogIndex = await getFilteredLogIndex(

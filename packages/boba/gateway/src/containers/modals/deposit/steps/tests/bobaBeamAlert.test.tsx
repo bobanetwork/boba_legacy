@@ -1,9 +1,9 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import Theme from 'themes'
+import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import BobaBeamAlert from '../bobaBeamAlert'
+import BobaBeamAlert from '../BridgeAlert'
 import { NETWORK } from 'util/network/network.util'
 import * as constants from 'util/constant'
 
@@ -19,9 +19,9 @@ const renderComponent = (state: any) => {
         ...state,
       })}
     >
-      <Theme>
+      <CustomThemeProvider>
         <BobaBeamAlert />
-      </Theme>
+      </CustomThemeProvider>
     </Provider>
   )
 }
@@ -29,6 +29,10 @@ const renderComponent = (state: any) => {
 describe('BobaBeamAlert', () => {
   test('should match the snapshot when active network is ethereum', () => {
     Object.defineProperty(constants, 'BOBABEAM_STATUS', {
+      value: 1,
+      writable: true,
+    })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
       value: 1,
       writable: true,
     })
@@ -45,6 +49,10 @@ describe('BobaBeamAlert', () => {
       value: 1,
       writable: true,
     })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
+      value: 1,
+      writable: true,
+    })
     const { asFragment } = renderComponent({
       network: {
         activeNetwork: NETWORK.MOONBEAM,
@@ -53,14 +61,35 @@ describe('BobaBeamAlert', () => {
     expect(asFragment()).toMatchSnapshot()
   })
 
-  test('should match the snapshot when active network is moonbeam and status is 0', () => {
+  test('should match the snapshot when active network is opera', () => {
     Object.defineProperty(constants, 'BOBABEAM_STATUS', {
+      value: 1,
+      writable: true,
+    })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
+      value: 1,
+      writable: true,
+    })
+    const { asFragment } = renderComponent({
+      network: {
+        activeNetwork: NETWORK.FANTOM,
+      },
+    })
+    expect(asFragment()).toMatchSnapshot()
+  })
+
+  test('should match the snapshot disabled from env params', () => {
+    Object.defineProperty(constants, 'BOBABEAM_STATUS', {
+      value: 0,
+      writable: true,
+    })
+    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
       value: 0,
       writable: true,
     })
     const { asFragment } = renderComponent({
       network: {
-        activeNetwork: NETWORK.MOONBEAM,
+        activeNetwork: NETWORK.FANTOM,
       },
     })
     expect(asFragment()).toMatchSnapshot()

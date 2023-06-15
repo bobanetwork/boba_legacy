@@ -1,6 +1,6 @@
 {
-  "name": "@boba/accountabstraction",
-  "version": "1.0.0",
+  "name": "@bobanetwork/accountabstraction",
+  "version": "1.0.1",
   "description": "BOBA Account Abstraction (EIP 4337) contracts",
   "main": "./dist/index.js",
   "scripts": {
@@ -33,8 +33,14 @@
     "smart",
     "contracts",
     "account-abstraction",
-    "eip-4337"
+    "eip-4337",
+    "boba"
   ],
+  "repository": "https://github.com/bobanetwork/boba/tree/develop/packages/boba/account-abstraction",
+  "homepage": "https://boba.network",
+  "bugs": {
+    "url": "https://github.com/bobanetwork/issues"
+  },
   "license": "ISC",
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.11",
@@ -66,7 +72,6 @@
     "@gnosis.pm/safe-contracts": "^1.3.0",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@openzeppelin/contracts": "^4.2.0",
-    "@openzeppelin/contracts-upgradeable": "4.3.2",
     "@thehubbleproject/bls": "^0.5.1",
     "@typechain/hardhat": "^6.1.2",
     "@types/mocha": "^9.0.0",

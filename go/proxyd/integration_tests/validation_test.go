@@ -229,6 +229,55 @@ func TestBatchRPCValidation(t *testing.T) {
 	}
 }
 
+func TestDebugEndpoints(t *testing.T) {
+	goodBackend := NewMockBackend(BatchedResponseHandler(200, goodResponse))
+	defer goodBackend.Close()
+
+	badBackend := NewMockBackend(BatchedResponseHandler(400, unexpectedResponse))
+	defer badBackend.Close()
+
+	require.NoError(t, os.Setenv("RPC_BACKEND_RPC_URL", goodBackend.URL()))
+	require.NoError(t, os.Setenv("DEBUG_BACKEND_RPC_URL", badBackend.URL()))
+
+	config := ReadConfig("debug_backend")
+	client := NewProxydClient("http://127.0.0.1:8545")
+	shutdown, err := proxyd.Start(config)
+	require.NoError(t, err)
+	defer shutdown()
+
+	tests := []struct {
+		name     string
+		body     string
+		res      string
+		code     int
+		reqCount int
+	}{
+		{
+			"rpc",
+			"{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [], \"id\": 123}",
+			unexpectedResponse,
+			400,
+			1,
+		},
+		{
+			"batch rpc",
+			"[{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [], \"id\": 123},{\"jsonrpc\": \"2.0\", \"method\": \"eth_chainId\", \"params\": [], \"id\": 123}]",
+			asArray(unexpectedResponse, unexpectedResponse),
+			200,
+			3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res, code, err := client.SendRequest([]byte(tt.body))
+			require.NoError(t, err)
+			RequireEqualJSON(t, []byte(tt.res), res)
+			require.Equal(t, tt.code, code)
+			require.Equal(t, 1, len(goodBackend.Requests()))
+		})
+	}
+}
+
 func TestRevertedRPC(t *testing.T) {
 	tests := []struct {
 		name string

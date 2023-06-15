@@ -1,0 +1,6 @@
+node_modules
+.env
+cache/
+artifacts/
+.idea
+.aws-sam/

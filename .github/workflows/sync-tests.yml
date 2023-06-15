@@ -39,7 +39,7 @@ jobs:
 
       - name: Collect docker logs on failure
         if: failure()
-        uses: jwalton/gh-docker-logs@v1
+        uses: jwalton/gh-docker-logs@v2
         with:
           images: 'ethereumoptimism/builder,ethereumoptimism/hardhat,ethereumoptimism/deployer,ethereumoptimism/data-transport-layer,ethereumoptimism/l2geth,ethereumoptimism/message-relayer,ethereumoptimism/batch-submitter,ethereumoptimism/l2geth'
           dest: './logs'

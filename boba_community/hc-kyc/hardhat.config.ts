@@ -12,9 +12,9 @@ const config: HardhatUserConfig = {
     boba_local: {
       url: 'http://localhost:8545',
     },
-    boba_rinkeby: {
-      url: 'https://rinkeby.boba.network',
-      bridgeCounterpartUrl: 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // public RPC
+    boba_goerli: {
+      url: 'https://goerli.boba.network',
+      bridgeCounterpartUrl: 'https://goerli.gateway.tenderly.co', // public RPC
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     } as any,
     boba_mainnet: {

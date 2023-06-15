@@ -14,7 +14,7 @@ const config: HardhatUserConfig = {
     },
     boba_goerli: {
       url: 'https://goerli.boba.network',
-      bridgeCounterpartUrl: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // public RPC
+      bridgeCounterpartUrl: 'https://goerli.gateway.tenderly.co', // public RPC
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     } as any,
     boba_mainnet: {

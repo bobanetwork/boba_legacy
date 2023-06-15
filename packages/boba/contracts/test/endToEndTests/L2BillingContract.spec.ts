@@ -49,7 +49,8 @@ describe('L2BillingContract Tests', async () => {
           '0x0000000000000000000000000000000000000000',
           '0x0000000000000000000000000000000000000000',
           '0x0000000000000000000000000000000000000000'
-        )).to.be.revertedWith('Fee token address cannot be zero')
+        )
+      ).to.be.revertedWith('Fee token address cannot be zero')
     })
 
     it('should have correct address', async () => {

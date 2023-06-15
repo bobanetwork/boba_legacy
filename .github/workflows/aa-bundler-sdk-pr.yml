@@ -1,0 +1,43 @@
+name: Will trigger version bump of AA-Bundler for NPM
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+     # only on change
+     - 'packages/boba/bundler_sdk/**/*'
+     - 'packages/boba/bundler_utils/**/*'
+     - 'packages/boba/account-abstraction/**/*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            bundler_sdk:
+              - 'packages/boba/account-abstraction/**/*'
+              - 'packages/boba/bundler_sdk/**/*'
+              - 'packages/boba/bundler_utils/**/*'
+
+      - name: PR commenter
+        if: steps.filter.outputs.bundler_sdk == 'true'
+        uses: mshick/add-pr-comment@v2
+        with:
+            message: |
+              ⚠️ **This PR triggers a minor release of the Bundler SDK** (Account Abstraction) to NPM as you made changes in the corresponding `bundler_sdk` directory.
+
+              Please make sure this is intentional.
+
+              The package that is going to be updated is `@bobanetwork/bundler_sdk`.
+
+

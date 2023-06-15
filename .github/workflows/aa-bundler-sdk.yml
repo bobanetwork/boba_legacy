@@ -1,7 +1,8 @@
 name: Publish AA-Bundler to NPM
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+    - '*'
 
 jobs:
   build:
@@ -14,9 +15,23 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
+
       - name: Install dependencies and build 🔧
         run: yarn install --frozen-lockfile --legacy-peer-deps && yarn run build
-      - name: Publish package on NPM 📦
+
+      - name: Publish AA package on NPM 📦
+        working-directory: ./packages/boba/account-abstraction
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOBA_FOUNDATION }}
+
+      - name: Publish BundlerUtils package on NPM 📦
+        working-directory: ./packages/boba/bundler_utils
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOBA_FOUNDATION }}
+
+      - name: Publish BundlerSDK package on NPM 📦
         working-directory: ./packages/boba/bundler_sdk
         run: npm publish --access public
         env:

@@ -1,0 +1,57 @@
+name: Deploy gateway to stage
+
+on:
+  push:
+    branches:
+      - 'develop'
+    paths:
+      # when only on change
+      - 'packages/boba/gateway/**/*'
+env:
+  STAGING_BUCKET_NAME: ${{ secrets.STAGING_BUCKET_NAME }}
+  REACT_APP_SPEED_CHECK: ${{ secrets.SPEED_CHECK }}
+  REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
+  REACT_APP_GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID }}
+  REACT_APP_SENTRY_DSN: ${{ secrets.SENTRY_DSN_MAINNET }}
+
+jobs:
+  build-gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - name: Install dependencies at root
+        run: yarn install
+      - name: Build in root
+        run: yarn build
+      - name: Latest tag
+        id: tag
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Print current tag
+        run: echo ${{ steps.tag.outputs.VERSION }}
+      - name: Prepare gateway build for stage
+        working-directory: ./packages/boba/gateway
+        run: yarn build:prod
+        env:
+          SKIP_PREFLIGHT_CHECK: true
+          REACT_APP_POLL_INTERVAL: 15000
+          REACT_APP_STATUS: 'normal'
+          REACT_APP_DISABLE_VE_DAO: 1
+          REACT_APP_BOBA_BEAM_STATUS: 1
+          REACT_APP_WALLET_VERSION: ${{ steps.tag.outputs.VERSION }}
+          REACT_APP_SPEED_CHECK: ${{ env.REACT_APP_SPEED_CHECK }}
+          REACT_APP_INFURA_ID: ${{ env.REACT_APP_INFURA_ID }}
+          REACT_APP_GA4_MEASUREMENT_ID: ${{ env.REACT_APP_GA4_MEASUREMENT_ID }}
+          REACT_APP_SENTRY_DSN: ${{ env.REACT_APP_SENTRY_DSN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: 'Deploy to S3:Staging'
+        working-directory: ./packages/boba/gateway
+        run: aws s3 rm s3://${{ env.STAGING_BUCKET_NAME }} --recursive && aws s3 sync build s3://${{ env.STAGING_BUCKET_NAME }} && aws s3 cp s3://${{ env.STAGING_BUCKET_NAME }}/index.html s3://${{ env.STAGING_BUCKET_NAME }}/index.html --metadata-directive REPLACE --cache-control max-age=0 --content-type text/html

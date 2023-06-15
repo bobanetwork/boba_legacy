@@ -18,7 +18,7 @@ jobs:
       contents: read
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -47,20 +47,21 @@ jobs:
       contents: read
     steps:
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_ACCESS_TOKEN_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN_SECRET }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - uses: actions/checkout@v2
 
-      - uses: chrisdickinson/setup-yq@latest
+      - name: yq - portable yaml processor
+        uses: mikefarah/yq@v4.34.1
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -126,13 +127,15 @@ jobs:
 
       - name: Build the side services
         working-directory: ./ops
-        run: docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+        run: |
+          #standard yq setup: $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+          docker-compose -f docker-compose.yml -f docker-compose-side.yml build -- $(yq eval '(.services | keys)[]' < ./docker-compose-side.yml  | tr '\n' ' ')
 
       - name: Print images
         working-directory: ./
         run: docker images
 
-      - name: Rename and retag the Optimism images
+      - name: Rename and retag images
         working-directory: ./ops
         run: |
           for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do
@@ -140,7 +143,7 @@ jobs:
           done
           docker images
 
-      - name: Rename and retag the optimism images
+      - name: Push images
         working-directory: ./ops
         run: |
           for i in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep bobanetwork); do
@@ -167,7 +170,7 @@ jobs:
       contents: read
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}

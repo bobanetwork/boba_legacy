@@ -8,7 +8,7 @@ chai.use(solidity)
 
 import { OptimismEnv } from './shared/env'
 import { verifyStateRoots } from './shared/state-root-verification'
-import { Server } from "http";
+import { Server } from 'http'
 
 describe('Turing 256 Bit Random Number Test', async () => {
   let env: OptimismEnv
@@ -52,11 +52,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
       env.l2Wallet
     )
 
-    TuringHelper = await ethers.deployContract(
-      'TuringHelper',
-      [],
-      env.l2Wallet
-    )
+    TuringHelper = await ethers.deployContract('TuringHelper', [], env.l2Wallet)
     console.log('    Helper contract deployed at', TuringHelper.address)
     await TuringHelper.deployTransaction.wait()
 
@@ -156,8 +152,12 @@ describe('Turing 256 Bit Random Number Test', async () => {
         )
       )
 
-      const postL1BOBABalance = await L1BOBAToken.balanceOf(env.l1Wallet.address)
-      const postL2BOBABalance = await L2BOBAToken.balanceOf(env.l2Wallet.address)
+      const postL1BOBABalance = await L1BOBAToken.balanceOf(
+        env.l1Wallet.address
+      )
+      const postL2BOBABalance = await L2BOBAToken.balanceOf(
+        env.l2Wallet.address
+      )
 
       expect(preL1BOBABalance).to.deep.eq(
         postL1BOBABalance.add(depositBOBAAmount)
@@ -211,9 +211,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
 
   it('should be funded for two transactions', async () => {
     const txPrice = await BobaTuringCredit.turingPrice()
-    const bal = await BobaTuringCredit.prepaidBalance(
-      TuringHelper.address
-    )
+    const bal = await BobaTuringCredit.prepaidBalance(TuringHelper.address)
     expect(bal).to.be.deep.eq(txPrice.mul(2))
   })
 
@@ -229,12 +227,10 @@ describe('Turing 256 Bit Random Number Test', async () => {
     .timeout(100000)
     .retries(3)
 
-    // The price of one transaction should have been deducted, leaving 1
-    it('should now be funded for one transaction', async () => {
+  // The price of one transaction should have been deducted, leaving 1
+  it('should now be funded for one transaction', async () => {
     const txPrice = await BobaTuringCredit.turingPrice()
-    const bal = await BobaTuringCredit.prepaidBalance(
-      TuringHelper.address
-    )
+    const bal = await BobaTuringCredit.prepaidBalance(TuringHelper.address)
     expect(bal).to.be.deep.eq(txPrice)
   })
 
@@ -243,9 +239,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     const tr = await random.getRandom()
     const res = await tr.wait()
     expect(res).to.be.ok
-    const bal = await BobaTuringCredit.prepaidBalance(
-      TuringHelper.address
-    )
+    const bal = await BobaTuringCredit.prepaidBalance(TuringHelper.address)
     expect(bal).to.be.deep.eq(1)
   })
 
@@ -259,9 +253,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
       { value: depositAmount }
     )
     await depositTx.wait()
-    const bal = await BobaTuringCredit.prepaidBalance(
-      TuringHelper.address
-    )
+    const bal = await BobaTuringCredit.prepaidBalance(TuringHelper.address)
     expect(bal).to.be.deep.at.least(txPrice.mul(6))
   })
 
@@ -273,7 +265,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
       await random.estimateGas.MixedInput(URL, 123, 999)
       expect(1).to.equal(0)
     } catch (e) {
-      expect(e.error.toString()).to.contain("SERVER_ERROR")
+      expect(e.error.toString()).to.contain('SERVER_ERROR')
     }
   })
 
@@ -283,7 +275,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
       const tr = await random.NestedRandom(1)
       expect(1).to.equal(0)
     } catch (e) {
-      expect(e.error.toString()).to.contain("SERVER_ERROR")
+      expect(e.error.toString()).to.contain('SERVER_ERROR')
     }
   })
 

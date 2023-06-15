@@ -1171,9 +1171,7 @@ describe('Boba Fee Payment Integration Tests', async () => {
         to: env.l2Wallet.address,
         value: ethers.utils.parseEther('0.5'),
       })
-    ).to.be.rejectedWith(
-      'insufficient l1 native token balance to pay for gas'
-    )
+    ).to.be.rejectedWith('insufficient l1 native token balance to pay for gas')
   })
 
   it('should return the correct receipt', async () => {

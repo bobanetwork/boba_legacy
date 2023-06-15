@@ -108,13 +108,13 @@ describe('Dao Action Test', async () => {
         GovernorBravoDelegate.address,
         governor_voting_period, // VOTING PERIOD - duration of the voting period in seconds
         governor_voting_delay, // VOTING DELAY - time between when a proposal is proposed and when the voting period starts, in seconds
-        governor_proposal_threshold // the votes necessary to propose
+        governor_proposal_threshold, // the votes necessary to propose
       ],
       env.l2Wallet
     )
 
     // set admin Timelock
-    // set eta to be the current timestamp for local and rinkeby
+    // set eta to be the current timestamp for local and goerli
     const eta1 = (await getTimestamp()) + eta_delay_s
 
     const setPendingAdminData = utils.defaultAbiCoder.encode(
@@ -133,7 +133,7 @@ describe('Dao Action Test', async () => {
 
     await setPendingAdminTx.wait()
     // call initiate() to complete setAdmin
-    // set eta to be the current timestamp for local and rinkeby
+    // set eta to be the current timestamp for local and goerli
     const eta2 = (await getTimestamp()) + eta_delay_s
 
     const initiateData = utils.defaultAbiCoder.encode(

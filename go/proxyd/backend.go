@@ -20,6 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -107,6 +108,7 @@ type Backend struct {
 	Name                 string
 	rpcURL               string
 	wsURL                string
+	debugRpcURL          string
 	authUsername         string
 	authPassword         string
 	rateLimiter          BackendRateLimiter
@@ -191,6 +193,7 @@ func NewBackend(
 	name string,
 	rpcURL string,
 	wsURL string,
+	debugRpcURL string,
 	rateLimiter BackendRateLimiter,
 	rpcSemaphore *semaphore.Weighted,
 	opts ...BackendOpt,
@@ -199,6 +202,7 @@ func NewBackend(
 		Name:            name,
 		rpcURL:          rpcURL,
 		wsURL:           wsURL,
+		debugRpcURL:     debugRpcURL,
 		rateLimiter:     rateLimiter,
 		maxResponseSize: math.MaxInt64,
 		client: &LimitedHTTPClient{
@@ -247,7 +251,37 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 			),
 		)
 
-		res, err := b.doForward(ctx, reqs, isBatch)
+		var (
+			res        []*RPCRes
+			err        error
+			defaultRes []*RPCRes
+			defaultErr error
+			debugRes   []*RPCRes
+			debugErr   error
+
+			resultMethods = []string{"eth_gasPrice", "eth_estimateGas", "eth_call", "eth_getBalance", "eth_chainId"}
+		)
+		defaultRes, defaultErr = b.doForward(ctx, reqs, isBatch, false)
+		if b.debugRpcURL != "" {
+			// We return the value of the debug endpoint if it is available
+			debugRes, debugErr = b.doForward(ctx, reqs, isBatch, true)
+			res, err = debugRes, debugErr
+			if defaultErr == nil && debugErr == nil {
+				for i, req := range reqs {
+					method := req.Method
+					if slices.Contains(resultMethods, method) {
+						debugResult(method, defaultRes[i], debugRes[i])
+					}
+					if method == "eth_getLogs" {
+						debugLogs(method, defaultRes[i], debugRes[i])
+					}
+				}
+			} else if (defaultErr == nil && debugErr != nil) || (defaultErr != nil && debugErr == nil) {
+				log.Error("One of response is error", "defaultErr", defaultErr, "debugErr", debugErr)
+			}
+		} else {
+			res, err = defaultRes, defaultErr
+		}
 		switch err {
 		case nil: // do nothing
 		// ErrBackendUnexpectedJSONRPC occurs because infura responds with a single JSON-RPC object
@@ -365,7 +399,7 @@ func (b *Backend) setOffline() {
 	}
 }
 
-func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool) ([]*RPCRes, error) {
+func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool, isDebug bool) ([]*RPCRes, error) {
 	isSingleElementBatch := len(rpcReqs) == 1
 
 	// Single element batches are unwrapped before being sent
@@ -394,7 +428,15 @@ func (b *Backend) doForward(ctx context.Context, rpcReqs []*RPCReq, isBatch bool
 		}
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", b.rpcURL, bytes.NewReader(body))
+	var (
+		httpReq *http.Request
+		err     error
+	)
+	if isDebug {
+		httpReq, err = http.NewRequestWithContext(ctx, "POST", b.debugRpcURL, bytes.NewReader(body))
+	} else {
+		httpReq, err = http.NewRequestWithContext(ctx, "POST", b.rpcURL, bytes.NewReader(body))
+	}
 	if err != nil {
 		return nil, wrapErr(err, "error creating backend request")
 	}
