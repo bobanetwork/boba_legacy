@@ -5,6 +5,7 @@ import { ethers } from 'hardhat'
 import { Contract, Signer, BigNumber, utils } from 'ethers'
 
 let L2Boba: Contract
+let RandomERC20: Contract
 let Teleportation: Contract
 let Proxy__Teleportation: Contract
 
@@ -38,6 +39,10 @@ describe('BOBA Teleportation Tests', async () => {
       L2Boba = await (
         await ethers.getContractFactory('L1ERC20')
       ).deploy(initialSupply, tokenName, tokenSymbol, 18)
+
+      RandomERC20 = await (
+        await ethers.getContractFactory('L1ERC20')
+      ).deploy(initialSupply, 'Random Token', 'RTN', 9)
 
       const Factory__Teleportation = await ethers.getContractFactory(
         'Teleportation'
@@ -81,6 +86,13 @@ describe('BOBA Teleportation Tests', async () => {
       expect(await Proxy__Teleportation.supportedTokens(L2Boba.address)).to.eq(
         true
       )
+    })
+
+    it('should add another supported token', async () => {
+      await Proxy__Teleportation.addSupportedToken(RandomERC20.address)
+      expect(
+        await Proxy__Teleportation.supportedTokens(RandomERC20.address)
+      ).to.eq(true)
     })
 
     it('should not add the supported chain if it is added', async () => {
@@ -133,6 +145,13 @@ describe('BOBA Teleportation Tests', async () => {
       )
     })
 
+    it('should remove a random supported token', async () => {
+      await Proxy__Teleportation.removeSupportedToken(RandomERC20.address)
+      expect(await Proxy__Teleportation.supportedTokens(RandomERC20.address)).to.eq(
+        false
+      )
+    })
+
     it('should not remove chain if it is already not supported', async () => {
       await expect(
         Proxy__Teleportation.removeSupportedChain(4)
@@ -179,6 +198,24 @@ describe('BOBA Teleportation Tests', async () => {
         (await Proxy__Teleportation.transferredAmount()).toString()
       ).to.be.eq(_amount.toString())
       const postBalance = await L2Boba.balanceOf(signerAddress)
+      expect(preBalance.sub(_amount)).to.be.eq(postBalance)
+    })
+
+    it('should teleport random tokens and emit event', async () => {
+      await Proxy__Teleportation.addSupportedToken(RandomERC20.address)
+      const _amount = ethers.utils.parseEther('100')
+      const preBalance = await RandomERC20.balanceOf(signerAddress)
+      await RandomERC20.approve(Proxy__Teleportation.address, _amount)
+      await expect(Proxy__Teleportation.teleportERC20(RandomERC20.address, _amount, 4))
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
+        .withArgs(RandomERC20.address, 31337, 4, 1, signerAddress, _amount)
+      expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
+        '2'
+      )
+      expect(
+        (await Proxy__Teleportation.transferredAmount()).toString()
+      ).to.be.eq(ethers.utils.parseEther('200').toString()) // 200 bc. of previous test
+      const postBalance = await RandomERC20.balanceOf(signerAddress)
       expect(preBalance.sub(_amount)).to.be.eq(postBalance)
     })
 
@@ -411,9 +448,9 @@ describe('BOBA Teleportation Tests', async () => {
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await expect(Proxy__Teleportation.teleportERC20(L2Boba.address, _amount, 4))
         .to.emit(Proxy__Teleportation, 'AssetReceived')
-        .withArgs(L2Boba.address, 31337, 4, 2, signerAddress, _amount)
+        .withArgs(L2Boba.address, 31337, 4, 3, signerAddress, _amount)
       expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
-        '3'
+        '4'
       )
       const payload = [
         {
