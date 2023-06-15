@@ -9,10 +9,11 @@ import (
 )
 
 func debugResult(ctx context.Context, method string, defaultRes *RPCRes, debugRes *RPCRes) {
-	if defaultRes.Result == nil && debugRes.Result == nil {
+	reqID := GetReqID(ctx)
+	if reflect.DeepEqual(defaultRes.Result, debugRes.Result) {
+		log.Debug("Response matches", "method", method, "result", debugResult, "req_id", reqID)
 		return
 	}
-	reqID := GetReqID(ctx)
 	debugResult, ok := debugRes.Result.(string)
 	if !ok {
 		log.Error("Failed to decode debugResult", "method", method, "debugResult", debugResult, "req_id", reqID, "result", debugRes.Result)
@@ -29,10 +30,11 @@ func debugResult(ctx context.Context, method string, defaultRes *RPCRes, debugRe
 }
 
 func debugLogs(ctx context.Context, method string, defaultRes *RPCRes, debugRes *RPCRes) {
-	if defaultRes.Result == nil && debugRes.Result == nil {
+	reqID := GetReqID(ctx)
+	if reflect.DeepEqual(defaultRes.Result, debugRes.Result) {
+		log.Debug("Response matches", "method", method, "result", debugLogs, "req_id", reqID)
 		return
 	}
-	reqID := GetReqID(ctx)
 	var debugLogs *types.Log
 	var defaultLogs *types.Log
 	debugLogs, ok := debugRes.Result.(*types.Log)
