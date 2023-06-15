@@ -466,6 +466,55 @@ describe('BOBA Teleportation Tests', async () => {
         .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
         .withArgs(3, signerAddress, _amount, 4)
     })
+
+    it('should teleport native asset and emit event', async () => {
+      const prevTransferredAmount = await Proxy__Teleportation.transferredAmount();
+      const _amount = ethers.utils.parseEther('100')
+      const preBalance = await ethers.provider.getBalance(signerAddress)
+      await expect(
+        Proxy__Teleportation.teleportNative(4, { value: _amount })
+      )
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
+        .withArgs(
+          ethers.constants.AddressZero,
+          31337,
+          4,
+          4,
+          signerAddress,
+          _amount
+        )
+      expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
+        '5'
+      )
+      expect(
+        BigNumber.from(await Proxy__Teleportation.transferredAmount())
+          .sub(prevTransferredAmount).toString()
+      ).to.be.eq(_amount.toString())
+
+      const gasFee = await getGasFeeFromLastestBlock(ethers.provider)
+
+      const postBalance = await ethers.provider.getBalance(signerAddress)
+      expect(preBalance.sub(_amount)).to.be.eq(postBalance.add(gasFee))
+    })
+
+
+    it('should disburse native asset and emit events', async () => {
+      const _amount = ethers.utils.parseEther('100')
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: _amount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 4,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseNative(payload, { value: _amount })
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
+        .withArgs(4, signerAddress, _amount, 4)
+    })
   })
 
   describe('Alt L2 - BOBA is the native token', () => {
@@ -841,6 +890,51 @@ describe('BOBA Teleportation Tests', async () => {
       )
         .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
         .withArgs(3, signerAddress, _amount, 4)
+    })
+
+    it('should teleport BOBA tokens and emit event for alt l2', async () => {
+      const prevTransferredAmount = BigNumber.from(
+        await Proxy__Teleportation.transferredAmount()
+      )
+      const _amount = ethers.utils.parseEther('100')
+      const preBalance = await L2Boba.balanceOf(signerAddress)
+      await L2Boba.approve(Proxy__Teleportation.address, _amount)
+      await expect(Proxy__Teleportation.teleportERC20(L2Boba.address, _amount, 4))
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
+        .withArgs(L2Boba.address, 31337, 4, 3, signerAddress, _amount)
+      expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
+        '4'
+      )
+      expect(
+        BigNumber.from(await Proxy__Teleportation.transferredAmount())
+          .sub(prevTransferredAmount)
+          .toString()
+      ).to.be.eq(_amount.toString())
+      const postBalance = await L2Boba.balanceOf(signerAddress)
+      expect(preBalance.sub(_amount)).to.be.eq(postBalance)
+    })
+
+    it('should teleport random tokens and emit event for alt l2', async () => {
+      const prevTransferredAmount = BigNumber.from(
+        await Proxy__Teleportation.transferredAmount()
+      )
+      await Proxy__Teleportation.addSupportedToken(RandomERC20.address)
+      const _amount = ethers.utils.parseEther('100')
+      const preBalance = await RandomERC20.balanceOf(signerAddress)
+      await RandomERC20.approve(Proxy__Teleportation.address, _amount)
+      await expect(Proxy__Teleportation.teleportERC20(RandomERC20.address, _amount, 4))
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
+        .withArgs(RandomERC20.address, 31337, 4, 4, signerAddress, _amount)
+      expect((await Proxy__Teleportation.totalDeposits(4)).toString()).to.be.eq(
+        '5'
+      )
+      expect(
+        BigNumber.from(await Proxy__Teleportation.transferredAmount())
+          .sub(prevTransferredAmount)
+          .toString()
+      ).to.be.eq(_amount.toString())
+      const postBalance = await RandomERC20.balanceOf(signerAddress)
+      expect(preBalance.sub(_amount)).to.be.eq(postBalance)
     })
   })
 

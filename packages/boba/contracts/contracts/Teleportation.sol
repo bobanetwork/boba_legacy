@@ -82,7 +82,7 @@ contract Teleportation is PausableUpgradeable {
         uint256 newAmount
     );
 
-    event NativeBOBABalanceWithdrawn(
+    event NativeBalanceWithdrawn(
         address indexed owner,
         uint256 balance
     );
@@ -494,7 +494,7 @@ contract Teleportation is PausableUpgradeable {
         uint256 _balance = address(this).balance;
         (bool sent,) = owner.call{gas: 2300, value: _balance}("");
         require(sent, "Failed to send Ether");
-        emit NativeBOBABalanceWithdrawn(owner, _balance);
+        emit NativeBalanceWithdrawn(owner, _balance);
     }
 
     /**
