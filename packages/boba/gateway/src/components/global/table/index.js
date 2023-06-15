@@ -34,17 +34,8 @@ const TableRow = styled(Row)`
     margin-right: 0px;
   }
 `
-type TableHeaderOptionType = {
-  name: string
-  tooltip: string
-  width: number
-}
 
-type TableHeaderType = {
-  options: TableHeaderOptionType[]
-}
-
-export const TableHeader = ({ options }: TableHeaderType) => {
+export const TableHeader = ({ options }) => {
   return (
     <TableHeaderContainer>
       {options?.map((option) => {
@@ -66,18 +57,8 @@ export const TableHeader = ({ options }: TableHeaderType) => {
   )
 }
 
-type TableContentOptionType = {
-  content: any
-  width: number
-}
-
-type TableContentType = {
-  options: TableContentOptionType[]
-  mobileOptions?: number[]
-}
-
-export const TableContent = ({ options, mobileOptions }: TableContentType) => {
-  const theme = useTheme() as any
+export const TableContent = ({ options, mobileOptions }) => {
+  const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const currentOptions =
     isMobile && mobileOptions ? mobileOptions.map((i) => options[i]) : options

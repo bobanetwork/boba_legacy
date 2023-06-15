@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import Theme from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import BobaBeamAlert from '../BridgeAlert'
+import BridgeAlert from '../BridgeAlert'
 import { NETWORK } from 'util/network/network.util'
 import * as constants from 'util/constant'
 
@@ -20,18 +20,14 @@ const renderComponent = (state: any) => {
       })}
     >
       <Theme>
-        <BobaBeamAlert />
+        <BridgeAlert />
       </Theme>
     </Provider>
   )
 }
 
-describe('BobaBeamAlert', () => {
+describe('BridgeAlert', () => {
   test('should match the snapshot when active network is ethereum', () => {
-    Object.defineProperty(constants, 'BOBABEAM_STATUS', {
-      value: 1,
-      writable: true,
-    })
     Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
       value: 1,
       writable: true,
@@ -44,28 +40,7 @@ describe('BobaBeamAlert', () => {
     expect(asFragment()).toMatchSnapshot()
   })
 
-  test('should match the snapshot when active network is moonbeam', () => {
-    Object.defineProperty(constants, 'BOBABEAM_STATUS', {
-      value: 1,
-      writable: true,
-    })
-    Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
-      value: 1,
-      writable: true,
-    })
-    const { asFragment } = renderComponent({
-      network: {
-        activeNetwork: NETWORK.MOONBEAM,
-      },
-    })
-    expect(asFragment()).toMatchSnapshot()
-  })
-
   test('should match the snapshot when active network is opera', () => {
-    Object.defineProperty(constants, 'BOBABEAM_STATUS', {
-      value: 1,
-      writable: true,
-    })
     Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
       value: 1,
       writable: true,
@@ -79,10 +54,6 @@ describe('BobaBeamAlert', () => {
   })
 
   test('should match the snapshot disabled from env params', () => {
-    Object.defineProperty(constants, 'BOBABEAM_STATUS', {
-      value: 0,
-      writable: true,
-    })
     Object.defineProperty(constants, 'BOBAOPERA_STATUS', {
       value: 0,
       writable: true,
