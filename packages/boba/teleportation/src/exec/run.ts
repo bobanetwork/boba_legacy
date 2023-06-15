@@ -68,14 +68,12 @@ const main = async () => {
     },
     []
   )
-  const BOBA_TOKEN_ADDRESS = BobaChains[chainId].BobaTokenAddress
   const TELEPORTATION_ADDRESS = BobaChains[chainId].teleportationAddress
 
   const service = new TeleportationService({
     l2RpcProvider: l2Provider,
     chainId,
     teleportationAddress: TELEPORTATION_ADDRESS,
-    bobaTokenAddress: BOBA_TOKEN_ADDRESS,
     disburserWallet,
     selectedBobaChains,
     pollingInterval: POLLING_INTERVAL,

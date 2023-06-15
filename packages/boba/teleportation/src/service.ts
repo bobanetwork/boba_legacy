@@ -22,9 +22,6 @@ interface TeleportationOptions {
   // Address of the teleportation contract
   teleportationAddress: string
 
-  // Address of the L2 BOBA token
-  bobaTokenAddress: string
-
   // Wallet
   disburserWallet: Wallet
 
@@ -47,8 +44,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
   private state: {
     Teleportation: Contract
-    // This is only for Mainnet and Goerli L2s
-    BOBAToken: Contract
     // the chain is registered in the teleportation contract
     supportedChains: ChainInfo[]
     // the contract of the chain that users deposit token
@@ -68,14 +63,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     )
     this.logger.info('Connected to Teleportation', {
       address: this.state.Teleportation.address,
-    })
-
-    this.logger.info('Connecting to BOBAToken contract...')
-    this.state.BOBAToken = getContractFactory('L2StandardERC20')
-      .attach(this.options.bobaTokenAddress)
-      .connect(this.options.disburserWallet)
-    this.logger.info('Connected to BOBAToken', {
-      address: this.state.BOBAToken.address,
     })
 
     // check the disburser wallet is the disburser of the contract
@@ -147,6 +134,12 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       }
       await sleep(this.options.pollingInterval)
     }
+  }
+
+  private getConnectedTokenContract(address: string): Contract {
+    return getContractFactory('L2StandardERC20')
+      .attach(address)
+      .connect(this.options.disburserWallet)
   }
 
   async _watchTeleportation(
@@ -245,12 +238,24 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           )
           await disburseTx.wait()
         } else {
-          // approve BOBA token
-          const approveTx = await this.state.BOBAToken.approve(
-            this.state.Teleportation.address,
-            totalDisbursements
-          )
-          await approveTx.wait()
+          // approve token(s), disbursements can be mixed - sum up token amounts per token
+          const tokens: Map<string, BigNumber> = new Map<string, BigNumber>()
+          const approvePending = []
+          for (const disb of slicedDisbursement) {
+            tokens.set(
+              disb.token,
+              BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
+            )
+          }
+          // do separate approves if necessary
+          for (const token of tokens.entries()) {
+            const approveTx = await this.getConnectedTokenContract(
+              token[0]
+            ).approve(this.state.Teleportation.address, token[1])
+            approvePending.push(approveTx.wait())
+          }
+          await Promise.all(approvePending)
+
           const disburseTx = await this.state.Teleportation.disburseERC20(
             slicedDisbursement
           )
