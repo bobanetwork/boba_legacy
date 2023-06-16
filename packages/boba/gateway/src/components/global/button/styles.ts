@@ -1,7 +1,12 @@
 import styled, { keyframes } from 'styled-components'
-import { ButtonTypes } from 'components/global/button'
 
-export const ButtonContainer = styled.button<ButtonTypes>`
+export const ButtonContainer = styled.button.withConfig({
+  shouldForwardProp: (prop) => !['loading', 'disable', 'small'].includes(prop),
+})<{
+  loading?: boolean
+  disable?: boolean
+  small?: boolean
+}>`
   display: flex;
   flex-direction: row;
   justify-content: center;

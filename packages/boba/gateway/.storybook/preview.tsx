@@ -6,6 +6,14 @@ import light from '../src/themes/light'
 import dark from '../src/themes/dark'
 import { GlobalStyle } from '../src/themes/globalStyle'
 
+import { Buffer } from 'buffer'
+
+//@ts-ignore
+if (!window.Buffer) {
+  //@ts-ignore
+  window.Buffer = window.Buffer || Buffer
+}
+
 const ThemeBlock = styled.div<{ left?: boolean; fill?: boolean }>(
   ({ left, fill, theme }) =>
     css`
@@ -43,6 +51,7 @@ export const withTheme: Decorator = (StoryFn, context) => {
   const storyTheme = theme === 'light' ? light : dark
 
   switch (theme) {
+    // FIXME: Not working correctly only dark theme is getting applied at both places.
     case 'side-by-side': {
       return (
         <>
