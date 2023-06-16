@@ -1,23 +1,16 @@
-import { render } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
-import createMockStore from 'redux-mock-store'
 import { MemoryRouter } from 'react-router-dom'
 import Menu from '.'
-
-const mockStore = createMockStore()
+import store from 'store'
+import { MENU_LIST } from './constant'
 
 const renderHeaderMenu = () => {
   return render(
     <MemoryRouter>
-      <Provider
-        store={mockStore({
-          ui: {
-            theme: 'dark',
-          },
-        })}
-      >
+      <Provider store={store}>
         <CustomThemeProvider>
           <Menu />
         </CustomThemeProvider>
@@ -29,17 +22,25 @@ const renderHeaderMenu = () => {
 describe('Layout => Header => Menu', () => {
   test('should match the snapshot', () => {
     const { asFragment } = renderHeaderMenu()
-
     expect(asFragment()).toMatchSnapshot()
   })
 
-  xtest('should change the location on clicking menu', () => {})
+  test('should have menu length of 6 with expected labels & paths', () => {
+    renderHeaderMenu()
+    const links = screen.getAllByRole('link')
+    expect(links.length).toBe(6)
+    links.forEach((link, index) => {
+      expect(link).toHaveTextContent(MENU_LIST[index].label)
+      expect(link).toHaveAttribute('href', MENU_LIST[index].path)
+    })
+  })
 
-  xtest('should change the menu item color base on the theme', () => {})
-
-  xtest('should change menu item color on hover', () => {})
-
-  xtest('should highlight the menu link for current page', () => {})
-
-  xtest('should menu length as 6 with expected url & labels', () => {})
+  test('should change the location on clicking menu', () => {
+    renderHeaderMenu()
+    const links = screen.getAllByRole('link')
+    links.forEach((link) => {
+      fireEvent.click(link)
+      expect(link).toHaveClass('active')
+    })
+  })
 })
