@@ -270,10 +270,10 @@ func (b *Backend) Forward(ctx context.Context, reqs []*RPCReq, isBatch bool) ([]
 				for i, req := range reqs {
 					method := req.Method
 					if slices.Contains(resultMethods, method) {
-						debugResult(ctx, method, defaultRes[i], debugRes[i])
+						debugResult(ctx, method, req, defaultRes[i], debugRes[i])
 					}
 					if method == "eth_getLogs" {
-						debugLogs(ctx, method, defaultRes[i], debugRes[i])
+						debugLogs(ctx, method, req, defaultRes[i], debugRes[i])
 					}
 				}
 			} else if (defaultErr == nil && debugErr != nil) || (defaultErr != nil && debugErr == nil) {
