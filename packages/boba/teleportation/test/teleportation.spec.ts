@@ -117,7 +117,6 @@ describe('teleportation', () => {
       l2RpcProvider: ethers.provider,
       chainId,
       teleportationAddress: Teleportation.address,
-      bobaTokenAddress: L2BOBA.address,
       disburserWallet: wallet1,
       selectedBobaChains,
       pollingInterval,
