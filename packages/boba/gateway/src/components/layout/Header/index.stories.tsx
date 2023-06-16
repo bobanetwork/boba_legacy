@@ -15,7 +15,12 @@ export default {
 
 const Template: StoryFn<HeaderProps> = (args) => {
   return (
-    <div style={{ height: '100vh' }}>
+    <div
+      style={{
+        height: '100vh',
+        width: '100%',
+      }}
+    >
       <Provider
         store={mockStore({
           ui: {

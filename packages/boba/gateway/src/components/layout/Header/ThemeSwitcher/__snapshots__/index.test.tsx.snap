@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout => Header => ThemeSwitcher should match the snapshot 1`] = `
+<DocumentFragment>
+  <button
+    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
+    tabindex="0"
+    type="button"
+  >
+    <div>
+      <div>
+        <div
+          data-src="theme-sun.svg"
+          src=""
+        />
+      </div>
+    </div>
+    <span
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</DocumentFragment>
+`;

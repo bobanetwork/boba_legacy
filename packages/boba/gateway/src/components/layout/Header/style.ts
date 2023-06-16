@@ -1,21 +1,13 @@
 import styled from 'styled-components'
 import BobaLogoImage from 'assets/images/boba-logo.png'
-import { Svg, Typography } from 'components/global'
+import { Svg } from 'components/global'
 
 export const HeaderContainer = styled.div`
-  width: 100%;
   height: 73px;
-  padding: 0 32px;
+  margin: 0px 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-`
-
-export const HeaderNav = styled.div`
-  display: flex;
-  justify-self: flex-start;
-  gap: 24px;
-  flex: 1;
+  justify-content: flex-start;
 `
 
 export const BobaLogo = styled.div`
@@ -27,27 +19,12 @@ export const BobaLogo = styled.div`
   background-size: contain;
 `
 
-export const NavItem = styled(Typography)<{ active?: string }>`
-  text-transform: uppercase;
-  cursor: pointer;
-  color: ${({ theme }) =>
-    theme.name === 'light'
-      ? theme.colors['gray'][600]
-      : theme.colors['gray'][100]};
-  &:hover {
-    color: ${({ theme }) =>
-      theme.name === 'light'
-        ? theme.colors['gray'][800]
-        : theme.colors['green'][300]};
-  }
-`
-
 export const HeaderAction = styled.div`
   display: flex;
   gap: 32px;
   align-items: center;
-  justify-self: flex-end;
-  justify-content: space-between;
+  flex: 1;
+  justify-content: flex-end;
 `
 
 export const ActionIcon = styled(Svg)`
