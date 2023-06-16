@@ -5,6 +5,7 @@ import { HeaderProps } from './types'
 import { Provider } from 'react-redux'
 import createMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
+import { MemoryRouter } from 'react-router-dom'
 
 const mockStore = createMockStore([thunk])
 
@@ -21,15 +22,17 @@ const Template: StoryFn<HeaderProps> = (args) => {
         width: '100%',
       }}
     >
-      <Provider
-        store={mockStore({
-          ui: {
-            theme: 'dark',
-          },
-        })}
-      >
-        <Header {...args} />
-      </Provider>
+      <MemoryRouter>
+        <Provider
+          store={mockStore({
+            ui: {
+              theme: 'dark',
+            },
+          })}
+        >
+          <Header {...args} />
+        </Provider>
+      </MemoryRouter>
     </div>
   )
 }

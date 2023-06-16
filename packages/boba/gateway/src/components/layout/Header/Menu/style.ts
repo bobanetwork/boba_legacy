@@ -1,4 +1,3 @@
-import { Typography } from 'components/global'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
