@@ -36,7 +36,6 @@
     "@sentry/react": "^7.51.0",
     "@sentry/tracing": "^7.51.0",
     "@walletconnect/web3-provider": "^1.8.0",
-    "assert": "^2.0.0",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "bn.js": "^5.1.3",
