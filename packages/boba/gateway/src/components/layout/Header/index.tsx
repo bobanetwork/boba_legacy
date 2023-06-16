@@ -1,19 +1,32 @@
 import React, { FC } from 'react'
 import { HeaderProps } from './types'
-import { BobaLogo, HeaderContainer, NavItem } from './style'
+import {
+  BobaLogo,
+  HeaderAction,
+  HeaderContainer,
+  HeaderNav,
+  NavItem,
+} from './style'
+import { Button } from 'components/global'
+import ThemeSwitcher from './ThemeSwitcher'
 
 const Header: FC<HeaderProps> = () => {
   return (
     <HeaderContainer>
       <BobaLogo />
-      <div>
+      <HeaderNav>
         <NavItem variant="body2">Bridge</NavItem>
         <NavItem variant="body2">Ecosystem</NavItem>
         <NavItem variant="body2">History</NavItem>
         <NavItem variant="body2">Earn</NavItem>
         <NavItem variant="body2">Stake</NavItem>
         <NavItem variant="body2">Dao</NavItem>
-      </div>
+      </HeaderNav>
+
+      <HeaderAction>
+        <Button small label="Connect Wallet" />
+        <ThemeSwitcher />
+      </HeaderAction>
     </HeaderContainer>
   )
 }

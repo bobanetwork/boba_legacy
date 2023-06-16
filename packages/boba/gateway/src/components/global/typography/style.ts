@@ -35,7 +35,6 @@ const options: Record<string, TypographyStyleProps> = {
 }
 
 export const StyledText = styled.p<{ variant?: VariantType }>`
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
 

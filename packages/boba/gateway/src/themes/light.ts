@@ -1,5 +1,5 @@
+import { defaultTypography } from './default'
 import { screen } from './screens'
-import { DefaultTheme } from 'styled-components'
 
 const light = {
   name: 'light',
@@ -69,6 +69,7 @@ const light = {
     },
   },
   boxShadow: '2px 2px 30px rgba(0, 0, 0, 0.15)',
+  ...defaultTypography,
 }
 
 export default light

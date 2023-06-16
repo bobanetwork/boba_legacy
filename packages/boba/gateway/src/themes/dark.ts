@@ -1,4 +1,6 @@
+import { defaultTypography } from './default'
 import { screen } from './screens'
+
 const dark = {
   name: 'dark',
   primarybg: '#BAE21A', //cyan
@@ -67,6 +69,7 @@ const dark = {
     },
   },
   boxShadow: 'none',
+  ...defaultTypography,
 }
 
 export default dark

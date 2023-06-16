@@ -96,6 +96,7 @@ import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import useWalletSwitch from 'hooks/useWalletSwitch'
 import NotificationBanner from 'components/notificationBanner'
+import Header from 'components/layout/Header'
 
 
 function Home() {
@@ -332,6 +333,7 @@ function Home() {
       {! maintenance &&
         <Box sx={{ display: 'flex', alignContent: 'space-between', flexDirection: 'column', width: '100%' }}>
           <PageHeader />
+          <Header />
           <Container maxWidth={false} sx={{
             minHeight: 'calc(100vh - 200px)',
             marginLeft: 'unset',

@@ -51,6 +51,7 @@ export const withTheme: Decorator = (StoryFn, context) => {
   const storyTheme = theme === 'light' ? light : dark
 
   switch (theme) {
+    // FIXME: Not working correctly only dark theme is getting applied at both places.
     case 'side-by-side': {
       return (
         <>
@@ -99,4 +100,4 @@ export const globalTypes = {
   },
 }
 
-export const decorators = []
+export const decorators = [withTheme]
