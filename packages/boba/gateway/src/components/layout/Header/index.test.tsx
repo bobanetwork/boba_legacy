@@ -32,4 +32,8 @@ describe('Layout => Header', () => {
 
     expect(asFragment()).toMatchSnapshot()
   })
+
+  xtest('should button with label connect wallet', () => {})
+
+  xtest('should trigger initConnect on click of connect wallet btn', () => {})
 })

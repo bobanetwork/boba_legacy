@@ -32,4 +32,7 @@ describe('Layout => Header => ThemeSwitcher', () => {
 
     expect(asFragment()).toMatchSnapshot()
   })
+  xtest('should switcher icon correctly based on the current them', () => {})
+  xtest('should change update the theme when the switcher clicked ', () => {})
+  xtest('should update the localstorage with theme name on change ', () => {})
 })

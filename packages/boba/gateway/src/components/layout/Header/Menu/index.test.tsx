@@ -32,4 +32,14 @@ describe('Layout => Header => Menu', () => {
 
     expect(asFragment()).toMatchSnapshot()
   })
+
+  xtest('should change the location on clicking menu', () => {})
+
+  xtest('should change the menu item color base on the theme', () => {})
+
+  xtest('should change menu item color on hover', () => {})
+
+  xtest('should highlight the menu link for current page', () => {})
+
+  xtest('should menu length as 6 with expected url & labels', () => {})
 })
