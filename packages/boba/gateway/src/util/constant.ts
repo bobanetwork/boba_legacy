@@ -132,7 +132,6 @@ export const PAGES_BY_NETWORK: PagesByNetworkType = {
     'Earn',
     'Stake',
     'DAO',
-    'Monster',
   ],
   bnb: ['Bridge', 'Wallet', 'Earn', 'History'],
   avax: ['Bridge', 'Wallet', 'Earn', 'History'],

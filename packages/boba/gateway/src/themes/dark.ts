@@ -1,5 +1,6 @@
+import { defaultTypography } from './default'
 import { screen } from './screens'
-import { typography } from './default'
+
 const dark = {
   name: 'dark',
   primarybg: '#BAE21A', //cyan
@@ -11,10 +12,9 @@ const dark = {
     glassy: 'rgba(255, 255, 255, 0.04)',
     secondary: 'rgba(255, 255, 255, 0.14)',
   },
-  ...typography,
   //new code
   background: '#191919',
-  defaultColorText: '#FFFFFF',
+  color: '#FFFFFF',
   colors: {
     danger: 'red',
     success: 'green',
@@ -69,9 +69,7 @@ const dark = {
     },
   },
   boxShadow: 'none',
-
-  ...typography,
-  //new code
+  ...defaultTypography,
 }
 
 export default dark
