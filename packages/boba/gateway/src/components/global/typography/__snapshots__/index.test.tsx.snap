@@ -3,7 +3,6 @@
 exports[`Typography should match snapshots body1 1`] = `
 <DocumentFragment>
   .c0 {
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 16px;
@@ -22,7 +21,6 @@ exports[`Typography should match snapshots body1 1`] = `
 exports[`Typography should match snapshots body2 1`] = `
 <DocumentFragment>
   .c0 {
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 14px;
@@ -41,7 +39,6 @@ exports[`Typography should match snapshots body2 1`] = `
 exports[`Typography should match snapshots body3 1`] = `
 <DocumentFragment>
   .c0 {
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
@@ -60,7 +57,6 @@ exports[`Typography should match snapshots body3 1`] = `
 exports[`Typography should match snapshots head 1`] = `
 <DocumentFragment>
   .c0 {
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 20px;
@@ -79,7 +75,6 @@ exports[`Typography should match snapshots head 1`] = `
 exports[`Typography should match snapshots subtitle 1`] = `
 <DocumentFragment>
   .c0 {
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
@@ -98,7 +93,6 @@ exports[`Typography should match snapshots subtitle 1`] = `
 exports[`Typography should match snapshots title 1`] = `
 <DocumentFragment>
   .c0 {
-  font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
   font-size: 18px;
