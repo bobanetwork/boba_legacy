@@ -271,11 +271,12 @@ contract Teleportation is PausableUpgradeable {
      * maxDepositAmount.
      *
      * @param _token ERC20 address of the token to deposit.
-     * @param _amount The amount of token to deposit.
+     * @param _amount The amount of token or native asset to deposit (must be the same as msg.value if native asset)
      * @param _toChainId The destination chain ID.
      */
-    function teleportERC20(address _token, uint256 _amount, uint256 _toChainId)
+    function teleportAsset(address _token, uint256 _amount, uint256 _toChainId)
     external
+    payable
     whenNotPaused()
     {
         SupportedToken memory supToken = supportedTokens[_token];
@@ -283,6 +284,7 @@ contract Teleportation is PausableUpgradeable {
         require(_amount >= supToken.minDepositAmount, "Deposit amount too small");
         require(_amount <= supToken.maxDepositAmount, "Deposit amount too big");
         require(supportedChains[_toChainId], "Target chain not supported");
+        require(address(0) != _token || _amount == msg.value, "Native amount invalid");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
@@ -296,45 +298,11 @@ contract Teleportation is PausableUpgradeable {
         }
 
         supportedTokens[_token] = supToken;
-        IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+        if (_token != address(0)) {
+            IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+        }
 
         emit AssetReceived(_token, block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
-        totalDeposits[_toChainId] += 1;
-    }
-
-    /**
-     * @dev Accepts deposits that will be disbursed to the sender's address on target L2.
-     * The method reverts if the amount is less than the current
-     * minDepositAmount, the amount is greater than the current
-     * maxDepositAmount.
-     *
-     * @param _toChainId The destination chain ID.
-     */
-    function teleportNative(uint256 _toChainId)
-    external
-    payable
-    whenNotPaused()
-    {
-        // TODO: Merge methods into one
-        address token = address(0);
-        SupportedToken memory supToken = supportedTokens[token];
-        require(msg.value >= supToken.minDepositAmount, "Deposit amount is too small");
-        require(msg.value <= supToken.maxDepositAmount, "Deposit amount is too big");
-        require(supportedChains[_toChainId], "Target chain is not supported");
-
-        // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
-        // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
-        if (block.timestamp < supToken.transferTimestampCheckPoint + 86400) {
-            supToken.transferredAmount += msg.value;
-            require(supToken.transferredAmount <= supToken.maxTransferAmountPerDay, "max amount per day exceeded");
-        } else {
-            supToken.transferredAmount = msg.value;
-            require(supToken.transferredAmount <= supToken.maxTransferAmountPerDay, "max amount per day exceeded");
-            supToken.transferTimestampCheckPoint = block.timestamp;
-        }
-        supportedTokens[token] = supToken;
-
-        emit AssetReceived(token, block.chainid, _toChainId, totalDeposits[_toChainId], msg.sender, msg.value);
         totalDeposits[_toChainId] += 1;
     }
 
@@ -354,6 +322,7 @@ contract Teleportation is PausableUpgradeable {
     onlyDisburser()
     whenNotPaused()
     {
+        // TODO: Merge with ERC20
         // Ensure there are disbursements to process.
         uint256 _numDisbursements = _disbursements.length;
         require(_numDisbursements > 0, "No disbursements");
