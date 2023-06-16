@@ -316,66 +316,7 @@ contract Teleportation is PausableUpgradeable {
      *
      * @param _disbursements A list of Disbursements to process.
      */
-    function disburseNative(Disbursement[] calldata _disbursements)
-    external
-    payable
-    onlyDisburser()
-    whenNotPaused()
-    {
-        // TODO: Merge with ERC20
-        // Ensure there are disbursements to process.
-        uint256 _numDisbursements = _disbursements.length;
-        require(_numDisbursements > 0, "No disbursements");
-
-        // Ensure the amount sent in the transaction is equal to the sum of the
-        // disbursements.
-        uint256 _totalDisbursed = 0;
-        for (uint256 i = 0; i < _numDisbursements; i++) {
-            require(_disbursements[i].token == address(0), "Expected native");
-            _totalDisbursed += _disbursements[i].amount;
-        }
-
-        // Ensure the balance is enough to cover the disbursements.
-        require(_totalDisbursed == msg.value, "Disbursement total != amount sent");
-
-        // Process disbursements.
-        for (uint256 i = 0; i < _numDisbursements; i++) {
-            uint256 _amount = _disbursements[i].amount;
-            address _addr = _disbursements[i].addr;
-            uint256 _sourceChainId = _disbursements[i].sourceChainId;
-            uint256 _depositId = _disbursements[i].depositId;
-
-            // Ensure the depositId matches our expected value.
-            require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
-            require(supportedChains[_sourceChainId], "Source chain is not supported");
-            totalDisbursements[_sourceChainId] += 1;
-
-            // Deliver the disbursement amount to the receiver. If the
-            // disbursement fails, the amount will be kept by the contract
-            // rather than reverting to prevent blocking progress on other
-            // disbursements.
-
-            // slither-disable-next-line calls-loop,reentrancy-events
-            (bool success,) = _addr.call{gas: 3000, value: _amount}("");
-            if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
-            else {
-                failedNativeDisbursements[_depositId] = FailedNativeDisbursement(true, _disbursements[i]);
-                emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
-            }
-        }
-    }
-
-    /**
-     * @dev Accepts a list of Disbursements and forwards the amount paid to
-     * the contract to each recipient. The method reverts if there are zero
-     * disbursements, the total amount to forward differs from the amount sent
-     * in the transaction, or the _nextDepositId is unexpected. Failed
-     * disbursements will not cause the method to revert, but will instead be
-     * held by the contract and availabe for the owner to withdraw.
-     *
-     * @param _disbursements A list of Disbursements to process.
-     */
-    function disburseERC20(Disbursement[] calldata _disbursements)
+    function disburseAsset(Disbursement[] calldata _disbursements)
     external
     payable
     onlyDisburser()
@@ -387,6 +328,7 @@ contract Teleportation is PausableUpgradeable {
 
 
         // Process disbursements.
+        uint remainingValue = msg.value;
         for (uint256 i = 0; i < _numDisbursements; i++) {
 
             uint256 _amount = _disbursements[i].amount;
@@ -399,15 +341,35 @@ contract Teleportation is PausableUpgradeable {
             require(supportedTokens[_token].supported, "Token not supported");
 
             // ensure amount sent in the tx is equal to disbursement (moved into loop to ensure token flexibility)
-            IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+            if (_token == address(0)) {
+                require(_amount <= remainingValue, "Disbursement total != amount sent");
+                remainingValue -= _amount;
+            } else {
+                IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+            }
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
             require(supportedChains[_sourceChainId], "Source chain is not supported");
             totalDisbursements[_sourceChainId] += 1;
 
-            // slither-disable-next-line calls-loop,reentrancy-events
-            IERC20(_token).safeTransfer(_addr, _amount);
+            if (_token == address(0)) {
+                // Deliver the disbursement amount to the receiver. If the
+                // disbursement fails, the amount will be kept by the contract
+                // rather than reverting to prevent blocking progress on other
+                // disbursements.
+
+                // slither-disable-next-line calls-loop,reentrancy-events
+                (bool success,) = _addr.call{gas: 3000, value: _amount}("");
+                if (success) emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
+                else {
+                    failedNativeDisbursements[_depositId] = FailedNativeDisbursement(true, _disbursements[i]);
+                    emit DisbursementFailed(_depositId, _addr, _amount, _sourceChainId);
+                }
+            } else {
+                // slither-disable-next-line calls-loop,reentrancy-events
+                IERC20(_token).safeTransfer(_addr, _amount);
+            }
             emit DisbursementSuccess(_depositId, _addr, _amount, _sourceChainId);
         }
     }
