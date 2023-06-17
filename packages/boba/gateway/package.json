@@ -133,7 +133,10 @@
   },
   "jest": {
     "collectCoverageFrom": [
-      "src/**/*.{ts,tsx}"
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.stories.{ts,tsx}",
+      "!src/**/types.{ts,tsx}",
+      "!src/**/style.{ts,tsx}"
     ]
   },
   "resolutions": {
