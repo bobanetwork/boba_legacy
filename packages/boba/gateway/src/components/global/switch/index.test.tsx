@@ -8,7 +8,7 @@ import configureStore from 'redux-mock-store'
 
 const mockStore = configureStore()
 
-const renderButton = (props: SwitchButtonTypes) => {
+const renderSwitch = (props: SwitchButtonTypes) => {
   return render(
     <Provider
       store={mockStore({
@@ -26,27 +26,27 @@ const renderButton = (props: SwitchButtonTypes) => {
 
 describe('SwitchButton', () => {
   test('SwitchButton Default State', () => {
-    const { asFragment } = renderButton({
+    const { asFragment } = renderSwitch({
       onStateChange: jest.fn(),
     })
     expect(asFragment()).toMatchSnapshot()
   })
   test('SwitchButton is Active', () => {
-    const { asFragment } = renderButton({
+    const { asFragment } = renderSwitch({
       isActive: true,
       onStateChange: jest.fn(),
     })
     expect(asFragment()).toMatchSnapshot()
   })
   test('SwitchButton is Disable', () => {
-    const { asFragment } = renderButton({
+    const { asFragment } = renderSwitch({
       isDisable: true,
       onStateChange: jest.fn(),
     })
     expect(asFragment()).toMatchSnapshot()
   })
   test('SwitchButton is Disable & Active', () => {
-    const { asFragment } = renderButton({
+    const { asFragment } = renderSwitch({
       isActive: true,
       isDisable: true,
       onStateChange: jest.fn(),
