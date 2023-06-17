@@ -96,6 +96,7 @@ import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskMo
 import useWalletSwitch from 'hooks/useWalletSwitch'
 import NotificationBanner from 'components/notificationBanner'
 import Header from 'components/layout/Header'
+import { Footer } from 'components/layout'
 
 
 function Home() {
@@ -346,6 +347,7 @@ function Home() {
           }}>
             <Outlet />
           </Container>
+          <Footer />
           <PageFooter/>
         </Box>
       }
