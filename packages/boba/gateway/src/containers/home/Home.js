@@ -95,8 +95,7 @@ import { NETWORK } from 'util/network/network.util'
 import InstallMetaMaskModal from 'containers/modals/noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import useWalletSwitch from 'hooks/useWalletSwitch'
 import NotificationBanner from 'components/notificationBanner'
-import Header from 'components/layout/Header'
-import { Footer } from 'components/layout'
+import { Footer, Header } from 'components/layout'
 
 
 function Home() {
@@ -337,18 +336,16 @@ function Home() {
           flexDirection: 'column',
           width: '100%'
         }}>
-          {/* <PageHeader /> */}
           <Header />
           <PageTitle />
           <Container maxWidth={false} sx={{
-            minHeight: 'calc(100vh - 200px)',
+            minHeight: 'calc(100vh - 75px)',
             marginLeft: 'unset',
             marginRight: 'unset'
           }}>
             <Outlet />
           </Container>
           <Footer />
-          <PageFooter/>
         </Box>
       }
     </>

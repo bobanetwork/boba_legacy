@@ -5,7 +5,7 @@ import { Button } from 'components/global'
 import ThemeSwitcher from './ThemeSwitcher'
 import Menu from './Menu'
 
-const Header: FC<HeaderProps> = () => {
+export const Header: FC<HeaderProps> = () => {
   return (
     <HeaderContainer>
       <BobaLogo />
@@ -17,5 +17,3 @@ const Header: FC<HeaderProps> = () => {
     </HeaderContainer>
   )
 }
-
-export default Header
