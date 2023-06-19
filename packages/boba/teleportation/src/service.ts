@@ -210,7 +210,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             this.logger.error(
               `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
             )
-            // TODO: Save somewhere to recover(!) or generally fail
+            // TODO: Save somewhere to recover(!) or generally fail (do once db teleporter is merged)
           } else {
             disbursement = [
               ...disbursement,
