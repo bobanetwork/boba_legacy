@@ -1,6 +1,4 @@
-//Default Typos
-
-export const typography = {
+export const defaultTypography = {
   titles: {
     heading1: '36px',
     heading2: '24px',

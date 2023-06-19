@@ -1,6 +1,5 @@
+import { defaultTypography } from './default'
 import { screen } from './screens'
-import { DefaultTheme } from 'styled-components'
-import { typography } from './default'
 
 const light = {
   name: 'light',
@@ -13,12 +12,9 @@ const light = {
     glassy: 'rgba(0,0,0, 0.09)',
     secondary: 'rgba(0, 0, 0, 0.08)',
   },
-
   //new code
-  ...typography,
-
-  defaultColorText: '#22221E',
   background: '#FFFFFF',
+  color: '#22221E',
   colors: {
     danger: 'red',
     success: 'green',
@@ -73,6 +69,7 @@ const light = {
     },
   },
   boxShadow: '2px 2px 30px rgba(0, 0, 0, 0.15)',
+  ...defaultTypography,
 }
 
 export default light
