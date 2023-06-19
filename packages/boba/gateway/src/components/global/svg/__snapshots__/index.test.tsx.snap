@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Svg Render Svg File 1`] = `
+<DocumentFragment>
+  <div>
+    <div>
+      <div
+        data-src="static/media/src/images/icons/arrowdown.svg"
+        src=""
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;
