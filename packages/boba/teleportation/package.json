@@ -4,7 +4,6 @@
    "description": "The teleportation between L2s and L1s",
    "main": "dist/src/index",
    "files": [
-      "dist/src/index",
       "test/**/*.ts"
    ],
    "scripts": {
@@ -28,7 +27,7 @@
       "@types/mocha": "^8.2.2",
       "@types/node": "^16.11.10",
       "chai": "^4.3.4",
-      "ethereum-waffle": "^3.3.0",
+      "ethereum-waffle": "^3.4.0",
       "ethers": "^5.5.4",
       "hardhat": "^2.12.5",
       "mocha": "^8.3.1",

@@ -17,9 +17,9 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { utils } from 'ethers'
 
-import { useTheme } from '@emotion/react'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
+
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
 
 import { exitBOBA } from 'actions/networkAction'
 import { openModal } from 'actions/uiAction'
@@ -29,9 +29,9 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
-import { 
-  selectLoading, 
-  selectSignatureStatus_exitTRAD, 
+import {
+  selectLoading,
+  selectSignatureStatus_exitTRAD,
   selectLookupPrice,
   selectBobaFeeChoice,
   selectBobaPriceRatio,

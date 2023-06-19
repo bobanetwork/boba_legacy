@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { BigNumber } from 'ethers'
-import { deepHexlify } from '@boba/bundler_utils'
+import { deepHexlify } from '@bobanetwork/bundler_utils'
 
 describe('#deepHexlify', function () {
   it('empty', () => {

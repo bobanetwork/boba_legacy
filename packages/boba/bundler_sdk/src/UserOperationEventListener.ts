@@ -1,6 +1,6 @@
 import { BigNumberish, Event } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/providers'
-import { EntryPoint } from '@boba/accountabstraction'
+import { EntryPoint } from '@bobanetwork/accountabstraction'
 import { defaultAbiCoder } from 'ethers/lib/utils'
 import Debug from 'debug'
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import "@boba/accountabstraction/contracts/interfaces/IEntryPoint.sol";
+import "@bobanetwork/accountabstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract GetUserOpHashes {
     error UserOpHashesResult(bytes32[] userOpHashes);

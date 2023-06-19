@@ -5,12 +5,13 @@ import { useSelector } from 'react-redux'
 import { selectTheme } from 'selectors'
 import light from './light'
 import dark from './dark'
+import { GlobalStyle } from './globalStyle'
 
 interface ThemeProps {
   children: ReactNode
 }
 
-const Theme = ({ children }: ThemeProps) => {
+const CustomThemeProvider = ({ children }: ThemeProps) => {
   const [currentTheme, setCurrentTheme] = useState(dark)
   const theme = useSelector(selectTheme)
 
@@ -25,4 +26,4 @@ const Theme = ({ children }: ThemeProps) => {
   return <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>
 }
 
-export default Theme
+export default CustomThemeProvider

@@ -30,10 +30,13 @@ import type {
 
 export interface HybridComputeHelperInterface extends utils.Interface {
   functions: {
+    "Get42(uint32,uint256)": FunctionFragment;
     "GetRandom(uint32,uint256)": FunctionFragment;
     "GetResponse(uint32,string,bytes)": FunctionFragment;
+    "Turing42()": FunctionFragment;
     "TuringRandom()": FunctionFragment;
     "TuringTx(string,bytes)": FunctionFragment;
+    "TuringTxV2(string,bytes)": FunctionFragment;
     "addPermittedCaller(address)": FunctionFragment;
     "addPermittedCallers(address[])": FunctionFragment;
     "checkPermittedCaller(address)": FunctionFragment;
@@ -50,10 +53,13 @@ export interface HybridComputeHelperInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "Get42"
       | "GetRandom"
       | "GetResponse"
+      | "Turing42"
       | "TuringRandom"
       | "TuringTx"
+      | "TuringTxV2"
       | "addPermittedCaller"
       | "addPermittedCallers"
       | "checkPermittedCaller"
@@ -69,6 +75,10 @@ export interface HybridComputeHelperInterface extends utils.Interface {
   ): FunctionFragment;
 
   encodeFunctionData(
+    functionFragment: "Get42",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "GetRandom",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
@@ -80,12 +90,17 @@ export interface HybridComputeHelperInterface extends utils.Interface {
       PromiseOrValue<BytesLike>
     ]
   ): string;
+  encodeFunctionData(functionFragment: "Turing42", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "TuringRandom",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "TuringTx",
+    values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "TuringTxV2",
     values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
@@ -134,16 +149,19 @@ export interface HybridComputeHelperInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
   ): string;
 
+  decodeFunctionResult(functionFragment: "Get42", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "GetRandom", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "GetResponse",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "Turing42", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "TuringRandom",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "TuringTx", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "TuringTxV2", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addPermittedCaller",
     data: BytesLike
@@ -189,6 +207,7 @@ export interface HybridComputeHelperInterface extends utils.Interface {
     "AdminChanged(address,address)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
     "CheckPermittedCaller(address,bool)": EventFragment;
+    "Offchain42(uint256,uint256)": EventFragment;
     "OffchainRandom(uint256,uint256)": EventFragment;
     "OffchainResponse(uint256,bytes)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
@@ -200,6 +219,7 @@ export interface HybridComputeHelperInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "AdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BeaconUpgraded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "CheckPermittedCaller"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Offchain42"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OffchainRandom"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OffchainResponse"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
@@ -250,6 +270,17 @@ export type CheckPermittedCallerEvent = TypedEvent<
 
 export type CheckPermittedCallerEventFilter =
   TypedEventFilter<CheckPermittedCallerEvent>;
+
+export interface Offchain42EventObject {
+  version: BigNumber;
+  random: BigNumber;
+}
+export type Offchain42Event = TypedEvent<
+  [BigNumber, BigNumber],
+  Offchain42EventObject
+>;
+
+export type Offchain42EventFilter = TypedEventFilter<Offchain42Event>;
 
 export interface OffchainRandomEventObject {
   version: BigNumber;
@@ -331,6 +362,12 @@ export interface HybridComputeHelper extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    Get42(
+      rType: PromiseOrValue<BigNumberish>,
+      _random: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     GetRandom(
       rType: PromiseOrValue<BigNumberish>,
       _random: PromiseOrValue<BigNumberish>,
@@ -344,11 +381,21 @@ export interface HybridComputeHelper extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    Turing42(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     TuringRandom(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     TuringTx(
+      _url: PromiseOrValue<string>,
+      _payload: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    TuringTxV2(
       _url: PromiseOrValue<string>,
       _payload: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -411,6 +458,12 @@ export interface HybridComputeHelper extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  Get42(
+    rType: PromiseOrValue<BigNumberish>,
+    _random: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   GetRandom(
     rType: PromiseOrValue<BigNumberish>,
     _random: PromiseOrValue<BigNumberish>,
@@ -424,11 +477,21 @@ export interface HybridComputeHelper extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  Turing42(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   TuringRandom(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   TuringTx(
+    _url: PromiseOrValue<string>,
+    _payload: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  TuringTxV2(
     _url: PromiseOrValue<string>,
     _payload: PromiseOrValue<BytesLike>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -491,6 +554,12 @@ export interface HybridComputeHelper extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    Get42(
+      rType: PromiseOrValue<BigNumberish>,
+      _random: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     GetRandom(
       rType: PromiseOrValue<BigNumberish>,
       _random: PromiseOrValue<BigNumberish>,
@@ -504,9 +573,17 @@ export interface HybridComputeHelper extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    Turing42(overrides?: CallOverrides): Promise<BigNumber>;
+
     TuringRandom(overrides?: CallOverrides): Promise<BigNumber>;
 
     TuringTx(
+      _url: PromiseOrValue<string>,
+      _payload: PromiseOrValue<BytesLike>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    TuringTxV2(
       _url: PromiseOrValue<string>,
       _payload: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
@@ -596,6 +673,12 @@ export interface HybridComputeHelper extends BaseContract {
       permitted?: null
     ): CheckPermittedCallerEventFilter;
 
+    "Offchain42(uint256,uint256)"(
+      version?: null,
+      random?: null
+    ): Offchain42EventFilter;
+    Offchain42(version?: null, random?: null): Offchain42EventFilter;
+
     "OffchainRandom(uint256,uint256)"(
       version?: null,
       random?: null
@@ -636,6 +719,12 @@ export interface HybridComputeHelper extends BaseContract {
   };
 
   estimateGas: {
+    Get42(
+      rType: PromiseOrValue<BigNumberish>,
+      _random: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     GetRandom(
       rType: PromiseOrValue<BigNumberish>,
       _random: PromiseOrValue<BigNumberish>,
@@ -649,11 +738,21 @@ export interface HybridComputeHelper extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    Turing42(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     TuringRandom(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     TuringTx(
+      _url: PromiseOrValue<string>,
+      _payload: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    TuringTxV2(
       _url: PromiseOrValue<string>,
       _payload: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -717,6 +816,12 @@ export interface HybridComputeHelper extends BaseContract {
   };
 
   populateTransaction: {
+    Get42(
+      rType: PromiseOrValue<BigNumberish>,
+      _random: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     GetRandom(
       rType: PromiseOrValue<BigNumberish>,
       _random: PromiseOrValue<BigNumberish>,
@@ -730,11 +835,21 @@ export interface HybridComputeHelper extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    Turing42(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     TuringRandom(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     TuringTx(
+      _url: PromiseOrValue<string>,
+      _payload: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    TuringTxV2(
       _url: PromiseOrValue<string>,
       _payload: PromiseOrValue<BytesLike>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }

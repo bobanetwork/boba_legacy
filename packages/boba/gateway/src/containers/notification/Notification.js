@@ -24,7 +24,7 @@ import { closeNotification } from 'actions/notificationAction';
 
 import Button from 'components/button/Button';
 
-import * as styles from './Notification.module.scss';
+import styles from './Notification.module.scss';
 
 class Notification extends React.Component {
   constructor(props) {

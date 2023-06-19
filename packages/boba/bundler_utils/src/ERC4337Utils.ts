@@ -1,6 +1,6 @@
 import { defaultAbiCoder, hexConcat, hexlify, keccak256, resolveProperties } from 'ethers/lib/utils'
-import { UserOperationStruct } from '@boba/accountabstraction'
-import { abi as entryPointAbi } from '@boba/accountabstraction/artifacts/contracts/interfaces/IEntryPoint.sol/IEntryPoint.json'
+import { UserOperationStruct } from '@bobanetwork/accountabstraction'
+import { abi as entryPointAbi } from '@bobanetwork/accountabstraction/artifacts/contracts/interfaces/IEntryPoint.sol/IEntryPoint.json'
 import { ethers } from 'ethers'
 import Debug from 'debug'
 

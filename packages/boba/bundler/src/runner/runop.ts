@@ -7,10 +7,10 @@
 
 import { BigNumber, getDefaultProvider, Signer, Wallet } from 'ethers'
 import { JsonRpcProvider } from '@ethersproject/providers'
-import { SimpleAccountFactory__factory } from '@boba/accountabstraction'
+import { SimpleAccountFactory__factory } from '@bobanetwork/accountabstraction'
 import { formatEther, keccak256, parseEther } from 'ethers/lib/utils'
 import { Command } from 'commander'
-import { erc4337RuntimeVersion } from '@boba/bundler_utils'
+import { erc4337RuntimeVersion } from '@bobanetwork/bundler_utils'
 import fs from 'fs'
 import {
   DeterministicDeployer,

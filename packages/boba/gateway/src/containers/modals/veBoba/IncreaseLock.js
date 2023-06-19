@@ -25,7 +25,7 @@ import { useRef } from 'react';
 import "react-datepicker/dist/react-datepicker.css";
 import { toWei_String } from 'util/amountConvert';
 
-import * as Styles from './ManageLockModal.module.scss';
+import Styles from './ManageLockModal.module.scss';
 import * as S from './ManageLockModal.styles';
 import * as G from 'containers/Global.styles';
 

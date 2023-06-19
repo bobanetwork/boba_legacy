@@ -10,16 +10,15 @@ import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 // use local sdk
-import { SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
-import SenderCreatorJson from '@boba/accountabstraction/artifacts/contracts/core/SenderCreator.sol/SenderCreator.json'
-import SimpleAccountFactoryJson from '@boba/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
-import MockFeedRegistryJson from '@boba/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
+import { PaymasterAPI, SimpleAccountAPI } from '@bobanetwork/bundler_sdk'
+import SimpleAccountFactoryJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
+import MockFeedRegistryJson from '@bobanetwork/accountabstraction/artifacts/contracts/test/mocks/MockFeedRegistry.sol/MockFeedRegistry.json'
 import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import EntryPointJson from '@boba/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
+import EntryPointJson from '@bobanetwork/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'
 
-import BobaDepositPaymasterJson from '@boba/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
+import BobaDepositPaymasterJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/BobaDepositPaymaster.sol/BobaDepositPaymaster.json'
 
 describe('AA Boba as Fee token Test\n', async () => {
   let env: OptimismEnv
@@ -193,19 +192,17 @@ describe('AA Boba as Fee token Test\n', async () => {
       }
     )
     it('should be able to submit a userOp including the paymaster to the bundler and trigger tx', async () => {
-      const op = await accountAPI.createUnsignedUserOp({
+      accountAPI.paymasterAPI = new PaymasterAPI({
+        paymasterAndData: hexConcat([
+         BobaDepositPaymaster.address,
+          hexZeroPad(L2BOBAToken.address, 20),
+        ])
+      })
+
+      signedOp = await accountAPI.createSignedUserOp({
         target: recipient.address,
         data: recipient.interface.encodeFunctionData('something', ['hello']),
       })
-
-      // TODO: check why paymasterAndData does not work when added to the walletAPI
-      op.paymasterAndData = hexConcat([
-        BobaDepositPaymaster.address,
-        hexZeroPad(L2BOBAToken.address, 20),
-      ])
-      op.preVerificationGas = await accountAPI.getPreVerificationGas(op)
-
-      signedOp = await accountAPI.signUserOp(op)
 
       const requestId = await bundlerProvider.sendUserOpToBundler(signedOp)
       const txid = await accountAPI.getUserOpReceipt(requestId)

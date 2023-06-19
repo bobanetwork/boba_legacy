@@ -16,7 +16,7 @@ export const StepImplementAWSLambda = () => {
       padding={15}
       style={{
         fontSize: 12,
-        backgroundColor: "#333",
+        backgroundColor: "#ccc",
         fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace"
       }}
     />;

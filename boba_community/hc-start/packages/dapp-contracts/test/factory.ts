@@ -65,7 +65,7 @@ describe('Turing Helper Factory', function () {
       BobaTuringCreditAddress = '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
       WETHAddress = '0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000'
       RouterAddress = '0x17C83E2B96ACfb5190d63F5E46d93c107eC0b514'
-    } else if (hre.network.name === 'rinkeby') {
+    } else if (hre.network.name === 'goerli') {
       WETHAddress = '0xc778417e063141139fce010982780140aa0cd5ab'
       RouterAddress = '0x6000eb83c2583AFD25D93cB0629D6b0a0B2F245c'
     } else {
@@ -134,27 +134,11 @@ describe('Turing Helper Factory', function () {
     console.log('    Factory contract deployed as', hcFactory.address)
   })
 
-  /*it.only('should deploy new funded HybridComputeHelper via Factory (payment in ETH)', async () => {
-    const minAmountBoba = parseEther('0.02')
-
-    const implTx = await turingFactory.deployMinimalETH(
-      [deployerWallet.address],
-      minAmountBoba,
-      { ...gasOverride, value: ethers.utils.parseEther('0.1') }
-    )
-
-    // TODO: Check if rest ETH is refunded
-
-    const res = await implTx.wait()
-    console.log('TX confirmation: ', res)
-    expect(res).to.be.ok
-  })*/
-
   let newHybridComputeHelper: Contract
   let newHybridComputeHelperOtherWallet: Contract
   it('should deploy new funded HybridComputeHelper via Factory and have proper ownership (payment in BOBA)', async () => {
     // Approva Boba before
-    const bobaToDeposit = ethers.utils.parseEther('0.02')
+    const bobaToDeposit = ethers.utils.parseEther('0.2')
     const approveTx = await L2BOBAToken.approve(
       hcFactory.address,
       bobaToDeposit

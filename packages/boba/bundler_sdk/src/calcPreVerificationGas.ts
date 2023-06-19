@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-import { UserOperationStruct } from '@boba/accountabstraction'
-import { NotPromise, packUserOp } from '@boba/bundler_utils'
+import { UserOperationStruct } from '@bobanetwork/accountabstraction'
+import { NotPromise, packUserOp } from '@bobanetwork/bundler_utils'
 import { arrayify, hexlify } from 'ethers/lib/utils'
 
 export interface GasOverheads {

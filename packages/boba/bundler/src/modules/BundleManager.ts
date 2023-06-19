@@ -1,4 +1,4 @@
-import { EntryPoint, EntryPointWrapper } from '@boba/accountabstraction'
+import { EntryPoint, EntryPointWrapper } from '@bobanetwork/accountabstraction'
 import { MempoolManager } from './MempoolManager'
 import { ValidateUserOpResult, ValidationManager } from './ValidationManager'
 import { BigNumber, BigNumberish } from 'ethers'

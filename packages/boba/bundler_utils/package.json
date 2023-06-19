@@ -1,10 +1,28 @@
 {
-  "name": "@boba/bundler_utils",
+  "name": "@bobanetwork/bundler_utils",
   "version": "0.2.3",
   "main": "./dist/index.js",
   "license": "MIT",
   "types": "dist/index",
-  "private": true,
+  "keywords": [
+    "boba",
+    "account abstraction",
+    "bundler",
+    "sdk",
+    "smart wallets",
+    "web3",
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "account-abstraction",
+    "eip-4337"
+  ],
+  "repository": "https://github.com/bobanetwork/boba/tree/develop/packages/boba/bundler_utils",
+  "homepage": "https://boba.network",
+  "bugs": {
+    "url": "https://github.com/bobanetwork/issues"
+  },
   "files": [
     "dist/*",
     "contracts/*",
@@ -19,7 +37,7 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@boba/accountabstraction": "^1.0.0",
+    "@bobanetwork/accountabstraction": "^1.0.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.5.0",
     "@openzeppelin/contracts": "^4.7.3",

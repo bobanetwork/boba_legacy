@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import "@boba/accountabstraction/contracts/interfaces/IAccount.sol";
-import "@boba/accountabstraction/contracts/interfaces/IPaymaster.sol";
-import "@boba/accountabstraction/contracts/interfaces/IEntryPoint.sol";
+import "@bobanetwork/accountabstraction/contracts/interfaces/IAccount.sol";
+import "@bobanetwork/accountabstraction/contracts/interfaces/IPaymaster.sol";
+import "@bobanetwork/accountabstraction/contracts/interfaces/IEntryPoint.sol";
 
 /**
  * contract for testing account interaction.

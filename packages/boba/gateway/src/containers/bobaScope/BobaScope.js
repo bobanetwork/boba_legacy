@@ -34,7 +34,7 @@ import { PageTitle }  from 'components'
 import Sevens from './Sevens'
 import FastExits from './FastExits'
 
-import * as styles from './Transactions.module.scss'
+import styles from './Transactions.module.scss'
 import * as S from './History.styles'
 
 import useInterval from 'hooks/useInterval'

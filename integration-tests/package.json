@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.2",
-    "@boba/accountabstraction": "1.0.0",
+    "@bobanetwork/accountabstraction": "*",
     "@boba/api": "0.0.1",
     "@boba/contracts": "0.0.1",
     "@boba/teleportation": "1.0.0",
