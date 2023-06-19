@@ -197,34 +197,42 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
         // we disburse tokens only if depositId is greater or equal to the last disbursement
         if (depositId.gte(lastDisbursement)) {
-          const receivingChainTokenAddr = this._getSupportedAssetBySymbol(
-            sourceChainTokenAddr,
-            sourceChainId.toNumber(),
-            chainId,
-            this.state.supportedChains
-          )
+          try {
+            const receivingChainTokenAddr = this._getSupportedAssetBySymbol(
+              sourceChainTokenAddr,
+              sourceChainId.toNumber(),
+              chainId,
+              this.state.supportedChains
+            )
 
-          const [isTokenSupported, , , , ,] =
-            await this.state.Teleportation.supportedTokens(sourceChainTokenAddr)
-          if (!isTokenSupported) {
-            this.logger.error(
-              `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
-            )
+            const [isTokenSupported, , , , ,] =
+              await this.state.Teleportation.supportedTokens(
+                sourceChainTokenAddr
+              )
+            if (!isTokenSupported) {
+              throw new Error(
+                `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
+              )
+            } else {
+              disbursement = [
+                ...disbursement,
+                {
+                  token: receivingChainTokenAddr, // token mapping for correct routing as addresses different on every network
+                  amount: amount.toString(),
+                  addr: emitter,
+                  depositId: depositId.toNumber(),
+                  sourceChainId: sourceChainId.toString(),
+                },
+              ]
+              this.logger.info(
+                `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
+              )
+            }
+          } catch (e) {
+            this.logger.error(e.message)
+            // TODO: Add recovery mechanism
             // TODO: Save somewhere to recover(!) or generally fail (do once db teleporter is merged)
-          } else {
-            disbursement = [
-              ...disbursement,
-              {
-                token: receivingChainTokenAddr, // token mapping for correct routing as addresses different on every network
-                amount: amount.toString(),
-                addr: emitter,
-                depositId: depositId.toNumber(),
-                sourceChainId: sourceChainId.toString(),
-              },
-            ]
-            this.logger.info(
-              `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
-            )
+            // TODO: for both when getSupportedAssetBySymbol fails or when onchain support is missing
           }
         }
       }
@@ -327,6 +335,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     const destChain: ChainInfo = supportedChains.find(
       (c) => c.chainId === destChainId
     )
+    if (!destChain || !sourceChain) {
+      throw new Error(
+        `Either destination or source chain not configured/supported: ${destChain} (dest), ${sourceChain} (source)`
+      )
+    }
 
     const receivingChainTokenSymbol =
       sourceChain.supportedAssets[sourceChainTokenAddr]
