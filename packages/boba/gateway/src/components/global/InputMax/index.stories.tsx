@@ -1,14 +1,15 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 
-import { MaxInput, MaxInputProps } from './'
+import { MaxInput } from './'
+import { MaxInputTypes } from './types'
 
 export default {
   title: 'Components/MaxInput',
   component: MaxInput,
 } as Meta
 
-const Template: StoryFn<MaxInputProps> = (args: MaxInputProps) => (
+const Template: StoryFn<MaxInputTypes> = (args: MaxInputTypes) => (
   <MaxInput {...args} />
 )
 

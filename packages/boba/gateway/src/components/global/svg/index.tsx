@@ -1,12 +1,8 @@
 import React from 'react'
 import { ReactSVG } from 'react-svg'
+import { SvgTypes } from './types'
 
-export interface SvgProps {
-  src: string
-  fill: string
-}
-
-export const Svg: React.FC<SvgProps> = ({ src, fill }) => (
+export const Svg: React.FC<SvgTypes> = ({ src, fill }) => (
   // @ts-ignore
   <ReactSVG
     src={src}

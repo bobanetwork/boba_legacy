@@ -1,5 +1,6 @@
 import React from 'react'
-import { SwitchButton, SwitchButtonProps } from './'
+import { SwitchButton } from './'
+import { SwitchButtonTypes } from './types'
 import { Meta, StoryFn } from '@storybook/react'
 
 export default {
@@ -7,7 +8,7 @@ export default {
   component: SwitchButton,
 } as Meta
 
-const Template: StoryFn<SwitchButtonProps> = (args: any) => (
+const Template: StoryFn<SwitchButtonTypes> = (args: any) => (
   <SwitchButton {...args} />
 )
 
