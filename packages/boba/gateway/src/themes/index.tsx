@@ -23,7 +23,12 @@ const CustomThemeProvider = ({ children }: ThemeProps) => {
     }
   }, [theme])
 
-  return <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>
+  return (
+    <ThemeProvider theme={currentTheme}>
+      <GlobalStyle />
+      {children}
+    </ThemeProvider>
+  )
 }
 
 export default CustomThemeProvider
