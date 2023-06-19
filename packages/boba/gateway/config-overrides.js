@@ -1,6 +1,7 @@
 // @ts-ignore
 const webpack = require('webpack');
 const { Buffer } = require('buffer');
+const path = require('path');
 
 module.exports = (config, env) => {
   // Resto de tu configuración...

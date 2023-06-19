@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Switch, Input, Slider } from './styles'
+import { SwitchButtonTypes } from './types'
 
-export interface SwitchButtonProps {
-  isDisable?: boolean
-  isActive?: boolean
-  onStateChange?: (isChecked: boolean) => void
-}
-
-export const SwitchButton: React.FC<SwitchButtonProps> = ({
+export const SwitchButton: React.FC<SwitchButtonTypes> = ({
   isDisable = false,
   isActive = false,
   onStateChange,

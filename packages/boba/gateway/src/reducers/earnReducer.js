@@ -14,8 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import networkService from 'services/networkService'
-
-const allAddresses = networkService.getAllAddresses()
+// console.log(networkService);
+let allAddresses = {};
+if (networkService) {
+  allAddresses == networkService.getAllAddresses()
+}
 
 const initialState = {
   // totalL1FeeRate: 0,

@@ -1,18 +1,13 @@
 import React, { useState } from 'react'
 import { InputContainer, MaxButton, Input } from './styles'
+import { MaxInputTypes } from './types'
 
-export interface MaxInputProps {
-  max: number
-  initialValue: number
-  onValueChange: (value: number) => void
-}
-
-export const MaxInput: React.FC<MaxInputProps> = ({
+export const MaxInput: React.FC<MaxInputTypes> = ({
   max,
   initialValue,
   onValueChange,
 }) => {
-  const [value, setValue] = useState<string | number>(initialValue)
+  const [value, setValue] = useState<string | number>(initialValue || '')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value

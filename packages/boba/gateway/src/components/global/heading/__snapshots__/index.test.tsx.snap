@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Heading should match snapshots h1 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 700;
+}
+
+<h1
+    class="c0"
+  >
+    Test Heading
+  </h1>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h2 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 29px;
+  font-weight: 700;
+}
+
+<h2
+    class="c0"
+  >
+    Test Heading
+  </h2>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h3 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 700;
+}
+
+<h3
+    class="c0"
+  >
+    Test Heading
+  </h3>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h4 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 700;
+}
+
+<h4
+    class="c0"
+  >
+    Test Heading
+  </h4>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h5 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 700;
+}
+
+<h5
+    class="c0"
+  >
+    Test Heading
+  </h5>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h6 1`] = `
+<DocumentFragment>
+  .c0 {
+  font-style: normal;
+  font-weight: 700;
+}
+
+<h6
+    class="c0"
+  >
+    Test Heading
+  </h6>
+</DocumentFragment>
+`;

@@ -1,21 +1,14 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { ButtonContainer, SpinLoader } from './styles'
+import { ButtonTypes } from './types'
 
-export interface ButtonTypes {
-  disable?: boolean
-  loading?: boolean
-  small?: boolean
-  label: string
-  onClick?: () => void
-}
-
-export const Button = ({
+export const Button: FC<ButtonTypes> = ({
   disable = false,
   loading = false,
   small = false,
   label,
   onClick,
-}: ButtonTypes) => {
+}) => {
   return (
     <ButtonContainer
       type="button"
@@ -23,7 +16,6 @@ export const Button = ({
       loading={loading}
       onClick={onClick}
       small={small}
-      label={label}
     >
       {loading && <SpinLoader />} {label}
     </ButtonContainer>
