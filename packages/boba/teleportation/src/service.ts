@@ -198,11 +198,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         // we disburse tokens only if depositId is greater or equal to the last disbursement
         if (depositId.gte(lastDisbursement)) {
           try {
-            const receivingChainTokenAddr = this._getSupportedAssetBySymbol(
+            const receivingChainTokenAddr = this.#getSupportedAssetBySymbol(
               sourceChainTokenAddr,
               sourceChainId.toNumber(),
-              chainId,
-              this.state.supportedChains
+              chainId
             )
 
             const [isTokenSupported, , , , ,] =
@@ -323,16 +322,21 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     return events
   }
 
-  _getSupportedAssetBySymbol(
+  /**
+   * @dev Helper method for accessing the supportedAssets map via value (needed as we need it one way another as we don't save the ticker on-chain).
+   * @param sourceChainTokenAddr: Token/Asset address (ZeroAddr for native asset) on source network
+   * @param sourceChainId: ChainId the request is coming from
+   * @param destChainId: Target chainId to bridge the asset.
+   **/
+  #getSupportedAssetBySymbol(
     sourceChainTokenAddr: string,
     sourceChainId: number,
-    destChainId: number,
-    supportedChains: ChainInfo[]
+    destChainId: number
   ) {
-    const sourceChain: ChainInfo = supportedChains.find(
+    const sourceChain: ChainInfo = this.state.supportedChains.find(
       (c) => c.chainId === sourceChainId
     )
-    const destChain: ChainInfo = supportedChains.find(
+    const destChain: ChainInfo = this.state.supportedChains.find(
       (c) => c.chainId === destChainId
     )
     if (!destChain || !sourceChain) {

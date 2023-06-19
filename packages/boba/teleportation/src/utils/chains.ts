@@ -11,6 +11,10 @@ export interface IBobaChains {
   }
 }
 
+/**
+ * @dev Chain configs
+ * @property supportedAssets: BOBA as fee token only supported for EOAs, since Teleporter consists of a contract & the disburser wallet (assuming ETH fee) everything with 0x0 should be fine.
+ **/
 export const BobaChains: IBobaChains = {
   288: {
     url: 'https://replica.boba.network',
@@ -19,8 +23,10 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 873302,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'ETH',
       '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7': 'BOBA',
+      '0x5DE1677344D3Cb0D7D465c10b72A8f60699C062d': 'USDT',
+      '0x68ac1623ACf9eB9F88b65B5F229fE3e2c0d5789e': 'BNB',
     },
   },
   1294: {
@@ -30,7 +36,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 479856,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'GLMR',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -41,7 +47,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 25078,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'AVAX',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -52,7 +58,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 3393,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'BNB',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -63,7 +69,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 10604,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'FTM',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -74,7 +80,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 59,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'ETH',
       '0x4200000000000000000000000000000000000023': 'BOBA',
     },
   },
@@ -85,7 +91,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 304189,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'DEV',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -96,7 +102,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 489,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'AVAX',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -107,7 +113,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 3288,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'BNB',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
@@ -118,7 +124,7 @@ export const BobaChains: IBobaChains = {
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
     height: 299,
     supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'NATIVE',
+      '0x0000000000000000000000000000000000000000': 'FTM',
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
