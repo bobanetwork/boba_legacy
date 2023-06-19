@@ -1,4 +1,4 @@
-import { expect } from './setup'
+import { expect } from '@boba/teleportation/test/setup'
 
 /* External Imports */
 import { ethers } from 'hardhat'
@@ -10,8 +10,6 @@ import {
   Wallet,
   utils,
 } from 'ethers'
-import fs, { promises as fsPromise } from 'fs'
-import path from 'path'
 import { orderBy } from 'lodash'
 
 /* Imports: Artifacts */
@@ -19,12 +17,16 @@ import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
-import { ChainInfo } from '../src/utils/types'
+import { ChainInfo } from '@boba/teleportation/src/utils/types'
 
 /* Imports: Core */
-import { TeleportationService } from '../dist/service'
+import { TeleportationService } from '@boba/teleportation/src/service'
+import { AppDataSource, historyDataRepository } from "@boba/teleportation/src/data-source";
+import { HistoryData } from '@boba/teleportation/src/entity/HistoryData'
+import { OptimismEnv } from './shared/env'
 
 describe('teleportation', () => {
+  let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
 
@@ -34,13 +36,18 @@ describe('teleportation', () => {
   let selectedBobaChains: ChainInfo[]
   const pollingInterval: number = 1000
   const blockRangePerPolling = 1000
-  const dbPath = './db'
 
   before(async () => {
-    ;[signer] = await ethers.getSigners()
+    env = await OptimismEnv.new()
+    await AppDataSource.initialize()
+    await AppDataSource.synchronize(true) // drops database and recreates
+
+    signer = env.l2Wallet
     signerAddr = await signer.getAddress()
-    wallet1 = ethers.Wallet.createRandom().connect(ethers.provider)
+    wallet1 = env.l2Wallet_2
     address1 = wallet1.address
+
+
     await signer.sendTransaction({
       to: wallet1.address,
       value: ethers.utils.parseEther('100'),
@@ -54,14 +61,6 @@ describe('teleportation', () => {
   let L2BOBA: Contract
 
   before(async () => {
-    // Remove file if it exists
-    const dumpsPath = path.resolve(
-      __dirname,
-      '../dist/src/db/depositInfo-31337.json'
-    )
-    if (fs.existsSync(dumpsPath)) {
-      fs.unlinkSync(dumpsPath)
-    }
     const chainId = (await ethers.provider.getNetwork()).chainId
 
     Factory__Teleportation = new ethers.ContractFactory(
@@ -69,6 +68,7 @@ describe('teleportation', () => {
       TeleportationJson.bytecode,
       wallet1
     )
+
     Teleportation = await Factory__Teleportation.deploy()
     await Teleportation.deployTransaction.wait()
 
@@ -122,7 +122,6 @@ describe('teleportation', () => {
       selectedBobaChains,
       pollingInterval,
       blockRangePerPolling,
-      dbPath,
     })
     return teleportationService
   }
@@ -184,6 +183,13 @@ describe('teleportation', () => {
         blockNumber
       )
 
+      expect(events.length).to.be.eq(1)
+      expect(events[0].args.sourceChainId).to.be.eq(chainId)
+      expect(events[0].args.toChainId).to.be.eq(chainId)
+      expect(events[0].args.depositId).to.be.eq(0, `Unexpected deposit ID: ${events[0].args.depositId}`)
+      expect(events[0].args.emitter).to.be.eq(signerAddr)
+      expect(events[0].args.amount).to.be.eq(utils.parseEther('10'), 'Amount unexpected')
+
       let disbursement = []
       for (const event of events) {
         const sourceChainId = event.args.sourceChainId
@@ -218,9 +224,15 @@ describe('teleportation', () => {
       expect(postSignerBOBABalance.sub(preSignerBOBABalance)).to.be.eq(
         utils.parseEther('10')
       )
+
+      const amountDisbursements = await Teleportation
+        .connect(signer)
+        .totalDisbursements(chainId)
+
+      expect(amountDisbursements).to.be.eq(1)
     })
 
-    it('should block the disbursement TX if it is already disbursed', async () =>{
+    it('should block the disbursement TX if it is already disbursed', async () => {
       const chainId = (await ethers.provider.getNetwork()).chainId
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
@@ -498,19 +510,13 @@ describe('teleportation', () => {
       expect(storedBlock).to.be.eq(latestBlock)
     }).retries(3)
 
-    it('should not disbure BOBA token if the data is reset', async () => {
-      // Remove file if it exists
-      const dumpsPath = path.resolve(
-        __dirname,
-        '../dist/src/db/depositInfo-31337.json'
-      )
-      if (fs.existsSync(dumpsPath)) {
-        fs.unlinkSync(dumpsPath)
-      }
+    it('should not disburse BOBA token if the data is reset', async () => {
 
       const chainId = (await ethers.provider.getNetwork()).chainId
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
+
+      await historyDataRepository.delete({ chainId })
 
       const latestBlock = await ethers.provider.getBlockNumber()
       const depositTeleportations = {
