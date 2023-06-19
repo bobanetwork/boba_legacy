@@ -8,7 +8,9 @@ export interface ChainInfo {
   name: string
   teleportationAddress: string
   height: number
-  BobaTokenAddress?: string
+  supportedAssets: {
+    [address: string]: string // symbol (MUST BE UNIQUE)
+  }
 }
 
 export interface DepositTeleportations {

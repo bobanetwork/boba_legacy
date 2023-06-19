@@ -87,14 +87,18 @@ describe('teleportation', () => {
 
     await L2BOBA.transfer(address1, utils.parseEther('100000000'))
 
+    const defaultMinDepositAmount = utils.parseEther('1')
+    const defaultMaxDepositAmount = utils.parseEther('100')
+    const defaultMaxTransferPerDay = utils.parseEther('100000')
+
     // intialize the teleportation contract
     await Teleportation.initialize(
-      utils.parseEther('1'),
-      utils.parseEther('100')
+      defaultMinDepositAmount,
+      defaultMaxDepositAmount
     )
     // add the supported chain & token
     await Teleportation.addSupportedChain(chainId)
-    await Teleportation.addSupportedToken(L2BOBA.address)
+    await Teleportation.addSupportedToken(L2BOBA.address, defaultMinDepositAmount, defaultMaxDepositAmount, defaultMaxTransferPerDay)
 
     // build payload
     selectedBobaChains = [
@@ -106,7 +110,10 @@ describe('teleportation', () => {
         name: 'localhost',
         teleportationAddress: Teleportation.address,
         height: 0,
-        BobaTokenAddress: L2BOBA.address,
+        supportedAssets: {
+          [L2BOBA.address]: 'BOBA',
+          [ethers.constants.AddressZero]: 'NATIVE'
+        }
       },
     ]
   })
@@ -149,7 +156,7 @@ describe('teleportation', () => {
 
       // deposit token
       await L2BOBA.approve(Teleportation.address, utils.parseEther('10'))
-      await Teleportation.connect(signer).teleportERC20(
+      await Teleportation.connect(signer).teleportAsset(
         L2BOBA.address,
         utils.parseEther('10'),
         chainId
@@ -243,10 +250,12 @@ describe('teleportation', () => {
         const depositId = event.args.depositId
         const amount = event.args.amount
         const emitter = event.args.emitter
+        const token = event.args.token
 
         disbursement = [
           ...disbursement,
           {
+            token,
             amount: amount.toString(),
             addr: emitter,
             depositId: depositId.toNumber(),
@@ -279,7 +288,7 @@ describe('teleportation', () => {
       // deposit token
       for (let i = 0; i < 15; i++) {
         await L2BOBA.approve(Teleportation.address, utils.parseEther('10'))
-        await Teleportation.connect(signer).teleportERC20(
+        await Teleportation.connect(signer).teleportAsset(
           L2BOBA.address,
           utils.parseEther('10'),
           chainId
@@ -363,7 +372,7 @@ describe('teleportation', () => {
 
       // deposit token
       await L2BOBA.approve(Teleportation.address, utils.parseEther('11'))
-      await Teleportation.connect(signer).teleportERC20(
+      await Teleportation.connect(signer).teleportAsset(
         L2BOBA.address,
         utils.parseEther('11'),
         chainId
@@ -442,7 +451,7 @@ describe('teleportation', () => {
       // deposit token
       await L2BOBA.approve(Teleportation.address, utils.parseEther('100'))
       for (let i = 0; i < 11; i++) {
-        await Teleportation.connect(signer).teleportERC20(
+        await Teleportation.connect(signer).teleportAsset(
           L2BOBA.address,
           utils.parseEther('1'),
           chainId

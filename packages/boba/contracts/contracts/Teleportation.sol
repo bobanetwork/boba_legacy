@@ -375,7 +375,7 @@ contract Teleportation is PausableUpgradeable {
     }
 
     /**
-     * @dev Retry native Boba disbursement if it failed previously
+     * @dev Retry native disbursement if it failed previously. Only applies to native disbursements bc. of low-level call.
      *
      * @param _depositIds A list of DepositIds to process.
      */

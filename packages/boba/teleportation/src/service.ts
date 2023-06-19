@@ -1,5 +1,12 @@
 /* Imports: External */
-import { Contract, Wallet, BigNumber, providers, EventFilter, constants as ethersConstants } from 'ethers'
+import {
+  Contract,
+  Wallet,
+  BigNumber,
+  providers,
+  EventFilter,
+  constants as ethersConstants,
+} from 'ethers'
 import { orderBy } from 'lodash'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'
@@ -182,27 +189,43 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       let disbursement = []
 
       for (const event of events) {
-        const sourceChainId = event.args.sourceChainId
+        const sourceChainId: BigNumber = event.args.sourceChainId
         const depositId = event.args.depositId
         const amount = event.args.amount
-        const token = event.args.token
+        const sourceChainTokenAddr = event.args.token
         const emitter = event.args.emitter
 
         // we disburse tokens only if depositId is greater or equal to the last disbursement
         if (depositId.gte(lastDisbursement)) {
-          disbursement = [
-            ...disbursement,
-            {
-              token,
-              amount: amount.toString(),
-              addr: emitter,
-              depositId: depositId.toNumber(),
-              sourceChainId: sourceChainId.toString(),
-            },
-          ]
-          this.logger.info(
-            `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${token}`
+          const receivingChainTokenAddr = this._getSupportedAssetBySymbol(
+            sourceChainTokenAddr,
+            sourceChainId.toNumber(),
+            chainId,
+            this.state.supportedChains
           )
+
+          const [isTokenSupported, , , , ,] =
+            await this.state.Teleportation.supportedTokens(sourceChainTokenAddr)
+          if (!isTokenSupported) {
+            this.logger.error(
+              `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
+            )
+            // TODO: Save somewhere to recover(!) or generally fail
+          } else {
+            disbursement = [
+              ...disbursement,
+              {
+                token: receivingChainTokenAddr, // token mapping for correct routing as addresses different on every network
+                amount: amount.toString(),
+                addr: emitter,
+                depositId: depositId.toNumber(),
+                sourceChainId: sourceChainId.toString(),
+              },
+            ]
+            this.logger.info(
+              `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
+            )
+          }
         }
       }
 
@@ -226,41 +249,33 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       let sliceEnd = numberOfDisbursement > 10 ? 10 : numberOfDisbursement
       while (sliceStart < numberOfDisbursement) {
         const slicedDisbursement = disbursement.slice(sliceStart, sliceEnd)
-        const totalDisbursements = slicedDisbursement.reduce((acc, cur) => {
-          return acc.add(BigNumber.from(cur.amount))
-        }, BigNumber.from('0'))
 
-        // Checking for first only as tests cover mixed disbursements and contract reverts if mixed as well
-        if (slicedDisbursement[0].token === ethersConstants.AddressZero) {
-          const disburseTx = await this.state.Teleportation.disburseNative(
-            slicedDisbursement,
-            { value: totalDisbursements }
+        // approve token(s), disbursements can be mixed - sum up token amounts per token
+        const tokens: Map<string, BigNumber> = new Map<string, BigNumber>()
+        const approvePending = []
+        for (const disb of slicedDisbursement) {
+          tokens.set(
+            disb.token,
+            BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
           )
-          await disburseTx.wait()
-        } else {
-          // approve token(s), disbursements can be mixed - sum up token amounts per token
-          const tokens: Map<string, BigNumber> = new Map<string, BigNumber>()
-          const approvePending = []
-          for (const disb of slicedDisbursement) {
-            tokens.set(
-              disb.token,
-              BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
-            )
-          }
-          // do separate approves if necessary
-          for (const token of tokens.entries()) {
+        }
+        // do separate approves if necessary
+        for (const token of tokens.entries()) {
+          // ignore native
+          if (token[0] !== ethersConstants.AddressZero) {
             const approveTx = await this.getConnectedTokenContract(
               token[0]
             ).approve(this.state.Teleportation.address, token[1])
             approvePending.push(approveTx.wait())
           }
-          await Promise.all(approvePending)
-
-          const disburseTx = await this.state.Teleportation.disburseERC20(
-            slicedDisbursement
-          )
-          await disburseTx.wait()
         }
+        await Promise.all(approvePending)
+
+        const disburseTx = await this.state.Teleportation.disburseAsset(
+          slicedDisbursement
+        )
+        await disburseTx.wait()
+
         sliceStart = sliceEnd
         sliceEnd = Math.min(sliceEnd + 10, numberOfDisbursement)
       }
@@ -298,6 +313,34 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       startBlock = endBlock
     }
     return events
+  }
+
+  _getSupportedAssetBySymbol(
+    sourceChainTokenAddr: string,
+    sourceChainId: number,
+    destChainId: number,
+    supportedChains: ChainInfo[]
+  ) {
+    const sourceChain: ChainInfo = supportedChains.find(
+      (c) => c.chainId === sourceChainId
+    )
+    const destChain: ChainInfo = supportedChains.find(
+      (c) => c.chainId === destChainId
+    )
+
+    const receivingChainTokenSymbol =
+      sourceChain.supportedAssets[sourceChainTokenAddr]
+    const supportedAsset = Object.entries(destChain.supportedAssets).find(
+      ([address, tokenSymbol]) => {
+        return tokenSymbol === receivingChainTokenSymbol
+      }
+    )
+    if (!supportedAsset) {
+      throw new Error(
+        `Asset ${receivingChainTokenSymbol} on chain ${destChainId} not configured but possibly supported on-chain`
+      )
+    }
+    return supportedAsset[0] // return only address
   }
 
   async _putDepositInfo(
