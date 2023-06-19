@@ -22,26 +22,40 @@ export const SocialLinkItem = styled.a`
   text-align: center;
   overflow: visible;
   svg {
-    path {
-      fill: ${({ theme }) => theme.colors['gray'][200]};
-    }
     &#docs {
       path {
         fill: none;
-        stroke: ${({ theme }) => theme.colors['gray'][200]};
+        stroke: ${({ theme }) =>
+          theme.name === 'light'
+            ? theme.colors['gray'][600]
+            : theme.colors['gray'][200]};
+          };
       }
+    }
+    path {
+      fill: ${({ theme }) =>
+        theme.name === 'light'
+          ? theme.colors['gray'][600]
+          : theme.colors['gray'][200]}
+        };
     }
   }
   &:hover {
     svg {
-      path {
-        fill: ${({ theme }) => theme.colors['gray'][100]};
-      }
       &#docs {
         path {
           fill: none;
-          stroke: ${({ theme }) => theme.colors['gray'][100]};
+          stroke: ${({ theme }) =>
+            theme.name === 'light'
+              ? theme.colors['gray'][700]
+              : theme.colors['gray'][100]}};
         }
+      }
+      path {
+        fill: ${({ theme }) =>
+          theme.name === 'light'
+            ? theme.colors['gray'][700]
+            : theme.colors['gray'][100]}};
       }
     }
   }
