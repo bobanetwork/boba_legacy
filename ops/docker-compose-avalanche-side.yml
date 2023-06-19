@@ -98,6 +98,28 @@ services:
         max-size: 10m
         max-file: "10"
 
+  teleportation:
+    depends_on:
+      - l2geth
+      - teleportation_db
+    image: bobanetwork/teleportation:latest
+    build:
+      context: ..
+      dockerfile: ./ops/docker/Dockerfile.packages
+      target: teleportation
+    deploy:
+      replicas: 0
+
+  teleportation_db:
+    image: postgres
+    deploy:
+      replicas: 1
+    environment:
+      POSTGRES_PASSWORD: abcdef
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+
 networks:
   default:
     name: local-network

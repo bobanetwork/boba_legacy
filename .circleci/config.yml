@@ -82,7 +82,7 @@ commands:
       - run:
           name: Bring up services
           command: |
-            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler
+            docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> up -d bobalink aa_deployer bundler teleportation_db
           working_directory: ops
       - run:
           name: Start background logging
