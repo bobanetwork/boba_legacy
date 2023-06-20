@@ -198,7 +198,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         // we disburse tokens only if depositId is greater or equal to the last disbursement
         if (depositId.gte(lastDisbursement)) {
           try {
-            const receivingChainTokenAddr = this.#getSupportedAssetBySymbol(
+            const receivingChainTokenAddr = this._getSupportedAssetBySymbol(
               sourceChainTokenAddr,
               sourceChainId.toNumber(),
               chainId
@@ -266,10 +266,12 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
           )
         }
-        // do separate approves if necessary
+        // do separate approves if necessary & sum up native requirement
+        let nativeValue: BigNumber = BigNumber.from('0')
         for (const token of tokens.entries()) {
-          // ignore native
-          if (token[0] !== ethersConstants.AddressZero) {
+          if (token[0] === ethersConstants.AddressZero) {
+            nativeValue = nativeValue.add(token[1])
+          } else {
             const approveTx = await this.getConnectedTokenContract(
               token[0]
             ).approve(this.state.Teleportation.address, token[1])
@@ -279,7 +281,8 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         await Promise.all(approvePending)
 
         const disburseTx = await this.state.Teleportation.disburseAsset(
-          slicedDisbursement
+          slicedDisbursement,
+          { value: nativeValue }
         )
         await disburseTx.wait()
 
@@ -328,7 +331,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
    * @param sourceChainId: ChainId the request is coming from
    * @param destChainId: Target chainId to bridge the asset.
    **/
-  #getSupportedAssetBySymbol(
+  _getSupportedAssetBySymbol(
     sourceChainTokenAddr: string,
     sourceChainId: number,
     destChainId: number
@@ -347,6 +350,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
     const receivingChainTokenSymbol =
       sourceChain.supportedAssets[sourceChainTokenAddr]
+
     const supportedAsset = Object.entries(destChain.supportedAssets).find(
       ([address, tokenSymbol]) => {
         return tokenSymbol === receivingChainTokenSymbol

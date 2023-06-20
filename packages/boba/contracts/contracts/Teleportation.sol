@@ -284,6 +284,7 @@ contract Teleportation is PausableUpgradeable {
         require(_amount >= supToken.minDepositAmount, "Deposit amount too small");
         require(_amount <= supToken.maxDepositAmount, "Deposit amount too big");
         require(supportedChains[_toChainId], "Target chain not supported");
+        // minimal workaround to keep logic concise
         require(address(0) != _token || _amount == msg.value, "Native amount invalid");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
