@@ -265,7 +265,9 @@ describe('BOBA Teleportation Tests', async () => {
         '1'
       )
       expect(
-        ((await Proxy__Teleportation.supportedTokens(L2Boba.address)).transferredAmount).toString()
+        (
+          await Proxy__Teleportation.supportedTokens(L2Boba.address)
+        ).transferredAmount.toString()
       ).to.be.eq(_amount.toString())
       const postBalance = await L2Boba.balanceOf(signerAddress)
       expect(preBalance.sub(_amount)).to.be.eq(postBalance)
@@ -290,14 +292,18 @@ describe('BOBA Teleportation Tests', async () => {
         '2'
       )
       expect(
-        (await Proxy__Teleportation.supportedTokens(RandomERC20.address)).transferredAmount.toString()
+        (
+          await Proxy__Teleportation.supportedTokens(RandomERC20.address)
+        ).transferredAmount.toString()
       ).to.be.eq(ethers.utils.parseEther('100').toString())
       const postBalance = await RandomERC20.balanceOf(signerAddress)
       expect(preBalance.sub(_amount)).to.be.eq(postBalance)
     })
 
     it('should not teleport BOBA tokens if the amount exceeds the daily limit', async () => {
-      const supportedToken = await Proxy__Teleportation.supportedTokens(L2Boba.address)
+      const supportedToken = await Proxy__Teleportation.supportedTokens(
+        L2Boba.address
+      )
       const maxTransferAmountPerDay = supportedToken.maxTransferAmountPerDay
       const transferredAmount = supportedToken.transferredAmount
       const _amount = maxTransferAmountPerDay.sub(transferredAmount).add(1)
@@ -310,13 +316,18 @@ describe('BOBA Teleportation Tests', async () => {
     it('should reset the transferred amount', async () => {
       await ethers.provider.send('evm_increaseTime', [86400])
       const _amount = ethers.utils.parseEther('1')
-      const transferTimestampCheckPoint =
-        (await Proxy__Teleportation.supportedTokens(L2Boba.address)).transferTimestampCheckPoint
+      const transferTimestampCheckPoint = (
+        await Proxy__Teleportation.supportedTokens(L2Boba.address)
+      ).transferTimestampCheckPoint
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
       await Proxy__Teleportation.teleportAsset(L2Boba.address, _amount, 4)
-      expect((await Proxy__Teleportation.supportedTokens(L2Boba.address)).transferredAmount).to.be.eq(_amount)
       expect(
-        (await Proxy__Teleportation.supportedTokens(L2Boba.address)).transferTimestampCheckPoint
+        (await Proxy__Teleportation.supportedTokens(L2Boba.address))
+          .transferredAmount
+      ).to.be.eq(_amount)
+      expect(
+        (await Proxy__Teleportation.supportedTokens(L2Boba.address))
+          .transferTimestampCheckPoint
       ).to.be.not.eq(transferTimestampCheckPoint)
     })
 
@@ -490,7 +501,10 @@ describe('BOBA Teleportation Tests', async () => {
     it('should withdraw BOBA balance', async () => {
       const preSignerBalnce = await L2Boba.balanceOf(signerAddress)
       const preBalance = await L2Boba.balanceOf(Proxy__Teleportation.address)
-      await Proxy__Teleportation.withdrawBalance(L2Boba.address)
+      await expect(Proxy__Teleportation.withdrawBalance(L2Boba.address))
+        .to.emit(Proxy__Teleportation, 'AssetBalanceWithdrawn')
+        .withArgs(L2Boba.address, signerAddress, preBalance)
+
       const postBalance = await L2Boba.balanceOf(Proxy__Teleportation.address)
       const postSignerBalance = await L2Boba.balanceOf(signerAddress)
       expect(preBalance.sub(postBalance)).to.be.eq(
@@ -501,9 +515,7 @@ describe('BOBA Teleportation Tests', async () => {
 
     it('should not withdraw BOBA balance if caller is not owner', async () => {
       await expect(
-        Proxy__Teleportation.connect(signer2).withdrawBalance(
-          L2Boba.address
-        )
+        Proxy__Teleportation.connect(signer2).withdrawBalance(L2Boba.address)
       ).to.be.revertedWith('Caller is not the owner')
     })
 
@@ -554,8 +566,9 @@ describe('BOBA Teleportation Tests', async () => {
         defaultMaxDailyLimit
       )
 
-      const prevTransferredAmount =
-        (await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).transferredAmount
+      const prevTransferredAmount = (
+        await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)
+      ).transferredAmount
       const _amount = ethers.utils.parseEther('100')
       const preBalance = await ethers.provider.getBalance(signerAddress)
       await expect(
@@ -565,7 +578,8 @@ describe('BOBA Teleportation Tests', async () => {
           4,
           { value: _amount }
         )
-      ).to.emit(Proxy__Teleportation, 'AssetReceived')
+      )
+        .to.emit(Proxy__Teleportation, 'AssetReceived')
         .withArgs(
           ethers.constants.AddressZero,
           31337,
@@ -578,7 +592,13 @@ describe('BOBA Teleportation Tests', async () => {
         '5'
       )
       expect(
-        BigNumber.from((await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).transferredAmount)
+        BigNumber.from(
+          (
+            await Proxy__Teleportation.supportedTokens(
+              ethers.constants.AddressZero
+            )
+          ).transferredAmount
+        )
           .sub(prevTransferredAmount)
           .toString()
       ).to.be.eq(_amount.toString())
@@ -605,6 +625,164 @@ describe('BOBA Teleportation Tests', async () => {
       )
         .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
         .withArgs(4, signerAddress, _amount, 4)
+    })
+
+    it('should disburse native asset and token if disbursement cumulative value does match msg.value', async () => {
+      const tokenAmount = ethers.utils.parseEther('3')
+      await L2Boba.approve(Proxy__Teleportation.address, tokenAmount)
+
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('10'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 5,
+        },
+        {
+          token: L2Boba.address,
+          amount: tokenAmount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 6,
+        },
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('12'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 7,
+        },
+      ]
+      await expect(
+        Proxy__Teleportation.disburseAsset(payload, {
+          value: ethers.utils.parseEther('22'),
+        })
+      )
+        .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
+        .withArgs(5, signerAddress, ethers.utils.parseEther('10'), 4)
+        .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
+        .withArgs(6, signerAddress, tokenAmount, 4)
+        .to.emit(Proxy__Teleportation, 'DisbursementSuccess')
+        .withArgs(7, signerAddress, ethers.utils.parseEther('12'), 4)
+    })
+
+    it('should not disburse native asset or token if disbursement cumulative value does not match msg.value', async () => {
+      const tokenAmount = ethers.utils.parseEther('3')
+      await L2Boba.approve(Proxy__Teleportation.address, tokenAmount)
+
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('10'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 8,
+        },
+        {
+          token: L2Boba.address,
+          amount: tokenAmount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 9,
+        },
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('12'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 10,
+        },
+      ]
+
+      await expect(
+        Proxy__Teleportation.disburseAsset(payload, {
+          value: ethers.utils.parseEther('21'),
+        })
+      ).to.be.revertedWith('Disbursement total != amount sent')
+    })
+
+    it('should not disburse native asset or token if token is not supported on target network (or invalid address was passed -> e.g. faulty server-side mapping)', async () => {
+      const tokenAmount = ethers.utils.parseEther('3')
+      await L2Boba.approve(Proxy__Teleportation.address, tokenAmount)
+
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('10'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 8,
+        },
+        {
+          token: L2Boba.address,
+          amount: tokenAmount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 9,
+        },
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('12'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 10,
+        },
+      ]
+
+      await Proxy__Teleportation.removeSupportedToken(L2Boba.address)
+
+      await expect(
+        Proxy__Teleportation.disburseAsset(payload, {
+          value: ethers.utils.parseEther('22'),
+        })
+      ).to.be.revertedWith('Token not supported')
+
+      await Proxy__Teleportation.addSupportedToken(
+        L2Boba.address,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxDailyLimit
+      )
+    })
+
+    it('should not disburse native asset or token if source chain is not supported on target network', async () => {
+      const tokenAmount = ethers.utils.parseEther('3')
+      await L2Boba.approve(Proxy__Teleportation.address, tokenAmount)
+
+      const payload = [
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('10'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 8,
+        },
+        {
+          token: L2Boba.address,
+          amount: tokenAmount,
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 9,
+        },
+        {
+          token: ethers.constants.AddressZero,
+          amount: ethers.utils.parseEther('12'),
+          addr: signerAddress,
+          sourceChainId: 4,
+          depositId: 10,
+        },
+      ]
+
+      await Proxy__Teleportation.removeSupportedChain(4)
+
+      await expect(
+        Proxy__Teleportation.disburseAsset(payload, {
+          value: ethers.utils.parseEther('22'),
+        })
+      ).to.be.revertedWith('Source chain not supported')
+
+      await Proxy__Teleportation.addSupportedChain(4)
     })
   })
 
@@ -690,7 +868,14 @@ describe('BOBA Teleportation Tests', async () => {
 
       const _amount = ethers.utils.parseEther('100')
       const preBalance = await ethers.provider.getBalance(signerAddress)
-      await expect(Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, _amount, 4, { value: _amount }))
+      await expect(
+        Proxy__Teleportation.teleportAsset(
+          ethers.constants.AddressZero,
+          _amount,
+          4,
+          { value: _amount }
+        )
+      )
         .to.emit(Proxy__Teleportation, 'AssetReceived')
         .withArgs(
           ethers.constants.AddressZero,
@@ -704,7 +889,11 @@ describe('BOBA Teleportation Tests', async () => {
         '1'
       )
       expect(
-        ((await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).transferredAmount).toString()
+        (
+          await Proxy__Teleportation.supportedTokens(
+            ethers.constants.AddressZero
+          )
+        ).transferredAmount.toString()
       ).to.be.eq(_amount.toString())
 
       const gasFee = await getGasFeeFromLastestBlock(ethers.provider)
@@ -714,16 +903,30 @@ describe('BOBA Teleportation Tests', async () => {
     })
 
     it('should not teleport native if the amount exceeds the daily limit', async () => {
-      const maxTransferAmountPerDay =
-        (await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).maxTransferAmountPerDay
-      const maxDepositAmount = (await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).maxDepositAmount
+      const maxTransferAmountPerDay = (
+        await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)
+      ).maxTransferAmountPerDay
+      const maxDepositAmount = (
+        await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)
+      ).maxDepositAmount
       const _amount = ethers.utils.parseEther('200')
-      await Proxy__Teleportation.setMaxAmount(ethers.constants.AddressZero, _amount)
-      await Proxy__Teleportation.setMaxTransferAmountPerDay(ethers.constants.AddressZero, _amount)
+      await Proxy__Teleportation.setMaxAmount(
+        ethers.constants.AddressZero,
+        _amount
+      )
+      await Proxy__Teleportation.setMaxTransferAmountPerDay(
+        ethers.constants.AddressZero,
+        _amount
+      )
       await expect(
-        Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, _amount, 4, {
-          value: _amount,
-        })
+        Proxy__Teleportation.teleportAsset(
+          ethers.constants.AddressZero,
+          _amount,
+          4,
+          {
+            value: _amount,
+          }
+        )
       ).to.be.revertedWith('max amount per day exceeded')
       await Proxy__Teleportation.setMaxTransferAmountPerDay(
         ethers.constants.AddressZero,
@@ -738,24 +941,45 @@ describe('BOBA Teleportation Tests', async () => {
     it('should reset the transferred amount', async () => {
       await ethers.provider.send('evm_increaseTime', [86400])
       const _amount = ethers.utils.parseEther('1')
-      const transferTimestampCheckPoint =
-        (await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).transferTimestampCheckPoint
+      const transferTimestampCheckPoint = (
+        await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)
+      ).transferTimestampCheckPoint
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
-      await Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, _amount, 4, {
-        value: _amount,
-      })
-      expect((await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).transferredAmount).to.be.eq(_amount)
+      await Proxy__Teleportation.teleportAsset(
+        ethers.constants.AddressZero,
+        _amount,
+        4,
+        {
+          value: _amount,
+        }
+      )
       expect(
-        (await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).transferTimestampCheckPoint
+        (
+          await Proxy__Teleportation.supportedTokens(
+            ethers.constants.AddressZero
+          )
+        ).transferredAmount
+      ).to.be.eq(_amount)
+      expect(
+        (
+          await Proxy__Teleportation.supportedTokens(
+            ethers.constants.AddressZero
+          )
+        ).transferTimestampCheckPoint
       ).to.be.not.eq(transferTimestampCheckPoint)
     })
 
     it('should revert if _toChainId is not supported', async () => {
       const _amount = ethers.utils.parseEther('10')
       await expect(
-        Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, _amount, 100, {
-          value: _amount,
-        })
+        Proxy__Teleportation.teleportAsset(
+          ethers.constants.AddressZero,
+          _amount,
+          100,
+          {
+            value: _amount,
+          }
+        )
       ).to.be.revertedWith('Target chain not supported')
     })
 
@@ -883,7 +1107,10 @@ describe('BOBA Teleportation Tests', async () => {
       const preBalance = await ethers.provider.getBalance(
         Proxy__Teleportation.address
       )
-      await Proxy__Teleportation.withdrawBalance(ethers.constants.AddressZero)
+      await expect(Proxy__Teleportation.withdrawBalance(ethers.constants.AddressZero))
+        .to.emit(Proxy__Teleportation, 'AssetBalanceWithdrawn')
+        .withArgs(ethers.constants.AddressZero, signerAddress, preBalance)
+
       const postBalance = await ethers.provider.getBalance(
         Proxy__Teleportation.address
       )
@@ -897,7 +1124,9 @@ describe('BOBA Teleportation Tests', async () => {
 
     it('should not withdraw BOBA balance if caller is not owner', async () => {
       await expect(
-        Proxy__Teleportation.connect(signer2).withdrawBalance(ethers.constants.AddressZero)
+        Proxy__Teleportation.connect(signer2).withdrawBalance(
+          ethers.constants.AddressZero
+        )
       ).to.be.revertedWith('Caller is not the owner')
     })
 
@@ -905,7 +1134,9 @@ describe('BOBA Teleportation Tests', async () => {
       await Proxy__Teleportation.pause()
       expect(await Proxy__Teleportation.paused()).to.be.eq(true)
       await expect(
-        Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, 1, 4, { value: 1 })
+        Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, 1, 4, {
+          value: 1,
+        })
       ).to.be.revertedWith('Pausable: paused')
       await expect(Proxy__Teleportation.disburseAsset([])).to.be.revertedWith(
         'Pausable: paused'
@@ -917,7 +1148,14 @@ describe('BOBA Teleportation Tests', async () => {
       expect(await Proxy__Teleportation.paused()).to.be.eq(false)
       const _amount = ethers.utils.parseEther('100')
       await L2Boba.approve(Proxy__Teleportation.address, _amount)
-      await expect(Proxy__Teleportation.teleportAsset(ethers.constants.AddressZero, _amount, 4, { value: _amount }))
+      await expect(
+        Proxy__Teleportation.teleportAsset(
+          ethers.constants.AddressZero,
+          _amount,
+          4,
+          { value: _amount }
+        )
+      )
         .to.emit(Proxy__Teleportation, 'AssetReceived')
         .withArgs(
           ethers.constants.AddressZero,
@@ -948,9 +1186,15 @@ describe('BOBA Teleportation Tests', async () => {
     })
 
     it('should teleport BOBA tokens and emit event for alt l2', async () => {
-      await Proxy__Teleportation.addSupportedToken(L2Boba.address, defaultMinDepositAmount, defaultMaxDepositAmount, defaultMaxDailyLimit)
+      await Proxy__Teleportation.addSupportedToken(
+        L2Boba.address,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxDailyLimit
+      )
       const prevTransferredAmount = BigNumber.from(
-        (await Proxy__Teleportation.supportedTokens(L2Boba.address)).transferredAmount
+        (await Proxy__Teleportation.supportedTokens(L2Boba.address))
+          .transferredAmount
       )
       const _amount = ethers.utils.parseEther('100')
       const preBalance = await L2Boba.balanceOf(signerAddress)
@@ -964,7 +1208,10 @@ describe('BOBA Teleportation Tests', async () => {
         '4'
       )
       expect(
-        BigNumber.from((await Proxy__Teleportation.supportedTokens(L2Boba.address)).transferredAmount)
+        BigNumber.from(
+          (await Proxy__Teleportation.supportedTokens(L2Boba.address))
+            .transferredAmount
+        )
           .sub(prevTransferredAmount)
           .toString()
       ).to.be.eq(_amount.toString())
@@ -974,7 +1221,8 @@ describe('BOBA Teleportation Tests', async () => {
 
     it('should teleport random tokens and emit event for alt l2', async () => {
       const prevTransferredAmount = BigNumber.from(
-        (await Proxy__Teleportation.supportedTokens(RandomERC20.address)).transferredAmount
+        (await Proxy__Teleportation.supportedTokens(RandomERC20.address))
+          .transferredAmount
       )
       await Proxy__Teleportation.addSupportedToken(
         RandomERC20.address,
@@ -994,7 +1242,10 @@ describe('BOBA Teleportation Tests', async () => {
         '5'
       )
       expect(
-        BigNumber.from((await Proxy__Teleportation.supportedTokens(RandomERC20.address)).transferredAmount)
+        BigNumber.from(
+          (await Proxy__Teleportation.supportedTokens(RandomERC20.address))
+            .transferredAmount
+        )
           .sub(prevTransferredAmount)
           .toString()
       ).to.be.eq(_amount.toString())
@@ -1089,7 +1340,7 @@ describe('BOBA Teleportation Tests', async () => {
       await PausedReceiver.setPauseStatus(false)
       await expect(
         Proxy__Teleportation.retryDisburseNative([1])
-      ).to.be.revertedWith('DepositId is not a failed disbursement')
+      ).to.be.revertedWith('DepositId not failed disbursement')
     })
 
     it('should not be able to call from non disburser', async () => {
@@ -1126,7 +1377,7 @@ describe('BOBA Teleportation Tests', async () => {
     it('should not be able to retry an already retried Disbursements', async () => {
       await expect(
         Proxy__Teleportation.retryDisburseNative([0])
-      ).to.be.revertedWith('DepositId is not a failed disbursement')
+      ).to.be.revertedWith('DepositId not failed disbursement')
     })
 
     it('should not be able to retry passed Disbursements', async () => {
@@ -1148,7 +1399,7 @@ describe('BOBA Teleportation Tests', async () => {
 
       await expect(
         Proxy__Teleportation.retryDisburseNative([1])
-      ).to.be.revertedWith('DepositId is not a failed disbursement')
+      ).to.be.revertedWith('DepositId not failed disbursement')
     })
 
     it('should be able to retry a batch of failed disbursements', async () => {
@@ -1393,17 +1644,23 @@ describe('BOBA Teleportation Tests', async () => {
         defaultMaxDailyLimit.add(2)
       )
       expect(
-        (await Proxy__Teleportation.supportedTokens(L2Boba.address)).maxTransferAmountPerDay.toString()
+        (
+          await Proxy__Teleportation.supportedTokens(L2Boba.address)
+        ).maxTransferAmountPerDay.toString()
       ).to.be.eq(defaultMaxDailyLimit.add(2))
     })
 
     it('should set daily limit native', async () => {
       await Proxy__Teleportation.setMaxTransferAmountPerDay(
         ethers.constants.AddressZero,
-        defaultMaxDailyLimit.add(2),
+        defaultMaxDailyLimit.add(2)
       )
       expect(
-        (await Proxy__Teleportation.supportedTokens(ethers.constants.AddressZero)).maxTransferAmountPerDay.toString()
+        (
+          await Proxy__Teleportation.supportedTokens(
+            ethers.constants.AddressZero
+          )
+        ).maxTransferAmountPerDay.toString()
       ).to.be.eq(defaultMaxDailyLimit.add(2))
     })
 

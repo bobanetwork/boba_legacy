@@ -92,12 +92,7 @@ contract Teleportation is PausableUpgradeable {
         uint256 newAmount
     );
 
-    event NativeBalanceWithdrawn(
-        address indexed owner,
-        uint256 balance
-    );
-
-    event TokenBalanceWithdrawn(
+    event AssetBalanceWithdrawn(
         address indexed token,
         address indexed owner,
         uint256 balance
@@ -262,8 +257,6 @@ contract Teleportation is PausableUpgradeable {
         emit TokenSupported(_token, false);
     }
 
-
-
     /**
      * @dev Accepts deposits that will be disbursed to the sender's address on target L2.
      * The method reverts if the amount is less than the current
@@ -351,7 +344,7 @@ contract Teleportation is PausableUpgradeable {
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
-            require(supportedChains[_sourceChainId], "Source chain is not supported");
+            require(supportedChains[_sourceChainId], "Source chain not supported");
             totalDisbursements[_sourceChainId] += 1;
 
             if (_token == address(0)) {
@@ -395,7 +388,7 @@ contract Teleportation is PausableUpgradeable {
         // Process disbursements.
         for (uint256 i = 0; i < _numDisbursements; i++) {
             FailedNativeDisbursement storage failedDisbursement = failedNativeDisbursements[_depositIds[i]];
-            require(failedDisbursement.failed, "DepositId is not a failed disbursement");
+            require(failedDisbursement.failed, "DepositId not failed disbursement");
             uint256 _amount = failedDisbursement.disbursement.amount;
             address _addr = failedDisbursement.disbursement.addr;
             uint256 _sourceChainId = failedDisbursement.disbursement.sourceChainId;
@@ -439,12 +432,12 @@ contract Teleportation is PausableUpgradeable {
             uint256 _balance = address(this).balance;
             (bool sent,) = owner.call{gas: 2300, value: _balance}("");
             require(sent, "Failed to send Ether");
-            emit NativeBalanceWithdrawn(owner, _balance);
+            emit AssetBalanceWithdrawn(_token, owner, _balance);
         } else {
             // no supportedToken check in case of generally lost tokens
             uint256 _balance = IERC20(_token).balanceOf(address(this));
             IERC20(_token).safeTransfer(owner, _balance);
-            emit TokenBalanceWithdrawn(_token, owner, _balance);
+            emit AssetBalanceWithdrawn(_token, owner, _balance);
         }
     }
 
