@@ -54,12 +54,10 @@ const deployFn: DeployFunction = async (hre) => {
     (hre as any).deployConfig.deployer_l2
   )
   await Proxy__Teleportation.initialize(
-    L2BOBA.address,
     utils.parseEther('1'),
     utils.parseEther('100')
   )
   await Teleportation.initialize(
-    L2BOBA.address,
     utils.parseEther('1'),
     utils.parseEther('100')
   )

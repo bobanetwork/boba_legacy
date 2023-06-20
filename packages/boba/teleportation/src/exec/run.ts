@@ -11,10 +11,15 @@ import { BobaChains } from '../utils/chains'
 
 /* Imports: Interface */
 import { ChainInfo } from '../utils/types'
+import { AppDataSource } from '../data-source'
 
 dotenv.config()
 
 const main = async () => {
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize() // initialize DB connection
+  }
+
   const config: Bcfg = new Config('teleportation')
   config.load({
     env: true,
@@ -33,15 +38,11 @@ const main = async () => {
   // Optional
   const POLLING_INTERVAL = config.uint(
     'polling-interval',
-    parseInt(env.POLLING_INTERVAL, 10) || 1000 * 60
+    parseInt(env.TELEPORTATION_POLLING_INTERVAL, 10) || 1000 * 60
   )
   const BLOCK_RANGE_PER_POLLING = config.uint(
     'block-range-per-polling',
-    parseInt(env.BLOCK_RANGE_PER_POLLING, 10) || 1000
-  )
-  const DATABASE_PATH = config.str(
-    'database-path',
-    env.DATABASE_PATH || '../db'
+    parseInt(env.TELEPORTATION_BLOCK_RANGE_PER_POLLING, 10) || 1000
   )
 
   if (!L2_NODE_WEB3_URL) {
@@ -78,7 +79,6 @@ const main = async () => {
     selectedBobaChains,
     pollingInterval: POLLING_INTERVAL,
     blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
-    dbPath: DATABASE_PATH,
   })
 
   await service.start()
