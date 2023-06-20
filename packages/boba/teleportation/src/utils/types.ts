@@ -1,5 +1,9 @@
 import { BigNumber, Contract, providers } from 'ethers'
 
+export interface SupportedAssets {
+  [address: string]: string // symbol (MUST BE UNIQUE)
+}
+
 export interface ChainInfo {
   chainId: number
   url: string
@@ -8,9 +12,7 @@ export interface ChainInfo {
   name: string
   teleportationAddress: string
   height: number
-  supportedAssets: {
-    [address: string]: string // symbol (MUST BE UNIQUE)
-  }
+  supportedAssets: SupportedAssets
 }
 
 export interface DepositTeleportations {

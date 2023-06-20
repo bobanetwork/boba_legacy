@@ -10,7 +10,7 @@ import { TeleportationService } from '../service'
 import { BobaChains } from '../utils/chains'
 
 /* Imports: Interface */
-import { ChainInfo } from '../utils/types'
+import { ChainInfo, SupportedAssets } from '../utils/types'
 import { AppDataSource } from '../data-source'
 
 dotenv.config()
@@ -58,12 +58,17 @@ const main = async () => {
   // get all boba chains and exclude the current chain
   const chainId = (await l2Provider.getNetwork()).chainId
   const isTestnet = BobaChains[chainId].testnet
+  let originSupportedAssets: SupportedAssets
   const selectedBobaChains: ChainInfo[] = Object.keys(BobaChains).reduce(
     (acc, cur) => {
       const chain = BobaChains[cur]
-      if (isTestnet === chain.testnet && Number(cur) !== chainId) {
-        chain.provider = new providers.StaticJsonRpcProvider(chain.url)
-        acc.push({ chainId: cur, ...chain })
+      if (isTestnet === chain.testnet) {
+        if (Number(cur) !== chainId) {
+          chain.provider = new providers.StaticJsonRpcProvider(chain.url)
+          acc.push({ chainId: cur, ...chain })
+        } else {
+          originSupportedAssets = chain.supportedAssets
+        }
       }
       return acc
     },
@@ -77,6 +82,7 @@ const main = async () => {
     teleportationAddress: TELEPORTATION_ADDRESS,
     disburserWallet,
     selectedBobaChains,
+    originSupportedAssets,
     pollingInterval: POLLING_INTERVAL,
     blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
   })

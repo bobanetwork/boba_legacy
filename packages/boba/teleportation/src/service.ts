@@ -17,7 +17,7 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
-import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
+import {ChainInfo, DepositTeleportations, Disbursement, SupportedAssets} from './utils/types'
 import { HistoryData } from './entity/HistoryData'
 import { AppDataSource, historyDataRepository } from "./data-source";
 
@@ -34,6 +34,9 @@ interface TeleportationOptions {
   disburserWallet: Wallet
 
   selectedBobaChains: ChainInfo[]
+
+  // Own chain to map token symbols to other networks
+  originSupportedAssets: SupportedAssets
 
   pollingInterval: number
 
@@ -335,20 +338,15 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     sourceChainId: number,
     destChainId: number
   ) {
-    const sourceChain: ChainInfo = this.state.supportedChains.find(
-      (c) => c.chainId === sourceChainId
-    )
     const destChain: ChainInfo = this.state.supportedChains.find(
       (c) => c.chainId === destChainId
     )
-    if (!destChain || !sourceChain) {
-      throw new Error(
-        `Either destination or source chain not configured/supported: ${destChain} (dest), ${sourceChain} (source)`
-      )
+    if (!destChain) {
+      throw new Error(`Destination chain not configured/supported: ${destChain}`)
     }
 
     const receivingChainTokenSymbol =
-      sourceChain.supportedAssets[sourceChainTokenAddr]
+      this.options.originSupportedAssets[sourceChainTokenAddr]
 
     const supportedAsset = Object.entries(destChain.supportedAssets).find(
       ([address, tokenSymbol]) => {
