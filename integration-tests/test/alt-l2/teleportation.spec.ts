@@ -28,8 +28,7 @@ import {
 import { OptimismEnv } from './shared/env'
 
 
-// TODO remove
-describe.only('teleportation', () => {
+describe('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
