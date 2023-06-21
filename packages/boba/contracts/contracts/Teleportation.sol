@@ -334,6 +334,11 @@ contract Teleportation is PausableUpgradeable {
             // implicitly contains addr(0) check through addSupportedToken()
             require(supportedTokens[_token].supported, "Token not supported");
 
+            // Ensure the depositId matches our expected value.
+            require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
+            require(supportedChains[_sourceChainId], "Source chain not supported");
+            totalDisbursements[_sourceChainId] += 1;
+
             // ensure amount sent in the tx is equal to disbursement (moved into loop to ensure token flexibility)
             if (_token == address(0)) {
                 require(_amount <= remainingValue, "Disbursement total != amount sent");
@@ -341,11 +346,6 @@ contract Teleportation is PausableUpgradeable {
             } else {
                 IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
             }
-
-            // Ensure the depositId matches our expected value.
-            require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
-            require(supportedChains[_sourceChainId], "Source chain not supported");
-            totalDisbursements[_sourceChainId] += 1;
 
             if (_token == address(0)) {
                 // Deliver the disbursement amount to the receiver. If the
