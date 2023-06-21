@@ -9,7 +9,7 @@ jobs:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Required for some installation in the SNX repo
       - uses: webfactory/ssh-agent@v0.8.0
