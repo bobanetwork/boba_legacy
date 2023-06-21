@@ -67,39 +67,39 @@ $white500: rgba(255, 255, 255, 0.5);
 }
 
 @font-face {
+  font-family: 'RobotoLight';
+  src: url(./assets/fonts/Roboto/Roboto-Light.ttf ) format('opentype');
+}
+@font-face {
+  font-family: 'RobotoLightItalic';
+  src: url(./assets/fonts/Roboto/Roboto-LightItalic.ttf ) format('opentype');
+}
+@font-face {
+  font-family: 'RobotoMedium';
+  src: url(./assets/fonts/Roboto/Roboto-Medium.ttf ) format('opentype');
+}
+@font-face {
+  font-family: 'RobotoMediumItalic';
+  src: url(./assets/fonts/Roboto/Roboto-MediumItalic.ttf ) format('opentype');
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url(./assets/fonts/Roboto/Roboto-Regular.ttf ) format('opentype');
+}
+
+@font-face {
+  font-family: 'MontserratItalic';
+  src: url(./assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url(./assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf) format('opentype');
+}
+
+@font-face {
   font-family: 'MessinaSB';
   src: url(./fonts/MessinaSansMono-SemiBold.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXL';
-  src: url(./fonts/MrEavesXLModOT-Reg.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLBold';
-  src: url(./fonts/MrEavesXLModOT-Bold.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLThin';
-  src: url(./fonts/MrEavesXLModOT-Thin.ttf) format('opentype');
-}
-
-
-@font-face {
-  font-family: 'MrEavesXL';
-  src: url(./fonts/MrEavesXLModOT-Reg.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLBold';
-  src: url(./fonts/MrEavesXLModOT-Bold.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLThin';
-  src: url(./fonts/MrEavesXLModOT-Thin.ttf) format('opentype');
 }
 
 .react-datepicker.dark {

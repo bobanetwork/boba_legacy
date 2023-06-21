@@ -36,7 +36,7 @@ import { Background } from 'components/global/background'
 
 function App() {
   const dispatch = useDispatch()
-  
+
   const theme = useSelector(selectTheme)
   const light = theme === 'light'
 
