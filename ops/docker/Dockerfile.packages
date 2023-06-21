@@ -130,6 +130,7 @@ WORKDIR /opt/optimism/packages/boba
 COPY --from=builder /opt/optimism/packages/boba/account-abstraction ./account-abstraction
 COPY --from=builder /opt/optimism/packages/boba/bundler_sdk ./bundler_sdk
 COPY --from=builder /opt/optimism/packages/boba/bundler_utils ./bundler_utils
+COPY --from=builder /opt/optimism/packages/boba/teleportation ./teleportation
 WORKDIR /opt/optimism/integration-tests
 COPY ./ops/scripts/integration-tests.sh ./
 CMD ["yarn", "test:integration"]
@@ -183,11 +184,13 @@ COPY --from=builder /opt/optimism/packages/boba/bundler /opt/optimism/packages/b
 COPY --from=builder /opt/optimism/packages/boba/account-abstraction /opt/optimism/packages/boba/account-abstraction
 COPY --from=builder /opt/optimism/packages/boba/bundler_sdk /opt/optimism/packages/boba/bundler_sdk
 COPY --from=builder /opt/optimism/packages/boba/bundler_utils /opt/optimism/packages/boba/bundler_utils
+COPY --from=builder /opt/optimism/packages/boba/teleportation /opt/optimism/packages/boba/teleportation
 WORKDIR /opt/optimism/packages/boba/bundler
 RUN npx webpack
 RUN rm -rf /opt/optimism/packages/boba/account-abstraction
 RUN rm -rf /opt/optimism/packages/boba/bundler_sdk
 RUN rm -rf /opt/optimism/packages/boba/bundler_utils
+RUN rm -rf /opt/optimism/packages/boba/teleportation
 RUN rm -rf /opt/optimism/packages/boba/bundler/node_modules
 RUN chmod +x ./wait-for-l1-and-l2.sh
 RUN chmod +x ./bundler.sh
