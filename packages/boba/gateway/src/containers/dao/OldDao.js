@@ -39,7 +39,6 @@ import {
 
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
-import { PageTitle } from 'components/global/PageTitle'
 import Connect from 'containers/connect/Connect'
 
 const PROPOSAL_STATES = [
@@ -75,7 +74,6 @@ function OldDao() {
 
   return (
     <S.DaoPageContainer>
-      <PageTitle title="DAO" slug="Participate in voting on proposals concerning the future of Boba Network"/>
       <Connect
         userPrompt={'Please connect to Boba to vote and propose'}
         accountEnabled={accountEnabled}

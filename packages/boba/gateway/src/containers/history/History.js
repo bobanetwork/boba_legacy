@@ -45,7 +45,6 @@ import * as S from './History.styles'
 import styles from './TX_All.module.scss'
 
 import useInterval from 'hooks/useInterval'
-import {PageTitle} from 'components/global/PageTitle'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
@@ -100,7 +99,6 @@ function History() {
 
   return (
     <S.HistoryPageContainer>
-      <PageTitle title="History" slug="Look back on past transactions"/>
 
       <Connect
         userPrompt={'Connect to MetaMask to see your history'}

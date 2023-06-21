@@ -29,7 +29,6 @@ import { selectBaseEnabled, selectActiveDataTab,selectSevens, selectFastExits } 
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
-import { PageTitle }  from 'components'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'
@@ -74,7 +73,6 @@ function BobaScope() {
 
   return (
     <S.ScopePageContainer>
-      <PageTitle title="Boba Scope" />
       <S.Header>
         <div className={styles.searchInput}>
           <Input

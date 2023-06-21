@@ -3,10 +3,18 @@ import { Meta, StoryFn } from '@storybook/react'
 
 import { PageTitle } from './'
 import { PageTitleTypes } from './types'
+import { BrowserRouter } from 'react-router-dom'
 
 export default {
   title: 'Components/PageTitle',
   component: PageTitle,
+  decorators: [
+    (StoryFn) => (
+      <BrowserRouter>
+        <StoryFn />
+      </BrowserRouter>
+    ),
+  ],
 } as Meta
 
 const Template: StoryFn<PageTitleTypes> = (args: any) => <PageTitle {...args} />
