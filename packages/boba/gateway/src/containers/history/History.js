@@ -26,7 +26,7 @@ import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
-import { 
+import {
   selectActiveHistoryTab,
   selectTransactions,
   selectAccountEnabled,
@@ -45,7 +45,7 @@ import * as S from './History.styles'
 import styles from './TX_All.module.scss'
 
 import useInterval from 'hooks/useInterval'
-import {PageTitle} from 'components/global/PageTitle'
+import {PageTitle} from 'components/layout/PageTitle'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 

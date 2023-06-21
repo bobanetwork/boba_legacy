@@ -41,7 +41,7 @@ import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import { PageTitle } from 'components/global/PageTitle'
+import { PageTitle } from 'components/layout/PageTitle'
 
 import networkService from 'services/networkService'
 

@@ -1,11 +1,11 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 
-import { PageTitle } from './'
+import { PageTitle } from '.'
 import { PageTitleTypes } from './types'
 
 export default {
-  title: 'Components/PageTitle',
+  title: 'Layout/PageTitle',
   component: PageTitle,
 } as Meta
 
