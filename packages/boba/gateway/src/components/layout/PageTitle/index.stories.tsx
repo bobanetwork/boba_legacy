@@ -24,3 +24,8 @@ Default.args = {
   title: 'History',
   slug: 'Look back on past transactions',
 }
+
+export const WithoutSlug = Template.bind({})
+WithoutSlug.args = {
+  title: 'Title only',
+}
