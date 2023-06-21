@@ -32,6 +32,7 @@ import Notification from 'containers/notification/Notification'
 
 import Router from './routes'
 import CustomThemeProvider from 'themes'
+import { Background } from 'components/global/background'
 
 function App() {
   const dispatch = useDispatch()
@@ -77,7 +78,7 @@ function App() {
         text: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       },
       background: {
-        default: light ? '#FFFFFF' : '#111315',
+        default: light ? '#E5E5E1' : '#191919',
         secondary: light
           ? 'rgba(3, 19, 19, 0.04)'
           : 'rgba(255, 255, 255, 0.06)',
@@ -396,9 +397,10 @@ function App() {
     <ThemeProvider theme={MUItheme}>
       <CustomThemeProvider>
         <CssBaseline />
+        <Background />
         <BrowserRouter>
           <Box
-            sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+            sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', zIndex:1, position:'relative' }}
           >
             <div
               style={{

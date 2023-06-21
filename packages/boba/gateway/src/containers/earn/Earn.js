@@ -41,7 +41,7 @@ import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import {PageTitle} from 'components'
+import { PageTitle } from 'components/global/PageTitle'
 
 import networkService from 'services/networkService'
 
@@ -103,7 +103,7 @@ function Earn() {
 
   return (
     <S.EarnPageContainer>
-      <PageTitle title={'Earn'} />
+      <PageTitle title="Earn" slug="Stake more, Earn more"/>
       <Connect
         userPrompt={'Connect to MetaMask to see your balances and contribute to the liquidity pool '}
         accountEnabled={accountEnabled}

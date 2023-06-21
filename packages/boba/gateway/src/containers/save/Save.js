@@ -26,7 +26,7 @@ import * as S from './Save.styles'
 
 import { Box, Typography, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
-import {PageTitle} from 'components'
+import { PageTitle } from 'components/global/PageTitle'
 
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
@@ -238,7 +238,7 @@ class Save extends React.Component {
     return (
       <S.StakePageContainer>
 
-        <PageTitle title={'Stake'} />
+        <PageTitle title="Stake" slug="Stake BOBA and earn rewards."/>
 
         <Connect
           userPrompt={'Please connect to Boba to stake'}

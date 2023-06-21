@@ -22,7 +22,6 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { useMediaQuery, useTheme } from '@mui/material'
-
 import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 
@@ -46,7 +45,7 @@ import * as S from './History.styles'
 import styles from './TX_All.module.scss'
 
 import useInterval from 'hooks/useInterval'
-import {PageTitle} from 'components'
+import {PageTitle} from 'components/global/PageTitle'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
@@ -101,7 +100,7 @@ function History() {
 
   return (
     <S.HistoryPageContainer>
-      <PageTitle title={'History'} />
+      <PageTitle title="History" slug="Look back on past transactions"/>
 
       <Connect
         userPrompt={'Connect to MetaMask to see your history'}

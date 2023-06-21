@@ -234,7 +234,8 @@ exports[`Layout => Header should match the snapshot 1`] = `
 
 .c0 {
   height: 73px;
-  margin: 0px 32px;
+  margin: 0px;
+  padding: 0px 32px;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -247,6 +248,9 @@ exports[`Layout => Header should match the snapshot 1`] = `
   -webkit-justify-content: flex-start;
   -ms-flex-pack: start;
   justify-content: flex-start;
+  -webkit-backdrop-filter: blur(7.5px);
+  backdrop-filter: blur(7.5px);
+  background: rgba(0,0,0,0.05);
 }
 
 .c1 {

@@ -12,9 +12,9 @@ const linesColor = (theme: string) => {
 
 const gradientColor = (theme: string) => {
   if (theme === 'light') {
-    return 'radial-gradient(55.87% 55.87% at 50% 50%, rgba(174, 219, 1, 0.4) 19.79%, rgba(174, 219, 1, 0.125) 62.5%, rgba(174, 219, 1, 0) 91.67%);'
+    return 'radial-gradient(45% 45% at 50% 50%, rgba(174, 219, 1, 0.4) 19.79%, rgba(174, 219, 1, 0.125) 50%, rgba(174, 219, 1, 0) 70%);'
   } else {
-    return 'radial-gradient(55.87% 55.87% at 50% 50%, rgba(174, 219, 1, 0.32) 19.79%, rgba(174, 219, 1, 0.1) 62.5%, rgba(174, 219, 1, 0) 91.67%);'
+    return 'radial-gradient(45% 45% at 50% 50%, rgba(174, 219, 1, 0.32) 19.79%, rgba(174, 219, 1, 0.1) 50%, rgba(174, 219, 1, 0) 70%);'
   }
 }
 
@@ -23,6 +23,8 @@ export const BackgroundContainer = styled.div`
   width: 100%;
   display: block;
   overflow: hidden;
+  position: fixed;
+  z-index: 0;
 `
 
 export const GridBackground = styled.div`
@@ -37,7 +39,7 @@ export const GridFade = styled.div`
   height: 100%;
   position: absolute;
   z-index: 1;
-  top: -50%;
+  top: -50vh;
   background-image: ${(props) => gradientColor(props.theme.name)};
   background-clip: padding-box;
   background-origin: content-box;
