@@ -1,12 +1,12 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
 
-import { PageTitle } from './'
+import { PageTitle } from '.'
 import { PageTitleTypes } from './types'
 import { BrowserRouter } from 'react-router-dom'
 
 export default {
-  title: 'Components/PageTitle',
+  title: 'Layout/PageTitle',
   component: PageTitle,
   decorators: [
     (StoryFn) => (

@@ -103,7 +103,6 @@ function App() {
       },
     },
     typography: {
-      fontFamily: ['MrEavesXL', 'Roboto'].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,

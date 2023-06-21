@@ -25,15 +25,15 @@ import ListProposal from 'components/listProposal/listProposal'
 
 import Select from 'components/select/Select'
 
-import { 
-  selectDaoBalance, 
-  selectDaoBalanceX, 
-  selectDaoVotes, 
-  selectDaoVotesX, 
-  selectProposals, 
+import {
+  selectDaoBalance,
+  selectDaoBalanceX,
+  selectDaoVotes,
+  selectDaoVotesX,
+  selectProposals,
   selectProposalThreshold,
   selectLoading,
-  selectAccountEnabled, 
+  selectAccountEnabled,
   selectLayer
 } from 'selectors'
 

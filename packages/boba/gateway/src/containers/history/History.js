@@ -26,7 +26,7 @@ import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
-import { 
+import {
   selectActiveHistoryTab,
   selectTransactions,
   selectAccountEnabled,
