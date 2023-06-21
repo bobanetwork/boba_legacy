@@ -6,6 +6,8 @@ import light from '../src/themes/light'
 import dark from '../src/themes/dark'
 import { GlobalStyle } from '../src/themes/globalStyle'
 
+import '../src/index.scss'
+
 import { Buffer } from 'buffer'
 
 //@ts-ignore

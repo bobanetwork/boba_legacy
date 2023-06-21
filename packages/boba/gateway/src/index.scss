@@ -1,16 +1,16 @@
 $red: #ff6868;
 $yellow: #f0ba31;
 $green: #0ebf9a;
-$blue:  #506DFA;// #4967ff;
+$blue:  #506DFA;
 $maxWidth: 450px;
 $red1: #ff8080;
 
-$gray1: #101010; //v. dark gray
+$gray1: #101010;
 $gray2: #323232;
 $gray3: #565656;
 $gray4: #7d7d7d;
 $gray5: #f8e5e5;
-$gray6: #d2d2d2; //v. light gray
+$gray6: #d2d2d2;
 $gray7: #f8f8f8;
 
 $bunnyRed: #c83950;
@@ -47,7 +47,6 @@ $white500: rgba(255, 255, 255, 0.5);
   white500: $white500;
 }
 
-// /* small screens */
 @mixin tablet {
   @media screen and (max-width: 1360px) {
     @content;
@@ -94,7 +93,7 @@ $white500: rgba(255, 255, 255, 0.5);
 
 @font-face {
   font-family: 'Montserrat';
-  src: url(./assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf) format('opentype');
+  src: url(./assets/fonts/Montserrat/static/Montserrat-Regular.ttf) format('opentype');
 }
 
 @font-face {
