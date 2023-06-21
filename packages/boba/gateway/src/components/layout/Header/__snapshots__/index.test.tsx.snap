@@ -324,13 +324,6 @@ exports[`Layout => Header should match the snapshot 1`] = `
       <a
         activeclassname="active"
         class="c3"
-        href="/ecosystem"
-      >
-        Ecosystem
-      </a>
-      <a
-        activeclassname="active"
-        class="c3"
         href="/history"
       >
         History
