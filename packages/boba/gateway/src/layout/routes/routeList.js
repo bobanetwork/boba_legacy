@@ -4,8 +4,6 @@ import { DISABLE_VE_DAO, ROUTES_PATH } from "util/constant";
 
 import Bridge from "containers/bridge/Bridge";
 import Home from "containers/home/Home";
-import Projects from 'containers/ecosystem/Projects';
-import Ecosystem from 'containers/ecosystem/Ecosystem';
 import OldDao from 'containers/dao/OldDao';
 import History from 'containers/history/History';
 import EarnWrapper from 'containers/earn/EarnWrapper';
@@ -76,17 +74,6 @@ export const ROUTE_LIST = [
         key: 'DAO',
         disable: !!Number(DISABLE_VE_DAO),
       },
-      {
-        path: ROUTES_PATH.ECOSYSTEM,
-        element: <Ecosystem />,
-        key: 'Ecosystem',
-        children: [
-          {
-            path: ':category',
-            element: <Projects />
-          }
-        ]
-      }
     ]
   }
 ]

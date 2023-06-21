@@ -39,13 +39,6 @@ exports[`Layout => Header => Menu should match the snapshot 1`] = `
     <a
       activeclassname="active"
       class="c1"
-      href="/ecosystem"
-    >
-      Ecosystem
-    </a>
-    <a
-      activeclassname="active"
-      class="c1"
       href="/history"
     >
       History
