@@ -8,12 +8,6 @@ export const MENU_LIST = [
     url: ROUTES_PATH.BRIDGE
   },
   {
-    key: 'Ecosystem',
-    icon: "SafeIcon",
-    title: "Ecosystem",
-    url: ROUTES_PATH.ECOSYSTEM
-  },
-  {
     key: 'History',
     icon: "HistoryIcon",
     title: "History",

@@ -7,10 +7,6 @@ export const MENU_LIST: Array<IMenuItem> = [
     path: ROUTES_PATH.BRIDGE,
   },
   {
-    label: 'Ecosystem',
-    path: ROUTES_PATH.ECOSYSTEM,
-  },
-  {
     label: 'History',
     path: ROUTES_PATH.HISTORY,
   },
