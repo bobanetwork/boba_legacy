@@ -1,25 +1,18 @@
 /* Imports: External */
-import {
-  Contract,
-  Wallet,
-  BigNumber,
-  providers,
-  EventFilter,
-  constants as ethersConstants,
-} from 'ethers'
-import { orderBy } from 'lodash'
+import {BigNumber, constants as ethersConstants, Contract, EventFilter, providers, Wallet,} from 'ethers'
+import {orderBy} from 'lodash'
 import 'reflect-metadata'
 
 /* Imports: Internal */
-import { sleep } from '@eth-optimism/core-utils'
-import { BaseService } from '@eth-optimism/common-ts'
-import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import {sleep} from '@eth-optimism/core-utils'
+import {BaseService} from '@eth-optimism/common-ts'
+import {getContractFactory} from '@eth-optimism/contracts'
+import {getBobaContractAt} from '@boba/contracts'
 
 /* Imports: Interface */
-import {ChainInfo, DepositTeleportations, Disbursement, SupportedAssets} from './utils/types'
-import { HistoryData } from './entity/HistoryData'
-import { AppDataSource, historyDataRepository } from "./data-source";
+import {ChainInfo, DepositTeleportations, Disbursement, SupportedAssets,} from './utils/types'
+import {HistoryData} from './entity/HistoryData'
+import {historyDataRepository} from './data-source'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -44,7 +37,6 @@ interface TeleportationOptions {
 }
 
 const optionSettings = {}
-const bobaTokenAddressOnAltL2s = '0x4200000000000000000000000000000000000006'
 
 export class TeleportationService extends BaseService<TeleportationOptions> {
   constructor(options: TeleportationOptions) {
@@ -70,6 +62,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       this.options.teleportationAddress,
       this.options.disburserWallet
     )
+
     this.logger.info('Connected to Teleportation', {
       address: this.state.Teleportation.address,
     })
@@ -165,13 +158,12 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       // store the new deposit info
       await this._putDepositInfo(chainId, lastBlock)
     }
-    const events = await this._getEvents(
+    return await this._getEvents(
       depositTeleportation.Teleportation,
       this.state.Teleportation.filters.AssetReceived(),
       lastBlock,
       latestBlock
     )
-    return events
   }
 
   async _disburseTeleportation(

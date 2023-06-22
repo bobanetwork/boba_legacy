@@ -16,6 +16,7 @@ export interface IBobaChains {
  * @property supportedAssets: BOBA as fee token only supported for EOAs, since Teleporter consists of a contract & the disburser wallet (assuming ETH fee) everything with 0x0 should be fine.
  **/
 export const BobaChains: IBobaChains = {
+  // TODO: Consider using AddressManager or AddressPackage instead
   288: {
     url: 'https://replica.boba.network',
     testnet: false,
