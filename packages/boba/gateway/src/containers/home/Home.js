@@ -17,7 +17,6 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Outlet } from 'react-router-dom'
 import { Box, Container, Grid, Link, Typography, useTheme, useMediaQuery } from '@mui/material'
-
 /**** styles *****/
 import * as S from './Home.styles'
 import turing from '../../images/boba2/turing.png'
@@ -81,7 +80,7 @@ import CDMCompletionModal from 'containers/modals/CDMCompletion/CDMCompletionMod
 import SwitchNetworkModal from 'containers/modals/switchNetwork/SwitchNetworkModal'
 
 /******** COMPONENTS ********/
-import {PageTitle} from 'components'
+import { PageTitle } from 'components/layout/PageTitle'
 import PageHeader from 'components/pageHeader/PageHeader'
 import PageFooter from 'components/pageFooter/PageFooter'
 import Alert from 'components/alert/Alert'
@@ -339,6 +338,7 @@ function Home() {
         }}>
           {/* <PageHeader /> */}
           <Header />
+          <PageTitle />
           <Container maxWidth={false} sx={{
             minHeight: 'calc(100vh - 200px)',
             marginLeft: 'unset',
