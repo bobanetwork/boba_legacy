@@ -32,10 +32,11 @@ import Notification from 'containers/notification/Notification'
 
 import Router from './routes'
 import CustomThemeProvider from 'themes'
+import { Background } from 'components/global/background'
 
 function App() {
   const dispatch = useDispatch()
-
+  
   const theme = useSelector(selectTheme)
   const light = theme === 'light'
 
@@ -77,7 +78,7 @@ function App() {
         text: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       },
       background: {
-        default: light ? '#FFFFFF' : '#111315',
+        default: light ? '#E5E5E1' : '#191919',
         secondary: light
           ? 'rgba(3, 19, 19, 0.04)'
           : 'rgba(255, 255, 255, 0.06)',
@@ -102,7 +103,6 @@ function App() {
       },
     },
     typography: {
-      fontFamily: ['MrEavesXL', 'Roboto'].join(','),
       h1: {
         fontSize: 42,
         fontWeight: 700,
@@ -397,8 +397,10 @@ function App() {
       <CustomThemeProvider>
         <CssBaseline />
         <BrowserRouter>
+        <Background />
+
           <Box
-            sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}
+            sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', zIndex:1, position:'relative' }}
           >
             <div
               style={{

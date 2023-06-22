@@ -1,13 +1,25 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import BobaLogoImage from 'assets/images/boba-logo.png'
 import { Svg } from 'components/global'
 
 export const HeaderContainer = styled.div`
   height: 73px;
-  margin: 0px 32px;
+  margin: 0px;
+  padding: 0px 32px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  backdrop-filter: blur(7.5px);
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: rgba(255, 255, 255, 0.5);
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: rgba(0, 0, 0, 0.05);
+    `}
 `
 
 export const BobaLogo = styled.div`
