@@ -10,14 +10,6 @@ exports[`PageTitle should match snapshots head 1`] = `
   font-weight: 700;
 }
 
-.c3 {
-  font-style: normal;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  font-weight: 500;
-}
-
 .c0 {
   display: -webkit-box;
   display: -webkit-flex;
@@ -38,10 +30,6 @@ exports[`PageTitle should match snapshots head 1`] = `
   color: #fff;
 }
 
-.c4 {
-  color: #acacac;
-}
-
 <div
     class="c0"
   >
@@ -50,11 +38,7 @@ exports[`PageTitle should match snapshots head 1`] = `
     >
       Page Title
     </h1>
-    <p
-      class="c3 c4"
-    >
-      This is the current slug
-    </p>
+    This is the current slug
   </div>
 </DocumentFragment>
 `;
