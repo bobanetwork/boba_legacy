@@ -910,11 +910,6 @@ describe('teleportation', () => {
         .attach(predeploys.Proxy__Boba_GasPriceOracle)
         .connect(signer)
 
-      const Proxy__Boba_GasPriceOracle = getContractFactory(
-        'Lib_ResolvedDelegateBobaProxy'
-      )
-        .attach(predeploys.Proxy__Boba_GasPriceOracle)
-        .connect(signer)
 
       const Factory__Boba_GasPriceOracleProxyCall =
         await ethers.getContractFactory(

@@ -910,12 +910,6 @@ describe('teleportation', () => {
         .attach(predeploys.Proxy__Boba_GasPriceOracle)
         .connect(signer)
 
-      const Proxy__Boba_GasPriceOracle = getContractFactory(
-        'Lib_ResolvedDelegateBobaProxy'
-      )
-        .attach(predeploys.Proxy__Boba_GasPriceOracle)
-        .connect(signer)
-
       const Factory__Boba_GasPriceOracleProxyCall =
         await ethers.getContractFactory(
           'Boba_GasPriceOracleProxyCall',
@@ -932,7 +926,7 @@ describe('teleportation', () => {
       await registerTx.wait()
 
       expect(
-        await Boba_GasPriceOracle.bobaFeeTokenUsers(env.l2Wallet.address)
+        await Boba_GasPriceOracle.useSecondaryFeeTokenAsFeeToken(env.l2Wallet.address)
       ).to.be.deep.eq(true)
 
 
