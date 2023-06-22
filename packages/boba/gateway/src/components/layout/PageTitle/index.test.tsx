@@ -1,11 +1,14 @@
-import { render } from '@testing-library/react'
-import { PageTitleTypes } from './types'
-import CustomThemeProvider from 'themes'
-import { PageTitle } from '.'
 import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import { BrowserRouter } from 'react-router-dom'
+
+import { render } from '@testing-library/react'
+
+import CustomThemeProvider from 'themes'
+import { PageTitleTypes } from './types'
+
+import { PageTitle } from '.'
 
 const mockStore = configureStore()
 

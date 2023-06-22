@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components'
-
+import { BackgroundProps } from './types'
 const gridHeight = '200vh'
 
 const linesColor = (theme: string) => {
@@ -34,15 +34,23 @@ export const GridBackground = styled.div`
   perspective: calc(${gridHeight} * 90);
 `
 
-export const GridFade = styled.div`
+export const GridFade = styled.div<BackgroundProps>`
   width: 100%;
   height: 100%;
   position: absolute;
   z-index: 1;
-  top: -50vh;
+  transform: translateY(-50vh);
+  will-change: translateY;
+  transition: transform 1s ease;
   background-image: ${(props) => gradientColor(props.theme.name)};
   background-clip: padding-box;
   background-origin: content-box;
+
+  ${({ position }) =>
+    position === 'top' &&
+    `
+    transform: translateY(-100vh);
+  `}
 `
 
 const playAnimation = keyframes`

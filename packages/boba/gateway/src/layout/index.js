@@ -36,7 +36,7 @@ import { Background } from 'components/global/background'
 
 function App() {
   const dispatch = useDispatch()
-
+  
   const theme = useSelector(selectTheme)
   const light = theme === 'light'
 
@@ -396,8 +396,9 @@ function App() {
     <ThemeProvider theme={MUItheme}>
       <CustomThemeProvider>
         <CssBaseline />
-        <Background />
         <BrowserRouter>
+        <Background />
+
           <Box
             sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', zIndex:1, position:'relative' }}
           >
