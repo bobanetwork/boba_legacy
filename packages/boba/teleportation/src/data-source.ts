@@ -4,7 +4,6 @@ import { HistoryData } from './entity/HistoryData'
 import * as postgres from 'pg' // keep depcheck (db driver)
 
 import dotenv from 'dotenv'
-import {FailedDisbursement} from "./entity/FailedDisbursement";
 
 dotenv.config()
 
@@ -23,4 +22,3 @@ export const AppDataSource = new DataSource({
 })
 
 export const historyDataRepository = AppDataSource.getRepository(HistoryData)
-export const failedDisbursementRepository = AppDataSource.getRepository(FailedDisbursement)

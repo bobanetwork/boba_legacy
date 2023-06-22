@@ -24,11 +24,7 @@ import {
   SupportedAssets,
 } from './utils/types'
 import { HistoryData } from './entity/HistoryData'
-import {
-  failedDisbursementRepository,
-  historyDataRepository,
-} from './data-source'
-import { FailedDisbursement } from './entity/FailedDisbursement'
+import { historyDataRepository } from './data-source'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -197,22 +193,18 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         await this.state.Teleportation.totalDisbursements(chainId)
       // eslint-disable-next-line prefer-const
       let disbursement: Disbursement[] = []
-      const failedDisbursement: FailedDisbursement[] = []
-      // after one failing disbursement we skip all subsequent ones and save them for later recovery as FailedDisbursement
-      let disbursementFailed: boolean = false
 
-      for (const event of events) {
-        const sourceChainId: BigNumber = event.args.sourceChainId
-        const depositId = event.args.depositId
-        const amount = event.args.amount
-        const sourceChainTokenAddr = event.args.token
-        const emitter = event.args.emitter
+      try {
+        for (const event of events) {
+          const sourceChainId: BigNumber = event.args.sourceChainId
+          const depositId = event.args.depositId
+          const amount = event.args.amount
+          const sourceChainTokenAddr = event.args.token
+          const emitter = event.args.emitter
 
-        // we disburse tokens only if depositId is greater or equal to the last disbursement
-        if (depositId.gte(lastDisbursement)) {
-          let destChainTokenAddr: string
-          try {
-            destChainTokenAddr =
+          // we disburse tokens only if depositId is greater or equal to the last disbursement
+          if (depositId.gte(lastDisbursement)) {
+            const destChainTokenAddr =
               this._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
                 sourceChainTokenAddr,
                 sourceChainId.toNumber(),
@@ -228,96 +220,31 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
                 `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
               )
             } else {
-              if (disbursementFailed) {
-                this.logger.warn(
-                  `Found a new deposit but not disbursing as previous disbursement failed. Saving into DB for later recovery - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
-                )
-
-                failedDisbursement.push({
+              disbursement = [
+                ...disbursement,
+                {
+                  token: destChainTokenAddr, // token mapping for correct routing as addresses different on every network
                   amount: amount.toString(),
+                  addr: emitter,
                   depositId: depositId.toNumber(),
-                  destChainId: chainId,
                   sourceChainId: sourceChainId.toString(),
-                  destChainTokenAddr,
-                  sourceChainTokenAddr,
-                  emitter,
-                  errorMsg: 'Previous depositID has failed.',
-                })
-              } else {
-                disbursement = [
-                  ...disbursement,
-                  {
-                    token: destChainTokenAddr, // token mapping for correct routing as addresses different on every network
-                    amount: amount.toString(),
-                    addr: emitter,
-                    depositId: depositId.toNumber(),
-                    sourceChainId: sourceChainId.toString(),
-                  },
-                ]
-                this.logger.info(
-                  `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
-                )
-              }
+                },
+              ]
+              this.logger.info(
+                `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
+              )
             }
-          } catch (e) {
-            this.logger.error(e.message)
-
-            // Save first failing and all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
-            disbursementFailed = true
-
-            failedDisbursement.push({
-              amount: amount.toString(),
-              depositId: depositId.toNumber(),
-              destChainId: chainId,
-              sourceChainId: sourceChainId.toString(),
-              destChainTokenAddr,
-              sourceChainTokenAddr,
-              emitter,
-              errorMsg: e.message,
-            })
           }
         }
+
+        // sort disbursement
+        disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+        // disbure the token but only if all disbursements could have been processed to avoid missing events due to updating the latestBlock
+        await this._disburseTx(disbursement, chainId, latestBlock)
+      } catch (e) {
+        // Catch outside loop to stop at first failing depositID as all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
+        this.logger.error(e.message)
       }
-
-      disbursement = [
-        ...disbursement,
-        ...(await this._recoverPreviouslyFailedDisbursements(chainId)),
-      ]
-
-      // Save failed disbursements here in bulk (also needed to avoid instant retry)
-      await failedDisbursementRepository.save(failedDisbursement)
-
-      // sort disbursement
-      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-      // disbure the token
-      await this._disburseTx(disbursement, chainId, latestBlock)
-    }
-  }
-
-  async _recoverPreviouslyFailedDisbursements(
-    destChainId: string | number
-  ): Promise<Disbursement[]> {
-    try {
-      const previouslyFailedDisbursements =
-        await failedDisbursementRepository.find({ where: { destChainId } })
-      return previouslyFailedDisbursements.map((fd) => {
-        return {
-          token: fd.destChainTokenAddr,
-          amount: fd.amount,
-          addr: fd.emitter,
-          depositId: fd.depositId,
-          sourceChainId: fd.sourceChainId,
-        }
-      })
-
-      // TODO: Delete recovered/retried disbursements
-
-      // TODO: Or just rely on latest block and retry????!!!!!
-
-    } catch (e) {
-      this.logger.error(
-        `Could not recover previously failed disbursements: ${e.message}`
-      )
     }
   }
 
