@@ -1,4 +1,3 @@
-#adapted from https://raw.githubusercontent.com/ethereum-optimism/optimism/develop/.circleci/config.yml
 version: 2.1
 
 executors:
@@ -11,6 +10,19 @@ executors:
       DOCKER_BUILDKIT: 1
 
 commands:
+  check-changed:
+    description: "Conditionally halts a step if certain modules change"
+    parameters:
+      patterns:
+        type: string
+        description: "Comma-separated list of dependencies"
+    steps:
+      - run:
+          name: "Check for changes"
+          command: |
+            cd ops/check-changed
+            pip3 install -r requirements.txt
+            python3 main.py "<<parameters.patterns>>"
   download-solidity-compilers:
     steps:
       - checkout
@@ -53,6 +65,9 @@ commands:
         description: Folder to run tests in
         type: string
     steps:
+      - check-changed:
+          patterns: common-ts,contracts,core-utils,data-transport-layer,message-relayer,regenesis-surgery,sdk,integration-tests,l2geth,packages/boba/account-abstraction,packages/boba/bobalink,packages/boba/bundler,packages/boba/bundler_sdk,packages/boba/bundler_utils,packages/boba/contracts,packages/boba/gas-price-oracle,packages/boba/register,packages/boba/teleportation,ops,ops_boba
+
       - run:
           name: Build the project
           command: yarn && yarn build
@@ -140,15 +155,8 @@ jobs:
       - image: cimg/postgres:14.1
     steps:
       - checkout
-      - run:
-          name: Check if we should run
-          command: |
-            shopt -s inherit_errexit
-            CHANGED=$(check-changed "(<<parameters.working_directory>>|<<parameters.dependencies>>)" || echo "TRUE")
-            echo $CHANGED
-            if [[ "$CHANGED" = "FALSE" ]]; then
-              circleci step halt
-            fi
+      - check-changed:
+          patterns: go/proxyd
       - run:
           name: Lint
           command: golangci-lint run -E goimports,sqlclosecheck,bodyclose,asciicheck,misspell,errorlint -e "errors.As" -e "errors.Is" ./...

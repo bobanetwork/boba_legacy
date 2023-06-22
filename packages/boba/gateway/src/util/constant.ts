@@ -67,23 +67,12 @@ export const EXPIRY_OPTIONS: ExpiryOptionType[] = [
   },
 ]
 
-export const ECOSYSTEM_CATEGORY: string[] = [
-  'defi',
-  'gamefi',
-  'nft',
-  'bridge',
-  'wallet',
-  'tool',
-  'token',
-]
-
 /*********************
  * Routes Constants **
  *********************/
 
 type RoutesPathType = {
   BRIDGE: string
-  ECOSYSTEM: string
   HISTORY: string
   EARN: string
   LOCK: string
@@ -97,7 +86,6 @@ type RoutesPathType = {
 
 export const ROUTES_PATH: RoutesPathType = {
   BRIDGE: '/bridge',
-  ECOSYSTEM: '/ecosystem',
   HISTORY: '/history',
   EARN: '/earn',
   LOCK: '/lock',
@@ -114,7 +102,6 @@ export const PER_PAGE: number = 8
 type Network = 'ethereum' | 'bnb' | 'avax' | 'fantom' | 'moonbeam' //we move this to global network type once we define this
 type Page =
   | 'Bridge'
-  | 'Ecosystem'
   | 'Wallet'
   | 'History'
   | 'Earn'
@@ -124,15 +111,7 @@ type Page =
 type PagesByNetworkType = Record<Network, Page[]>
 
 export const PAGES_BY_NETWORK: PagesByNetworkType = {
-  ethereum: [
-    'Bridge',
-    'Ecosystem',
-    'Wallet',
-    'History',
-    'Earn',
-    'Stake',
-    'DAO',
-  ],
+  ethereum: ['Bridge', 'Wallet', 'History', 'Earn', 'Stake', 'DAO'],
   bnb: ['Bridge', 'Wallet', 'Earn', 'History'],
   avax: ['Bridge', 'Wallet', 'Earn', 'History'],
   fantom: ['Bridge', 'Wallet', 'Earn', 'History'],
