@@ -685,7 +685,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationServiceBnb._getSupportedAssetBySymbol(
+          teleportationServiceBnb._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainId
@@ -764,7 +764,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationService._getSupportedAssetBySymbol(
+          teleportationService._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainId
@@ -845,7 +845,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationService._getSupportedAssetBySymbol(
+          teleportationService._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainIdBnb
@@ -969,7 +969,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationService._getSupportedAssetBySymbol(
+          teleportationService._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainId

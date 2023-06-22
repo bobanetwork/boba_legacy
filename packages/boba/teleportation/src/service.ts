@@ -1,18 +1,34 @@
 /* Imports: External */
-import {BigNumber, constants as ethersConstants, Contract, EventFilter, providers, Wallet,} from 'ethers'
-import {orderBy} from 'lodash'
+import {
+  BigNumber,
+  constants as ethersConstants,
+  Contract,
+  EventFilter,
+  providers,
+  Wallet,
+} from 'ethers'
+import { orderBy } from 'lodash'
 import 'reflect-metadata'
 
 /* Imports: Internal */
-import {sleep} from '@eth-optimism/core-utils'
-import {BaseService} from '@eth-optimism/common-ts'
-import {getContractFactory} from '@eth-optimism/contracts'
-import {getBobaContractAt} from '@boba/contracts'
+import { sleep } from '@eth-optimism/core-utils'
+import { BaseService } from '@eth-optimism/common-ts'
+import { getContractFactory } from '@eth-optimism/contracts'
+import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
-import {ChainInfo, DepositTeleportations, Disbursement, SupportedAssets,} from './utils/types'
-import {HistoryData} from './entity/HistoryData'
-import {historyDataRepository} from './data-source'
+import {
+  ChainInfo,
+  DepositTeleportations,
+  Disbursement,
+  SupportedAssets,
+} from './utils/types'
+import { HistoryData } from './entity/HistoryData'
+import {
+  failedDisbursementRepository,
+  historyDataRepository,
+} from './data-source'
+import { FailedDisbursement } from './entity/FailedDisbursement'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -180,7 +196,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       const lastDisbursement =
         await this.state.Teleportation.totalDisbursements(chainId)
       // eslint-disable-next-line prefer-const
-      let disbursement = []
+      let disbursement: Disbursement[] = []
+      const failedDisbursement: FailedDisbursement[] = []
+      // after one failing disbursement we skip all subsequent ones and save them for later recovery as FailedDisbursement
+      let disbursementFailed: boolean = false
 
       for (const event of events) {
         const sourceChainId: BigNumber = event.args.sourceChainId
@@ -191,12 +210,14 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
         // we disburse tokens only if depositId is greater or equal to the last disbursement
         if (depositId.gte(lastDisbursement)) {
+          let destChainTokenAddr: string
           try {
-            const receivingChainTokenAddr = this._getSupportedAssetBySymbol(
-              sourceChainTokenAddr,
-              sourceChainId.toNumber(),
-              chainId
-            )
+            destChainTokenAddr =
+              this._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+                sourceChainTokenAddr,
+                sourceChainId.toNumber(),
+                chainId
+              )
 
             const [isTokenSupported, , , , ,] =
               await this.state.Teleportation.supportedTokens(
@@ -207,33 +228,96 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
                 `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
               )
             } else {
-              disbursement = [
-                ...disbursement,
-                {
-                  token: receivingChainTokenAddr, // token mapping for correct routing as addresses different on every network
+              if (disbursementFailed) {
+                this.logger.warn(
+                  `Found a new deposit but not disbursing as previous disbursement failed. Saving into DB for later recovery - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
+                )
+
+                failedDisbursement.push({
                   amount: amount.toString(),
-                  addr: emitter,
                   depositId: depositId.toNumber(),
+                  destChainId: chainId,
                   sourceChainId: sourceChainId.toString(),
-                },
-              ]
-              this.logger.info(
-                `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
-              )
+                  destChainTokenAddr,
+                  sourceChainTokenAddr,
+                  emitter,
+                  errorMsg: 'Previous depositID has failed.',
+                })
+              } else {
+                disbursement = [
+                  ...disbursement,
+                  {
+                    token: destChainTokenAddr, // token mapping for correct routing as addresses different on every network
+                    amount: amount.toString(),
+                    addr: emitter,
+                    depositId: depositId.toNumber(),
+                    sourceChainId: sourceChainId.toString(),
+                  },
+                ]
+                this.logger.info(
+                  `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
+                )
+              }
             }
           } catch (e) {
             this.logger.error(e.message)
-            // TODO: Add recovery mechanism
-            // TODO: Save somewhere to recover(!) or generally fail (do once db teleporter is merged)
-            // TODO: for both when getSupportedAssetBySymbol fails or when onchain support is missing
+
+            // Save first failing and all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
+            disbursementFailed = true
+
+            failedDisbursement.push({
+              amount: amount.toString(),
+              depositId: depositId.toNumber(),
+              destChainId: chainId,
+              sourceChainId: sourceChainId.toString(),
+              destChainTokenAddr,
+              sourceChainTokenAddr,
+              emitter,
+              errorMsg: e.message,
+            })
           }
         }
       }
+
+      disbursement = [
+        ...disbursement,
+        ...(await this._recoverPreviouslyFailedDisbursements(chainId)),
+      ]
+
+      // Save failed disbursements here in bulk (also needed to avoid instant retry)
+      await failedDisbursementRepository.save(failedDisbursement)
 
       // sort disbursement
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
       // disbure the token
       await this._disburseTx(disbursement, chainId, latestBlock)
+    }
+  }
+
+  async _recoverPreviouslyFailedDisbursements(
+    destChainId: string | number
+  ): Promise<Disbursement[]> {
+    try {
+      const previouslyFailedDisbursements =
+        await failedDisbursementRepository.find({ where: { destChainId } })
+      return previouslyFailedDisbursements.map((fd) => {
+        return {
+          token: fd.destChainTokenAddr,
+          amount: fd.amount,
+          addr: fd.emitter,
+          depositId: fd.depositId,
+          sourceChainId: fd.sourceChainId,
+        }
+      })
+
+      // TODO: Delete recovered/retried disbursements
+
+      // TODO: Or just rely on latest block and retry????!!!!!
+
+    } catch (e) {
+      this.logger.error(
+        `Could not recover previously failed disbursements: ${e.message}`
+      )
     }
   }
 
@@ -325,7 +409,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
    * @param sourceChainId: ChainId the request is coming from
    * @param destChainId: Target chainId to bridge the asset.
    **/
-  _getSupportedAssetBySymbol(
+  _getSupportedDestChainTokenAddrBySourceChainTokenAddr(
     sourceChainTokenAddr: string,
     sourceChainId: number,
     destChainId: number
@@ -334,7 +418,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       (c) => c.chainId === destChainId
     )
     if (!destChain) {
-      throw new Error(`Destination chain not configured/supported: ${destChain}`)
+      throw new Error(
+        `Destination chain not configured/supported: ${destChain}`
+      )
     }
 
     const receivingChainTokenSymbol =
