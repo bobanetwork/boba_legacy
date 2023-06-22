@@ -66,7 +66,7 @@ commands:
         type: string
     steps:
       - check-changed:
-          patterns: common-ts,contracts,core-utils,data-transport-layer,message-relayer,regenesis-surgery,sdk,integration-tests,l2geth,packages/boba/account-abstraction,packages/boba/bobalink,packages/boba/bundler,packages/boba/bundler_sdk,packages/boba/bundler_utils,packages/boba/contracts,packages/boba/gas-price-oracle,packages/boba/register,packages/boba/teleportation
+          patterns: common-ts,contracts,core-utils,data-transport-layer,message-relayer,regenesis-surgery,sdk,integration-tests,l2geth,packages/boba/account-abstraction,packages/boba/bobalink,packages/boba/bundler,packages/boba/bundler_sdk,packages/boba/bundler_utils,packages/boba/contracts,packages/boba/gas-price-oracle,packages/boba/register,packages/boba/teleportation,ops,ops_boba
 
       - run:
           name: Build the project
