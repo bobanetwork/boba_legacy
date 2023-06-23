@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageTitle should match snapshots head 1`] = `
+<DocumentFragment>
+  .c1 {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 700;
+}
+
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding: 50px 15px;
+  gap: 15px 0px;
+}
+
+.c2 {
+  color: #fff;
+}
+
+<div
+    class="c0"
+  >
+    <h1
+      class="c1 c2"
+    >
+      Page Title
+    </h1>
+    This is the current slug
+  </div>
+</DocumentFragment>
+`;
