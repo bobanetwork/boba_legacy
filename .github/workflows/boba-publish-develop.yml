@@ -1,11 +1,9 @@
 name: Publish Packages (boba-develop)
 
 on:
-  pull_request:
-
-  # push:
-  #   branches:
-  #     - 'develop'
+  push:
+    branches:
+      - 'develop'
 
 jobs:
 
@@ -129,7 +127,7 @@ jobs:
 
       - name: Build the core services
         working-directory: ./ops
-        run: docker-compose build fraud-detector
+        run: docker-compose build
 
       - name: Build the side services
         working-directory: ./ops
