@@ -1,5 +1,5 @@
-FROM python:3.8-slim
-RUN pip3 install --no-cache-dir web3==5.31.4
+FROM python:3.11-slim
+RUN pip3 install --debug --no-cache-dir web3==5.31.4
 COPY boba_community/fraud-detector/fraud-detector.py /
 COPY boba_community/fraud-detector/packages/jsonrpclib /jsonrpclib
 COPY /packages/contracts/artifacts/contracts/L1/rollup/StateCommitmentChain.sol/StateCommitmentChain.json /contracts/StateCommitmentChain.json
