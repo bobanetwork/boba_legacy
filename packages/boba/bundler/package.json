@@ -19,10 +19,10 @@
     "hardhat-node": "npx hardhat node --no-deploy"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/contracts": "^4.9.2",
     "@bobanetwork/accountabstraction": "^1.0.0",
-    "@bobanetwork/bundler_utils": "^0.2.3",
     "@bobanetwork/bundler_sdk": "^0.3.1-beta.0",
+    "@bobanetwork/bundler_utils": "^0.2.3",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/properties": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
@@ -39,9 +39,6 @@
   },
   "devDependencies": {
     "@eth-optimism/contracts": "^0.5.11",
-    "ow": "^0.28.1",
-    "webpack": "^5.76.0",
-    "webpack-cli": "^5.0.1",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
@@ -58,10 +55,13 @@
     "chai-as-promised": "^7.1.1",
     "hardhat": "^2.12.5",
     "hardhat-deploy": "^0.11.12",
+    "ow": "^0.28.1",
     "sinon": "^14.0.0",
     "solidity-coverage": "^0.7.21",
     "solidity-string-utils": "^0.0.8-0",
     "ts-node": ">=8.0.0",
-    "typechain": "^8.1.0"
+    "typechain": "^8.1.0",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^5.0.1"
   }
 }
