@@ -67,7 +67,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.goerli.boba.network',
     testnet: true,
     name: 'Boba Ethereum Goerli',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    teleportationAddress: '0x97880a36512d3D478552ec24d81978ff631dB106',
     height: 59,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
@@ -78,7 +78,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.avax.boba.network',
     testnet: true,
     name: 'Boba Avalanche Testnet',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    teleportationAddress: '0x867A329179565eE07108846cb0F3F8673fE58030',
     height: 489,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'AVAX',
@@ -89,7 +89,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bnb.boba.network',
     testnet: true,
     name: 'Boba BNB Testnet',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    teleportationAddress: '0x748069569925847BACf07944bC4327500f66b320',
     height: 3288,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'BNB',
@@ -100,7 +100,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bobaopera.boba.network',
     testnet: true,
     name: 'Bobaopera Testnet',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    teleportationAddress: '0x07F331aEa6375F48695b1F9248801998754a6219',
     height: 299,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'FTM',
