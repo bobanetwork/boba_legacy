@@ -4,8 +4,9 @@ pragma solidity 0.8.9;
 /* External Imports */
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import '@openzeppelin/contracts/utils/Address.sol';
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
 /**
  * @title Teleportation
@@ -14,7 +15,7 @@ import '@openzeppelin/contracts/utils/Address.sol';
  * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L1/teleportr/TeleportrDeposit.sol
  * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L2/teleportr/TeleportrDisburser.sol
  */
-contract Teleportation is PausableUpgradeable {
+contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     using Address for address;
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -194,6 +195,7 @@ contract Teleportation is PausableUpgradeable {
 
         __Context_init_unchained();
         __Pausable_init_unchained();
+        __Multicall_init_unchained();
 
         emit DisburserTransferred(owner);
         emit OwnershipTransferred(owner);
