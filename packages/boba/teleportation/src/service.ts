@@ -351,17 +351,16 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       )
     }
 
-    const receivingChainTokenSymbol =
-      this.options.originSupportedAssets[sourceChainTokenAddr]
+    const destChainTokenSymbol = destChain.supportedAssets[sourceChainTokenAddr]
 
-    const supportedAsset = Object.entries(destChain.supportedAssets).find(
-      ([address, tokenSymbol]) => {
-        return tokenSymbol === receivingChainTokenSymbol
-      }
-    )
+    const supportedAsset = Object.entries(
+      this.options.originSupportedAssets
+    ).find(([address, tokenSymbol]) => {
+      return tokenSymbol === destChainTokenSymbol
+    })
     if (!supportedAsset) {
       throw new Error(
-        `Asset ${receivingChainTokenSymbol} on chain ${destChainId} not configured but possibly supported on-chain`
+        `Asset ${destChainTokenSymbol} on chain ${destChainId} not configured but possibly supported on-chain`
       )
     }
     return supportedAsset[0] // return only address

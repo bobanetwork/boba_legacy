@@ -20,7 +20,7 @@ const main = async () => {
   if (!AppDataSource.isInitialized) {
     AppDataSource.setOptions({
       migrationsRun: true,
-      logging: true,
+      logging: false,
       synchronize: true,
     })
     await AppDataSource.initialize() // initialize DB connection
