@@ -29,8 +29,8 @@ exports[`Button Default Button 1`] = `
   font-weight: 700;
   font-size: 18px;
   box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
+  -webkit-transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 .c0:hover {
@@ -75,8 +75,8 @@ exports[`Button Disable Button 1`] = `
   font-weight: 700;
   font-size: 18px;
   box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
+  -webkit-transition: all 0.25s ease;
+  transition: all 0.25s ease;
   background: #637A0D;
   cursor: default;
 }
@@ -119,8 +119,8 @@ exports[`Button Loading Button 1`] = `
   font-weight: 700;
   font-size: 18px;
   box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
+  -webkit-transition: all 0.25s ease;
+  transition: all 0.25s ease;
   background: #AEDB01;
   cursor: default;
 }
@@ -158,6 +158,61 @@ exports[`Button Loading Button 1`] = `
 </DocumentFragment>
 `;
 
+exports[`Button Outline Button 1`] = `
+<DocumentFragment>
+  .c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  min-width: 290px;
+  -webkit-appearance: none;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 0px;
+  outline: none;
+  background: #AEDB01;
+  padding: 16px 25px;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
+  -webkit-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+  border: 1px solid #AEDB01;
+  color: #AEDB01;
+  background: transparent;
+  box-shadow: none;
+}
+
+.c0:hover {
+  background: #90B406;
+}
+
+.c0:hover {
+  color: #22221E;
+  background: #AEDB01;
+}
+
+<button
+    class="c0"
+    type="button"
+  >
+     Outline Button
+  </button>
+</DocumentFragment>
+`;
+
 exports[`Button Small Button 1`] = `
 <DocumentFragment>
   .c0 {
@@ -187,11 +242,11 @@ exports[`Button Small Button 1`] = `
   font-weight: 700;
   font-size: 18px;
   box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
+  -webkit-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+  min-width: auto;
   font-size: 14px;
   border-radius: 33px;
-  min-width: auto;
 }
 
 .c0:hover {
