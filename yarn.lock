@@ -5142,6 +5142,11 @@
   resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.8.1.tgz"
   integrity sha512-xQ6eUZl+RDyb/FiZe1h+U7qr/f4p/SrTSQcTPH2bjur3C5DbuW/zFgCU/b1P/xcIaEqJep+9ju4xDRi3rmChdQ==
 
+"@openzeppelin/contracts@^4.9.2":
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.2.tgz#1cb2d5e4d3360141a17dbc45094a8cad6aac16c1"
+  integrity sha512-mO+y6JaqXjWeMh9glYVzVu8HYPGknAAnWyxTRhGeckOruyXQMNnlcW6w/Dx9ftLeIQk6N+ZJFuVmTwF7lEIFrg==
+
 "@openzeppelin/test-helpers@^0.5.15":
   version "0.5.16"
   resolved "https://registry.npmjs.org/@openzeppelin/test-helpers/-/test-helpers-0.5.16.tgz"
@@ -31142,20 +31147,7 @@ yargs@^15.0.0, yargs@^15.0.2, yargs@^15.1.0:
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
 
-yargs@^17.1.1:
-  version "17.6.2"
-  resolved "https://registry.npmjs.org/yargs/-/yargs-17.6.2.tgz"
-  integrity sha512-1/9UrdHjDZc0eOU0HxOHoS78C69UD3JRMvzlJ7S79S2nTaWRA/whGCTV8o9e/N/1Va9YIV7Q4sOxD8VV4pCWOw==
-  dependencies:
-    cliui "^8.0.1"
-    escalade "^3.1.1"
-    get-caller-file "^2.0.5"
-    require-directory "^2.1.1"
-    string-width "^4.2.3"
-    y18n "^5.0.5"
-    yargs-parser "^21.1.1"
-
-yargs@^17.6.2:
+yargs@^17.1.1, yargs@^17.6.2, yargs@^17.7.2:
   version "17.7.2"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.7.2.tgz#991df39aca675a192b816e1e0363f9d75d2aa269"
   integrity sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==
