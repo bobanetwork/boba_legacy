@@ -30,17 +30,6 @@ export const BobaChains: IBobaChains = {
       '0x68ac1623ACf9eB9F88b65B5F229fE3e2c0d5789e': 'BNB',
     },
   },
-  1294: {
-    url: 'https://replica.bobabeam.boba.network',
-    testnet: false,
-    name: 'Bobabeam',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
-    height: 479856,
-    supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'GLMR',
-      '0x4200000000000000000000000000000000000006': 'BOBA',
-    },
-  },
   43288: {
     url: 'https://replica.avax.boba.network',
     testnet: false,
@@ -83,17 +72,6 @@ export const BobaChains: IBobaChains = {
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0x4200000000000000000000000000000000000023': 'BOBA',
-    },
-  },
-  1297: {
-    url: 'https://replica.bobabase.boba.network',
-    testnet: true,
-    name: 'Bobabase',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
-    height: 304189,
-    supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'DEV',
-      '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
   4328: {
