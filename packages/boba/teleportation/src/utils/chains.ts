@@ -116,10 +116,24 @@ export const BobaChains: IBobaChains = {
     testnet: false,
     name: 'Ethereum Mainnet',
     teleportationAddress: '0x0',
-    height: 59,
+    height: 17565090,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
-      '0x4200000000000000000000000000000000000023': 'BOBA',
+      '0x42bBFa2e77757C645eeaAd1655E0911a7553Efbc': 'BOBA',
+      '0xdAC17F958D2ee523a2206206994597C13D831ec7': 'USDT',
+      '0xB8c77482e45F1F44dE1745F52C74426C631bDD52': 'BNB',
+    },
+  },
+  5: {
+    url: 'https://goerli.gateway.tenderly.co',
+    testnet: true,
+    name: 'Goerli Testnet',
+    teleportationAddress: '0x0',
+    height: 9244943,
+    supportedAssets: {
+      '0x0000000000000000000000000000000000000000': 'ETH',
+      '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49': 'USDT',
+      '0xFC1C82c5EdeB51082CF30FDDb434D2cBDA1f6924': 'BNB',
     },
   },
   //#endregion
