@@ -926,7 +926,7 @@ describe('teleportation', () => {
       await registerTx.wait()
 
       expect(
-        await Boba_GasPriceOracle.useSecondaryFeeTokenAsFeeToken(env.l2Wallet.address)
+        await Boba_GasPriceOracle.bobaFeeTokenUsers(env.l2Wallet.address)
       ).to.be.deep.eq(true)
 
 
