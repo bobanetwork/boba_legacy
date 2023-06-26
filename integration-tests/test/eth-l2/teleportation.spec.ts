@@ -135,6 +135,9 @@ describe('teleportation', () => {
 
   const startTeleportationService = async (useBnb?: boolean) => {
     const chainIdToUse = useBnb ? chainIdBnb : chainId
+
+    console.log("SELECTED CHAIN ----------------------", selectedBobaChains, selectedBobaChainsBnb)
+
     return new TeleportationService({
       l2RpcProvider: ethers.provider,
       chainId: chainIdToUse,
@@ -145,8 +148,8 @@ describe('teleportation', () => {
       selectedBobaChains: useBnb ? selectedBobaChainsBnb : selectedBobaChains,
       // only defined one other for the routing tests (so idx 0 = own origin network)
       originSupportedAssets: useBnb
-        ? selectedBobaChainsBnb[0].supportedAssets
-        : selectedBobaChains[0].supportedAssets,
+        ? selectedBobaChains[0].supportedAssets
+        : selectedBobaChainsBnb[0].supportedAssets,
       pollingInterval,
       blockRangePerPolling,
     })
@@ -676,6 +679,9 @@ describe('teleportation', () => {
 
       expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
 
+      const teleportationServiceEth = await startTeleportationService(false)
+      await teleportationServiceEth.init()
+
       let disbursement = []
       for (const event of events) {
         const sourceChainId = chainIdBnb // event.args.sourceChainId.toNumber() -> (is correct, but we were mocking a fake chainId for testing)
@@ -685,7 +691,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationServiceBnb._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainId
@@ -711,9 +717,6 @@ describe('teleportation', () => {
 
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
-
-      const teleportationServiceEth = await startTeleportationService(false)
-      await teleportationServiceEth.init()
 
       await teleportationServiceEth._disburseTx(
         disbursement,
@@ -755,6 +758,9 @@ describe('teleportation', () => {
 
       expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
 
+      const teleportationServiceEth = await startTeleportationService(false)
+      await teleportationServiceEth.init()
+
       let disbursement = []
       for (const event of events) {
         const sourceChainId = chainIdBnb // event.args.sourceChainId.toNumber() -> (is correct, but we were mocking a fake chainId for testing)
@@ -764,7 +770,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationService._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainId
@@ -790,9 +796,6 @@ describe('teleportation', () => {
 
       const preBNBBalance = await L2BNBOnBobaEth.balanceOf(address1)
       const preSignerBNBBalance = await L2BNBOnBobaEth.balanceOf(signerAddr)
-
-      const teleportationServiceEth = await startTeleportationService(false)
-      await teleportationServiceEth.init()
 
       await teleportationServiceEth._disburseTx(
         disbursement,
@@ -836,6 +839,9 @@ describe('teleportation', () => {
 
       expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
 
+      const teleportationServiceBnb = await startTeleportationService(true)
+      await teleportationServiceBnb.init()
+
       let disbursement = []
       for (const event of events) {
         const sourceChainId = event.args.sourceChainId.toNumber()
@@ -845,7 +851,7 @@ describe('teleportation', () => {
         const emitter = event.args.emitter
 
         const receivingChainTokenAddr =
-          teleportationService._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          teleportationServiceBnb._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
             sourceChainId,
             chainIdBnb
@@ -880,9 +886,6 @@ describe('teleportation', () => {
       const preSignerBNBBalance = await bnbChainInfo.provider.getBalance(
         signerAddr
       )
-
-      const teleportationServiceBnb = await startTeleportationService(true)
-      await teleportationServiceBnb.init()
 
       await teleportationServiceBnb._disburseTx(
         disbursement,
