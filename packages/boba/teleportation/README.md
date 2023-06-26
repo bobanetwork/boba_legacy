@@ -38,6 +38,11 @@ Audits outstanding.
 
 ## Testnet deployments
 
+### Goerli (L1)
+- Teleportation deployed to: `0x025b2769D3bA7509B1e178811F7d8A06c7D5A907`
+- Proxy__Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
+
+
 ### Boba Goerli
 - Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
 - Proxy__Teleportation deployed to: `0x97880a36512d3D478552ec24d81978ff631dB106`
