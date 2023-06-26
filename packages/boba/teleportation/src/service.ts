@@ -23,7 +23,7 @@ import {
   Disbursement,
   SupportedAssets,
 } from './utils/types'
-import { HistoryData } from './entity/HistoryData'
+import { HistoryData } from './entities/HistoryData.entity'
 import { historyDataRepository } from './data-source'
 
 interface TeleportationOptions {
@@ -99,7 +99,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       )
       if (!isSupported) {
         throw new Error(
-          `Chain ${chainId} is not supported by the contract ${this.state.Teleportation.address}`
+          `Chain ${chainId} is not supported by the contract ${this.state.Teleportation.address} on chain ${(await this.state.Teleportation.provider.getNetwork()).chainId}`
         )
       } else {
         this.state.supportedChains = [...this.state.supportedChains, chain]

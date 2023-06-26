@@ -12,7 +12,9 @@ import { BobaChains } from '../utils/chains'
 /* Imports: Interface */
 import { ChainInfo, SupportedAssets } from '../utils/types'
 import { AppDataSource } from '../data-source'
-import {HistoryData} from "../entity/HistoryData";
+import {HistoryData} from "../entities/HistoryData.entity";
+import {join} from "path";
+import {Init1687802800701} from "../migrations/1687802800701-00_Init";
 
 dotenv.config()
 
@@ -21,7 +23,9 @@ const main = async () => {
     AppDataSource.setOptions({
       migrationsRun: true,
       logging: false,
-      synchronize: true,
+      synchronize: false,
+      entities: [HistoryData],
+      migrations: [Init1687802800701],
     })
     await AppDataSource.initialize() // initialize DB connection
   }
