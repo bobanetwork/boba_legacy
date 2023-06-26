@@ -375,7 +375,16 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       const historyData = new HistoryData()
       historyData.chainId = chainId
       historyData.blockNo = latestBlock
-      await historyDataRepository.save(historyData)
+      if (
+        await historyDataRepository.findOneBy({ chainId: historyData.chainId })
+      ) {
+        await historyDataRepository.update(
+          { chainId: historyData.chainId },
+          historyData
+        )
+      } else {
+        await historyDataRepository.save(historyData)
+      }
     } catch (error) {
       this.logger.error(`Failed to put depositInfo! - ${error}`)
     }

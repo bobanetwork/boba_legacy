@@ -78,7 +78,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.avax.boba.network',
     testnet: true,
     name: 'Boba Avalanche Testnet',
-    teleportationAddress: '0x867A329179565eE07108846cb0F3F8673fE58030',
+    teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
     height: 489,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'AVAX',
@@ -89,7 +89,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bnb.boba.network',
     testnet: true,
     name: 'Boba BNB Testnet',
-    teleportationAddress: '0x748069569925847BACf07944bC4327500f66b320',
+    teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
     height: 3288,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'BNB',
@@ -100,7 +100,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bobaopera.boba.network',
     testnet: true,
     name: 'Bobaopera Testnet',
-    teleportationAddress: '0x07F331aEa6375F48695b1F9248801998754a6219',
+    teleportationAddress: '0x2965Cc3d8Ba6790d6fCCedaC44864f2ff6e01f21',
     height: 299,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'FTM',

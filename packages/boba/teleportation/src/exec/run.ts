@@ -12,13 +12,20 @@ import { BobaChains } from '../utils/chains'
 /* Imports: Interface */
 import { ChainInfo, SupportedAssets } from '../utils/types'
 import { AppDataSource } from '../data-source'
+import {HistoryData} from "../entity/HistoryData";
 
 dotenv.config()
 
 const main = async () => {
   if (!AppDataSource.isInitialized) {
+    AppDataSource.setOptions({
+      migrationsRun: true,
+      logging: true,
+      synchronize: true,
+    })
     await AppDataSource.initialize() // initialize DB connection
   }
+  console.log('Database initialized: ', AppDataSource.isInitialized)
 
   const config: Bcfg = new Config('teleportation')
   config.load({
