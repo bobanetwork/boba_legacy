@@ -52,4 +52,11 @@ describe('Button', () => {
     })
     expect(asFragment()).toMatchSnapshot()
   })
+  test('Outline Button', () => {
+    const { asFragment } = renderButton({
+      outline: true,
+      label: 'Outline Button',
+    })
+    expect(asFragment()).toMatchSnapshot()
+  })
 })

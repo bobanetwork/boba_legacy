@@ -39,3 +39,12 @@ Small.args = {
   small: true,
   label: 'Default Button',
 }
+
+export const Outline = Template.bind({})
+Outline.args = {
+  disable: false,
+  loading: false,
+  small: false,
+  outline: true,
+  label: 'Default Button',
+}

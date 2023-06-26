@@ -3,7 +3,8 @@ import * as G from '../Global.styles'
 
 import { useDispatch } from 'react-redux'
 import AlertIcon from 'components/icons/AlertIcon'
-import Button from 'components/button/Button.js'
+//import Button from 'components/button/Button.js'
+import {Button} from 'components/global/button'
 
 import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
@@ -28,15 +29,11 @@ const Connect = ({
         </G.AlertText>
       </G.AlertInfo>
       <Button
-        type="primary"
-        variant="contained"
-          size="small"
-          newStyle
         onClick={() => dispatch(setConnect(true))}
-        sx={{fontWeight: '500;'}}
-      >
-        Connect
-      </Button>
+        label="Connect"
+        small
+      />
+        
     </G.LayerAlert>
     )
   } else if (layer !== 'L2' && connectToBoba) {
@@ -49,14 +46,10 @@ const Connect = ({
           </G.AlertText>
         </G.AlertInfo>
         <Button
-          type="primary"
-          variant="contained"
-          size="small"
-          newStyle
+          small
           onClick={() => dispatch(setConnectBOBA(true))}
-        >
-          Connect to Boba
-        </Button>
+          label="Connect to Boba"
+        />
       </G.LayerAlert>
     )
   }

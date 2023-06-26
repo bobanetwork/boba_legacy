@@ -20,6 +20,11 @@ const dark = {
     success: 'green',
     info: 'blue',
     warning: 'yellow',
+    box: {
+      background:
+        'linear-gradient(151.67deg, rgba(48, 48, 48, 0.7) 7.91%, rgba(48, 48, 48, 0.7) 45.81%, rgba(37, 37, 37, 0.7) 85.18%),linear-gradient(0deg, #545454, #545454)',
+      border: '#545454',
+    },
     gray: {
       50: '#EEEEEE',
       100: '#A8A8A8',

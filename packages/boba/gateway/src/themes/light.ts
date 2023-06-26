@@ -16,10 +16,14 @@ const light = {
   background: '#FFFFFF',
   color: '#22221E',
   colors: {
-    danger: 'red',
+    danger: '#FF0000',
     success: 'green',
     info: 'blue',
     warning: 'yellow',
+    box: {
+      background: 'rgba(253, 255, 248, 0.9)',
+      border: '#DEE0D8',
+    },
     gray: {
       50: 'rgba(253, 255, 248, 0.9)',
       100: '#F0F1EA',

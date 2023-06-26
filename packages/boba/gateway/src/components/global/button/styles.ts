@@ -1,10 +1,12 @@
 import styled, { keyframes } from 'styled-components'
 
 export const ButtonContainer = styled.button.withConfig({
-  shouldForwardProp: (prop) => !['loading', 'disable', 'small'].includes(prop),
+  shouldForwardProp: (prop) =>
+    !['loading', 'disable', 'small', 'outline'].includes(prop),
 })<{
   loading?: boolean
   disable?: boolean
+  outline?: boolean
   small?: boolean
 }>`
   display: flex;
@@ -24,7 +26,7 @@ export const ButtonContainer = styled.button.withConfig({
   font-size: ${(props) => props.theme.text.heading1};
 
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
-  transition: background-color 0.25s ease;
+  transition: all 0.25s ease;
 
   ${(props) =>
     props.disable &&
@@ -50,9 +52,21 @@ export const ButtonContainer = styled.button.withConfig({
     ${(props) =>
     props.small &&
     `
+    min-width:auto;
     font-size: ${props.theme.text.body2};
     border-radius: 33px;
-    min-width:auto;
+   `}
+      ${(props) =>
+    props.outline &&
+    `
+    border: 1px solid ${props.theme.colors.green[300]};
+    color: ${props.theme.colors.green[300]};
+    background: transparent;
+    box-shadow:none;
+    &:hover {
+      color:${props.theme.colors.gray[800]};
+      background:${props.theme.colors.green[300]};
+    }
   `}
 `
 

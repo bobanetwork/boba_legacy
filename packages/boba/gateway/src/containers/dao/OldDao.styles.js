@@ -42,14 +42,22 @@ export const DaoWalletContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   padding: '0px 20px',
-  minHeight: '700px',
   width: '30%',
+  minWidth: '330px',
   gap: '10px',
   borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.glassy,
+  border:'1px solid ' + theme.palette.background.glassyBorder,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
   },
+}));
+
+export const VerticalDivisor =  styled(Box)(({ theme }) => ({
+  width:'1px',
+  background:"rgba(84, 84, 84, 1)",
+  height:'47px',
+  margin:'0px 50px'
 }));
 
 export const DaoProposalContainer = styled(Box)(({ theme }) => ({
@@ -59,8 +67,6 @@ export const DaoProposalContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'flex-start',
   padding: '0 32px',
   minHeight: '500px',
-  borderRadius: theme.palette.primary.borderRadius,
-  background: theme.palette.background.glassy,
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     padding: '0 20px',

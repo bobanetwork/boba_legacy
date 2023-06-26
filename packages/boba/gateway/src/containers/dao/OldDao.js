@@ -16,14 +16,15 @@ limitations under the License. */
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { openError, openModal } from 'actions/uiAction'
 import { orderBy } from 'util/lodash';
 
-import Button from 'components/button/Button'
 import ListProposal from 'components/listProposal/listProposal'
 
-import Select from 'components/select/Select'
+import { Typography } from 'components/global/typography'
+//import Select from 'components/select/Select'
+import { Button } from 'components/global/button'
 
 import {
   selectDaoBalance,
@@ -40,6 +41,7 @@ import {
 import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
 import Connect from 'containers/connect/Connect'
+import { TabHeader } from 'components/global/tabHeader'
 
 const PROPOSAL_STATES = [
   { value: 'All', label: 'All' },
@@ -47,19 +49,19 @@ const PROPOSAL_STATES = [
   { value: 'Active', label: 'Active' },
   { value: 'Canceled', label: 'Canceled' },
   { value: 'Defeated', label: 'Defeated' },
-  { value: 'Succeeded', label: 'Succeeded' },
+  /*{ value: 'Succeeded', label: 'Succeeded' },
   { value: 'Queued', label: 'Queued' },
   { value: 'Expired', label: 'Expired' },
-  { value: 'Executed', label: 'Executed' }
+  { value: 'Executed', label: 'Executed' }*/
 ]
 
-function OldDao() {
+const OldDao = () => {
 
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
   const layer = useSelector(selectLayer());
-  const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
+  const loading = useSelector(selectLoading(['PROPOSALS/GET']))
 
   let proposals = useSelector(selectProposals)
   proposals = orderBy(proposals, i => i.startTimestamp, 'desc')
@@ -72,6 +74,14 @@ function OldDao() {
 
   const [ selectedState, setSelectedState ] = useState(PROPOSAL_STATES[ 0 ])
 
+  const handleNewProposal = () => {
+    if (Number(votes + votesX) < Number(proposalThreshold)) {
+      dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
+    } else {
+      dispatch(openModal('newProposalModal'))
+    }
+  }
+
   return (
     <S.DaoPageContainer>
       <Connect
@@ -82,48 +92,49 @@ function OldDao() {
       />
       <S.DaoPageContent>
         <S.DaoWalletContainer>
-          <Box sx={{ padding: '24px 0px' }}>
-            <Typography variant="h4">Balances</Typography>
-            <Typography variant="body1" style={{ opacity: '0.5' }}>BOBA:</Typography>
-            <Typography variant="h4" >{!!layer ? Math.round(Number(balance)) : '--'}</Typography>
-            <Typography variant="body1" style={{ opacity: '0.5' }}>xBOBA:</Typography>
-            <Typography variant="h4" >{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
+          <Box sx={{ paddingTop: '24px' }}>
+            <Typography variant="h4">Balance</Typography>
+            <Box
+              sx={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent:'center',
+                gap: '10px',
+                paddingTop:'24px',
+              }}
+            >
+              <Box sx={{padding:'5px', gap:'10px 0px'}}>
+                <Typography variant="body3" style={{ opacity: '0.5' }}>BOBA:</Typography>
+                <Typography variant="head" >{!!layer ? Math.round(Number(balance)) : '--'}</Typography>
+              </Box>
+              <S.VerticalDivisor />
+              <Box sx={{padding:'5px'}}>
+                <Typography variant="body3" style={{ opacity: '0.5' }}>xBOBA:</Typography>
+                <Typography variant="head" >{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
+              </Box>
+            </Box>
           </Box>
-          <G.DividerLine />
-          <Box sx={{ padding: '24px 0px' }}>
-            <Typography variant="h4">Votes</Typography>
-            <Typography variant="body1" style={{ opacity: '0.5' }}>Boba:</Typography>
-            <Typography variant="h4" >{!!layer ? Math.round(Number(votes)) : '--'}</Typography>
-            <Typography variant="body1" style={{ opacity: '0.5' }}>xBoba:</Typography>
-            <Typography variant="h4" >{!!layer ? Math.round(Number(votesX)) : '--'}</Typography>
-            <Typography variant="body1" style={{ opacity: '0.5' }}>Total:</Typography>
-            <Typography variant="h4" >{!!layer ? Math.round(Number(votes) + Number(votesX)) : '--'}</Typography>
+          <Box>
             {layer === 'L2' &&
               <S.DaoWalletAction>
                 <Button
-                  color="primary"
-                  variant="outlined"
                   onClick={() => { dispatch(openModal('delegateDaoModal')) }}
-                  disabled={!accountEnabled}
-                >
-                  Delegate BOBA
-                </Button>
+                  disable={!accountEnabled}
+                  label="Delegate BOBA"
+                  outline
+                />
                 <Button
-                  color="primary"
-                  variant="outlined"
                   onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
-                  disabled={!accountEnabled}
-                >
-                  Delegate xBOBA
-                </Button>
+                  disable={!accountEnabled}
+                  label="Delegate xBOBA"
+                  outline
+                />
               </S.DaoWalletAction>
             }
-            <Box sx={{ padding: '12px 0px' }}>
-              <Typography variant="body3">Only votes delegated BEFORE the start of the active voting period are counted in your vote</Typography>
-            </Box>
           </Box>
-          <G.DividerLine />
-          <Box sx={{
+          <Box
+            sx={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
@@ -131,28 +142,17 @@ function OldDao() {
             padding: '24px 0px'
           }}>
             <Button
-              fullWidth={true}
-              color="primary"
-              variant="outlined"
-              disabled={!accountEnabled}
-              onClick={() => {
-                if (Number(votes + votesX) < Number(proposalThreshold)) {
-                  dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
-                } else {
-                  dispatch(openModal('newProposalModal'))
-                }
-              }}
-            >
-              Create new proposal
-            </Button>
-            <Box sx={{ padding: '12px 0px' }}>
-              <Typography variant="body3">At least {proposalThreshold} BOBA + xBOBA are needed to create a new proposal</Typography>
-            </Box>
+              disable={!accountEnabled}
+              onClick={() => handleNewProposal}
+              label="Create new proposal"
+              outline
+            />
           </Box>
         </S.DaoWalletContainer>
+
         <S.DaoProposalContainer>
-          <S.DaoProposalHead>
-            <Typography variant="h3">Proposals</Typography>
+          <TabHeader options={PROPOSAL_STATES} callback={(e)=> setSelectedState(e)} />
+          {/*<S.DaoProposalHead>
             <Select
               options={PROPOSAL_STATES}
               onSelect={(e) => {
@@ -163,7 +163,7 @@ function OldDao() {
               newSelect={true}
             ></Select>
           </S.DaoProposalHead>
-          <G.DividerLine />
+            */}
           <S.DaoProposalListContainer>
             {!!loading && !proposals.length ? <Typography>Loading...</Typography> : null}
             {proposals

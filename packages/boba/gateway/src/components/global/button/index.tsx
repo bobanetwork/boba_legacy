@@ -6,6 +6,7 @@ export const Button: FC<ButtonTypes> = ({
   disable = false,
   loading = false,
   small = false,
+  outline = false,
   label,
   onClick,
 }) => {
@@ -15,6 +16,7 @@ export const Button: FC<ButtonTypes> = ({
       disable={disable}
       loading={loading}
       onClick={onClick}
+      outline={outline}
       small={small}
     >
       {loading && <SpinLoader />} {label}
