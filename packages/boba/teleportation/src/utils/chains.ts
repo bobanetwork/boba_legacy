@@ -17,6 +17,8 @@ export interface IBobaChains {
  **/
 export const BobaChains: IBobaChains = {
   // TODO: Consider using AddressManager or AddressPackage instead
+
+  //#region boba_networks
   288: {
     url: 'https://replica.boba.network',
     testnet: false,
@@ -68,7 +70,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Boba Ethereum Goerli',
     teleportationAddress: '0x97880a36512d3D478552ec24d81978ff631dB106',
-    height: 59,
+    height: 3820,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0x4200000000000000000000000000000000000023': 'BOBA',
@@ -79,7 +81,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Boba Avalanche Testnet',
     teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
-    height: 489,
+    height: 3148,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'AVAX',
       '0x0000000000000000000000000000000000000000': 'BOBA',
@@ -90,7 +92,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Boba BNB Testnet',
     teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
-    height: 3288,
+    height: 240152,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'BNB',
       '0x0000000000000000000000000000000000000000': 'BOBA',
@@ -101,10 +103,24 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Bobaopera Testnet',
     teleportationAddress: '0x2965Cc3d8Ba6790d6fCCedaC44864f2ff6e01f21',
-    height: 299,
+    height: 3197,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'FTM',
       '0x0000000000000000000000000000000000000000': 'BOBA',
     },
   },
+  //#endregion
+  //#region l1
+  1: {
+    url: 'https://eth.llamarpc.com',
+    testnet: false,
+    name: 'Ethereum Mainnet',
+    teleportationAddress: '0x0',
+    height: 59,
+    supportedAssets: {
+      '0x0000000000000000000000000000000000000000': 'ETH',
+      '0x4200000000000000000000000000000000000023': 'BOBA',
+    },
+  },
+  //#endregion
 }
