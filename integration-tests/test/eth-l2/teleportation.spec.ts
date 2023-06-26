@@ -145,8 +145,8 @@ describe('teleportation', () => {
       selectedBobaChains: useBnb ? selectedBobaChainsBnb : selectedBobaChains,
       // only defined one other for the routing tests (so idx 0 = own origin network)
       originSupportedAssets: useBnb
-        ? selectedBobaChains[0].supportedAssets
-        : selectedBobaChainsBnb[0].supportedAssets,
+        ? selectedBobaChainsBnb[0].supportedAssets
+        : selectedBobaChains[0].supportedAssets,
       pollingInterval,
       blockRangePerPolling,
     })
