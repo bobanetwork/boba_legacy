@@ -113,6 +113,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDeposits = await depositTeleportation.totalDeposits(
           this.options.chainId
         )
+
         this.state.depositTeleportations.push({
           Teleportation: depositTeleportation,
           chainId,
