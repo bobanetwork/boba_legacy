@@ -93,7 +93,7 @@ const main = async () => {
     teleportationAddress: TELEPORTATION_ADDRESS,
     disburserWallet,
     selectedBobaChains,
-    originSupportedAssets,
+    ownSupportedAssets: originSupportedAssets,
     pollingInterval: POLLING_INTERVAL,
     blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
   })

@@ -41,7 +41,7 @@ interface TeleportationOptions {
   selectedBobaChains: ChainInfo[]
 
   // Own chain to map token symbols to other networks
-  originSupportedAssets: SupportedAssets
+  ownSupportedAssets: SupportedAssets
 
   pollingInterval: number
 
@@ -342,25 +342,27 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     sourceChainId: number,
     destChainId: number
   ) {
-    const destChain: ChainInfo = this.state.supportedChains.find(
-      (c) => c.chainId === destChainId
+    const srcChain: ChainInfo = this.state.supportedChains.find(
+      (c) => c.chainId === sourceChainId
     )
-    if (!destChain) {
+    if (!srcChain) {
       throw new Error(
-        `Destination chain not configured/supported: ${destChain}`
+        `Source chain not configured/supported: ${srcChain}`
       )
     }
 
-    const destChainTokenSymbol = destChain.supportedAssets[sourceChainTokenAddr]
+    const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr]
+    // TODO: Remove destChainId if working
+    console.log("src CHAIN: ", srcChainTokenSymbol, sourceChainTokenAddr, srcChain.supportedAssets)
 
     const supportedAsset = Object.entries(
-      this.options.originSupportedAssets
+      this.options.ownSupportedAssets
     ).find(([address, tokenSymbol]) => {
-      return tokenSymbol === destChainTokenSymbol
+      return tokenSymbol === srcChainTokenSymbol
     })
     if (!supportedAsset) {
       throw new Error(
-        `Asset ${destChainTokenSymbol} on chain ${destChainId} not configured but possibly supported on-chain`
+        `Asset ${srcChainTokenSymbol} on chain ${destChainId} not configured but possibly supported on-chain`
       )
     }
     return supportedAsset[0] // return only address
