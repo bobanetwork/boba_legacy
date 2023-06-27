@@ -28,7 +28,8 @@ import {
 import { OptimismEnv } from './shared/env'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
-describe('teleportation', () => {
+// TODO: Remove only
+describe.only('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
@@ -147,7 +148,7 @@ describe('teleportation', () => {
       disburserWallet: wallet1,
       selectedBobaChains: useBnb ? selectedBobaChainsBnb : selectedBobaChains,
       // only defined one other for the routing tests (so idx 0 = own origin network)
-      originSupportedAssets: useBnb
+      ownSupportedAssets: useBnb
         ? selectedBobaChains[0].supportedAssets
         : selectedBobaChainsBnb[0].supportedAssets,
       pollingInterval,

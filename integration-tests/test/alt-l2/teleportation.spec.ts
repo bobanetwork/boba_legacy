@@ -136,8 +136,6 @@ describe('teleportation', () => {
   const startTeleportationService = async (useBnb?: boolean) => {
     const chainIdToUse = useBnb ? chainIdBnb : chainId
 
-    console.log("SELECTED CHAIN ----------------------", selectedBobaChains, selectedBobaChainsBnb)
-
     return new TeleportationService({
       l2RpcProvider: ethers.provider,
       chainId: chainIdToUse,
@@ -147,7 +145,7 @@ describe('teleportation', () => {
       disburserWallet: wallet1,
       selectedBobaChains: useBnb ? selectedBobaChainsBnb : selectedBobaChains,
       // only defined one other for the routing tests (so idx 0 = own origin network)
-      originSupportedAssets: useBnb
+      ownSupportedAssets: useBnb
         ? selectedBobaChains[0].supportedAssets
         : selectedBobaChainsBnb[0].supportedAssets,
       pollingInterval,
