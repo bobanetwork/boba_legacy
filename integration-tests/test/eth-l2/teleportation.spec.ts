@@ -28,8 +28,7 @@ import {
 import { OptimismEnv } from './shared/env'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
-// TODO: Remove
-describe.only('teleportation', () => {
+describe('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
