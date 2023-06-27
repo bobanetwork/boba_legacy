@@ -136,8 +136,6 @@ describe('teleportation', () => {
   const startTeleportationService = async (useBnb?: boolean) => {
     const chainIdToUse = useBnb ? chainIdBnb : chainId
 
-    console.log("SELECTED CHAIN ----------------------", selectedBobaChains, selectedBobaChainsBnb)
-
     return new TeleportationService({
       l2RpcProvider: ethers.provider,
       chainId: chainIdToUse,
