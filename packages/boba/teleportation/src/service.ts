@@ -18,6 +18,7 @@ import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
 import {
+  AssetReceivedEvent,
   ChainInfo,
   DepositTeleportations,
   Disbursement,
@@ -99,7 +100,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       )
       if (!isSupported) {
         throw new Error(
-          `Chain ${chainId} is not supported by the contract ${this.state.Teleportation.address} on chain ${(await this.state.Teleportation.provider.getNetwork()).chainId}`
+          `Chain ${chainId} is not supported by the contract ${
+            this.state.Teleportation.address
+          } on chain ${
+            (await this.state.Teleportation.provider.getNetwork()).chainId
+          }`
         )
       } else {
         this.state.supportedChains = [...this.state.supportedChains, chain]
@@ -132,7 +137,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const latestBlock =
           await depositTeleportation.Teleportation.provider.getBlockNumber()
         try {
-          const events = await this._watchTeleportation(
+          const events: AssetReceivedEvent[] = await this._watchTeleportation(
             depositTeleportation,
             latestBlock
           )
@@ -160,7 +165,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   async _watchTeleportation(
     depositTeleportation: DepositTeleportations,
     latestBlock: number
-  ): Promise<any> {
+  ): Promise<AssetReceivedEvent[]> {
     let lastBlock: number
     const chainId = depositTeleportation.chainId.toString()
     try {
@@ -181,7 +186,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
   async _disburseTeleportation(
     depositTeleportation: DepositTeleportations,
-    events: any,
+    events: AssetReceivedEvent[],
     latestBlock: number
   ): Promise<void> {
     const chainId = depositTeleportation.chainId
@@ -202,14 +207,14 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           const amount = event.args.amount
           const sourceChainTokenAddr = event.args.token
           const emitter = event.args.emitter
+          const destChainId = event.args.toChainId
 
           // we disburse tokens only if depositId is greater or equal to the last disbursement
           if (depositId.gte(lastDisbursement)) {
             const destChainTokenAddr =
               this._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
                 sourceChainTokenAddr,
-                sourceChainId.toNumber(),
-                chainId
+                sourceChainId
               )
 
             const [isTokenSupported, , , , ,] =
@@ -335,34 +340,32 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
    * @dev Helper method for accessing the supportedAssets map via value (needed as we need it one way another as we don't save the ticker on-chain).
    * @param sourceChainTokenAddr: Token/Asset address (ZeroAddr for native asset) on source network
    * @param sourceChainId: ChainId the request is coming from
-   * @param destChainId: Target chainId to bridge the asset.
    **/
   _getSupportedDestChainTokenAddrBySourceChainTokenAddr(
     sourceChainTokenAddr: string,
-    sourceChainId: number,
-    destChainId: number
+    sourceChainId: BigNumber | number
   ) {
     const srcChain: ChainInfo = this.state.supportedChains.find(
-      (c) => c.chainId === sourceChainId
+      (c) => c.chainId.toString() === sourceChainId.toString()
     )
     if (!srcChain) {
       throw new Error(
-        `Source chain not configured/supported: ${srcChain}`
+        `Source chain not configured/supported: ${srcChain} - ${sourceChainId} - supported: ${JSON.stringify(
+          this.state.supportedChains.map((c) => c.chainId)
+        )}`
       )
     }
 
     const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr]
-    // TODO: Remove destChainId if working
-    console.log("src CHAIN: ", srcChainTokenSymbol, sourceChainTokenAddr, srcChain.supportedAssets)
 
-    const supportedAsset = Object.entries(
-      this.options.ownSupportedAssets
-    ).find(([address, tokenSymbol]) => {
-      return tokenSymbol === srcChainTokenSymbol
-    })
+    const supportedAsset = Object.entries(this.options.ownSupportedAssets).find(
+      ([address, tokenSymbol]) => {
+        return tokenSymbol === srcChainTokenSymbol
+      }
+    )
     if (!supportedAsset) {
       throw new Error(
-        `Asset ${srcChainTokenSymbol} on chain ${destChainId} not configured but possibly supported on-chain`
+        `Asset ${srcChainTokenSymbol} on chain destinationChain not configured but possibly supported on-chain`
       )
     }
     return supportedAsset[0] // return only address

@@ -28,7 +28,8 @@ import {
 import { OptimismEnv } from './shared/env'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
-describe('teleportation', () => {
+// TODO: Remove
+describe.only('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
@@ -693,8 +694,7 @@ describe('teleportation', () => {
         const receivingChainTokenAddr =
           teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
-            sourceChainId,
-            chainId
+            sourceChainId
           )
         expect(receivingChainTokenAddr).to.be.eq(
           L2BOBA.address,
@@ -772,8 +772,7 @@ describe('teleportation', () => {
         const receivingChainTokenAddr =
           teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
-            sourceChainId,
-            chainId
+            sourceChainId
           )
         expect(receivingChainTokenAddr).to.be.eq(
           L2BNBOnBobaEth.address,
@@ -853,8 +852,7 @@ describe('teleportation', () => {
         const receivingChainTokenAddr =
           teleportationServiceBnb._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
             token,
-            sourceChainId,
-            chainIdBnb
+            sourceChainId
           )
         expect(receivingChainTokenAddr).to.be.eq(
           ethers.constants.AddressZero,

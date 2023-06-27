@@ -4,6 +4,17 @@ export interface SupportedAssets {
   [address: string]: string // symbol (MUST BE UNIQUE)
 }
 
+export interface AssetReceivedEvent {
+  args: {
+    token: string
+    sourceChainId: BigNumber
+    toChainId: BigNumber
+    depositId: BigNumber
+    emitter: string
+    amount: BigNumber
+  }
+}
+
 export interface ChainInfo {
   chainId: number
   url: string
