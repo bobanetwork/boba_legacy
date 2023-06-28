@@ -7667,6 +7667,11 @@
   dependencies:
     "@types/jest" "*"
 
+"@types/truncate-middle@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/truncate-middle/-/truncate-middle-1.0.1.tgz#3e427c39d2b15bf0ef10401eee2e732be94f5ef6"
+  integrity sha512-HpUx5cnvMJpeCIqS3Q0neIviFWIH8W6nSmPhAMdzugxiCywOBy0n5OeZgJ+0u3GibDg8ZboxHYYKUg9ArtRdJg==
+
 "@types/trusted-types@^2.0.2":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.3.tgz#a136f83b0758698df454e328759dbd3d44555311"
