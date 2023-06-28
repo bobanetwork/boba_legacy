@@ -60,31 +60,38 @@
 # l1_chain_1                   | Private Key: 0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e
 
 # Account #0
-x-deployer_pk: &deployer_pk
+x-deployer_pk:
+  &deployer_pk
   DEPLOYER_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 # Account #8
-x-relayer_pk: &relayer_pk
+x-relayer_pk:
+  &relayer_pk
   RELAYER_PRIVATE_KEY: '0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97'
 
 # Account #18
-x-fast-relayer_pk: &fast-relayer_pk
+x-fast-relayer_pk:
+  &fast-relayer_pk
   FAST_RELAYER_PRIVATE_KEY: '0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0'
 
 # Account #19 - allows the fee test
-x-integration_pk: &integration_pk
+x-integration_pk:
+  &integration_pk
   PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
 # Account #14 - allows the fee test
-x-integration_2_pk: &integration_2_pk
+x-integration_2_pk:
+  &integration_2_pk
   PRIVATE_KEY_2: '0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa'
 
 # Account #15 - allows the fee test
-x-integration_3_pk: &integration_3_pk
+x-integration_3_pk:
+  &integration_3_pk
   PRIVATE_KEY_3: '0x8166f546bab6da521a8369cab06c5d2b9e46670292d85c875ee9ec20e84ffb61'
 
 # Account #6 - allows the bobalink test
-x-bobalink_pk: &bobalink_pk
+x-bobalink_pk:
+  &bobalink_pk
   BOBALINK_PRIVATE_KEY: '0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
 
 version: "3"
@@ -116,7 +123,7 @@ services:
       FRAUD_PROOF_WINDOW_SECONDS: 0
       L1_NODE_WEB3_URL: http://l1_chain:8545
       # these keys are hardhat's first 2 accounts, DO NOT use in production
-      << : [*deployer_pk, *relayer_pk]
+      <<: [ *deployer_pk, *relayer_pk ]
       SEQUENCER_ADDRESS: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
       PROPOSER_ADDRESS: "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc"
       # setting the whitelist owner to address(0) disables the whitelist
@@ -137,7 +144,7 @@ services:
       DTL_REGISTRY_URL: http://dtl:8081/addresses.json
       DTL_STATE_DUMP_REGISTRY_URL: http://dtl:8081/state-dump.latest.json
     ports:
-        # expose the service to the host for getting the contract addrs
+      # expose the service to the host for getting the contract addrs
       - ${DEPLOYER_PORT:-8077}:8082
 
   # deploys boba contracts and serves contract addresses
@@ -157,7 +164,7 @@ services:
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       URL: http://dtl:8081/addresses.json
       # DO NOT use in production
-      << : [*deployer_pk, *relayer_pk, *fast-relayer_pk]
+      <<: [ *deployer_pk, *relayer_pk, *fast-relayer_pk ]
       RETRIES: 200
       DTL_REGISTRY_URL: http://dtl:8081/boba-addr.json
       # skip compilation when run in docker-compose, since the contracts
@@ -175,7 +182,7 @@ services:
       target: data-transport-layer
     # override with the dtl script and the env vars required for it
     env_file:
-      -  ./envs/dtl.env
+      - ./envs/dtl.env
     # set the rest of the env vars for the network whcih do not
     # depend on the docker-compose setup
     environment:
@@ -244,7 +251,7 @@ services:
       L2_NODE_WEB3_URL: http://l2geth:8545
       URL: http://dtl:8081/addresses.json
       # a funded hardhat account
-      << : *relayer_pk
+      <<: *relayer_pk
       RETRIES: 200
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
@@ -271,7 +278,7 @@ services:
       URL: http://dtl:8081/addresses.json
       BOBA_URL: http://dtl:8081/boba-addr.json
       # This is who pays for the fast message relayer
-      << : *fast-relayer_pk
+      <<: *fast-relayer_pk
       RETRIES: 200
       POLLING_INTERVAL: 6000
       GET_LOGS_INTERVAL: 500
@@ -313,7 +320,7 @@ services:
   integration_tests:
     image: bobanetwork/integration-tests:latest
     deploy:
-       replicas: 0
+      replicas: 0
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.packages
@@ -333,7 +340,13 @@ services:
       NO_NETWORK: 1
       RETRIES: 200
       L2_CHAINID: 31338 #unfortunately, elsewhere the L2_CHAINID is called CHAIN_ID
-      << : [*integration_pk, *integration_2_pk, *integration_3_pk, *bobalink_pk]
+      <<:
+        [
+          *integration_pk,
+          *integration_2_pk,
+          *integration_3_pk,
+          *bobalink_pk
+        ]
     volumes:
       - ~/result:/opt/optimism/integration-tests/result
 
@@ -384,29 +397,29 @@ services:
     env_file:
       - ./envs/geth.env
     environment:
-        ETH1_HTTP: http://l1_chain:8545
-        ROLLUP_TIMESTAMP_REFRESH: 5s
-        ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
-        ROLLUP_CLIENT_HTTP: http://dtl:7878
-        ROLLUP_BACKEND: 'l1'
-        ROLLUP_VERIFIER_ENABLE: 'true'
-        RETRIES: 60
-        # no need to keep this secret, only used internally to sign blocks
-        BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-        BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-        ROLLUP_POLL_INTERVAL_FLAG: "10s"
-        TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
-        EMERGENCY_FORK_NUMBER: 0
-        L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
-        BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
+      ETH1_HTTP: http://l1_chain:8545
+      ROLLUP_TIMESTAMP_REFRESH: 5s
+      ROLLUP_STATE_DUMP_PATH: http://dtl:8081/state-dump.latest.json
+      ROLLUP_CLIENT_HTTP: http://dtl:7878
+      ROLLUP_BACKEND: 'l1'
+      ROLLUP_VERIFIER_ENABLE: 'true'
+      RETRIES: 60
+      # no need to keep this secret, only used internally to sign blocks
+      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
+      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
+      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      TURING_CREDIT_ADDRESS: "0x4200000000000000000000000000000000000020"
+      EMERGENCY_FORK_NUMBER: 0
+      L2_BOBA_TOKEN_ADDRESS: "0x4200000000000000000000000000000000000023"
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0x4200000000000000000000000000000000000024"
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
 
   fraud-detector:
     depends_on:
-     - verifier
-     - dtl
+      - verifier
+      - dtl
     image: bobanetwork/fraud-detector:latest
     deploy:
       replicas: 1
