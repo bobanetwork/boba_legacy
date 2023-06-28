@@ -5,7 +5,6 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import '@openzeppelin/contracts/utils/Address.sol';
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
@@ -17,7 +16,6 @@ import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
  * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L2/teleportr/TeleportrDisburser.sol
  */
 contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
-    using Address for address;
     using ERC165Checker for address;
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
