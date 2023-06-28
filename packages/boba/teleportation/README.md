@@ -53,7 +53,3 @@ Audits outstanding.
 ### Boba BNB Testnet
 - Teleportation deployed to: `0x025b2769D3bA7509B1e178811F7d8A06c7D5A907`
 - Proxy__Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
-
-### Boba Opera Testnet (Fantom)
-- Teleportation deployed to: `0x5ACFD6c90015dd5241BeBCE9Cec93D2D01f10580`
-- Proxy__Teleportation deployed to: `0x2965Cc3d8Ba6790d6fCCedaC44864f2ff6e01f21`

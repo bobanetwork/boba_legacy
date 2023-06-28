@@ -35,6 +35,7 @@
       "typescript": "4.5.2"
    },
    "dependencies": {
+      "@aws-crypto/client-node": "^3.2.0",
       "@eth-optimism/common-ts": "0.2.2",
       "@eth-optimism/contracts": "0.5.11",
       "bcfg": "^0.1.6",

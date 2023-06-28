@@ -254,7 +254,11 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      */
     function removeSupportedToken(address _token) external onlyOwner() onlyInitialized() {
         require(supportedTokens[_token].supported == true, "Already not supported");
-        delete supportedTokens[_token];
+        delete supportedTokens[_token].supported;
+        delete supportedTokens[_token].minDepositAmount;
+        delete supportedTokens[_token].maxDepositAmount;
+        delete supportedTokens[_token].maxTransferAmountPerDay;
+        // we might want to keep transferredAmount & lastTimestamp in case it is being added (shortly) after again
 
         emit TokenSupported(_token, false);
     }
