@@ -38,11 +38,11 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
 
     struct SupportedToken {
         bool supported;
-        // The minimum amount that be deposited in a receive.
+        // The minimum amount that needs to be deposited in a receive.
         uint256 minDepositAmount;
-        // The maximum amount that be deposited in a receive.
+        // The maximum amount that can be deposited in a receive.
         uint256 maxDepositAmount;
-        // set maximum amount of tokens can be transferred in 24 hours
+        // set maximum amount of tokens that can be transferred in 24 hours
         uint256 maxTransferAmountPerDay;
         // The total amount of tokens transferred in 24 hours
         uint256 transferredAmount;
