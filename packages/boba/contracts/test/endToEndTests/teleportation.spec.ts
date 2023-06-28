@@ -35,6 +35,7 @@ const getGasFeeFromLastestBlock = async (provider: any): Promise<BigNumber> => {
 describe('Asset Teleportation Tests', async () => {
   describe('Teleport asset tests', async () => {
     beforeEach(async () => {
+
       await Proxy__Teleportation.addSupportedToken(
         L2Boba.address,
         defaultMinDepositAmount,
@@ -172,7 +173,20 @@ describe('Asset Teleportation Tests', async () => {
             defaultMaxDepositAmount,
             defaultMaxDailyLimit
           )
-        ).to.be.revertedWith('Not a contract or native')
+        ).to.be.revertedWith('Not ERC20 or native')
+      })
+
+      it('should not add supported token if it is not an ERC20 token but a contract address', async () => {
+        await expect(
+          Proxy__Teleportation.addSupportedToken(
+            Proxy__Teleportation.address,
+            defaultMinDepositAmount,
+            defaultMaxDepositAmount,
+            defaultMaxDailyLimit
+          )
+        ).to.be.revertedWith(
+          "Not ERC20 or native"
+        )
       })
 
       it('should not add supported token if it is already added', async () => {

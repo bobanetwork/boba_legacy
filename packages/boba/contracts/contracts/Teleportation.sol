@@ -2,6 +2,7 @@
 pragma solidity 0.8.9;
 
 /* External Imports */
+import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/Address.sol';
@@ -17,6 +18,7 @@ import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
  */
 contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     using Address for address;
+    using ERC165Checker for address;
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -220,7 +222,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     */
     function addSupportedToken(address _token, uint256 _minDepositAmount, uint256 _maxDepositAmount, uint256 _maxTransferAmountPerDay) public onlyOwner() onlyInitialized() {
         require(supportedTokens[_token].supported == false, "Already supported");
-        require(address(0) == _token || Address.isContract(_token), "Not a contract or native");
+        require(address(0) == _token || _token.supportsInterface(type(IERC20).interfaceId), "Not ERC20 or native");
         // doesn't ensure it's ERC20
 
         require(_minDepositAmount > 0 && _minDepositAmount <= _maxDepositAmount, "incorrect min/max deposit");
