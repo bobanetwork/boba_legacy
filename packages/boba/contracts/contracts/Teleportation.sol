@@ -224,7 +224,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         // doesn't ensure it's ERC20
 
         require(_minDepositAmount > 0 && _minDepositAmount <= _maxDepositAmount, "incorrect min/max deposit");
-        // set maximum amount of tokens can be transferred in 24 hours
+        // set maximum amount of tokens that can be transferred in 24 hours
         require(_maxDepositAmount <= _maxTransferAmountPerDay, "max deposit amount more than daily limit");
 
         supportedTokens[_token] = SupportedToken(true, _minDepositAmount, _maxDepositAmount, _maxTransferAmountPerDay, 0, block.timestamp);
