@@ -63,5 +63,5 @@ if [[ $DAEMON == 1 ]]; then
 else
   docker-compose \
     -f "$DIR/$DOCKER_FILE" \
-    up --no-build -V --no-recreate
+    up --no-build -V
 fi
