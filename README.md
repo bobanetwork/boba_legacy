@@ -78,7 +78,20 @@ You'll need the following:
 
 **Note: this is only relevant to developers who wish to work on Boba core services. For most test uses, e.g. deploying your contracts, it's simpler to use https://goerli.boba.network**.
 
-Clone the repository, open it, and install nodejs packages with `yarn`:
+Ensure that you have installed and are using nodejs v16.16.0:
+
+```bash
+$ node --version
+v16.16.0
+```
+
+If you have multiple versions of node installed and use nvm, ensure you are using nodejs v16.16.0
+
+```bash
+$ nvm use
+```
+
+Install nodejs packages with `yarn`:
 
 ```bash
 $ git clone git@github.com:bobanetwork/boba.git
@@ -111,7 +124,7 @@ Spinning up the side services
 
 ```bash
 $ cd ops
-$ docker-compose -f docker-compose.yml -f docker-compose-side yml up bundler aa_deployer
+$ docker-compose -f docker-compose.yml -f docker-compose-side.yml up bundler aa_deployer
 ```
 
 Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialization. Recommended settings in docker - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
