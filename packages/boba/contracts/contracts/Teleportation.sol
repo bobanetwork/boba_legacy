@@ -214,7 +214,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     }
 
     /**
-    * @dev Add support of a specific token on this network.
+    * @dev Add support of a specific ERC20 token on this network.
     *
     * @param _token Token address to support or ZeroAddress for native
     */
