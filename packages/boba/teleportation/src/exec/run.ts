@@ -14,7 +14,6 @@ import { ChainInfo, SupportedAssets } from '../utils/types'
 import { AppDataSource } from '../data-source'
 import { HistoryData } from '../entities/HistoryData.entity'
 import { Init1687802800701 } from '../migrations/1687802800701-00_Init'
-import { getMultiRegionKeyFromAWSKms } from '../utils/kms'
 
 dotenv.config()
 
@@ -41,14 +40,9 @@ const main = async () => {
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   // This private key is used to send funds to the contract and initiate the tx,
   // so it should have enough BOBA balance
-  //const TELEPORTATION_DISBURSER_KEY = config.str('teleportation-disburser-key', env.TELEPORTATION_DISBURSER_KEY)
-  const TELEPORTATION_DISBURSER_KEY_ENC = config.str(
-    'teleportation-disburser-key-enc',
-    env.TELEPORTATION_DISBURSER_KEY_ENC
-  )
-  const TELEPORTATION_DISBURSER_KEY_AWS_ID = config.str(
-    'teleportation-disburser-key-aws-id',
-    env.TELEPORTATION_DISBURSER_KEY_AWS_ID
+  const TELEPORTATION_DISBURSER_KEY = config.str(
+    'teleportation-disburser-key',
+    env.TELEPORTATION_DISBURSER_KEY
   )
 
   // Optional
@@ -64,19 +58,12 @@ const main = async () => {
   if (!L2_NODE_WEB3_URL) {
     throw new Error('Must pass L2_NODE_WEB3_URL')
   }
-  if (!TELEPORTATION_DISBURSER_KEY_ENC || !TELEPORTATION_DISBURSER_KEY_AWS_ID) {
-    throw new Error(
-      'Must pass TELEPORTATION_DISBURSER_KEY_ENC and TELEPORTATION_DISBURSER_KEY_AWS_ID'
-    )
+  if (!TELEPORTATION_DISBURSER_KEY) {
+    throw new Error('Must pass TELEPORTATION_DISBURSER_KEY')
   }
 
-  const teleportationDisburserKey = await getMultiRegionKeyFromAWSKms(
-    TELEPORTATION_DISBURSER_KEY_AWS_ID,
-    TELEPORTATION_DISBURSER_KEY_ENC
-  )
-
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
-  const disburserWallet = new Wallet(teleportationDisburserKey, l2Provider)
+  const disburserWallet = new Wallet(TELEPORTATION_DISBURSER_KEY, l2Provider)
 
   // get all boba chains and exclude the current chain
   const chainId = (await l2Provider.getNetwork()).chainId
