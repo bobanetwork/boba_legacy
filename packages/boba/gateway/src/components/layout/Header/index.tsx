@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setConnect } from 'actions/setupAction'
 import { selectAccountEnabled } from 'selectors'
 import { WalletAddress } from './WalletAddress'
+import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 export const Header: FC<HeaderProps> = () => {
   const dispatch = useDispatch<any>()
@@ -23,6 +24,7 @@ export const Header: FC<HeaderProps> = () => {
       <BobaLogo />
       <Menu />
       <HeaderAction>
+        <LayerSwitcher visisble={false} />
         {accountEnabled ? (
           <WalletAddress />
         ) : (
