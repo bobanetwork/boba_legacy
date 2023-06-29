@@ -1,7 +1,4 @@
-FROM python:3.8-slim
-RUN apt-get update \
-  && apt-get install gcc -y \
-  && apt-get clean
+FROM python:3.11-slim
 RUN pip3 install --no-cache-dir web3==5.31.4
 COPY boba_community/fraud-detector/fraud-detector.py /
 COPY boba_community/fraud-detector/packages/jsonrpclib /jsonrpclib
