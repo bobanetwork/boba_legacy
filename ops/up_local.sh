@@ -49,7 +49,7 @@ if [[ $BUILD == 1 ]]; then
   docker-compose -f $DOCKER_FILE build --parallel -- deployer dtl batch_submitter relayer integration_tests
   docker-compose -f $DOCKER_FILE build --parallel -- boba_message-relayer-fast boba_deployer
   docker-compose -f $DOCKER_FILE build --parallel -- verifier replica
-  docker-compose -f $DOCKER_FILE build  fraud-detector
+  docker-compose -f $DOCKER_FILE build fraud-detector
 
 elif [[ $BUILD == 0 ]]; then
   docker-compose -f "$DIR/$DOCKER_FILE" pull
@@ -63,5 +63,5 @@ if [[ $DAEMON == 1 ]]; then
 else
   docker-compose \
     -f "$DIR/$DOCKER_FILE" \
-    up --no-build -V
+    up --no-build -V --no-recreate
 fi
