@@ -69,7 +69,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.goerli.boba.network',
     testnet: true,
     name: 'Boba Ethereum Goerli',
-    teleportationAddress: '0x97880a36512d3D478552ec24d81978ff631dB106',
+    teleportationAddress: '0x2af1C32E1dE8e041B7E45525A1Ca3C519Fac312F',
     height: 3820,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
@@ -80,7 +80,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.avax.boba.network',
     testnet: true,
     name: 'Boba Avalanche Testnet',
-    teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
+    teleportationAddress: '0x9A57d90E80BE60340f804fd2D0373dd34AB934A2',
     height: 3148,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'AVAX',
@@ -91,7 +91,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bnb.boba.network',
     testnet: true,
     name: 'Boba BNB Testnet',
-    teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
+    teleportationAddress: '0xE3B5FB4CDa3C4c58A804e8856B5eC81D87972512',
     height: 240152,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'BNB',
@@ -102,7 +102,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bobaopera.boba.network',
     testnet: true,
     name: 'Bobaopera Testnet',
-    teleportationAddress: '0x2965Cc3d8Ba6790d6fCCedaC44864f2ff6e01f21',
+    teleportationAddress: '0x6889344Baf6a954e37a368DCE501e70a9E76D150',
     height: 3197,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'FTM',
@@ -128,7 +128,7 @@ export const BobaChains: IBobaChains = {
     url: 'https://goerli.gateway.tenderly.co',
     testnet: true,
     name: 'Goerli Testnet',
-    teleportationAddress: '0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2',
+    teleportationAddress: '0x9A597f96899d9cc7Ba0Bd8a4148d7B7Ed6AA0300',
     height: 9244943,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
