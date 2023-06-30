@@ -39,17 +39,17 @@ Audits outstanding.
 ## Testnet deployments
 
 ### Goerli (L1)
-- Teleportation deployed to: `0x025b2769D3bA7509B1e178811F7d8A06c7D5A907`
-- Proxy__Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
+- Teleportation deployed to: `0x0D42E13a3a7203C281Ca72e90AF992781259197C`
+- Proxy__Teleportation deployed to: `0x9A597f96899d9cc7Ba0Bd8a4148d7B7Ed6AA0300`
 
 ### Boba Goerli
-- Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
-- Proxy__Teleportation deployed to: `0x97880a36512d3D478552ec24d81978ff631dB106`
+- Teleportation deployed to: `0x3Ad2babB5E8E4f7a5cAc75d330655ab6f0FBa14A`
+- Proxy__Teleportation deployed to: `0x2af1C32E1dE8e041B7E45525A1Ca3C519Fac312F`
 
 ### Boba Avax Testnet
-- Teleportation deployed to: `0x025b2769D3bA7509B1e178811F7d8A06c7D5A907`
-- Proxy__Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
+- Teleportation deployed to: `0xB5FFFbB049DA94611b488f0921735b4B07e0BDDE`
+- Proxy__Teleportation deployed to: `0x9A57d90E80BE60340f804fd2D0373dd34AB934A2`
 
 ### Boba BNB Testnet
-- Teleportation deployed to: `0x025b2769D3bA7509B1e178811F7d8A06c7D5A907`
-- Proxy__Teleportation deployed to: `0x71348271f12b98Bbc83c329dcaA424EC6F1F05F2`
+- Teleportation deployed to: `0xf7dE3869B7a0333e6B3a513A37Dc6270041BCC05`
+- Proxy__Teleportation deployed to: `0xE3B5FB4CDa3C4c58A804e8856B5eC81D87972512`
