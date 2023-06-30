@@ -620,6 +620,13 @@ describe('teleportation', () => {
         defaultMaxDepositAmount,
         defaultMaxTransferPerDay
       )
+      await Teleportation.addSupportedToken(
+        L2BOBA.address,
+        chainIdBnb,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
 
       console.log(
         `Teleportation on ETH: ${Teleportation.address} / on BNB: ${TeleportationBNB.address}`
@@ -718,6 +725,8 @@ describe('teleportation', () => {
         ]
       }
 
+      console.log('Added disbursement: ', disbursement)
+
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
 
       const preBOBABalance = await L2BOBA.balanceOf(address1)
@@ -794,6 +803,8 @@ describe('teleportation', () => {
             sourceChainId: sourceChainId.toString(),
           },
         ]
+
+        console.log('Added disbursement native: ', disbursement)
       }
 
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
