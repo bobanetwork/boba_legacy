@@ -28,8 +28,7 @@ import {
 import { OptimismEnv } from './shared/env'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
-// TODO: Remove
-describe.only('teleportation', () => {
+describe('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
@@ -105,6 +104,13 @@ describe.only('teleportation', () => {
     // add the supported chain & token
     await Teleportation.addSupportedToken(
       L2BOBA.address,
+      chainId,
+      defaultMinDepositAmount,
+      defaultMaxDepositAmount,
+      defaultMaxTransferPerDay
+    )
+    await Teleportation.addSupportedToken(
+      ethers.constants.AddressZero,
       chainId,
       defaultMinDepositAmount,
       defaultMaxDepositAmount,
@@ -593,6 +599,13 @@ describe.only('teleportation', () => {
       // add the supported chain & token
       await TeleportationBNB.addSupportedToken(
         L2BobaOnBobaBnb.address,
+        chainId,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
+      await TeleportationBNB.addSupportedToken(
+        ethers.constants.AddressZero,
         chainId,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,

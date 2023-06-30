@@ -109,6 +109,13 @@ describe('teleportation', () => {
       defaultMaxDepositAmount,
       defaultMaxTransferPerDay
     )
+    await Teleportation.addSupportedToken(
+      ethers.constants.AddressZero,
+      chainId,
+      defaultMinDepositAmount,
+      defaultMaxDepositAmount,
+      defaultMaxTransferPerDay
+    )
 
     // build payload
     selectedBobaChains = [
@@ -592,6 +599,13 @@ describe('teleportation', () => {
       // add the supported chain & token
       await TeleportationBNB.addSupportedToken(
         L2BobaOnBobaBnb.address,
+        chainId,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
+      await TeleportationBNB.addSupportedToken(
+        ethers.constants.AddressZero,
         chainId,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,
