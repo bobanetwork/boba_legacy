@@ -58,8 +58,8 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     address public owner;
 
     /// @dev ZeroAddress for native asset
-    mapping(address => SupportedToken) public supportedTokens;
-    mapping(uint256 => bool) public supportedChains;
+    /// {assetAddress} => {targetChainId} => {tokenConfig}
+    mapping(address => mapping(uint256 => SupportedToken)) public supportedTokens;
 
     // The total number of successful deposits received.
     mapping(uint256 => uint256) public totalDeposits;
@@ -76,6 +76,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     event MinDepositAmountSet(
     /* @dev Zero Address = native asset **/
         address token,
+        uint256 toChainId,
         uint256 previousAmount,
         uint256 newAmount
     );
@@ -83,12 +84,14 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     event MaxDepositAmountSet(
     /* @dev Zero Address = native asset **/
         address token,
+        uint256 toChainId,
         uint256 previousAmount,
         uint256 newAmount
     );
 
     event MaxTransferAmountPerDaySet(
         address token,
+        uint256 toChainId,
         uint256 previousAmount,
         uint256 newAmount
     );
@@ -141,13 +144,9 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         address newOwner
     );
 
-    event ChainSupported(
-        uint256 indexed chainId,
-        bool supported
-    );
-
     event TokenSupported(
         address indexed token,
+        uint256 indexed toChainId,
         bool supported
     );
 
@@ -179,22 +178,10 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      * Public Functions *
      ********************/
 
-    /**
-     * @dev Initialize this contract.
-      *
-     * @param _minNativeDepositAmount The initial minimum deposit amount.
-     * @param _maxNativeDepositAmount The initial maximum deposit amount.
-     */
-    function initialize(
-        uint256 _minNativeDepositAmount,
-        uint256 _maxNativeDepositAmount,
-        uint256 _maxTransferAmountPerDay
-    ) external onlyNotInitialized() initializer() {
-
+    /// @dev Initialize this contract
+    function initialize() external onlyNotInitialized() initializer() {
         disburser = msg.sender;
         owner = msg.sender;
-
-        addSupportedToken(address(0), _minNativeDepositAmount, _maxNativeDepositAmount, _maxTransferAmountPerDay);
 
         __Context_init_unchained();
         __Pausable_init_unchained();
@@ -205,24 +192,12 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     }
 
     /**
-     * @dev add the support between this chain and the given chain.
-     *
-     * @param _chainId The target chain Id to support.
-     */
-    function addSupportedChain(uint256 _chainId) external onlyOwner() onlyInitialized() {
-        require(supportedChains[_chainId] == false, "Already supported");
-        supportedChains[_chainId] = true;
-
-        emit ChainSupported(_chainId, true);
-    }
-
-    /**
     * @dev Add support of a specific ERC20 token on this network.
     *
     * @param _token Token address to support or ZeroAddress for native
     */
-    function addSupportedToken(address _token, uint256 _minDepositAmount, uint256 _maxDepositAmount, uint256 _maxTransferAmountPerDay) public onlyOwner() onlyInitialized() {
-        require(supportedTokens[_token].supported == false, "Already supported");
+    function addSupportedToken(address _token, uint256 _toChainId, uint256 _minDepositAmount, uint256 _maxDepositAmount, uint256 _maxTransferAmountPerDay) public onlyOwner() onlyInitialized() {
+        require(supportedTokens[_token][_toChainId].supported == false, "Already supported");
         // Not added ERC165 as implemented for L1 ERC20
         require(address(0) == _token || Address.isContract(_token), "Not contract or native");
         // doesn't ensure it's ERC20
@@ -231,24 +206,12 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         // set maximum amount of tokens that can be transferred in 24 hours
         require(_maxDepositAmount <= _maxTransferAmountPerDay, "max deposit amount more than daily limit");
 
-        supportedTokens[_token] = SupportedToken(true, _minDepositAmount, _maxDepositAmount, _maxTransferAmountPerDay, 0, block.timestamp);
+        supportedTokens[_token][_toChainId] = SupportedToken(true, _minDepositAmount, _maxDepositAmount, _maxTransferAmountPerDay, 0, block.timestamp);
 
-        emit TokenSupported(_token, true);
-        emit MinDepositAmountSet(_token, 0, _minDepositAmount);
-        emit MaxDepositAmountSet(_token, 0, _maxDepositAmount);
-        emit MaxTransferAmountPerDaySet(_token, 0, _maxTransferAmountPerDay);
-    }
-
-    /**
-     * @dev remove the support between this chain and the given chain.
-     *
-     * @param _chainId The target chain Id not to support.
-     */
-    function removeSupportedChain(uint256 _chainId) external onlyOwner() onlyInitialized() {
-        require(supportedChains[_chainId] == true, "Already not supported");
-        supportedChains[_chainId] = false;
-
-        emit ChainSupported(_chainId, false);
+        emit TokenSupported(_token, _toChainId, true);
+        emit MinDepositAmountSet(_token, _toChainId, 0, _minDepositAmount);
+        emit MaxDepositAmountSet(_token, _toChainId, 0, _maxDepositAmount);
+        emit MaxTransferAmountPerDaySet(_token, _toChainId, 0, _maxTransferAmountPerDay);
     }
 
     /**
@@ -256,15 +219,15 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      *
      * @param _token The token not to support.
      */
-    function removeSupportedToken(address _token) external onlyOwner() onlyInitialized() {
-        require(supportedTokens[_token].supported == true, "Already not supported");
-        delete supportedTokens[_token].supported;
-        delete supportedTokens[_token].minDepositAmount;
-        delete supportedTokens[_token].maxDepositAmount;
-        delete supportedTokens[_token].maxTransferAmountPerDay;
+    function removeSupportedToken(address _token, uint256 _toChainId) external onlyOwner() onlyInitialized() {
+        require(supportedTokens[_token][_toChainId].supported == true, "Already not supported");
+        delete supportedTokens[_token][_toChainId].supported;
+        delete supportedTokens[_token][_toChainId].minDepositAmount;
+        delete supportedTokens[_token][_toChainId].maxDepositAmount;
+        delete supportedTokens[_token][_toChainId].maxTransferAmountPerDay;
         // we might want to keep transferredAmount & lastTimestamp in case it is being added (shortly) after again
 
-        emit TokenSupported(_token, false);
+        emit TokenSupported(_token, _toChainId, false);
     }
 
     /**
@@ -282,13 +245,12 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     payable
     whenNotPaused()
     {
-        SupportedToken memory supToken = supportedTokens[_token];
-        require(supToken.supported == true, "Token not supported");
+        SupportedToken memory supToken = supportedTokens[_token][_toChainId];
+        require(supToken.supported == true, "Token or chain not supported");
         require(_amount >= supToken.minDepositAmount, "Deposit amount too small");
         require(_amount <= supToken.maxDepositAmount, "Deposit amount too big");
-        require(supportedChains[_toChainId], "Target chain not supported");
         // minimal workaround to keep logic concise
-        require(address(0) != _token || _amount == msg.value, "Native amount invalid");
+        require(address(0) != _token || (address(0) == _token && _amount == msg.value), "Native amount invalid");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
@@ -301,7 +263,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
             supToken.transferTimestampCheckPoint = block.timestamp;
         }
 
-        supportedTokens[_token] = supToken;
+        supportedTokens[_token][_toChainId] = supToken;
         if (_token != address(0)) {
             IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
         }
@@ -330,7 +292,6 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         uint256 _numDisbursements = _disbursements.length;
         require(_numDisbursements > 0, "No disbursements");
 
-
         // Process disbursements.
         uint remainingValue = msg.value;
         for (uint256 i = 0; i < _numDisbursements; i++) {
@@ -341,11 +302,11 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
             uint256 _depositId = _disbursements[i].depositId;
             address _token = _disbursements[i].token;
 
-            require(supportedTokens[_token].supported, "Token not supported");
+            // Bidirectional support expected
+            require(supportedTokens[_token][_sourceChainId].supported, "Token or chain not supported");
 
             // Ensure the depositId matches our expected value.
             require(_depositId == totalDisbursements[_sourceChainId], "Unexpected next deposit id");
-            require(supportedChains[_sourceChainId], "Source chain not supported");
             totalDisbursements[_sourceChainId] += 1;
 
             // ensure amount sent in the tx is equal to disbursement (moved into loop to ensure token flexibility)
@@ -482,39 +443,39 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         emit OwnershipTransferred(_newOwner);
     }
 
-
     /**
      * @notice Sets the minimum amount that can be deposited in a receive.
      *
      * @param _token configure for which token or ZeroAddress for native
      * @param _minDepositAmount The new minimum deposit amount.
      */
-    function setMinAmount(address _token, uint256 _minDepositAmount) external onlyOwner() {
-        SupportedToken memory supToken = supportedTokens[_token];
-        require(supToken.supported, "Token not supported");
+    function setMinAmount(address _token, uint256 _toChainId, uint256 _minDepositAmount) external onlyOwner() {
+        SupportedToken memory supToken = supportedTokens[_token][_toChainId];
+        require(supToken.supported, "Token or chain not supported");
         require(_minDepositAmount > 0 && _minDepositAmount <= supToken.maxDepositAmount, "incorrect min deposit amount");
 
         uint256 pastMinDepositAmount = supToken.minDepositAmount;
-        supportedTokens[_token].minDepositAmount = _minDepositAmount;
+        supportedTokens[_token][_toChainId].minDepositAmount = _minDepositAmount;
 
-        emit MinDepositAmountSet(_token, pastMinDepositAmount, _minDepositAmount);
+        emit MinDepositAmountSet(_token, _toChainId, pastMinDepositAmount, _minDepositAmount);
     }
 
     /**
      * @dev Sets the maximum amount that can be deposited in a receive.
      *
      * @param _token configure for which token or ZeroAddr for native asset
+     * @param _toChainId target chain id to set configuration for
      * @param _maxDepositAmount The new maximum deposit amount.
      */
-    function setMaxAmount(address _token, uint256 _maxDepositAmount) external onlyOwner() {
-        SupportedToken memory supToken = supportedTokens[_token];
-        require(supToken.supported, "Token not supported");
+    function setMaxAmount(address _token, uint256 _toChainId, uint256 _maxDepositAmount) external onlyOwner() {
+        SupportedToken memory supToken = supportedTokens[_token][_toChainId];
+        require(supToken.supported, "Token or chain not supported");
         require(_maxDepositAmount <= supToken.maxTransferAmountPerDay, "max deposit amount more than daily limit");
         require(_maxDepositAmount > 0 && _maxDepositAmount >= supToken.minDepositAmount, "incorrect max deposit amount");
         uint256 pastMaxDepositAmount = supToken.maxDepositAmount;
 
-        supportedTokens[_token].maxDepositAmount = _maxDepositAmount;
-        emit MaxDepositAmountSet(_token, pastMaxDepositAmount, _maxDepositAmount);
+        supportedTokens[_token][_toChainId].maxDepositAmount = _maxDepositAmount;
+        emit MaxDepositAmountSet(_token, _toChainId, pastMaxDepositAmount, _maxDepositAmount);
     }
 
     /**
@@ -523,15 +484,15 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      * @param _token Token or native asset (ZeroAddr) to set value for
      * @param _maxTransferAmountPerDay The new maximum daily transfer amount.
      */
-    function setMaxTransferAmountPerDay(address _token, uint256 _maxTransferAmountPerDay) external onlyOwner() {
+    function setMaxTransferAmountPerDay(address _token, uint256 _toChainId, uint256 _maxTransferAmountPerDay) external onlyOwner() {
 
-        SupportedToken memory supToken = supportedTokens[_token];
-        require(supToken.supported, "Token not supported");
+        SupportedToken memory supToken = supportedTokens[_token][_toChainId];
+        require(supToken.supported, "Token or chain not supported");
         require(_maxTransferAmountPerDay > 0 && _maxTransferAmountPerDay >= supToken.maxDepositAmount, "incorrect daily limit");
         uint256 pastMaxTransferAmountPerDay = supToken.maxTransferAmountPerDay;
 
-        supportedTokens[_token].maxTransferAmountPerDay = _maxTransferAmountPerDay;
+        supportedTokens[_token][_toChainId].maxTransferAmountPerDay = _maxTransferAmountPerDay;
 
-        emit MaxTransferAmountPerDaySet(_token, pastMaxTransferAmountPerDay, _maxTransferAmountPerDay);
+        emit MaxTransferAmountPerDaySet(_token, _toChainId, pastMaxTransferAmountPerDay, _maxTransferAmountPerDay);
     }
 }
