@@ -96,7 +96,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     for (const chain of this.options.selectedBobaChains) {
       const chainId = chain.chainId
       // assuming BOBA is enabled on supported networks to retain battle-tested logic
-      const bobaTokenContract = Object.keys(chain.supportedAssets).find(k => chain.supportedAssets[k] === "BOBA")
+      const bobaTokenContract = Object.keys(chain.supportedAssets).find(
+        (k) => chain.supportedAssets[k] === 'BOBA'
+      )
       const isSupported = await this.state.Teleportation.supportedTokens(
         bobaTokenContract,
         chainId
