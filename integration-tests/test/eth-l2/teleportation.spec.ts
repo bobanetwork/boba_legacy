@@ -28,7 +28,8 @@ import {
 import { OptimismEnv } from './shared/env'
 import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
-describe('teleportation', () => {
+// TODO: Remove
+describe.only('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
@@ -100,14 +101,11 @@ describe('teleportation', () => {
     await L2BOBA.transfer(address1, utils.parseEther('100000000'))
 
     // intialize the teleportation contract
-    await Teleportation.initialize(
-      defaultMinDepositAmount,
-      defaultMaxDepositAmount
-    )
+    await Teleportation.initialize()
     // add the supported chain & token
-    await Teleportation.addSupportedChain(chainId)
     await Teleportation.addSupportedToken(
       L2BOBA.address,
+      chainId,
       defaultMinDepositAmount,
       defaultMaxDepositAmount,
       defaultMaxTransferPerDay
@@ -590,24 +588,21 @@ describe('teleportation', () => {
       await L2BNBOnBobaEth.transfer(address1, utils.parseEther('100000000'))
 
       // intialize the teleportation contract
-      await TeleportationBNB.initialize(
-        defaultMinDepositAmount,
-        defaultMaxDepositAmount
-      )
+      await TeleportationBNB.initialize()
 
       // add the supported chain & token
-      await TeleportationBNB.addSupportedChain(chainId)
       await TeleportationBNB.addSupportedToken(
         L2BobaOnBobaBnb.address,
+        chainId,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,
         defaultMaxTransferPerDay
       )
 
       // add support on previous network
-      await Teleportation.addSupportedChain(chainIdBnb)
       await Teleportation.addSupportedToken(
         L2BNBOnBobaEth.address,
+        chainIdBnb,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,
         defaultMaxTransferPerDay

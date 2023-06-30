@@ -95,7 +95,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     this.state.depositTeleportations = []
     for (const chain of this.options.selectedBobaChains) {
       const chainId = chain.chainId
-      const isSupported = await this.state.Teleportation.supportedChains(
+      // assuming BOBA is enabled on supported networks to retain battle-tested logic
+      const bobaTokenContract = Object.keys(chain.supportedAssets).find(k => chain.supportedAssets[k] === "BOBA")
+      const isSupported = await this.state.Teleportation.supportedTokens(
+        bobaTokenContract,
         chainId
       )
       if (!isSupported) {
@@ -219,7 +222,8 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
             const [isTokenSupported, , , , ,] =
               await this.state.Teleportation.supportedTokens(
-                sourceChainTokenAddr
+                sourceChainTokenAddr,
+                sourceChainId
               )
             if (!isTokenSupported) {
               throw new Error(
