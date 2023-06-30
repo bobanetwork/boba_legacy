@@ -54,7 +54,6 @@ await L2StandardERC721.deployTransaction.wait()
 **NOTE: Once you have your L1StandardERC721 address, please contact us so we can register that address in the L1 and L2 NFT bridges.**
 
 ## How to bridge NFTs
-
 ### CASE 1 - Native L1 NFT - Bridge NFTs from Ethereum to Boba
 
 First, users transfer their NFT to the L1 NFT Bridge, starting with an approval.
