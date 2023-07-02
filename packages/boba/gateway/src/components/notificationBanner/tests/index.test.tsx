@@ -7,7 +7,16 @@ import configureStore from 'redux-mock-store'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import { BannerConfig } from '../bannerConfig'
 
-const data = BannerConfig[NETWORK.FANTOM]
+jest.mock('../bannerConfig', () => ({
+  BannerConfig: {
+    ETHEREUM: {
+      message: `Alert message goes here`,
+      content: `Alert descriptive message goes here`,
+    },
+  },
+}))
+
+const data = BannerConfig[NETWORK.ETHEREUM]
 
 const mockStore = configureStore()
 
@@ -19,7 +28,7 @@ const renderBanner = (props: any) => {
           theme: 'dark',
         },
         network: {
-          activeNetwork: NETWORK.FANTOM,
+          activeNetwork: NETWORK.ETHEREUM,
           activeNetworkType: NETWORK_TYPE.MAINNET,
         },
       })}
