@@ -3,33 +3,27 @@ import { providers } from 'ethers';
 import EthereumIcon from 'components/icons/chain/L1/EthereumIcon';
 import BNBIcon from 'components/icons/chain/L1/BNBIcon';
 import AvalancheIcon from 'components/icons/chain/L1/AvalancheIcon';
-import FantomIcon from 'components/icons/chain/L1/FantomIcon';
 
 import BobaIcon from 'components/icons/chain/L2/BobaIcon';
 import BobaBNBIcon from 'components/icons/chain/L2/BobaBNBIcon';
 import BobaAvaxIcon from 'components/icons/chain/L2/BobaAvaxIcon';
-import BobaFantomIcon from 'components/icons/chain/L2/BobaFantomIcon';
 
 import { ethereumConfig } from './config/ethereum';
 import { bnbConfig } from './config/bnb';
-import { fantomConfig } from './config/fantom';
 import { avaxConfig } from './config/avax';
 import { LAYER } from 'util/constant';
 
 export const L1_ICONS = {
   ethereum: EthereumIcon,
   bnb: BNBIcon,
-  avax: AvalancheIcon,
-  fantom: FantomIcon
+  avax: AvalancheIcon
 }
 
 export const L2_ICONS = {
   ethereum: BobaIcon,
   bnb: BobaBNBIcon,
-  avax: BobaAvaxIcon,
-  fantom: BobaFantomIcon
+  avax: BobaAvaxIcon
 }
-
 
 export const NETWORK_TYPE = {
   MAINNET: 'Mainnet',
@@ -39,7 +33,6 @@ export const NETWORK_TYPE = {
 export const NETWORK = {
   ETHEREUM: 'ETHEREUM',
   BNB: 'BNB',
-  FANTOM: 'FANTOM',
   AVAX: 'AVAX'
 }
 
@@ -104,26 +97,6 @@ export const CHAIN_ID_LIST = {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.BNB,
     layer: LAYER.L2
-  },
-  4002: {
-    networkType: NETWORK_TYPE.TESTNET,
-    chain: NETWORK.FANTOM,
-    layer: LAYER.L1
-  },
-  4051: {
-    networkType: NETWORK_TYPE.TESTNET,
-    chain: NETWORK.FANTOM,
-    layer: LAYER.L2
-  },
-  250: {
-    networkType: NETWORK_TYPE.MAINNET,
-    chain: NETWORK.FANTOM,
-    layer: LAYER.L1
-  },
-  301: {
-    networkType: NETWORK_TYPE.MAINNET,
-    chain: NETWORK.FANTOM,
-    layer: LAYER.L2
   }
 }
 
@@ -158,16 +131,6 @@ export const NetworkList = {
         l1: 'Avalanche Mainnet C-Chain',
         l2: 'Boba Avalanche'
       }
-    },
-    {
-      icon: 'fantom',
-      chain: NETWORK.FANTOM,
-      label: 'Fantom <> Boba',
-      key: 'fantom',
-      name: {
-        l1: 'Fantom',
-        l2: 'Bobaopera'
-      }
     }
   ],
   Testnet: [
@@ -200,16 +163,6 @@ export const NetworkList = {
         l1: 'Fuji Testnet',
         l2: 'Boba Fuji Testnet',
       }
-    },
-    {
-      icon: 'fantom',
-      chain: NETWORK.FANTOM,
-      label: 'Opera (Testnet) <> Boba',
-      key: 'fantom',
-      name: {
-        l1: 'Fantom Testnet',
-        l2: 'Bobaopera Testnet',
-      }
     }
   ]
 }
@@ -217,7 +170,6 @@ export const NetworkList = {
 const networkConfig = {
   [NETWORK.ETHEREUM] : ethereumConfig,
   [NETWORK.BNB] : bnbConfig,
-  [NETWORK.FANTOM] : fantomConfig,
   [NETWORK.AVAX] : avaxConfig
 }
 

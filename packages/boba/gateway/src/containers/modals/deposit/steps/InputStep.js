@@ -18,7 +18,6 @@ import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
-import BridgeAlert from './BridgeAlert'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 

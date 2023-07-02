@@ -63,8 +63,6 @@ import {
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
 
-import BridgeAlert from './BridgeAlert'
-
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const dispatch = useDispatch()
