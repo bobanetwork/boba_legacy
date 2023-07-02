@@ -6,11 +6,14 @@ import ThemeSwitcher from './ThemeSwitcher'
 import Menu from './Menu'
 import { useDispatch, useSelector } from 'react-redux'
 import { setConnect } from 'actions/setupAction'
-import { selectAccountEnabled } from 'selectors'
+import { selectAccountEnabled, selectLayer } from 'selectors'
 import { WalletAddress } from './WalletAddress'
+import { FeeSwitcher } from 'components/mainMenu'
+import { LAYER } from 'util/constant'
 
 export const Header: FC<HeaderProps> = () => {
   const dispatch = useDispatch<any>()
+  const layer = useSelector<any>(selectLayer())
   const accountEnabled = useSelector<any>(selectAccountEnabled())
 
   const onConnect = () => {
@@ -23,7 +26,10 @@ export const Header: FC<HeaderProps> = () => {
       <Menu />
       <HeaderAction>
         {accountEnabled ? (
-          <WalletAddress />
+          <>
+            {layer === LAYER.L2 ? <FeeSwitcher /> : null}
+            <WalletAddress />
+          </>
         ) : (
           <Button onClick={onConnect} small label="Connect Wallet" />
         )}
