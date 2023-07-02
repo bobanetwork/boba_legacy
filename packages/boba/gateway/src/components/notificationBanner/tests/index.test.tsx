@@ -7,7 +7,16 @@ import configureStore from 'redux-mock-store'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import { BannerConfig } from '../bannerConfig'
 
-const data = BannerConfig[NETWORK.FANTOM]
+jest.mock('../bannerConfig', () => ({
+  BannerConfig: {
+    FANTOM: {
+      message: `BobaOpera is being wound down & will no longer be available, starting June 25th`,
+      content: `BobaOpera is being wound down & will no longer be available starting June 25th. For users of BobaOpera or BobaOpera applications you will need to transfer all your funds to Fantom mainnet before June 15th or risk permanently losing access to any assets on BobaOpera.`,
+    },
+  },
+}))
+
+const data = BannerConfig[NETWORK.FANTOM] || {}
 
 const mockStore = configureStore()
 

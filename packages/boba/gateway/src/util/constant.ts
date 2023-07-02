@@ -28,8 +28,6 @@ export const DISABLE_VE_DAO: EnvType = process.env.REACT_APP_DISABLE_VE_DAO
 // WalletConnect FLAG
 export const DISABLE_WALLETCONNECT: EnvType =
   process.env.REACT_APP_DISABLE_WALLETCONNECT
-export const BOBAOPERA_STATUS: EnvType =
-  process.env.REACT_APP_BOBA_OPERA_STATUS || 0
 
 type BridgeType = {
   FAST_BRIDGE: string
@@ -113,7 +111,7 @@ export const ROUTES_PATH: RoutesPathType = {
 
 export const PER_PAGE: number = 8
 
-type Network = 'ethereum' | 'bnb' | 'avax' | 'fantom' //we move this to global network type once we define this
+type Network = 'ethereum' | 'bnb' | 'avax' //we move this to global network type once we define this
 type Page =
   | 'Bridge'
   | 'Ecosystem'
@@ -138,7 +136,6 @@ export const PAGES_BY_NETWORK: PagesByNetworkType = {
   ],
   bnb: ['Bridge', 'Wallet', 'Earn', 'History'],
   avax: ['Bridge', 'Wallet', 'Earn', 'History'],
-  fantom: ['Bridge', 'Wallet', 'Earn', 'History'],
 }
 
 enum Layer {
