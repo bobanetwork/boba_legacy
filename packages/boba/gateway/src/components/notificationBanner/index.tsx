@@ -61,6 +61,10 @@ interface NotificationBannerProps {
   children?: ReactNode
 }
 
+/**
+ * Notification banner is sticky banner at the top of the gateway.
+ */
+
 // @component
 const NotificationBanner: React.FC<NotificationBannerProps> = ({
   children,

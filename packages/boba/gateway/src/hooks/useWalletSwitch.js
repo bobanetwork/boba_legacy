@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { openModal } from 'actions/uiAction';
 import { setConnect, setConnectBOBA, setConnectETH } from 'actions/setupAction';
-import { 
-  selectActiveNetwork, 
-  selectActiveNetworkType, 
-  selectNetwork, 
+import {
+  selectActiveNetwork,
+  selectActiveNetworkType,
+  selectNetwork,
   selectNetworkType,
   selectBaseEnabled,
   selectLayer
@@ -26,6 +26,7 @@ const useWalletSwitch = () => {
   const [ reconnect, setReconnect ] = useState(false);
 
   useEffect(() => {
+    console.log(`reconnect =${reconnect}`)
     if (!!reconnect && !!baseEnabled) {
 
       if (layer === LAYER.L1) {
@@ -42,6 +43,7 @@ const useWalletSwitch = () => {
 
   useEffect(() => {
     if (activeNetwork !== network || activeNetworkType !== networkType) {
+      console.low('switch network modal')
       dispatch(openModal('switchNetworkModal'))
     }
   }, [activeNetwork, activeNetworkType, network, networkType, dispatch])
