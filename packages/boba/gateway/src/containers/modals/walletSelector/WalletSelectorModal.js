@@ -14,8 +14,11 @@ import networkService from 'services/networkService'
 
 import metaMaskLogo from 'images/metamask.svg'
 import walletConnectLogo from 'images/walletconnect.svg'
+import { useWalletConnect } from 'hooks/useWalletConnect'
 
 function WalletSelectorModal ({ open }) {
+
+  const { triggerInit } = useWalletConnect()
 
   const dispatch = useDispatch()
 
@@ -28,7 +31,7 @@ function WalletSelectorModal ({ open }) {
     try {
       if (await networkService.walletService.connectWallet(type)) {
         dispatch(closeModal('walletSelectorModal'))
-        dispatch(setWalletConnected(true))
+        triggerInit();
       } else {
         resetConnectChain()
       }
