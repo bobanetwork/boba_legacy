@@ -54,17 +54,6 @@ export const BobaChains: IBobaChains = {
       '0x4200000000000000000000000000000000000006': 'BOBA',
     },
   },
-  301: {
-    url: 'https://replica.bobaopera.boba.network',
-    testnet: false,
-    name: 'Bobaopera',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
-    height: 10604,
-    supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'FTM',
-      '0x4200000000000000000000000000000000000006': 'BOBA',
-    },
-  },
   2888: {
     url: 'https://replica.goerli.boba.network',
     testnet: true,
@@ -95,17 +84,6 @@ export const BobaChains: IBobaChains = {
     height: 240152,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'BNB',
-      '0x0000000000000000000000000000000000000000': 'BOBA',
-    },
-  },
-  4051: {
-    url: 'https://replica.testnet.bobaopera.boba.network',
-    testnet: true,
-    name: 'Bobaopera Testnet',
-    teleportationAddress: '0x6889344Baf6a954e37a368DCE501e70a9E76D150',
-    height: 3197,
-    supportedAssets: {
-      '0x4200000000000000000000000000000000000023': 'FTM',
       '0x0000000000000000000000000000000000000000': 'BOBA',
     },
   },
