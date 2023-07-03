@@ -99,9 +99,9 @@ For **secondary addresses**, such as L2 Tokens and Messengers, please see the [B
 |               |                                                                                  |
 | ------------- | -------------------------------------------------------------------------------- |
 | ChainID       | 56288                                                                            |
-| RPC           | [https://bnb.boba.network](https://bnb.boba.network)                             |
-| Replica RPC   | [https://replica.bnb.boba.network](https://replica.bnb.boba.network)             |
-| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)                     |
+| RPC           | [https://bnb.boba.network](https://bnb.boba.network)
+<br/><br/>We have partnered with Tenderly (ip-based rate limiting, subscribe to Tenderly if you need more): <br/>[http://boba-bnb.gateway.tenderly.co](http://boba-bnb.gateway.tenderly.co)<br/>[http://gateway.tenderly.co/public/boba-bnb](http://gateway.tenderly.co/public/boba-bnb) |
+| Gateway            | [https://gateway.boba.network](https://gateway.boba.network)
 | Blockexplorer | [https://blockexplorer.bnb.boba.network](https://blockexplorer.bnb.boba.network) |
-| Websocket     | [wss://wss.bnb.boba.network](wss://wss.bnb.boba.network)                         |
+| Websocket          | [wss://boba-bnb.gateway.tenderly.co](wss://boba-bnb.gateway.tenderly.co)<br/>[wss://gateway.tenderly.co/public/boba-bnb](wss://gateway.tenderly.co/public/boba-bnb)                                                                                         |
 | Gas Cap       | 50000000                                                                         |

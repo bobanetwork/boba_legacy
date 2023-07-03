@@ -23,6 +23,7 @@ For **account abstraction** contract addresses, please refer the list [here](htt
 | Gateway        | [https://gateway.boba.network](https://gateway.boba.network) |
 | Blockexplorer  | [https://testnet.bobascan.com](https://testnet.bobascan.com)             |
 | Websocket      | [wss://wss.goerli.boba.network](wss://wss.goerli.boba.network)           |
+| Bundler        | [https://bundler.goerli.boba.network](https://bundler.goerli.boba.network)|
 | Gas Cap        | 50000000                                                                 |
 
 
