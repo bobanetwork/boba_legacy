@@ -11,9 +11,10 @@ import '@openzeppelin/contracts/utils/Address.sol';
 /**
  * @title Teleportation
  *
- * Shout out to optimisim for providing the inspiration for this contract:
- * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L1/teleportr/TeleportrDeposit.sol
- * https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/L2/teleportr/TeleportrDisburser.sol
+ * Bridge the native asset or whitelisted ERC20 tokens between whitelisted networks (L2's/L1's). 
+ * 
+ * @notice The contract itself emits events and locks the funds to be bridged/teleported. These events are then picked up by a backend service that releases the corresponding token or native asset on the destination network. Withdrawal periods (e.g. for optimistic rollups) are not handled by the contract itself, but would be handled on the Teleportation service if deemed necessary.
+ * @dev Implementation of the Teleportation service can be found at https://github.com/bobanetwork/boba within /packages/boba/teleportation if not moved.
  */
 contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     using Address for address;
@@ -54,19 +55,23 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      * Variables *
      *************/
 
+    /// @dev Wallet that is being used to release teleported assets on the destination network. 
     address public disburser;
+
+    /// @dev General owner wallet to change configurations.
     address public owner;
 
-    /// @dev ZeroAddress for native asset
+    /// @dev Assets and networks to be supported. ZeroAddress for native asset
     /// {assetAddress} => {targetChainId} => {tokenConfig}
     mapping(address => mapping(uint256 => SupportedToken)) public supportedTokens;
 
-    // The total number of successful deposits received.
+    /// @dev The total number of successful deposits received.
     mapping(uint256 => uint256) public totalDeposits;
-    /// The total number of disbursements processed.
+
+    /// @dev The total number of disbursements processed.
     mapping(uint256 => uint256) public totalDisbursements;
 
-    // depositId to failed status and disbursement info
+    // @dev depositId to failed status and disbursement info
     mapping(uint256 => FailedNativeDisbursement) public failedNativeDisbursements;
 
     /********************
