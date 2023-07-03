@@ -63,7 +63,6 @@ const amountToUseConfig = {
   'OMG': { provider: 'omisego' },
   'USDC': { provider: 'usd-coin' },
   'AVAX': { provider: 'avalanche-2' },
-  'FTM': { provider: 'fantom' },
   'BNB': { provider: 'binancecoin' },
   'tBNB': { provider: 'binancecoin' }
 }

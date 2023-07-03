@@ -137,8 +137,6 @@ function TokenPage({
         return 'usd-coin'
       } else if (i.symbolL1 === 'AVAX') {
         return 'avalanche-2'
-      } else if (i.symbolL1 === 'FTM') {
-        return 'fantom'
       } else if (['BNB', 'tBNB'].includes(i.symbolL1)) {
         return 'binancecoin'
       } else {
