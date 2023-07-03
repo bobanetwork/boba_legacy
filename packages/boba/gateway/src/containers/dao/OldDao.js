@@ -72,15 +72,18 @@ const OldDao = () => {
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
 
-  const [ selectedState, setSelectedState ] = useState(PROPOSAL_STATES[ 0 ])
+  const [selectedState, setSelectedState] = useState(PROPOSAL_STATES[0])
 
   const handleNewProposal = () => {
-    //remove if for testing. 
-    /*if (Number(votes + votesX) < Number(proposalThreshold)) {
-      dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
-    } else {*/
+    if (Number(votes + votesX) < Number(proposalThreshold)) {
+      dispatch(
+        openError(
+          `Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`
+        )
+      )
+    } else {
       dispatch(openModal('newProposalModal'))
-    /*}*/
+    }
   }
 
   return (
