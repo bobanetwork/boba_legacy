@@ -67,7 +67,6 @@ import ExitModal from 'containers/modals/exit/ExitModal'
 import EarnDepositModal from 'containers/modals/earn/EarnDepositModal'
 import EarnWithdrawModal from 'containers/modals/earn/EarnWithdrawModal'
 import DelegateDaoModal from 'containers/modals/dao/DelegateDaoModal'
-import DelegateDaoXModal from 'containers/modals/dao/DelegateDaoXModal'
 import NewProposalModal from 'containers/modals/dao/old/NewProposalModalOldDao'
 import CastVoteModal from 'containers/modals/dao/CastVoteModal'
 import TokenPickerModal from 'containers/modals/tokenPicker/TokenPickerModal'
@@ -136,7 +135,6 @@ function Home() {
   const EarnWithdrawModalState = useSelector(selectModalState('EarnWithdrawModal'))
 
   const delegateBobaDaoModalState = useSelector(selectModalState('delegateDaoModal'))
-  const delegateBobaDaoXModalState = useSelector(selectModalState('delegateDaoXModal'))
   const proposalBobaDaoModalState = useSelector(selectModalState('newProposalModal'))
   const castVoteModalState = useSelector(selectModalState('castVoteModal'))
 
@@ -244,7 +242,6 @@ function Home() {
       {!!EarnWithdrawModalState && <EarnWithdrawModal open={EarnWithdrawModalState} />}
 
       {!!delegateBobaDaoModalState && <DelegateDaoModal open={delegateBobaDaoModalState} />}
-      {!!delegateBobaDaoXModalState && <DelegateDaoXModal open={delegateBobaDaoXModalState} />}
       {!!proposalBobaDaoModalState && <NewProposalModal open={proposalBobaDaoModalState} />}
       {!!castVoteModalState && <CastVoteModal open={castVoteModalState} proposalId={proposalId} />}
       {!!tokenPickerModalState && <TokenPickerModal tokenIndex={tokenIndex} open={tokenPickerModalState} />}
@@ -336,8 +333,8 @@ function Home() {
           flexDirection: 'column',
           width: '100%'
         }}>
-          {/* <PageHeader /> */}
-          <Header />
+          <PageHeader />
+          {/*<Header />*/}
           <PageTitle />
           <Container maxWidth={false} sx={{
             minHeight: 'calc(100vh - 200px)',

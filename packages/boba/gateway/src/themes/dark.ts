@@ -22,9 +22,11 @@ const dark = {
     warning: 'yellow',
     box: {
       background:
-        'linear-gradient(151.67deg, rgba(48, 48, 48, 0.7) 7.91%, rgba(48, 48, 48, 0.7) 45.81%, rgba(37, 37, 37, 0.7) 85.18%),linear-gradient(0deg, #545454, #545454)',
-      border: '#545454',
+        'linear-gradient(129deg, rgba(48, 48, 48, 0.60) 0%, rgba(48, 48, 48, 0.60) 46.35%, rgba(37, 37, 37, 0.60) 94.51%)',
+      border: 'rgba(84, 84, 84, 1)',
     },
+    popup:
+      'linear-gradient(129deg, rgba(48, 48, 48, 0.70) 0%, rgba(48, 48, 48, 0.70) 46.35%, rgba(37, 37, 37, 0.70) 94.51%)',
     gray: {
       50: '#EEEEEE',
       100: '#A8A8A8',

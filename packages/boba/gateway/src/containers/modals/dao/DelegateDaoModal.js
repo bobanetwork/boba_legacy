@@ -16,135 +16,175 @@ limitations under the License. */
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Box, Typography} from '@mui/material'
 
 import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
-import Button from 'components/button/Button'
 
-import { delegateVotes } from 'actions/daoAction'
+import { delegateVotes, delegateVotesX } from 'actions/daoAction'
 
 import networkService from 'services/networkService'
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
-import * as S from './daoModal.styles'
+import { Button } from 'components/global/button'
+import { Dropdown } from 'components/global/dropdown'
+import { Typography } from 'components/global/typography'
+import { getCoinImage } from 'util/coinImage'
+import { TabComponent } from 'components/global/tabs';
+import { ButtonContainer } from './styles';
 
-function DelegateDaoModal({ open }) {
+const DelegateDaoModal = ({ open }) => {
+  const [recipient, setRecipient] = useState('')
+  const [selectedToken, setSelectedToken] = useState(null);
+  const dispatch = useDispatch()
 
-    const [recipient, setRecipient] = useState('');
-    const dispatch = useDispatch()
+  const disabled = !recipient;
+  const loading = false //ToDo useSelector(selectLoading([ 'DELEGATE_DAO/CREATE' ]))
+  const wAddress = networkService.account ? networkService.account : ''
 
-    const disabled = !recipient;
+  const handleClose = () => {
+    setRecipient('')
+    dispatch(closeModal('delegateDaoModal'))
+  }
 
-    const loading = false //ToDo useSelector(selectLoading([ 'DELEGATE_DAO/CREATE' ]))
-
-    const wAddress = networkService.account ? networkService.account : ''
-
-    function handleClose() {
-        setRecipient('')
-        dispatch(closeModal('delegateDaoModal'))
-    }
-
-    const submit = async () => {
-        let res = await dispatch(delegateVotes({ recipient }));
-        if (res) dispatch(openAlert(`Votes delegated successfully!`))
-        handleClose()
-    }
-
-    const submitMe = async () => {
-        let res = await dispatch(delegateVotes({ recipient: wAddress }))
-        if (res) dispatch(openAlert(`Vote self-delegation successfull!`))
-        handleClose()
-    }
-
-    return (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            maxWidth="sm"
-        >
-            <Box sx={{mb: 2}}>
-            <Box sx={{mb: 2,display: 'flex', alignItems: 'center'}}>
-                <BobaGlassIcon />
-                <Typography variant="body1" >
-                    Delegate my BOBA votes
-                </Typography>
-            </Box>
-            <S.DividerLine />
-            </Box>
-            <Box sx={{display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                <Typography variant="h3" sx={{mb: 1}}>
-                    To me
-                </Typography>
-                <Typography variant="body3" component="p"
-                    style={{ opacity: 0.65}}>
-                    My address:
-                </Typography>
-                <Typography variant="body3" component="p"
-                      style={{fontSize: '13px', mb:2}}
-                    >
-                      {wAddress}
-                </Typography>
-                <Button
-                    sx={{mb: 2}}
-                    onClick={()=>{submitMe()}}
-                    color='primary'
-                    variant="outlined"
-                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power to yourself"}
-                    loading={loading}
-                    triggerTime={new Date()}
-                    fullWidth={true}
-                    size="large"
-                >
-                    Delegate to me
-                </Button>
-            </Box>
-            <Box sx={{
-                display: 'flex', justifyContent: 'space-around',
-                overflow: 'hidden',
-                gap: '10px',
-                alignItems: 'center'
-            }}>
-                <S.DividerLine />
-                <Typography variant="body3" >OR</Typography>
-                <S.DividerLine />
-            </Box>
-            <Box
-                sx={{
-                    gap: '10px',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}
-            >
-                <Typography variant="h3" sx={{mb: 1}}>
-                    To someone else
-                </Typography>
-                <Box sx={{display: 'flex', mb: 1, flexDirection: 'column'}}>
-                    <Input
-                        label='Receiving address:'
-                        placeholder='Address (0x...)'
-                        value={recipient}
-                        onChange={i => setRecipient(i.target.value)}
-                    />
-                </Box>
-                <Button
-                    onClick={()=>{submit()}}
-                    color='primary'
-                    variant="outlined"
-                    tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}
-                    loading={loading}
-                    disabled={disabled}
-                    triggerTime={new Date()}
-                    fullWidth={true}
-                    size="large"
-                >
-                    Delegate to other
-                </Button>
-            </Box>
-        </Modal>
+  const submit = async () => {
+    if (!selectedToken) {
+      return null
+    }   
+    const res = await dispatch(
+      selectedToken === 'xboba'
+        ? delegateVotesX({ recipient })
+        : delegateVotes({ recipient })
     )
+    if (res) {
+      dispatch(openAlert(`Votes delegated successfully!`))
+    }
+    handleClose()
+  }
+
+  const submitMe = async () => {
+    if (!selectedToken) {
+      return null
+    }
+    const res = await dispatch(
+      selectedToken === 'xboba'
+        ? delegateVotesX({ recipient: wAddress })
+        : delegateVotes({ recipient: wAddress })
+    )
+    if (res) {
+      dispatch(openAlert(`Vote self-delegation successfull!`))
+    }
+    handleClose()
+  }
+
+
+
+  const SelectToken = () => (
+    <Dropdown
+      error={selectedToken ? false : true}
+      onItemSelected={(token)=> setSelectedToken(token)}
+      defaultItem={
+        selectedToken || {
+          value: null,
+          imgSrc: 'default',
+          label: 'Choose type of BOBA',
+      }}
+      items={[
+        { value: 'boba', label: 'Boba', imgSrc: getCoinImage('boba') },
+        { value: 'xboba', label: 'xBoba', imgSrc: getCoinImage('xboba') },
+      ]}
+    />
+  )
+
+  return (
+    <Modal
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      title="Delegate Vote"
+    >
+      <TabComponent
+        tabs={[
+          {
+            label: 'To Me',
+            content: (
+              <>
+                <>
+                  <Typography variant="body2">
+                      My address: <br />
+                      {wAddress} <br />
+                      Choose which BOBA to delegate BOBA voting power to
+                  </Typography>
+                  <SelectToken />
+                </>
+                <ButtonContainer>
+                  <Button
+                    onClick={()=>{submitMe()}}
+                    loading={loading}
+                    /*
+                      tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power to yourself"}
+                      triggerTime={new Date()}
+                    */
+                    label="Delegate"
+                  />
+                  <Button
+                    onClick={() => handleClose()}
+                    transparent
+                    label="Cancel"
+                  />
+                </ButtonContainer>
+              </>
+            ),
+          },
+          {
+            label: 'To other',
+            content: (
+              <>
+                <>
+                <Typography variant="body2">
+                    My address: <br />
+                    {wAddress} <br />
+                  Choose which BOBA to delegate BOBA voting power to
+                </Typography>
+                <SelectToken />
+                </>
+                <>
+                  <Input
+                    label="Destination Address:"
+                    placeholder="Enter Address here (0x...)"
+                    value={recipient}
+                    onChange={(i) => setRecipient(i.target.value)}
+                  />
+                </>
+                <ButtonContainer>
+                    <Button
+                      onClick={() => {
+                        submit()
+                      }}
+                      /*tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}*/
+                      loading={loading}
+                      disabled={disabled}
+                      label="Delegate to other"
+                      /*
+                      triggerTime={new Date()}
+                      fullWidth={true}
+                      size="large"*/
+                    />
+                    <Button
+                      onClick={() => handleClose()}
+                      transparent
+                      label="Cancel"
+                    />
+                </ButtonContainer>
+              </>
+            ),
+          }
+        ]}
+      /> 
+
+
+    </Modal>
+  )
 }
 
 export default React.memo(DelegateDaoModal)

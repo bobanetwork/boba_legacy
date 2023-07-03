@@ -7,6 +7,8 @@ export const Button: FC<ButtonTypes> = ({
   loading = false,
   small = false,
   outline = false,
+  transparent = false,
+  className,
   label,
   onClick,
 }) => {
@@ -17,7 +19,9 @@ export const Button: FC<ButtonTypes> = ({
       loading={loading}
       onClick={onClick}
       outline={outline}
+      transparent={transparent}
       small={small}
+      className={className}
     >
       {loading && <SpinLoader />} {label}
     </ButtonContainer>

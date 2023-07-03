@@ -5,9 +5,10 @@ import { Typography } from 'components/global/typography'
 
 export const TabHeader = ({ options, callback }: TabHeaderType) => {
   const [selected, setSelected] = React.useState('All')
-  const handleClick = (value: string) => {
-    callback(value)
-    setSelected(value)
+
+  const handleClick = (option: any) => {
+    callback(option)
+    setSelected(option.value)
   }
 
   return (
@@ -18,7 +19,7 @@ export const TabHeader = ({ options, callback }: TabHeaderType) => {
           <TabItem
             key={value}
             className={selected === value ? 'active' : ''}
-            onClick={() => handleClick(value)}
+            onClick={() => handleClick(option)}
           >
             <Typography variant="body1">{label}</Typography>
           </TabItem>

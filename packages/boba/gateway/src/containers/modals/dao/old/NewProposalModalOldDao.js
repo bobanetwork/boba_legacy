@@ -11,33 +11,33 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
-import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 // import Select from 'react-select'
 import Select from 'components/select/Select'
 
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold } from 'selectors'
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
+import { Button } from 'components/global/button'
+import { Typography } from 'components/global/typography'
 
-function NewProposalModal({ open }) {
+const NewProposalModal = ({ open }) => {
 
   const dispatch = useDispatch()
 
-  const [ action, setAction ] = useState('')
-  const [ votingThreshold, setVotingThreshold ] = useState('')
+  const [action, setAction] = useState('')
+  const [votingThreshold, setVotingThreshold] = useState('')
 
-  const [ LPfeeMin, setLPfeeMin ] = useState('')
-  const [ LPfeeMax, setLPfeeMax ] = useState('')
-  const [ LPfeeOwn, setLPfeeOwn ] = useState('')
+  const [LPfeeMin, setLPfeeMin] = useState('')
+  const [LPfeeMax, setLPfeeMax] = useState('')
+  const [LPfeeOwn, setLPfeeOwn] = useState('')
 
-  const [ proposeText, setProposeText ] = useState('')
-  const [ proposalUri, setProposalUri ] = useState('')
+  const [proposeText, setProposeText] = useState('')
+  const [proposalUri, setProposalUri] = useState('')
 
   const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
 
@@ -54,7 +54,7 @@ function NewProposalModal({ open }) {
     setAction(e.target.value)
   }
 
-  function handleClose() {
+  const handleClose = () => {
     setVotingThreshold('')
     setLPfeeMin('')
     setLPfeeMax('')
@@ -66,10 +66,26 @@ function NewProposalModal({ open }) {
   }
 
   const options = [
-    { value: 'change-threshold', label: 'Change Voting Threshold', title: 'Change Voting Threshold' },
-    { value: 'text-proposal', label: 'Freeform Text Proposal', title: 'Freeform Text Proposal' },
-    { value: 'change-lp1-fee', label: 'Change L1 LP fees', title: 'Change L1 LP fees' },
-    { value: 'change-lp2-fee', label: 'Change L2 LP fees', title: 'Change L2 LP fees' }
+    {
+      value: 'change-threshold',
+      label: 'Change Voting Threshold',
+      title: 'Change Voting Threshold',
+    },
+    {
+      value: 'text-proposal',
+      label: 'Freeform Text Proposal',
+      title: 'Freeform Text Proposal',
+    },
+    {
+      value: 'change-lp1-fee',
+      label: 'Change L1 LP fees',
+      title: 'Change L1 LP fees',
+    },
+    {
+      value: 'change-lp2-fee',
+      label: 'Change L2 LP fees',
+      title: 'Change L2 LP fees',
+    },
   ]
 
   const customStyles = {
@@ -84,10 +100,11 @@ function NewProposalModal({ open }) {
     let res = null
 
     if (action === 'change-threshold') {
-      res = await dispatch(createDaoProposal({
-        action,
-        value: [ votingThreshold ],
-        text: '' //extra text if any
+      res = await dispatch(
+        createDaoProposal({
+          action,
+          value: [votingThreshold],
+          text: '', //extra text if any
       }))
     } else if (action === 'text-proposal') {
       res = await dispatch(createDaoProposal({
@@ -140,24 +157,15 @@ function NewProposalModal({ open }) {
   }
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      maxWidth="sm"
-    >
+    <Modal open={open} onClose={handleClose} maxWidth="sm" title="New Proposal">
       <Box>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <BobaGlassIcon />
-          <Typography variant="body1" >
-            New Proposal
-          </Typography>
-        </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {action === '' &&
-            <Typography variant="body2" style={{ lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5' }}>
-              Currently, the DAO can change the voting threshold, propose free-form text proposals, and
-              change to the bridge fee limits for the L1 and L2 bridge pools.
+            <Typography variant="body2" >
+              Currently, the DAO can change the voting threshold, propose
+              free-form text proposals, and change to the bridge fee limits for
+              the L1 and L2 bridge pools.
             </Typography>
           }
           <Select
@@ -170,9 +178,7 @@ function NewProposalModal({ open }) {
           </Select>
           {action === 'change-threshold' &&
             <>
-              <Typography variant="body2"
-                style={{ lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5' }}
-              >
+              <Typography variant="body2">
                 The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
               </Typography>
               <Input
@@ -188,11 +194,10 @@ function NewProposalModal({ open }) {
           }
           {(action === 'change-lp1-fee' || action === 'change-lp2-fee') &&
             <>
-              <Typography variant="body2"
-                style={{ lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5' }}
-              >
-                Possible settings range from 0.0% to 5.0%.
-                All three values must be specified and the maximum fee must be larger than the minimum fee.
+              <Typography variant="body2">
+                Possible settings range from 0.0% to 5.0%. All three values must
+                be specified and the maximum fee must be larger than the minimum
+                fee.
               </Typography>
               <Input
                 label="New LP minimium fee (%)"
@@ -222,9 +227,7 @@ function NewProposalModal({ open }) {
           }
           {action === 'text-proposal' &&
             <>
-              <Typography variant="body2"
-                style={{ lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5' }}
-              >
+              <Typography variant="body2">
                 Your proposal title is limited to 100 characters. Use the link field below to provide more information.
               </Typography>
               <Input
@@ -232,11 +235,11 @@ function NewProposalModal({ open }) {
                 value={proposeText}
                 onChange={(i) => setProposeText(i.target.value.slice(0, 100))}
               />
-              <Typography variant="body2"
-                style={{ lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5' }}
-              >
-                You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate
-                website. The link length is limited to 150 characters. You may need to use a link shortener.
+              <Typography variant="body2">
+                You should provide additional information (technical
+                specifications, diagrams, forum threads, and other material) on
+                a seperate website. The link length is limited to 150
+                characters. You may need to use a link shortener.
               </Typography>
               <Input
                 placeholder="URI, https://..."
@@ -247,20 +250,13 @@ function NewProposalModal({ open }) {
           }
         </Box>
       </Box>
-      <Box sx={{ width: '100%', my: 2 }}>
-        <Button
-          onClick={() => { submit() }}
-          color='primary'
-          variant='outlined'
-          tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to submit a new proposal"}
-          loading={loading}
-          disabled={disabled()}
-          fullWidth={true}
-          size="large"
-        >
-          Submit
-        </Button>
-      </Box>
+      <Button
+        onClick={() => { submit() }}
+        /*tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to submit a new proposal"}*/
+        loading={loading}
+        disabled={disabled()}
+        label="Create"
+      />
     </Modal >
   )
 }

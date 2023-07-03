@@ -3,24 +3,30 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import { closeModal } from 'actions/uiAction'
-import { setConnectBOBA, setConnectETH, setWalletConnected } from 'actions/setupAction.js'
+import {
+  setConnectBOBA,
+  setConnectETH,
+  setWalletConnected,
+} from 'actions/setupAction.js'
 
 import Modal from 'components/modal/Modal'
-
-import { Box, Typography } from '@mui/material'
-import { Content, BoxCenter } from 'components/modal/Modal.styles'
+import { Typography } from 'components/global/typography'
+import { Svg } from 'components/global/svg'
 
 import networkService from 'services/networkService'
 
 import metaMaskLogo from 'images/metamask.svg'
 import walletConnectLogo from 'images/walletconnect.svg'
+import ArrowIcon from 'images/icons/arrowright.svg'
 
-function WalletSelectorModal ({ open }) {
+import { Wallets, Wallet, Icon, ArrowContainer, IconContainer } from './styles'
+
+const WalletSelectorModal = ({ open }) => {
 
   const dispatch = useDispatch()
 
   const connectToWallet = async (type) => {
-    function resetConnectChain() {
+    const resetConnectChain = () => {
       dispatch(setConnectETH(false))
       dispatch(setConnectBOBA(false))
     }
@@ -38,7 +44,7 @@ function WalletSelectorModal ({ open }) {
     }
   }
 
-  function handleClose () {
+  const handleClose = () => {
     dispatch(closeModal('walletSelectorModal'))
     dispatch(setConnectETH(false))
     dispatch(setConnectBOBA(false))
@@ -51,24 +57,28 @@ function WalletSelectorModal ({ open }) {
       newStyle={true}
       maxWidth="450px"
       minHeight="200px"
-      title="Connect to Wallet"
+      title="Connect Wallet"
     >
-      <Box>
-        <Content>
-          <BoxCenter onClick={() => connectToWallet('metamask')}>
-            <img src={metaMaskLogo} alt='metamask' height="100"/>
-            <Typography variant="body" sx={{fontWeight: 700, mb: 2}}>
-              MetaMask
-            </Typography>
-          </BoxCenter>
-          <BoxCenter onClick={() => connectToWallet('walletconnect')}>
-            <img src={walletConnectLogo} alt='walletconnect' height="100"/>
-            <Typography variant="body" sx={{fontWeight: 700, mb: 2}}>
-              WalletConnect
-            </Typography>
-          </BoxCenter>
-        </Content>
-      </Box>
+      <Wallets>
+        <Wallet onClick={() => connectToWallet('metamask')}>
+          <IconContainer>
+            <Icon src={metaMaskLogo} alt="metamask" />
+          </IconContainer>
+          <Typography variant="title">MetaMask</Typography>
+          <ArrowContainer>
+            <Svg fill="#fff" src={ArrowIcon} />
+          </ArrowContainer>
+        </Wallet>
+        <Wallet onClick={() => connectToWallet('walletconnect')}>
+          <IconContainer>
+            <Icon src={walletConnectLogo} alt="walletconnect" />
+          </IconContainer>
+          <Typography variant="title">WalletConnect</Typography>
+          <ArrowContainer>
+            <Svg fill="#fff" src={ArrowIcon} />
+          </ArrowContainer>
+        </Wallet>
+      </Wallets>
     </Modal>
   )
 }

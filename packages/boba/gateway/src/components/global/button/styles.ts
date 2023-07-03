@@ -2,12 +2,13 @@ import styled, { keyframes } from 'styled-components'
 
 export const ButtonContainer = styled.button.withConfig({
   shouldForwardProp: (prop) =>
-    !['loading', 'disable', 'small', 'outline'].includes(prop),
+    !['loading', 'disable', 'small', 'outline', 'transparent'].includes(prop),
 })<{
   loading?: boolean
   disable?: boolean
   outline?: boolean
   small?: boolean
+  transparent?: boolean
 }>`
   display: flex;
   flex-direction: row;
@@ -52,22 +53,47 @@ export const ButtonContainer = styled.button.withConfig({
     ${(props) =>
     props.small &&
     `
-    min-width:auto;
-    font-size: ${props.theme.text.body2};
-    border-radius: 33px;
-   `}
-      ${(props) =>
+      min-width:auto;
+      font-size: ${props.theme.text.body2};
+      border-radius: 33px;
+    `}
+    ${(props) =>
     props.outline &&
     `
-    border: 1px solid ${props.theme.colors.green[300]};
-    color: ${props.theme.colors.green[300]};
-    background: transparent;
-    box-shadow:none;
-    &:hover {
-      color:${props.theme.colors.gray[800]};
-      background:${props.theme.colors.green[300]};
-    }
-  `}
+      border: 1px solid ${props.theme.colors.green[300]};
+      color: ${props.theme.colors.green[300]};
+      background: transparent;
+      box-shadow:none;
+      &:hover {
+        color:${props.theme.colors.gray[800]};
+        background:${props.theme.colors.green[300]};
+      }
+    `}
+
+    ${(props) =>
+    props.transparent &&
+    `
+      flex-direction:column;
+      background:transparent;
+      border-color:transparent;
+      color:${props.theme.colors.gray[100]};
+      box-shadow:none;
+      min-width: 100px;
+      margin:0px auto;
+      &:after{
+        content:'';
+        width:0px;
+        height:2px;
+        transition: all 0.25s ease;
+        background:${props.theme.colors.gray[100]};
+      }
+      &:hover {
+        background:transparent;
+        &:after {
+          width:110%;
+        }
+      }
+    `}
 `
 
 const nk_spinner = keyframes`

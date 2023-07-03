@@ -19,7 +19,7 @@ export const DropdownContainer = styled.div`
     `}
 `
 
-export const Header = styled.div`
+export const Header = styled.div<{ error: boolean }>`
   box-sizing: border-box;
   position: relative;
   z-index: 2;
@@ -46,6 +46,11 @@ export const Header = styled.div`
       &:hover {
         border-color: ${props.theme.colors.gray[100]};
       }
+    `}
+    ${(props) =>
+    props.error &&
+    ` 
+      border-color:${props.theme.colors.red[300]}
     `}
 `
 
@@ -147,4 +152,8 @@ export const DropdownContent = styled.div`
         }
       `};
   }
+`
+
+export const Arrow = styled.img`
+  margin-left: auto;
 `

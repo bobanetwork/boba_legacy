@@ -17,7 +17,7 @@ import { getCoinImage } from 'util/coinImage'
 
 import { Box, Typography, useMediaQuery, useTheme} from '@mui/material'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import BN from 'bignumber.js'
 import parse from 'html-react-parser'

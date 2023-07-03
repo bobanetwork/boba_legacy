@@ -31,7 +31,7 @@ import { selectProposalThreshold,selectLockRecords } from 'selectors'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
 
-function NewProposalModal({ open }) {
+const NewProposalModal = ({ open }) => {
 
   const dispatch = useDispatch()
 
@@ -191,14 +191,10 @@ function NewProposalModal({ open }) {
       open={open}
       onClose={handleClose}
       maxWidth="sm"
+      title="New Proposal"
     >
       <Box>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <BobaGlassIcon />
-          <Typography variant="body1" >
-            New Proposal
-          </Typography>
-        </Box>
+
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {action === '' &&

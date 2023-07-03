@@ -25,7 +25,7 @@ import ListProposal from 'components/listProposal/listProposal'
 import { Typography } from 'components/global/typography'
 //import Select from 'components/select/Select'
 import { Button } from 'components/global/button'
-
+import {Preloader} from 'components/dao/preloader'
 import {
   selectDaoBalance,
   selectDaoBalanceX,
@@ -75,11 +75,12 @@ const OldDao = () => {
   const [ selectedState, setSelectedState ] = useState(PROPOSAL_STATES[ 0 ])
 
   const handleNewProposal = () => {
-    if (Number(votes + votesX) < Number(proposalThreshold)) {
+    //remove if for testing. 
+    /*if (Number(votes + votesX) < Number(proposalThreshold)) {
       dispatch(openError(`Insufficient BOBA to create a new proposal. You need at least ${proposalThreshold} BOBA + xBOBA to create a proposal.`))
-    } else {
+    } else {*/
       dispatch(openModal('newProposalModal'))
-    }
+    /*}*/
   }
 
   return (
@@ -106,33 +107,16 @@ const OldDao = () => {
             >
               <Box sx={{padding:'5px', gap:'10px 0px'}}>
                 <Typography variant="body3" style={{ opacity: '0.5' }}>BOBA:</Typography>
-                <Typography variant="head" >{!!layer ? Math.round(Number(balance)) : '--'}</Typography>
+                <Typography variant="head" style={{ color: 'rgba(144, 180, 6, 1)' }}>{!!layer ? Math.round(Number(balance)) : '--'}</Typography>
               </Box>
               <S.VerticalDivisor />
               <Box sx={{padding:'5px'}}>
                 <Typography variant="body3" style={{ opacity: '0.5' }}>xBOBA:</Typography>
-                <Typography variant="head" >{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
+                <Typography variant="head" style={{ color: 'rgba(144, 180, 6, 1)' }}>{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
               </Box>
             </Box>
           </Box>
-          <Box>
-            {layer === 'L2' &&
-              <S.DaoWalletAction>
-                <Button
-                  onClick={() => { dispatch(openModal('delegateDaoModal')) }}
-                  disable={!accountEnabled}
-                  label="Delegate BOBA"
-                  outline
-                />
-                <Button
-                  onClick={() => { dispatch(openModal('delegateDaoXModal')) }}
-                  disable={!accountEnabled}
-                  label="Delegate xBOBA"
-                  outline
-                />
-              </S.DaoWalletAction>
-            }
-          </Box>
+
           <Box
             sx={{
             width: '100%',
@@ -141,31 +125,34 @@ const OldDao = () => {
             gap: '10px',
             padding: '24px 0px'
           }}>
+
+            {layer === 'L2' && 
+              <Button
+              onClick={() => { dispatch(openModal('delegateDaoModal')) }}
+              disable={!accountEnabled}
+              label="Stake BOBA"
+            />
+            }
             <Button
               disable={!accountEnabled}
-              onClick={() => handleNewProposal}
-              label="Create new proposal"
+              onClick={() => handleNewProposal()}
+              label="Create proposal"
               outline
             />
           </Box>
         </S.DaoWalletContainer>
 
         <S.DaoProposalContainer>
-          <TabHeader options={PROPOSAL_STATES} callback={(e)=> setSelectedState(e)} />
-          {/*<S.DaoProposalHead>
-            <Select
-              options={PROPOSAL_STATES}
-              onSelect={(e) => {
-                setSelectedState(e)
-              }}
-              sx={{ marginBottom: '20px' }}
-              value={selectedState}
-              newSelect={true}
-            ></Select>
-          </S.DaoProposalHead>
-            */}
+          <TabHeader
+            options={PROPOSAL_STATES}
+            callback={(e) => setSelectedState(e)}
+          />
+          
+
           <S.DaoProposalListContainer>
-            {!!loading && !proposals.length ? <Typography>Loading...</Typography> : null}
+            {!!loading && !proposals.length && (
+              <Preloader />
+            )}
             {proposals
               // eslint-disable-next-line array-callback-return
               .filter((p) => {

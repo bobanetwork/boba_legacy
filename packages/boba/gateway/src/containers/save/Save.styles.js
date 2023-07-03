@@ -155,3 +155,16 @@ export const ListContainer = styled(Box)(({ theme }) => ({
     gap: '5px',
   }
 }))
+
+
+export const BlockContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  height:'100%',
+  padding: '24px',
+  width: '100%',
+  gap: '25px 0px',
+  borderRadius: theme.palette.primary.borderRadius,
+  background: theme.palette.background.glassy,
+  border:'1px solid ' + theme.palette.background.glassyBorder,
+}))

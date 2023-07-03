@@ -28,7 +28,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 

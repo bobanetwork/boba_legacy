@@ -2,10 +2,9 @@ import { styled } from '@mui/material/styles'
 import { Box, Grid } from '@mui/material'
 
 export const Wrapper = styled(Box)(({ theme, ...props }) => ({
-  borderBottom: theme.palette.mode === 'light' ? '1px solid #c3c5c7' : '1px solid #192537',
+  border: '1px solid ' + theme.palette.background.glassyBorder,
   borderRadius: '12px',
-  background: theme.palette.background.default,
-  marginBottom: '10px',
+  background: theme.palette.background.glassy,
   [theme.breakpoints.down('md')]: {
     padding: '20px 10px',
   },
