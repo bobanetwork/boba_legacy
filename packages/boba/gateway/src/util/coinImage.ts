@@ -1,6 +1,5 @@
 import TESTLogo from 'images/test.svg'
 import mttLogo from 'images/mtt.png'
-import moonbase from 'images/moonbase.png'
 
 export const getCoinImage = (symbol: string): string => {
   const logoURIbase =
@@ -11,9 +10,6 @@ export const getCoinImage = (symbol: string): string => {
   }
   if (symbol === 'mtt') {
     url = mttLogo
-  }
-  if (symbol === 'DEV') {
-    url = moonbase
   }
 
   return url
