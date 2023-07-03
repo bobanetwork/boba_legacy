@@ -58,16 +58,18 @@ export const IconContainer = styled.div`
   border-radius: 50%;
   width: 16px;
   height: 16px;
-  // margin-right: 8px;
+  aligncontent: center;
 `
 
 export const Option = styled.div`
   display: flex;
+  flexdirection: row;
   align-items: center;
   font-size: ${(props) => props.theme.text.body2};
   font-weight: bold;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
+  border-radius: 14px;
   text-align: left;
   color: inherit;
 `
@@ -90,7 +92,7 @@ export const DefaultIcon = styled.div`
 export const Icon = styled.img`
   width: 16px;
   height: 16px;
-  // margin-right: 8px;
+  aligncontent: center;
 `
 
 export const DropdownBody = styled.div`

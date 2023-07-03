@@ -64,24 +64,11 @@ export const Dropdown: React.FC<IDropdownProps> = ({
         <DropdownBody>
           <DropdownContent>
             {items.map((item, index) => (
-              <Option
-                key={index}
-                onClick={() => selectItem(item)}
-                style={{
-                  flexDirection: 'row',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                }}
-              >
+              <Option key={index} onClick={() => selectItem(item)}>
                 {item.imgSrc && (
-                  <IconContainer style={{ alignContent: 'center' }}>
+                  <IconContainer>
                     {item.imgSrc !== 'default' && (
-                      <Icon
-                        style={{ alignContent: 'center' }}
-                        src={item.imgSrc}
-                        alt={item.label}
-                      />
+                      <Icon style={{}} src={item.imgSrc} alt={item.label} />
                     )}
                     {item.imgSrc === 'default' && <DefaultIcon />}
                   </IconContainer>
