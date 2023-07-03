@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, ReactNode } from 'react'
 import ArrowDown from '../../../images/icons/arrowdown.svg'
 import {
   DropdownContainer,
@@ -11,8 +11,8 @@ import {
   DropdownContent,
 } from './styles'
 interface IDropdownItem {
-  value: string
-  label: string
+  value?: string
+  label: string | ReactNode
   imgSrc?: string
 }
 
@@ -50,7 +50,10 @@ export const Dropdown: React.FC<IDropdownProps> = ({
           {selectedItem.imgSrc && (
             <IconContainer>
               {selectedItem.imgSrc !== 'default' && (
-                <Icon src={selectedItem.imgSrc} alt={selectedItem.label} />
+                <Icon
+                  src={selectedItem.imgSrc}
+                  alt={selectedItem.label as string}
+                />
               )}
               {selectedItem.imgSrc === 'default' && <DefaultIcon />}
             </IconContainer>
@@ -67,7 +70,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
               <Option key={index} onClick={() => selectItem(item)}>
                 {item.imgSrc && (
                   <IconContainer>
-                    <img src={item.imgSrc} alt={item.label} />
+                    <img src={item.imgSrc} alt={item.label as string} />
                   </IconContainer>
                 )}
                 {item.label}
