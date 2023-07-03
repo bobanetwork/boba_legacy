@@ -53,7 +53,7 @@ contract EntryPointWrapper {
     }
 
     /**
-     * returned failed identified offending userOp during simulation
+     * returned failed offending userOp during simulation
      * @param status the FailedOp error was returned
      * @param opIndex index into the array of ops to the failed one (in simulateValidation, this is always zero)
      * @param reason revert reason
