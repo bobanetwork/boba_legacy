@@ -55,26 +55,10 @@ export const Dropdown: React.FC<IDropdownProps> = ({
         <DropdownBody>
           <DropdownContent>
             {items.map((item, index) => (
-              <Option
-                key={index}
-                onClick={() => selectItem(item)}
-                style={{
-                  flexDirection: 'row',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                }}
-              >
+              <Option key={index} onClick={() => selectItem(item)}>
                 {item.imgSrc && (
-                  <IconContainer style={{ alignContent: 'center' }}>
-                    {item.imgSrc !== 'default' && (
-                      <Icon
-                        style={{ alignContent: 'center' }}
-                        src={item.imgSrc}
-                        alt={item.label}
-                      />
-                    )}
-                    {item.imgSrc === 'default' && <DefaultIcon />}
+                  <IconContainer>
+                    <img src={item.imgSrc} alt={item.label} />
                   </IconContainer>
                 )}
                 {item.label}

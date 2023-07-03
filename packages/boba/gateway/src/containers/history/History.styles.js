@@ -94,14 +94,6 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
 
 export const Table = styled(Box)(({theme}) =>({
   Gradient: 'Linear #303030-#252525',
-  // Opacity: 60%,
-  // lightest- top left corner ,
-  // darkest- bottom right corner ,
-  // Outline: Gray 300,
-  // Background blur: 15,
-  // Shadow: #000000-25%
-              //  X-0 Y-2 Blur-4
-              // (Bridge Shadow),
   borderRadius: '6px',
   display: 'flex',
   flexDirection: 'column',
@@ -138,13 +130,11 @@ export const TableFilters = styled(Box)(({ theme }) => ({
 
 
 export const NetworkDropDowns = styled(Box)(({theme}) => ({
-  // width: "30%",
   display: "flex",
   flexDirection: 'row',
   alignItems: "center",
   justifyContent: "center",
   gap:'16px',
-  // padding: "20px",
   fontSize:"16px"
 }))
 
@@ -167,13 +157,3 @@ export const TableContent = styled(Box)(({ theme }) => ({
   alignItems: "flex-start",
   justifyContent: "space-between",
 }))
-
-// Gradient: Linear #303030-#252525
-// Opacity: 60%
-// lightest- top left corner 
-// darkest- bottom right corner 
-// Outline: Gray 300
-// Background blur: 15
-// Shadow: #000000-25%
-//                X-0 Y-2 Blur-4
-//               (Bridge Shadow)

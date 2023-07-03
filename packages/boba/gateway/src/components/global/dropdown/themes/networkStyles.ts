@@ -26,7 +26,6 @@ export const Header = styled.div`
   z-index: 2;
   color: inherit;
   border-radius: 20px;
-  // min-width: 167px;
   padding: 8px 16px;
   gap: 8px;
   transition: 0.25s all;
@@ -124,7 +123,6 @@ export const DropdownBody = styled.div`
     `}
 `
 export const DropdownContent = styled.div`
-  // min-height: 80px;
   padding: 0px 10px;
 
   max-height: 200px;
