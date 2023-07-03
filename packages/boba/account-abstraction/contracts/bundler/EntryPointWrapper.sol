@@ -141,7 +141,7 @@ contract EntryPointWrapper {
      * Wraps call to simulateValidation on EntryPoint, parses custom error reverts and returns response in return data
      * @param userOp the user operation to validate.
      * @return FailedOp Return status and response
-     * @return ValidResponse Return response
+     * @return Valid Return response
      * @dev If a validResponse is received failedOp status is empty, and vice versa
      */
     function simulateValidation(UserOperation calldata userOp) external returns (FailedOpStatus memory, Response memory) {
