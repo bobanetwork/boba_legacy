@@ -2,8 +2,6 @@
 
 <img width="1097" alt="Boba NFT Bridge" src="https://user-images.githubusercontent.com/46272347/145503571-0b5e34c9-c55e-4ff8-8749-19a130d32958.png">
 
-> **Note: These contracts have not been audited, exercise caution when using them on mainnet**
-
 Boba NFT bridges support **native L1 NFTs** and **native L2 NFTs** to be moved back and forth.
 
 * Native L1 NFT: the original NFT contract was deployed on L1
@@ -56,7 +54,6 @@ await L2StandardERC721.deployTransaction.wait()
 **NOTE: Once you have your L1StandardERC721 address, please contact us so we can register that address in the L1 and L2 NFT bridges.**
 
 ## How to bridge NFTs
-
 ### CASE 1 - Native L1 NFT - Bridge NFTs from Ethereum to Boba
 
 First, users transfer their NFT to the L1 NFT Bridge, starting with an approval.
