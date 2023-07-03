@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
+import * as G from '../Global.styles'
 import { useDispatch } from 'react-redux'
 import { isEqual,orderBy } from 'util/lodash';
 
@@ -24,6 +25,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { useMediaQuery, useTheme } from '@mui/material'
 import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
+import Button from 'components/button/Button.js'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import {
@@ -47,11 +49,50 @@ import styles from './TX_All.module.scss'
 import useInterval from 'hooks/useInterval'
 import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
+import Select from 'components/select/Select'
+import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors'
+import { Dropdown } from "components/global/dropdown/index/network"
+import AvalancheIcon from '../../images/avax.svg'
+import BNBIcon from "../../images/bnb.svg"
+import EthereumIcon from "../../images/ethereum.svg"
+import FantomIcon from "../../images/ftm.svg"
+import AllNetworksIcon from "../../images/allNetworks.svg"
+
+
+const NETWORKS = [
+  {value:"All Networks", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
+  { value: "Avalanche", label: "Avalanche", key: "Avalanche", imgSrc: AvalancheIcon},
+  {value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
+  { value: "Ethereum", label: "Ethereum", key: "Ethereum", imgSrc:EthereumIcon},
+  { value: "Fantom", label: "Fantom", key: "Fantom", imgSrc: FantomIcon }
+  // {value:"All Networks", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
+  // { value: "Avalanche", label: "Avalanche", key: "Avalanche", imgSrc: AvalancheIcon},
+  // {value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
+  // { value: "Ethereum", label: "Ethereum", key: "Ethereum", imgSrc:EthereumIcon},
+  // { value: "Fantom", label: "Fantom", key: "Fantom", imgSrc:FantomIcon}
+]
+  
+const TABLE_HEADINGS = ["Date", "From", "To", "Token", "Amount", "Status"]
+
 
 function History() {
+
+  const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[0])
+  const getTableHeadings = () => {
+    return (
+      <>
+      {
+        TABLE_HEADINGS.map((element) => {
+        return (
+          <div>{element}</div>
+        )
+        })}
+    </>
+    )
+  }
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -91,8 +132,26 @@ function History() {
     return true
   })
 
+  const getDatePicker = (label) => { 
+    return (<>
+      <DatePicker
+        wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
+        popperClassName={styles.popperStyle}
+        selected={startDate}
+        onChange={(date) => setStartDate(date)}
+        selectsStart
+        endDate={new Date(endDate)}
+        maxDate={new Date(endDate)}
+        calendarClassName={theme.palette.mode}
+        placeholderText={isMobile ? {label} : ''}
+      />
+      </>)
+  
+    
+  }
+
   useInterval(() => {
-    if (accountEnabled) {
+     if (accountEnabled) {
       dispatch(fetchTransactions())
     }
   }, POLL_INTERVAL)
@@ -100,12 +159,7 @@ function History() {
   return (
     <S.HistoryPageContainer>
 
-      <Connect
-        userPrompt={'Connect to MetaMask to see your history'}
-        accountEnabled={layer}
-      />
-
-      {layer && (
+      {true && (
         <>
           <S.Header>
             <div className={styles.searchInput}>
@@ -113,7 +167,7 @@ function History() {
                 size="small"
                 placeholder="Search by hash"
                 value={searchHistory}
-                onChange={(i) => {
+                onChange={(i) => { 
                   setSearchHistory(i.target.value)
                 }}
                 className={styles.searchBar}
@@ -122,7 +176,7 @@ function History() {
             <div className={styles.actions}>
               {!isMobile ? (
                 <div style={{ margin: '0px 10px', opacity: 0.7 }}>
-                  Show period from
+                  Date range from
                 </div>
               ) : null}
               <DatePicker
@@ -152,57 +206,33 @@ function History() {
               />
             </div>
           </S.Header>
-          <div className={styles.data}>
-            <div className={styles.section}>
-              <Tabs
-                onClick={(tab) => {
-                  dispatch(setActiveHistoryTab(tab))
-                }}
-                activeTab={activeTab}
-                tabs={[
-                  'All',
-                  `${networkName['l1']} to ${networkName['l2']}`,
-                  `${networkName['l2']} to ${networkName['l1']}`,
-                  'Bridge between L1s',
-                  'Pending',
-                ]}
-              />
+          
+          <S.Table>
+            <S.TableFilters>
+              <S.NetworkDropDowns>
+                <div style={{fontSize:'16px'}}>From</div>
+                <Dropdown {...{ items: NETWORKS, defaultItem: selectedNetwork }}/>
+                <div style={{fontSize:'16px',paddingLeft:'16px'}}>To</div>
+                <Dropdown {...{ items: NETWORKS, defaultItem: selectedNetwork }} />
+              </S.NetworkDropDowns>
+              <div>Filter</div>
+            </S.TableFilters>
+            <S.TableHeadings>
+              {getTableHeadings()}
+            </S.TableHeadings>
+          </S.Table>
 
-              {activeTab === 'All' && (
-                <All
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === `${networkName['l1']} to ${networkName['l2']}` && (
-                <Deposits
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === `${networkName['l2']} to ${networkName['l1']}` && (
-                <Exits
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === 'Bridge between L1s' && (
-                <Transfers
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === 'Pending' && (
-                <Pending
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-            </div>
+          <div style={{marginLeft: "auto", marginRight: "auto", padding:"20px"}}>
+            <Button style={{marginLeft: "auto",
+                    marginRight: "auto"}}
+                    type="primary"
+                    variant="contained"
+                    size="small"
+                    newStyle
+                    onClick={() => dispatch(setConnect(true))}
+                    sx={{fontWeight: '500;'}}>
+              Connect Wallet
+            </Button>
           </div>
         </>
       )}

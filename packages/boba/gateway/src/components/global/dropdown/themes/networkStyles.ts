@@ -125,13 +125,13 @@ export const DropdownContent = styled.div`
   // min-height: 80px;
   padding: 0px 10px;
 
-  // max-height: 100px;
+  max-height: 200px;
   display: flex;
   flex-direction: column;
   gap: 5px 0px;
   overflow-y: auto;
   & > ${Option} {
-    transition: 0.25s all;
+    transition: 0.25s all;s
     border-radius: 14px;
     padding: 5px;
     box-sizing: border-box;
