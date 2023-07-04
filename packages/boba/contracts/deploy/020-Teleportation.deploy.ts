@@ -53,16 +53,8 @@ const deployFn: DeployFunction = async (hre) => {
     Proxy__Teleportation.address,
     (hre as any).deployConfig.deployer_l2
   )
-  await Proxy__Teleportation.initialize(
-    L2BOBA.address,
-    utils.parseEther('1'),
-    utils.parseEther('100')
-  )
-  await Teleportation.initialize(
-    L2BOBA.address,
-    utils.parseEther('1'),
-    utils.parseEther('100')
-  )
+  await Proxy__Teleportation.initialize()
+  await Teleportation.initialize()
   console.log(`Proxy__Teleportation initialized`)
 
   await registerBobaAddress(
@@ -74,6 +66,10 @@ const deployFn: DeployFunction = async (hre) => {
     addressManager,
     'Teleportation',
     Teleportation.address
+  )
+
+  console.log(
+    `Proxy__Teleportation (${Proxy__Teleportation.address}) & Teleportation (${Teleportation.address}) registered.`
   )
 }
 

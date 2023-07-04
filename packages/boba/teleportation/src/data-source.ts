@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
-import { HistoryData } from './entity/HistoryData'
+import { HistoryData } from './entities/HistoryData.entity'
 import * as postgres from 'pg' // keep depcheck (db driver)
 
 import dotenv from 'dotenv'

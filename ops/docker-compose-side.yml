@@ -62,6 +62,7 @@ services:
     depends_on:
      - l2geth
      - teleportation_db
+     - kms
     image: bobanetwork/teleportation:latest
     build:
       context: ..
@@ -69,6 +70,10 @@ services:
       target: teleportation
     deploy:
       replicas: 0
+    environment:
+      # TODO: Further compare KMS setup with BatchSubmitter
+      TELEPORTATION_DISBURSER_KEY_ID: "${TELEPORTATION_DISBURSER_KEY_ID}"
+      TELEPORTATION_DISBURSER_KEY_ENC: "${TELEPORTATION_DISBURSER_KEY_ENC}"
 
   teleportation_db:
     image: postgres
