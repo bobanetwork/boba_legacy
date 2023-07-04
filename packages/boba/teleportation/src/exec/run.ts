@@ -10,15 +10,25 @@ import { TeleportationService } from '../service'
 import { BobaChains } from '../utils/chains'
 
 /* Imports: Interface */
-import { ChainInfo } from '../utils/types'
+import { ChainInfo, SupportedAssets } from '../utils/types'
 import { AppDataSource } from '../data-source'
+import { HistoryData } from '../entities/HistoryData.entity'
+import { Init1687802800701 } from '../migrations/1687802800701-00_Init'
 
 dotenv.config()
 
 const main = async () => {
   if (!AppDataSource.isInitialized) {
+    AppDataSource.setOptions({
+      migrationsRun: true,
+      logging: false,
+      synchronize: false,
+      entities: [HistoryData],
+      migrations: [Init1687802800701],
+    })
     await AppDataSource.initialize() // initialize DB connection
   }
+  console.log('Database initialized: ', AppDataSource.isInitialized)
 
   const config: Bcfg = new Config('teleportation')
   config.load({
@@ -58,27 +68,31 @@ const main = async () => {
   // get all boba chains and exclude the current chain
   const chainId = (await l2Provider.getNetwork()).chainId
   const isTestnet = BobaChains[chainId].testnet
+  let originSupportedAssets: SupportedAssets
   const selectedBobaChains: ChainInfo[] = Object.keys(BobaChains).reduce(
     (acc, cur) => {
       const chain = BobaChains[cur]
-      if (isTestnet === chain.testnet && Number(cur) !== chainId) {
-        chain.provider = new providers.StaticJsonRpcProvider(chain.url)
-        acc.push({ chainId: cur, ...chain })
+      if (isTestnet === chain.testnet) {
+        if (Number(cur) !== chainId) {
+          chain.provider = new providers.StaticJsonRpcProvider(chain.url)
+          acc.push({ chainId: cur, ...chain })
+        } else {
+          originSupportedAssets = chain.supportedAssets
+        }
       }
       return acc
     },
     []
   )
-  const BOBA_TOKEN_ADDRESS = BobaChains[chainId].BobaTokenAddress
   const TELEPORTATION_ADDRESS = BobaChains[chainId].teleportationAddress
 
   const service = new TeleportationService({
     l2RpcProvider: l2Provider,
     chainId,
     teleportationAddress: TELEPORTATION_ADDRESS,
-    bobaTokenAddress: BOBA_TOKEN_ADDRESS,
     disburserWallet,
     selectedBobaChains,
+    ownSupportedAssets: originSupportedAssets,
     pollingInterval: POLLING_INTERVAL,
     blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
   })
