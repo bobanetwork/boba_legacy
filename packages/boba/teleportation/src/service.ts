@@ -1,5 +1,12 @@
 /* Imports: External */
-import { Contract, Wallet, BigNumber, providers, EventFilter } from 'ethers'
+import {
+  BigNumber,
+  constants as ethersConstants,
+  Contract,
+  EventFilter,
+  providers,
+  Wallet,
+} from 'ethers'
 import { orderBy } from 'lodash'
 import 'reflect-metadata'
 
@@ -10,9 +17,15 @@ import { getContractFactory } from '@eth-optimism/contracts'
 import { getBobaContractAt } from '@boba/contracts'
 
 /* Imports: Interface */
-import { ChainInfo, DepositTeleportations, Disbursement } from './utils/types'
-import { HistoryData } from './entity/HistoryData'
-import { AppDataSource, historyDataRepository } from "./data-source";
+import {
+  AssetReceivedEvent,
+  ChainInfo,
+  DepositTeleportations,
+  Disbursement,
+  SupportedAssets,
+} from './utils/types'
+import { HistoryData } from './entities/HistoryData.entity'
+import { historyDataRepository } from './data-source'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -23,13 +36,13 @@ interface TeleportationOptions {
   // Address of the teleportation contract
   teleportationAddress: string
 
-  // Address of the L2 BOBA token
-  bobaTokenAddress: string
-
   // Wallet
   disburserWallet: Wallet
 
   selectedBobaChains: ChainInfo[]
+
+  // Own chain to map token symbols to other networks
+  ownSupportedAssets: SupportedAssets
 
   pollingInterval: number
 
@@ -37,7 +50,6 @@ interface TeleportationOptions {
 }
 
 const optionSettings = {}
-const bobaTokenAddressOnAltL2s = '0x4200000000000000000000000000000000000006'
 
 export class TeleportationService extends BaseService<TeleportationOptions> {
   constructor(options: TeleportationOptions) {
@@ -46,8 +58,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
   private state: {
     Teleportation: Contract
-    // This is only for Mainnet and Goerli L2s
-    BOBAToken: Contract
     // the chain is registered in the teleportation contract
     supportedChains: ChainInfo[]
     // the contract of the chain that users deposit token
@@ -65,16 +75,9 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       this.options.teleportationAddress,
       this.options.disburserWallet
     )
+
     this.logger.info('Connected to Teleportation', {
       address: this.state.Teleportation.address,
-    })
-
-    this.logger.info('Connecting to BOBAToken contract...')
-    this.state.BOBAToken = getContractFactory('L2StandardERC20')
-      .attach(this.options.bobaTokenAddress)
-      .connect(this.options.disburserWallet)
-    this.logger.info('Connected to BOBAToken', {
-      address: this.state.BOBAToken.address,
     })
 
     // check the disburser wallet is the disburser of the contract
@@ -92,12 +95,21 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     this.state.depositTeleportations = []
     for (const chain of this.options.selectedBobaChains) {
       const chainId = chain.chainId
-      const isSupported = await this.state.Teleportation.supportedChains(
+      // assuming BOBA is enabled on supported networks to retain battle-tested logic
+      const bobaTokenContract = Object.keys(chain.supportedAssets).find(
+        (k) => chain.supportedAssets[k] === 'BOBA'
+      )
+      const isSupported = await this.state.Teleportation.supportedTokens(
+        bobaTokenContract,
         chainId
       )
       if (!isSupported) {
         throw new Error(
-          `Chain ${chainId} is not supported by the contract ${this.state.Teleportation.address}`
+          `Chain ${chainId} is not supported by the contract ${
+            this.state.Teleportation.address
+          } on chain ${
+            (await this.state.Teleportation.provider.getNetwork()).chainId
+          }`
         )
       } else {
         this.state.supportedChains = [...this.state.supportedChains, chain]
@@ -111,6 +123,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDeposits = await depositTeleportation.totalDeposits(
           this.options.chainId
         )
+
         this.state.depositTeleportations.push({
           Teleportation: depositTeleportation,
           chainId,
@@ -125,11 +138,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   protected async _start(): Promise<void> {
     while (this.running) {
       for (const depositTeleportation of this.state.depositTeleportations) {
-        // search BobaReceived events
+        // search AssetReceived events
         const latestBlock =
           await depositTeleportation.Teleportation.provider.getBlockNumber()
         try {
-          const events = await this._watchTeleportation(
+          const events: AssetReceivedEvent[] = await this._watchTeleportation(
             depositTeleportation,
             latestBlock
           )
@@ -148,10 +161,16 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
   }
 
+  private getConnectedTokenContract(address: string): Contract {
+    return getContractFactory('L2StandardERC20')
+      .attach(address)
+      .connect(this.options.disburserWallet)
+  }
+
   async _watchTeleportation(
     depositTeleportation: DepositTeleportations,
     latestBlock: number
-  ): Promise<any> {
+  ): Promise<AssetReceivedEvent[]> {
     let lastBlock: number
     const chainId = depositTeleportation.chainId.toString()
     try {
@@ -162,18 +181,17 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       // store the new deposit info
       await this._putDepositInfo(chainId, lastBlock)
     }
-    const events = await this._getEvents(
+    return await this._getEvents(
       depositTeleportation.Teleportation,
-      this.state.Teleportation.filters.BobaReceived(),
+      this.state.Teleportation.filters.AssetReceived(),
       lastBlock,
       latestBlock
     )
-    return events
   }
 
   async _disburseTeleportation(
     depositTeleportation: DepositTeleportations,
-    events: any,
+    events: AssetReceivedEvent[],
     latestBlock: number
   ): Promise<void> {
     const chainId = depositTeleportation.chainId
@@ -185,35 +203,60 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       const lastDisbursement =
         await this.state.Teleportation.totalDisbursements(chainId)
       // eslint-disable-next-line prefer-const
-      let disbursement = []
+      let disbursement: Disbursement[] = []
 
-      for (const event of events) {
-        const sourceChainId = event.args.sourceChainId
-        const depositId = event.args.depositId
-        const amount = event.args.amount
-        const emitter = event.args.emitter
+      try {
+        for (const event of events) {
+          const sourceChainId: BigNumber = event.args.sourceChainId
+          const depositId = event.args.depositId
+          const amount = event.args.amount
+          const sourceChainTokenAddr = event.args.token
+          const emitter = event.args.emitter
+          const destChainId = event.args.toChainId
 
-        // we disburse tokens only if depositId is greater or equal to the last disbursement
-        if (depositId.gte(lastDisbursement)) {
-          disbursement = [
-            ...disbursement,
-            {
-              amount: amount.toString(),
-              addr: emitter,
-              depositId: depositId.toNumber(),
-              sourceChainId: sourceChainId.toString(),
-            },
-          ]
-          this.logger.info(
-            `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter}`
-          )
+          // we disburse tokens only if depositId is greater or equal to the last disbursement
+          if (depositId.gte(lastDisbursement)) {
+            const destChainTokenAddr =
+              this._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+                sourceChainTokenAddr,
+                sourceChainId
+              )
+
+            const [isTokenSupported, , , , ,] =
+              await this.state.Teleportation.supportedTokens(
+                sourceChainTokenAddr,
+                sourceChainId
+              )
+            if (!isTokenSupported) {
+              throw new Error(
+                `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
+              )
+            } else {
+              disbursement = [
+                ...disbursement,
+                {
+                  token: destChainTokenAddr, // token mapping for correct routing as addresses different on every network
+                  amount: amount.toString(),
+                  addr: emitter,
+                  depositId: depositId.toNumber(),
+                  sourceChainId: sourceChainId.toString(),
+                },
+              ]
+              this.logger.info(
+                `Found a new deposit - sourceChainId: ${sourceChainId.toString()} - depositId: ${depositId.toNumber()} - amount: ${amount.toString()} - emitter: ${emitter} - token/native: ${sourceChainTokenAddr}`
+              )
+            }
+          }
         }
-      }
 
-      // sort disbursement
-      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-      // disbure the token
-      await this._disburseTx(disbursement, chainId, latestBlock)
+        // sort disbursement
+        disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+        // disbure the token but only if all disbursements could have been processed to avoid missing events due to updating the latestBlock
+        await this._disburseTx(disbursement, chainId, latestBlock)
+      } catch (e) {
+        // Catch outside loop to stop at first failing depositID as all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
+        this.logger.error(e.message)
+      }
     }
   }
 
@@ -230,27 +273,36 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       let sliceEnd = numberOfDisbursement > 10 ? 10 : numberOfDisbursement
       while (sliceStart < numberOfDisbursement) {
         const slicedDisbursement = disbursement.slice(sliceStart, sliceEnd)
-        const totalDisbursements = slicedDisbursement.reduce((acc, cur) => {
-          return acc.add(BigNumber.from(cur.amount))
-        }, BigNumber.from('0'))
-        if (this.options.bobaTokenAddress !== bobaTokenAddressOnAltL2s) {
-          // approve BOBA token
-          const approveTx = await this.state.BOBAToken.approve(
-            this.state.Teleportation.address,
-            totalDisbursements
+
+        // approve token(s), disbursements can be mixed - sum up token amounts per token
+        const tokens: Map<string, BigNumber> = new Map<string, BigNumber>()
+        const approvePending = []
+        for (const disb of slicedDisbursement) {
+          tokens.set(
+            disb.token,
+            BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
           )
-          await approveTx.wait()
-          const disburseTx = await this.state.Teleportation.disburseBOBA(
-            slicedDisbursement
-          )
-          await disburseTx.wait()
-        } else {
-          const disburseTx = await this.state.Teleportation.disburseNativeBOBA(
-            slicedDisbursement,
-            { value: totalDisbursements }
-          )
-          await disburseTx.wait()
         }
+        // do separate approves if necessary & sum up native requirement
+        let nativeValue: BigNumber = BigNumber.from('0')
+        for (const token of tokens.entries()) {
+          if (token[0] === ethersConstants.AddressZero) {
+            nativeValue = nativeValue.add(token[1])
+          } else {
+            const approveTx = await this.getConnectedTokenContract(
+              token[0]
+            ).approve(this.state.Teleportation.address, token[1])
+            approvePending.push(approveTx.wait())
+          }
+        }
+        await Promise.all(approvePending)
+
+        const disburseTx = await this.state.Teleportation.disburseAsset(
+          slicedDisbursement,
+          { value: nativeValue }
+        )
+        await disburseTx.wait()
+
         sliceStart = sliceEnd
         sliceEnd = Math.min(sliceEnd + 10, numberOfDisbursement)
       }
@@ -290,6 +342,41 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     return events
   }
 
+  /**
+   * @dev Helper method for accessing the supportedAssets map via value (needed as we need it one way another as we don't save the ticker on-chain).
+   * @param sourceChainTokenAddr: Token/Asset address (ZeroAddr for native asset) on source network
+   * @param sourceChainId: ChainId the request is coming from
+   **/
+  _getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+    sourceChainTokenAddr: string,
+    sourceChainId: BigNumber | number
+  ) {
+    const srcChain: ChainInfo = this.state.supportedChains.find(
+      (c) => c.chainId.toString() === sourceChainId.toString()
+    )
+    if (!srcChain) {
+      throw new Error(
+        `Source chain not configured/supported: ${srcChain} - ${sourceChainId} - supported: ${JSON.stringify(
+          this.state.supportedChains.map((c) => c.chainId)
+        )}`
+      )
+    }
+
+    const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr]
+
+    const supportedAsset = Object.entries(this.options.ownSupportedAssets).find(
+      ([address, tokenSymbol]) => {
+        return tokenSymbol === srcChainTokenSymbol
+      }
+    )
+    if (!supportedAsset) {
+      throw new Error(
+        `Asset ${srcChainTokenSymbol} on chain destinationChain not configured but possibly supported on-chain`
+      )
+    }
+    return supportedAsset[0] // return only address
+  }
+
   async _putDepositInfo(
     chainId: number | string,
     latestBlock: number
@@ -298,7 +385,16 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       const historyData = new HistoryData()
       historyData.chainId = chainId
       historyData.blockNo = latestBlock
-      await historyDataRepository.save(historyData)
+      if (
+        await historyDataRepository.findOneBy({ chainId: historyData.chainId })
+      ) {
+        await historyDataRepository.update(
+          { chainId: historyData.chainId },
+          historyData
+        )
+      } else {
+        await historyDataRepository.save(historyData)
+      }
     } catch (error) {
       this.logger.error(`Failed to put depositInfo! - ${error}`)
     }

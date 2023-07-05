@@ -1,17 +1,13 @@
 import { NETWORK, NETWORK_TYPE } from "util/network/network.util";
 // testnet addresss
 import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
-import addresses_BobaBase from "@boba/register/addresses/addressesBobaBase_0xF8d0bF3a1411AC973A606f90B2d1ee0840e5979B"
-import addresses_BobaOperaTestnet from "@boba/register/addresses/addressesBobaOperaTestnet_0x12ad9f501149D3FDd703cC10c567F416B7F0af8b"
 import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79"
 import addresses_BobaBnbTestnet from "@boba/register/addresses/addressBobaBnbTestnet_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa"
 
 // mainnet address
 import addresses_Mainnet from "@boba/register/addresses/addressesMainnet_0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089"
-import addresses_BobaBeam from "@boba/register/addresses/addressBobaBeam_0x564c10A60af35a07f0EA8Be3106a4D81014b21a0"
 import addresses_BobaAvax from "@boba/register/addresses/addressBobaAvax_0x00220f8ce1c4be8436574e575fE38558d85e2E6b"
 import addresses_BobaBnb from "@boba/register/addresses/addressBobaBnb_0xeb989B25597259cfa51Bd396cE1d4B085EC4c753"
-import addresses_BobaOpera from "@boba/register/addresses/addressBobaOpera_0x4e7325bcf09e091Bb8119258B885D4ef687B7386"
 
 // layerzero addresses.
 import layerZeroTestnet from "@boba/register/addresses/layerZeroTestnet"
@@ -42,19 +38,12 @@ const ADDRESS_CONFIG = {
       ...layerZeroMainnet.Layer_Zero_Protocol.Avalanche,
       layerZeroTargetChainID: layerZeroMainnet.Layer_Zero_Protocol.Mainnet.Layer_Zero_ChainId,
     },
-    [ NETWORK.MOONBEAM ]: {
-      ...addresses_BobaBeam,
-      ...layerZeroMainnet.BOBA_Bridges.Moonbeam,
-      ...layerZeroMainnet.Layer_Zero_Protocol.Moonbeam,
-      layerZeroTargetChainID: layerZeroMainnet.Layer_Zero_Protocol.Mainnet.Layer_Zero_ChainId,
-    },
     [ NETWORK.BNB ]: {
       ...addresses_BobaBnb,
       ...layerZeroMainnet.BOBA_Bridges.BNB,
       ...layerZeroMainnet.Layer_Zero_Protocol.BNB,
       layerZeroTargetChainID: layerZeroMainnet.Layer_Zero_Protocol.Mainnet.Layer_Zero_ChainId,
-    },
-    [ NETWORK.FANTOM ]: addresses_BobaOpera,
+    }
   },
   [ NETWORK_TYPE.TESTNET ]: {
     [ NETWORK.ETHEREUM ]: {
@@ -69,19 +58,12 @@ const ADDRESS_CONFIG = {
       ...layerZeroTestnet.Layer_Zero_Protocol.Avalanche,
       layerZeroTargetChainID: layerZeroTestnet.Layer_Zero_Protocol.Avalanche.Layer_Zero_ChainId,
     },
-    [ NETWORK.FANTOM ]: {
-      ...addresses_BobaOperaTestnet,
-      ...layerZeroTestnet.BOBA_Bridges.Fantom,
-      ...layerZeroTestnet.Layer_Zero_Protocol.Fantom,
-      layerZeroTargetChainID: layerZeroTestnet.Layer_Zero_Protocol.Fantom.Layer_Zero_ChainId,
-    },
     [ NETWORK.BNB ]: {
       ...addresses_BobaBnbTestnet,
       ...layerZeroTestnet.BOBA_Bridges.BNB,
       ...layerZeroTestnet.Layer_Zero_Protocol.BNB,
-      layerZeroTargetChainID: layerZeroTestnet.Layer_Zero_Protocol.Fantom.Layer_Zero_ChainId,
-    },
-    [ NETWORK.MOONBEAM ]: addresses_BobaBase,
+      layerZeroTargetChainID: layerZeroTestnet.Layer_Zero_Protocol.BNB.Layer_Zero_ChainId,
+    }
   }
 }
 
@@ -129,7 +111,7 @@ const SUPPORTED_ASSETS = {
           'L2': '0xf56b164efd3cfc02ba739b719b6526a6fa1ca32a'
         }
       },
-      altL1Chains: [ 'Moonbeam', 'BNB', 'Fantom', 'Avalanche' ]
+      altL1Chains: [ 'BNB', 'Avalanche' ]
     },
     [ NETWORK.AVAX ]: {
       tokenAddresses: {
@@ -138,48 +120,28 @@ const SUPPORTED_ASSETS = {
       tokens: [ 'BOBA', 'AVAX', 'EVO', 'USDT.e', 'USDt', 'USDC.e', 'BUSD.e', 'BUSD', 'DAI.e' ],
       altL1Chains: [ 'Avalanche' ]
     },
-    [ NETWORK.MOONBEAM ]: {
-      tokenAddresses: {},
-      tokens: [ 'BOBA', 'GLMR' ],
-      altL1Chains: [ 'Moonbeam' ]
-    },
     [ NETWORK.BNB ]: {
       tokenAddresses: {},
       tokens: [ 'BOBA', 'BNB', 'BUSD', 'USDC', 'USDT', 'SUSHI' ],
       altL1Chains: [ 'BNB' ]
-    },
-    [ NETWORK.FANTOM ]: {
-      tokenAddresses: {},
-      tokens: [ 'BOBA', 'FTM', 'USDC', 'DAI' ],
-      altL1Chains: [ 'Bobaopera Mainnet' ]
-    },
+    }
   },
   [ NETWORK_TYPE.TESTNET ]: {
     [ NETWORK.ETHEREUM ]: {
       tokenAddresses: {},
       tokens: [ 'BOBA', 'USDC', 'OMG', 'xBOBA' ],
-      altL1Chains: [ 'BNB', 'Fantom', 'Avalanche' ]
+      altL1Chains: [ 'BNB', 'Avalanche' ]
     },
     [ NETWORK.AVAX ]: {
       tokenAddresses: {},
       tokens: [ 'BOBA', 'AVAX' ],
       altL1Chains: [ 'Avalanche' ]
     },
-    [ NETWORK.MOONBEAM ]: {
-      tokenAddresses: {},
-      tokens: [ 'BOBA', 'GLMR' ],
-      altL1Chains: [ 'Moonbase' ]
-    },
     [ NETWORK.BNB ]: {
       tokenAddresses: {},
       tokens: [ 'BOBA', 'BNB', 'MMT' ],
       altL1Chains: [ 'BNB' ]
-    },
-    [ NETWORK.FANTOM ]: {
-      tokenAddresses: {},
-      tokens: [ 'BOBA', 'FTM' ],
-      altL1Chains: [ 'Fantom' ]
-    },
+    }
   }
 }
 
