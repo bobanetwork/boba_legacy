@@ -48,7 +48,7 @@
     "eslint-config-react-app": "^7.0.0",
     "ethers": "^5.5.4",
     "graphql": "^16.3.0",
-    "html-react-parser": "^1.4.0",
+    "html-react-parser": "^4.0.0",
     "http-browserify": "^1.7.0",
     "https-browserify": "^1.0.0",
     "human-standard-token-abi": "^2.0.0",

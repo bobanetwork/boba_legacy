@@ -63,8 +63,6 @@ import {
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
 
-import BridgeAlert from './BridgeAlert'
-
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   const dispatch = useDispatch()
@@ -295,7 +293,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
-        <BridgeAlert />
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
@@ -320,7 +317,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <BridgeAlert />
         {!isBridge && (
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
             Fast Bridge to L2

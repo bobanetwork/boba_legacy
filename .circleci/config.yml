@@ -26,10 +26,12 @@ commands:
   download-solidity-compilers:
     steps:
       - checkout
+
       - run:
           name: Generate cache key from all hardhat.config.ts files
           working_directory: ops
           command: ./scripts/checksum.sh /tmp/checksum.txt
+
       - restore_cache:
           keys:
             - solc-compilers-{{ checksum "/tmp/checksum.txt" }}-{{ .Environment.CACHE_VERSION }}
@@ -80,7 +82,13 @@ commands:
 
       - run:
           name: Build the side services
-          command: docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+          command: |
+            yq() {
+              docker run --rm -i -v ${PWD}:/workdir mikefarah/yq "$@"
+            }
+            echo $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ')
+            echo $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
+            docker-compose -f <<parameters.docker_compose_file>> -f docker-compose-side.yml build -- $(yq '(.services | keys)[]' <<parameters.docker_compose_file>>  | tr '\n' ' ') $(yq '(.services | keys)[]' docker-compose-side.yml  | tr '\n' ' ')
           working_directory: ops
 
       - run:

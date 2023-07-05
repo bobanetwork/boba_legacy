@@ -1,5 +1,20 @@
 import { BigNumber, Contract, providers } from 'ethers'
 
+export interface SupportedAssets {
+  [address: string]: string // symbol (MUST BE UNIQUE)
+}
+
+export interface AssetReceivedEvent {
+  args: {
+    token: string
+    sourceChainId: BigNumber
+    toChainId: BigNumber
+    depositId: BigNumber
+    emitter: string
+    amount: BigNumber
+  }
+}
+
 export interface ChainInfo {
   chainId: number
   url: string
@@ -8,7 +23,7 @@ export interface ChainInfo {
   name: string
   teleportationAddress: string
   height: number
-  BobaTokenAddress?: string
+  supportedAssets: SupportedAssets
 }
 
 export interface DepositTeleportations {
@@ -20,6 +35,8 @@ export interface DepositTeleportations {
 }
 
 export interface Disbursement {
+  /** @dev Ignored for native disbursements */
+  token: string
   amount: string
   addr: string
   sourceChainId: number | string
