@@ -2,7 +2,7 @@ service: sls-bobaopera-tn-metaTransaction # NOTE: update this with your service 
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   stackName: sls-bobaopera-tn-metaTransaction
   stage: prod
   region: us-east-1

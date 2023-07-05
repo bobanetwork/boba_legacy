@@ -68,7 +68,7 @@ exports[`NotificationBanner  should match snapshot and check show banner when op
       class="c1"
       data-testid="message"
     >
-      BobaOpera is being wound down & will no longer be available, starting June 25th
+      Alert message goes here
       <span
         class="c2"
         role="readMore"
@@ -148,7 +148,7 @@ exports[`NotificationBanner  should match snapshot without message 1`] = `
       class="c1"
       data-testid="message"
     >
-      BobaOpera is being wound down & will no longer be available, starting June 25th
+      Alert message goes here
       <span
         class="c2"
         role="readMore"
