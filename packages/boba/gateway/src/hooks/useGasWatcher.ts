@@ -33,7 +33,7 @@ const useGasWatcher = () => {
 
   const verifierStatus = useSelector(selectVerifierStatus)
   const baseEnabled = useSelector(selectBaseEnabled())
-  const [gas, setGas] = useState<any>({})
+  const [gas, setGas] = useState<any>()
   const networkName = useSelector(selectActiveNetworkName())
   const activeNetwork = useSelector(selectActiveNetwork())
   const activeNetworkType = useSelector(selectActiveNetworkType())
@@ -69,7 +69,8 @@ const useGasWatcher = () => {
     // fetch savings only if network is ethereum and mainnet.
     if (
       activeNetwork === NETWORK.ETHEREUM &&
-      activeNetworkType === NETWORK_TYPE.MAINNET
+      activeNetworkType === NETWORK_TYPE.MAINNET &&
+      gas
     ) {
       getGasSavings()
     }
