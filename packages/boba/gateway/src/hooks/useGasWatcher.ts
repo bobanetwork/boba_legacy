@@ -33,7 +33,7 @@ const useGasWatcher = () => {
 
   const verifierStatus = useSelector(selectVerifierStatus)
   const baseEnabled = useSelector(selectBaseEnabled())
-  const [gas, setGas] = useState<any>()
+  const [gas, setGas] = useState<any>({})
   const networkName = useSelector(selectActiveNetworkName())
   const activeNetwork = useSelector(selectActiveNetwork())
   const activeNetworkType = useSelector(selectActiveNetworkType())

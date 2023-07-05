@@ -25,7 +25,6 @@ import {
   MultiValue,
   SingleValue
 } from './Custom.select';
-import { StyledMenu } from './styles';
 
 function Select({
   label,
