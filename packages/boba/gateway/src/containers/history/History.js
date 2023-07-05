@@ -63,16 +63,11 @@ import AllNetworksIcon from "../../images/allNetworks.svg"
 
 
 const NETWORKS = [
-  {value:"All Networks", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
+  { value:"All Networks", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
   { value: "Avalanche", label: "Avalanche", key: "Avalanche", imgSrc: AvalancheIcon},
-  {value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
+  { value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
   { value: "Ethereum", label: "Ethereum", key: "Ethereum", imgSrc:EthereumIcon},
   { value: "Fantom", label: "Fantom", key: "Fantom", imgSrc: FantomIcon }
-  // {value:"All Networks", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
-  // { value: "Avalanche", label: "Avalanche", key: "Avalanche", imgSrc: AvalancheIcon},
-  // {value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
-  // { value: "Ethereum", label: "Ethereum", key: "Ethereum", imgSrc:EthereumIcon},
-  // { value: "Fantom", label: "Fantom", key: "Fantom", imgSrc:FantomIcon}
 ]
   
 const TABLE_HEADINGS = ["Date", "From", "To", "Token", "Amount", "Status"]
@@ -133,17 +128,24 @@ function History() {
   })
 
   const getDatePicker = (label) => { 
+    const dateSelector = (date) => {
+      label === "To" ? setEndDate(date) : setStartDate(date)
+      console.log("end date:", endDate)
+      console.log("start date:", startDate)
+    } 
     return (<>
       <DatePicker
         wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
         popperClassName={styles.popperStyle}
-        selected={startDate}
-        onChange={(date) => setStartDate(date)}
-        selectsStart
-        endDate={new Date(endDate)}
-        maxDate={new Date(endDate)}
+        selected={label === "To" ? endDate : startDate}
+        onChange={(date) => dateSelector(date)}
+        {...(label === "From" ? { selectsStart: true } : { selectsEnd: true })}
         calendarClassName={theme.palette.mode}
-        placeholderText={isMobile ? {label} : ''}
+        placeholderText={isMobile ? { label } : ''}
+        {...(label === "From" ?
+          { endDate: new Date(endDate)} : { startDate: new Date(startDate), minDate: new Date(startDate) })}
+        maxDate={new Date(now)}
+        
       />
       </>)
   
@@ -179,31 +181,12 @@ function History() {
                   Date range from
                 </div>
               ) : null}
-              <DatePicker
-                wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
-                popperClassName={styles.popperStyle}
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                selectsStart
-                endDate={new Date(endDate)}
-                maxDate={new Date(endDate)}
-                calendarClassName={theme.palette.mode}
-                placeholderText={isMobile ? 'From' : ''}
-              />
+              {getDatePicker("From")}
               {!isMobile ? (
                 <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
               ) : null}
-              <DatePicker
-                wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
-                popperClassName={styles.popperStyle}
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                selectsEnd
-                startDate={new Date(startDate)}
-                minDate={new Date(startDate)}
-                calendarClassName={theme.palette.mode}
-                placeholderText={isMobile ? 'To' : ''}
-              />
+
+              {getDatePicker("To")}
             </div>
           </S.Header>
           
@@ -211,9 +194,13 @@ function History() {
             <S.TableFilters>
               <S.NetworkDropDowns>
                 <div style={{fontSize:'16px'}}>From</div>
-                <Dropdown {...{ items: NETWORKS, defaultItem: selectedNetwork }}/>
+                <Dropdown items={NETWORKS}
+                  defaultItem={activeTab}
+                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))} />
                 <div style={{fontSize:'16px',paddingLeft:'16px'}}>To</div>
-                <Dropdown {...{ items: NETWORKS, defaultItem: selectedNetwork }} />
+                <Dropdown items={NETWORKS}
+                  defaultItem={activeTab}
+                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))} />
               </S.NetworkDropDowns>
               <div>Filter</div>
             </S.TableFilters>
