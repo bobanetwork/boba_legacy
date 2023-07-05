@@ -11,8 +11,8 @@ import '@openzeppelin/contracts/utils/Address.sol';
 /**
  * @title Teleportation
  *
- * Bridge the native asset or whitelisted ERC20 tokens between whitelisted networks (L2's/L1's). 
- * 
+ * Bridge the native asset or whitelisted ERC20 tokens between whitelisted networks (L2's/L1's).
+ *
  * @notice The contract itself emits events and locks the funds to be bridged/teleported. These events are then picked up by a backend service that releases the corresponding token or native asset on the destination network. Withdrawal periods (e.g. for optimistic rollups) are not handled by the contract itself, but would be handled on the Teleportation service if deemed necessary.
  * @dev Implementation of the Teleportation service can be found at https://github.com/bobanetwork/boba within /packages/boba/teleportation if not moved.
  */
@@ -55,7 +55,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      * Variables *
      *************/
 
-    /// @dev Wallet that is being used to release teleported assets on the destination network. 
+    /// @dev Wallet that is being used to release teleported assets on the destination network.
     address public disburser;
 
     /// @dev General owner wallet to change configurations.
@@ -255,7 +255,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         require(_amount >= supToken.minDepositAmount, "Deposit amount too small");
         require(_amount <= supToken.maxDepositAmount, "Deposit amount too big");
         // minimal workaround to keep logic concise
-        require(address(0) != _token || (address(0) == _token && _amount == msg.value), "Native amount invalid");
+        require((address(0) != _token && msg.value == 0) || (address(0) == _token && _amount == msg.value), "Native amount invalid");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time

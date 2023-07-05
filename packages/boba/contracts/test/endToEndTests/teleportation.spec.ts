@@ -713,6 +713,30 @@ describe('Asset Teleportation Tests', async () => {
         expect(preBalance.sub(_amount)).to.be.eq(postBalance.add(gasFee))
       })
 
+      it('should not teleport native asset if amount is not equal msg.value', async () => {
+        const _amount = ethers.utils.parseEther('1')
+        await expect(
+          Proxy__Teleportation.teleportAsset(
+            ethers.constants.AddressZero,
+            _amount,
+            chainId4,
+            { value: ethers.utils.parseEther('1.00001') }
+          )
+        ).to.be.revertedWith('Native amount invalid')
+      })
+
+      it('should not teleport token if msg.value > 0', async () => {
+        const _amount = ethers.utils.parseEther('1')
+        await expect(
+          Proxy__Teleportation.teleportAsset(
+            L2Boba.address,
+            _amount,
+            chainId4,
+            { value: _amount }
+          )
+        ).to.be.revertedWith('Native amount invalid')
+      })
+
       it('should disburse native asset and emit events', async () => {
         const _amount = ethers.utils.parseEther('100')
         const payload = [
