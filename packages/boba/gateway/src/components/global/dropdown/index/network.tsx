@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import ArrowDown from '../../../../images/icons/arrowdown.svg'
 import {
   DropdownContainer,
@@ -43,8 +43,28 @@ export const Dropdown: React.FC<IDropdownProps> = ({
     [onItemSelected]
   )
 
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // const dropdownRef = React.useRef(null);
+  React.useEffect(() => {
+    const handleClickOutside = (e: Event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+    // Bind the event listener
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [dropdownRef])
+
   return (
-    <DropdownContainer className="dropdown">
+    <DropdownContainer className="dropdown" ref={dropdownRef}>
       <Header onClick={handleDropdown}>
         <Option>
           {selectedItem.imgSrc && (

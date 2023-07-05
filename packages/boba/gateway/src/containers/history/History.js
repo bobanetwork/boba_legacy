@@ -196,11 +196,11 @@ function History() {
                 <div style={{fontSize:'16px'}}>From</div>
                 <Dropdown items={NETWORKS}
                   defaultItem={activeTab}
-                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))} />
+                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))}/>
                 <div style={{fontSize:'16px',paddingLeft:'16px'}}>To</div>
                 <Dropdown items={NETWORKS}
                   defaultItem={activeTab}
-                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))} />
+                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))}/>
               </S.NetworkDropDowns>
               <div>Filter</div>
             </S.TableFilters>
