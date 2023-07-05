@@ -198,7 +198,7 @@ const NewProposalModal = ({ open }) => {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {action === '' &&
-            <Typography variant="body2" style={{ lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5' }}>
+            <Typography variant="body2" >
               Currently, the DAO can change the voting threshold, propose free-form text proposals, and
               change to the bridge fee limits for the L1 and L2 bridge pools.
             </Typography>

@@ -80,7 +80,7 @@ const ListProposal = ({ proposal }) => {
     const link = hasLink ? description?.split('@@')[1] : null;
     return link;
   };
-  
+
   const FormatDescription = ({ description }) => {
     return (
       <Typography variant="body2">{getDescription({ description })}</Typography>

@@ -20,10 +20,13 @@ import Input from 'components/input/Input'
 // import Select from 'react-select'
 import Select from 'components/select/Select'
 
+//import { Input } from 'components/global/Input'
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold } from 'selectors'
 import { Button } from 'components/global/button'
-import { Typography } from 'components/global/typography'
+import { ModalTypography } from 'components/global/modalTypography'
+import { Dropdown } from 'components/global/dropdown'
+import { Line } from './style'
 
 const NewProposalModal = ({ open }) => {
 
@@ -44,14 +47,14 @@ const NewProposalModal = ({ open }) => {
 
   const proposalThreshold = useSelector(selectProposalThreshold)
 
-  const onActionChange = (e) => {
+  const onActionChange = (option) => {
     setVotingThreshold('')
     setLPfeeMin('')
     setLPfeeMax('')
     setLPfeeOwn('')
     setProposeText('')
     setProposalUri('')
-    setAction(e.target.value)
+    setAction(option.value)
   }
 
   const handleClose = () => {
@@ -156,49 +159,50 @@ const NewProposalModal = ({ open }) => {
     }
   }
 
+
   return (
-    <Modal open={open} onClose={handleClose} maxWidth="sm" title="New Proposal">
+    <Modal open={open} onClose={handleClose} maxWidth="sm" title="Create Proposal">
       <Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {action === '' &&
-            <Typography variant="body2" >
-              Currently, the DAO can change the voting threshold, propose
-              free-form text proposals, and change to the bridge fee limits for
-              the L1 and L2 bridge pools.
-            </Typography>
-          }
-          <Select
-            options={options}
-            onSelect={onActionChange}
-            styles={customStyles}
-            sx={{ marginBottom: '20px' }}
-            value={action}
-          >
-          </Select>
+          <ModalTypography variant="body2" >
+            At least 100000.0 BOBA + xBOBA are needed to create a new proposal
+          </ModalTypography>
+
+          <Dropdown
+            style={{ zIndex: 2 }}
+            onItemSelected={(option)=> onActionChange(option)}
+            defaultItem={{
+                value: null,
+                label: 'Choose type of proposal',
+            }}
+            items={options}
+          />
+          <Line />
           {action === 'change-threshold' &&
             <>
-              <Typography variant="body2">
+              <ModalTypography variant="body2">
                 The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
-              </Typography>
+              </ModalTypography>
+
               <Input
-                label="DAO voting threshold"
-                placeholder='New voting threshold (e.g. 65000)'
-                value={votingThreshold}
-                type="number"
-                onChange={(i) => setVotingThreshold(i.target.value)}
-                fullWidth
-                sx={{ marginBottom: '20px' }}
-              />
+                  label="DAO voting threshold"
+                  placeholder='New voting threshold (e.g. 65000)'
+                  value={votingThreshold}
+                  type="number"
+                  onChange={(i) => setVotingThreshold(i.target.value)}
+                  fullWidth
+                  sx={{ marginBottom: '20px' }}
+            />
             </>
           }
           {(action === 'change-lp1-fee' || action === 'change-lp2-fee') &&
             <>
-              <Typography variant="body2">
+              <ModalTypography variant="body2">
                 Possible settings range from 0.0% to 5.0%. All three values must
                 be specified and the maximum fee must be larger than the minimum
                 fee.
-              </Typography>
+              </ModalTypography>
               <Input
                 label="New LP minimium fee (%)"
                 placeholder="Minimium fee (e.g. 1.0)"
@@ -227,20 +231,20 @@ const NewProposalModal = ({ open }) => {
           }
           {action === 'text-proposal' &&
             <>
-              <Typography variant="body2">
+              <ModalTypography variant="body2">
                 Your proposal title is limited to 100 characters. Use the link field below to provide more information.
-              </Typography>
+              </ModalTypography>
               <Input
                 placeholder="Title (<100 characters)"
                 value={proposeText}
                 onChange={(i) => setProposeText(i.target.value.slice(0, 100))}
               />
-              <Typography variant="body2">
+              <ModalTypography variant="body2">
                 You should provide additional information (technical
                 specifications, diagrams, forum threads, and other material) on
                 a seperate website. The link length is limited to 150
                 characters. You may need to use a link shortener.
-              </Typography>
+              </ModalTypography>
               <Input
                 placeholder="URI, https://..."
                 value={proposalUri}
