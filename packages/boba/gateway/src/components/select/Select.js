@@ -121,7 +121,6 @@ function Select({
 
   // TODO: Make use of react-select across all.
   if (newSelect) {
-    console.log('options', options)
     return <Box className={[
       styles.Select,
       className
