@@ -3,13 +3,13 @@ import { HeaderProps } from './types'
 import { BobaLogo, HeaderAction, HeaderContainer } from './style'
 import { Button } from 'components/global'
 import ThemeSwitcher from './ThemeSwitcher'
-import Menu from './Menu'
+import Navigation from './Navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { setConnect } from 'actions/setupAction'
 import { selectAccountEnabled, selectLayer } from 'selectors'
 import { WalletAddress } from './WalletAddress'
-import { FeeSwitcher } from 'components/mainMenu'
 import { LAYER } from 'util/constant'
+import FeeSwitcher from './feeSwitcher'
 
 export const Header: FC<HeaderProps> = () => {
   const dispatch = useDispatch<any>()
@@ -23,7 +23,7 @@ export const Header: FC<HeaderProps> = () => {
   return (
     <HeaderContainer>
       <BobaLogo />
-      <Menu />
+      <Navigation />
       <HeaderAction>
         {accountEnabled ? (
           <>

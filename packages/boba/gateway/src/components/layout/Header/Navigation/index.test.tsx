@@ -3,7 +3,7 @@ import React from 'react'
 import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
 import { MemoryRouter } from 'react-router-dom'
-import Menu from '.'
+import Navigation from '.'
 import store from 'store'
 import { MENU_LIST } from './constant'
 
@@ -12,7 +12,7 @@ const renderHeaderMenu = () => {
     <MemoryRouter>
       <Provider store={store}>
         <CustomThemeProvider>
-          <Menu />
+          <Navigation />
         </CustomThemeProvider>
       </Provider>
     </MemoryRouter>
