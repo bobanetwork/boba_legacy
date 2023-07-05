@@ -53,7 +53,6 @@ const Home = () => {
     if (accountEnabled /*== MetaMask is connected*/) {
       dispatch(fetchBalances()) // account specific
       if (activeNetwork === NETWORK.ETHEREUM) {
-        console.log(`calling getFS info - ${accountEnabled}`)
         dispatch(getFS_Info())   // account specific
         dispatch(getFS_Saves()) // account specific
       }

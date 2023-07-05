@@ -5,35 +5,45 @@ import {
   GasListItemLabel,
   GasListItemValue,
 } from './style'
+import useGasWatcher from 'hooks/useGasWatcher'
+import { useSelector } from 'react-redux'
+import { selectActiveNetworkName } from 'selectors'
 
-interface GasWatcherProps {}
+const GasWatcher: FC = () => {
+  const { gas, savings, verifierStatus } = useGasWatcher()
+  const networkName = useSelector(selectActiveNetworkName())
 
-const GasWatcher: FC<GasWatcherProps> = (props) => {
+  if (!gas) {
+    return null
+  }
+
   return (
     <GasListContainer>
       <GasListItem>
-        <GasListItemLabel>Ethereum</GasListItemLabel>
-        <GasListItemValue>10 Gwei</GasListItemValue>
+        <GasListItemLabel>{networkName['l1']}</GasListItemLabel>
+        <GasListItemValue>{gas?.gasL1} Gwei</GasListItemValue>
       </GasListItem>
       <GasListItem>
-        <GasListItemLabel>Boba</GasListItemLabel>
-        <GasListItemValue>10 Gwei</GasListItemValue>
+        <GasListItemLabel>{networkName['l2']}</GasListItemLabel>
+        <GasListItemValue>{gas?.gasL2} Gwei</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>Savings</GasListItemLabel>
-        <GasListItemValue>0x</GasListItemValue>
+        <GasListItemValue>{savings.toFixed(0)}x</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>L1</GasListItemLabel>
-        <GasListItemValue>9190546</GasListItemValue>
+        <GasListItemValue>{gas.blockL1}</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>L2</GasListItemLabel>
-        <GasListItemValue>39317</GasListItemValue>
+        <GasListItemValue>{gas.blockL2}</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>Last Verified Block</GasListItemLabel>
-        <GasListItemValue>38412</GasListItemValue>
+        <GasListItemValue>
+          {Number(verifierStatus?.matchedBlock)}
+        </GasListItemValue>
       </GasListItem>
     </GasListContainer>
   )
