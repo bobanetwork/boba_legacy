@@ -108,40 +108,53 @@ const OldDao = () => {
                 paddingTop:'24px',
               }}
             >
-              <Box sx={{padding:'5px', gap:'10px 0px'}}>
+              <Box sx={{ padding: '5px', gap: '10px 0px' }}>
                 <Typography variant="body3" style={{ opacity: '0.5' }}>BOBA:</Typography>
-                <Typography variant="head" style={{ color: 'rgba(144, 180, 6, 1)' }}>{!!layer ? Math.round(Number(balance)) : '--'}</Typography>
+                <Typography
+                  variant="head"
+                  style={{ color: 'rgba(144, 180, 6, 1)' }}
+                >
+                  {!!layer ? Math.round(Number(balance)) : '--'}
+                </Typography>
               </Box>
               <S.VerticalDivisor />
-              <Box sx={{padding:'5px'}}>
+              <Box sx={{ padding: '5px' }}>
                 <Typography variant="body3" style={{ opacity: '0.5' }}>xBOBA:</Typography>
-                <Typography variant="head" style={{ color: 'rgba(144, 180, 6, 1)' }}>{!!layer ? Math.round(Number(balanceX)) : '--'}</Typography>
+                <Typography
+                  variant="head"
+                  style={{ color: 'rgba(144, 180, 6, 1)' }}
+                >
+                  {!!layer ? Math.round(Number(balanceX)) : '--'}
+                </Typography>
               </Box>
             </Box>
           </Box>
 
           <Box
             sx={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            padding: '24px 0px'
-          }}>
-
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              padding: '24px 0px',
+            }}>
             {layer === 'L2' && 
               <Button
-              onClick={() => { dispatch(openModal('delegateDaoModal')) }}
-              disable={!accountEnabled}
-              label="Stake BOBA"
+                onClick={() => {
+                  dispatch(openModal('delegateDaoModal'))
+                }}
+                disable={!accountEnabled}
+                label="Stake BOBA"
             />
             }
-            <Button
-              disable={!accountEnabled}
-              onClick={() => handleNewProposal()}
-              label="Create proposal"
-              outline
-            />
+            {accountEnabled &&
+              <Button
+                disable={!accountEnabled}
+                onClick={() => handleNewProposal()}
+                label="Create proposal"
+                outline
+              />
+            }
           </Box>
         </S.DaoWalletContainer>
 
@@ -150,12 +163,8 @@ const OldDao = () => {
             options={PROPOSAL_STATES}
             callback={(e) => setSelectedState(e)}
           />
-          
-
           <S.DaoProposalListContainer>
-            {!!loading && !proposals.length && (
-              <Preloader />
-            )}
+            {!!loading && !proposals.length && <Preloader />}
             {proposals
               // eslint-disable-next-line array-callback-return
               .filter((p) => {
@@ -165,9 +174,11 @@ const OldDao = () => {
                 return selectedState.value === p.state;
               })
               .map((p, index) => {
-                return <React.Fragment key={index}>
-                  <ListProposal proposal={p} />
-                </React.Fragment>
+                return (
+                  <React.Fragment key={index}>
+                    <ListProposal proposal={p} />
+                  </React.Fragment>
+                )
               })}
           </S.DaoProposalListContainer>
         </S.DaoProposalContainer>

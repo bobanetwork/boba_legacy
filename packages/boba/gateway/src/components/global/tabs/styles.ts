@@ -19,12 +19,12 @@ export const TabIndex = styled.div<{
   active?: boolean
 }>`
   width: 100%;
-  padding: 8px 40px 8px 40px;
+  padding: 8px 30px 8px 30px;
   text-align: center;
   cursor: pointer;
   border-radius: 8px;
   font-weight: bold;
-  font-size: ${(props) => props.theme.text.body1};
+  font-size: ${(props) => props.theme.text.body2};
   background: transparent;
   ${(props) =>
     props.active &&

@@ -106,7 +106,7 @@ const DelegateDaoModal = ({ open }) => {
       <TabComponent
         tabs={[
           {
-            label: 'To Me',
+            label: 'To Myself',
             content: (
               <>
                 <>
@@ -137,7 +137,7 @@ const DelegateDaoModal = ({ open }) => {
             ),
           },
           {
-            label: 'To other',
+            label: 'To Someone Else',
             content: (
               <>
                 <>

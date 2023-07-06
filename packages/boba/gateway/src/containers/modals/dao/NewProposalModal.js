@@ -276,7 +276,8 @@ const NewProposalModal = ({ open }) => {
           }
           {action === 'text-proposal' &&
             <>
-              <Typography variant="body2"
+              <Typography
+                variant="body2"
                 style={{ lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5' }}
               >
                 Your proposal title is limited to 100 characters. Use the link field below to provide more information.

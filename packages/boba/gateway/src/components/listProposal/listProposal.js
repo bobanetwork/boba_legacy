@@ -61,13 +61,17 @@ const ListProposal = ({ proposal }) => {
   }
 
   const doQueueProposal = async () => {
-    let res = await dispatch(queueProposal(proposal.id))
-    if (res) dispatch(openAlert(`Proposal is queuing`))
+    const res = await dispatch(queueProposal(proposal.id))
+    if (res) {
+      dispatch(openAlert(`Proposal is queuing`))
+    }
   }
 
   const doExecuteProposal = async () => {
-    let res = await dispatch(executeProposal(proposal.id))
-    if (res) dispatch(openAlert(`Proposal is executing`))
+    const res = await dispatch(executeProposal(proposal.id))
+    if (res) {
+      dispatch(openAlert(`Proposal is executing`))
+    }
   }
   const getDescription = ({ description }) => {
     const hasLink = !!description?.includes('@@');
@@ -87,8 +91,8 @@ const ListProposal = ({ proposal }) => {
     )
   };
 
-  const startTime = formatDate(proposal.startTimestamp,'lll');
-  const endTime = formatDate(proposal.endTimestamp,'lll');
+  const startTime = formatDate(proposal.startTimestamp, 'lll')
+  const endTime = formatDate(proposal.endTimestamp, 'lll')
 
   const hasVoted = proposal.hasVoted
 
