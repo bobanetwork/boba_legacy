@@ -26,6 +26,7 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button.js'
+import {DropdownNetwork} from 'components/global/dropdown/themes'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import {
@@ -54,7 +55,7 @@ import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors'
-import { Dropdown } from "components/global/dropdown/index/network"
+import { Dropdown } from "components/global/dropdown"
 import AvalancheIcon from '../../images/avax.svg'
 import BNBIcon from "../../images/bnb.svg"
 import EthereumIcon from "../../images/ethereum.svg"
@@ -63,7 +64,7 @@ import AllNetworksIcon from "../../images/allNetworks.svg"
 
 
 const NETWORKS = [
-  { value:"All Networks", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
+  { value:"All", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
   { value: "Avalanche", label: "Avalanche", key: "Avalanche", imgSrc: AvalancheIcon},
   { value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
   { value: "Ethereum", label: "Ethereum", key: "Ethereum", imgSrc:EthereumIcon},
@@ -76,13 +77,15 @@ const TABLE_HEADINGS = ["Date", "From", "To", "Token", "Amount", "Status"]
 function History() {
 
   const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[0])
+  const [toNetwork, setToNetwork] = useState(null)
+  const [fromNetwork, setFromNetwork] = useState(null)
   const getTableHeadings = () => {
     return (
       <>
       {
-        TABLE_HEADINGS.map((element) => {
+        TABLE_HEADINGS.map((element, i) => {
         return (
-          <div>{element}</div>
+          <div key={`table_heading_${i}`}>{element}</div>
         )
         })}
     </>
@@ -91,9 +94,8 @@ function History() {
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-
+  
   const dispatch = useDispatch()
-
   const now = new Date()
   const last_6months = new Date(
     now.getFullYear(),
@@ -109,6 +111,16 @@ function History() {
   const [searchHistory, setSearchHistory] = useState('')
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
   const networkName = useSelector(selectActiveNetworkName())
+
+  const networkChangeHandler = () => {
+    if (fromNetwork && toNetwork && !(fromNetwork + toNetwork).includes("All")) {
+      dispatch(setActiveHistoryTab(`${fromNetwork } to ${toNetwork}`))
+    } else {
+      dispatch(setActiveHistoryTab('All'))
+    }
+  }
+
+  
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(
@@ -194,13 +206,19 @@ function History() {
             <S.TableFilters>
               <S.NetworkDropDowns>
                 <div style={{fontSize:'16px'}}>From</div>
-                <Dropdown items={NETWORKS}
-                  defaultItem={activeTab}
-                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))}/>
-                <div style={{fontSize:'16px',paddingLeft:'16px'}}>To</div>
-                <Dropdown items={NETWORKS}
-                  defaultItem={activeTab}
-                  onItemSelected={(option) => dispatch(setActiveHistoryTab(option.value))}/>
+                <DropdownNetwork items={NETWORKS}
+                  defaultItem={fromNetwork || selectedNetwork}
+                  onItemSelected={(option) => {
+                    setFromNetwork(option)
+                    networkChangeHandler()
+                  }} />
+                <div style={{ fontSize: '16px', paddingLeft: '16px' }}>To</div>
+                <DropdownNetwork items={NETWORKS}
+                  defaultItem={fromNetwork || selectedNetwork}
+                  onItemSelected={(option) => {
+                    setToNetwork(option)
+                    networkChangeHandler()
+                  }} />
               </S.NetworkDropDowns>
               <div>Filter</div>
             </S.TableFilters>

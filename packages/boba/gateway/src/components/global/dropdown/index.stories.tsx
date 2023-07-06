@@ -1,8 +1,7 @@
 import React from 'react'
 import { StoryFn, Meta } from '@storybook/react'
 
-import { Dropdown } from './index/form'
-import { IDropdownProps } from './interfaces/interfaces'
+import { Dropdown, IDropdownProps } from '.'
 
 export default {
   title: 'Components/Dropdown/Form',

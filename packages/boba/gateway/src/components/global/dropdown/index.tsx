@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
-import ArrowDown from '../../../../images/icons/arrowdown.svg'
+import ArrowDown from '../../../images/icons/arrowdown.svg'
 import {
   DropdownContainer,
   Header,
@@ -9,7 +9,8 @@ import {
   DropdownBody,
   Icon,
   DropdownContent,
-} from '../themes/networkStyles'
+  Arrow,
+} from './styles'
 interface IDropdownItem {
   value: string
   label: string
@@ -17,15 +18,19 @@ interface IDropdownItem {
 }
 
 export interface IDropdownProps {
+  error: boolean
   items: IDropdownItem[]
   defaultItem: IDropdownItem
   onItemSelected?: (item: IDropdownItem) => void
+  className?: string
 }
 
 export const Dropdown: React.FC<IDropdownProps> = ({
   items,
   defaultItem,
+  error = false,
   onItemSelected,
+  className,
 }) => {
   const [selectedItem, setSelectedItem] = useState<IDropdownItem>(defaultItem)
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -34,19 +39,15 @@ export const Dropdown: React.FC<IDropdownProps> = ({
     setIsOpen(!isOpen)
   }, [isOpen])
 
-  const selectItem = useCallback(
-    (item: IDropdownItem) => {
-      setSelectedItem(item)
-      setIsOpen(false)
-      onItemSelected && onItemSelected(item)
-    },
-    [onItemSelected]
-  )
+  const selectItem = useCallback((item: IDropdownItem) => {
+    onItemSelected && onItemSelected(item)
+    setSelectedItem(item)
+    setIsOpen(false)
+  }, [])
 
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // const dropdownRef = React.useRef(null);
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (e: Event) => {
       if (
         dropdownRef.current &&
@@ -63,9 +64,13 @@ export const Dropdown: React.FC<IDropdownProps> = ({
     }
   }, [dropdownRef])
 
+  useEffect(() => {
+    setSelectedItem(defaultItem)
+  }, [defaultItem])
+
   return (
-    <DropdownContainer className="dropdown" ref={dropdownRef}>
-      <Header onClick={handleDropdown}>
+    <DropdownContainer className={`dropdown ${className}`} ref={dropdownRef}>
+      <Header onClick={handleDropdown} error={error}>
         <Option>
           {selectedItem.imgSrc && (
             <IconContainer>
@@ -77,7 +82,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
           )}
           {selectedItem.label}
 
-          {isOpen ? <img src={ArrowDown} /> : <img src={ArrowDown} />}
+          <Arrow src={ArrowDown} />
         </Option>
       </Header>
       {isOpen && (
@@ -87,10 +92,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
               <Option key={index} onClick={() => selectItem(item)}>
                 {item.imgSrc && (
                   <IconContainer>
-                    {item.imgSrc !== 'default' && (
-                      <Icon style={{}} src={item.imgSrc} alt={item.label} />
-                    )}
-                    {item.imgSrc === 'default' && <DefaultIcon />}
+                    <Icon src={item.imgSrc} alt={item.label} />
                   </IconContainer>
                 )}
                 {item.label}
