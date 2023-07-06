@@ -24,7 +24,7 @@ export const Header = styled.div<{ error: boolean }>`
   position: relative;
   z-index: 2;
   color: inherit;
-  border-radius: 14px;
+  border-radius: 12px;
   min-width: 290px;
   padding: 15px;
   transition: 0.25s all;
@@ -49,7 +49,7 @@ export const Header = styled.div<{ error: boolean }>`
     `}
     ${(props) =>
     props.error &&
-    ` 
+    `
       border-color:${props.theme.colors.red[300]}
     `}
 `

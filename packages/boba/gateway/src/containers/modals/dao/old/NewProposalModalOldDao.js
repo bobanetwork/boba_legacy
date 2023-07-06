@@ -17,16 +17,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
-// import Select from 'react-select'
-import Select from 'components/select/Select'
 
-//import { Input } from 'components/global/Input'
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold } from 'selectors'
 import { Button } from 'components/global/button'
 import { ModalTypography } from 'components/global/modalTypography'
 import { Dropdown } from 'components/global/dropdown'
-import { Line } from './style'
 
 const NewProposalModal = ({ open }) => {
 
@@ -178,7 +174,6 @@ const NewProposalModal = ({ open }) => {
             }}
             items={options}
           />
-          <Line />
           {action === 'change-threshold' &&
             <>
               <ModalTypography variant="body2">
