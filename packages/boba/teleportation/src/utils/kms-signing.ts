@@ -15,12 +15,13 @@ import {
   BigNumber,
   constants,
   Contract,
+  PopulatedTransaction,
   providers,
   utils,
   Wallet,
 } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import {Provider} from "@ethersproject/abstract-provider";
+import { Provider } from '@ethersproject/abstract-provider'
 
 const kmsClient = new KMSClient({
   region: 'us-east-1',
@@ -157,14 +158,16 @@ const findRightKey = (msg: Buffer, r: BN, s: BN, expectedEthAddr: string) => {
   return { pubKey, v }
 }
 
-const sendTx = async (
-  providerUrl: string,
-  teleportationAddr: string,
+export const sendTxViaKMS = async (
+  providerUrl: string | Provider,
   contractAddr: string,
-  toAddr: string,
-  amount: BigNumber
+  nativeValue: BigNumber,
+  unsignedTx: PopulatedTransaction
 ) => {
-  const provider = new providers.JsonRpcProvider(providerUrl)
+  const provider =
+    typeof providerUrl === 'string'
+      ? new providers.JsonRpcProvider(providerUrl)
+      : providerUrl
 
   const pubKey = await getPublicKey(keyId)
   const ethAddr = getEthereumAddress(Buffer.from(pubKey.PublicKey))
@@ -177,24 +180,16 @@ const sendTx = async (
     .div('100')
     .toHexString()
 
-  // Not native asset, approve
-  const token = getContractFactory('L2StandardERC20').attach(contractAddr)
-
-  const unsignedTx = await token.populateTransaction.approve(
-    teleportationAddr,
-    amount
-  )
-
   const tx: Transaction = new Transaction(
     {
       nonce: await provider.getTransactionCount(ethAddr),
       gasPrice,
       gasLimit: 160000,
-      to: contractAddr, // TODO
+      to: contractAddr,
       r: sig.r.toBuffer(),
       s: sig.s.toBuffer(),
       v: recoveredPubAddr.v,
-      value: '0x00', // TODO for tokens: amount.toHexString(),
+      value: nativeValue.toHexString(),
       data: Buffer.from(unsignedTx.data.slice('0x'.length), 'hex'),
     }
     /*,{
@@ -202,12 +197,14 @@ const sendTx = async (
     }*/
   )
 
-  await sendRawTx(ethAddr, provider, tx)
-
-
+  return sendRawTx(ethAddr, provider, tx)
 }
 
-const sendRawTx = async (ethAddr: string, provider: Provider, tx: Transaction) => {
+const sendRawTx = async (
+  ethAddr: string,
+  provider: Provider,
+  tx: Transaction
+) => {
   const msgHash = tx.hash(false)
   const sig = await findEthereumSig(msgHash)
   const recoveredPubAddr = findRightKey(msgHash, sig.r, sig.s, ethAddr)
@@ -227,13 +224,3 @@ const sendRawTx = async (ethAddr: string, provider: Provider, tx: Transaction) =
   const serializedTx = tx.serialize().toString('hex')
   return provider.sendTransaction(`0x${serializedTx}`)
 }
-
-sendTx(
-  'https://replica.goerli.boba.network',
-  '0x2af1C32E1dE8e041B7E45525A1Ca3C519Fac312F', // teleporter
-  '0x4200000000000000000000000000000000000023', // constants.AddressZero,
-  '0xb584166074Bf0a2C91FAd4f9C6Bad3C4E166cf2c',
-  utils.parseEther('0.00001')
-)
-  .then(console.log)
-  .catch(console.error)

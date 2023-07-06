@@ -26,6 +26,7 @@ import {
 } from './utils/types'
 import { HistoryData } from './entities/HistoryData.entity'
 import { historyDataRepository } from './data-source'
+import { sendTxViaKMS } from './utils/kms-signing'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -161,12 +162,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
   }
 
-  private getConnectedTokenContract(address: string): Contract {
-    return getContractFactory('L2StandardERC20')
-      .attach(address)
-      .connect(this.options.disburserWallet)
-  }
-
   async _watchTeleportation(
     depositTeleportation: DepositTeleportations,
     latestBlock: number
@@ -289,17 +284,35 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           if (token[0] === ethersConstants.AddressZero) {
             nativeValue = nativeValue.add(token[1])
           } else {
-            const approveTx = await this.getConnectedTokenContract(
+            const contract = getContractFactory('L2StandardERC20').attach(
               token[0]
-            ).approve(this.state.Teleportation.address, token[1])
+            )
+            const approveTxUnsigned =
+              await contract.populateTransaction.approve(
+                this.state.Teleportation.address,
+                token[1]
+              )
+            const approveTx = await sendTxViaKMS(
+              this.state.Teleportation.provider,
+              token[0],
+              BigNumber.from('0'),
+              approveTxUnsigned
+            )
             approvePending.push(approveTx.wait())
           }
         }
         await Promise.all(approvePending)
 
-        const disburseTx = await this.state.Teleportation.disburseAsset(
-          slicedDisbursement,
-          { value: nativeValue }
+        const disburseTxUnsigned =
+          await this.state.Teleportation.populateTransaction.disburseAsset(
+            slicedDisbursement,
+            { value: nativeValue }
+          )
+        const disburseTx = await sendTxViaKMS(
+          this.state.Teleportation.provider,
+          this.state.Teleportation.address,
+          nativeValue,
+          disburseTxUnsigned
         )
         await disburseTx.wait()
 
