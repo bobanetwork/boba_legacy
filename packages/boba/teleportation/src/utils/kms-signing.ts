@@ -1,10 +1,26 @@
-import {GetPublicKeyCommand, KMSClient, SignCommand, SignCommandInput, SignCommandOutput} from '@aws-sdk/client-kms'
+import {
+  GetPublicKeyCommand,
+  KMSClient,
+  SignCommand,
+  SignCommandInput,
+  SignCommandOutput,
+} from '@aws-sdk/client-kms'
 import * as ethutil from 'ethereumjs-util'
 import * as asn1 from 'asn1.js'
 import BN from 'bn.js'
-import { TxData, Transaction} from 'ethereumjs-tx'
+import { TxData, Transaction } from 'ethereumjs-tx'
 import { keccak256 } from '@ethersproject/keccak256'
-import { ethers } from 'ethers'
+import { serialize } from '@ethersproject/transactions'
+import {
+  BigNumber,
+  constants,
+  Contract,
+  providers,
+  utils,
+  Wallet,
+} from 'ethers'
+import { getContractFactory } from '@eth-optimism/contracts'
+import {Provider} from "@ethersproject/abstract-provider";
 
 const kmsClient = new KMSClient({
   region: 'us-east-1',
@@ -45,7 +61,7 @@ const getPublicKey = (keyPairId: string) => {
 }
 
 const getEthereumAddress = (publicKey: Buffer): string => {
-  console.log('Encoded Pub Key: ' + publicKey.toString('hex'))
+  //console.log('Encoded Pub Key: ' + publicKey.toString('hex'))
 
   // The public key is ASN1 encoded in a format according to
   // https://tools.ietf.org/html/rfc5480#section-2
@@ -75,8 +91,8 @@ const findEthereumSig = async (msgHash) => {
   const decoded = EcdsaSigAsnParse.decode(sigBuffer, 'der')
   const r: BN = decoded.r
   let s: BN = decoded.s
-  console.log('r: ' + r.toString(10))
-  console.log('s: ' + s.toString(10))
+  //console.log('r: ' + r.toString(10))
+  //console.log('s: ' + s.toString(10))
 
   const tempsig = r.toString(16) + s.toString(16)
 
@@ -107,20 +123,20 @@ const findEthereumSig = async (msgHash) => {
 }
 
 const recoverPubKeyFromSig = (msg: Buffer, r: BN, s: BN, v: number) => {
-  console.log(
+  /*console.log(
     'Recovering public key with msg ' +
       msg.toString('hex') +
       ' r: ' +
       r.toString(16) +
       ' s: ' +
       s.toString(16)
-  )
+  )*/
   const rBuffer = r.toBuffer()
   const sBuffer = s.toBuffer()
   const pubKey = ethutil.ecrecover(msg, v, rBuffer, sBuffer)
   const addrBuf = ethutil.pubToAddress(pubKey)
   const RecoveredEthAddr = ethutil.bufferToHex(addrBuf)
-  console.log('Recovered ethereum address: ' + RecoveredEthAddr)
+  // console.log('Recovered ethereum address: ' + RecoveredEthAddr)
   return RecoveredEthAddr
 }
 
@@ -141,46 +157,83 @@ const findRightKey = (msg: Buffer, r: BN, s: BN, expectedEthAddr: string) => {
   return { pubKey, v }
 }
 
-const sendTx = async (providerUrl: string, toAddr: string) => {
-  const provider = new ethers.providers.JsonRpcProvider(providerUrl)
+const sendTx = async (
+  providerUrl: string,
+  teleportationAddr: string,
+  contractAddr: string,
+  toAddr: string,
+  amount: BigNumber
+) => {
+  const provider = new providers.JsonRpcProvider(providerUrl)
 
   const pubKey = await getPublicKey(keyId)
   const ethAddr = getEthereumAddress(Buffer.from(pubKey.PublicKey))
   const ethAddrHash = ethutil.keccak(Buffer.from(ethAddr))
-  let sig = await findEthereumSig(ethAddrHash)
-  let recoveredPubAddr = findRightKey(ethAddrHash, sig.r, sig.s, ethAddr)
+  const sig = await findEthereumSig(ethAddrHash)
+  const recoveredPubAddr = findRightKey(ethAddrHash, sig.r, sig.s, ethAddr)
 
-  // TODO: adapt
-  const txParams: TxData = {
-    nonce: await provider.getTransactionCount(ethAddr),
-    gasPrice: '0x0918400000',
-    gasLimit: 160000,
-    to: toAddr,
-    value: '0x00',
-    data: '0x00',
-    r: sig.r.toBuffer(),
-    s: sig.s.toBuffer(),
-    v: recoveredPubAddr.v,
-  }
+  const gasPrice = (await provider.getGasPrice())
+    .mul('120')
+    .div('100')
+    .toHexString()
 
-  console.log(txParams)
+  // Not native asset, approve
+  const token = getContractFactory('L2StandardERC20').attach(contractAddr)
 
-  const tx: Transaction = new Transaction({
-    ...txParams,
-  })
+  const unsignedTx = await token.populateTransaction.approve(
+    teleportationAddr,
+    amount
+  )
 
+  const tx: Transaction = new Transaction(
+    {
+      nonce: await provider.getTransactionCount(ethAddr),
+      gasPrice,
+      gasLimit: 160000,
+      to: contractAddr, // TODO
+      r: sig.r.toBuffer(),
+      s: sig.s.toBuffer(),
+      v: recoveredPubAddr.v,
+      value: '0x00', // TODO for tokens: amount.toHexString(),
+      data: Buffer.from(unsignedTx.data.slice('0x'.length), 'hex'),
+    }
+    /*,{
+      chain: (await provider.getNetwork()).chainId,
+    }*/
+  )
+
+  await sendRawTx(ethAddr, provider, tx)
+
+
+}
+
+const sendRawTx = async (ethAddr: string, provider: Provider, tx: Transaction) => {
   const msgHash = tx.hash(false)
-  sig = await findEthereumSig(msgHash)
-  recoveredPubAddr = findRightKey(msgHash, sig.r, sig.s, ethAddr)
+  const sig = await findEthereumSig(msgHash)
+  const recoveredPubAddr = findRightKey(msgHash, sig.r, sig.s, ethAddr)
   tx.r = sig.r.toBuffer()
   tx.s = sig.s.toBuffer()
   tx.v = new BN(recoveredPubAddr.v).toBuffer()
-  console.log(tx.getSenderAddress().toString('hex'))
+
+  const senderAddr: string = tx.getSenderAddress().toString('hex')
+
+  if (`0x${senderAddr}` !== recoveredPubAddr.pubKey) {
+    throw new Error(
+      'Signature invalid, recovered this sender address: ' + senderAddr
+    )
+  }
 
   // Send signed tx to ethereum network
   const serializedTx = tx.serialize().toString('hex')
-  const res = await provider.sendTransaction(`0x${serializedTx}`)
-  console.log('Receipt: ', res)
+  return provider.sendTransaction(`0x${serializedTx}`)
 }
 
-sendTx('https://goerli.boba.network', '0xb584166074Bf0a2C91FAd4f9C6Bad3C4E166cf2c').then(console.log).catch(console.error)
+sendTx(
+  'https://replica.goerli.boba.network',
+  '0x2af1C32E1dE8e041B7E45525A1Ca3C519Fac312F', // teleporter
+  '0x4200000000000000000000000000000000000023', // constants.AddressZero,
+  '0xb584166074Bf0a2C91FAd4f9C6Bad3C4E166cf2c',
+  utils.parseEther('0.00001')
+)
+  .then(console.log)
+  .catch(console.error)
