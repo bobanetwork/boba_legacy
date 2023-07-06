@@ -40,9 +40,25 @@ const main = async () => {
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
   // This private key is used to send funds to the contract and initiate the tx,
   // so it should have enough BOBA balance
-  const TELEPORTATION_DISBURSER_KEY = config.str(
-    'teleportation-disburser-key',
-    env.TELEPORTATION_DISBURSER_KEY
+  const TELEPORTATION_AWS_KMS_ACCESS_KEY = config.str(
+    'teleportation-aws-kms-access-key',
+    env.TELEPORTATION_AWS_KMS_ACCESS_KEY
+  )
+  const TELEPORTATION_AWS_KMS_SECRET_KEY = config.str(
+    'teleportation-aws-kms-secret-key',
+    env.TELEPORTATION_AWS_KMS_SECRET_KEY
+  )
+  const TELEPORTATION_AWS_KMS_KEY_ID = config.str(
+    'teleportation-aws-kms-key-id',
+    env.TELEPORTATION_AWS_KMS_KEY_ID
+  )
+  const TELEPORTATION_AWS_KMS_REGION = config.str(
+    'teleportation-aws-kms-region',
+    env.TELEPORTATION_AWS_KMS_REGION
+  )
+  const TELEPORTATION_AWS_KMS_ENDPOINT = config.str(
+    'teleportation-aws-kms-endpoint',
+    env.TELEPORTATION_AWS_KMS_ENDPOINT
   )
 
   // Optional
@@ -58,12 +74,17 @@ const main = async () => {
   if (!L2_NODE_WEB3_URL) {
     throw new Error('Must pass L2_NODE_WEB3_URL')
   }
-  if (!TELEPORTATION_DISBURSER_KEY) {
-    throw new Error('Must pass TELEPORTATION_DISBURSER_KEY')
+  if (
+    !TELEPORTATION_AWS_KMS_ACCESS_KEY ||
+    !TELEPORTATION_AWS_KMS_SECRET_KEY ||
+    !TELEPORTATION_AWS_KMS_KEY_ID ||
+    !TELEPORTATION_AWS_KMS_ENDPOINT ||
+    !TELEPORTATION_AWS_KMS_REGION
+  ) {
+    throw new Error('Must pass TELEPORTATION AWS CONFIG ENV')
   }
 
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
-  const disburserWallet = new Wallet(TELEPORTATION_DISBURSER_KEY, l2Provider)
 
   // get all boba chains and exclude the current chain
   const chainId = (await l2Provider.getNetwork()).chainId
@@ -90,11 +111,17 @@ const main = async () => {
     l2RpcProvider: l2Provider,
     chainId,
     teleportationAddress: TELEPORTATION_ADDRESS,
-    disburserWallet,
     selectedBobaChains,
     ownSupportedAssets: originSupportedAssets,
     pollingInterval: POLLING_INTERVAL,
     blockRangePerPolling: BLOCK_RANGE_PER_POLLING,
+    awsConfig: {
+      awsKmsAccessKey: TELEPORTATION_AWS_KMS_ACCESS_KEY,
+      awsKmsSecretKey: TELEPORTATION_AWS_KMS_SECRET_KEY,
+      awsKmsKeyId: TELEPORTATION_AWS_KMS_KEY_ID,
+      awsKmsRegion: TELEPORTATION_AWS_KMS_REGION,
+      awsKmsEndpoint: TELEPORTATION_AWS_KMS_ENDPOINT
+    },
   })
 
   await service.start()

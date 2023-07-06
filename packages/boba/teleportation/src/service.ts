@@ -26,7 +26,7 @@ import {
 } from './utils/types'
 import { HistoryData } from './entities/HistoryData.entity'
 import { historyDataRepository } from './data-source'
-import { sendTxViaKMS } from './utils/kms-signing'
+import { IKMSSignerConfig, KMSSigner } from './utils/kms-signing'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -37,9 +37,6 @@ interface TeleportationOptions {
   // Address of the teleportation contract
   teleportationAddress: string
 
-  // Wallet
-  disburserWallet: Wallet
-
   selectedBobaChains: ChainInfo[]
 
   // Own chain to map token symbols to other networks
@@ -48,6 +45,8 @@ interface TeleportationOptions {
   pollingInterval: number
 
   blockRangePerPolling: number
+
+  awsConfig: IKMSSignerConfig
 }
 
 const optionSettings = {}
@@ -63,6 +62,8 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     supportedChains: ChainInfo[]
     // the contract of the chain that users deposit token
     depositTeleportations: DepositTeleportations[]
+    // AWS KMS Signer for disburser key, ..
+    KMSSigner: KMSSigner
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -70,11 +71,14 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       options: this.options,
     })
 
+    this.logger.info('Initializing KMSSigner...')
+    this.state.KMSSigner = new KMSSigner(this.options.awsConfig)
+
     this.logger.info('Connecting to Teleportation contract...')
     this.state.Teleportation = await getBobaContractAt(
       'Teleportation',
       this.options.teleportationAddress,
-      this.options.disburserWallet
+      this.options.l2RpcProvider
     )
 
     this.logger.info('Connected to Teleportation', {
@@ -83,9 +87,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
     // check the disburser wallet is the disburser of the contract
     const disburserAddress = await this.state.Teleportation.disburser()
-    if (disburserAddress !== this.options.disburserWallet.address) {
+    const kmsSignerAddress = await this.state.KMSSigner.getSignerAddr()
+    if (disburserAddress.toLowerCase() !== kmsSignerAddress.toLowerCase()) {
       throw new Error(
-        `Disburser wallet ${this.options.disburserWallet.address} is not the disburser of the contract ${disburserAddress}`
+        `Disburser wallet ${kmsSignerAddress} is not the disburser of the contract ${disburserAddress}`
       )
     }
 
@@ -134,6 +139,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         })
       }
     }
+    this.logger.info('Teleportation service initialized successfully.')
   }
 
   protected async _start(): Promise<void> {
@@ -176,7 +182,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       // store the new deposit info
       await this._putDepositInfo(chainId, lastBlock)
     }
-    return await this._getEvents(
+    return this._getEvents(
       depositTeleportation.Teleportation,
       this.state.Teleportation.filters.AssetReceived(),
       lastBlock,
@@ -292,7 +298,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
                 this.state.Teleportation.address,
                 token[1]
               )
-            const approveTx = await sendTxViaKMS(
+            const approveTx = await this.state.KMSSigner.sendTxViaKMS(
               this.state.Teleportation.provider,
               token[0],
               BigNumber.from('0'),
@@ -308,7 +314,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             slicedDisbursement,
             { value: nativeValue }
           )
-        const disburseTx = await sendTxViaKMS(
+        const disburseTx = await this.state.KMSSigner.sendTxViaKMS(
           this.state.Teleportation.provider,
           this.state.Teleportation.address,
           nativeValue,
