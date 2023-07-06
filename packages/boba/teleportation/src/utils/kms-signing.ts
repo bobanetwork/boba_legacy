@@ -8,20 +8,13 @@ import {
 import * as ethutil from 'ethereumjs-util'
 import * as asn1 from 'asn1.js'
 import BN from 'bn.js'
-import { TxData, Transaction } from 'ethereumjs-tx'
+import { Transaction } from 'ethereumjs-tx'
 import { keccak256 } from '@ethersproject/keccak256'
-import { serialize } from '@ethersproject/transactions'
 import {
   BigNumber,
-  constants,
-  Contract,
   PopulatedTransaction,
   providers,
-  utils,
-  Wallet,
 } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
-import { Provider } from '@ethersproject/abstract-provider'
 
 const kmsClient = new KMSClient({
   region: 'us-east-1',
@@ -159,7 +152,7 @@ const findRightKey = (msg: Buffer, r: BN, s: BN, expectedEthAddr: string) => {
 }
 
 export const sendTxViaKMS = async (
-  providerUrl: string | Provider,
+  providerUrl: string | providers.Provider,
   contractAddr: string,
   nativeValue: BigNumber,
   unsignedTx: PopulatedTransaction
@@ -202,7 +195,7 @@ export const sendTxViaKMS = async (
 
 const sendRawTx = async (
   ethAddr: string,
-  provider: Provider,
+  provider: providers.Provider,
   tx: Transaction
 ) => {
   const msgHash = tx.hash(false)
