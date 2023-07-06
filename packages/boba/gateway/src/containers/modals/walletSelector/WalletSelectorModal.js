@@ -15,15 +15,16 @@ import networkService from 'services/networkService'
 import metaMaskLogo from 'images/metamask.svg'
 import walletConnectLogo from 'images/walletconnect.svg'
 import { useWalletConnect } from 'hooks/useWalletConnect'
+import { setConnect } from 'actions/setupAction'
 
-function WalletSelectorModal ({ open }) {
+const WalletSelectorModal = ({ open }) => {
 
   const { triggerInit } = useWalletConnect()
 
   const dispatch = useDispatch()
 
   const connectToWallet = async (type) => {
-    function resetConnectChain() {
+    const resetConnectChain = () => {
       dispatch(setConnectETH(false))
       dispatch(setConnectBOBA(false))
     }
@@ -41,8 +42,9 @@ function WalletSelectorModal ({ open }) {
     }
   }
 
-  function handleClose () {
+  const handleClose = () => {
     dispatch(closeModal('walletSelectorModal'))
+    dispatch(setConnect(false))
     dispatch(setConnectETH(false))
     dispatch(setConnectBOBA(false))
   }
