@@ -11,6 +11,11 @@ Keys:
           KeyUsage: SIGN_VERIFY
           Description: ECC key for PROPOSER with curve secp256k1
         PrivateKeyHex: 67f8f3c9fa467b28ead9e08c4e78d089166ebe871f482330860d1c71f613de9e
+      - Metadata:
+          KeyId: 3
+          KeyUsage: SIGN_VERIFY
+          Description: Teleportation disburser key
+        PrivateKeyHex: ee7fa2988cf373f3f6b96e622e740734f5b6a969435f037c7f4f58feea419437
 
 Aliases:
   - AliasName: alias/0x91ef3b19cdb344c5010358718e9347dd5cb2f362
@@ -18,3 +23,6 @@ Aliases:
 
   - AliasName: alias/0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea
     TargetKeyId: 0xf31ca20d67bf4e3ddb4d7546c4a0983f3fa6ffea
+
+  - AliasName: alias/3
+    TargetKeyId: 3

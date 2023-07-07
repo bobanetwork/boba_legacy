@@ -146,7 +146,6 @@ describe('teleportation', () => {
       teleportationAddress: useBnb
         ? TeleportationBNB.address
         : Teleportation.address,
-      disburserWallet: wallet1,
       selectedBobaChains: useBnb ? selectedBobaChainsBnb : selectedBobaChains,
       // only defined one other for the routing tests (so idx 0 = own origin network)
       ownSupportedAssets: useBnb
@@ -154,6 +153,14 @@ describe('teleportation', () => {
         : selectedBobaChainsBnb[0].supportedAssets,
       pollingInterval,
       blockRangePerPolling,
+      awsConfig: {
+        // Default values for local kms endpoint
+        awsKmsAccessKey: process.env.TELEPORTATION_AWS_KMS_ACCESS_KEY ?? '1',
+        awsKmsSecretKey: process.env.TELEPORTATION_AWS_KMS_SECRET_KEY ?? '2',
+        awsKmsKeyId: process.env.TELEPORTATION_AWS_KMS_KEY_ID ?? '3',
+        awsKmsEndpoint: process.env.TELEPORTATION_AWS_KMS_ENDPOINT ?? 'http://kms:8888/',
+        awsKmsRegion: process.env.TELEPORTATION_AWS_KMS_REGION ?? 'us-east-1',
+      },
     })
   }
 
