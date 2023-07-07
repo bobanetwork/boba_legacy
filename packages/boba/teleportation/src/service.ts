@@ -290,7 +290,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           if (token[0] === ethersConstants.AddressZero) {
             nativeValue = nativeValue.add(token[1])
           } else {
-            console.log("Approving: ", token[0], token[1], this.state.Teleportation.address)
             const contract = getContractFactory('L2StandardERC20').attach(
               token[0]
             )
@@ -310,20 +309,17 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         }
         await Promise.all(approvePending)
 
-        console.log("disbursing: ", slicedDisbursement, this.state.Teleportation.address, nativeValue)
         const disburseTxUnsigned =
           await this.state.Teleportation.populateTransaction.disburseAsset(
             slicedDisbursement,
             { value: nativeValue }
           )
-        console.log("Unsinged disbursing tx: ", disburseTxUnsigned, (await this.state.Teleportation.provider.getNetwork()))
         const disburseTx = await this.state.KMSSigner.sendTxViaKMS(
           this.state.Teleportation.provider,
           this.state.Teleportation.address,
           nativeValue,
           disburseTxUnsigned
         )
-        console.log("disburseTX: ", disburseTx, this.state.Teleportation.address, this.state.Teleportation.provider)
         await disburseTx.wait()
 
         sliceStart = sliceEnd
