@@ -2,137 +2,15 @@
 
 exports[`SwitchButton SwitchButton Default State 1`] = `
 <DocumentFragment>
-  .c3 {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  will-change: background-color;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: #E5E5E1;
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-  border-radius: 34px;
-  border: 0px;
-  background-clip: content-box;
-}
-
-.c3:before {
-  position: absolute;
-  border-radius: 17px;
-  content: '';
-  height: 17px;
-  width: 17px;
-  left: 2px;
-  bottom: 2px;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: rgba(253,255,248,0.9);
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.c4:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c4:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c4:disabled + .c2 {
-  background-color: #5F5F5F;
-  border-color: #BEE234;
-}
-
-.c4:disabled + .c2:before {
-  background-color: #262626;
-}
-
-.c4:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c4:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c1 {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  outline: none;
-  border: none;
-}
-
-.c1:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c1:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c1:disabled + .c2 {
-  background-color: #E5E5E1;
-  border-color: #BEE234;
-}
-
-.c1:disabled + .c2:before {
-  background-color: #C8CAC2;
-}
-
-.c1:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c1:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c0 {
-  position: relative;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  width: 35px;
-  height: 21px;
-  border: 0px;
-  background-clip: content-box;
-  border-radius: 34px;
-}
-
-<label
-    class="c0"
+  <label
+    class="sc-ewnqHT byTfLr"
   >
     <input
-      class="c1"
+      class="sc-gTRrQi fYYSjw"
       type="checkbox"
     />
     <span
-      class="c2 c3"
+      class="sc-bgqQcB hNFcsA"
     />
   </label>
 </DocumentFragment>
@@ -140,138 +18,16 @@ exports[`SwitchButton SwitchButton Default State 1`] = `
 
 exports[`SwitchButton SwitchButton is Active 1`] = `
 <DocumentFragment>
-  .c3 {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  will-change: background-color;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: #E5E5E1;
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-  border-radius: 34px;
-  border: 0px;
-  background-clip: content-box;
-}
-
-.c3:before {
-  position: absolute;
-  border-radius: 17px;
-  content: '';
-  height: 17px;
-  width: 17px;
-  left: 2px;
-  bottom: 2px;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: rgba(253,255,248,0.9);
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.c4:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c4:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c4:disabled + .c2 {
-  background-color: #5F5F5F;
-  border-color: #BEE234;
-}
-
-.c4:disabled + .c2:before {
-  background-color: #262626;
-}
-
-.c4:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c4:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c1 {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  outline: none;
-  border: none;
-}
-
-.c1:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c1:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c1:disabled + .c2 {
-  background-color: #E5E5E1;
-  border-color: #BEE234;
-}
-
-.c1:disabled + .c2:before {
-  background-color: #C8CAC2;
-}
-
-.c1:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c1:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c0 {
-  position: relative;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  width: 35px;
-  height: 21px;
-  border: 0px;
-  background-clip: content-box;
-  border-radius: 34px;
-}
-
-<label
-    class="c0"
+  <label
+    class="sc-ewnqHT byTfLr"
   >
     <input
       checked=""
-      class="c1"
+      class="sc-gTRrQi fYYSjw"
       type="checkbox"
     />
     <span
-      class="c2 c3"
+      class="sc-bgqQcB hNFcsA"
     />
   </label>
 </DocumentFragment>
@@ -279,139 +35,17 @@ exports[`SwitchButton SwitchButton is Active 1`] = `
 
 exports[`SwitchButton SwitchButton is Disable & Active 1`] = `
 <DocumentFragment>
-  .c3 {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  will-change: background-color;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: #E5E5E1;
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-  border-radius: 34px;
-  border: 0px;
-  background-clip: content-box;
-}
-
-.c3:before {
-  position: absolute;
-  border-radius: 17px;
-  content: '';
-  height: 17px;
-  width: 17px;
-  left: 2px;
-  bottom: 2px;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: rgba(253,255,248,0.9);
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.c4:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c4:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c4:disabled + .c2 {
-  background-color: #5F5F5F;
-  border-color: #BEE234;
-}
-
-.c4:disabled + .c2:before {
-  background-color: #262626;
-}
-
-.c4:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c4:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c1 {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  outline: none;
-  border: none;
-}
-
-.c1:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c1:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c1:disabled + .c2 {
-  background-color: #E5E5E1;
-  border-color: #BEE234;
-}
-
-.c1:disabled + .c2:before {
-  background-color: #C8CAC2;
-}
-
-.c1:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c1:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c0 {
-  position: relative;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  width: 35px;
-  height: 21px;
-  border: 0px;
-  background-clip: content-box;
-  border-radius: 34px;
-}
-
-<label
-    class="c0"
+  <label
+    class="sc-ewnqHT byTfLr"
   >
     <input
       checked=""
-      class="c1"
+      class="sc-gTRrQi fYYSjw"
       disabled=""
       type="checkbox"
     />
     <span
-      class="c2 c3"
+      class="sc-bgqQcB hNFcsA"
     />
   </label>
 </DocumentFragment>
@@ -419,138 +53,16 @@ exports[`SwitchButton SwitchButton is Disable & Active 1`] = `
 
 exports[`SwitchButton SwitchButton is Disable 1`] = `
 <DocumentFragment>
-  .c3 {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  will-change: background-color;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: #E5E5E1;
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.2s;
-  transition: 0.2s;
-  border-radius: 34px;
-  border: 0px;
-  background-clip: content-box;
-}
-
-.c3:before {
-  position: absolute;
-  border-radius: 17px;
-  content: '';
-  height: 17px;
-  width: 17px;
-  left: 2px;
-  bottom: 2px;
-  -webkit-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  transform: translateZ(0);
-  background-color: rgba(253,255,248,0.9);
-  -webkit-transition: 0.4s;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.c4:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c4:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c4:disabled + .c2 {
-  background-color: #5F5F5F;
-  border-color: #BEE234;
-}
-
-.c4:disabled + .c2:before {
-  background-color: #262626;
-}
-
-.c4:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c4:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c1 {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  outline: none;
-  border: none;
-}
-
-.c1:checked + .c2 {
-  background-color: #AEDB01;
-  border-color: #AEDB01;
-}
-
-.c1:checked + .c2:before {
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  -webkit-transform: translateX(14px);
-  -ms-transform: translateX(14px);
-  transform: translateX(14px);
-}
-
-.c1:disabled + .c2 {
-  background-color: #E5E5E1;
-  border-color: #BEE234;
-}
-
-.c1:disabled + .c2:before {
-  background-color: #C8CAC2;
-}
-
-.c1:disabled:checked + .c2 {
-  background-color: #637A0D;
-  border-color: #637A0D;
-}
-
-.c1:focus + .c2 {
-  outline: none;
-  box-shadow: 0 0 1px #2196f3;
-}
-
-.c0 {
-  position: relative;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  width: 35px;
-  height: 21px;
-  border: 0px;
-  background-clip: content-box;
-  border-radius: 34px;
-}
-
-<label
-    class="c0"
+  <label
+    class="sc-ewnqHT byTfLr"
   >
     <input
-      class="c1"
+      class="sc-gTRrQi fYYSjw"
       disabled=""
       type="checkbox"
     />
     <span
-      class="c2 c3"
+      class="sc-bgqQcB hNFcsA"
     />
   </label>
 </DocumentFragment>
