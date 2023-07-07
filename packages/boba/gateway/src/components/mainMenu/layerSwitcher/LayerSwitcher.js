@@ -56,7 +56,7 @@ import {
   setWalletConnected
 } from 'actions/setupAction'
 
-import { fetchTransactions } from 'actions/networkAction'
+import { addTokenList, fetchTransactions } from 'actions/networkAction'
 
 import { closeModal, openModal } from 'actions/uiAction'
 import Button from 'components/button/Button'
@@ -117,6 +117,7 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
         dispatch(fetchTransactions())
+        dispatch(addTokenList())
         return true
       } else {
         return false

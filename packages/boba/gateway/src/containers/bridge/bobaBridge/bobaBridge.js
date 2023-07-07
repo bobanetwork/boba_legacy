@@ -136,37 +136,30 @@ function BobaBridge() {
     return (
       <>
       <S.BobaContent>
-        <S.BobaContentWrapper
-          flexDirection="row"
-          fullWidth={true}
-          gap="10px"
+        <Box width="100%">
+          <S.ChainDirectionLabel variant="body2" pb="10px" sx={{color: theme.palette.primary.info}}>
+            From
+          </S.ChainDirectionLabel>
+          <S.ChainInput>
+            { config().from }
+          </S.ChainInput>
+        </Box>
+        <Box
+          display="flex"
+          flexDirection="column"
           alignItems="flex-end"
+          mt="26px"
         >
-          <Box width="100%">
-            <S.ChainDirectionLabel variant="body2" pb="10px" sx={{color: theme.palette.primary.info}}>
-              From
-            </S.ChainDirectionLabel>
-            <S.ChainInput>
-              { config().from }
-            </S.ChainInput>
-          </Box>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="flex-end"
-            mt="26px"
-          >
-            <ChainSwitchIcon />
-          </Box>
-          <Box width="100%">
-            <S.ChainDirectionLabel variant="body2" pb="10px">
-              To
-            </S.ChainDirectionLabel>
-            <S.ChainInput>
-                { config().to }
-            </S.ChainInput>
-          </Box>
-        </S.BobaContentWrapper>
+          <ChainSwitchIcon />
+        </Box>
+        <Box width="100%">
+          <S.ChainDirectionLabel variant="body2" pb="10px">
+            To
+          </S.ChainDirectionLabel>
+          <S.ChainInput>
+              { config().to }
+          </S.ChainInput>
+        </Box>
       </S.BobaContent>
       {!accountEnabled &&
         <Box alignSelf="center">

@@ -23,7 +23,7 @@ import { MenuProps } from './types'
  * @returns
  */
 
-const Menu: FC<MenuProps> = ({ isOpen }) => {
+const Navigation: FC<MenuProps> = ({ isOpen }) => {
   return (
     <StyledNav>
       {MENU_LIST.map((menu) => {
@@ -42,4 +42,4 @@ const Menu: FC<MenuProps> = ({ isOpen }) => {
   )
 }
 
-export default Menu
+export default Navigation
