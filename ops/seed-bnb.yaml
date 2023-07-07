@@ -15,7 +15,7 @@ Keys:
           KeyId: 3
           KeyUsage: SIGN_VERIFY
           Description: Teleportation disburser key
-        PrivateKeyHex: c526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa
+        PrivateKeyHex: 81f43b0303746bfacbaae64947850e86deca412d3b39b1f8d3c89bf483d615f3
 
 Aliases:
   - AliasName: alias/0x91ef3b19cdb344c5010358718e9347dd5cb2f362
