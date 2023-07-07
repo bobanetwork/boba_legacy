@@ -196,7 +196,7 @@ export class KMSSigner {
       {
         nonce: await provider.getTransactionCount(ethAddr),
         gasPrice,
-        gasLimit: 160000,
+        gasLimit: 10_000_000,
         to: contractAddr,
         r: sig.r.toBuffer(),
         s: sig.s.toBuffer(),
