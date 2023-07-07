@@ -44,7 +44,7 @@ import networkService from 'services/networkService'
 
 import { WrapperActionsModal } from 'components/modal/Modal.styles'
 
-function TransferModal ({ open, token, minHeight }) {
+function TransferModal ({ open, token }) {
 
   const dispatch = useDispatch()
 

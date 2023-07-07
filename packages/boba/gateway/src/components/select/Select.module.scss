@@ -1,9 +1,6 @@
-@import 'index.scss';
-
 .Select {
   display: flex;
   flex-direction: column;
-  // margin-bottom: 10px;
   min-width: 100px;
 
   .label {
@@ -27,7 +24,7 @@
     padding-right: 10px;
     -webkit-appearance: none;
     -webkit-border-radius: 0;
-    color: $gray3;
+    color: #565656;
     position: absolute;
     left: 0;
     top: 0;

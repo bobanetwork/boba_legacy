@@ -24,7 +24,6 @@ import tokenReducer from './tokenReducer'
 import nftReducer from './nftReducer'
 import uiReducer from './uiReducer'
 import setupReducer from './setupReducer'
-import notificationReducer from './notificationReducer'
 import earnReduer from './earnReducer'
 import lookupReducer from './lookupReducer'
 import signatureReducer from './signatureReducer'
@@ -47,7 +46,6 @@ const rootReducer = combineReducers({
   nft: nftReducer,
   ui: uiReducer,
   setup: setupReducer,
-  notification: notificationReducer,
   earn: earnReduer,
   lookup: lookupReducer,
   dao: daoReducer,

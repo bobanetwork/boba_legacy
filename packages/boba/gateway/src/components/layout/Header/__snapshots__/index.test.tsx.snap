@@ -1,360 +1,57 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Layout => Header should button with label connect wallet 1`] = `
-<DocumentFragment>
-  .c5 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
-  font-size: 14px;
-  border-radius: 33px;
-  min-width: auto;
-}
-
-.c5:hover {
-  background: #90B406;
-}
-
-.c0 {
-  height: 73px;
-  margin: 0px 32px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-}
-
-.c1 {
-  width: 40px;
-  height: 40px;
-  margin-right: 32px;
-  background: url(boba-logo.png) no-repeat;
-  background-position: 100%;
-  background-size: contain;
-}
-
-.c4 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  gap: 32px;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  -webkit-box-pack: end;
-  -webkit-justify-content: flex-end;
-  -ms-flex-pack: end;
-  justify-content: flex-end;
-}
-
-.c2 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  gap: 24px;
-}
-
-.c3 {
-  font-size: 14px;
-  line-height: 16px;
-  font-weight: 500;
-  text-transform: uppercase;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  color: #A8A8A8;
-}
-
-.c3:hover,
-.c3.active {
-  color: #AEDB01;
-}
-
-<div
-    class="c0"
-  >
-    <div
-      class="c1"
-    />
-    <div
-      class="c2"
-    >
-      <a
-        activeclassname="active"
-        class="c3"
-        href="/bridge"
-      >
-        Bridge
-      </a>
-      <a
-        activeclassname="active"
-        class="c3"
-        href="/ecosystem"
-      >
-        Ecosystem
-      </a>
-      <a
-        activeclassname="active"
-        class="c3"
-        href="/history"
-      >
-        History
-      </a>
-      <a
-        activeclassname="active"
-        class="c3"
-        href="/earn"
-      >
-        Earn
-      </a>
-      <a
-        activeclassname="active"
-        class="c3"
-        href="/stake"
-      >
-        Stake
-      </a>
-      <a
-        activeclassname="active"
-        class="c3"
-        href="/DAO"
-      >
-        Dao
-      </a>
-    </div>
-    <div
-      class="c4"
-    >
-      <button
-        class="c5"
-        type="button"
-      >
-         Connect Wallet
-      </button>
-      <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
-        tabindex="0"
-        type="button"
-      >
-        <div>
-          <div>
-            <div
-              data-src="theme-sun.svg"
-              src=""
-            />
-          </div>
-        </div>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
-      </button>
-    </div>
-  </div>
-</DocumentFragment>
-`;
-
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
-  .c5 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: background-color 0.25s ease;
-  transition: background-color 0.25s ease;
-  font-size: 14px;
-  border-radius: 33px;
-  min-width: auto;
-}
-
-.c5:hover {
-  background: #90B406;
-}
-
-.c0 {
-  height: 73px;
-  margin: 0px;
-  padding: 0px 32px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: start;
-  -webkit-justify-content: flex-start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  -webkit-backdrop-filter: blur(7.5px);
-  backdrop-filter: blur(7.5px);
-  background: rgba(0,0,0,0.05);
-}
-
-.c1 {
-  width: 40px;
-  height: 40px;
-  margin-right: 32px;
-  background: url(boba-logo.png) no-repeat;
-  background-position: 100%;
-  background-size: contain;
-}
-
-.c4 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  gap: 32px;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  -webkit-box-pack: end;
-  -webkit-justify-content: flex-end;
-  -ms-flex-pack: end;
-  justify-content: flex-end;
-}
-
-.c2 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  gap: 24px;
-}
-
-.c3 {
-  font-size: 14px;
-  line-height: 16px;
-  font-weight: 500;
-  text-transform: uppercase;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  color: #A8A8A8;
-}
-
-.c3:hover,
-.c3.active {
-  color: #AEDB01;
-}
-
-<div
-    class="c0"
+  <div
+    class="sc-eywOmQ fauosd"
   >
     <div
-      class="c1"
+      class="sc-eAzDjm kajovC"
     />
     <div
-      class="c2"
+      class="sc-hUOJWJ cbCyxP"
     >
       <a
         activeclassname="active"
-        class="c3"
+        class="sc-dPwPAC gNHJEr"
         href="/bridge"
       >
         Bridge
       </a>
       <a
         activeclassname="active"
-        class="c3"
+        class="sc-dPwPAC gNHJEr"
         href="/history"
       >
         History
       </a>
       <a
         activeclassname="active"
-        class="c3"
+        class="sc-dPwPAC gNHJEr"
         href="/earn"
       >
         Earn
       </a>
       <a
         activeclassname="active"
-        class="c3"
+        class="sc-dPwPAC gNHJEr"
         href="/stake"
       >
         Stake
       </a>
       <a
         activeclassname="active"
-        class="c3"
+        class="sc-dPwPAC gNHJEr"
         href="/DAO"
       >
         Dao
       </a>
     </div>
     <div
-      class="c4"
+      class="sc-fABZjn daRNmZ"
     >
       <button
-        class="c5"
+        class="sc-kuWgmH fwvaEM"
         type="button"
       >
          Connect Wallet
@@ -362,6 +59,7 @@ exports[`Layout => Header should match the snapshot 1`] = `
       <button
         class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
         tabindex="0"
+        title="light-icon"
         type="button"
       >
         <div>

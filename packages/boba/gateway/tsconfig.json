@@ -22,7 +22,8 @@
     "types": ["jest", "testing-library__jest-dom"],
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "types/custom.d.ts",
   ],
   "include": [
     "src"

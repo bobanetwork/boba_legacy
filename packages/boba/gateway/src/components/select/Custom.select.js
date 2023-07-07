@@ -1,8 +1,8 @@
 import React from 'react'
-import { Box, Typography } from '@mui/material';
+
 import { components } from 'react-select';
-import * as G from 'containers/Global.styles';
-import * as S from './Select.style';
+import { IconContainer, ValueContainer } from './styles';
+import { Typography } from 'components/global';
 
 export const Option = (props) => {
 
@@ -12,21 +12,16 @@ export const Option = (props) => {
     label,
     subTitle
   } = props.data;
-
   return <>
     <components.Option {...props}>
-      <S.SelectOptionContainer p={2} gap={2}>
-        {icon && <Box display='flex'>
-          <G.ThumbnailContainer px={2} py={1}>
-            <img src={icon} alt={title} />
-          </G.ThumbnailContainer>
-        </Box>}
-        <Box>
-          {label && <Typography variant="body1">{label}</Typography>}
-          {title && <Typography variant="body2" style={{ opacity: 0.6 }}>{title}</Typography>}
-          {subTitle && <Typography variant="body2" style={{ opacity: 0.6 }}>{subTitle}</Typography>}
-        </Box>
-      </S.SelectOptionContainer>
+      <ValueContainer>
+        {icon && <IconContainer>
+          <img src={icon} alt={title} width="100%"/>
+        </IconContainer>}
+        {label && <Typography variant="body3">{label}</Typography>}
+        {title && <Typography variant="body3" >{title}</Typography>}
+        {subTitle && <Typography variant="body3" >{subTitle}</Typography>}
+      </ValueContainer>
     </components.Option>
   </>
 }
@@ -41,10 +36,16 @@ export const MultiValue = (props) => {
   </>
 }
 export const SingleValue = (props) => {
-
+  const { icon, title, label, subTitle } = props.data;
   return <>
     <components.SingleValue  {...props}>
-      <Typography variant="body2">{props.data.label}</Typography>
+      <ValueContainer>
+        {icon && <IconContainer>
+          <img src={icon} alt={title} width="100%"/>
+        </IconContainer>}
+        {label && <Typography variant="body1">{label}</Typography>}
+        {title && <Typography variant="body2" >{title}</Typography>}
+      </ValueContainer>
     </components.SingleValue>
   </>
 }

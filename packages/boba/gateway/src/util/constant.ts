@@ -20,7 +20,6 @@ export const INFURA_ID: EnvType = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG: EnvType =
   process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION: EnvType = process.env.REACT_APP_WALLET_VERSION
-export const APP_STATUS: EnvType = process.env.REACT_APP_STATUS || 'normal'
 export const SPEED_CHECK: EnvType = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL: EnvType = process.env.REACT_APP_TARGET_CHAIN_URL
 // VE DAO FLAG

@@ -15,6 +15,7 @@ limitations under the License. */
 
 import React from 'react';
 import ReactSelect from 'react-select';
+import { useTheme as useThemeStyle } from 'styled-components';
 import { Select as MuiSelect, MenuItem, useTheme, Typography, Box } from '@mui/material';
 import styles from './Select.module.scss';
 import * as S from './Select.style';
@@ -38,6 +39,7 @@ function Select({
   isLoading = false,
 }) {
   const theme = useTheme();
+  const styledTheme = useThemeStyle()
   const selected = options.find(i => i.value === value);
 
   function renderOption(i) {
@@ -130,32 +132,37 @@ function Select({
         options={options}
         isLoading={isLoading}
         styles={{
+          menu: (base) => ({
+            ...base,
+            padding: '10px 5px',
+            background: styledTheme.colors.gray[ 400 ],
+            borderRadius: '8px',
+            zIndex: 100,
+          }),
+          option: (base) => ({
+            ...base,
+            background: styledTheme.colors.gray[ 400 ],
+            cursor: 'pointer',
+          }),
           control: (base) => ({
             ...base,
-            background: theme.palette.background.default,
-            borderRadius: theme.palette.primary.borderRadius,
-            padding: '5px 10px',
+            background: styledTheme.colors.gray[ 400 ],
+            borderRadius: '33px',
+            padding: '0 10px',
             width: '100%',
-            border: '1px solid rgba(255, 255, 255, 0.14)'
+            border: '0px'
           }),
           indicatorSeparator: (base) => ({
             ...base,
             display: 'none',
           }),
-          container: (base) => ({
-            ...base,
-            background: 'none'
-          }),
           singleValue: (base) => ({
             ...base,
-            background: 'transparent',
-            color: theme.palette.secondary.text,
-            padding: '5px'
+            color: theme.color,
           }),
           multiValue: (base) => ({
             ...base,
-            background: theme.palette.background.secondary,
-            color: theme.palette.secondary.text,
+            color: theme.color,
             marginRight: '5px',
             paddingRight: '5px',
           }),
@@ -168,7 +175,7 @@ function Select({
         components={{
           Option,
           MultiValue,
-          SingleValue
+          SingleValue,
         }}
       />
     </Box>

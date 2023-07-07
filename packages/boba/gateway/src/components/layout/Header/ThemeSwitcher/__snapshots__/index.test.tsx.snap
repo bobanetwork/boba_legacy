@@ -5,6 +5,7 @@ exports[`Layout => Header => ThemeSwitcher should match the snapshot 1`] = `
   <button
     class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
     tabindex="0"
+    title="light-icon"
     type="button"
   >
     <div>
