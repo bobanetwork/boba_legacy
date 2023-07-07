@@ -73,8 +73,6 @@ export class KMSSigner {
   }
 
   private getEthereumAddress = (publicKey: Buffer): string => {
-    //console.log('Encoded Pub Key: ' + publicKey.toString('hex'))
-
     // The public key is ASN1 encoded in a format according to
     // https://tools.ietf.org/html/rfc5480#section-2
     // I used https://lapo.it/asn1js to figure out how to parse this
@@ -88,7 +86,6 @@ export class KMSSigner {
 
     const address = keccak256(pubKeyBuffer) // keccak256 hash of publicKey
     const ethAddr = `0x${address.substring(address.length - 40)}`
-    console.log('Generated Ethreum address: ' + ethAddr)
     return ethAddr
   }
 
@@ -98,13 +95,10 @@ export class KMSSigner {
       throw new Error('Signature is undefined.')
     }
     const sigBuffer: Buffer = Buffer.from(signature.Signature)
-    console.log('encoded sig: ' + sigBuffer.toString('hex'))
 
     const decoded = this.EcdsaSigAsnParse.decode(sigBuffer, 'der')
     const r: BN = decoded.r
     let s: BN = decoded.s
-    //console.log('r: ' + r.toString(10))
-    //console.log('s: ' + s.toString(10))
 
     const tempsig = r.toString(16) + s.toString(16)
 
@@ -117,17 +111,10 @@ export class KMSSigner {
     // the value of s needs to be SMALLER than half of the curve
     // i.e. we need to flip s if it's greater than half of the curve
     if (s.gt(secp256k1halfN)) {
-      console.log(
-        's is on the wrong side of the curve... flipping - tempsig: ' +
-          tempsig +
-          ' length: ' +
-          tempsig.length
-      )
       // According to EIP2 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md
       // if s < half the curve we need to invert it
       // s = curve.n - s
       s = secp256k1N.sub(s)
-      console.log('new s: ' + s.toString(10))
       return { r, s }
     }
     // if s is less than half of the curve, we're on the "good" side of the curve, we can just return
@@ -140,7 +127,6 @@ export class KMSSigner {
     const pubKey = ethutil.ecrecover(msg, v, rBuffer, sBuffer)
     const addrBuf = ethutil.pubToAddress(pubKey)
     const RecoveredEthAddr = ethutil.bufferToHex(addrBuf)
-    // console.log('Recovered ethereum address: ' + RecoveredEthAddr)
     return RecoveredEthAddr
   }
 
@@ -157,7 +143,6 @@ export class KMSSigner {
       v = 28
       pubKey = this.recoverPubKeyFromSig(msg, r, s, v)
     }
-    console.log('Found the right ETH Address: ' + pubKey + ' v: ' + v)
     return { pubKey, v }
   }
 
