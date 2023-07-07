@@ -25,7 +25,7 @@ import { GAS_POLL_INTERVAL } from 'util/constant'
    const gasSavings = (Number(gas.gasL1) * (l2Fee - l1SecurityFee) / Number(gas.gasL2)) / l2Fee;
    The l1 security fee is directly deducted from the user's account
  *
- *
+ * NOTE:TODO: https://github.com/bobanetwork/boba/pull/982#discussion_r1253868688
  */
 
 const useGasWatcher = () => {

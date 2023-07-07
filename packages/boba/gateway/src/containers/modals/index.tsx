@@ -22,6 +22,11 @@ import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 
+/**
+ *
+ * NOTE:TODO: https://github.com/bobanetwork/boba/pull/982#discussion_r1253868688
+ */
+
 const ModalContainer = () => {
   const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(
