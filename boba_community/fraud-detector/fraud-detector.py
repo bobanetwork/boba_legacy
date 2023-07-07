@@ -83,11 +83,6 @@ batch_size =1000
 
 rpc = [None]*4
 
-rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
-if 'rinkeby' in os.environ['L1_NODE_WEB3_URL']:
-  rpc[1].middleware_onion.inject(geth_poa_middleware, layer=0)
-assert (rpc[1].isConnected())
-logger.debug ("Connected to L1_NODE_WEB3_URL")
 
 while True:
   try:
