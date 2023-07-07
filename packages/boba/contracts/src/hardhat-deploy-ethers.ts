@@ -114,7 +114,9 @@ export const getBobaContractAt = async (
   address: string,
   signer?: any
 ) => {
-  if (!signer) return new Contract(address, getContractArtifact(name).abi)
+  if (!signer) {
+    return new Contract(address, getContractArtifact(name).abi)
+  }
   return new Contract(address, getContractArtifact(name).abi, signer)
 }
 
