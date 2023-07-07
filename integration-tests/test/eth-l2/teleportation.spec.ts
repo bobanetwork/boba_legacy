@@ -26,10 +26,8 @@ import {
   historyDataRepository,
 } from '@boba/teleportation/src/data-source'
 import { OptimismEnv } from './shared/env'
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
-// TODO: Remove only
-describe.only('teleportation', () => {
+describe('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
