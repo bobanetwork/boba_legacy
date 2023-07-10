@@ -639,7 +639,7 @@ class NetworkService {
     }
   }
 
-  async initializeAccount({ networkGateway: network, networkType, chainIdChanged }) {
+  async initializeAccount({chainIdChanged}) {
 
     try {
 
@@ -655,25 +655,24 @@ class NetworkService {
 
       let chainId = chainIdChanged
       if (!chainId) {
-        chainId = await this.provider.getNetwork().then(network => network.chainId)
+        chainId = await this.provider.getNetwork().then(nt => nt.chainId)
       }
-      this.networkGateway = network
-      this.networkType = networkType
 
       // defines the set of possible networks along with chainId for L1 and L2
       const networkDetail = getNetworkDetail({
-        network,
-        networkType
+        network: this.networkGateway,
+        networkType: this.networkType
       })
+
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
-      if (!!NETWORK[ network ] && chainId === L2ChainId) {
+      if (!!NETWORK[ this.networkGateway ] && chainId === L2ChainId) {
         this.L1orL2 = 'L2';
-      } else if(!!NETWORK[ network ] && chainId === L1ChainId) {
+      } else if(!!NETWORK[ this.networkGateway ] && chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
         return 'wrongnetwork'
@@ -3823,7 +3822,6 @@ class NetworkService {
   async withdrawFS_Savings(stakeID) {
 
     if(!this.account) {
-      console.log('NS: withdrawFS_Savings() error - called but account === null')
       return
     }
 
@@ -3845,7 +3843,6 @@ class NetworkService {
   async getFS_Saves() {
 
     if(this.account === null) {
-      console.log('NS: getFS_Saves() error - called but account === null')
       return
     }
 

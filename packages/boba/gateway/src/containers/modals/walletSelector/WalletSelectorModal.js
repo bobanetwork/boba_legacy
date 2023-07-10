@@ -22,6 +22,12 @@ import ArrowIcon from 'images/icons/arrowright.svg'
 import { Wallets, Wallet, Icon, ArrowContainer, IconContainer } from './styles'
 
 const WalletSelectorModal = ({ open }) => {
+import { useWalletConnect } from 'hooks/useWalletConnect'
+import { setConnect } from 'actions/setupAction'
+
+const WalletSelectorModal = ({ open }) => {
+
+  const { triggerInit } = useWalletConnect()
 
   const dispatch = useDispatch()
 
@@ -34,7 +40,7 @@ const WalletSelectorModal = ({ open }) => {
     try {
       if (await networkService.walletService.connectWallet(type)) {
         dispatch(closeModal('walletSelectorModal'))
-        dispatch(setWalletConnected(true))
+        triggerInit();
       } else {
         resetConnectChain()
       }
@@ -46,6 +52,7 @@ const WalletSelectorModal = ({ open }) => {
 
   const handleClose = () => {
     dispatch(closeModal('walletSelectorModal'))
+    dispatch(setConnect(false))
     dispatch(setConnectETH(false))
     dispatch(setConnectBOBA(false))
   }

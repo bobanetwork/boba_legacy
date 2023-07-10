@@ -29,7 +29,7 @@ import Input from 'components/input/Input'
 
 import { WrapperActionsModal } from 'components/modal/styles'
 
-function TransferNFTModal ({ open, token, minHeight }) {
+function TransferNFTModal ({ open, token }) {
 
   const dispatch = useDispatch()
 

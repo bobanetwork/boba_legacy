@@ -129,7 +129,7 @@ export const PageSwitcher = styled(Box)(({ theme }) => ({
 }));
 
 
-export const ThumbnailContainer = styled(Box)(({ theme }) => ({
+export const ThumbnailContainer = styled.div(({ theme }) => ({
   background: theme.palette.background.secondary,
   borderRadius: theme.palette.primary.borderRadius,
   border: '1px solid rgba(255, 255, 255, 0.15)',

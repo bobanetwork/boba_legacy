@@ -1,23 +1,15 @@
-import { render } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
-import createMockStore from 'redux-mock-store'
 import { MemoryRouter } from 'react-router-dom'
 import ThemeSwitcher from '.'
-
-const mockStore = createMockStore()
+import store from 'store'
 
 const renderThemeSwitcher = () => {
   return render(
     <MemoryRouter>
-      <Provider
-        store={mockStore({
-          ui: {
-            theme: 'dark',
-          },
-        })}
-      >
+      <Provider store={store}>
         <CustomThemeProvider>
           <ThemeSwitcher />
         </CustomThemeProvider>
@@ -27,12 +19,26 @@ const renderThemeSwitcher = () => {
 }
 
 describe('Layout => Header => ThemeSwitcher', () => {
+  beforeEach(() => {
+    jest.spyOn(Storage.prototype, 'setItem')
+    Storage.prototype.setItem = jest.fn()
+  })
+
   test('should match the snapshot', () => {
     const { asFragment } = renderThemeSwitcher()
-
     expect(asFragment()).toMatchSnapshot()
   })
-  xtest('should switcher icon correctly based on the current them', () => {})
-  xtest('should change update the theme when the switcher clicked ', () => {})
-  xtest('should update the localstorage with theme name on change ', () => {})
+
+  test('should switch themes & show icons correctly when clicked on button', () => {
+    renderThemeSwitcher()
+
+    expect(screen.queryByTitle('dark-icon')).toBeNull()
+    expect(screen.getByTitle('light-icon')).toBeVisible()
+
+    fireEvent.click(screen.getByTitle('light-icon'))
+    expect(localStorage.setItem).toHaveBeenCalledWith('theme', 'light')
+
+    expect(screen.getByTitle('dark-icon')).toBeVisible()
+    expect(screen.queryByTitle('light-icon')).toBeNull()
+  })
 })

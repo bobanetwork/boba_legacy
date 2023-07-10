@@ -109,6 +109,13 @@ services:
       target: teleportation
     deploy:
       replicas: 0
+    environment:
+      # KMS setup (incl. defaults)
+      TELEPORTATION_AWS_KMS_ACCESS_KEY: "${TELEPORTATION_AWS_KMS_ACCESS_KEY:-1}"
+      TELEPORTATION_AWS_KMS_SECRET_KEY: "${TELEPORTATION_AWS_KMS_SECRET_KEY:-2}"
+      TELEPORTATION_AWS_KMS_KEY_ID: "${TELEPORTATION_AWS_KMS_KEY_ID:-3}"
+      TELEPORTATION_AWS_KMS_REGION: "${TELEPORTATION_AWS_KMS_REGION:-us-east-1}"
+      TELEPORTATION_AWS_KMS_ENDPOINT: "${TELEPORTATION_AWS_KMS_ENDPOINT:-http://kms:8888/}"
 
   teleportation_db:
     image: postgres

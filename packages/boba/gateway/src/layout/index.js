@@ -28,8 +28,6 @@ import {
 import { setTheme } from 'actions/uiAction'
 import { selectTheme } from 'selectors'
 
-import Notification from 'containers/notification/Notification'
-
 import Router from './routes'
 import CustomThemeProvider from 'themes'
 import { Background } from 'components/global/background'
@@ -422,7 +420,6 @@ function App() {
                 backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
               }}
             >
-              <Notification />
               <Suspense fallback={<>Loading...</>}>
                 <Router />
               </Suspense>

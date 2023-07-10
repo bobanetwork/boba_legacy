@@ -2,43 +2,8 @@
 
 exports[`Button Default Button 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-}
-
-.c0:hover {
-  background: #90B406;
-}
-
-<button
-    class="c0"
+  <button
+    class="sc-bgqQcB iScuhT"
     type="button"
   >
      Test Button
@@ -48,41 +13,8 @@ exports[`Button Default Button 1`] = `
 
 exports[`Button Disable Button 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-  background: #637A0D;
-  cursor: default;
-}
-
-<button
-    class="c0"
+  <button
+    class="sc-bgqQcB kJERur"
     type="button"
   >
      Test Button
@@ -92,66 +24,12 @@ exports[`Button Disable Button 1`] = `
 
 exports[`Button Loading Button 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-  background: #AEDB01;
-  cursor: default;
-}
-
-.c0:hover {
-  background: #90B406;
-}
-
-.c1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  margin-right: 5px;
-  position: relative;
-  box-sizing: border-box;
-  width: 16px;
-  height: 16px;
-  border: 3px solid rgba(95,95,95,0.3);
-  border-left: 3px solid rgba(38,38,38,1);
-  border-radius: 50%;
-  -webkit-animation: bJpHsz 1s infinite cubic-bezier(0.65,0.54,0.5,0.93);
-  animation: bJpHsz 1s infinite cubic-bezier(0.65,0.54,0.5,0.93);
-}
-
-<button
-    class="c0"
+  <button
+    class="sc-bgqQcB ebQeRa"
     type="button"
   >
     <span
-      class="c1"
+      class="sc-gTRrQi daKBPn"
     />
      Test Button
   </button>
@@ -215,46 +93,8 @@ exports[`Button Outline Button 1`] = `
 
 exports[`Button Small Button 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-  min-width: auto;
-  font-size: 14px;
-  border-radius: 33px;
-}
-
-.c0:hover {
-  background: #90B406;
-}
-
-<button
-    class="c0"
+  <button
+    class="sc-bgqQcB eyNniH"
     type="button"
   >
      Test Button
