@@ -3,7 +3,7 @@
 exports[`Button Default Button 1`] = `
 <DocumentFragment>
   <button
-    class="sc-bgqQcB iScuhT"
+    class="sc-bgqQcB dtFbmO"
     type="button"
   >
      Test Button
@@ -14,7 +14,7 @@ exports[`Button Default Button 1`] = `
 exports[`Button Disable Button 1`] = `
 <DocumentFragment>
   <button
-    class="sc-bgqQcB kJERur"
+    class="sc-bgqQcB ggCAzm"
     type="button"
   >
      Test Button
@@ -25,7 +25,7 @@ exports[`Button Disable Button 1`] = `
 exports[`Button Loading Button 1`] = `
 <DocumentFragment>
   <button
-    class="sc-bgqQcB ebQeRa"
+    class="sc-bgqQcB rbfxr"
     type="button"
   >
     <span
@@ -38,52 +38,8 @@ exports[`Button Loading Button 1`] = `
 
 exports[`Button Outline Button 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  min-width: 290px;
-  -webkit-appearance: none;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 0px;
-  outline: none;
-  background: #AEDB01;
-  padding: 16px 25px;
-  font-weight: 700;
-  font-size: 18px;
-  box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
-  -webkit-transition: all 0.25s ease;
-  transition: all 0.25s ease;
-  border: 1px solid #AEDB01;
-  color: #AEDB01;
-  background: transparent;
-  box-shadow: none;
-}
-
-.c0:hover {
-  background: #90B406;
-}
-
-.c0:hover {
-  color: #22221E;
-  background: #AEDB01;
-}
-
-<button
-    class="c0"
+  <button
+    class="sc-bgqQcB beNNKZ"
     type="button"
   >
      Outline Button
@@ -94,7 +50,7 @@ exports[`Button Outline Button 1`] = `
 exports[`Button Small Button 1`] = `
 <DocumentFragment>
   <button
-    class="sc-bgqQcB eyNniH"
+    class="sc-bgqQcB hWWaYy"
     type="button"
   >
      Test Button
