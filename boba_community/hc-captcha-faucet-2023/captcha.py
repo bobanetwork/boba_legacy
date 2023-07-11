@@ -76,9 +76,7 @@ def check_hcaptcha(clientResponse):
   http = urllib3.PoolManager(ca_certs=certifi.where())
 
   # Send a POST request and receive a HTTPResponse object.
-  error_reason = 0
   headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-  # data = 'response='+clientResponse+'&secret='+HCAPTCHA_API_SECRET
   data = {'response': clientResponse, 'secret': HCAPTCHA_API_SECRET}
 
   resp = http.request("POST",
@@ -88,9 +86,7 @@ def check_hcaptcha(clientResponse):
   result = json.loads(resp.data)
   print("result: ", result)
 
-  # maybe try-catch for better error msgs (tweet not existing, ..)
-  is_allowed_to_claim = result[
-    "success"]  # DISABLED FOR NOW: and account_exists_long_enough and account_public_metrics_check
+  is_allowed_to_claim = result["success"]
   print("from endpoint:", is_allowed_to_claim)
 
   return is_allowed_to_claim
