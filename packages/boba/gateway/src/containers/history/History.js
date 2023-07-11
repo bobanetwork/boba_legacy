@@ -16,24 +16,25 @@ limitations under the License. */
 import React, { useState } from 'react'
 import * as G from '../Global.styles'
 import { useDispatch } from 'react-redux'
-import { isEqual,orderBy } from 'util/lodash';
+import { isEqual, orderBy } from 'util/lodash'
+import { TransactionsTable } from './TransactionsTable'
 
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { useMediaQuery, useTheme } from '@mui/material'
-import {isSameOrAfterDate, isSameOrBeforeDate} from 'util/dates'
+import { isSameOrAfterDate, isSameOrBeforeDate } from 'util/dates'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button.js'
-import {DropdownNetwork} from 'components/global/dropdown/themes'
+import { DropdownNetwork } from 'components/global/dropdown/themes'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import {
   selectActiveHistoryTab,
   selectTransactions,
   selectAccountEnabled,
-  selectLayer
+  selectLayer,
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
@@ -55,46 +56,64 @@ import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors'
-import { Dropdown } from "components/global/dropdown"
+import { Dropdown } from 'components/global/dropdown'
 import AvalancheIcon from '../../images/avax.svg'
-import BNBIcon from "../../images/bnb.svg"
-import EthereumIcon from "../../images/ethereum.svg"
-import FantomIcon from "../../images/ftm.svg"
-import AllNetworksIcon from "../../images/allNetworks.svg"
-
+import BNBIcon from '../../images/bnb.svg'
+import EthereumIcon from '../../images/ethereum.svg'
+import FantomIcon from '../../images/ftm.svg'
+import AllNetworksIcon from '../../images/allNetworks.svg'
+import { TableHeader } from 'components/global/table/index.tsx'
 
 const NETWORKS = [
-  { value:"All", label: "All Networks", key:"All Networks", imgSrc:AllNetworksIcon},
-  { value: "Avalanche", label: "Avalanche", key: "Avalanche", imgSrc: AvalancheIcon},
-  { value:"BNB", label:"BNB",key:"BNB", imgSrc: BNBIcon},
-  { value: "Ethereum", label: "Ethereum", key: "Ethereum", imgSrc:EthereumIcon},
-  { value: "Fantom", label: "Fantom", key: "Fantom", imgSrc: FantomIcon }
+  {
+    value: 'All',
+    label: 'All Networks',
+    key: 'All Networks',
+    imgSrc: AllNetworksIcon,
+  },
+  {
+    value: 'Avalanche',
+    label: 'Avalanche',
+    key: 'Avalanche',
+    imgSrc: AvalancheIcon,
+  },
+  { value: 'BNB', label: 'BNB', key: 'BNB', imgSrc: BNBIcon },
+  {
+    value: 'Ethereum',
+    label: 'Ethereum',
+    key: 'Ethereum',
+    imgSrc: EthereumIcon,
+  },
+  { value: 'Fantom', label: 'Fantom', key: 'Fantom', imgSrc: FantomIcon },
 ]
-  
-const TABLE_HEADINGS = ["Date", "From", "To", "Token", "Amount", "Status"]
 
+const TABLE_HEADINGS = ['Date', 'From', 'To', 'Token', 'Amount', 'Status']
 
 function History() {
-
+  const tableHeaderOptions = [
+    { name: 'Date', width: 168 },
+    {
+      name: 'From',
+      width: 142,
+    },
+    {
+      name: 'To',
+      width: 142,
+    },
+    {
+      name: 'Token',
+      width: 90,
+    },
+    { name: 'Amount', width: 80 },
+    { name: 'Status', width: 88 },
+  ]
   const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[0])
   const [toNetwork, setToNetwork] = useState(null)
   const [fromNetwork, setFromNetwork] = useState(null)
-  const getTableHeadings = () => {
-    return (
-      <>
-      {
-        TABLE_HEADINGS.map((element, i) => {
-        return (
-          <div key={`table_heading_${i}`}>{element}</div>
-        )
-        })}
-    </>
-    )
-  }
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  
+
   const dispatch = useDispatch()
   const now = new Date()
   const last_6months = new Date(
@@ -113,14 +132,16 @@ function History() {
   const networkName = useSelector(selectActiveNetworkName())
 
   const networkChangeHandler = () => {
-    if (fromNetwork && toNetwork && !(fromNetwork + toNetwork).includes("All")) {
-      dispatch(setActiveHistoryTab(`${fromNetwork } to ${toNetwork}`))
+    if (
+      fromNetwork &&
+      toNetwork &&
+      !(fromNetwork + toNetwork).includes('All')
+    ) {
+      dispatch(setActiveHistoryTab(`${fromNetwork} to ${toNetwork}`))
     } else {
       dispatch(setActiveHistoryTab('All'))
     }
   }
-
-  
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(
@@ -133,55 +154,61 @@ function History() {
     if (startDate && endDate) {
       return (
         isSameOrAfterDate(i.timeStamp, startDate) &&
-        isSameOrBeforeDate(i.timeStamp,endDate)
+        isSameOrBeforeDate(i.timeStamp, endDate)
       )
     }
     return true
   })
 
-  const getDatePicker = (label) => { 
+  const getDatePicker = (label) => {
     const dateSelector = (date) => {
-      label === "To" ? setEndDate(date) : setStartDate(date)
-      console.log("end date:", endDate)
-      console.log("start date:", startDate)
-    } 
-    return (<>
-      <DatePicker
-        wrapperClassName={theme.palette.mode === "light" ? styles.datePickerInput : styles.datePickerInputDark}
-        popperClassName={styles.popperStyle}
-        selected={label === "To" ? endDate : startDate}
-        onChange={(date) => dateSelector(date)}
-        {...(label === "From" ? { selectsStart: true } : { selectsEnd: true })}
-        calendarClassName={theme.palette.mode}
-        placeholderText={isMobile ? { label } : ''}
-        {...(label === "From" ?
-          { endDate: new Date(endDate)} : { startDate: new Date(startDate), minDate: new Date(startDate) })}
-        maxDate={new Date(now)}
-        
-      />
-      </>)
-  
-    
+      label === 'To' ? setEndDate(date) : setStartDate(date)
+      console.log('end date:', endDate)
+      console.log('start date:', startDate)
+    }
+    return (
+      <>
+        <DatePicker
+          wrapperClassName={
+            theme.palette.mode === 'light'
+              ? styles.datePickerInput
+              : styles.datePickerInputDark
+          }
+          popperClassName={styles.popperStyle}
+          selected={label === 'To' ? endDate : startDate}
+          onChange={(date) => dateSelector(date)}
+          {...(label === 'From'
+            ? { selectsStart: true }
+            : { selectsEnd: true })}
+          calendarClassName={theme.palette.mode}
+          placeholderText={isMobile ? { label } : ''}
+          {...(label === 'From'
+            ? { endDate: new Date(endDate) }
+            : { startDate: new Date(startDate), minDate: new Date(startDate) })}
+          maxDate={new Date(now)}
+        />
+      </>
+    )
   }
 
   useInterval(() => {
-     if (accountEnabled) {
+    if (accountEnabled) {
       dispatch(fetchTransactions())
     }
   }, POLL_INTERVAL)
 
   return (
     <S.HistoryPageContainer>
-
-      {true && (
+      {layer && (
         <>
           <S.Header>
             <div className={styles.searchInput}>
               <Input
                 size="small"
-                placeholder="Search by hash"
+                placeholder="Search Here"
+                style={{ background: '#262626' }}
                 value={searchHistory}
-                onChange={(i) => { 
+                onChange={(i) => {
                   setSearchHistory(i.target.value)
                 }}
                 className={styles.searchBar}
@@ -193,52 +220,114 @@ function History() {
                   Date range from
                 </div>
               ) : null}
-              {getDatePicker("From")}
+              {getDatePicker('From')}
               {!isMobile ? (
                 <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
               ) : null}
 
-              {getDatePicker("To")}
+              {getDatePicker('To')}
             </div>
           </S.Header>
-          
+
           <S.Table>
             <S.TableFilters>
               <S.NetworkDropDowns>
-                <div style={{fontSize:'16px'}}>From</div>
-                <DropdownNetwork items={NETWORKS}
+                <div style={{ fontSize: '16px' }}>From</div>
+                <DropdownNetwork
+                  items={NETWORKS}
                   defaultItem={fromNetwork || selectedNetwork}
                   onItemSelected={(option) => {
                     setFromNetwork(option)
                     networkChangeHandler()
-                  }} />
+                  }}
+                />
                 <div style={{ fontSize: '16px', paddingLeft: '16px' }}>To</div>
-                <DropdownNetwork items={NETWORKS}
+                <DropdownNetwork
+                  items={NETWORKS}
                   defaultItem={fromNetwork || selectedNetwork}
                   onItemSelected={(option) => {
                     setToNetwork(option)
                     networkChangeHandler()
-                  }} />
+                  }}
+                />
               </S.NetworkDropDowns>
-              <div>Filter</div>
+              <div>Filter</div>{' '}
+              {/* {need to make this a dropdown and add the image} */}
             </S.TableFilters>
-            <S.TableHeadings>
-              {getTableHeadings()}
-            </S.TableHeadings>
+            <TransactionsTable
+              style={{ width: '100%' }}
+              transactions={transactions}
+            />
           </S.Table>
+          <TableHeader options={tableHeaderOptions} />
 
-          <div style={{marginLeft: "auto", marginRight: "auto", padding:"20px"}}>
-            <Button style={{marginLeft: "auto",
-                    marginRight: "auto"}}
-                    type="primary"
-                    variant="contained"
-                    size="small"
-                    newStyle
-                    onClick={() => dispatch(setConnect(true))}
-                    sx={{fontWeight: '500;'}}>
+          {/* <div
+            style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
+          >
+            <Button
+              style={{ marginLeft: 'auto', marginRight: 'auto' }}
+              type="primary"
+              variant="contained"
+              size="small"
+              newStyle
+              onClick={() => dispatch(setConnect(true))}
+              sx={{ fontWeight: '500;' }}
+            >
               Connect Wallet
             </Button>
-          </div>
+          </div> */}
+          {/* <div className={styles.data}>
+            <div className={styles.section}>
+              <Tabs
+                onClick={(tab) => {
+                  dispatch(setActiveHistoryTab(tab))
+                }}
+                activeTab={activeTab}
+                tabs={[
+                  'All',
+                  `${networkName['l1']} to ${networkName['l2']}`,
+                  `${networkName['l2']} to ${networkName['l1']}`,
+                  'Bridge between L1s',
+                  'Pending',
+                ]}
+              />
+
+              {activeTab === 'All' && (
+                <All
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
+
+              {activeTab === `${networkName['l1']} to ${networkName['l2']}` && (
+                <Deposits
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
+
+              {activeTab === `${networkName['l2']} to ${networkName['l1']}` && (
+                <Exits
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
+
+              {activeTab === 'Bridge between L1s' && (
+                <Transfers
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
+
+              {activeTab === 'Pending' && (
+                <Pending
+                  searchHistory={searchHistory}
+                  transactions={transactions}
+                />
+              )}
+            </div>
+          </div> */}
         </>
       )}
     </S.HistoryPageContainer>
