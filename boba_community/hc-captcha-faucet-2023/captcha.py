@@ -4,13 +4,16 @@ import json
 import urllib3
 import certifi
 from web3 import Web3
+import time
 
 authorized_contract = None  # for open access
 
 HCAPTCHA_API_SECRET = '0x'  # do not push
 VERIFY_URL = "https://hcaptcha.com/siteverify"
-PRIVATE_KEY = "0x" # TODO: do not push
+PRIVATE_KEY = "0x"  # TODO: do not push
 SENDER_ADDRESS = "0x"
+
+LIMIT_LIST_FILE = "/tmp/addresses.json"
 
 
 # or...
@@ -28,11 +31,31 @@ def lambda_handler(input, context):
 
   print("ClientRequest to verify: ", hcaptcha_client_response, provider_url, wallet_addr)
 
-  allowed_to_claim = check_hcaptcha(hcaptcha_client_response)
+  with open(LIMIT_LIST_FILE, 'w+') as f:
+    prev_wallets_claimed = f.read()
+    wallets_claimed = json.loads("{}" if prev_wallets_claimed == "" else prev_wallets_claimed)
+
+  now = time.time()
+  if wallet_addr not in wallets_claimed:
+    time_limit_ok = True
+  else:
+    last_claimed = wallets_claimed[wallet_addr]
+    time_limit_ok = (now - last_claimed) > 86400  # 1 day in seconds
+
+  allowed_to_claim = time_limit_ok and check_hcaptcha(hcaptcha_client_response)
+  if not allowed_to_claim:
+    if not time_limit_ok:
+      error_msg = "Wait 24h"
+    else:
+      error_msg = "Captcha failed"
 
   if allowed_to_claim:
     # TBD: potentially add rpc url whitelist
     txId = send_tx(provider_url, wallet_addr)
+
+    with open(LIMIT_LIST_FILE, 'w') as f:
+      wallets_claimed[wallet_addr] = now
+      f.write(wallets_claimed)
 
     returnPayload = {
       'statusCode': 200,
@@ -45,7 +68,7 @@ def lambda_handler(input, context):
     returnPayload = {
       'statusCode': 400,
       'body': json.dumps({
-        "error": "Captcha failed"
+        "error": error_msg
       })
     }
 
