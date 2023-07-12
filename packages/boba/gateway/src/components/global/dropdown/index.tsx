@@ -9,6 +9,7 @@ import {
   DropdownBody,
   Icon,
   DropdownContent,
+  Arrow,
 } from './styles'
 interface IDropdownItem {
   value?: string
@@ -17,6 +18,7 @@ interface IDropdownItem {
 }
 
 export interface IDropdownProps {
+  error: boolean
   items: IDropdownItem[]
   defaultItem: IDropdownItem
   onItemSelected?: (item: IDropdownItem) => void
@@ -25,6 +27,7 @@ export interface IDropdownProps {
 export const Dropdown: React.FC<IDropdownProps> = ({
   items,
   defaultItem,
+  error = false,
   onItemSelected,
 }) => {
   const [selectedItem, setSelectedItem] = useState<IDropdownItem>(defaultItem)
@@ -34,18 +37,15 @@ export const Dropdown: React.FC<IDropdownProps> = ({
     setIsOpen(!isOpen)
   }, [isOpen])
 
-  const selectItem = useCallback(
-    (item: IDropdownItem) => {
-      setSelectedItem(item)
-      setIsOpen(false)
-      onItemSelected && onItemSelected(item)
-    },
-    [onItemSelected]
-  )
+  const selectItem = useCallback((item: IDropdownItem) => {
+    onItemSelected && onItemSelected(item)
+    setSelectedItem(item)
+    setIsOpen(false)
+  }, [])
 
   return (
     <DropdownContainer className="dropdown">
-      <Header onClick={handleDropdown}>
+      <Header onClick={handleDropdown} error={error}>
         <Option>
           {selectedItem.imgSrc && (
             <IconContainer>
@@ -60,7 +60,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
           )}
           {selectedItem.label}
 
-          {isOpen ? <img src={ArrowDown} /> : <img src={ArrowDown} />}
+          <Arrow src={ArrowDown} />
         </Option>
       </Header>
       {isOpen && (

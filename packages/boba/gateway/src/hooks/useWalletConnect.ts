@@ -150,6 +150,7 @@ export const useWalletConnect = () => {
 
   useEffect(() => {
     if (connectRequest && !networkService.walletService.provider) {
+      console.log([connectRequest, networkService.walletService])
       // bypass walletSelectorModal
       if (DISABLE_WALLETCONNECT) {
         triggerInit()

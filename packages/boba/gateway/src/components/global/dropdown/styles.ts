@@ -19,12 +19,12 @@ export const DropdownContainer = styled.div`
     `}
 `
 
-export const Header = styled.div`
+export const Header = styled.div<{ error: boolean }>`
   box-sizing: border-box;
   position: relative;
   z-index: 2;
   color: inherit;
-  border-radius: 14px;
+  border-radius: 12px;
   min-width: 290px;
   padding: 15px;
   transition: 0.25s all;
@@ -46,6 +46,11 @@ export const Header = styled.div`
       &:hover {
         border-color: ${props.theme.colors.gray[100]};
       }
+    `}
+    ${(props) =>
+    props.error &&
+    `
+      border-color:${props.theme.colors.red[300]}
     `}
 `
 
@@ -88,7 +93,6 @@ export const Icon = styled.img`
 `
 
 export const DropdownBody = styled.div`
-  padding-top: 10px;
   transition: 0.25s all;
   background: inherit;
   position: absolute;
@@ -96,7 +100,7 @@ export const DropdownBody = styled.div`
   left: 0px;
   top: 50px;
   z-index: 1;
-  padding: 25px 0px 10px 0px;
+  padding: 25px 5px 10px 0px;
   box-sizing: border-box;
   border: inherit;
   border-top: 0px;
@@ -116,12 +120,29 @@ export const DropdownBody = styled.div`
 `
 export const DropdownContent = styled.div`
   min-height: 80px;
-  padding: 0px 10px;
+  padding: 0px 10px 0px 10px;
   max-height: 100px;
   display: flex;
   flex-direction: column;
   gap: 5px 0px;
   overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 4px;
+    margin-right: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
+
   & > ${Option} {
     transition: 0.25s all;
     border-radius: 14px;
@@ -147,4 +168,8 @@ export const DropdownContent = styled.div`
         }
       `};
   }
+`
+
+export const Arrow = styled.img`
+  margin-left: auto;
 `

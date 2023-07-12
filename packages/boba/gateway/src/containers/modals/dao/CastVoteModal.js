@@ -21,8 +21,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { closeModal, openAlert } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
-import Button from 'components/button/Button'
-import Select from 'components/select/Select'
+
 
 import { castProposalVote } from 'actions/daoAction'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
@@ -30,8 +29,10 @@ import { selectLockRecords,selectLoading } from 'selectors'
 import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
 
 import networkService from 'services/networkService'
+import { Dropdown } from 'components/global/dropdown'
+import { Button } from 'components/global/button'
 
-function CastVoteModal({ open, proposalId }) {
+const CastVoteModal = ({ open, proposalId }) => {
 
   const dispatch = useDispatch()
   const [ selectedVoteType, setselectedVoteType ] = useState(null)
@@ -64,13 +65,17 @@ function CastVoteModal({ open, proposalId }) {
 
 
   useEffect(() => {
-    async function filterUsedTokens() {
+    const filterUsedTokens = async () =>{
       setloadingOptions(true);
-      const filterOptionP = nftOptions.map(async (token) => {
-        const receipt = await networkService.checkProposalVote(proposalId, token.value);
-        if (!receipt || !receipt.hasVoted) {
-          return token;
-        }
+      const filterOptionP = nftOptions
+        .map(async (token) => {
+          const receipt = await networkService.checkProposalVote(
+            proposalId,
+            token.value
+          )
+          if (!receipt || !receipt.hasVoted) {
+            return token
+          }
       }).filter(Boolean)
 
       const tokensRes = await Promise.all(filterOptionP);
@@ -86,7 +91,7 @@ function CastVoteModal({ open, proposalId }) {
     setselectedVoteType(voteType)
   }
 
-  function handleClose() {
+  const handleClose = () => {
     dispatch(closeModal('castVoteModal'))
   }
 
@@ -104,13 +109,15 @@ function CastVoteModal({ open, proposalId }) {
   }
 
   const submit = async () => {
-    let tokenIds = tokens.map((t) => t.value);
+    const tokenIds = tokens.map((t) => t.value);
 
-    let res = await dispatch(castProposalVote({
-      id: Number(proposalId),
-      userVote: selectedVoteType.value,
-      tokenIds
-    }));
+    const res = await dispatch(
+      castProposalVote({
+        id: Number(proposalId),
+        userVote: selectedVoteType.value,
+        tokenIds
+      })
+    );
 
     if (res) {
       dispatch(openAlert(`Your vote has been submitted successfully.`))
@@ -123,52 +130,42 @@ function CastVoteModal({ open, proposalId }) {
       open={open}
       onClose={handleClose}
       maxWidth="sm"
+      title={`Cast Vote on proposal ${proposalId}`}
     >
       <Box>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <BobaGlassIcon />
-          <Typography variant="body1" >
-            Cast Vote on proposal {proposalId}
-          </Typography>
-        </Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <Select
-            label={'Vote type'}
-            options={options}
-            onSelect={onVoteTypeChange}
-            styles={customStyles}
-            sx={{ marginBottom: '20px' }}
-            value={selectedVoteType}
-            newSelect={true}
+          <Dropdown
+            style={{ zIndex: 2 }}
+            onItemSelected={(option)=> onVoteTypeChange(option)}
+            defaultItem={{
+                value: null,
+                label: 'Select a Vote type',
+            }}
+            items={options}
           />
-          <Select
-            label={'Select Nft token'}
-            options={filterOptions}
-            onSelect={(value) => setTokens(value)}
-            styles={customStyles}
-            sx={{ marginBottom: '20px' }}
-            value={tokens}
-            newSelect={true}
-            isMulti={true}
-            isLoading={loadingOptions}
+
+          <Dropdown
+            style={{ zIndex: 1 }}
+            onItemSelected={(option)=> setTokens(option)}
+            defaultItem={{
+                value: null,
+                label: 'Select Nft token',
+            }}
+            items={filterOptions}
           />
+
         </Box>
       </Box>
-      <Box sx={{ width: '100%', my: 2 }}>
-        <Button
-          onClick={() => { submit() }}
-          color='primary'
-          variant='outlined'
-          tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to cast on a proposal"}
-          loading={loading}
-          fullWidth={true}
-          disabled={!tokens.length || !selectedVoteType}
-          size="large"
-        >
-          Submit
-        </Button>
-      </Box>
+      <Button
+        onClick={() => { submit() }}
+        loading={loading}
+        disabled={!tokens.length || !selectedVoteType}
+        label="Submit"
+        /*
+        tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to cast on a proposal"}
+        */
+      />
     </Modal >
   )
 }
