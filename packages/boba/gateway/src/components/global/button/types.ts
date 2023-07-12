@@ -1,7 +1,10 @@
+import { ReactNode } from 'react'
+
 export interface ButtonTypes {
   disable?: boolean
   loading?: boolean
   small?: boolean
-  label: string
+  style?: Record<string, string>
+  label: ReactNode | string
   onClick?: () => void
 }
