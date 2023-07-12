@@ -4,7 +4,7 @@ import { TableContentContainer, TableHeaderContainer, TableRow } from './styles'
 import { Row } from 'components/global/containers'
 
 export const TransactionsTableHeader = styled(TableHeader)`
-  padding: 8px 24px 0px 24px;
+  padding: 8px 24px 4px 24px;
   background: none;
   position: sticky;
   top: 0;

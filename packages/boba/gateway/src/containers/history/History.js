@@ -17,7 +17,6 @@ import React, { useState } from 'react'
 import * as G from '../Global.styles'
 import { useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'util/lodash'
-import { TransactionsTable } from './TransactionsTable'
 
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
@@ -38,6 +37,7 @@ import {
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
+import { formatDate } from 'util/dates'
 
 import Exits from './TX_Exits'
 import Deposits from './TX_Deposits'
@@ -47,6 +47,7 @@ import Transfers from './TX_Transfers'
 
 import * as S from './History.styles'
 import styles from './TX_All.module.scss'
+import { Table } from './styles'
 
 import useInterval from 'hooks/useInterval'
 import Connect from 'containers/connect/Connect'
@@ -63,6 +64,9 @@ import EthereumIcon from '../../images/ethereum.svg'
 import FantomIcon from '../../images/ftm.svg'
 import AllNetworksIcon from '../../images/allNetworks.svg'
 import { TableHeader } from 'components/global/table/index.tsx'
+import { element } from 'prop-types'
+import { TransactionsResolver } from './TransactionsResolver'
+import { TransactionsTableHeader } from 'components/global/table/themes'
 
 const NETWORKS = [
   {
@@ -87,26 +91,32 @@ const NETWORKS = [
   { value: 'Fantom', label: 'Fantom', key: 'Fantom', imgSrc: FantomIcon },
 ]
 
-const TABLE_HEADINGS = ['Date', 'From', 'To', 'Token', 'Amount', 'Status']
+const TableOptions = [
+  {
+    name: 'Date',
+    width: 168,
+    tooltip: '',
+  },
+  {
+    name: 'From',
+    width: 142,
+    tooltip: '',
+  },
+  {
+    name: 'To',
+    width: 142,
+    tooltip: '',
+  },
+  {
+    name: 'Token',
+    width: 90,
+    tooltip: '',
+  },
+  { name: 'Amount', width: 80, tooltip: '' },
+  { name: 'Status', width: 88, tooltip: '' },
+]
 
 function History() {
-  const tableHeaderOptions = [
-    { name: 'Date', width: 168 },
-    {
-      name: 'From',
-      width: 142,
-    },
-    {
-      name: 'To',
-      width: 142,
-    },
-    {
-      name: 'Token',
-      width: 90,
-    },
-    { name: 'Amount', width: 80 },
-    { name: 'Status', width: 88 },
-  ]
   const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[0])
   const [toNetwork, setToNetwork] = useState(null)
   const [fromNetwork, setFromNetwork] = useState(null)
@@ -198,15 +208,14 @@ function History() {
   }, POLL_INTERVAL)
 
   return (
-    <S.HistoryPageContainer>
+    <S.HistoryPageContainer style={{ overflowY: 'auto', width: '100%' }}>
       {layer && (
         <>
-          <S.Header>
+          <S.Header style={{ position: 'sticky', top: '0' }}>
             <div className={styles.searchInput}>
               <Input
                 size="small"
                 placeholder="Search Here"
-                style={{ background: '#262626' }}
                 value={searchHistory}
                 onChange={(i) => {
                   setSearchHistory(i.target.value)
@@ -229,37 +238,55 @@ function History() {
             </div>
           </S.Header>
 
-          <S.Table>
-            <S.TableFilters>
-              <S.NetworkDropDowns>
-                <div style={{ fontSize: '16px' }}>From</div>
-                <DropdownNetwork
-                  items={NETWORKS}
-                  defaultItem={fromNetwork || selectedNetwork}
-                  onItemSelected={(option) => {
-                    setFromNetwork(option)
-                    networkChangeHandler()
-                  }}
-                />
-                <div style={{ fontSize: '16px', paddingLeft: '16px' }}>To</div>
-                <DropdownNetwork
-                  items={NETWORKS}
-                  defaultItem={fromNetwork || selectedNetwork}
-                  onItemSelected={(option) => {
-                    setToNetwork(option)
-                    networkChangeHandler()
-                  }}
-                />
-              </S.NetworkDropDowns>
-              <div>Filter</div>{' '}
-              {/* {need to make this a dropdown and add the image} */}
-            </S.TableFilters>
-            <TransactionsTable
-              style={{ width: '100%' }}
+          <Table>
+            <div
+              style={{
+                width: '100%',
+                position: 'sticky',
+                top: '0',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <S.TableFilters
+                style={{
+                  width: '100%',
+                }}
+              >
+                <S.NetworkDropDowns>
+                  <div style={{ fontSize: '16px' }}>From</div>
+                  <DropdownNetwork
+                    items={NETWORKS}
+                    defaultItem={fromNetwork || selectedNetwork}
+                    onItemSelected={(option) => {
+                      setFromNetwork(option)
+                      networkChangeHandler()
+                    }}
+                  />
+                  <div style={{ fontSize: '16px', paddingLeft: '16px' }}>
+                    To
+                  </div>
+                  <DropdownNetwork
+                    items={NETWORKS}
+                    defaultItem={fromNetwork || selectedNetwork}
+                    onItemSelected={(option) => {
+                      setToNetwork(option)
+                      networkChangeHandler()
+                    }}
+                  />
+                </S.NetworkDropDowns>
+                <div>Filter</div>{' '}
+                {/* {need to make this a dropdown and add the image} */}
+              </S.TableFilters>
+              <TransactionsTableHeader
+                options={TableOptions}
+              ></TransactionsTableHeader>
+            </div>
+            <TransactionsResolver
               transactions={transactions}
-            />
-          </S.Table>
-          <TableHeader options={tableHeaderOptions} />
+              style={{ maxHeight: '70%' }}
+            ></TransactionsResolver>
+          </Table>
 
           {/* <div
             style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}

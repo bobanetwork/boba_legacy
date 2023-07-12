@@ -18,8 +18,7 @@ export const HistoryPageContainer = styled(Box)(({ theme }) => ({
   paddingTop: '0px',
   width: '70%',
   minWidth: '710px',
-  // background:
-  //   'var(--glass-bg-popup, linear-gradient(129deg, rgba(48, 48, 48, 0.70) 0%, rgba(48, 48, 48, 0.70) 46.35%, rgba(37, 37, 37, 0.70) 94.51%))',
+  maxWidth: '1040px',
   [theme.breakpoints.between('md', 'lg')]: {
     width: '90%',
     padding: '0px',
@@ -93,7 +92,7 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
 
 export const Table = styled(Box)(({ theme }) => ({
   Gradient: 'Linear #303030-#252525',
-  borderRadius: '6px',
+  borderRadius: '12px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -105,7 +104,6 @@ export const Table = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     gap: '10px',
   },
-  // background: theme.palette.background.secondary,
   [theme.breakpoints.down('md')]: {
     marginBottom: '5px',
   },
@@ -120,7 +118,6 @@ export const TableFilters = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-start',
-  border: '1px solid #545454',
   [theme.breakpoints.down('md')]: {
     marginBottom: '5px',
     flexDirection: 'row',
