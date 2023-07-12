@@ -6,22 +6,18 @@ import { closeModal } from 'actions/uiAction'
 import {
   setConnectBOBA,
   setConnectETH,
-  setWalletConnected,
 } from 'actions/setupAction.js'
 
 import Modal from 'components/modal/Modal'
 import { Typography } from 'components/global/typography'
 import { Svg } from 'components/global/svg'
-
 import networkService from 'services/networkService'
-
 import metaMaskLogo from 'images/metamask.svg'
 import walletConnectLogo from 'images/walletconnect.svg'
 import ArrowIcon from 'images/icons/arrowright.svg'
 
 import { Wallets, Wallet, Icon, ArrowContainer, IconContainer } from './styles'
 
-const WalletSelectorModal = ({ open }) => {
 import { useWalletConnect } from 'hooks/useWalletConnect'
 import { setConnect } from 'actions/setupAction'
 

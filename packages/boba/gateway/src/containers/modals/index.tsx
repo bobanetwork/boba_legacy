@@ -19,6 +19,7 @@ import TransferNFTModal from './transfer/TransferNFTModal'
 import ManageLockModal from './veBoba/ManageLockModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
+import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 
 /**
  *
@@ -49,7 +50,9 @@ const ModalContainer = () => {
     selectModalState('installMetaMaskModal')
   )
   const manageLockModalState = useSelector(selectModalState('manageLock'))
-
+  const walletSelectorModalState = useSelector(
+    selectModalState('walletSelectorModal')
+  )
   const CDMCompletionModalState = useSelector(
     selectModalState('CDMCompletionModal')
   )
@@ -131,6 +134,9 @@ const ModalContainer = () => {
       )}
       {!!manageLockModalState && (
         <ManageLockModal open={manageLockModalState} lock={lock} />
+      )}
+      {!!walletSelectorModalState && (
+        <WalletSelectorModal open={walletSelectorModalState} />
       )}
       {!!CDMCompletionModalState && (
         <CDMCompletionModal open={CDMCompletionModalState} />
