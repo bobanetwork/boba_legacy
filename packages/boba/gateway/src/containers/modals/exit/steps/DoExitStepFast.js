@@ -46,7 +46,7 @@ import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
 import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import BN from 'bignumber.js'
 

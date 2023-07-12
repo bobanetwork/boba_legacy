@@ -10,6 +10,7 @@ const ColorBox = styled.div`
   border-radius: 8px;
   width: 100px;
   height: 100px;
+  margin: 10px 0px;
 `
 
 const Title = styled.p`
@@ -43,13 +44,23 @@ export const Palette = () => {
           <>
             <Title>{currentColor}s</Title>
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-              {Object.entries(colors[currentColor]).map(([name, color]) => (
-                <div key={name} style={{ margin: '10px' }}>
-                  <ColorBox style={{ backgroundColor: color as string }} />
-                  <SubTitle>{name}</SubTitle>
-                  <Item>{color}</Item>
+              {typeof colors[currentColor] === 'object' ? (
+                Object.entries(colors[currentColor]).map(([name, color]) => (
+                  <div key={name} style={{ margin: '10px' }}>
+                    <ColorBox style={{ backgroundColor: color as string }} />
+                    <SubTitle>{name}</SubTitle>
+                    <Item>{color}</Item>
+                  </div>
+                ))
+              ) : (
+                <div style={{ margin: '10px' }}>
+                  <ColorBox
+                    style={{ backgroundColor: colors[currentColor] as string }}
+                  />
+                  <SubTitle>{currentColor}</SubTitle>
+                  <Item>{colors[currentColor]}</Item>
                 </div>
-              ))}
+              )}
             </div>
           </>
         )

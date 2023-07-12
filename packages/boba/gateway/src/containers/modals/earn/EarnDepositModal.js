@@ -13,7 +13,7 @@ import { powAmount, toWei_String } from 'util/amountConvert'
 import BN from 'bignumber.js'
 
 import { Box, Typography } from '@mui/material'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import { earnL1, earnL2 } from 'actions/networkAction'
 import { fetchAllowance } from 'actions/earnAction'

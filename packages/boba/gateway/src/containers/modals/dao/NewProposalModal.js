@@ -31,7 +31,7 @@ import { selectProposalThreshold,selectLockRecords } from 'selectors'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
 
-function NewProposalModal({ open }) {
+const NewProposalModal = ({ open }) => {
 
   const dispatch = useDispatch()
 
@@ -191,18 +191,14 @@ function NewProposalModal({ open }) {
       open={open}
       onClose={handleClose}
       maxWidth="sm"
+      title="New Proposal"
     >
       <Box>
-        <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-          <BobaGlassIcon />
-          <Typography variant="body1" >
-            New Proposal
-          </Typography>
-        </Box>
+
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {action === '' &&
-            <Typography variant="body2" style={{ lineHeight: '1', fontSize: '0.8em', marginTop: '20px', color: '#f8e5e5' }}>
+            <Typography variant="body2" >
               Currently, the DAO can change the voting threshold, propose free-form text proposals, and
               change to the bridge fee limits for the L1 and L2 bridge pools.
             </Typography>
@@ -280,7 +276,8 @@ function NewProposalModal({ open }) {
           }
           {action === 'text-proposal' &&
             <>
-              <Typography variant="body2"
+              <Typography
+                variant="body2"
                 style={{ lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5' }}
               >
                 Your proposal title is limited to 100 characters. Use the link field below to provide more information.

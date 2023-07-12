@@ -29,7 +29,7 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 import { CounterButton } from 'components';
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import {
   selectLoading,
