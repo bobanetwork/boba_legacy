@@ -61,7 +61,7 @@ function App() {
           ? `solid 2px ${buttonColor}`
           : `solid 2px ${buttonColor}`,
         alert: light ? 'black' : '#FFD88D',
-        tooltip: light ? 'rgba(3, 19, 19, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        tooltip: light ? '#5E6058' : '#545454',
         info: light ? 'rgba(3, 19, 19, 0.65)' : 'rgba(255, 255, 255, 0.65)',
       },
       secondary: {
@@ -89,7 +89,7 @@ function App() {
         input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
         footer: light ? '#1A1D1F' : '#1A1D1F',
         glassy: light ? 'rgba(0,0,0, 0.09)' : 'rgba(255, 255, 255, 0.04)',
-        tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+        tooltip: light ? '#5E6058' : '#545454',
         alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
       neutral: {
