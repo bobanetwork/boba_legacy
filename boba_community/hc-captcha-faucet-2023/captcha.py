@@ -23,7 +23,7 @@ LIMIT_LIST_FILE = "/tmp/addresses.json"
 def lambda_handler(input, context):
   print("DEBUG: ", input)
 
-  print("DEBUG: from Geth:", input)
+  print("DEBUG: from L2:", input)
 
   hcaptcha_client_response = input['hcaptcha_resp']
   provider_url = input['provider_url']
