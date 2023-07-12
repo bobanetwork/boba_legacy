@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Box } from '@mui/material'
@@ -23,9 +23,9 @@ import { orderBy } from 'util/lodash';
 import ListProposal from 'components/listProposal/listProposal'
 
 import { Typography } from 'components/global/typography'
-//import Select from 'components/select/Select'
+
 import { Button } from 'components/global/button'
-import {Preloader} from 'components/dao/preloader'
+import { Preloader } from 'components/dao/preloader'
 import {
   selectDaoBalance,
   selectDaoBalanceX,
@@ -35,13 +35,25 @@ import {
   selectProposalThreshold,
   selectLoading,
   selectAccountEnabled,
-  selectLayer
+  selectLayer,
+  selectBaseEnabled,
+  selectActiveNetwork
 } from 'selectors'
 
-import * as G from 'containers/Global.styles'
 import * as S from './OldDao.styles'
 import Connect from 'containers/connect/Connect'
 import { TabHeader } from 'components/global/tabHeader'
+import useInterval from 'hooks/useInterval';
+import { NETWORK } from 'util/network/network.util';
+import { POLL_INTERVAL } from 'util/constant';
+import {
+  fetchDaoBalance,
+  fetchDaoBalanceX,
+  fetchDaoProposals,
+  fetchDaoVotes,
+  fetchDaoVotesX,
+  getProposalThreshold
+} from 'actions/daoAction';
 
 const PROPOSAL_STATES = [
   { value: 'All', label: 'All' },
@@ -60,8 +72,11 @@ const OldDao = () => {
   const dispatch = useDispatch()
 
   const accountEnabled = useSelector(selectAccountEnabled())
+  const basedEnable = useSelector(selectBaseEnabled())
+  const activeNetwork = useSelector(selectActiveNetwork());
+
   const layer = useSelector(selectLayer());
-  const loading = useSelector(selectLoading(['PROPOSALS/GET']))
+  const loading = useSelector(selectLoading([ 'PROPOSALS/GET' ]))
 
   let proposals = useSelector(selectProposals)
   proposals = orderBy(proposals, i => i.startTimestamp, 'desc')
@@ -72,7 +87,29 @@ const OldDao = () => {
   const votesX = useSelector(selectDaoVotesX)
   const proposalThreshold = useSelector(selectProposalThreshold)
 
-  const [selectedState, setSelectedState] = useState(PROPOSAL_STATES[0])
+  const [ selectedState, setSelectedState ] = useState(PROPOSAL_STATES[ 0 ])
+
+  useEffect(() => {
+    if (basedEnable && activeNetwork === NETWORK.ETHEREUM) {
+      dispatch(getProposalThreshold());
+      dispatch(fetchDaoProposals());
+    }
+  }, [ dispatch, basedEnable, activeNetwork ])
+
+
+  useInterval(() => {
+    if (accountEnabled && activeNetwork === NETWORK.ETHEREUM) {
+      dispatch(fetchDaoBalance())      // account specific
+      dispatch(fetchDaoVotes())        // account specific
+      dispatch(fetchDaoBalanceX())     // account specific
+      dispatch(fetchDaoVotesX())       // account specific
+    }
+
+    if (basedEnable && activeNetwork === NETWORK.ETHEREUM) {
+      dispatch(fetchDaoProposals());
+    }
+  }, POLL_INTERVAL)
+
 
   const handleNewProposal = () => {
     if (Number(votes + votesX) < Number(proposalThreshold)) {
@@ -103,9 +140,9 @@ const OldDao = () => {
                 width: '100%',
                 display: 'flex',
                 flexDirection: 'row',
-                justifyContent:'center',
+                justifyContent: 'center',
                 gap: '10px',
-                paddingTop:'24px',
+                paddingTop: '24px',
               }}
             >
               <Box sx={{ padding: '5px', gap: '10px 0px' }}>
@@ -138,14 +175,14 @@ const OldDao = () => {
               gap: '10px',
               padding: '24px 0px',
             }}>
-            {layer === 'L2' && 
+            {layer === 'L2' &&
               <Button
                 onClick={() => {
                   dispatch(openModal('delegateDaoModal'))
                 }}
                 disable={!accountEnabled}
                 label="Stake BOBA"
-            />
+              />
             }
             {accountEnabled &&
               <Button
