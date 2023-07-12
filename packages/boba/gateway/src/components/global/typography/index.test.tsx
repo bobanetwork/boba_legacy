@@ -25,6 +25,12 @@ const renderTypography = (props: TypographyProps) => {
 }
 
 describe('Typography', () => {
+  test('should match snapshots h1', () => {
+    const { asFragment } = renderTypography({
+      variant: 'h1',
+    })
+    expect(asFragment()).toMatchSnapshot()
+  })
   test('should match snapshots head', () => {
     const { asFragment } = renderTypography({
       variant: 'head',

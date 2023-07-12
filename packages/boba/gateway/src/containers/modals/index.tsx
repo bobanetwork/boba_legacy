@@ -4,7 +4,6 @@ import { selectModalState } from 'selectors'
 import CDMCompletionModal from './CDMCompletion/CDMCompletionModal'
 import CastVoteModal from './dao/CastVoteModal'
 import DelegateDaoModal from './dao/DelegateDaoModal'
-import DelegateDaoXModal from './dao/DelegateDaoXModal'
 import NewProposalModal from './dao/NewProposalModal'
 import DepositBatchModal from './deposit/DepositBatchModal'
 import DepositModal from './deposit/DepositModal'
@@ -18,9 +17,9 @@ import TokenPickerModal from './tokenPicker/TokenPickerModal'
 import TransferModal from './transfer/TransferModal'
 import TransferNFTModal from './transfer/TransferNFTModal'
 import ManageLockModal from './veBoba/ManageLockModal'
-import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
+import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 
 /**
  *
@@ -77,9 +76,7 @@ const ModalContainer = () => {
   const delegateBobaDaoModalState = useSelector(
     selectModalState('delegateDaoModal')
   )
-  const delegateBobaDaoXModalState = useSelector(
-    selectModalState('delegateDaoXModal')
-  )
+
   const proposalBobaDaoModalState = useSelector(
     selectModalState('newProposalModal')
   )
@@ -110,9 +107,6 @@ const ModalContainer = () => {
       )}
       {!!delegateBobaDaoModalState && (
         <DelegateDaoModal open={delegateBobaDaoModalState} />
-      )}
-      {!!delegateBobaDaoXModalState && (
-        <DelegateDaoXModal open={delegateBobaDaoXModalState} />
       )}
       {!!proposalBobaDaoModalState && (
         <NewProposalModal open={proposalBobaDaoModalState} />

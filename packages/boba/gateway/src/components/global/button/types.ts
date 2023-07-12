@@ -6,5 +6,8 @@ export interface ButtonTypes {
   small?: boolean
   style?: Record<string, string>
   label: ReactNode | string
+  outline?: boolean
+  transparent?: boolean
+  className?: string
   onClick?: () => void
 }
