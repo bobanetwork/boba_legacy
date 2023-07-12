@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined'
 import HelpOutlineOutlined from '@mui/icons-material/HelpOutlineOutlined'
 import {
@@ -7,20 +7,29 @@ import {
   BridgeHeader,
   BridgeInfo,
   BridgeReceiveWrapper,
+  BridgeTabItem,
+  BridgeTabs,
   BridgeWrapper,
   ConnectButton,
 } from './styles'
 import { Heading } from 'components/global'
 import { useDispatch } from 'react-redux'
 import Tooltip from 'components/tooltip/Tooltip'
+import { openModal } from 'actions/uiAction'
 
 interface Props {}
 
+enum BRIDGE_TYPE {
+  CLASSIC,
+  FAST,
+}
+
 const Bridging = (props: Props) => {
   const dispatch = useDispatch<any>()
+  const [bridgeType, setbridgeType] = useState(BRIDGE_TYPE.CLASSIC)
 
   const openSettingModal = () => {
-    // TODO: open setting modals;
+    dispatch(openModal('settingsModal'))
   }
 
   return (
@@ -47,6 +56,20 @@ const Bridging = (props: Props) => {
             onClick={openSettingModal}
           />
         </BridgeHeader>
+        <BridgeTabs>
+          <BridgeTabItem
+            active={bridgeType === BRIDGE_TYPE.CLASSIC}
+            onClick={() => setbridgeType(BRIDGE_TYPE.CLASSIC)}
+          >
+            Classic
+          </BridgeTabItem>
+          <BridgeTabItem
+            active={bridgeType === BRIDGE_TYPE.FAST}
+            onClick={() => setbridgeType(BRIDGE_TYPE.FAST)}
+          >
+            Fast
+          </BridgeTabItem>
+        </BridgeTabs>
       </BridgeContent>
       <BridgeReceiveWrapper></BridgeReceiveWrapper>
       <BridgeInfo></BridgeInfo>

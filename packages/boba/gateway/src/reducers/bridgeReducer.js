@@ -18,6 +18,7 @@ const initialState = {
   tokens: [],
   bridgeType: null,
   multiBridgeMode: false,
+  bridgeToAddressState: false,
 };
 
 function bridgeReducer(state = initialState, action) {
@@ -65,6 +66,12 @@ function bridgeReducer(state = initialState, action) {
 
     case 'BRIDGE/MODE/CHANGE':
         return { ...state, multiBridgeMode: action.payload }
+
+    case 'BRIDGE/TOADDRESS/SET':
+      return {
+        ...state,
+        bridgeToAddressState: action.payload
+      }
 
     case 'BRIDGE/TOKEN/AMOUNT/CHANGE': {
         let newTokens = [...state.tokens];

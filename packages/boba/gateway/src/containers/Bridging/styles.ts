@@ -2,7 +2,7 @@ import { Button } from 'components/global'
 import styled from 'styled-components'
 
 export const BridgeWrapper = styled.div`
-  margin: 20px auto;
+  margin: 32px auto;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -37,6 +37,34 @@ export const BridgeHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`
+
+export const BridgeTabs = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background: ${(props) => props.theme.colors.gray[400]};
+  border-radius: 8px;
+  padding: 5px;
+  width: 100%;
+`
+export const BridgeTabItem = styled.div<{
+  active?: boolean
+}>`
+  width: 100%;
+  padding: 8px 50px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: ${(props) => props.theme.text.body2};
+  background: transparent;
+  ${(props) =>
+    props.active &&
+    `
+  color:${props.theme.colors.gray[600]};
+  background:${props.theme.colors.green[300]};
+
+`};
 `
 
 export const BridgeReceiveWrapper = styled.div``

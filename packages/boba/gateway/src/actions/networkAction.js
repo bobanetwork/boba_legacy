@@ -262,3 +262,9 @@ export function setActiveNetwork(payload) {
     return dispatch({ type: 'NETWORK/SET/ACTIVE' })
   }
 }
+
+export function setActiveNetworkType(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'NETWORK/SET_TYPE/ACTIVE', payload })
+  }
+}

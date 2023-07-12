@@ -54,3 +54,9 @@ export function setMultiBridgeMode(mode) {
     return dispatch({ type: 'BRIDGE/MODE/CHANGE', payload: mode });
   }
 }
+
+export function setBridgeToAddress(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/TOADDRESS/SET', payload });
+  }
+}

@@ -30,3 +30,9 @@ export function selectMultiBridgeMode() {
     return state.bridge.multiBridgeMode
   }
 }
+
+export function selectBridgeToAddressState() {
+  return function (state) {
+    return state.bridge.bridgeToAddressState
+  }
+}

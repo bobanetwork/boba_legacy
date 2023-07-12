@@ -20,6 +20,7 @@ import ManageLockModal from './veBoba/ManageLockModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
+import SettingsModal from './settings'
 
 /**
  *
@@ -59,6 +60,7 @@ const ModalContainer = () => {
   const switchNetworkModalState = useSelector(
     selectModalState('switchNetworkModal')
   )
+  const SettingsModalState = useSelector(selectModalState('settingsModal'))
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -144,6 +146,7 @@ const ModalContainer = () => {
       {!!switchNetworkModalState && (
         <SwitchNetworkModal open={switchNetworkModalState} />
       )}
+      {!!SettingsModalState && <SettingsModal open={SettingsModalState} />}
     </>
   )
 }
