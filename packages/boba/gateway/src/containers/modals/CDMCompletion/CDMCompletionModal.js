@@ -22,7 +22,7 @@ import { resetCDMCompletion } from 'actions/transactionAction'
 
 import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import { selectCDMType, selectCDMMessage, selectCDMTransaction } from 'selectors'
 

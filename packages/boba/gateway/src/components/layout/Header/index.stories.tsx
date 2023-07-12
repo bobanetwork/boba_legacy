@@ -1,6 +1,6 @@
 import React from 'react'
 import { Meta, StoryFn } from '@storybook/react'
-import Header from '.'
+import { Header } from '.'
 import { HeaderProps } from './types'
 import { Provider } from 'react-redux'
 import createMockStore from 'redux-mock-store'

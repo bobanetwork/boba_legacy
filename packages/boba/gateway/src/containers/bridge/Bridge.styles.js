@@ -97,6 +97,7 @@ export const BobaGlassIcon = styled(Box)(({ theme }) => ({
 
 
 export const Content = styled(Box)(({ theme }) => ({
+  zIndex: -1,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'flex-start',

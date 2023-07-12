@@ -1,16 +1,16 @@
 $red: #ff6868;
 $yellow: #f0ba31;
 $green: #0ebf9a;
-$blue:  #506DFA;// #4967ff;
+$blue:  #506DFA;
 $maxWidth: 450px;
 $red1: #ff8080;
 
-$gray1: #101010; //v. dark gray
+$gray1: #101010;
 $gray2: #323232;
 $gray3: #565656;
 $gray4: #7d7d7d;
 $gray5: #f8e5e5;
-$gray6: #d2d2d2; //v. light gray
+$gray6: #d2d2d2;
 $gray7: #f8f8f8;
 
 $bunnyRed: #c83950;
@@ -47,7 +47,6 @@ $white500: rgba(255, 255, 255, 0.5);
   white500: $white500;
 }
 
-// /* small screens */
 @mixin tablet {
   @media screen and (max-width: 1360px) {
     @content;
@@ -64,42 +63,6 @@ $white500: rgba(255, 255, 255, 0.5);
   @media screen and (max-width: 450px) {
     @content;
   }
-}
-
-@font-face {
-  font-family: 'MessinaSB';
-  src: url(./fonts/MessinaSansMono-SemiBold.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXL';
-  src: url(./fonts/MrEavesXLModOT-Reg.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLBold';
-  src: url(./fonts/MrEavesXLModOT-Bold.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLThin';
-  src: url(./fonts/MrEavesXLModOT-Thin.ttf) format('opentype');
-}
-
-
-@font-face {
-  font-family: 'MrEavesXL';
-  src: url(./fonts/MrEavesXLModOT-Reg.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLBold';
-  src: url(./fonts/MrEavesXLModOT-Bold.ttf) format('opentype');
-}
-
-@font-face {
-  font-family: 'MrEavesXLThin';
-  src: url(./fonts/MrEavesXLModOT-Thin.ttf) format('opentype');
 }
 
 .react-datepicker.dark {
@@ -152,35 +115,4 @@ $white500: rgba(255, 255, 255, 0.5);
     background-color: #3C5DFC;
     color: #fff;
   }
-}
-
-
-/*****************************************
-***  Background image specific styling ***
-******************************************/
-.pageContainer::after {
-  content: '';
-  position: absolute;
-  background: url('./images/boba2/wave_bg.svg') no-repeat;
-  top: 40%;
-  margin-left: -1%;
-  left: 0;
-  width: 100%;
-  height: 250px;
-  background-size: 50%;
-  z-index: -1;
-  transform: rotate(-8deg);
-}
-
-.pageContainer::before {
-  content: '';
-  position: absolute;
-  background: url('./images/boba2/grid_bg.svg') no-repeat;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 200px;
-  background-size: 100% 81%;
-  z-index: -1;
-  margin-bottom: 30px;
 }

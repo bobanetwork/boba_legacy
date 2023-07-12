@@ -58,6 +58,8 @@ export const LayerAlert = styled(Box)(({ theme }) => ({
   border: 'none',
   borderRadius: theme.palette.primary.borderRadius,
   background: theme.palette.background.glassy,
+  border:'1px solid ' + theme.palette.background.glassyBorder,
+
   [ theme.breakpoints.up('md') ]: {
     width: '100%',
   },
@@ -127,7 +129,7 @@ export const PageSwitcher = styled(Box)(({ theme }) => ({
 }));
 
 
-export const ThumbnailContainer = styled(Box)(({ theme }) => ({
+export const ThumbnailContainer = styled.div(({ theme }) => ({
   background: theme.palette.background.secondary,
   borderRadius: theme.palette.primary.borderRadius,
   border: '1px solid rgba(255, 255, 255, 0.15)',

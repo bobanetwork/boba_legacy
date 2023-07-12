@@ -5,6 +5,7 @@ const storybookConfig: StorybookConfig = {
   features: {
     storyStoreV7: true,
   },
+  staticDirs: ['../src/assets'],
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
@@ -13,6 +14,14 @@ const storybookConfig: StorybookConfig = {
     '@storybook/addon-toolbars',
     '@storybook/addon-actions',
     '@storybook/addon-styling',
+    {
+      name: 'storybook-addon-sass-postcss',
+      options: {
+        rule: {
+          test: /\.(scss|sass)$/i,
+        },
+      },
+    },
   ],
   webpackFinal: async (config) => {
     if (!config.resolve) {

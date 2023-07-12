@@ -27,9 +27,9 @@ import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
 import Input from 'components/input/Input'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
-function TransferNFTModal ({ open, token, minHeight }) {
+function TransferNFTModal ({ open, token }) {
 
   const dispatch = useDispatch()
 

@@ -28,15 +28,13 @@ import {
 import { setTheme } from 'actions/uiAction'
 import { selectTheme } from 'selectors'
 
-import Notification from 'containers/notification/Notification'
-
 import Router from './routes'
 import CustomThemeProvider from 'themes'
 import { Background } from 'components/global/background'
 
 function App() {
   const dispatch = useDispatch()
-  
+
   const theme = useSelector(selectTheme)
   const light = theme === 'light'
 
@@ -90,7 +88,8 @@ function App() {
         modalTransparent: light ? '#fff' : 'transparent',
         input: light ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
         footer: light ? '#1A1D1F' : '#1A1D1F',
-        glassy: light ? 'rgba(0,0,0, 0.09)' : 'rgba(255, 255, 255, 0.04)',
+        glassy: light ? 'rgba(253, 255, 248, 0.9)' : 'linear-gradient(129deg, rgba(48, 48, 48, 0.60) 0%, rgba(48, 48, 48, 0.60) 46.35%, rgba(37, 37, 37, 0.60) 94.51%)',
+        glassyBorder: light? 'rgba(253, 255, 248, 0.9)' : 'rgba(84, 84, 84, 1)',
         tooltip: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 255, 255, 0.06)',
         alert: light ? 'rgba(3, 19, 19, 0.06)' : 'rgba(255, 216, 141, 0.1)',
       },
@@ -139,6 +138,16 @@ function App() {
       },
     },
     components: {
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius:'12px',
+            "& $notchedOutline": {
+              padding:'15px 16px'
+            }
+          }
+        }
+      },
       ReactSelect: {
         styleOverrides: {
           root: {
@@ -411,7 +420,6 @@ function App() {
                 backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
               }}
             >
-              <Notification />
               <Suspense fallback={<>Loading...</>}>
                 <Router />
               </Suspense>

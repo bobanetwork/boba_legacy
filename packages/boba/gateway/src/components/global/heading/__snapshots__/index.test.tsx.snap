@@ -2,16 +2,8 @@
 
 exports[`Heading should match snapshots h1 1`] = `
 <DocumentFragment>
-  .c0 {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 36px;
-  line-height: 44px;
-  font-weight: 700;
-}
-
-<h1
-    class="c0"
+  <h1
+    class="sc-bgqQcB jYvPsJ"
   >
     Test Heading
   </h1>
@@ -20,16 +12,8 @@ exports[`Heading should match snapshots h1 1`] = `
 
 exports[`Heading should match snapshots h2 1`] = `
 <DocumentFragment>
-  .c0 {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 24px;
-  line-height: 29px;
-  font-weight: 700;
-}
-
-<h2
-    class="c0"
+  <h2
+    class="sc-bgqQcB hisnER"
   >
     Test Heading
   </h2>
@@ -38,16 +22,8 @@ exports[`Heading should match snapshots h2 1`] = `
 
 exports[`Heading should match snapshots h3 1`] = `
 <DocumentFragment>
-  .c0 {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 22px;
-  font-weight: 700;
-}
-
-<h3
-    class="c0"
+  <h3
+    class="sc-bgqQcB hPrUKN"
   >
     Test Heading
   </h3>
@@ -56,16 +32,8 @@ exports[`Heading should match snapshots h3 1`] = `
 
 exports[`Heading should match snapshots h4 1`] = `
 <DocumentFragment>
-  .c0 {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 16px;
-  font-weight: 700;
-}
-
-<h4
-    class="c0"
+  <h4
+    class="sc-bgqQcB bblAst"
   >
     Test Heading
   </h4>
@@ -74,16 +42,8 @@ exports[`Heading should match snapshots h4 1`] = `
 
 exports[`Heading should match snapshots h5 1`] = `
 <DocumentFragment>
-  .c0 {
-  font-style: normal;
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 14px;
-  font-weight: 700;
-}
-
-<h5
-    class="c0"
+  <h5
+    class="sc-bgqQcB jfkGcq"
   >
     Test Heading
   </h5>
@@ -92,13 +52,8 @@ exports[`Heading should match snapshots h5 1`] = `
 
 exports[`Heading should match snapshots h6 1`] = `
 <DocumentFragment>
-  .c0 {
-  font-style: normal;
-  font-weight: 700;
-}
-
-<h6
-    class="c0"
+  <h6
+    class="sc-bgqQcB jDQrGH"
   >
     Test Heading
   </h6>
