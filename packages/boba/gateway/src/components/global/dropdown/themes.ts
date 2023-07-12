@@ -13,6 +13,7 @@ import { DefaultIcon } from './styles'
 
 export const DropdownNetwork = styled(Dropdown)`
   ${DropdownContainer} {
+    background: none;
     font-size: 16px;
     ${(props) =>
       props.theme.name === 'light' &&
@@ -35,18 +36,19 @@ export const DropdownNetwork = styled(Dropdown)`
       props.theme.name === 'light' &&
       css`
         border: 1px solid ${props.theme.colors.gray[400]};
-        background: ${props.theme.colors.gray[100]};
+        background: none;
         &:hover {
           border-color: 1px solid ${props.theme.colors.gray[500]};
-          background: ${props.theme.colors.gray[300]};
+          background: none;
         }
       `}
     ${(props) =>
       props.theme.name === 'dark' &&
       css`
         border: 2px solid ${props.theme.colors.gray[200]};
-        background: ${props.theme.colors.gray[500]};
+        background: none;
         &:hover {
+          background: none;
           border-color: ${props.theme.colors.green[300]};
         }
       `}

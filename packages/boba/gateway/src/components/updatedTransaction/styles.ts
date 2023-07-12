@@ -2,68 +2,25 @@ import styled, { css } from 'styled-components'
 import { styled as styledOld } from '@mui/material/styles'
 import { Box, Grid } from '@mui/material'
 
-export const TransactionAmount = styled.div`
-  font-size: 14px;
-  width: 80px;
-`
-
-export const Date = styled.div`
-  color: var(--dark-type-1, #eee);
-  font-family: Roboto;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  min-width: 168px;
-  text-align: left;
-`
-
-export const Icon = styled.img`
-  width: 32px;
-  height: 32px;
-`
-
-export const Status = styled.div`
-  font-size: 14px;
-  width: 88px;
-  text-align: left;
-`
-
-export const TransactionChain = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 142px;
-  gap: 8px;
-  text-align: left;
-`
-
-export const TransactionChainDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  gap: 2px;
-`
-
-export const TransactionEntry = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 16px 24px;
-  align-items: center;
-  // gap: 56px;
-  font-size: 16px;
-  width: 100%;
-`
-
-export const TransactionToken = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-items: center;
-  width: 90px;
-  text-align: left;
-`
+export const TableOld = styled(Box)(({ theme }) => ({
+  Gradient: 'Linear #303030-#252525',
+  borderRadius: '12px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  textAlign: 'center',
+  width: '100%',
+  background:
+    'var(--glass-bg-popup, linear-gradient(129deg, rgba(48, 48, 48, 0.70) 0%, rgba(48, 48, 48, 0.70) 46.35%, rgba(37, 37, 37, 0.70) 94.51%))',
+  [theme.breakpoints.down('sm')]: {
+    gap: '10px',
+  },
+  // background: theme.palette.background.secondary,
+  [theme.breakpoints.down('md')]: {
+    marginBottom: '5px',
+  },
+}))
 
 export const Wrapper = styled.div`
   borderradius: 0;
