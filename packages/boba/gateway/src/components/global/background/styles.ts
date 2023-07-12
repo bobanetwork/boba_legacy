@@ -14,7 +14,7 @@ const gradientColor = (theme: string) => {
   if (theme === 'light') {
     return 'radial-gradient(45% 45% at 50% 50%, rgba(174, 219, 1, 0.4) 19.79%, rgba(174, 219, 1, 0.125) 50%, rgba(174, 219, 1, 0) 70%);'
   } else {
-    return 'radial-gradient(45% 45% at 50% 50%, rgba(174, 219, 1, 0.32) 19.79%, rgba(174, 219, 1, 0.1) 50%, rgba(174, 219, 1, 0) 70%);'
+    return 'radial-gradient(55.87% 55.87% at 50.00% 50.00%, rgba(174, 219, 1, 0.24) 19.79%, rgba(174, 219, 1, 0.08) 62.50%, rgba(174, 219, 1, 0.00) 91.67%);'
   }
 }
 
@@ -37,10 +37,14 @@ export const GridBackground = styled.div`
 export const GridFade = styled.div<BackgroundProps>`
   width: 100%;
   height: 100%;
+  max-width: 1441px;
+  max-height: 870px;
   position: absolute;
   z-index: 1;
-  transform: translateY(-50vh);
-  will-change: translateY;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -100%);
+  will-change: translate;
   transition: transform 1s ease;
   background-image: ${(props) => gradientColor(props.theme.name)};
   background-clip: padding-box;
@@ -49,7 +53,7 @@ export const GridFade = styled.div<BackgroundProps>`
   ${({ position }) =>
     position === 'top' &&
     `
-    transform: translateY(-100vh);
+    transform:translate(-50%, -150%);
   `}
 `
 

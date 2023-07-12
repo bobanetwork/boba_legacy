@@ -17,6 +17,11 @@ const Template: StoryFn<TypographyProps> = (args: any) => (
 
 export const Default = Template.bind({})
 
+export const H1 = Template.bind({})
+H1.args = {
+  variant: 'h1',
+}
+
 export const Head = Template.bind({})
 Head.args = {
   variant: 'head',

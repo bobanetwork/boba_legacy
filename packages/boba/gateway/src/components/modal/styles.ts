@@ -1,4 +1,4 @@
-import { Box, IconButton } from '@mui/material'
+import { Box } from '@mui/material'
 import styled, { css } from 'styled-components'
 import ModalUnstyled from '@mui/base/ModalUnstyled'
 
@@ -46,51 +46,27 @@ export const Style = styled.div<StyleProps>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border: 1px solid ${(props) => props.theme.colors.gray[300]};
+  background: ${(props) => props.theme.colors.popup};
+  width: 100%;
 
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: linear-gradient(
-        151.67deg,
-        rgba(48, 48, 48, 0.7) 7.91%,
-        rgba(48, 48, 48, 0.7) 45.81%,
-        rgba(37, 37, 37, 0.7) 85.18%
-      );
-    `}
   ${(props) =>
     props.transparent &&
     css`
       background: ${props.theme.palette.background.modalTransparent};
     `}
-  
 
-
-  backdrop-filter: ${(props) => (props.transparent ? 'none' : 'blur(66px)')};
-  padding: 20px;
-  border: 0;
+  backdrop-filter: ${(props) => (props.transparent ? 'none' : 'blur(15px)')};
+  padding: 32px 24px;
   outline: 0;
   box-sizing: border-box;
-  max-width: 100%;
-  border-radius: 20px;
+  border-radius: 12px;
 
   ${(props) =>
     props.shouldForwardProp &&
     `
     ${props.shouldForwardProp(props)}
   `}
-`
-
-export const IconButtonTag = styled(IconButton)`
-  @media (max-width: 980px) {
-    position: absolute;
-    top: 0;
-    right: 20px;
-  }
 `
 
 export const WrapperActionsModal = styled(Box)`
@@ -103,14 +79,28 @@ export const WrapperActionsModal = styled(Box)`
 
 export const ModalHead = styled(Box)`
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   gap: 5px;
+`
+export const IconButtonTag = styled.div`
+  margin-left: auto;
+  cursor: pointer;
 `
 
 export const Content = styled(Box)`
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+`
+
+export const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
   gap: 10px;
 `
 

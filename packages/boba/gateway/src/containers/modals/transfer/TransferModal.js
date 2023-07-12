@@ -42,7 +42,7 @@ import { amountToUsd, toWei_String } from 'util/amountConvert'
 
 import networkService from 'services/networkService'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 function TransferModal ({ open, token }) {
 

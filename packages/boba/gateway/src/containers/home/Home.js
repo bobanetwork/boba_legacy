@@ -18,14 +18,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Outlet } from 'react-router-dom'
 import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
-import {
-  fetchBalances,
-} from 'actions/networkAction'
+import { fetchBalances } from 'actions/networkAction'
 
-import {
-  selectAccountEnabled,
-  selectActiveNetwork,
-} from 'selectors'
+import { selectAccountEnabled, selectActiveNetwork } from 'selectors'
 
 /******** COMPONENTS ********/
 import { PageTitle } from 'components/layout/PageTitle'
