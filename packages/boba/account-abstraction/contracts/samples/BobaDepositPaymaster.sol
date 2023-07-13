@@ -40,8 +40,11 @@ contract BobaDepositPaymaster is BasePaymaster {
         uint8 tokenDecimals;
     }
 
+    /** @dev Max age of token/eth price returned by latestRoundData() */
+    uint256 constant public MAX_AGE_ASSET_PRICE = 10800; // default 3h TBD
+
     //calculated cost of the postOp
-    uint256 constant public COST_OF_POST = 35000;
+    uint256 public constant COST_OF_POST = 35000;
     address public constant QUOTE_USD = 0x0000000000000000000000000000000000000348;
 
     // for alt-l1, treat this as the native token
@@ -140,11 +143,21 @@ contract BobaDepositPaymaster is BasePaymaster {
         Oracle memory oracleInfo = oracles[token];
         require(oracleInfo.feedRegistry != NULL_ORACLE, "DepositPaymaster: unsupported token");
         address base = oracleInfo.tokenBase;
-        uint256 ethPrice = uint256(oracles[L2_ETH].feedRegistry.latestAnswer(oracles[L2_ETH].tokenBase, QUOTE_USD));
-        uint256 tokenPrice = uint256(oracleInfo.feedRegistry.latestAnswer(base, QUOTE_USD));
+
+        uint256 currTimestamp = block.timestamp;
+        (uint80 roundId, int256 price,,uint256 priceUpdatedAt,) = oracles[L2_ETH].feedRegistry.latestRoundData(oracles[L2_ETH].tokenBase, QUOTE_USD);
+        require(roundId != 0 && price > 0 && priceUpdatedAt != 0 && priceUpdatedAt <= currTimestamp, "ETH round failed");
+        require((currTimestamp - priceUpdatedAt) < MAX_AGE_ASSET_PRICE, "ETH price expired");
+        uint256 ethPrice = uint256(price);
+
+        (roundId, price,, priceUpdatedAt,) = oracleInfo.feedRegistry.latestRoundData(base, QUOTE_USD);
+        require(roundId != 0 && price > 0 && priceUpdatedAt != 0 && priceUpdatedAt <= currTimestamp, "Token round failed");
+        require((currTimestamp - priceUpdatedAt) < MAX_AGE_ASSET_PRICE, "Token price expired");
+        uint256 tokenPrice = uint256(price);
+
         uint256 ethPriceDecimals = uint256(oracles[L2_ETH].feedRegistry.decimals(oracles[L2_ETH].tokenBase, QUOTE_USD));
         uint256 tokenPriceDecimals = uint256(oracleInfo.feedRegistry.decimals(base, QUOTE_USD));
-        uint256 requiredAmount = (ethBought * ethPrice * (10**tokenPriceDecimals)) / (tokenPrice * (10**ethPriceDecimals));
+        uint256 requiredAmount = (ethBought * uint256(ethPrice) * (10**tokenPriceDecimals)) / (uint256(tokenPrice) * (10**ethPriceDecimals));
         // there is no requiredAmount = 0 check, priceRatio from oracle shouldnt exceed ethBought
         return ((requiredAmount * (10**oracleInfo.tokenDecimals)) / (10**oracles[L2_ETH].tokenDecimals));
     }

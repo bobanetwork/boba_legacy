@@ -6,92 +6,94 @@ import "../../samples/IBobaStraw.sol";
 
 contract MockFeedRegistry is IBobaStraw {
 
-  int256 public fixedReturnValue = 45;
-  uint8 public decimalsOverride = 8;
+    int256 public fixedReturnValue = 45;
+    uint8 public decimalsOverride = 8;
+    uint80 public fixedRoundId = 1;
+    uint256 public fixedUpdatedAt = block.timestamp;
 
-  function latestRoundData(
-    address base,
-    address quote
-  )
+    function latestRoundData(
+        address base,
+        address quote
+    )
     external
     view
     returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
+        uint80 roundId,
+        int256 answer,
+        uint256 startedAt,
+        uint256 updatedAt,
+        uint80 answeredInRound // deprecated
     ) {
-      return (0,0,0,0,0);
+        return (fixedRoundId, fixedReturnValue, 0, fixedUpdatedAt, 0);
     }
 
-  function getRoundData(
-    address base,
-    address quote,
-    uint80 _roundId
-  )
+    function getRoundData(
+        address base,
+        address quote,
+        uint80 _roundId
+    )
     external
     view
     returns (
-      uint80 roundId,
-      int256 answer,
-      uint256 startedAt,
-      uint256 updatedAt,
-      uint80 answeredInRound
+        uint80 roundId,
+        int256 answer,
+        uint256 startedAt,
+        uint256 updatedAt,
+        uint80 answeredInRound
     ) {
-      return (0,0,0,0,0);
+        return (0, 0, 0, 0, 0);
     }
 
-  // V2 AggregatorInterface
+    // V2 AggregatorInterface
 
-  function latestAnswer(
-    address base,
-    address quote
-  )
+    function latestAnswer(
+        address base,
+        address quote
+    )
     external
     view
     returns (
-      int256 answer
+        int256 answer
     ) {
         return fixedReturnValue;
     }
 
-  function latestTimestamp(
-    address base,
-    address quote
-  )
+    function latestTimestamp(
+        address base,
+        address quote
+    )
     external
     view
     returns (
-      uint256 timestamp
+        uint256 timestamp
     ) {
-      return 0;
+        return 0;
     }
 
-  function decimals(
-    address base,
-    address quote
-  )
+    function decimals(
+        address base,
+        address quote
+    )
     external
     view
     returns (
-      uint8
+        uint8
     ) {
-      return decimalsOverride;
+        return decimalsOverride;
     }
 
     function updateFixedRetunValue(
-      int256 newValue
+        int256 newValue
     )
-     external
+    external
     {
         fixedReturnValue = newValue;
     }
 
     function updateDecimals(
-      uint8 newDecimals
+        uint8 newDecimals
     )
-     external
+    external
     {
         decimalsOverride = newDecimals;
     }
