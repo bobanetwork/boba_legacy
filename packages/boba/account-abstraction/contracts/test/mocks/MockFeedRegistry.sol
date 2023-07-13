@@ -82,12 +82,28 @@ contract MockFeedRegistry is IBobaStraw {
         return decimalsOverride;
     }
 
-    function updateFixedRetunValue(
+    function updateFixedReturnValue(
         int256 newValue
     )
     external
     {
         fixedReturnValue = newValue;
+    }
+
+    function updateFixedRoundId(
+        uint80 newValue
+    )
+    external
+    {
+        fixedRoundId = newValue;
+    }
+
+    function updateFixedUpdatedAt(
+        uint256 newValue
+    )
+    external
+    {
+        fixedUpdatedAt = newValue;
     }
 
     function updateDecimals(
