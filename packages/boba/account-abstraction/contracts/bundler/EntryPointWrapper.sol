@@ -162,7 +162,12 @@ contract EntryPointWrapper {
         }
     }
 
-    // helper function to slice function signature from return data
+    /** @dev Helper function to slice function signature from return data
+    * @param _bytes: signature
+    * @param _start: where to start the slice
+    * @param _length: Length of slice
+    * @return Sliced signature
+    */
     function slice(
         bytes memory _bytes,
         uint256 _start,
@@ -232,7 +237,9 @@ contract EntryPointWrapper {
         return tempBytes;
     }
 
-    // helper function to get multiple userOpHashes in a single call, used by the bundler
+    /** @dev Helper function to get multiple userOpHashes in a single call, used by the bundler
+    * @param entryPoint: EntryPoint interface/address
+    * @param userOps: User operations to return user op hash for. */
     function getUserOpHashes(IEntryPoint entryPoint, UserOperation[] memory userOps) public view returns (bytes32[] memory ret) {
         ret = new bytes32[](userOps.length);
         for (uint i = 0; i < userOps.length; i++) {
@@ -241,7 +248,9 @@ contract EntryPointWrapper {
         return ret;
     }
 
-    // helper function to get hashed accounthash of addresses, used by the bundler
+    /** @dev Helper function to get hashed accounthash of addresses, used by the bundler
+    * @param addresses: Addresses to return code hashes for.
+    * @return Hash of code hashes */
     function getCodeHashes(address[] memory addresses) public view returns (bytes32) {
         bytes32[] memory hashes = new bytes32[](addresses.length);
         for (uint i = 0; i < addresses.length; i++) {
