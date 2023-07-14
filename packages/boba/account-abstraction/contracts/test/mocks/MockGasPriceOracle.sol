@@ -16,7 +16,7 @@ contract MockGasPriceOracle is IBobaGasPriceOracle {
     return fixedReturnValue;
   }
 
-  function updateFixedRetunValue(uint256 newValue) external {
+  function updateFixedReturnValue(uint256 newValue) external {
         fixedReturnValue = newValue;
     }
 
