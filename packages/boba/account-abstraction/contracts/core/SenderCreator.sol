@@ -14,7 +14,6 @@ contract SenderCreator {
      */
     function createSender(bytes calldata initCode) external returns (address sender) {
         address factory = address(bytes20(initCode[0 : 20]));
-        require(factory != address(0), "Invalid initCode");
         bytes memory initCallData = initCode[20 :];
         bool success;
         /* solhint-disable no-inline-assembly */

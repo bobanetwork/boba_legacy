@@ -41,7 +41,7 @@ contract BobaDepositPaymaster is BasePaymaster {
     }
 
     /** @dev Max age of token/eth price returned by latestRoundData() */
-    uint256 constant public MAX_AGE_ASSET_PRICE = 10800; // default 3h TBD
+    uint256 public constant MAX_AGE_ASSET_PRICE = 10800; // default 3h TBD
 
     //calculated cost of the postOp
     uint256 public constant COST_OF_POST = 35000;
