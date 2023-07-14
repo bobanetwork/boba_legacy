@@ -166,7 +166,7 @@ contract EntryPointWrapper {
     * @param _bytes: signature
     * @param _start: where to start the slice
     * @param _length: Length of slice
-    * @return Sliced signature
+    * @return Sliced returnData
     */
     function slice(
         bytes memory _bytes,
