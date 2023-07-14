@@ -163,7 +163,7 @@ contract EntryPointWrapper {
     }
 
     /** @dev Helper function to slice function signature from return data
-    * @param _bytes: signature
+    * @param _bytes: returnData
     * @param _start: where to start the slice
     * @param _length: Length of slice
     * @return Sliced returnData
