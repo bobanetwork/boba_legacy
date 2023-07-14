@@ -54,6 +54,7 @@ const env = cleanEnv(process.env, {
     default: 'onchain',
   }),
   L2_URL: str({ default: 'http://localhost:8545' }),
+  L2_WS_URL: str({ default: 'ws://localhost:8546'}),
   L2_POLLING_INTERVAL: num({ default: 10 }),
   L2_WALLET_MIN_BALANCE_ETH: num({
     default: 2,
@@ -141,6 +142,9 @@ export const l2Provider = asL2Provider(
   new providers.JsonRpcProvider(env.L2_URL)
 )
 l2Provider.pollingInterval = env.L2_POLLING_INTERVAL
+export const l2WsProvider = asL2Provider(
+  new providers.WebSocketProvider(env.L2_WS_URL)
+)
 
 export const replicaProvider = asL2Provider(
   new providers.JsonRpcProvider(env.REPLICA_URL)

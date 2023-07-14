@@ -7,14 +7,14 @@ import {
   providers,
   Wallet,
 } from 'ethers'
-import { orderBy } from 'lodash'
+import {orderBy} from 'lodash'
 import 'reflect-metadata'
 
 /* Imports: Internal */
-import { sleep } from '@eth-optimism/core-utils'
-import { BaseService } from '@eth-optimism/common-ts'
-import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import {sleep} from '@eth-optimism/core-utils'
+import {BaseService} from '@eth-optimism/common-ts'
+import {getContractFactory} from '@eth-optimism/contracts'
+import {getBobaContractAt} from '@boba/contracts'
 
 /* Imports: Interface */
 import {
@@ -24,12 +24,13 @@ import {
   Disbursement,
   SupportedAssets,
 } from './utils/types'
-import { HistoryData } from './entities/HistoryData.entity'
-import { historyDataRepository } from './data-source'
-import { IKMSSignerConfig, KMSSigner } from './utils/kms-signing'
+import {HistoryData} from './entities/HistoryData.entity'
+import {historyDataRepository} from './data-source'
+import {IKMSSignerConfig, KMSSigner} from './utils/kms-signing'
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
+  l2WSRpcProvider?: providers.WebSocketProvider
 
   // chainId of the L2 network
   chainId: number
@@ -52,6 +53,9 @@ interface TeleportationOptions {
 const optionSettings = {}
 
 export class TeleportationService extends BaseService<TeleportationOptions> {
+  private readonly EXPECTED_PONG_BACK = 15000
+  private readonly KEEP_ALIVE_CHECK_INTERVAL = 7500
+
   constructor(options: TeleportationOptions) {
     super('Teleportation', options, optionSettings)
   }
@@ -63,7 +67,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     // the contract of the chain that users deposit token
     depositTeleportations: DepositTeleportations[]
     // AWS KMS Signer for disburser key, ..
-    KMSSigner: KMSSigner
+    KMSSigner: KMSSigner,
+    // ws connection ping timeout
+    wsPingTimeout: { number: NodeJS.Timeout },
+    // ws connection keep alive interval
+    wsKeepAliveInterval: { number: NodeJS.Timer },
   } = {} as any
 
   protected async _init(): Promise<void> {
@@ -78,7 +86,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     this.state.Teleportation = await getBobaContractAt(
       'Teleportation',
       this.options.teleportationAddress,
-      this.options.l2RpcProvider
+      this.options.l2WSRpcProvider ?? this.options.l2RpcProvider
     )
 
     this.logger.info('Connected to Teleportation', {
@@ -132,6 +140,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
         this.state.depositTeleportations.push({
           Teleportation: depositTeleportation,
+          wsAvailable: !!chain.wsProvider,
           chainId,
           totalDisbursements,
           totalDeposits,
@@ -143,8 +152,31 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   }
 
   protected async _start(): Promise<void> {
+
+    const wsDepositTeleportation = this.state.depositTeleportations.filter(t => t.wsAvailable)
+    const noWsDepositTeleportation = this.state.depositTeleportations.filter(t => !t.wsAvailable)
+
+    // Websocket providers
+    for (const depositTeleportation of wsDepositTeleportation) {
+      const latestBlock =
+        await depositTeleportation.Teleportation.provider.getBlockNumber()
+
+      // load events for blocks before currentBlock
+      const events: AssetReceivedEvent[] = await this._watchTeleportation(
+        depositTeleportation,
+        latestBlock
+      )
+      await this._disburseTeleportation(
+        depositTeleportation,
+        events,
+        latestBlock
+      )
+
+      this._handleWebsocketConnection(depositTeleportation, latestBlock)
+    }
+
     while (this.running) {
-      for (const depositTeleportation of this.state.depositTeleportations) {
+      for (const depositTeleportation of noWsDepositTeleportation) {
         // search AssetReceived events
         const latestBlock =
           await depositTeleportation.Teleportation.provider.getBlockNumber()
@@ -168,6 +200,48 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     }
   }
 
+  _handleWebsocketConnection(depositTeleportation: DepositTeleportations, latestBlock: number) {
+    const provider: providers.WebSocketProvider = depositTeleportation.Teleportation.provider as providers.WebSocketProvider
+    const chainId = depositTeleportation.chainId
+
+    provider._websocket.on('open', () => {
+
+      this.state.wsKeepAliveInterval[chainId] = setInterval(() => {
+        console.log('Checking if the connection is alive, sending a ping for chainId', chainId)
+
+        provider._websocket.ping()
+
+        // Use `WebSocket#terminate()`, which immediately destroys the connection,
+        // instead of `WebSocket#close()`, which waits for the close timer.
+        // Delay should be equal to the interval at which your server
+        // sends out pings plus a conservative assumption of the latency.
+        this.state.wsPingTimeout[chainId] = setTimeout(() => {
+          provider._websocket.terminate()
+        }, this.EXPECTED_PONG_BACK)
+      }, this.KEEP_ALIVE_CHECK_INTERVAL)
+
+      depositTeleportation.Teleportation.on(this.state.Teleportation.filters.AssetReceived(), async (event) => {
+        await this._disburseTeleportation(
+          depositTeleportation,
+          [event],
+          latestBlock
+        )
+      })
+    })
+
+    provider._websocket.on('close', () => {
+      console.error('The websocket connection was closed for chainId', chainId)
+      clearInterval(this.state.wsKeepAliveInterval[chainId])
+      clearTimeout(this.state.wsPingTimeout[chainId])
+      this._handleWebsocketConnection(depositTeleportation, latestBlock)
+    })
+
+    provider._websocket.on('pong', () => {
+      console.log('Received pong, so connection is alive, clearing the timeout for chainId ', chainId)
+      clearInterval(this.state.wsPingTimeout[chainId])
+    })
+  }
+
   async _watchTeleportation(
     depositTeleportation: DepositTeleportations,
     latestBlock: number
@@ -182,6 +256,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       // store the new deposit info
       await this._putDepositInfo(chainId, lastBlock)
     }
+
     return this._getEvents(
       depositTeleportation.Teleportation,
       this.state.Teleportation.filters.AssetReceived(),
@@ -213,7 +288,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           const amount = event.args.amount
           const sourceChainTokenAddr = event.args.token
           const emitter = event.args.emitter
-          const destChainId = event.args.toChainId
 
           // we disburse tokens only if depositId is greater or equal to the last disbursement
           if (depositId.gte(lastDisbursement)) {
@@ -312,7 +386,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const disburseTxUnsigned =
           await this.state.Teleportation.populateTransaction.disburseAsset(
             slicedDisbursement,
-            { value: nativeValue }
+            {value: nativeValue}
           )
         const disburseTx = await this.state.KMSSigner.sendTxViaKMS(
           this.state.Teleportation.provider,
@@ -345,11 +419,13 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   ): Promise<any> {
     let events = []
     let startBlock = fromBlock
+
     while (startBlock < toBlock) {
       const endBlock = Math.min(
         startBlock + this.options.blockRangePerPolling,
         toBlock
       )
+
       const partialEvents = await contract.queryFilter(
         event,
         startBlock,
@@ -405,10 +481,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       historyData.chainId = chainId
       historyData.blockNo = latestBlock
       if (
-        await historyDataRepository.findOneBy({ chainId: historyData.chainId })
+        await historyDataRepository.findOneBy({chainId: historyData.chainId})
       ) {
         await historyDataRepository.update(
-          { chainId: historyData.chainId },
+          {chainId: historyData.chainId},
           historyData
         )
       } else {

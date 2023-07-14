@@ -18,7 +18,9 @@ export interface AssetReceivedEvent {
 export interface ChainInfo {
   chainId: number
   url: string
+  wsUrl?: string
   provider: providers.StaticJsonRpcProvider
+  wsProvider?: providers.WebSocketProvider
   testnet: boolean
   name: string
   teleportationAddress: string
@@ -28,6 +30,7 @@ export interface ChainInfo {
 
 export interface DepositTeleportations {
   Teleportation: Contract
+  wsAvailable: boolean
   chainId: number
   totalDeposits: BigNumber
   totalDisbursements: BigNumber

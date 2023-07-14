@@ -17,7 +17,7 @@ import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
-import { ChainInfo } from '@boba/teleportation/src/utils/types'
+import {ChainInfo, DepositTeleportations} from '@boba/teleportation/src/utils/types'
 
 /* Imports: Core */
 import { TeleportationService } from '@boba/teleportation/src/service'
@@ -26,11 +26,14 @@ import {
   historyDataRepository,
 } from '@boba/teleportation/src/data-source'
 import { OptimismEnv } from './shared/env'
+import {WebSocketProvider} from "@ethersproject/providers";
 
-describe('teleportation', () => {
+// TODO: Remove only
+describe.only('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
+  let wsProvider: WebSocketProvider
 
   let wallet1: Wallet
   let address1: string
@@ -53,6 +56,7 @@ describe('teleportation', () => {
     signerAddr = await signer.getAddress()
     wallet1 = env.l2Wallet_2
     address1 = wallet1.address
+    wsProvider = env.l2WsProvider
 
     await signer.sendTransaction({
       to: wallet1.address,
@@ -120,10 +124,12 @@ describe('teleportation', () => {
     selectedBobaChains = [
       {
         chainId,
-        url: 'http://localhost:8545',
+        url: 'http://l2geth:8545',
+        wsUrl: 'ws://l2geth:8546',
         provider: ethers.provider,
+        wsProvider: wsProvider,
         testnet: true,
-        name: 'localhost',
+        name: 'l2geth',
         teleportationAddress: Teleportation.address,
         height: 0,
         supportedAssets: {
@@ -141,6 +147,7 @@ describe('teleportation', () => {
 
     return new TeleportationService({
       l2RpcProvider: ethers.provider,
+      l2WSRpcProvider: wsProvider,
       chainId: chainIdToUse,
       teleportationAddress: useBnb
         ? TeleportationBNB.address
@@ -396,6 +403,7 @@ describe('teleportation', () => {
   })
 
   describe('global tests', () => {
+
     it('should watch Teleportation contract', async () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
@@ -413,6 +421,7 @@ describe('teleportation', () => {
       const depositTeleportations = {
         Teleportation,
         chainId,
+        wsAvailable: false,
         totalDeposits: BigNumber.from('0'),
         totalDisbursements: BigNumber.from('0'),
         height: 0,
@@ -435,9 +444,10 @@ describe('teleportation', () => {
       await teleportationService.init()
 
       const latestBlock = await ethers.provider.getBlockNumber()
-      const depositTeleportations = {
+      const depositTeleportations: DepositTeleportations = {
         Teleportation,
         chainId,
+        wsAvailable: false,
         totalDeposits: BigNumber.from('0'),
         totalDisbursements: BigNumber.from('0'),
         height: 0,
@@ -491,6 +501,7 @@ describe('teleportation', () => {
       const depositTeleportations = {
         Teleportation,
         chainId,
+        wsAvailable: false,
         totalDeposits: BigNumber.from('0'),
         totalDisbursements: BigNumber.from('0'),
         height: 0,
@@ -510,6 +521,7 @@ describe('teleportation', () => {
       const depositTeleportations = {
         Teleportation,
         chainId,
+        wsAvailable: false,
         totalDeposits: BigNumber.from('0'),
         totalDisbursements: BigNumber.from('0'),
         height: 0,
@@ -554,6 +566,7 @@ describe('teleportation', () => {
       const depositTeleportations = {
         Teleportation,
         chainId,
+        wsAvailable: false,
         totalDeposits: BigNumber.from('0'),
         totalDisbursements: BigNumber.from('0'),
         height: 0,
@@ -643,7 +656,9 @@ describe('teleportation', () => {
         {
           chainId: chainIdBnb,
           url: 'http://localhost:8545',
+          wsUrl: 'ws://localhost:8546',
           provider: ethers.provider,
+          wsProvider: wsProvider,
           testnet: true,
           name: 'localhost:bnb',
           teleportationAddress: TeleportationBNB.address,
@@ -658,7 +673,9 @@ describe('teleportation', () => {
         {
           chainId,
           url: 'http://localhost:8545',
+          wsUrl: 'ws://localhost:8546',
           provider: ethers.provider,
+          wsProvider: wsProvider,
           testnet: true,
           name: 'localhost',
           teleportationAddress: Teleportation.address,

@@ -38,6 +38,7 @@ const main = async () => {
 
   const env = process.env
   const L2_NODE_WEB3_URL = config.str('l2-node-web3-url', env.L2_NODE_WEB3_URL)
+  const L2_WS_NODE_WEB3_URL: string | undefined = config.str('l2-ws-node-web3-url', env.L2_WS_NODE_WEB3_URL)
   // This private key is used to send funds to the contract and initiate the tx,
   // so it should have enough BOBA balance
   const TELEPORTATION_AWS_KMS_ACCESS_KEY = config.str(
@@ -85,6 +86,10 @@ const main = async () => {
   }
 
   const l2Provider = new providers.StaticJsonRpcProvider(L2_NODE_WEB3_URL)
+  const l2WSRpcProvider = L2_WS_NODE_WEB3_URL ? new providers.WebSocketProvider(L2_WS_NODE_WEB3_URL) : null;
+  if (L2_WS_NODE_WEB3_URL) {
+    console.log('Websocket node url provided, using websocket instead of http provider', L2_WS_NODE_WEB3_URL)
+  }
 
   // get all boba chains and exclude the current chain
   const chainId = (await l2Provider.getNetwork()).chainId
@@ -109,6 +114,7 @@ const main = async () => {
 
   const service = new TeleportationService({
     l2RpcProvider: l2Provider,
+    l2WSRpcProvider: l2WSRpcProvider,
     chainId,
     teleportationAddress: TELEPORTATION_ADDRESS,
     selectedBobaChains,

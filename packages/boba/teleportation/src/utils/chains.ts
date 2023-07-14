@@ -1,6 +1,8 @@
 export interface IBobaChains {
   [chainId: number]: {
     url: string
+    /** @dev If defined teleportation service will use websocket instead of regular httpProvider */
+    wsUrl?: string
     testnet: boolean
     name: string
     teleportationAddress: string
@@ -21,6 +23,7 @@ export const BobaChains: IBobaChains = {
   //#region boba_networks
   288: {
     url: 'https://replica.boba.network',
+    wsUrl: 'wss://boba-ethereum.gateway.tenderly.co',
     testnet: false,
     name: 'Boba Ethereum Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -34,6 +37,7 @@ export const BobaChains: IBobaChains = {
   },
   43288: {
     url: 'https://replica.avax.boba.network',
+    wsUrl: 'wss://wss.avax.boba.network',
     testnet: false,
     name: 'Boba Avalanche Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -45,6 +49,7 @@ export const BobaChains: IBobaChains = {
   },
   56288: {
     url: 'https://replica.bnb.boba.network',
+    wsUrl: 'wss://boba-bnb.gateway.tenderly.co',
     testnet: false,
     name: 'Boba BNB Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -56,6 +61,7 @@ export const BobaChains: IBobaChains = {
   },
   2888: {
     url: 'https://replica.goerli.boba.network',
+    wsUrl: 'wss://wss.goerli.boba.network',
     testnet: true,
     name: 'Boba Ethereum Goerli',
     teleportationAddress: '0x64bD91c67af8cd17e04BeBDaac675f0EF6527edd',
@@ -67,6 +73,7 @@ export const BobaChains: IBobaChains = {
   },
   4328: {
     url: 'https://replica.testnet.avax.boba.network',
+    wsUrl: 'wss://wss.testnet.avax.boba.network',
     testnet: true,
     name: 'Boba Avalanche Testnet',
     teleportationAddress: '0xC226F132A686A08018431C913d87693396246024',
@@ -78,6 +85,7 @@ export const BobaChains: IBobaChains = {
   },
   9728: {
     url: 'https://replica.testnet.bnb.boba.network',
+    wsUrl: 'wss://wss.testnet.bnb.boba.network',
     testnet: true,
     name: 'Boba BNB Testnet',
     teleportationAddress: '0xC226F132A686A08018431C913d87693396246024',

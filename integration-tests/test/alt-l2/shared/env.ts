@@ -15,6 +15,7 @@ import {
 import {
   l1Provider,
   l2Provider,
+  l2WsProvider,
   replicaProvider,
   verifierProvider,
   l1Wallet,
@@ -70,6 +71,7 @@ export class OptimismEnv {
   messengerFast: CrossChainMessenger
   l1Provider: providers.JsonRpcProvider
   l2Provider: providers.JsonRpcProvider
+  l2WsProvider: providers.WebSocketProvider
   verifierProvider: providers.JsonRpcProvider
   replicaProvider: providers.JsonRpcProvider
 
@@ -92,6 +94,7 @@ export class OptimismEnv {
     this.l2BobalinkWallet = args.l2BobalinkWallet
     this.l1Provider = args.l1Provider
     this.l2Provider = args.l2Provider
+    this.l2WsProvider = args.l2WsProvider
     this.verifierProvider = args.verifierProvider
     this.replicaProvider = args.replicaProvider
     this.bundlerUrl = args.bundlerUrl
@@ -145,6 +148,7 @@ export class OptimismEnv {
       l2BobalinkWallet,
       l1Provider,
       l2Provider,
+      l2WsProvider,
       verifierProvider,
       replicaProvider,
       l1Bridge,
