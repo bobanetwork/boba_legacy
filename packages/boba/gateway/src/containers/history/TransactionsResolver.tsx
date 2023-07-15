@@ -5,6 +5,8 @@ import {
 } from 'components/global/table/themes'
 
 import { TableHeaderOptionType } from 'components/global/table'
+import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
+import { getCoinImage } from 'util/coinImage'
 import { formatDate } from 'util/dates'
 import {
   Date,
@@ -18,12 +20,16 @@ import {
   TransactionContractAdress,
 } from './styles'
 import { useSelector } from 'react-redux'
-import { selectLoading, selectTokens } from 'selectors'
+import {
+  selectLoading,
+  selectTokens,
+  selectActiveNetworkIcon,
+  selectActiveNetworkName,
+} from 'selectors'
 import truncate from 'truncate-middle'
 import EthereumIcon from '../../images/ethereum.svg'
 import { logAmount } from 'util/amountConvert'
 import { maxWidth } from '@mui/system'
-import { getCoinImage } from 'util/coinImage'
 
 export enum TRANSACTION_FILTER_STATUS {
   Pending = 'Pending',
@@ -48,7 +54,6 @@ export enum LAYER {
 }
 
 export interface ITransactionFilter {
-  networks: INetworks
   fromNetwork: string
   toNetwork: string
   fromToNetwork?: string
@@ -97,18 +102,12 @@ export interface ITransaction {
   UserFacingStatus?: TRANSACTION_FILTER_STATUS
 }
 
-export interface IChain {
-  symbol: string
-  imgSrc: string
-  layer: LAYER
-}
-
 export interface IProcessedTransaction {
-  date: number
+  timeStamp: number
   from: string
-  fromChain: IChain
+  fromLayer: LAYER
   to: string
-  toChain: IChain
+  toLayer: LAYER
   tokenSymbol: string
   amount: string
   status?: TRANSACTION_FILTER_STATUS // need to remove the undefined option
@@ -123,7 +122,8 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
   transactionsFilter,
 }) => {
-  console.log(transactionsFilter.networks)
+  const icon = useSelector(selectActiveNetworkIcon())
+  const activeNetworks = useSelector(selectActiveNetworkName())
 
   // should filter out transctions that aren't cross domain
   const crossDomainFilter = (transaction: ITransaction) => {
@@ -140,11 +140,11 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
         return true
       }
       // deposit
-      case transactionsFilter.networks.l1: {
+      case activeNetworks.l1: {
         return transaction.depositL2
       }
       // exit
-      case transactionsFilter.networks.l2: {
+      case activeNetworks.networks.l2: {
         return transaction.exitL2
       }
     }
@@ -174,7 +174,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       transactionsFilter.status &&
       transactionsFilter.status !== TRANSACTION_FILTER_STATUS.All
     ) {
-      console.log('transaction status', transaction.UserFacingStatus)
       return transactionsFilter.status === transaction.UserFacingStatus
     }
 
@@ -201,32 +200,33 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   })
 
-  console.log('filtered transactions: ', filteredTransactions)
-
   const tokenFromAddress = useSelector(selectTokens)
-  console.log('supported tokens', tokenFromAddress)
 
-  const getTransactionToken = (imgSrc: string, symbol: string) => {
+  const getTransactionToken = (symbol: string) => {
     return (
       <TransactionToken>
-        <Icon src={imgSrc} alt={'ETH'} />
+        <Icon src={getCoinImage(symbol)} alt={symbol} />
         <div>{symbol}</div>
       </TransactionToken>
     )
   }
 
-  const getTransactionChain = (
-    imgSrc: string,
-    symbol: string,
-    contractAddress: string
-  ) => {
+  const getTransactionChain = (layer: LAYER, address: string) => {
     return (
       <TransactionChain>
-        <Icon src={imgSrc} alt={symbol} />
+        {/* <Icon src={imgSrc} alt={'Not Working'} /> */}
+        {layer === LAYER.L1
+          ? L1_ICONS[icon as keyof typeof L1_ICONS]({ selected: true })
+          : L2_ICONS[icon as keyof typeof L2_ICONS]({ selected: true })}
         <TransactionChainDetails>
-          <div>{symbol}</div>
-          <TransactionContractAdress style={{ fontSize: '12px' }}>
-            {truncate(contractAddress, 4, 4, '...')}
+          <div>
+            {layer === LAYER.L1 ? activeNetworks.l1 : activeNetworks.l2}
+          </div>
+          <TransactionContractAdress
+            onClick={() => navigator.clipboard.writeText(address)}
+            style={{ fontSize: '12px' }}
+          >
+            {truncate(address, 4, 4, '...')}
           </TransactionContractAdress>
         </TransactionChainDetails>
       </TransactionChain>
@@ -237,32 +237,11 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     return <Date>{formatDate(timeStamp, 'DD MMM YYYY hh:mm A')}</Date>
   }
 
-  // const chainResolver = (name: string, layer: LAYER) => {}
+  // const chainResolver = (name: string, layer: LAYER) => {
 
-  const getTransactionAmount = (transaction: ITransaction) => {
-    let amount = ''
-    if (transaction.action.token) {
-      if (
-        transaction.action.token ===
-        '0x4200000000000000000000000000000000000006'
-      ) {
-        amount = logAmount(transaction.action.amount, 18, 4)
-        console.log(amount)
-      } else {
-        const chain =
-          transaction.chain === 'L1pending' ? 'L1' : transaction.chain
-        let token = tokenFromAddress[transaction.action.token.toLowerCase()]
-        if (chain === 'L2' && !token) {
-          token = Object.values(tokenFromAddress).find(
-            (t: any) =>
-              t.addressL2.toLowerCase() ===
-              transaction.action.token.toLowerCase()
-          )
-        }
-        const symbol = token[`symbol${chain}`]
-        amount = logAmount(transaction.action.amount, token?.decimals, 4)
-      }
-    }
+  // }
+
+  const getTransactionAmount = (amount: string) => {
     return amount ? (
       <TransactionAmount>{amount}</TransactionAmount>
     ) : (
@@ -270,76 +249,81 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   }
 
-  // const process_transaction = (transaction: ITransaction) => {
-  //   let amount = ''
-  //   const chain = transaction.chain === 'L1pending' ? 'L1' : transaction.chain
-  //   let token = tokenFromAddress[transaction.action.token.toLowerCase()]
-  //   if (chain === 'L2' && !token) {
-  //     token = Object.values(tokenFromAddress).find(
-  //       (t: any) =>
-  //         t.addressL2.toLowerCase() === transaction.action.token.toLowerCase()
-  //     )
-  //   }
-  //   let symbol = token[`symbol${chain}`]
+  const process_transaction = (transaction: ITransaction) => {
+    let amountString = ''
+    const chain = transaction.chain === 'L1pending' ? 'L1' : transaction.chain
+    let token = tokenFromAddress[transaction.action.token.toLowerCase()]
+    if (chain === 'L2' && !token) {
+      token = Object.values(tokenFromAddress).find(
+        (t: any) =>
+          t.addressL2.toLowerCase() === transaction.action.token.toLowerCase()
+      )
+    }
+    const symbol = token[`symbol${chain}`]
 
-  //   amount = logAmount(transaction.action.amount, token?.decimals, 4)
+    amountString = logAmount(transaction.action.amount, token?.decimals, 4)
 
-  //   const processedTransaction: IProcessedTransaction = {
-  //     date: transaction.timeStamp,
-  //     from: transaction.from,
-  //     fromChain: '',
-  //     to: transaction.to,
-  //     toChain: '',
-  //     tokenSymbol: symbol,
-  //     amount: amount,
-  //     status: transaction.UserFacingStatus,
-  //   }
-  // }
+    const processedTransaction: IProcessedTransaction = {
+      timeStamp: transaction.timeStamp,
+      from: transaction.from,
+      fromLayer: transaction.depositL2 ? LAYER.L1 : LAYER.L2,
+      to: transaction.to,
+      toLayer: transaction.depositL2 ? LAYER.L2 : LAYER.L1,
+      tokenSymbol: symbol,
+      amount: amountString,
+      status: transaction.UserFacingStatus,
+    }
+    return processedTransaction
+  }
+
+  const processedTransactions = filteredTransactions.map((transaction) => {
+    return process_transaction(transaction)
+  })
 
   return (
     <TransationsTableWrapper>
       <div>
-        {filteredTransactions.map((transaction, index) => {
-          return (
-            <TransactionsTableContent
-              key={`transaction_${index}`}
-              options={[
-                {
-                  content: getTransactionDate(transaction.timeStamp),
-                  width: 168,
-                },
-                {
-                  content: getTransactionChain(
-                    EthereumIcon,
-                    'ETH',
-                    transaction.from
-                  ),
-                  width: 142,
-                },
-                {
-                  content: getTransactionChain(
-                    EthereumIcon,
-                    'ETH',
-                    transaction.to
-                  ),
-                  width: 142,
-                },
-                {
-                  content: getTransactionToken(EthereumIcon, 'ETH'),
-                  width: 90,
-                },
-                {
-                  content: getTransactionAmount(transaction),
-                  width: 80,
-                },
-                {
-                  content: <Status>{transaction.UserFacingStatus}</Status>,
-                  width: 88,
-                },
-              ]}
-            />
-          )
-        })}
+        {processedTransactions.map(
+          (transaction: IProcessedTransaction, index) => {
+            return (
+              <TransactionsTableContent
+                key={`transaction_${index}`}
+                options={[
+                  {
+                    content: getTransactionDate(transaction.timeStamp),
+                    width: 168,
+                  },
+                  {
+                    content: getTransactionChain(
+                      transaction.fromLayer,
+                      transaction.from
+                    ),
+                    width: 142,
+                  },
+                  {
+                    content: getTransactionChain(
+                      transaction.toLayer,
+                      transaction.to
+                    ),
+                    width: 142,
+                  },
+                  {
+                    content: getTransactionToken('ETH'),
+                    width: 90,
+                  },
+                  {
+                    content: getTransactionAmount(transaction.amount),
+                    width: 80,
+                  },
+                  {
+                    content: <Status>{transaction.status}</Status>,
+                    width: 88,
+                  },
+                ]}
+              />
+            )
+          }
+        )}
       </div>
     </TransationsTableWrapper>
   )
