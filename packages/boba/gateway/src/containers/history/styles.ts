@@ -4,17 +4,37 @@ export const TransationsTableWrapper = styled.div`
   width: 100%;
   overflow-y: auto;
   max-height: 512px;
+  &::-webkit-scrollbar {
+    width: 24px;
+  }
+  &::-webkit-scrollbar-track {
+    width: 24px;
+    padding: 8px;
+    margin: 0px;
+  }
+
   ${(props) =>
     props.theme.name === 'light' &&
     css`
       color: ${props.theme.colors.gray[800]};
-      // border-top: 1px solid ${props.theme.colors.gray[400]};
+      &::-webkit-scrollbar-thumb {
+        background-color: ${props.theme.colors.gray[500]};
+        background-clip: padding-box;
+        border: 8px solid transparent;
+        border-radius: 12px;
+      }
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
       color: ${props.theme.colors.gray[50]};
-      // border-top: 1px solid ${props.theme.colors.gray[300]};
+
+      &::-webkit-scrollbar-thumb {
+        background-color: ${props.theme.colors.gray[300]};
+        background-clip: padding-box;
+        border: 8px solid transparent;
+        border-radius: 12px;
+      }
     `};
 `
 
@@ -105,29 +125,18 @@ export const Table = styled.div`
   text-align: center;
   width: 100%;
 
-  background: var(
-    --glass-bg-popup,
-    linear-gradient(
-      129deg,
-      rgba(48, 48, 48, 0.7) 0%,
-      rgba(48, 48, 48, 0.7) 46.35%,
-      rgba(37, 37, 37, 0.7) 94.51%
-    )
-  );
-  -webkit-scrollbar {
-    background: red;
-  }
-
   ${(props) =>
     props.theme.name === 'light' &&
     css`
       border: 1px solid ${props.theme.colors.gray[400]};
-      background: ${props.theme.colors.gray[50]};
+      background: ${props.theme.colors.box.background};
+      box-shadow: ${props.theme.boxShadow};
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
       border: 1px solid ${props.theme.colors.gray[300]};
+      background: ${props.theme.colors.box.background};
     `}
   @media screen and (max-width: 600px) {
     flexdirection: 'column';

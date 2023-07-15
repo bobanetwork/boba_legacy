@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { Svg } from 'components/global/svg'
 
 export const DropdownContainer = styled.div`
   display: inline-flex;
@@ -55,10 +56,12 @@ export const Header = styled.div<{ error: boolean }>`
 `
 
 export const IconContainer = styled.div`
-  border-radius: 50%;
   width: 32px;
   height: 32px;
   margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 export const Option = styled.div`
@@ -86,10 +89,12 @@ export const DefaultIcon = styled.div`
       background: ${props.theme.colors.gray[200]};
     `}
 `
-export const Icon = styled.img`
-  width: 32px;
-  height: 32px;
+export const Icon = styled(Svg)`
   margin-right: 8px;
+  svg {
+    max-width: 32px;
+    height: auto;
+  }
 `
 
 export const DropdownBody = styled.div`
@@ -170,6 +175,16 @@ export const DropdownContent = styled.div`
   }
 `
 
-export const Arrow = styled.img`
+export const Arrow = styled(Svg)`
   margin-left: auto;
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      fill: ${props.theme.colors.gray[100]};
+    `}
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      fill: ${props.theme.colors.gray[600]};
+    `}
 `

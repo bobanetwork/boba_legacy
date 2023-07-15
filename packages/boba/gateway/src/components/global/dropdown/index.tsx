@@ -17,7 +17,7 @@ import {
   DropdownContent,
   Arrow,
 } from './styles'
-interface IDropdownItem {
+export interface IDropdownItem {
   value?: string
   label: string | ReactNode
   imgSrc?: string
@@ -76,7 +76,13 @@ export const Dropdown: React.FC<IDropdownProps> = ({
 
   return (
     <DropdownContainer className={`dropdown ${className}`} ref={dropdownRef}>
-      <Header onClick={handleDropdown} error={error}>
+      <Header
+        onClick={handleDropdown}
+        error={error}
+        className={
+          isOpen ? `dropdown ${className} active` : `dropdown ${className}`
+        }
+      >
         <Option>
           {selectedItem.imgSrc && (
             <IconContainer>
@@ -89,19 +95,30 @@ export const Dropdown: React.FC<IDropdownProps> = ({
               {selectedItem.imgSrc === 'default' && <DefaultIcon />}
             </IconContainer>
           )}
-          {selectedItem.label}
+          <div>{selectedItem.label}</div>
 
-          <Arrow src={ArrowDown} />
+          <Arrow src={ArrowDown} className={`dropdown ${className}`} />
         </Option>
       </Header>
       {isOpen && (
         <DropdownBody>
           <DropdownContent>
             {items.map((item, index) => (
-              <Option key={index} onClick={() => selectItem(item)}>
+              <Option
+                key={index}
+                className={
+                  item.value &&
+                  (item.value === selectedItem.value
+                    ? `dropdown ${className} active`
+                    : `dropdown ${className}`)
+                }
+                onClick={() => selectItem(item)}
+              >
                 {item.imgSrc && (
                   <IconContainer>
-                    <img src={item.imgSrc} alt={item.label as string} />
+                    {item.imgSrc !== 'default' && (
+                      <Icon src={item.imgSrc} alt={item.label as string} />
+                    )}
                   </IconContainer>
                 )}
                 {item.label}

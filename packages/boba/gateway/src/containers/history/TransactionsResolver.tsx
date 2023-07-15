@@ -23,10 +23,37 @@ import truncate from 'truncate-middle'
 import EthereumIcon from '../../images/ethereum.svg'
 import { logAmount } from 'util/amountConvert'
 import { maxWidth } from '@mui/system'
+import { getCoinImage } from 'util/coinImage'
 
-export interface IFilter {
-  status: string
-  targetHash: string
+export enum TRANSACTION_FILTER_STATUS {
+  Pending = 'Pending',
+  Completed = 'Completed',
+  Canceled = 'Canceled',
+  All = 'All',
+}
+
+export enum TRANSACTION_STATUS {
+  Succeeded = 'succeeded',
+  Pending = 'pending',
+  Failed = 'failed',
+}
+
+export interface INetworks {
+  l1: string
+  l2: string
+}
+export enum LAYER {
+  L1 = 'L1',
+  L2 = 'L2',
+}
+
+export interface ITransactionFilter {
+  networks: INetworks
+  fromNetwork: string
+  toNetwork: string
+  fromToNetwork?: string
+  status?: string
+  targetHash?: string
 }
 
 export interface IAction {
@@ -42,8 +69,8 @@ export interface IAction {
 
 export interface ICrossDomainMessage {
   crossDomainMessage: number
-  crossDomainMessageEstimatedFinalizedTime: number
-  crossDomainMessageFinalized: number
+  crossDomainMessageEstimateFinalizedTime: number
+  crossDomainMessageFinalize: number
   crossDomainMessageSendTime: number
   fast: number
   l2BlockHash: string
@@ -55,29 +82,129 @@ export interface ICrossDomainMessage {
 
 export interface ITransaction {
   action: IAction
-  activity: string
+  activity?: string
   blockNumber: number
   chain: string
   contractAddress: string
   contractName: string
   crossDomainMessage: ICrossDomainMessage
-  depositL2: boolean
+  depositL2?: boolean
+  exitL2?: boolean
   from: string
   hash: string
   timeStamp: number
   to: string
+  UserFacingStatus?: TRANSACTION_FILTER_STATUS
+}
+
+export interface IChain {
+  symbol: string
+  imgSrc: string
+  layer: LAYER
+}
+
+export interface IProcessedTransaction {
+  date: number
+  from: string
+  fromChain: IChain
+  to: string
+  toChain: IChain
+  tokenSymbol: string
+  amount: string
+  status?: TRANSACTION_FILTER_STATUS // need to remove the undefined option
 }
 
 export interface ITransactionsResolverProps {
-  filter: IFilter
+  transactionsFilter: ITransactionFilter
   transactions: ITransaction[]
 }
 
 export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
-  filter,
+  transactionsFilter,
 }) => {
+  console.log(transactionsFilter.networks)
+
+  // should filter out transctions that aren't cross domain
+  const crossDomainFilter = (transaction: ITransaction) => {
+    return (
+      transaction.crossDomainMessage &&
+      transaction.crossDomainMessage.crossDomainMessage
+    )
+  }
+
+  // filter transactions by direction
+  const networkFilter = (transaction: ITransaction) => {
+    switch (transactionsFilter.fromNetwork) {
+      case 'All': {
+        return true
+      }
+      // deposit
+      case transactionsFilter.networks.l1: {
+        return transaction.depositL2
+      }
+      // exit
+      case transactionsFilter.networks.l2: {
+        return transaction.exitL2
+      }
+    }
+    return false
+  }
+  const getTransactionStatus = (transaction: ITransaction) => {
+    if (
+      transaction.action &&
+      transaction.crossDomainMessage.crossDomainMessageSendTime
+    ) {
+      switch (transaction.action.status) {
+        case TRANSACTION_STATUS.Succeeded: {
+          return TRANSACTION_FILTER_STATUS.Completed
+        }
+        case TRANSACTION_STATUS.Pending: {
+          return TRANSACTION_FILTER_STATUS.Pending
+        }
+      }
+    }
+    return TRANSACTION_FILTER_STATUS.Canceled
+  }
+  const statusFilter = (transaction: ITransaction) => {
+    // filter out transactions whose status does not match
+    const status = getTransactionStatus(transaction)
+    transaction.UserFacingStatus = status
+    if (
+      transactionsFilter.status &&
+      transactionsFilter.status !== TRANSACTION_FILTER_STATUS.All
+    ) {
+      console.log('transaction status', transaction.UserFacingStatus)
+      return transactionsFilter.status === transaction.UserFacingStatus
+    }
+
+    return true
+  }
+
+  // filter out transactions whose hash does not match
+  const hashFilter = (transaction: ITransaction) => {
+    if (
+      transactionsFilter.targetHash &&
+      !transaction.hash.includes(transactionsFilter.targetHash)
+    ) {
+      return false
+    }
+    return true
+  }
+
+  const filteredTransactions = transactions.filter((transaction) => {
+    return (
+      crossDomainFilter(transaction) &&
+      networkFilter(transaction) &&
+      statusFilter(transaction) &&
+      hashFilter(transaction)
+    )
+  })
+
+  console.log('filtered transactions: ', filteredTransactions)
+
   const tokenFromAddress = useSelector(selectTokens)
+  console.log('supported tokens', tokenFromAddress)
 
   const getTransactionToken = (imgSrc: string, symbol: string) => {
     return (
@@ -110,24 +237,69 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     return <Date>{formatDate(timeStamp, 'DD MMM YYYY hh:mm A')}</Date>
   }
 
-  const getTransactionAmount = (amount: string) => {
-    return <TransactionAmount>{amount}</TransactionAmount>
+  // const chainResolver = (name: string, layer: LAYER) => {}
+
+  const getTransactionAmount = (transaction: ITransaction) => {
+    let amount = ''
+    if (transaction.action.token) {
+      if (
+        transaction.action.token ===
+        '0x4200000000000000000000000000000000000006'
+      ) {
+        amount = logAmount(transaction.action.amount, 18, 4)
+        console.log(amount)
+      } else {
+        const chain =
+          transaction.chain === 'L1pending' ? 'L1' : transaction.chain
+        let token = tokenFromAddress[transaction.action.token.toLowerCase()]
+        if (chain === 'L2' && !token) {
+          token = Object.values(tokenFromAddress).find(
+            (t: any) =>
+              t.addressL2.toLowerCase() ===
+              transaction.action.token.toLowerCase()
+          )
+        }
+        const symbol = token[`symbol${chain}`]
+        amount = logAmount(transaction.action.amount, token?.decimals, 4)
+      }
+    }
+    return amount ? (
+      <TransactionAmount>{amount}</TransactionAmount>
+    ) : (
+      <TransactionAmount>Not Available</TransactionAmount>
+    )
   }
+
+  // const process_transaction = (transaction: ITransaction) => {
+  //   let amount = ''
+  //   const chain = transaction.chain === 'L1pending' ? 'L1' : transaction.chain
+  //   let token = tokenFromAddress[transaction.action.token.toLowerCase()]
+  //   if (chain === 'L2' && !token) {
+  //     token = Object.values(tokenFromAddress).find(
+  //       (t: any) =>
+  //         t.addressL2.toLowerCase() === transaction.action.token.toLowerCase()
+  //     )
+  //   }
+  //   let symbol = token[`symbol${chain}`]
+
+  //   amount = logAmount(transaction.action.amount, token?.decimals, 4)
+
+  //   const processedTransaction: IProcessedTransaction = {
+  //     date: transaction.timeStamp,
+  //     from: transaction.from,
+  //     fromChain: '',
+  //     to: transaction.to,
+  //     toChain: '',
+  //     tokenSymbol: symbol,
+  //     amount: amount,
+  //     status: transaction.UserFacingStatus,
+  //   }
+  // }
 
   return (
     <TransationsTableWrapper>
       <div>
-        {transactions.map((transaction, index) => {
-          console.log(transaction)
-          let amount = ''
-          if (transaction.action.token) {
-            const token_address = transaction.action.token.toLowerCase()
-            const token = tokenFromAddress[token_address]
-            amount = logAmount(transaction.action.amount, token?.decimals, 2)
-          } else {
-            amount = '0.00'
-          }
-
+        {filteredTransactions.map((transaction, index) => {
           return (
             <TransactionsTableContent
               key={`transaction_${index}`}
@@ -157,10 +329,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                   width: 90,
                 },
                 {
-                  content: getTransactionAmount(amount),
+                  content: getTransactionAmount(transaction),
                   width: 80,
                 },
-                { content: <Status>Pending</Status>, width: 88 },
+                {
+                  content: <Status>{transaction.UserFacingStatus}</Status>,
+                  width: 88,
+                },
               ]}
             />
           )

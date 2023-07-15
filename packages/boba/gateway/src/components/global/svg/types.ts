@@ -1,4 +1,6 @@
 export interface SvgTypes {
   src: string
-  fill: string
+  fill?: string
+  className?: string
+  alt?: string
 }

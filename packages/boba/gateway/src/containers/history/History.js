@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as G from '../Global.styles'
 import { useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'util/lodash'
@@ -57,10 +57,10 @@ import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors'
-import { Dropdown } from 'components/global/dropdown'
+// import { IDropdownItem } from 'components/global/dropdown/types'
 import AvalancheIcon from '../../images/avax.svg'
 import BNBIcon from '../../images/bnb.svg'
-import EthereumIcon from '../../images/ethereum.svg'
+import EthereumIcon from '../../images/ethereumFlex.svg'
 import FantomIcon from '../../images/ftm.svg'
 import AllNetworksIcon from '../../images/allNetworks.svg'
 import { TableHeader } from 'components/global/table/index.tsx'
@@ -72,23 +72,20 @@ const NETWORKS = [
   {
     value: 'All',
     label: 'All Networks',
-    key: 'All Networks',
     imgSrc: AllNetworksIcon,
   },
   {
     value: 'Avalanche',
     label: 'Avalanche',
-    key: 'Avalanche',
     imgSrc: AvalancheIcon,
   },
-  { value: 'BNB', label: 'BNB', key: 'BNB', imgSrc: BNBIcon },
+  { value: 'BNB', label: 'BNB', imgSrc: BNBIcon },
   {
     value: 'Ethereum',
     label: 'Ethereum',
-    key: 'Ethereum',
     imgSrc: EthereumIcon,
   },
-  { value: 'Fantom', label: 'Fantom', key: 'Fantom', imgSrc: FantomIcon },
+  { value: 'Fantom', label: 'Fantom', imgSrc: FantomIcon },
 ]
 
 const TableOptions = [
@@ -117,9 +114,8 @@ const TableOptions = [
 ]
 
 function History() {
-  const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[0])
-  const [toNetwork, setToNetwork] = useState(null)
-  const [fromNetwork, setFromNetwork] = useState(null)
+  const [toNetwork, setToNetwork] = useState(NETWORKS[0])
+  const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -140,18 +136,22 @@ function History() {
   const [searchHistory, setSearchHistory] = useState('')
   const activeTab = useSelector(selectActiveHistoryTab, isEqual)
   const networkName = useSelector(selectActiveNetworkName())
+  console.log(networkName)
 
   const networkChangeHandler = () => {
-    if (
-      fromNetwork &&
-      toNetwork &&
-      !(fromNetwork + toNetwork).includes('All')
-    ) {
-      dispatch(setActiveHistoryTab(`${fromNetwork} to ${toNetwork}`))
+    console.log(`${fromNetwork['value']} to ${toNetwork['value']}`)
+    if (!(fromNetwork.value + toNetwork.value).includes('All')) {
+      dispatch(
+        setActiveHistoryTab(`${fromNetwork.value} to ${toNetwork.value}`)
+      )
     } else {
       dispatch(setActiveHistoryTab('All'))
     }
   }
+
+  useEffect(() => {
+    networkChangeHandler()
+  }, [fromNetwork, toNetwork])
 
   const unorderedTransactions = useSelector(selectTransactions, isEqual)
   const orderedTransactions = orderBy(
@@ -169,6 +169,22 @@ function History() {
     }
     return true
   })
+
+  const getNetworks = () => {
+    return [
+      NETWORKS[0],
+      {
+        label: networkName['l1'],
+        value: networkName['l1'],
+        imgSrc: EthereumIcon,
+      },
+      {
+        label: networkName['l2'],
+        value: networkName['l2'],
+        imgSrc: EthereumIcon,
+      },
+    ]
+  }
 
   const getDatePicker = (label) => {
     const dateSelector = (date) => {
@@ -208,10 +224,10 @@ function History() {
   }, POLL_INTERVAL)
 
   return (
-    <S.HistoryPageContainer style={{ overflowY: 'auto', width: '100%' }}>
+    <S.HistoryPageContainer>
       {layer && (
         <>
-          <S.Header style={{ position: 'sticky', top: '0' }}>
+          <S.Header>
             <div className={styles.searchInput}>
               <Input
                 size="small"
@@ -242,8 +258,6 @@ function History() {
             <div
               style={{
                 width: '100%',
-                position: 'sticky',
-                top: '0',
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -256,22 +270,20 @@ function History() {
                 <S.NetworkDropDowns>
                   <div style={{ fontSize: '16px' }}>From</div>
                   <DropdownNetwork
-                    items={NETWORKS}
-                    defaultItem={fromNetwork || selectedNetwork}
+                    items={getNetworks()}
+                    defaultItem={fromNetwork}
                     onItemSelected={(option) => {
                       setFromNetwork(option)
-                      networkChangeHandler()
                     }}
                   />
                   <div style={{ fontSize: '16px', paddingLeft: '16px' }}>
                     To
                   </div>
                   <DropdownNetwork
-                    items={NETWORKS}
-                    defaultItem={fromNetwork || selectedNetwork}
+                    items={getNetworks()}
+                    defaultItem={toNetwork}
                     onItemSelected={(option) => {
                       setToNetwork(option)
-                      networkChangeHandler()
                     }}
                   />
                 </S.NetworkDropDowns>
@@ -284,11 +296,18 @@ function History() {
             </div>
             <TransactionsResolver
               transactions={transactions}
+              transactionsFilter={{
+                networks: networkName,
+                fromNetwork: fromNetwork.value,
+                toNetwork: toNetwork.value,
+                status: 'All',
+                targetHash: searchHistory,
+              }}
               style={{ maxHeight: '70%' }}
             ></TransactionsResolver>
           </Table>
 
-          {/* <div
+          <div
             style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
           >
             <Button
@@ -302,59 +321,7 @@ function History() {
             >
               Connect Wallet
             </Button>
-          </div> */}
-          {/* <div className={styles.data}>
-            <div className={styles.section}>
-              <Tabs
-                onClick={(tab) => {
-                  dispatch(setActiveHistoryTab(tab))
-                }}
-                activeTab={activeTab}
-                tabs={[
-                  'All',
-                  `${networkName['l1']} to ${networkName['l2']}`,
-                  `${networkName['l2']} to ${networkName['l1']}`,
-                  'Bridge between L1s',
-                  'Pending',
-                ]}
-              />
-
-              {activeTab === 'All' && (
-                <All
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === `${networkName['l1']} to ${networkName['l2']}` && (
-                <Deposits
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === `${networkName['l2']} to ${networkName['l1']}` && (
-                <Exits
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === 'Bridge between L1s' && (
-                <Transfers
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-
-              {activeTab === 'Pending' && (
-                <Pending
-                  searchHistory={searchHistory}
-                  transactions={transactions}
-                />
-              )}
-            </div>
-          </div> */}
+          </div>
         </>
       )}
     </S.HistoryPageContainer>

@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components'
 import { TableHeader, TableContent } from 'components/global/table'
+import { Svg } from 'components/global/svg'
 import { TableContentContainer, TableHeaderContainer, TableRow } from './styles'
 import { Row } from 'components/global/containers'
 
@@ -8,17 +9,21 @@ export const TransactionsTableHeader = styled(TableHeader)`
   background: none;
   position: sticky;
   top: 0;
+  border-radius: unset;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
       color: ${props.theme.colors.gray[700]};
+      border-top: 1px solid ${props.theme.colors.gray[400]};
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
       color: ${props.theme.colors.gray[100]};
+      border-top: 1px solid ${props.theme.colors.gray[300]};
     `}
-  ${TableRow} {
+    ${TableRow} {
+    border: none;
     p {
       font-size: 12px;
     }
@@ -30,4 +35,16 @@ export const TransactionsTableContent = styled(TableContent)`
   ${TableRow} {
     border: none;
   }
+`
+export const AllNetworksIcon = styled(Svg)`
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      fill: ${props.theme.colors.gray[100]};
+    `}
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      fill: ${props.theme.colors.gray[600]};
+    `}
 `
