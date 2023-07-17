@@ -7,9 +7,13 @@ import {
 } from './index.styles'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
-import React, { FC } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { ElementType, FC } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { ListLabel } from '../tokenPicker/styles'
+import { L1_ICONS, L2_ICONS, NetworkList } from 'util/network/network.util'
+import { selectActiveNetworkType, selectModalState } from 'selectors'
+import { getCoinImage } from 'util/coinImage'
+import { setNetwork } from 'actions/networkAction'
 
 interface NetworkPickerModalProps {
   open: boolean
@@ -17,9 +21,28 @@ interface NetworkPickerModalProps {
 
 const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
   const dispatch = useDispatch<any>()
+  const networkType = useSelector(selectActiveNetworkType())
+  const selectionLayer = useSelector(selectModalState('selectionLayer'))
 
   const handleClose = () => {
     dispatch(closeModal('networkPicker'))
+  }
+
+  const networkList = (NetworkList as Record<string, any>)[networkType]
+
+  const l1Icon = L1_ICONS as Record<string, ElementType>
+  const l2Icon = L2_ICONS as Record<string, ElementType>
+
+  const onChainChange = (chainDetail: any) => {
+    dispatch(
+      setNetwork({
+        network: chainDetail.chain,
+        name: chainDetail.name,
+        networkIcon: chainDetail.icon,
+        networkType,
+      })
+    )
+    handleClose()
   }
 
   return (
@@ -33,22 +56,23 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
       <ListLabel> Network Names </ListLabel>
       <NetworkPickerModalContainer>
         <NetworkPickerList>
-          <NetworkItem>
-            <NetworkIcon></NetworkIcon>
-            <NetworkLabel>Ethereum Mainnet</NetworkLabel>
-          </NetworkItem>
-          <NetworkItem>
-            <NetworkIcon></NetworkIcon>
-            <NetworkLabel>BNB Chain</NetworkLabel>
-          </NetworkItem>
-          <NetworkItem>
-            <NetworkIcon></NetworkIcon>
-            <NetworkLabel>Boba Network</NetworkLabel>
-          </NetworkItem>
-          <NetworkItem>
-            <NetworkIcon></NetworkIcon>
-            <NetworkLabel>Boba BNB chain</NetworkLabel>
-          </NetworkItem>
+          {networkList.map((chainDetail: any) => {
+            const Icon =
+              selectionLayer === 'l1'
+                ? l1Icon[chainDetail.icon]
+                : l2Icon[chainDetail.icon]
+            return (
+              <NetworkItem
+                key={chainDetail.label}
+                onClick={() => onChainChange(chainDetail)}
+              >
+                <NetworkIcon>
+                  <Icon selected />
+                </NetworkIcon>
+                <NetworkLabel>{chainDetail.name[selectionLayer]}</NetworkLabel>
+              </NetworkItem>
+            )
+          })}
         </NetworkPickerList>
       </NetworkPickerModalContainer>
     </Modal>

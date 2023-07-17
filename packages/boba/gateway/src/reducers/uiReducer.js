@@ -58,6 +58,7 @@ function uiReducer (state = initialState, action) {
         tokenIndex: action.tokenIndex,
         lock: action.lock, // incase of lock record
         proposalId: action.proposalId, // incase of vote on proposal
+        selectionLayer: action.selectionLayer, // use incase of new chain/network picker.
       }
     case 'UI/MODAL/CLOSE':
       return { ...state, [action.payload]: false }

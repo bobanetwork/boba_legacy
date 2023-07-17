@@ -12,7 +12,11 @@ import {
   SwitchIcon,
 } from './styles'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectActiveNetworkIcon, selectLayer } from 'selectors'
+import {
+  selectActiveNetworkIcon,
+  selectActiveNetworkName,
+  selectLayer,
+} from 'selectors'
 import { NETWORK_ICONS } from './constant'
 import { DEFAULT_NETWORK, LAYER } from 'util/constant'
 import useSwitchChain from 'hooks/useSwitchChain'
@@ -25,15 +29,19 @@ const Chains = (props: Props) => {
 
   const { switchChain } = useSwitchChain()
 
-  const networkNames = useSelector(selectActiveNetworkIcon())
+  const networkNames = useSelector(selectActiveNetworkName())
   const activeNetworkIcon = useSelector(selectActiveNetworkIcon())
   const layer = useSelector(selectLayer())
   const icons = NETWORK_ICONS[activeNetworkIcon]
   const L1Icon = icons['L1']
   const L2Icon = icons['L2']
 
-  const openNetworkPicker = () => {
-    dispatch(openModal('networkPicker'))
+  const openNetworkPicker = (inputLayer: string) => {
+    let sLayer = inputLayer
+    if (layer && layer === LAYER.L2) {
+      sLayer = inputLayer === 'l1' ? 'l2' : 'l1'
+    }
+    dispatch(openModal('networkPicker', null, null, null, null, null, sLayer))
   }
 
   const openTokenPicker = () => {
@@ -70,7 +78,7 @@ const Chains = (props: Props) => {
     <ChainContainer>
       <ChainPickerContainer>
         <ChainPickerLabel>From</ChainPickerLabel>
-        <ChainPicker onClick={() => openNetworkPicker()}>
+        <ChainPicker onClick={() => openNetworkPicker('l1')}>
           {!layer || layer === LAYER.L1 ? <L1ChainInfo /> : <L2ChainInfo />}
           <ChainPickerIcon>
             <DownArrow />
@@ -82,7 +90,7 @@ const Chains = (props: Props) => {
       </SwitchChainIcon>
       <ChainPickerContainer>
         <ChainPickerLabel>To</ChainPickerLabel>
-        <ChainPicker onClick={() => openTokenPicker()}>
+        <ChainPicker onClick={() => openNetworkPicker('l2')}>
           {!layer || layer === LAYER.L1 ? <L2ChainInfo /> : <L1ChainInfo />}
           <ChainPickerIcon>
             <DownArrow />

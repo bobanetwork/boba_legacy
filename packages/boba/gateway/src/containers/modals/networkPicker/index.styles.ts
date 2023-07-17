@@ -34,7 +34,9 @@ export const NetworkItem = styled.div<{ selected?: boolean }>`
     background: var(--gray-400, #393939);
   }
 `
-export const NetworkIcon = styled.div``
+export const NetworkIcon = styled.div`
+  display: flex;
+`
 export const NetworkLabel = styled(Typography).attrs({
   variant: 'body1',
 })`

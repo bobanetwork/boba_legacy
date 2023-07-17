@@ -32,10 +32,9 @@ function WrongNetworkModal({open}) {
     <Modal
       open={open}
       onClose={handleClose}
-      maxWidth="xs"
       minHeight="180px"
       title="Wrong Network"
-      newStyle={true}
+      transparent={false}
     >
       <Box display="flex" alignItems="center" justifyContent="center">
         <Button
