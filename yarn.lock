@@ -11439,10 +11439,10 @@ batch@0.6.1:
   resolved "https://registry.npmjs.org/batch/-/batch-0.6.1.tgz"
   integrity sha512-x+VAiMRL6UPkx+kudNvxTl6hB2XNNCG2r+7wixVfIYwu/2HKRXimwQyaumLjMveWvT2Hkd/cAJw+QBMfJ/EKVw==
 
-bcfg@^0.1.6, bcfg@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.npmjs.org/bcfg/-/bcfg-0.1.7.tgz"
-  integrity sha512-+4beq5bXwfmxdcEoHYQsaXawh1qFzjLcRvPe5k5ww/NEWzZTm56Jk8LuPmfeGB7X584jZ8xGq6UgMaZnNDa5Ww==
+bcfg@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/bcfg/-/bcfg-0.2.1.tgz#d6ebd9827a99ff62bfad326edd349babc58d6e97"
+  integrity sha512-Q69DG2V9QJexdXvYoiXM4xfQ5m65tIOAzJCcW4USQdvbWEJJqBQ9MEDdyJb2ei5fadAJPVp8rUpLbFnkC37FZA==
   dependencies:
     bsert "~0.0.10"
 
