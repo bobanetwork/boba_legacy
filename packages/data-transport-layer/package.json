@@ -86,7 +86,7 @@
     "hardhat": "^2.12.5",
     "lint-staged": "11.0.0",
     "mocha": "^8.4.0",
-    "pino-pretty": "^5.0.0",
+    "pino-pretty": "^10.0.1",
     "prettier": "^2.3.1",
     "prom-client": "^14.2.0",
     "rimraf": "^3.0.2",
