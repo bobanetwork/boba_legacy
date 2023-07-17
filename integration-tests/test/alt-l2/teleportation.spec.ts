@@ -125,7 +125,6 @@ describe('teleportation', () => {
     selectedBobaChains = [
       {
         chainId,
-        // not needed, as being used to fill up provider/wsProvider in real teleportation service
         url: '',
         provider: httpProvider,
         wsProvider: wsProvider,
@@ -697,7 +696,6 @@ describe('teleportation', () => {
       selectedBobaChains = [
         {
           chainId: chainIdBnb,
-          // not needed, as being used to fill up provider/wsProvider in real teleportation service
           url: '',
           provider: httpProvider,
           wsProvider: wsProvider,
@@ -714,7 +712,6 @@ describe('teleportation', () => {
       selectedBobaChainsBnb = [
         {
           chainId,
-          // not needed, as being used to fill up provider/wsProvider in real teleportation service
           url: '',
           provider: httpProvider,
           wsProvider: wsProvider,
