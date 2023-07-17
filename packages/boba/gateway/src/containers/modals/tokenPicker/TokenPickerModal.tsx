@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 
 import { updateToken } from 'actions/bridgeAction'
 import { fetchBalances } from 'actions/networkAction'
@@ -8,21 +8,27 @@ import { isEqual } from 'util/lodash'
 
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  selectLayer,
+  selectTokenToBridge,
   selectlayer1Balance,
   selectlayer2Balance,
-  selectLayer,
 } from 'selectors'
 import { logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
-import {
-  TokenPickerModalContainer,
-  TokenPickerList,
-  TokenListItem,
-  TokenSymbol,
-  TokenLabel,
-  TokenBalance,
-} from './styles'
 import { LAYER } from 'util/constant'
+import {
+  ActionLabel,
+  ListLabel,
+  TokenBalance,
+  TokenLabel,
+  TokenListItem,
+  TokenPickerAction,
+  TokenPickerList,
+  TokenPickerModalContainer,
+  TokenSearchContainer,
+  TokenSearchInput,
+  TokenSymbol,
+} from './styles'
 
 // the L2 token which can not be exited so exclude from dropdown in case of L2
 const NON_EXITABLE_TOKEN = [
@@ -45,6 +51,10 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
 
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
+  const tokenToBridge = useSelector(selectTokenToBridge())
+
+  const [isMyToken, setIsMyToken] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   let balances = l1Balance
 
@@ -60,8 +70,8 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
     dispatch(closeModal('tokenPicker'))
   }
 
-  const addToken = (token: any) => {
-    dispatch(updateToken({ token, tokenIndex }))
+  const onTokenSelect = (token: any) => {
+    dispatch(updateToken({ token, tokenIndex: 0 }))
     handleClose()
   }
 
@@ -74,17 +84,35 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
       transparent={false}
     >
       <TokenPickerModalContainer>
+        <TokenSearchContainer>
+          <TokenSearchInput
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search token name"
+          />
+        </TokenSearchContainer>
+        <TokenPickerAction>
+          <ActionLabel
+            selected={!isMyToken}
+            onClick={() => setIsMyToken(false)}
+          >
+            All
+          </ActionLabel>
+          <ActionLabel selected={isMyToken} onClick={() => setIsMyToken(true)}>
+            My Tokens
+          </ActionLabel>
+        </TokenPickerAction>
+        <ListLabel> Token Names </ListLabel>
         <TokenPickerList>
           {balances.length > 0
             ? balances
-                .filter((token: any) => {
+                .filter((token: any, index: number) => {
                   if (layer === LAYER.L2) {
                     return !(NON_EXITABLE_TOKEN.indexOf(token.symbol) > 0)
                   }
                   return true
                 })
                 .map((token: any) => {
-                  const amount =
+                  const amount: string =
                     token.symbol === 'ETH'
                       ? Number(
                           logAmount(token.balance, token.decimals, 3)
@@ -99,12 +127,27 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                           maximumFractionDigits: 2,
                         })
 
+                  if (isMyToken && Number(amount) <= 0) {
+                    return null
+                  }
+
+                  if (
+                    searchTerm &&
+                    !token.symbol.includes(searchTerm.toUpperCase())
+                  ) {
+                    return null
+                  }
+
                   return (
-                    <TokenListItem selected={token.symbol === 'ETH'}>
+                    <TokenListItem
+                      key={token.symbol}
+                      selected={token.symbol === tokenToBridge.symbol}
+                      onClick={() => onTokenSelect(token)}
+                    >
                       <TokenSymbol>
                         <img
                           src={getCoinImage(token.symbol)}
-                          alt="logo"
+                          alt={`${token.symbol} logo`}
                           width="24px"
                           height="24px"
                         />

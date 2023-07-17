@@ -9,6 +9,7 @@ import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import React, { FC } from 'react'
 import { useDispatch } from 'react-redux'
+import { ListLabel } from '../tokenPicker/styles'
 
 interface NetworkPickerModalProps {
   open: boolean
@@ -29,6 +30,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
       title="Select Network"
       transparent={false}
     >
+      <ListLabel> Network Names </ListLabel>
       <NetworkPickerModalContainer>
         <NetworkPickerList>
           <NetworkItem>

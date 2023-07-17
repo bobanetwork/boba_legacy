@@ -19,6 +19,12 @@ export function selectBridgeTokens() {
   }
 }
 
+export function selectTokenToBridge() {
+  return function (state) {
+    return state.bridge.tokens[0]
+  }
+}
+
 export function selectBridgeType() {
   return function (state) {
     return state.bridge.bridgeType
