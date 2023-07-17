@@ -14,8 +14,8 @@ let signer2: Signer
 let signerAddress: string
 let signer2Address: string
 
-const chainId31337 = '31337'
-const chainId4 = '4'
+const chainId31337 = 31337
+const chainId4 = 4
 const initialSupply = utils.parseEther('10000000000')
 const tokenName = 'BOBA'
 const tokenSymbol = 'BOBA'
