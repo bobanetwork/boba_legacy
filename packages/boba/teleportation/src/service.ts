@@ -160,19 +160,26 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
     // Websocket providers
     for (const depositTeleportation of wsDepositTeleportation) {
+
       const latestBlock =
         await depositTeleportation.Teleportation.provider.getBlockNumber()
 
-      // load events for blocks before currentBlock
-      const events: AssetReceivedEvent[] = await this._watchTeleportation(
-        depositTeleportation,
-        latestBlock
-      )
-      await this._disburseTeleportation(
-        depositTeleportation,
-        events,
-        latestBlock
-      )
+      try {
+        // load events for blocks before currentBlock
+        const events: AssetReceivedEvent[] = await this._watchTeleportation(
+          depositTeleportation,
+          latestBlock
+        )
+        await this._disburseTeleportation(
+          depositTeleportation,
+          events,
+          latestBlock
+        )
+      } catch (err) {
+        this.logger.error('Error while running teleportation (ws)', {
+          err,
+        })
+      }
 
       this._handleWebsocketConnection(depositTeleportation, latestBlock)
     }
@@ -207,7 +214,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     const chainId = depositTeleportation.chainId
 
     // also returns all parameters of the event, which we don't need here (last one is the event itself)
-    depositTeleportation.Teleportation.on(this.state.Teleportation.filters.AssetReceived(), async (_,_1,_2,_3,_4,_5, event) => {
+    depositTeleportation.Teleportation.on(this.state.Teleportation.filters.AssetReceived(), async (_, _1, _2, _3, _4, _5, event) => {
       console.log("Received new event via websocket..")
       await this._disburseTeleportation(
         depositTeleportation,
