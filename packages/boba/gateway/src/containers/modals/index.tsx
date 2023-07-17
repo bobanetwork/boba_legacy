@@ -21,6 +21,7 @@ import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 import SettingsModal from './settings'
+import NetworkPickerModal from './networkPicker'
 
 /**
  *
@@ -83,6 +84,8 @@ const ModalContainer = () => {
     selectModalState('newProposalModal')
   )
   const castVoteModalState = useSelector(selectModalState('castVoteModal'))
+
+  const networkPickerModalState = useSelector(selectModalState('networkPicker'))
 
   return (
     <>
@@ -147,6 +150,9 @@ const ModalContainer = () => {
         <SwitchNetworkModal open={switchNetworkModalState} />
       )}
       {!!SettingsModalState && <SettingsModal open={SettingsModalState} />}
+      {!!networkPickerModalState && (
+        <NetworkPickerModal open={networkPickerModalState} />
+      )}
     </>
   )
 }

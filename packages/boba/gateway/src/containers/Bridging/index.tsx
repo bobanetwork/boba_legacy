@@ -13,9 +13,12 @@ import {
   ConnectButton,
 } from './styles'
 import { Heading } from 'components/global'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Tooltip from 'components/tooltip/Tooltip'
 import { openModal } from 'actions/uiAction'
+import { selectAccountEnabled } from 'selectors'
+import { setConnect } from 'actions/setupAction'
+import Chains from './chain'
 
 interface Props {}
 
@@ -26,10 +29,16 @@ enum BRIDGE_TYPE {
 
 const Bridging = (props: Props) => {
   const dispatch = useDispatch<any>()
+  const accountEnabled = useSelector<any>(selectAccountEnabled())
+
   const [bridgeType, setbridgeType] = useState(BRIDGE_TYPE.CLASSIC)
 
   const openSettingModal = () => {
     dispatch(openModal('settingsModal'))
+  }
+
+  const onConnect = () => {
+    dispatch(setConnect(true))
   }
 
   return (
@@ -70,13 +79,19 @@ const Bridging = (props: Props) => {
             Fast
           </BridgeTabItem>
         </BridgeTabs>
+        <Chains />
       </BridgeContent>
       <BridgeReceiveWrapper></BridgeReceiveWrapper>
       <BridgeInfo></BridgeInfo>
       <BridgeAction>
-        <ConnectButton
-          label={<Heading variant="h3"> Connect Wallet</Heading>}
-        />
+        {!accountEnabled ? (
+          <ConnectButton
+            onClick={onConnect}
+            label={<Heading variant="h3"> Connect Wallet</Heading>}
+          />
+        ) : (
+          <ConnectButton label={<Heading variant="h3">Bridge</Heading>} />
+        )}
       </BridgeAction>
     </BridgeWrapper>
   )

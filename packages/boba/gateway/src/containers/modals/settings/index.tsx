@@ -15,6 +15,7 @@ import { setActiveNetworkType } from 'actions/networkAction'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { selectActiveNetworkType, selectBridgeToAddressState } from 'selectors'
 import { setBridgeToAddress } from 'actions/bridgeAction'
+import useDisconnect from 'hooks/useDisconnect'
 
 interface SettingsModalProps {
   open: boolean
@@ -28,6 +29,12 @@ const SettingsModal: FC<SettingsModalProps> = ({ open }) => {
   const handleClose = () => {
     dispatch(closeModal('settingsModal'))
   }
+
+  /**
+   * //TODO:
+   * On change Network should close modal.
+   * Should show's wrong network modal as soon as closes.
+   */
 
   const onChangeNetworkType = (value: boolean) => {
     dispatch(
@@ -47,7 +54,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ open }) => {
       onClose={handleClose}
       minHeight="180px"
       title="Settings"
-      transparent
+      transparent={false}
     >
       <SettingsWrapper>
         <SettingsItem>

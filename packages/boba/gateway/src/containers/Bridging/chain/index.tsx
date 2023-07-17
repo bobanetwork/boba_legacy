@@ -1,0 +1,96 @@
+import React, { FC } from 'react'
+import {
+  ChainContainer,
+  ChainPickerIcon,
+  ChainPicker,
+  ChainPickerContainer,
+  ChainIcon,
+  ChainPickerLabel,
+  ChainPickerPlaceHolder,
+  DownArrow,
+  SwitchChainIcon,
+  SwitchIcon,
+} from './styles'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectActiveNetworkIcon, selectLayer } from 'selectors'
+import { NETWORK_ICONS } from './constant'
+import { DEFAULT_NETWORK, LAYER } from 'util/constant'
+import useSwitchChain from 'hooks/useSwitchChain'
+import { openModal } from 'actions/uiAction'
+
+type Props = {}
+
+const Chains = (props: Props) => {
+  const dispatch = useDispatch<any>()
+
+  const { switchChain } = useSwitchChain()
+
+  const networkNames = useSelector(selectActiveNetworkIcon())
+  const activeNetworkIcon = useSelector(selectActiveNetworkIcon())
+  const layer = useSelector(selectLayer())
+  const icons = NETWORK_ICONS[activeNetworkIcon]
+  const L1Icon = icons['L1']
+  const L2Icon = icons['L2']
+
+  const openNetworkPicker = () => {
+    dispatch(openModal('networkPicker'))
+  }
+
+  const openTokenPicker = () => {
+    dispatch(openModal('tokenPicker'))
+  }
+
+  const L1ChainInfo = () => {
+    return (
+      <>
+        <ChainIcon>
+          <L1Icon selected />
+        </ChainIcon>
+        <ChainPickerPlaceHolder>
+          {networkNames['l1'] || DEFAULT_NETWORK.NAME.L1}
+        </ChainPickerPlaceHolder>
+      </>
+    )
+  }
+
+  const L2ChainInfo = () => {
+    return (
+      <>
+        <ChainIcon>
+          <L2Icon selected />
+        </ChainIcon>
+        <ChainPickerPlaceHolder>
+          {networkNames['l2'] || DEFAULT_NETWORK.NAME.L2}
+        </ChainPickerPlaceHolder>
+      </>
+    )
+  }
+
+  return (
+    <ChainContainer>
+      <ChainPickerContainer>
+        <ChainPickerLabel>From</ChainPickerLabel>
+        <ChainPicker onClick={() => openNetworkPicker()}>
+          {!layer || layer === LAYER.L1 ? <L1ChainInfo /> : <L2ChainInfo />}
+          <ChainPickerIcon>
+            <DownArrow />
+          </ChainPickerIcon>
+        </ChainPicker>
+      </ChainPickerContainer>
+      <SwitchChainIcon onClick={() => switchChain()}>
+        <SwitchIcon />
+      </SwitchChainIcon>
+      <ChainPickerContainer>
+        <ChainPickerLabel>To</ChainPickerLabel>
+        <ChainPicker onClick={() => openTokenPicker()}>
+          {!layer || layer === LAYER.L1 ? <L2ChainInfo /> : <L1ChainInfo />}
+          <ChainPickerIcon>
+            <DownArrow />
+          </ChainPickerIcon>
+        </ChainPicker>
+      </ChainPickerContainer>
+    </ChainContainer>
+  )
+}
+
+export default Chains
