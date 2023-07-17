@@ -17,7 +17,7 @@ import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation
 import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
-import {ChainInfo, DepositTeleportations} from '@boba/teleportation/src/utils/types'
+import { ChainInfo, DepositTeleportations} from '@boba/teleportation/src/utils/types'
 
 /* Imports: Core */
 import { TeleportationService } from '@boba/teleportation/src/service'
@@ -26,14 +26,14 @@ import {
   historyDataRepository,
 } from '@boba/teleportation/src/data-source'
 import { OptimismEnv } from './shared/env'
-import {WebSocketProvider} from "@ethersproject/providers";
+import {JsonRpcProvider, WebSocketProvider} from "@ethersproject/providers";
 
-// TODO: Remove only
-describe.only('teleportation', () => {
+describe('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
   let wsProvider: WebSocketProvider
+  let httpProvider: JsonRpcProvider
 
   let wallet1: Wallet
   let address1: string
@@ -52,11 +52,12 @@ describe.only('teleportation', () => {
     await AppDataSource.initialize()
     await AppDataSource.synchronize(true) // drops database and recreates
 
-    signer = env.l2Wallet
-    signerAddr = await signer.getAddress()
-    wallet1 = env.l2Wallet_2
-    address1 = wallet1.address
     wsProvider = env.l2WsProvider
+    httpProvider = env.l2Provider
+    signer = env.l2Wallet.connect(wsProvider ?? httpProvider)
+    signerAddr = await signer.getAddress()
+    wallet1 = env.l2Wallet_2.connect(wsProvider ?? httpProvider)
+    address1 = wallet1.address
 
     await signer.sendTransaction({
       to: wallet1.address,
@@ -76,7 +77,7 @@ describe.only('teleportation', () => {
   let L2BNBOnBobaEth: Contract
 
   before(async () => {
-    chainId = (await ethers.provider.getNetwork()).chainId
+    chainId = (await httpProvider.getNetwork()).chainId
     chainIdBnb = chainId + 1
 
     Factory__Teleportation = new ethers.ContractFactory(
@@ -124,12 +125,12 @@ describe.only('teleportation', () => {
     selectedBobaChains = [
       {
         chainId,
-        url: 'http://l2geth:8545',
-        wsUrl: 'ws://l2geth:8546',
-        provider: ethers.provider,
+        // not needed, as being used to fill up provider/wsProvider in real teleportation service
+        url: '',
+        provider: httpProvider,
         wsProvider: wsProvider,
         testnet: true,
-        name: 'l2geth',
+        name: 'localhost',
         teleportationAddress: Teleportation.address,
         height: 0,
         supportedAssets: {
@@ -146,7 +147,7 @@ describe.only('teleportation', () => {
     const chainIdToUse = useBnb ? chainIdBnb : chainId
 
     return new TeleportationService({
-      l2RpcProvider: ethers.provider,
+      l2RpcProvider: httpProvider,
       l2WSRpcProvider: wsProvider,
       chainId: chainIdToUse,
       teleportationAddress: useBnb
@@ -180,7 +181,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
 
       const events = await teleportationService._getEvents(
         Teleportation,
@@ -198,7 +199,7 @@ describe.only('teleportation', () => {
         chainId
       )
 
-      const latestBlockNumber = await ethers.provider.getBlockNumber()
+      const latestBlockNumber = await httpProvider.getBlockNumber()
       const latestEvents = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.AssetReceived(),
@@ -218,7 +219,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.AssetReceived(),
@@ -276,7 +277,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.AssetReceived(),
@@ -322,7 +323,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const startBlockNumber = await ethers.provider.getBlockNumber()
+      const startBlockNumber = await httpProvider.getBlockNumber()
 
       // deposit token
       for (let i = 0; i < 15; i++) {
@@ -334,7 +335,7 @@ describe.only('teleportation', () => {
         )
       }
 
-      const endBlockNumber = await ethers.provider.getBlockNumber()
+      const endBlockNumber = await httpProvider.getBlockNumber()
       const latestEvents = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.AssetReceived(),
@@ -349,7 +350,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.AssetReceived(),
@@ -384,13 +385,13 @@ describe.only('teleportation', () => {
 
       const preBOBABalance = await L2BOBA.balanceOf(address1)
       const preSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
-      const preBlockNumber = await ethers.provider.getBlockNumber()
+      const preBlockNumber = await httpProvider.getBlockNumber()
 
       await teleportationService._disburseTx(disbursement, chainId, blockNumber)
 
       const postBOBABalance = await L2BOBA.balanceOf(address1)
       const postSignerBOBABalance = await L2BOBA.balanceOf(signerAddr)
-      const postBlockNumber = await ethers.provider.getBlockNumber()
+      const postBlockNumber = await httpProvider.getBlockNumber()
 
       expect(preBOBABalance.sub(postBOBABalance)).to.be.eq(
         utils.parseEther('150')
@@ -404,7 +405,7 @@ describe.only('teleportation', () => {
 
   describe('global tests', () => {
 
-    it('should watch Teleportation contract', async () => {
+    it('should watch Teleportation contract via http', async () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
@@ -417,7 +418,7 @@ describe.only('teleportation', () => {
       )
 
       // check events
-      const latestBlock = await ethers.provider.getBlockNumber()
+      const latestBlock = await httpProvider.getBlockNumber()
       const depositTeleportations = {
         Teleportation,
         chainId,
@@ -443,7 +444,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const latestBlock = await ethers.provider.getBlockNumber()
+      const latestBlock = await httpProvider.getBlockNumber()
       const depositTeleportations: DepositTeleportations = {
         Teleportation,
         chainId,
@@ -497,7 +498,7 @@ describe.only('teleportation', () => {
       }
 
       // check events
-      const latestBlock = await ethers.provider.getBlockNumber()
+      const latestBlock = await httpProvider.getBlockNumber()
       const depositTeleportations = {
         Teleportation,
         chainId,
@@ -517,7 +518,7 @@ describe.only('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      const latestBlock = await ethers.provider.getBlockNumber()
+      const latestBlock = await httpProvider.getBlockNumber()
       const depositTeleportations = {
         Teleportation,
         chainId,
@@ -562,7 +563,7 @@ describe.only('teleportation', () => {
 
       await historyDataRepository.delete({ chainId })
 
-      const latestBlock = await ethers.provider.getBlockNumber()
+      const latestBlock = await httpProvider.getBlockNumber()
       const depositTeleportations = {
         Teleportation,
         chainId,
@@ -584,6 +585,47 @@ describe.only('teleportation', () => {
       )
       const postBOBABalance = await L2BOBA.balanceOf(address1)
       expect(preBOBABalance.sub(postBOBABalance)).to.be.eq(0)
+    })
+
+    it('should watch Teleportation contract via ws', async () => {
+      const teleportationService = await startTeleportationService()
+      await teleportationService.init()
+
+      // deposit token
+      const amount = utils.parseEther('11')
+      await L2BOBA.approve(Teleportation.address, amount)
+
+      // check events
+      const latestBlock = await wsProvider.getBlockNumber()
+      const depositTeleportations = {
+        Teleportation,
+        chainId,
+        wsAvailable: true,
+        totalDeposits: BigNumber.from('0'),
+        totalDisbursements: BigNumber.from('0'),
+        height: latestBlock,
+      }
+
+      teleportationService._handleWebsocketConnection(depositTeleportations, latestBlock)
+
+      const preBOBABalance = await L2BOBA.balanceOf(address1)
+      const tx = await Teleportation.connect(signer).teleportAsset(
+        L2BOBA.address,
+        amount,
+        chainId
+      )
+      await tx.wait()
+
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      console.log("Waiting 2 seconds for websocket to catch up..")
+      await delay(2000)
+
+      // websocket should have disbursed now
+      const postBOBABalance = await L2BOBA.balanceOf(address1)
+      expect(preBOBABalance).not.be.eq(postBOBABalance)
+      expect(preBOBABalance.sub(postBOBABalance)).to.be.eq(
+        amount
+      )
     })
   })
 
@@ -655,9 +697,9 @@ describe.only('teleportation', () => {
       selectedBobaChains = [
         {
           chainId: chainIdBnb,
-          url: 'http://localhost:8545',
-          wsUrl: 'ws://localhost:8546',
-          provider: ethers.provider,
+          // not needed, as being used to fill up provider/wsProvider in real teleportation service
+          url: '',
+          provider: httpProvider,
           wsProvider: wsProvider,
           testnet: true,
           name: 'localhost:bnb',
@@ -672,9 +714,9 @@ describe.only('teleportation', () => {
       selectedBobaChainsBnb = [
         {
           chainId,
-          url: 'http://localhost:8545',
-          wsUrl: 'ws://localhost:8546',
-          provider: ethers.provider,
+          // not needed, as being used to fill up provider/wsProvider in real teleportation service
+          url: '',
+          provider: httpProvider,
           wsProvider: wsProvider,
           testnet: true,
           name: 'localhost',
@@ -694,7 +736,7 @@ describe.only('teleportation', () => {
       await teleportationServiceBnb.init()
 
       // deposit token
-      const preBlockNumber = await ethers.provider.getBlockNumber()
+      const preBlockNumber = await httpProvider.getBlockNumber()
       await L2BobaOnBobaBnb.connect(signer).approve(
         TeleportationBNB.address,
         utils.parseEther('10')
@@ -705,7 +747,7 @@ describe.only('teleportation', () => {
         chainId // toChainId
       )
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
       const events = await teleportationServiceBnb._getEvents(
         TeleportationBNB,
         TeleportationBNB.filters.AssetReceived(),
@@ -777,7 +819,7 @@ describe.only('teleportation', () => {
       await teleportationService.init()
 
       // deposit token
-      const preBlockNumber = await ethers.provider.getBlockNumber()
+      const preBlockNumber = await httpProvider.getBlockNumber()
       await TeleportationBNB.connect(signer).teleportAsset(
         ethers.constants.AddressZero, // send native BNB
         utils.parseEther('10'),
@@ -785,7 +827,7 @@ describe.only('teleportation', () => {
         { value: utils.parseEther('10') }
       )
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
       const events = await teleportationService._getEvents(
         TeleportationBNB,
         TeleportationBNB.filters.AssetReceived(),
@@ -855,7 +897,7 @@ describe.only('teleportation', () => {
       await teleportationService.init()
 
       // deposit token
-      const preBlockNumber = await ethers.provider.getBlockNumber()
+      const preBlockNumber = await httpProvider.getBlockNumber()
 
       await L2BNBOnBobaEth.approve(
         Teleportation.address,
@@ -867,7 +909,7 @@ describe.only('teleportation', () => {
         chainIdBnb // toChainId
       )
 
-      const blockNumber = await ethers.provider.getBlockNumber()
+      const blockNumber = await httpProvider.getBlockNumber()
       const events = await teleportationService._getEvents(
         Teleportation,
         Teleportation.filters.AssetReceived(),

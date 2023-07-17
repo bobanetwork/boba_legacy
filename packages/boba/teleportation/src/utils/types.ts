@@ -1,4 +1,5 @@
 import { BigNumber, Contract, providers } from 'ethers'
+import {IBobaChain} from "./chains";
 
 export interface SupportedAssets {
   [address: string]: string // symbol (MUST BE UNIQUE)
@@ -15,17 +16,10 @@ export interface AssetReceivedEvent {
   }
 }
 
-export interface ChainInfo {
+export interface ChainInfo extends IBobaChain {
   chainId: number
-  url: string
-  wsUrl?: string
   provider: providers.StaticJsonRpcProvider
   wsProvider?: providers.WebSocketProvider
-  testnet: boolean
-  name: string
-  teleportationAddress: string
-  height: number
-  supportedAssets: SupportedAssets
 }
 
 export interface DepositTeleportations {

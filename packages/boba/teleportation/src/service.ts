@@ -4,7 +4,7 @@ import {
   constants as ethersConstants,
   Contract,
   EventFilter,
-  providers,
+  providers, Signer,
   Wallet,
 } from 'ethers'
 import {orderBy} from 'lodash'
@@ -27,6 +27,7 @@ import {
 import {HistoryData} from './entities/HistoryData.entity'
 import {historyDataRepository} from './data-source'
 import {IKMSSignerConfig, KMSSigner} from './utils/kms-signing'
+import {IBobaChain} from "./utils/chains";
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -113,6 +114,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       const bobaTokenContract = Object.keys(chain.supportedAssets).find(
         (k) => chain.supportedAssets[k] === 'BOBA'
       )
+
       const isSupported = await this.state.Teleportation.supportedTokens(
         bobaTokenContract,
         chainId
@@ -130,7 +132,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const depositTeleportation = await getBobaContractAt(
           'Teleportation',
           chain.teleportationAddress,
-          chain.provider
+          chain.wsProvider ?? chain.provider
         )
         const totalDisbursements =
           await this.state.Teleportation.totalDisbursements(chainId)
@@ -204,8 +206,17 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     const provider: providers.WebSocketProvider = depositTeleportation.Teleportation.provider as providers.WebSocketProvider
     const chainId = depositTeleportation.chainId
 
-    provider._websocket.on('open', () => {
+    // also returns all parameters of the event, which we don't need here (last one is the event itself)
+    depositTeleportation.Teleportation.on(this.state.Teleportation.filters.AssetReceived(), async (_,_1,_2,_3,_4,_5, event) => {
+      console.log("Received new event via websocket..")
+      await this._disburseTeleportation(
+        depositTeleportation,
+        [event],
+        latestBlock
+      )
+    })
 
+    provider._websocket.on('open', () => {
       this.state.wsKeepAliveInterval[chainId] = setInterval(() => {
         console.log('Checking if the connection is alive, sending a ping for chainId', chainId)
 
@@ -219,14 +230,6 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           provider._websocket.terminate()
         }, this.EXPECTED_PONG_BACK)
       }, this.KEEP_ALIVE_CHECK_INTERVAL)
-
-      depositTeleportation.Teleportation.on(this.state.Teleportation.filters.AssetReceived(), async (event) => {
-        await this._disburseTeleportation(
-          depositTeleportation,
-          [event],
-          latestBlock
-        )
-      })
     })
 
     provider._websocket.on('close', () => {
@@ -240,6 +243,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       console.log('Received pong, so connection is alive, clearing the timeout for chainId ', chainId)
       clearInterval(this.state.wsPingTimeout[chainId])
     })
+    console.log("Websocket started..")
   }
 
   async _watchTeleportation(

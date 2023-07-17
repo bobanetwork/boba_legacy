@@ -1,16 +1,18 @@
-export interface IBobaChains {
-  [chainId: number]: {
-    url: string
-    /** @dev If defined teleportation service will use websocket instead of regular httpProvider */
-    wsUrl?: string
-    testnet: boolean
-    name: string
-    teleportationAddress: string
-    height: number
-    supportedAssets: {
-      [address: string]: string // symbol (MUST BE UNIQUE)
-    }
+export interface IBobaChain {
+  url: string
+  /** @dev If defined teleportation service will use websocket instead of regular httpProvider */
+  wsUrl?: string
+  testnet: boolean
+  name: string
+  teleportationAddress: string
+  height: number
+  supportedAssets: {
+    [address: string]: string // symbol (MUST BE UNIQUE)
   }
+}
+
+export interface IBobaChains {
+  [chainId: number]: IBobaChain
 }
 
 /**

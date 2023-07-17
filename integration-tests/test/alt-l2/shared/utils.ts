@@ -152,9 +152,8 @@ export const l2Provider = asL2Provider(
 )
 l2Provider.pollingInterval = env.L2_POLLING_INTERVAL
 
-export const l2WsProvider = asL2Provider(
-  new providers.WebSocketProvider(env.L2_WS_URL)
-)
+// asL2Provider breaks Websocket provider
+export const l2WsProvider = new providers.WebSocketProvider(env.L2_WS_URL)
 
 export const replicaProvider = asL2Provider(
   new providers.JsonRpcProvider(env.REPLICA_URL)

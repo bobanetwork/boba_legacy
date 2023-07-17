@@ -7,7 +7,7 @@ import Config from 'bcfg'
 import { TeleportationService } from '../service'
 
 /* Imports: Config */
-import { BobaChains } from '../utils/chains'
+import {BobaChains, IBobaChain} from '../utils/chains'
 
 /* Imports: Interface */
 import { ChainInfo, SupportedAssets } from '../utils/types'
@@ -97,10 +97,14 @@ const main = async () => {
   let originSupportedAssets: SupportedAssets
   const selectedBobaChains: ChainInfo[] = Object.keys(BobaChains).reduce(
     (acc, cur) => {
-      const chain = BobaChains[cur]
+      const chain: ChainInfo = BobaChains[cur]
       if (isTestnet === chain.testnet) {
         if (Number(cur) !== chainId) {
+
           chain.provider = new providers.StaticJsonRpcProvider(chain.url)
+          if (chain.wsUrl) {
+            chain.wsProvider = new providers.WebSocketProvider(chain.wsUrl)
+          }
           acc.push({ chainId: cur, ...chain })
         } else {
           originSupportedAssets = chain.supportedAssets
