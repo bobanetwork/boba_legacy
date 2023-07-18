@@ -21,7 +21,7 @@ export function selectBridgeTokens() {
 
 export function selectTokenToBridge() {
   return function (state) {
-    return state.bridge.tokens[0]
+    return state.bridge.tokens[ 0 ]
   }
 }
 
@@ -40,5 +40,11 @@ export function selectMultiBridgeMode() {
 export function selectBridgeToAddressState() {
   return function (state) {
     return state.bridge.bridgeToAddressState
+  }
+}
+
+export function selectBridgeAlerts() {
+  return function (state) {
+    return state.bridge.alerts
   }
 }

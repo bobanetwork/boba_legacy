@@ -16,21 +16,26 @@ limitations under the License. */
 
 const initialState = {
   tokens: [],
-  bridgeType: null,
+  bridgeType: 'CLASSIC',
   multiBridgeMode: false,
   bridgeToAddressState: false,
+  alerts: []
 };
 
 function bridgeReducer(state = initialState, action) {
   switch (action.type) {
     case 'BRIDGE/TYPE/SELECT':
-      return { ...state, bridgeType: action.payload }
+      return {
+        ...state,
+        bridgeType: action.payload
+      }
 
     case 'BRIDGE/TOKEN/RESET':
-      return { ...state,
+      return {
+        ...state,
         tokens: [],
         multiBridgeMode: false
-    }
+      }
 
     case 'BRIDGE/TOKEN/SELECT':
       return {
@@ -58,14 +63,14 @@ function bridgeReducer(state = initialState, action) {
     }
 
     case 'BRIDGE/TOKEN/REMOVE': {
-        let tokens = [ ...state.tokens ];
-        tokens.splice(action.payload, 1)
+      let tokens = [ ...state.tokens ];
+      tokens.splice(action.payload, 1)
 
-        return { ...state, tokens: tokens }
-      }
+      return { ...state, tokens: tokens }
+    }
 
     case 'BRIDGE/MODE/CHANGE':
-        return { ...state, multiBridgeMode: action.payload }
+      return { ...state, multiBridgeMode: action.payload }
 
     case 'BRIDGE/TOADDRESS/SET':
       return {
@@ -74,15 +79,30 @@ function bridgeReducer(state = initialState, action) {
       }
 
     case 'BRIDGE/TOKEN/AMOUNT/CHANGE': {
-        let newTokens = [...state.tokens];
-        let { index, amount, toWei_String } = action.payload;
-        newTokens[ index ] = {
-          ...newTokens[ index ],
-          amount,
-          toWei_String
-        };
-        return { ...state, tokens: newTokens }
+      let newTokens = [ ...state.tokens ];
+      let { index, amount, toWei_String } = action.payload;
+      newTokens[ index ] = {
+        ...newTokens[ index ],
+        amount,
+        toWei_String
+      };
+      return { ...state, tokens: newTokens }
+    }
+
+    case 'BRIDGE/ALERT/SET': {
+      return {
+        ...state,
+        alerts: [
+          ...state.alerts,
+          action.payload
+        ]
       }
+    }
+
+    case 'BRIDGE/ALERT/CLEAR': {
+      return { ...state, alerts: [] }
+    }
+
     default:
       return state;
   }

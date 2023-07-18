@@ -44,10 +44,6 @@ const Chains = (props: Props) => {
     dispatch(openModal('networkPicker', null, null, null, null, null, sLayer))
   }
 
-  const openTokenPicker = () => {
-    dispatch(openModal('tokenPicker'))
-  }
-
   const L1ChainInfo = () => {
     return (
       <>

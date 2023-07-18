@@ -1,14 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined'
 import HelpOutlineOutlined from '@mui/icons-material/HelpOutlineOutlined'
 import {
   BridgeAction,
   BridgeContent,
   BridgeHeader,
-  BridgeInfo,
-  BridgeReceiveWrapper,
-  BridgeTabItem,
-  BridgeTabs,
   BridgeWrapper,
   ConnectButton,
 } from './styles'
@@ -19,19 +15,13 @@ import { openModal } from 'actions/uiAction'
 import { selectAccountEnabled } from 'selectors'
 import { setConnect } from 'actions/setupAction'
 import Chains from './chain'
+import BridgeInput from './BridgeInput'
+import BridgeAlert from './BridgeAlert'
+import BridgeTypeSelector from './BridgeTypeSelector'
 
-interface Props {}
-
-enum BRIDGE_TYPE {
-  CLASSIC,
-  FAST,
-}
-
-const Bridging = (props: Props) => {
+const Bridging = () => {
   const dispatch = useDispatch<any>()
   const accountEnabled = useSelector<any>(selectAccountEnabled())
-
-  const [bridgeType, setbridgeType] = useState(BRIDGE_TYPE.CLASSIC)
 
   const openSettingModal = () => {
     dispatch(openModal('settingsModal'))
@@ -65,24 +55,11 @@ const Bridging = (props: Props) => {
             onClick={openSettingModal}
           />
         </BridgeHeader>
-        <BridgeTabs>
-          <BridgeTabItem
-            active={bridgeType === BRIDGE_TYPE.CLASSIC}
-            onClick={() => setbridgeType(BRIDGE_TYPE.CLASSIC)}
-          >
-            Classic
-          </BridgeTabItem>
-          <BridgeTabItem
-            active={bridgeType === BRIDGE_TYPE.FAST}
-            onClick={() => setbridgeType(BRIDGE_TYPE.FAST)}
-          >
-            Fast
-          </BridgeTabItem>
-        </BridgeTabs>
+        <BridgeAlert />
+        <BridgeTypeSelector />
         <Chains />
+        <BridgeInput />
       </BridgeContent>
-      <BridgeReceiveWrapper></BridgeReceiveWrapper>
-      <BridgeInfo></BridgeInfo>
       <BridgeAction>
         {!accountEnabled ? (
           <ConnectButton

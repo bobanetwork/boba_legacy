@@ -141,8 +141,13 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                   return (
                     <TokenListItem
                       key={token.symbol}
-                      selected={token.symbol === tokenToBridge.symbol}
-                      onClick={() => onTokenSelect(token)}
+                      selected={token.symbol === tokenToBridge?.symbol}
+                      onClick={() =>
+                        onTokenSelect({
+                          ...token,
+                          amount,
+                        })
+                      }
                     >
                       <TokenSymbol>
                         <img

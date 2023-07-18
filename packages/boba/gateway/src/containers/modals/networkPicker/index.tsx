@@ -11,7 +11,11 @@ import React, { ElementType, FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ListLabel } from '../tokenPicker/styles'
 import { L1_ICONS, L2_ICONS, NetworkList } from 'util/network/network.util'
-import { selectActiveNetworkType, selectModalState } from 'selectors'
+import {
+  selectActiveNetwork,
+  selectActiveNetworkType,
+  selectModalState,
+} from 'selectors'
 import { getCoinImage } from 'util/coinImage'
 import { setNetwork } from 'actions/networkAction'
 
@@ -22,6 +26,7 @@ interface NetworkPickerModalProps {
 const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
   const dispatch = useDispatch<any>()
   const networkType = useSelector(selectActiveNetworkType())
+  const activeNetwork = useSelector(selectActiveNetwork())
   const selectionLayer = useSelector(selectModalState('selectionLayer'))
 
   const handleClose = () => {
@@ -63,6 +68,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
                 : l2Icon[chainDetail.icon]
             return (
               <NetworkItem
+                selected={chainDetail.chain === activeNetwork}
                 key={chainDetail.label}
                 onClick={() => onChainChange(chainDetail)}
               >

@@ -1,4 +1,4 @@
-import { Button } from 'components/global'
+import { Button, Typography } from 'components/global'
 import styled from 'styled-components'
 
 export const BridgeWrapper = styled.div`
@@ -27,7 +27,7 @@ export const BridgeContent = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   justify-content: space-around;
   align-items: flex-start;
 `
@@ -37,34 +37,6 @@ export const BridgeHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-`
-
-export const BridgeTabs = styled.div`
-  display: flex;
-  justify-content: space-between;
-  background: ${(props) => props.theme.colors.gray[400]};
-  border-radius: 8px;
-  padding: 5px;
-  width: 100%;
-`
-export const BridgeTabItem = styled.div<{
-  active?: boolean
-}>`
-  width: 100%;
-  padding: 8px 50px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: ${(props) => props.theme.text.body2};
-  background: transparent;
-  ${(props) =>
-    props.active &&
-    `
-  color:${props.theme.colors.gray[600]};
-  background:${props.theme.colors.green[300]};
-
-`};
 `
 
 export const BridgeReceiveWrapper = styled.div``
@@ -81,3 +53,9 @@ export const ConnectButton = styled(Button).attrs({
     width: '100%',
   },
 })``
+
+export const Label = styled(Typography).attrs({
+  variant: 'body2',
+})`
+  color: ${(props) => props.theme.colors.gray[100]};
+`

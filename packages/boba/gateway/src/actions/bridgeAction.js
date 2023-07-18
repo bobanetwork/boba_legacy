@@ -60,3 +60,15 @@ export function setBridgeToAddress(payload) {
     return dispatch({ type: 'BRIDGE/TOADDRESS/SET', payload });
   }
 }
+
+export function setBridgeAlert(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/ALERT/SET', payload });
+  }
+}
+
+export function clearBridgeAlert() {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/ALERT/CLEAR' });
+  }
+}

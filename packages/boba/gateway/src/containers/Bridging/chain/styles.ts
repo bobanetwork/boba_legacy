@@ -7,7 +7,7 @@ import Switch from 'images/icons/switchIcon.svg'
 export const ChainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   width: 100%;
 `
 
