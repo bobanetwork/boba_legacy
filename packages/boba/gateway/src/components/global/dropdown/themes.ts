@@ -151,7 +151,7 @@ export const DropdownNetwork = styled(Dropdown)`
     box-sizing: border-box;
     border: inherit;
     border-top: 0px;
-    border-radius: 14px 14px 14px 14px;
+    border-radius: 14px;
 
     ${(props) =>
       props.theme.name === 'light' &&

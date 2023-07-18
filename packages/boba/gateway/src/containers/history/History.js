@@ -23,10 +23,11 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
 import { useMediaQuery, useTheme } from '@mui/material'
-import { isSameOrAfterDate, isSameOrBeforeDate } from 'util/dates'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button.js'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
+import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
+import transctionService from 'services/transaction.service'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import {
@@ -39,12 +40,6 @@ import {
 import { fetchTransactions } from 'actions/networkAction'
 import { formatDate } from 'util/dates'
 
-import Exits from './TX_Exits'
-import Deposits from './TX_Deposits'
-import All from './TX_All'
-import Pending from './TX_Pending'
-import Transfers from './TX_Transfers'
-
 import * as S from './History.styles'
 import styles from './TX_All.module.scss'
 import { Table } from './styles'
@@ -56,36 +51,30 @@ import Select from 'components/select/Select'
 import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { selectActiveNetworkName } from 'selectors'
+import { selectActiveNetworkName, selectActiveNetworkIcon } from 'selectors'
 // import { IDropdownItem } from 'components/global/dropdown/types'
 import AvalancheIcon from '../../images/avax.svg'
 import BNBIcon from '../../images/bnb.svg'
 import EthereumIcon from '../../images/ethereumFlex.svg'
 import FantomIcon from '../../images/ftm.svg'
+import FilterIcon from '../../images/filter.svg'
 import AllNetworksIcon from '../../images/allNetworks.svg'
 import { TableHeader } from 'components/global/table/index.tsx'
 import { element } from 'prop-types'
 import { TransactionsResolver } from './TransactionsResolver'
 import { TransactionsTableHeader } from 'components/global/table/themes'
+import { FilterDropDown } from 'components/filter'
 
-const NETWORKS = [
-  {
-    value: 'All',
-    label: 'All Networks',
-    imgSrc: AllNetworksIcon,
-  },
-  {
-    value: 'Avalanche',
-    label: 'Avalanche',
-    imgSrc: AvalancheIcon,
-  },
-  { value: 'BNB', label: 'BNB', imgSrc: BNBIcon },
-  {
-    value: 'Ethereum',
-    label: 'Ethereum',
-    imgSrc: EthereumIcon,
-  },
-  { value: 'Fantom', label: 'Fantom', imgSrc: FantomIcon },
+const DEFAULT_NETWORK = {
+  value: 'All',
+  label: 'All Networks',
+  imgSrc: AllNetworksIcon,
+}
+const FILTER_OPTIONS = [
+  { value: 'All', label: 'All Status' },
+  { value: 'Completed', label: 'Completed' },
+  { value: 'Pending', label: 'Pending' },
+  { value: 'Canceled', label: 'Canceled' },
 ]
 
 const TableOptions = [
@@ -114,8 +103,8 @@ const TableOptions = [
 ]
 
 function History() {
-  const [toNetwork, setToNetwork] = useState(NETWORKS[0])
-  const [fromNetwork, setFromNetwork] = useState(NETWORKS[0])
+  const [toNetwork, setToNetwork] = useState(DEFAULT_NETWORK)
+  const [fromNetwork, setFromNetwork] = useState(DEFAULT_NETWORK)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -129,14 +118,17 @@ function History() {
   )
 
   const [startDate, setStartDate] = useState(last_6months)
+  const [transactionStatus, setTransactionStatus] = useState('All')
   const [endDate, setEndDate] = useState(now)
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
 
   const [searchHistory, setSearchHistory] = useState('')
-  const activeTab = useSelector(selectActiveHistoryTab, isEqual)
   const networkName = useSelector(selectActiveNetworkName())
-  console.log(networkName)
+
+  const icon = useSelector(selectActiveNetworkIcon())
+  const L1Icon = L1_ICONS[icon]
+  const L2Icon = L2_ICONS[icon]
 
   const networkChangeHandler = () => {
     console.log(`${fromNetwork['value']} to ${toNetwork['value']}`)
@@ -153,35 +145,20 @@ function History() {
     networkChangeHandler()
   }, [fromNetwork, toNetwork])
 
-  const unorderedTransactions = useSelector(selectTransactions, isEqual)
-  const orderedTransactions = orderBy(
-    unorderedTransactions,
-    (i) => i.timeStamp,
-    'desc'
-  )
-
-  const transactions = orderedTransactions.filter((i) => {
-    if (startDate && endDate) {
-      return (
-        isSameOrAfterDate(i.timeStamp, startDate) &&
-        isSameOrBeforeDate(i.timeStamp, endDate)
-      )
-    }
-    return true
-  })
+  const transactions = useSelector(selectTransactions, isEqual)
 
   const getNetworks = () => {
     return [
-      NETWORKS[0],
+      DEFAULT_NETWORK,
       {
         label: networkName['l1'],
         value: networkName['l1'],
-        imgSrc: EthereumIcon,
+        imgSrc: L1Icon({ selected: true }),
       },
       {
         label: networkName['l2'],
         value: networkName['l2'],
-        imgSrc: EthereumIcon,
+        imgSrc: L2Icon({ selected: true }),
       },
     ]
   }
@@ -216,11 +193,18 @@ function History() {
       </>
     )
   }
-
-  useInterval(() => {
+  const syncTransactions = async () => {
     if (accountEnabled) {
-      dispatch(fetchTransactions())
+      const newTransactions = await transctionService.getTransactions()
+      console.log('poller called')
+      if (new Set(transactions).size !== new Set(newTransactions).size) {
+        console.log('actualizando')
+        dispatch(fetchTransactions())
+      }
     }
+  }
+  useInterval(async () => {
+    await syncTransactions()
   }, POLL_INTERVAL)
 
   return (
@@ -287,8 +271,14 @@ function History() {
                     }}
                   />
                 </S.NetworkDropDowns>
-                <div>Filter</div>{' '}
-                {/* {need to make this a dropdown and add the image} */}
+                <FilterDropDown
+                  items={FILTER_OPTIONS}
+                  defaultItem={FILTER_OPTIONS[0]}
+                  imgSrc={FilterIcon}
+                  onItemSelected={(item) => {
+                    setTransactionStatus(item.value)
+                  }}
+                />
               </S.TableFilters>
               <TransactionsTableHeader
                 options={TableOptions}
@@ -300,8 +290,10 @@ function History() {
                 networks: networkName,
                 fromNetwork: fromNetwork.value,
                 toNetwork: toNetwork.value,
-                status: 'All',
+                status: transactionStatus,
                 targetHash: searchHistory,
+                startDate: startDate,
+                endDate: endDate,
               }}
               style={{ maxHeight: '70%' }}
             ></TransactionsResolver>

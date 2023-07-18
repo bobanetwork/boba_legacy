@@ -4,6 +4,7 @@ export const TransationsTableWrapper = styled.div`
   width: 100%;
   overflow-y: auto;
   max-height: 512px;
+  // padding:0px
   &::-webkit-scrollbar {
     width: 24px;
   }
@@ -38,9 +39,11 @@ export const TransationsTableWrapper = styled.div`
     `};
 `
 
-export const TransactionContractAdress = styled.div`
+export const TransactionHash = styled.a`
   font-size: 12px;
   text-decoration: underline;
+  width: 102px;
+  height: 16px;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -64,6 +67,7 @@ export const Date = styled.div`
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  text-align: left;
   width: 168px;
   white-space: nowrap;
 `
@@ -97,6 +101,17 @@ export const TransactionChain = styled.div`
   gap: 8px;
   text-align: left;
 `
+export const IconContainer = styled.div`
+  width: 32px;
+  height: 32px;
+  direction: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    width: 32px !important;
+    height: auto;
+  }
+`
 
 export const TransactionChainDetails = styled.div`
   display: flex;
@@ -124,6 +139,7 @@ export const Table = styled.div`
   justify-content: space-between;
   text-align: center;
   width: 100%;
+  padding-bottom: 10px;
 
   ${(props) =>
     props.theme.name === 'light' &&

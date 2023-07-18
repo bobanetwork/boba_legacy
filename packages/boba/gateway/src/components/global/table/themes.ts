@@ -24,6 +24,8 @@ export const TransactionsTableHeader = styled(TableHeader)`
     `}
     ${TableRow} {
     border: none;
+    margin: 0px;
+    padding 0px;
     p {
       font-size: 12px;
     }
@@ -34,6 +36,18 @@ export const TransactionsTableContent = styled(TableContent)`
   padding: 16px 24px;
   ${TableRow} {
     border: none;
+  }
+  &: hover {
+    background: ${(props) => props.theme.colors.gray[300]};
+  }
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      fill: ${props.theme.colors.gray[600]};
+    `}
+  ${TableRow} {
+    margin: 0px;
+    padding 0px;
   }
 `
 export const AllNetworksIcon = styled(Svg)`
