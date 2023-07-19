@@ -56,7 +56,7 @@
     "hardhat": "^2.12.5",
     "hardhat-deploy": "^0.11.12",
     "ow": "^0.28.1",
-    "sinon": "^14.0.0",
+    "sinon": "^15.2.0",
     "solidity-coverage": "^0.7.21",
     "solidity-string-utils": "^0.0.8-0",
     "ts-node": ">=8.0.0",

@@ -26,7 +26,6 @@ import {
   historyDataRepository,
 } from '@boba/teleportation/src/data-source'
 import { OptimismEnv } from './shared/env'
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
 
 describe('teleportation', () => {
   let env: OptimismEnv
@@ -704,7 +703,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        const sourceChainId = chainIdBnb // event.args.sourceChainId.toNumber() -> (is correct, but we were mocking a fake chainId for testing)
+        const sourceChainId = chainIdBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
         const depositId = event.args.depositId
         const amount = event.args.amount
         const token = event.args.token
@@ -784,7 +783,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        const sourceChainId = chainIdBnb // event.args.sourceChainId.toNumber() -> (is correct, but we were mocking a fake chainId for testing)
+        const sourceChainId = chainIdBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
         const depositId = event.args.depositId
         const amount = event.args.amount
         const token = event.args.token
@@ -866,7 +865,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        const sourceChainId = event.args.sourceChainId.toNumber()
+        const sourceChainId = event.args.sourceChainId
         const depositId = await TeleportationBNB.totalDisbursements(chainId) // event.args.depositId --> correct, but we used a fake chainId to simulate Bnb so we need to correct depositId here
         const amount = event.args.amount
         const token = event.args.token
