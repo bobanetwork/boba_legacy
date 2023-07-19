@@ -253,11 +253,10 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
   // filter out transactions whose hash does not match
   const hashFilter = (transaction: ITransaction) => {
-    if (
-      transactionsFilter.targetHash &&
-      !transaction.hash.includes(transactionsFilter.targetHash)
-    ) {
-      return false
+    if (transactionsFilter.targetHash) {
+      if (!transaction.hash.includes(transactionsFilter.targetHash)) {
+        return false
+      }
     }
     return true
   }

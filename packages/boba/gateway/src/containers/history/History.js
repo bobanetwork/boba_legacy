@@ -38,13 +38,13 @@ import { fetchTransactions } from 'actions/networkAction'
 
 import * as S from './History.styles'
 import styles from './TX_All.module.scss'
-import { Table } from './styles'
+import { Table, IconContainer, Icon, NoHistory } from './styles'
 
 import useInterval from 'hooks/useInterval'
 import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { selectActiveNetworkName, selectActiveNetworkIcon } from 'selectors'
+import { selectActiveNetworkName } from 'selectors'
 import FilterIcon from '../../images/filter.svg'
 import AllNetworksIcon from '../../images/allNetworks.svg'
 import {
@@ -54,6 +54,8 @@ import {
 import { TransactionsTableHeader } from 'components/global/table/themes'
 import { FilterDropDown } from 'components/filter'
 import { getCoinImage } from 'util/coinImage'
+import noHistoryIcon from '../../images/noHistory.svg'
+import { Svg } from 'components/global/svg'
 
 const DEFAULT_NETWORK = {
   value: 'All',
@@ -293,9 +295,11 @@ function History() {
         </>
       )}
       {!layer && (
-        <div
+        <NoHistory
           style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
         >
+          <Svg src={noHistoryIcon} />
+          <div>No History.</div>
           <Button
             style={{ marginLeft: 'auto', marginRight: 'auto' }}
             type="primary"
@@ -307,7 +311,7 @@ function History() {
           >
             Connect Wallet
           </Button>
-        </div>
+        </NoHistory>
       )}
     </S.HistoryPageContainer>
   )

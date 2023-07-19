@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { Svg } from 'components/global/svg'
 
 export const TransationsTableWrapper = styled.div`
   width: 100%;
@@ -159,5 +160,40 @@ export const Table = styled.div`
   }
   @media screen and (max-width: 900px) {
     marginbottom: '5px';
+  }
+`
+
+export const NoHistory = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  font-size: 16px;
+  gap: 10px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[100]};
+    `}
+
+    svg {
+    ${(props) =>
+      props.theme.name === 'light' &&
+      css`
+        fill: ${props.theme.colors.gray[700]};
+      `}
+    ${(props) =>
+      props.theme.name === 'dark' &&
+      css`
+        fill: ${props.theme.colors.gray[100]};
+      `}
   }
 `
