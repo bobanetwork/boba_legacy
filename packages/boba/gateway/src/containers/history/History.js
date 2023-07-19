@@ -23,7 +23,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 
 import { useMediaQuery, useTheme } from '@mui/material'
 import Input from 'components/input/Input'
-import Button from 'components/button/Button.js'
+import { Button } from 'components/global'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
 import transctionService from 'services/transaction.service'
 
@@ -38,10 +38,10 @@ import { fetchTransactions } from 'actions/networkAction'
 
 import * as S from './History.styles'
 import styles from './TX_All.module.scss'
-import { Table, IconContainer, Icon, NoHistory } from './styles'
+import { Table, NoHistory } from './styles'
 
 import useInterval from 'hooks/useInterval'
-import { setConnectBOBA, setConnect } from 'actions/setupAction'
+import { setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors'
@@ -301,16 +301,10 @@ function History() {
           <Svg src={noHistoryIcon} />
           <div>No History.</div>
           <Button
-            style={{ marginLeft: 'auto', marginRight: 'auto' }}
-            type="primary"
-            variant="contained"
-            size="small"
-            newStyle
             onClick={() => dispatch(setConnect(true))}
-            sx={{ fontWeight: '500;' }}
-          >
-            Connect Wallet
-          </Button>
+            small
+            label="Connect Wallet"
+          />
         </NoHistory>
       )}
     </S.HistoryPageContainer>
