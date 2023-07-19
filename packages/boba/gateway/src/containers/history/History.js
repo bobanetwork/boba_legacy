@@ -198,7 +198,13 @@ function History() {
       {layer && (
         <>
           <S.Header>
-            <div className={styles.searchInput}>
+            <div
+              className={
+                theme.palette.mode === 'light'
+                  ? styles.searchInput
+                  : styles.searchInputDark
+              }
+            >
               <Input
                 size="small"
                 placeholder="Search Here"
@@ -284,23 +290,24 @@ function History() {
               style={{ maxHeight: '70%' }}
             ></TransactionsResolver>
           </Table>
-
-          <div
-            style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-          >
-            <Button
-              style={{ marginLeft: 'auto', marginRight: 'auto' }}
-              type="primary"
-              variant="contained"
-              size="small"
-              newStyle
-              onClick={() => dispatch(setConnect(true))}
-              sx={{ fontWeight: '500;' }}
-            >
-              Connect Wallet
-            </Button>
-          </div>
         </>
+      )}
+      {!layer && (
+        <div
+          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
+        >
+          <Button
+            style={{ marginLeft: 'auto', marginRight: 'auto' }}
+            type="primary"
+            variant="contained"
+            size="small"
+            newStyle
+            onClick={() => dispatch(setConnect(true))}
+            sx={{ fontWeight: '500;' }}
+          >
+            Connect Wallet
+          </Button>
+        </div>
       )}
     </S.HistoryPageContainer>
   )

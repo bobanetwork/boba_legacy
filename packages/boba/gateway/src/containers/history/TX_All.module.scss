@@ -10,6 +10,23 @@
 
 .searchInput {
   width: 250px !important;
+  border-radius: 12px;
+  background-color: #fdfff8e5;
+  border-color: #c8cac2;
+  color: #8f9288;
+  font-size: 16px;
+  @include mobile {
+    width: 100% !important;
+  }
+}
+
+.searchInputDark {
+  width: 250px !important;
+  border-radius: 12px;
+  background-color: #262626;
+  border-color: #545454;
+  color: #5f5f5f;
+  font-size: 16px;
   @include mobile {
     width: 100% !important;
   }
@@ -105,53 +122,16 @@
 }
 
 .datePickerInput {
-    border-radius: 8px;
-    width: 130px;
-    margin: 0 15px;
-    position: relative;
-  @include mobile {
-      width: 100%;
-      margin: 0;
-    }
-
-
-    &::after {
-      content: '';
-      width: 0;
-      height: 0;
-      position: absolute;
-      right: 10px;
-      font-size: 25px;
-      bottom: 15px;
-    }
-
-    input {
-      background: rgba(0, 0, 0, 0.09);
-      color: rgba(0, 0, 0, 0.87);
-      height: 40px;
-      width: 130px;
-      padding: 0 15px;
-      line-height: 40px;
-      border: 0;
-      border-radius: 8px;
-      font-size: 16px;
-      text-align: left;
-      @include mobile {
-        width: 100%;
-      }
-    }
-}
-
-.datePickerInputDark {
   border-radius: 8px;
   width: 130px;
-  margin: 0px 15px;
+  border: 1px solid #c8cac2;
+  margin: 0 15px;
+  background: none;
   position: relative;
   @include mobile {
     width: 100%;
     margin: 0;
   }
-
 
   &::after {
     content: '';
@@ -164,10 +144,50 @@
   }
 
   input {
-    background: #FFFFFF0A;
-    color: white;
+    background: #fdfff8e5;
+
+    color: #22221e;
     height: 40px;
-    width: 130px;
+    width: 128px;
+    padding: 0 15px;
+    line-height: 40px;
+    border: 0;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: left;
+    @include mobile {
+      width: 100%;
+    }
+  }
+}
+
+.datePickerInputDark {
+  border-radius: 8px;
+  width: 130px;
+  margin: 0px 15px;
+  border: 1px solid #545454;
+  position: relative;
+  @include mobile {
+    width: 100%;
+    margin: 0;
+  }
+
+  &::after {
+    content: '';
+    width: 0;
+    height: 0;
+    position: absolute;
+    right: 10px;
+    font-size: 25px;
+    bottom: 15px;
+  }
+
+  input {
+    background: #262626;
+
+    color: #eeeeee;
+    height: 40px;
+    width: 128px;
     padding: 0 15px;
     line-height: 40px;
     border: 0;
