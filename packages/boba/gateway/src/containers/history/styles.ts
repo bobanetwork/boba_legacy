@@ -61,7 +61,7 @@ export const TransactionAmount = styled.div`
   width: 80px;
 `
 
-export const Date = styled.div`
+export const TransactionDate = styled.div`
   font-family: Roboto;
   font-size: 14px;
   font-style: normal;
@@ -131,7 +131,6 @@ export const TransactionToken = styled.div`
 `
 
 export const Table = styled.div`
-  gradient: Linear #303030-#252525;
   border-radius: 12px;
   display: flex;
   flex-direction: column;

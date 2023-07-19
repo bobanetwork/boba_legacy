@@ -1,8 +1,5 @@
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import networkService from './networkService'
-import { useSelector } from 'react-redux'
-import { selectTransactions } from 'selectors'
-import { isEqual } from 'util/lodash'
 
 class TransactionService {
   async getSevens() {

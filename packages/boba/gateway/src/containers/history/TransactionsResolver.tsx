@@ -1,16 +1,11 @@
-import {
-  TransactionsTableHeader,
-  TransactionsTableContent,
-} from 'components/global/table/themes'
+import { TransactionsTableContent } from 'components/global/table/themes'
 
-import { TableHeaderOptionType } from 'components/global/table'
 import React, { useState, useEffect } from 'react'
-import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 import { getCoinImage } from 'util/coinImage'
 import { formatDate, isSameOrAfterDate, isSameOrBeforeDate } from 'util/dates'
 import { Dayjs } from 'dayjs'
 import {
-  Date,
+  TransactionDate,
   TransactionAmount,
   Icon,
   Status,
@@ -23,17 +18,10 @@ import {
 } from './styles'
 import { useSelector } from 'react-redux'
 import { orderBy } from 'util/lodash'
-import {
-  selectLoading,
-  selectTokens,
-  selectActiveNetworkIcon,
-  selectActiveNetworkName,
-} from 'selectors'
+import { selectTokens, selectActiveNetworkName } from 'selectors'
 import truncate from 'truncate-middle'
-import EthereumIcon from '../../images/ethereum.svg'
 import { logAmount } from 'util/amountConvert'
 import networkService from 'services/networkService'
-import { maxWidth } from '@mui/system'
 
 export enum TRANSACTION_FILTER_STATUS {
   Pending = 'Pending',
@@ -46,6 +34,12 @@ export enum TRANSACTION_STATUS {
   Succeeded = 'succeeded',
   Pending = 'pending',
   Failed = 'failed',
+}
+
+const NetworkNameToSymbol: { [key: string]: string } = {
+  ethereum: 'ETH',
+  boba: 'BOBA',
+  bnb: 'BNB',
 }
 
 export interface INetworks {
@@ -84,11 +78,16 @@ export interface ICrossDomainMessage {
   crossDomainMessageFinalize: number
   crossDomainMessageSendTime: number
   fast: number
-  l2BlockHash: string
-  l2BlockNumber: number
-  l2From: string
-  l2Hash: string
-  l2To: string
+  l2BlockHash?: string
+  l2BlockNumber?: number
+  l2From?: string
+  l2Hash?: string
+  l2To?: string
+  l1BlockHash?: string
+  l1BlockNumber?: number
+  l1From?: string
+  l1Hash?: string
+  l1To?: string
 }
 
 export interface ITransaction {
@@ -126,6 +125,16 @@ export interface ITransactionsResolverProps {
   transactions: ITransaction[]
 }
 
+export const GetSymbolFromNetworkName = (networkName: string): string => {
+  const networks: string[] = Object.keys(NetworkNameToSymbol)
+  for (const network of networks) {
+    if (networkName.toLowerCase().includes(network)) {
+      return NetworkNameToSymbol[network]
+    }
+  }
+  return 'N/A'
+}
+
 export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
   transactionsFilter,
@@ -133,13 +142,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const [currentTransactions, setCurrentTransactions] = useState<
     ITransaction[]
   >([])
-  console.log(transactions)
+
   useEffect(() => {
     setCurrentTransactions(transactions)
   }, [transactions])
 
-  const icon = useSelector(selectActiveNetworkIcon())
   const activeNetworks = useSelector(selectActiveNetworkName())
+  const tokenFromAddress = useSelector(selectTokens)
   const orderedTransactions = orderBy(
     currentTransactions,
     (i) => i.timeStamp,
@@ -262,12 +271,55 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   })
 
-  const tokenFromAddress = useSelector(selectTokens)
+  const process_transaction = (transaction: ITransaction) => {
+    let amountString = ''
+    const chain = transaction.chain === 'L1pending' ? 'L1' : transaction.chain
+    let token = tokenFromAddress[transaction.action.token.toLowerCase()]
+    if (chain === LAYER.L2 && !token) {
+      token = Object.values(tokenFromAddress).find(
+        (t: any) =>
+          t.addressL2.toLowerCase() === transaction.action.token.toLowerCase()
+      )
+    }
+    const symbol = token[`symbol${chain}`]
+
+    amountString = logAmount(transaction.action.amount, token?.decimals, 4)
+    let transactionL1Hash = ''
+    let transactionL2Hash = ''
+    if (chain === LAYER.L2) {
+      transactionL2Hash = transaction.hash
+      transactionL1Hash = transaction.crossDomainMessage.l1Hash
+        ? transaction.crossDomainMessage.l1Hash
+        : 'n/a'
+    } else if (chain === LAYER.L1) {
+      transactionL1Hash = transaction.hash
+      transactionL2Hash = transaction.crossDomainMessage.l2Hash
+        ? transaction.crossDomainMessage.l2Hash
+        : 'n/a'
+    }
+    const processedTransaction: IProcessedTransaction = {
+      timeStamp: transaction.timeStamp,
+      from: transaction.from,
+      fromLayer: chain as LAYER,
+      to: transaction.to,
+      toLayer: (chain as LAYER) === LAYER.L1 ? LAYER.L2 : LAYER.L1,
+      tokenSymbol: symbol,
+      amount: amountString,
+      status: transaction.UserFacingStatus,
+      l1Hash: transactionL1Hash,
+      l2Hash: transactionL2Hash,
+    }
+    return processedTransaction
+  }
+
+  const processedTransactions = filteredTransactions.map((transaction) => {
+    return process_transaction(transaction)
+  })
 
   const getTransactionToken = (symbol: string) => {
     return (
       <TransactionToken>
-        <Icon src={getCoinImage(symbol)} alt={symbol} />
+        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
         <div>{symbol}</div>
       </TransactionToken>
     )
@@ -277,15 +329,12 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     let networkName = layer === LAYER.L1 ? activeNetworks.l1 : activeNetworks.l2
     networkName = networkName.split(' ')[0]
     const linkToHash = getNetworkExplorerLink(layer, hash)
+    const symbol = GetSymbolFromNetworkName(networkName)
     // href={chainLink({ chain: prefix, hash: detail.hash })}
 
     return (
       <TransactionChain>
-        <IconContainer>
-          {layer === LAYER.L1
-            ? L1_ICONS[icon as keyof typeof L1_ICONS]({ selected: true })
-            : L2_ICONS[icon as keyof typeof L2_ICONS]({ selected: true })}
-        </IconContainer>
+        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
         <TransactionChainDetails>
           <div style={{ width: '102px', height: '16px' }}>{networkName}</div>
           <TransactionHash
@@ -294,7 +343,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
             rel="noopener noreferrer"
             style={{ fontSize: '12px' }}
           >
-            {`TX: ${truncate(hash, 4, 4, '...')}`}
+            {`Tx: ${truncate(hash, 4, 4, '...')}`}
           </TransactionHash>
         </TransactionChainDetails>
       </TransactionChain>
@@ -302,12 +351,12 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   }
 
   const getTransactionDate = (timeStamp: number) => {
-    return <Date>{formatDate(timeStamp, 'DD MMM YYYY hh:mm A')}</Date>
+    return (
+      <TransactionDate>
+        {formatDate(timeStamp, 'DD MMM YYYY hh:mm A')}
+      </TransactionDate>
+    )
   }
-
-  // const chainResolver = (name: string, layer: LAYER) => {
-
-  // }
 
   const getTransactionAmount = (amount: string) => {
     return amount ? (
@@ -316,39 +365,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       <TransactionAmount>Not Available</TransactionAmount>
     )
   }
-
-  const process_transaction = (transaction: ITransaction) => {
-    let amountString = ''
-    const chain = transaction.chain === 'L1pending' ? 'L1' : transaction.chain
-    let token = tokenFromAddress[transaction.action.token.toLowerCase()]
-    if (chain === 'L2' && !token) {
-      token = Object.values(tokenFromAddress).find(
-        (t: any) =>
-          t.addressL2.toLowerCase() === transaction.action.token.toLowerCase()
-      )
-    }
-    const symbol = token[`symbol${chain}`]
-
-    amountString = logAmount(transaction.action.amount, token?.decimals, 4)
-
-    const processedTransaction: IProcessedTransaction = {
-      timeStamp: transaction.timeStamp,
-      from: transaction.from,
-      fromLayer: transaction.depositL2 ? LAYER.L1 : LAYER.L2,
-      to: transaction.to,
-      toLayer: transaction.depositL2 ? LAYER.L2 : LAYER.L1,
-      tokenSymbol: symbol,
-      amount: amountString,
-      status: transaction.UserFacingStatus,
-      l1Hash: '',
-      l2Hash: '',
-    }
-    return processedTransaction
-  }
-
-  const processedTransactions = filteredTransactions.map((transaction) => {
-    return process_transaction(transaction)
-  })
 
   return (
     <TransationsTableWrapper>
@@ -365,14 +381,18 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                 {
                   content: getTransactionChain(
                     transaction.fromLayer,
-                    transaction.from
+                    transaction.fromLayer === LAYER.L1
+                      ? transaction.l1Hash
+                      : transaction.l2Hash
                   ),
                   width: 142,
                 },
                 {
                   content: getTransactionChain(
                     transaction.toLayer,
-                    transaction.to
+                    transaction.toLayer === LAYER.L1
+                      ? transaction.l1Hash
+                      : transaction.l2Hash
                   ),
                   width: 142,
                 },
