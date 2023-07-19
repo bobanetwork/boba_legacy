@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 import {Typography, Box} from '@mui/material'
 
 export const HistoryContainer = styled.div`
@@ -97,3 +97,22 @@ export const AlertInfo = styled(Box)`
   align-items: center;
   flex: 1;
 `;
+
+
+export const SearchInputContainer = styled.div`
+  width: 250px !important;
+  @media (max-width: 768px) {
+    width: 100% !important;
+  }
+
+`
+
+export const ContentContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`
+

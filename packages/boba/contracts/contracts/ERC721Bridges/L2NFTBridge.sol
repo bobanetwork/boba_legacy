@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-/**
- Note: This contract has not been audited, exercise caution when using this on mainnet
- */
 pragma solidity >0.7.5;
 pragma experimental ABIEncoderV2;
 

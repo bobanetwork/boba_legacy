@@ -46,7 +46,7 @@ import {
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 
 import BN from 'bignumber.js'

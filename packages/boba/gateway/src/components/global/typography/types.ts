@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 
 export type VariantType =
+  | 'h1'
   | 'head'
   | 'title'
   | 'body1'

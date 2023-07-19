@@ -17,8 +17,12 @@ import React from 'react'
 import { NavigateNext, NavigateBefore } from '@mui/icons-material'
 
 import { useTheme } from '@mui/material'
-
-import * as S from './Pager.styles'
+import {
+  PagerContainer,
+  PagerContent,
+  PagerLabel,
+  PagerNavigation,
+} from './styles'
 
 interface PagerProps {
   currentPage: number
@@ -44,12 +48,12 @@ const Pager = ({
   }
 
   return (
-    <S.PagerContainer>
+    <PagerContainer>
       <div>{label}</div>
-      <S.PagerContent>
-        <S.PagerLabel>{`Page ${currentPage} of ${totalPages}`}</S.PagerLabel>
+      <PagerContent>
+        <PagerLabel>{`Page ${currentPage} of ${totalPages}`}</PagerLabel>
 
-        <S.PagerNavigation
+        <PagerNavigation
           variant={variant}
           size="small"
           color="primary"
@@ -57,9 +61,9 @@ const Pager = ({
           onClick={onClickBack}
         >
           <NavigateBefore />
-        </S.PagerNavigation>
+        </PagerNavigation>
 
-        <S.PagerNavigation
+        <PagerNavigation
           variant={variant}
           size="small"
           color="primary"
@@ -67,9 +71,9 @@ const Pager = ({
           onClick={onClickNext}
         >
           <NavigateNext />
-        </S.PagerNavigation>
-      </S.PagerContent>
-    </S.PagerContainer>
+        </PagerNavigation>
+      </PagerContent>
+    </PagerContainer>
   )
 }
 

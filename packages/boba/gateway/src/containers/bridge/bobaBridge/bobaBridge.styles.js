@@ -22,6 +22,7 @@ export const BobaBridgeWrapper = styled(Box)(({ theme, width }) => ({
 export const BobaContent = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  flexDirection: 'column',
   justifyContent: 'space-between',
   gap: '10px',
 }))

@@ -2,10 +2,10 @@ service: sls-boba-goerli-metaTransaction # NOTE: update this with your service n
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   stackName: sls-boba-goerli-metaTransaction
   stage: prod
-  region: us-east-2
+  region: us-east-1
 
 package:
   exclude:

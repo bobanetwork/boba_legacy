@@ -28,7 +28,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 
@@ -62,8 +62,6 @@ import {
   fetchL1FeeBalance,
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
-
-import BridgeAlert from './BridgeAlert'
 
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
@@ -295,7 +293,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
-        <BridgeAlert />
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
@@ -320,7 +317,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <BridgeAlert />
         {!isBridge && (
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
             Fast Bridge to L2

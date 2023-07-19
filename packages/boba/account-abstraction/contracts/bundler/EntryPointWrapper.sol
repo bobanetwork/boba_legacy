@@ -6,6 +6,13 @@ pragma solidity ^0.8.12;
 
 import "../interfaces/IEntryPoint.sol";
 
+/**
+ * @title EntryPointWrapper
+ * @notice The EntryPointWrapper is used by the Bundler to fetch simulateValidation results from the EntryPoint.
+ * Boba network currently does not support custom error reverts in solidity and error arguments of the custom
+ * revert are not returned, which the EntryPoint relies on for returning simulation results. This wrapper wraps
+ * the call to the EntryPoint and handles custom revert data to produce general identifiable return data
+ */
 contract EntryPointWrapper {
     /**
      * gas and return values during simulation
@@ -15,6 +22,7 @@ contract EntryPointWrapper {
      * @param validAfter - first timestamp this UserOp is valid (merging account and paymaster time-range)
      * @param validUntil - last timestamp this UserOp is valid (merging account and paymaster time-range)
      * @param paymasterContext returned by validatePaymasterUserOp (to be passed into postOp)
+     * @dev the same struct used by EntryPoint when returning simulateValidation results
      */
     struct ReturnInfo {
         uint256 preOpGas;
@@ -25,6 +33,10 @@ contract EntryPointWrapper {
         bytes paymasterContext;
     }
 
+    /**
+     * API struct used by getStakeInfo and simulateValidation
+     * @dev the same struct used by EntryPoint when returning simulateValidation results
+     */
     struct StakeInfo {
         uint256 stake;
         uint256 unstakeDelaySec;
@@ -33,18 +45,36 @@ contract EntryPointWrapper {
     /**
      * returned aggregated signature info.
      * the aggregator returned by the account, and its current stake.
+     * @dev the same struct used by EntryPoint when returning simulateValidation results
      */
     struct AggregatorStakeInfo {
         address aggregator;
         StakeInfo stakeInfo;
     }
 
+    /**
+     * returned failed offending userOp during simulation
+     * @param status the FailedOp error was returned
+     * @param opIndex index into the array of ops to the failed one (in simulateValidation, this is always zero)
+     * @param reason revert reason
+     * @dev an empty struct corresponds to a succesful validationResult
+     */
     struct FailedOpStatus {
         bool status;
         uint256 opIndex;
         string reason;
     }
 
+    /**
+     * returned succesful simulateValidation result response
+     * @param selectorType distinguish between ValidationResult and ValidationResultWithAggregation
+     * @param returnInfo gas and time-range returned values
+     * @param senderInfo stake information about the sender
+     * @param factoryInfo stake information about the factory (if any)
+     * @param paymasterInfo stake information about the paymaster (if any)
+     * @param aggregatorInfo signature aggregation info (if the account requires signature aggregator)
+     * @dev an empty struct corresponds to a FailedOp return
+     */
     struct Response {
         string selectorType;
         ReturnInfo returnInfo;
@@ -107,6 +137,13 @@ contract EntryPointWrapper {
         entryPoint = _entryPoint;
     }
 
+    /**
+     * Wraps call to simulateValidation on EntryPoint, parses custom error reverts and returns response in return data
+     * @param userOp the user operation to validate.
+     * @return FailedOp Return status and response
+     * @return Valid Return response
+     * @dev If a validResponse is received failedOp status is empty, and vice versa
+     */
     function simulateValidation(UserOperation calldata userOp) external returns (FailedOpStatus memory, Response memory) {
         try entryPoint.simulateValidation(userOp) {}
         catch (bytes memory revertData) {
@@ -125,6 +162,12 @@ contract EntryPointWrapper {
         }
     }
 
+    /** @dev Helper function to slice function signature from return data
+    * @param _bytes: returnData
+    * @param _start: where to start the slice
+    * @param _length: Length of slice
+    * @return Sliced returnData
+    */
     function slice(
         bytes memory _bytes,
         uint256 _start,
@@ -194,6 +237,9 @@ contract EntryPointWrapper {
         return tempBytes;
     }
 
+    /** @dev Helper function to get multiple userOpHashes in a single call, used by the bundler
+    * @param entryPoint: EntryPoint interface/address
+    * @param userOps: User operations to return user op hash for. */
     function getUserOpHashes(IEntryPoint entryPoint, UserOperation[] memory userOps) public view returns (bytes32[] memory ret) {
         ret = new bytes32[](userOps.length);
         for (uint i = 0; i < userOps.length; i++) {
@@ -202,6 +248,9 @@ contract EntryPointWrapper {
         return ret;
     }
 
+    /** @dev Helper function to get hashed accounthash of addresses, used by the bundler
+    * @param addresses: Addresses to return code hashes for.
+    * @return Hash of code hashes */
     function getCodeHashes(address[] memory addresses) public view returns (bytes32) {
         bytes32[] memory hashes = new bytes32[](addresses.length);
         for (uint i = 0; i < addresses.length; i++) {
@@ -211,6 +260,12 @@ contract EntryPointWrapper {
         return (keccak256(data));
     }
 
+    /**
+     * Wraps call to getSenderAddress on EntryPoint, parses custom error reverts and returns response in return data
+     * @param initCode the constructor code to be passed into the UserOperation.
+     * @return returns the computed counterfactual sender address
+     * @dev additional helper method to unwrap a custom error revert in readable form, similar to simulateValidation
+     */
     function getSenderAddress(bytes calldata initCode) external returns (address) {
         try entryPoint.getSenderAddress(initCode) {}
         catch (bytes memory revertData) {

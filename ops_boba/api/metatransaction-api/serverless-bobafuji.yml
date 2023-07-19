@@ -2,7 +2,7 @@ service: sls-bobafuji-metaTransaction # NOTE: update this with your service name
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   stackName: sls-bobafuji-metaTransaction
   stage: prod
   region: us-east-1

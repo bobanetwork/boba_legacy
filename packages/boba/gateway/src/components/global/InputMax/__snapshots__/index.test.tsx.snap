@@ -2,67 +2,11 @@
 
 exports[`MaxInput Max Input Component with Initial Value 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  min-width: 250px;
-  position: relative;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.c2 {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  position: absolute;
-  cursor: pointer;
-  right: 10px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  font-family: inherit;
-  background: #F0F1EA;
-  border: 1px solid #8F9288;
-  color: #8F9288;
-}
-
-.c1 {
-  width: 100%;
-  padding: 15px;
-  font-weight: 500;
-  line-height: 1;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: 12px;
-  -webkit-transition: all 0.25s;
-  transition: all 0.25s;
-  outline: none;
-  font-family: inherit;
-  font-size: 16px;
-  background: #F0F1EA;
-  border: 1px solid #DEE0D8;
-  color: #8F9288;
-}
-
-.c1:hover {
-  background: #E1E2D8;
-}
-
-.c1:focus {
-  background: rgba(255,255,255,0);
-}
-
-<div
-    class="c0"
+  <div
+    class="sc-bgqQcB iFQfPY"
   >
     <input
-      class="c1"
+      class="sc-ewnqHT jwbTWF"
       max="10"
       min="0"
       placeholder="Enter Amount"
@@ -71,7 +15,7 @@ exports[`MaxInput Max Input Component with Initial Value 1`] = `
       value="5"
     />
     <button
-      class="c2"
+      class="sc-gTRrQi jDacYj"
     >
       Max
     </button>
@@ -81,67 +25,11 @@ exports[`MaxInput Max Input Component with Initial Value 1`] = `
 
 exports[`MaxInput Max Input Component without Initial Value 1`] = `
 <DocumentFragment>
-  .c0 {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  min-width: 250px;
-  position: relative;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.c2 {
-  display: -webkit-inline-box;
-  display: -webkit-inline-flex;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  position: absolute;
-  cursor: pointer;
-  right: 10px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  font-family: inherit;
-  background: #F0F1EA;
-  border: 1px solid #8F9288;
-  color: #8F9288;
-}
-
-.c1 {
-  width: 100%;
-  padding: 15px;
-  font-weight: 500;
-  line-height: 1;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border-radius: 12px;
-  -webkit-transition: all 0.25s;
-  transition: all 0.25s;
-  outline: none;
-  font-family: inherit;
-  font-size: 16px;
-  background: #F0F1EA;
-  border: 1px solid #DEE0D8;
-  color: #8F9288;
-}
-
-.c1:hover {
-  background: #E1E2D8;
-}
-
-.c1:focus {
-  background: rgba(255,255,255,0);
-}
-
-<div
-    class="c0"
+  <div
+    class="sc-bgqQcB iFQfPY"
   >
     <input
-      class="c1"
+      class="sc-ewnqHT jwbTWF"
       max="10"
       min="0"
       placeholder="Enter Amount"
@@ -150,7 +38,7 @@ exports[`MaxInput Max Input Component without Initial Value 1`] = `
       value=""
     />
     <button
-      class="c2"
+      class="sc-gTRrQi jDacYj"
     >
       Max
     </button>

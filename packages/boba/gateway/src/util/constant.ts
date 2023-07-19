@@ -20,7 +20,6 @@ export const INFURA_ID: EnvType = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG: EnvType =
   process.env.REACT_APP_MAX_HEALTH_BLOCK_LAG
 export const WALLET_VERSION: EnvType = process.env.REACT_APP_WALLET_VERSION
-export const APP_STATUS: EnvType = process.env.REACT_APP_STATUS || 'normal'
 export const SPEED_CHECK: EnvType = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL: EnvType = process.env.REACT_APP_TARGET_CHAIN_URL
 // VE DAO FLAG
@@ -28,10 +27,6 @@ export const DISABLE_VE_DAO: EnvType = process.env.REACT_APP_DISABLE_VE_DAO
 // WalletConnect FLAG
 export const DISABLE_WALLETCONNECT: EnvType =
   process.env.REACT_APP_DISABLE_WALLETCONNECT
-export const BOBABEAM_STATUS: EnvType =
-  process.env.REACT_APP_BOBA_BEAM_STATUS || 0
-export const BOBAOPERA_STATUS: EnvType =
-  process.env.REACT_APP_BOBA_OPERA_STATUS || 0
 
 type BridgeType = {
   FAST_BRIDGE: string
@@ -99,7 +94,7 @@ export const ROUTES_PATH: RoutesPathType = {
 
 export const PER_PAGE: number = 8
 
-type Network = 'ethereum' | 'bnb' | 'avax' | 'fantom' | 'moonbeam' //we move this to global network type once we define this
+type Network = 'ethereum' | 'bnb' | 'avax' //we move this to global network type once we define this
 type Page =
   | 'Bridge'
   | 'Wallet'
@@ -114,8 +109,6 @@ export const PAGES_BY_NETWORK: PagesByNetworkType = {
   ethereum: ['Bridge', 'Wallet', 'History', 'Earn', 'Stake', 'DAO'],
   bnb: ['Bridge', 'Wallet', 'Earn', 'History'],
   avax: ['Bridge', 'Wallet', 'Earn', 'History'],
-  fantom: ['Bridge', 'Wallet', 'Earn', 'History'],
-  moonbeam: ['Bridge', 'Wallet', 'Earn', 'History'],
 }
 
 enum Layer {

@@ -20,6 +20,13 @@ const dark = {
     success: 'green',
     info: 'blue',
     warning: 'yellow',
+    box: {
+      background:
+        'linear-gradient(129deg, rgba(48, 48, 48, 0.60) 0%, rgba(48, 48, 48, 0.60) 46.35%, rgba(37, 37, 37, 0.60) 94.51%)',
+      border: 'rgba(84, 84, 84, 1)',
+    },
+    popup:
+      'linear-gradient(129deg, rgba(48, 48, 48, 0.70) 0%, rgba(48, 48, 48, 0.70) 46.35%, rgba(37, 37, 37, 0.70) 94.51%)',
     gray: {
       50: '#EEEEEE',
       100: '#A8A8A8',

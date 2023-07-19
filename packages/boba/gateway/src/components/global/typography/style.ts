@@ -2,6 +2,11 @@ import styled, { css } from 'styled-components'
 import { TypographyStyleProps, VariantType } from './types'
 
 const options: Record<string, TypographyStyleProps> = {
+  h1: {
+    size: '24px',
+    lineHeight: '1',
+    fontWeight: 500,
+  },
   head: {
     size: '20px',
     lineHeight: '23px',
