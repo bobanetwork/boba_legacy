@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
-import * as G from '../Global.styles'
 import { useDispatch } from 'react-redux'
-import { isEqual, orderBy } from 'util/lodash'
+import { isEqual } from 'util/lodash'
 
 import { useSelector } from 'react-redux'
 import DatePicker from 'react-datepicker'
@@ -26,44 +25,35 @@ import { useMediaQuery, useTheme } from '@mui/material'
 import Input from 'components/input/Input'
 import Button from 'components/button/Button.js'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
-import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 import transctionService from 'services/transaction.service'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import {
-  selectActiveHistoryTab,
   selectTransactions,
   selectAccountEnabled,
   selectLayer,
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
-import { formatDate } from 'util/dates'
 
 import * as S from './History.styles'
 import styles from './TX_All.module.scss'
 import { Table } from './styles'
 
 import useInterval from 'hooks/useInterval'
-import Connect from 'containers/connect/Connect'
-import Tabs from 'components/tabs/Tabs'
-import Select from 'components/select/Select'
 import { setConnectBOBA, setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName, selectActiveNetworkIcon } from 'selectors'
-// import { IDropdownItem } from 'components/global/dropdown/types'
-import AvalancheIcon from '../../images/avax.svg'
-import BNBIcon from '../../images/bnb.svg'
-import EthereumIcon from '../../images/ethereumFlex.svg'
-import FantomIcon from '../../images/ftm.svg'
 import FilterIcon from '../../images/filter.svg'
 import AllNetworksIcon from '../../images/allNetworks.svg'
-import { TableHeader } from 'components/global/table/index.tsx'
-import { element } from 'prop-types'
-import { TransactionsResolver } from './TransactionsResolver'
+import {
+  TransactionsResolver,
+  GetSymbolFromNetworkName,
+} from './TransactionsResolver'
 import { TransactionsTableHeader } from 'components/global/table/themes'
 import { FilterDropDown } from 'components/filter'
+import { getCoinImage } from 'util/coinImage'
 
 const DEFAULT_NETWORK = {
   value: 'All',
@@ -126,10 +116,6 @@ function History() {
   const [searchHistory, setSearchHistory] = useState('')
   const networkName = useSelector(selectActiveNetworkName())
 
-  const icon = useSelector(selectActiveNetworkIcon())
-  const L1Icon = L1_ICONS[icon]
-  const L2Icon = L2_ICONS[icon]
-
   const networkChangeHandler = () => {
     console.log(`${fromNetwork['value']} to ${toNetwork['value']}`)
     if (!(fromNetwork.value + toNetwork.value).includes('All')) {
@@ -153,12 +139,12 @@ function History() {
       {
         label: networkName['l1'],
         value: networkName['l1'],
-        imgSrc: L1Icon({ selected: true }),
+        imgSrc: getCoinImage(GetSymbolFromNetworkName(networkName['l1'])),
       },
       {
         label: networkName['l2'],
         value: networkName['l2'],
-        imgSrc: L2Icon({ selected: true }),
+        imgSrc: getCoinImage(GetSymbolFromNetworkName(networkName['l2'])),
       },
     ]
   }
