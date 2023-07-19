@@ -26,6 +26,7 @@ import Input from 'components/input/Input'
 import { Button } from 'components/global'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
 import transctionService from 'services/transaction.service'
+import { ALL_NETWORKS, FILTER_OPTIONS, TableOptions } from './constants'
 
 import { setActiveHistoryTab } from 'actions/uiAction'
 import {
@@ -46,7 +47,7 @@ import { setConnect } from 'actions/setupAction'
 import { POLL_INTERVAL } from 'util/constant'
 import { selectActiveNetworkName } from 'selectors'
 import FilterIcon from '../../images/filter.svg'
-import AllNetworksIcon from '../../images/allNetworks.svg'
+
 import {
   TransactionsResolver,
   GetSymbolFromNetworkName,
@@ -57,46 +58,9 @@ import { getCoinImage } from 'util/coinImage'
 import noHistoryIcon from '../../images/noHistory.svg'
 import { Svg } from 'components/global/svg'
 
-const DEFAULT_NETWORK = {
-  value: 'All',
-  label: 'All Networks',
-  imgSrc: AllNetworksIcon,
-}
-const FILTER_OPTIONS = [
-  { value: 'All', label: 'All Status' },
-  { value: 'Completed', label: 'Completed' },
-  { value: 'Pending', label: 'Pending' },
-  { value: 'Canceled', label: 'Canceled' },
-]
-
-const TableOptions = [
-  {
-    name: 'Date',
-    width: 168,
-    tooltip: '',
-  },
-  {
-    name: 'From',
-    width: 142,
-    tooltip: '',
-  },
-  {
-    name: 'To',
-    width: 142,
-    tooltip: '',
-  },
-  {
-    name: 'Token',
-    width: 90,
-    tooltip: '',
-  },
-  { name: 'Amount', width: 80, tooltip: '' },
-  { name: 'Status', width: 88, tooltip: '' },
-]
-
 function History() {
-  const [toNetwork, setToNetwork] = useState(DEFAULT_NETWORK)
-  const [fromNetwork, setFromNetwork] = useState(DEFAULT_NETWORK)
+  const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
+  const [fromNetwork, setFromNetwork] = useState(ALL_NETWORKS)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -137,7 +101,7 @@ function History() {
 
   const getNetworks = () => {
     return [
-      DEFAULT_NETWORK,
+      ALL_NETWORKS,
       {
         label: networkName['l1'],
         value: networkName['l1'],
