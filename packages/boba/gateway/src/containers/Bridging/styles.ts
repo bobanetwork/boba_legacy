@@ -32,13 +32,6 @@ export const BridgeContent = styled.div`
   align-items: flex-start;
 `
 
-export const BridgeHeader = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`
-
 export const BridgeReceiveWrapper = styled.div``
 export const BridgeInfo = styled.div``
 export const BridgeAction = styled.div`

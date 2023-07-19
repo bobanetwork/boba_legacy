@@ -1,16 +1,14 @@
 import React from 'react'
-import SettingsOutlined from '@mui/icons-material/SettingsOutlined'
-import HelpOutlineOutlined from '@mui/icons-material/HelpOutlineOutlined'
+
 import {
   BridgeAction,
   BridgeContent,
-  BridgeHeader,
   BridgeWrapper,
   ConnectButton,
 } from './styles'
 import { Heading } from 'components/global'
 import { useDispatch, useSelector } from 'react-redux'
-import Tooltip from 'components/tooltip/Tooltip'
+
 import { openModal } from 'actions/uiAction'
 import { selectAccountEnabled } from 'selectors'
 import { setConnect } from 'actions/setupAction'
@@ -18,15 +16,11 @@ import Chains from './chain'
 import BridgeInput from './BridgeInput'
 import BridgeAlert from './BridgeAlert'
 import BridgeTypeSelector from './BridgeTypeSelector'
+import BridgeHeader from './BridgeHeader'
 
 const Bridging = () => {
   const dispatch = useDispatch<any>()
   const accountEnabled = useSelector<any>(selectAccountEnabled())
-
-  const openSettingModal = () => {
-    dispatch(openModal('settingsModal'))
-  }
-
   const onConnect = () => {
     dispatch(setConnect(true))
   }
@@ -34,27 +28,7 @@ const Bridging = () => {
   return (
     <BridgeWrapper>
       <BridgeContent>
-        <BridgeHeader>
-          <Heading variant="h2">
-            Bridge
-            <Tooltip
-              title={`
-                Classic Bridge:
-                This option is always available but has a 7 day delay before receiving your funds.
-                Fast Bridge:
-                A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient.`}
-            >
-              <HelpOutlineOutlined
-                fontSize="small"
-                sx={{ cursor: 'pointer', ml: 1, color: '#A8A8A8' }}
-              />
-            </Tooltip>
-          </Heading>
-          <SettingsOutlined
-            sx={{ cursor: 'pointer', color: '#A8A8A8' }}
-            onClick={openSettingModal}
-          />
-        </BridgeHeader>
+        <BridgeHeader />
         <BridgeAlert />
         <BridgeTypeSelector />
         <Chains />
