@@ -2,7 +2,7 @@ import React from 'react'
 import { ReactSVG } from 'react-svg'
 import { SvgTypes } from './types'
 
-export const Svg: React.FC<SvgTypes> = ({ src, className, fill, alt }) => (
+export const Svg: React.FC<SvgTypes> = ({ src, className, fill }) => (
   // @ts-ignore
   <ReactSVG
     src={src}
@@ -12,6 +12,5 @@ export const Svg: React.FC<SvgTypes> = ({ src, className, fill, alt }) => (
         svg.setAttribute('fill', fill)
       }
     }}
-    alt={alt ? alt : ''}
   />
 )

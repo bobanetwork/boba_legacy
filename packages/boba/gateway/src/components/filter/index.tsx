@@ -85,9 +85,7 @@ export const FilterDropDown: React.FC<IFilterDropdownProps> = ({
       >
         {imgSrc && (
           <IconContainer>
-            {imgSrc !== 'default' && (
-              <Icon src={imgSrc} alt={selectedItem.label as string} />
-            )}
+            {imgSrc !== 'default' && <Icon src={imgSrc} />}
             {imgSrc === 'default' && <DefaultIcon />}
           </IconContainer>
         )}

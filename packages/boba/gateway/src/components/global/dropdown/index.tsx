@@ -87,10 +87,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
           {selectedItem.imgSrc && (
             <IconContainer>
               {selectedItem.imgSrc !== 'default' && (
-                <Icon
-                  src={selectedItem.imgSrc}
-                  alt={selectedItem.label as string}
-                />
+                <Icon src={selectedItem.imgSrc} />
               )}
               {selectedItem.imgSrc === 'default' && <DefaultIcon />}
             </IconContainer>
@@ -116,9 +113,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
               >
                 {item.imgSrc && (
                   <IconContainer>
-                    {item.imgSrc !== 'default' && (
-                      <Icon src={item.imgSrc} alt={item.label as string} />
-                    )}
+                    {item.imgSrc !== 'default' && <Icon src={item.imgSrc} />}
                   </IconContainer>
                 )}
                 {item.label}
