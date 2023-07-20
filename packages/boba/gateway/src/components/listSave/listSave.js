@@ -1,144 +1,100 @@
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { isEqual } from 'util/lodash';
+import { openAlert, openError } from 'actions/uiAction';
+import { formatDate } from 'util/dates';
+import Button from 'components/button/Button';
+import { Box, Typography } from '@mui/material';
+import * as S from './ListSave.styles';
+import { withdrawFS_Savings } from 'actions/fixedAction';
 
-import { openAlert, openError } from 'actions/uiAction'
-import {formatDate} from 'util/dates'
-import Button from 'components/button/Button'
-// eslint-disable-next-line no-unused-vars
-import { Box, Typography, LinearProgress } from '@mui/material'
-import * as S from "./ListSave.styles"
+const ListSave = ({ stakeInfo }) => {
+  const [state, setState] = useState({
+    stakeInfo,
+  });
 
-import { withdrawFS_Savings } from 'actions/fixedAction'
-import BobaIcon from 'components/icons/BobaIcon'
+  useEffect(() => {
+    setState({ stakeInfo });
+  }, [stakeInfo]);
 
-class ListSave extends React.Component {
+  const handleUnstake = async () => {
+    const { stakeInfo } = state;
 
-  constructor(props) {
-
-    super(props)
-
-    const {
-      stakeInfo,
-      isMobile
-    } = this.props
-
-    this.state = {
-      stakeInfo,
-      isMobile
-    }
-
-  }
-
-  componentDidUpdate(prevState) {
-
-    const { stakeInfo, isMobile } = this.props
-
-    if (!isEqual(prevState.stakeInfo, stakeInfo)) {
-      this.setState({ stakeInfo })
-    }
-
-    if (!isEqual(prevState.isMobile, isMobile)) {
-      this.setState({ isMobile })
-    }
-
-  }
-
-  async handleUnstake() {
-
-    const { stakeInfo } = this.state
-
-    const withdrawTX = await this.props.dispatch(withdrawFS_Savings(stakeInfo.stakeId))
+    const withdrawTX = await withdrawFS_Savings(stakeInfo.stakeId);
 
     if (withdrawTX) {
-      this.props.dispatch(openAlert("Your BOBA were unstaked"))
+      openAlert('Your BOBA were unstaked')
     } else {
-      this.props.dispatch(openError("Failed to unstake BOBA"))
+      openError('Failed to unstake BOBA')
     }
+  };
 
+  const timeDeposit_S = state.stakeInfo.depositTimestamp;
+  const timeDeposit = formatDate(timeDeposit_S);
+
+  const timeNow_S = Math.round(Date.now() / 1000);
+  const duration_S = timeNow_S - timeDeposit_S;
+  const earned =
+    state.stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60));
+
+  const twoWeeks = 14 * 24 * 60 * 60;
+  const twoDays = 2 * 24 * 60 * 60;
+
+  const residual_S = duration_S % (twoWeeks + twoDays);
+  const timeZero_S = timeNow_S - residual_S;
+  const unlocktimeNextBegin = formatDate(timeZero_S + twoWeeks);
+  const unlocktimeNextEnd = formatDate(timeZero_S + twoWeeks + twoDays);
+
+  let locked = true;
+  if (residual_S > twoWeeks) {
+    locked = false
   }
 
-  render() {
+  return (
+    <S.StakeListItemContainer>
+      <S.StakeItemDetails>
+        <Box>
+          <Typography variant="body2" sx={{ opacity: 0.65 }}>
+            Staked Boba
+          </Typography>
+          <Typography variant="body2">
+            {state.stakeInfo.depositAmount
+              ? `${state.stakeInfo.depositAmount.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}`
+              : `0`}
+          </Typography>
+        </Box>
+        <Box sx={{ textAlign: 'left' }}>
+          <Typography variant="body2" sx={{ opacity: 0.65 }}>
+            Earned
+          </Typography>
+          <Typography variant="body2">{earned.toFixed(3)}</Typography>
+        </Box>
+        <Box sx={{ textAlign: 'left' }}>
+          <Typography variant="body2" sx={{ opacity: 0.65 }}>
+            Staked on
+          </Typography>
+          <Typography variant="body2">{timeDeposit}</Typography>
+        </Box>
+      </S.StakeItemDetails>
+      <S.StakeItemContent>
+        <div>
+          <Typography variant="body2">Next unstake window:</Typography>
+          <Typography variant="body2">
+            {unlocktimeNextBegin} - {unlocktimeNextEnd}
+          </Typography>
+        </div>
+      </S.StakeItemContent>
+      <S.StakeItemAction>
+        <Button onClick={handleUnstake} disable={locked} label="Unstake"/>
+      </S.StakeItemAction>
+    </S.StakeListItemContainer>
+  );
+};
 
-    const {
-      stakeInfo,
-    } = this.state
-
-    const timeDeposit_S = stakeInfo.depositTimestamp
-    const timeDeposit = formatDate(timeDeposit_S)
-
-    const timeNow_S = Math.round(Date.now() / 1000)
-    let duration_S = timeNow_S - timeDeposit_S
-    const earned = stakeInfo.depositAmount * (0.05 / 365.0) * (duration_S / (24 * 60 * 60))
-
-    const twoWeeks = 14 * 24 * 60 * 60
-    const twoDays = 2 * 24 * 60 * 60
-
-    const residual_S = duration_S % (twoWeeks + twoDays)
-    const timeZero_S = timeNow_S - residual_S
-    const unlocktimeNextBegin = formatDate(timeZero_S + twoWeeks)
-    const unlocktimeNextEnd = formatDate(timeZero_S + twoWeeks + twoDays)
-
-    let locked = true
-    if (residual_S > twoWeeks) locked = false
-
-    return (
-      <S.StakeListItemContainer>
-        <S.StakeItemDetails>
-          <Box>
-            <Typography variant="body2" sx={{ opacity: 0.65 }}>
-              Staked Boba
-            </Typography>
-            <Typography variant="body2">
-              {stakeInfo.depositAmount ? `${stakeInfo.depositAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `0`}
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'left' }}>
-            <Typography variant="body2" sx={{ opacity: 0.65 }}>
-              Earned
-            </Typography>
-            <Typography variant="body2">
-              <BobaIcon /> {' '} {earned.toFixed(3)}
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'left' }}>
-            <Typography variant="body2" sx={{ opacity: 0.65 }}>
-              Staked on
-            </Typography>
-            <Typography variant="body2">
-              {timeDeposit}
-            </Typography>
-          </Box>
-        </S.StakeItemDetails>
-        <S.StakeItemContent>
-          <Box sx={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'flex-start',
-          }}>
-            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em', opacity: '0.65', paddingRight: '6px'}}>Next unstake window:</Typography>
-            <Typography style={{ fontSize: '0.9em', lineHeight: '1.1em' }}>{unlocktimeNextBegin} - {unlocktimeNextEnd}</Typography>
-          </Box>
-          {/*
-          <Box sx={{ width: '100%', my: 2 }}>
-            <LinearProgress color='warning' value={70} variant="determinate" />
-          </Box>
-          */}
-        </S.StakeItemContent>
-        <S.StakeItemAction>
-          <Button variant="contained"
-            onClick={() => { this.handleUnstake() }}
-            disabled={locked}
-          >Unstake</Button>
-        </S.StakeItemAction>
-      </S.StakeListItemContainer>
-    );
-
-  }
-}
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   fixed: state.fixed,
-})
+});
 
-export default connect(mapStateToProps)(ListSave)
+export default connect(mapStateToProps)(ListSave);

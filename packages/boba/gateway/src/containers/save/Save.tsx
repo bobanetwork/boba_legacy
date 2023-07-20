@@ -24,11 +24,7 @@ import { openAlert } from 'actions/uiAction'
 
 import * as S from './Save.styles'
 
-import { Box, Grid } from '@mui/material'
-
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
-import ListSave from 'components/listSave/listSave'
 import Connect from 'containers/connect/Connect'
 
 import { toWei_String } from 'util/amountConvert'
@@ -36,7 +32,7 @@ import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
 import { Typography } from 'components/global/typography'
 import { Button } from 'components/global/button'
-
+import TransactionList from 'components/stake/transactionList'
 const Save = (props: any) => {
   const { stakeInfo } = props.fixed
 
@@ -214,30 +210,30 @@ const Save = (props: any) => {
           <S.BlockContainer>
             <div>
               <div>
-                <div>
-                  <Typography variant="head">Staked</Typography>
-                  <Typography variant="head">2.0024 BOBA</Typography>
-                </div>
+                <Typography variant="head">Staked</Typography>
+                <Typography variant="head">{totalBOBAstaked} BOBA</Typography>
+              </div>
+            </div>
+            <div>
+              <div>
+                <Typography variant="head">Boba Balance</Typography>
+                <Typography variant="head">
+                  {state.max_Float_String} BOBA
+                </Typography>
+              </div>
+            </div>
+            <div>
+              <div>
+                <Typography variant="head">APY</Typography>
+                <Typography variant="head">5.22%</Typography>
+              </div>
+            </div>
+            <div>
+              <div>
+                <Button label="Stake" />
               </div>
               <div>
-                <div>
-                  <Typography variant="head">Boba Balance</Typography>
-                  <Typography variant="head">9899.28 BOBA</Typography>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Typography variant="head">APY</Typography>
-                  <Typography variant="head">5.22%</Typography>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Button label="Stake" />
-                </div>
-                <div>
-                  <Button label="Unstake" outline />
-                </div>
+                <Button label="Unstake" outline />
               </div>
             </div>
           </S.BlockContainer>
@@ -264,23 +260,7 @@ const Save = (props: any) => {
       </div>
       <div>
         <div>
-          <S.StakeEarnContainer>
-            <div>
-              <Typography variant="body2"> Stake BOBA Earn BOBA </Typography>
-              <Typography variant="h1"> 5% Fixed APY </Typography>
-            </div>
-            <S.StakeItem>
-              <div>
-                <Typography variant="body2">Active stakes</Typography>
-                <Typography variant="body1">{totalBOBAstaked} BOBA</Typography>
-              </div>
-            </S.StakeItem>
-          </S.StakeEarnContainer>
           <S.StakeInputContainer>
-            <div>
-              <Typography variant="body2"> BOBA Balance:</Typography>
-              <Typography variant="body2">{state.max_Float_String}</Typography>
-            </div>
             <Input
               placeholder={`Amount to stake`}
               value={props.stakeValue}
@@ -337,12 +317,6 @@ const Save = (props: any) => {
           </S.StakeInputContainer>
         </div>
         <div>
-          <S.StakeHeadContainer>
-            <div>
-              <BobaGlassIcon />
-              <Typography variant="body1">Stake BOBA</Typography>
-            </div>
-          </S.StakeHeadContainer>
           {Object.keys(stakeInfo).length === 0 ? (
             <S.StakeContainer>
               <div>
@@ -369,10 +343,11 @@ const Save = (props: any) => {
           ) : (
             <div>
               {Object.keys(stakeInfo).map((v, i) => {
+                console.log('stakeInfo', stakeInfo[i])
                 if (stakeInfo[i].isActive) {
                   return (
                     <S.StakeItemContainer key={i}>
-                      <ListSave stakeInfo={stakeInfo[i]} />
+                      <TransactionList stakeInfo={stakeInfo[i]} />
                     </S.StakeItemContainer>
                   )
                 }
