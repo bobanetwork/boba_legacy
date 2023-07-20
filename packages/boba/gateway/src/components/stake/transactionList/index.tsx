@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+dayjs.extend(duration)
+
 import { connect } from 'react-redux'
 import { openAlert, openError } from 'actions/uiAction'
 import { formatDate } from 'util/dates'
@@ -35,28 +39,17 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
     }
   }
 
-  const timeDeposit_S = state.stakeInfo.depositTimestamp
-  const timeDeposit = formatDate(timeDeposit_S)
+  const timeDeposit = dayjs.unix(state.stakeInfo.depositTimestamp)
+  const timeNow = dayjs()
 
-  const timeNow_S = Math.round(Date.now() / 1000)
-  const duration_S = timeNow_S - timeDeposit_S
-  const earned =
-    state.stakeInfo.depositAmount *
-    (0.05 / 365.0) *
-    (duration_S / (24 * 60 * 60))
+  const duration_Days = timeNow.diff(timeDeposit, 'day')
+  const earned = state.stakeInfo.depositAmount * (0.05 / 365.0) * duration_Days
 
-  const twoWeeks = 14 * 24 * 60 * 60
-  const twoDays = 2 * 24 * 60 * 60
+  const unlocktimeNextBegin = timeNow.add(14, 'day')
 
-  const residual_S = duration_S % (twoWeeks + twoDays)
-  const timeZero_S = timeNow_S - residual_S
-  const unlocktimeNextBegin = formatDate(timeZero_S + twoWeeks)
-  const unlocktimeNextEnd = formatDate(timeZero_S + twoWeeks + twoDays)
+  const unlocktimeNextEnd = unlocktimeNextBegin.add(2, 'day')
 
-  let locked = true
-  if (residual_S > twoWeeks) {
-    locked = false
-  }
+  const locked = duration_Days <= 14
 
   return (
     <StakeListItemContainer>
@@ -77,14 +70,17 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
         </div>
         <div>
           <Typography variant="body2">Staked on</Typography>
-          <Typography variant="body2">{timeDeposit}</Typography>
+          <Typography variant="body2">
+            {timeDeposit.format('YYYY-MM-DD')}
+          </Typography>
         </div>
       </StakeItemDetails>
       <StakeItemContent>
         <div>
           <Typography variant="body2">Next unstake window:</Typography>
           <Typography variant="body2">
-            {unlocktimeNextBegin} - {unlocktimeNextEnd}
+            {unlocktimeNextBegin.format('YYYY-MM-DD')} -
+            {unlocktimeNextEnd.format('YYYY-MM-DD')}
           </Typography>
         </div>
       </StakeItemContent>

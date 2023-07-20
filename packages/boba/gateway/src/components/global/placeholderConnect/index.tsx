@@ -19,13 +19,12 @@ export const PlaceholderConnect = () => {
   const dispatch = useDispatch<any>()
 
   const handdleConnect = () => {
-    console.log(layer)
     dispatch(layer === LAYER.L2 ? setConnectBOBA(true) : setConnect(true))
   }
 
   return (
     <PlaceholderContainer>
-      <Svg src={placehoderIcon} fill="#ccc" />
+      <Svg src={placehoderIcon} fill="" />
       <Label variant="body2">No {location?.pathname?.substring(1)}</Label>
 
       {!accountEnabled && (
