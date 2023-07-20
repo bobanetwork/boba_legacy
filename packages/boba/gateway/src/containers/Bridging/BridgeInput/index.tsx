@@ -52,7 +52,7 @@ const BridgeInput: FC<Props> = (props) => {
       dispatch(
         setBridgeAlert({
           meta: token.symbol,
-          type: 'NOTE',
+          type: 'info',
           text: `The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
       In some cases, three interactions with MetaMask are needed. If you are bridging out of a
       new wallet, it starts out with a 0 approval, and therefore, only two interactions with

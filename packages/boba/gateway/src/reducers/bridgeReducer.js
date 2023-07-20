@@ -90,6 +90,13 @@ function bridgeReducer(state = initialState, action) {
     }
 
     case 'BRIDGE/ALERT/SET': {
+
+      const isFound = state.alerts.find((alert) => alert.meta === action.payload.meta)
+
+      if (isFound) {
+        return {...state}
+      }
+
       return {
         ...state,
         alerts: [

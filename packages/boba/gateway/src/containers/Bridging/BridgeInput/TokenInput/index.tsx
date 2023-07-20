@@ -32,11 +32,17 @@ const TokenInput = (props: Props) => {
     const underZero = new BN(value).lt(new BN(0.0))
     const overMax = new BN(value).gt(new BN(maxValue))
 
+    dispatch(
+      clearBridgeAlert({
+        keys: ['VALUE_TOO_SMALL', 'VALUE_TOO_LARGE'],
+      })
+    )
+
     if (underZero) {
       dispatch(
         setBridgeAlert({
           meta: 'VALUE_TOO_SMALL',
-          type: 'ERROR',
+          type: 'error',
           text: `Value too small: the value must be greater than 0`,
         })
       )
@@ -44,16 +50,10 @@ const TokenInput = (props: Props) => {
       dispatch(
         setBridgeAlert({
           meta: 'VALUE_TOO_LARGE',
-          type: 'ERROR',
+          type: 'error',
           text: `Value too large: the value must be smaller than ${Number(
             maxValue
           ).toFixed(5)}`,
-        })
-      )
-    } else {
-      dispatch(
-        clearBridgeAlert({
-          keys: ['VALUE_TOO_SMALL', 'VALUE_TOO_LARGE'],
         })
       )
     }
