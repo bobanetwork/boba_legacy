@@ -115,5 +115,16 @@ export const BobaChains: IBobaChains = {
       '0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1': 'BOBA',
     },
   },
+  97: {
+    url: 'https://bsc-testnet.publicnode.com',
+    testnet: true,
+    name: 'BNB Testnet',
+    teleportationAddress: '0x1b633BdA998507795A4552809be25D1dCe1d881d',
+    height: 9244943,
+    supportedAssets: {
+      '0x0000000000000000000000000000000000000000': 'BNB',
+      '0x875cD11fDf085e0E11B0EE6b814b6d0b38fA554C': 'BOBA',
+    },
+  },
   //#endregion
 }
