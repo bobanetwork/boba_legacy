@@ -72,3 +72,9 @@ export function clearBridgeAlert(payload) {
     return dispatch({ type: 'BRIDGE/ALERT/CLEAR', payload });
   }
 }
+
+export function purgeBridgeAlert(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/ALERT/PURGE', payload });
+  }
+}

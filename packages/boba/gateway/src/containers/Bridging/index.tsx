@@ -14,10 +14,14 @@ import BridgeInput from './BridgeInput'
 import BridgeAlert from './BridgeAlert'
 import BridgeTypeSelector from './BridgeTypeSelector'
 import BridgeHeader from './BridgeHeader'
+import useBridgeCleanup from 'hooks/useBridgeCleanup'
 
 const Bridging = () => {
+  useBridgeCleanup()
+
   const dispatch = useDispatch<any>()
   const accountEnabled = useSelector<any>(selectAccountEnabled())
+
   const onConnect = () => {
     dispatch(setConnect(true))
   }

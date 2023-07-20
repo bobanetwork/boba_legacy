@@ -51,7 +51,7 @@ const BridgeInput: FC<Props> = (props) => {
     ) {
       dispatch(
         setBridgeAlert({
-          meta: token.symbol,
+          meta: 'OMG_INFO',
           type: 'info',
           text: `The OMG Token was minted in 2017 and it does not conform to the ERC20 token standard.
       In some cases, three interactions with MetaMask are needed. If you are bridging out of a
@@ -60,7 +60,11 @@ const BridgeInput: FC<Props> = (props) => {
         })
       )
     } else {
-      dispatch(clearBridgeAlert())
+      dispatch(
+        clearBridgeAlert({
+          keys: ['OMG_INFO'],
+        })
+      )
     }
   }, [dispatch, bridgeType, token, layer])
 

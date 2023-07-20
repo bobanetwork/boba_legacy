@@ -112,6 +112,10 @@ function bridgeReducer(state = initialState, action) {
       return { ...state, alerts: filterAlerts }
     }
 
+    case 'BRIDGE/ALERT/PURGE': {
+      return { ...state, alerts: [] }
+    }
+
     default:
       return state;
   }
