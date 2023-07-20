@@ -27,12 +27,13 @@ const InputWithButton: FC<Props> = ({
       <Input
         type={type}
         value={value}
+        disabled={disabled}
         id={name}
         name={name}
         placeholder={placeholder}
         onChange={onChange}
       />
-      <InputActionButton onClick={onButtonClick}>
+      <InputActionButton disabled={disabled} onClick={onButtonClick}>
         {buttonLabel}
       </InputActionButton>
     </InputContainer>

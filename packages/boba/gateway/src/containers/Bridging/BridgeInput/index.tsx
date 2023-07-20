@@ -30,6 +30,7 @@ import { LAYER } from 'util/constant'
 import { BRIDGE_TYPE } from '../BridgeTypeSelector'
 import { clearBridgeAlert, setBridgeAlert } from 'actions/bridgeAction'
 import TokenInput from './TokenInput'
+import { formatTokenAmount } from 'util/common'
 
 type Props = {}
 
@@ -98,7 +99,9 @@ const BridgeInput: FC<Props> = (props) => {
       {token && (
         <ReceiveContainer>
           <Label>Receive</Label>
-          <ReceiveAmount>0.645 {token.symbol}</ReceiveAmount>
+          <ReceiveAmount>
+            {formatTokenAmount(token)} {token.symbol}
+          </ReceiveAmount>
         </ReceiveContainer>
       )}
       <BridgeToAddress />

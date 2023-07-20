@@ -1,11 +1,9 @@
 import React, { FC, useEffect, useState } from 'react'
-
 import { updateToken } from 'actions/bridgeAction'
 import { fetchBalances } from 'actions/networkAction'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import { isEqual } from 'util/lodash'
-
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectLayer,
@@ -13,7 +11,6 @@ import {
   selectlayer1Balance,
   selectlayer2Balance,
 } from 'selectors'
-import { logAmount } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 import { LAYER } from 'util/constant'
 import {
@@ -29,6 +26,7 @@ import {
   TokenSearchInput,
   TokenSymbol,
 } from './styles'
+import { formatTokenAmount } from 'util/common'
 
 // the L2 token which can not be exited so exclude from dropdown in case of L2
 const NON_EXITABLE_TOKEN = [
@@ -112,20 +110,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                   return true
                 })
                 .map((token: any) => {
-                  const amount: string =
-                    token.symbol === 'ETH'
-                      ? Number(
-                          logAmount(token.balance, token.decimals, 3)
-                        ).toLocaleString(undefined, {
-                          minimumFractionDigits: 3,
-                          maximumFractionDigits: 3,
-                        })
-                      : Number(
-                          logAmount(token.balance, token.decimals, 2)
-                        ).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })
+                  const amount = formatTokenAmount(token)
 
                   if (isMyToken && Number(amount) <= 0) {
                     return null

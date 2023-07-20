@@ -1,5 +1,4 @@
 import React from 'react'
-
 import {
   BridgeAction,
   BridgeContent,
@@ -8,8 +7,6 @@ import {
 } from './styles'
 import { Heading } from 'components/global'
 import { useDispatch, useSelector } from 'react-redux'
-
-import { openModal } from 'actions/uiAction'
 import { selectAccountEnabled } from 'selectors'
 import { setConnect } from 'actions/setupAction'
 import Chains from './chain'

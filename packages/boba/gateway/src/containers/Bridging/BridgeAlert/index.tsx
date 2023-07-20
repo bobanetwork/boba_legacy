@@ -16,7 +16,7 @@ const BridgeAlert: FC = () => {
       {alerts &&
         alerts.map((alert: any) => {
           return (
-            <AlertContainer>
+            <AlertContainer key={alert.meta}>
               <AlertIcon />
               <AlertText>{alert.text}</AlertText>
             </AlertContainer>

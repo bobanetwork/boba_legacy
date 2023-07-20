@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const InputContainer = styled.div`
   width: 100%;
@@ -15,6 +15,7 @@ export const InputContainer = styled.div`
 export const Input = styled.input`
   flex: 1;
   padding: 10px;
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
   color: ${(props) => props.theme.colors.gray[50]};
   font-size: 16px;
   font-style: normal;
@@ -24,8 +25,8 @@ export const Input = styled.input`
   outline: none;
   border: none;
 `
-export const InputActionButton = styled.button`
-  cursor: pointer;
+export const InputActionButton = styled.button<{ disabled?: boolean }>`
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   display: flex;
   padding: 4px 6px;
   align-items: flex-start;

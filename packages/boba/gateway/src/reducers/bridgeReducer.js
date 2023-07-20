@@ -100,7 +100,9 @@ function bridgeReducer(state = initialState, action) {
     }
 
     case 'BRIDGE/ALERT/CLEAR': {
-      return { ...state, alerts: [] }
+      const filterAlerts = state.alerts.filter((alert) =>
+        !action.payload.keys.includes(alert.meta))
+      return { ...state, alerts: filterAlerts }
     }
 
     default:

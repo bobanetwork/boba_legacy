@@ -4,10 +4,11 @@ import styled from 'styled-components'
 import ErrorOutline from '@mui/icons-material/ErrorOutline'
 
 export const AlertContainer = styled.div`
+  width: 100%;
   display: flex;
   padding: 12px 16px;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
   border-radius: 8px;
   border: 1px solid #d84f4f;

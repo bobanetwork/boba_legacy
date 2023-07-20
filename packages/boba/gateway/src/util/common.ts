@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import { logAmount } from './amountConvert'
+
 type TokenSymbolType = {
   tokenSymbol: string
 }
@@ -41,4 +43,28 @@ export const sortRawTokens = (tokens: any) => {
     .sort(comparator)
 
   return [...start, ...last]
+}
+
+export const formatTokenAmount = (token: any) => {
+  if (!token) {
+    return null
+  }
+  const amount: string =
+    token.symbol === 'ETH'
+      ? Number(logAmount(token.balance, token.decimals, 3)).toLocaleString(
+          undefined,
+          {
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+          }
+        )
+      : Number(logAmount(token.balance, token.decimals, 2)).toLocaleString(
+          undefined,
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        )
+
+  return amount
 }
