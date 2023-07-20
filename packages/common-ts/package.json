@@ -35,7 +35,7 @@
     "@eth-optimism/core-utils": "0.8.1",
     "@sentry/node": "^7.30.0",
     "@types/pino-std-serializers": "^4.0.0",
-    "bcfg": "^0.1.7",
+    "bcfg": "^0.2.1",
     "body-parser": "^1.20.0",
     "commander": "^9.0.0",
     "dotenv": "^16.0.0",
