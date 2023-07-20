@@ -50,10 +50,6 @@ Audits outstanding.
 - Teleportation deployed to: `0x28fd3770b42797890e07d53DDd1e10DcD55D966E`
 - Proxy__Teleportation deployed to: `0x64bD91c67af8cd17e04BeBDaac675f0EF6527edd`
 
-### Boba Avax Testnet
-- Teleportation deployed to: `0x885bfeC3D89755d2bCc1e73b6EeEEae94D54eBE4`
-- Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
-
 ### Boba BNB Testnet
 - Teleportation deployed to: `0x885bfeC3D89755d2bCc1e73b6EeEEae94D54eBE4`
 - Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
