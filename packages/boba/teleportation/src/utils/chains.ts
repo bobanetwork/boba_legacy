@@ -98,7 +98,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x1b633BdA998507795A4552809be25D1dCe1d881d',
-    height: 9244943,
+    height: 31747477,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'BNB',
       '0x875cD11fDf085e0E11B0EE6b814b6d0b38fA554C': 'BOBA',
