@@ -298,7 +298,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
           return (
             <TransactionsTableContent
               key={`transaction-${index}`}
-              data-testid={`transaction-${index}`}
               options={[
                 {
                   content: getTransactionDate(transaction.timeStamp),
