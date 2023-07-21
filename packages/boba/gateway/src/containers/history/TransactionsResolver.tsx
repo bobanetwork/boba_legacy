@@ -1,5 +1,5 @@
 import { TransactionsTableContent } from 'components/global/table/themes'
-
+import dayjs, { Dayjs } from 'dayjs'
 import React, { useState, useEffect } from 'react'
 import { getCoinImage } from 'util/coinImage'
 import { formatDate, isSameOrAfterDate, isSameOrBeforeDate } from 'util/dates'
@@ -12,7 +12,7 @@ import {
   TransactionChain,
   TransactionChainDetails,
   TransactionToken,
-  TransationsTableWrapper,
+  TransactionsWrapper,
   TransactionHash,
   IconContainer,
 } from './styles'
@@ -77,10 +77,16 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
   const dateFilter = (transaction: ITransaction) => {
     const txnAfterStartDate = transactionsFilter.startDate
-      ? isSameOrAfterDate(transaction.timeStamp, transactionsFilter.startDate)
+      ? isSameOrAfterDate(
+          transaction.timeStamp,
+          dayjs(transactionsFilter.startDate)
+        )
       : true
     const txnBeforeEndDate = transactionsFilter.endDate
-      ? isSameOrBeforeDate(transaction.timeStamp, transactionsFilter.endDate)
+      ? isSameOrBeforeDate(
+          transaction.timeStamp,
+          dayjs(transactionsFilter.endDate)
+        )
       : true
 
     return txnAfterStartDate && txnBeforeEndDate
@@ -286,12 +292,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   }
 
   return (
-    <TransationsTableWrapper>
+    <TransactionsWrapper>
       {filteredProcessedTransactions.map(
         (transaction: IProcessedTransaction, index) => {
           return (
             <TransactionsTableContent
-              key={`transaction_${index}`}
+              key={`transaction-${index}`}
+              data-testid={`transaction-${index}`}
               options={[
                 {
                   content: getTransactionDate(transaction.timeStamp),
@@ -332,6 +339,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
           )
         }
       )}
-    </TransationsTableWrapper>
+    </TransactionsWrapper>
   )
 }

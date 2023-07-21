@@ -1,5 +1,3 @@
-import { Dayjs } from 'dayjs'
-
 export enum TRANSACTION_FILTER_STATUS {
   Pending = 'Pending',
   Completed = 'Completed',
@@ -25,10 +23,9 @@ export enum LAYER {
 export interface ITransactionFilter {
   fromNetwork: string
   toNetwork: string
-  startDate?: Dayjs
-  endDate?: Dayjs
-  fromToNetwork?: string
-  status?: string
+  startDate?: Date
+  endDate?: Date
+  status?: TRANSACTION_FILTER_STATUS
   targetHash?: string
 }
 
