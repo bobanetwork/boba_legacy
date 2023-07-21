@@ -53,3 +53,10 @@ Audits outstanding.
 ### Boba BNB Testnet
 - Teleportation deployed to: `0x885bfeC3D89755d2bCc1e73b6EeEEae94D54eBE4`
 - Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
+
+
+---
+
+## User flow / Dev flow: 
+![TeleportationFlow](https://github.com/bobanetwork/boba/assets/28724551/1c5fceb8-126d-42d1-92b4-59ec5ed9ad71)
+
