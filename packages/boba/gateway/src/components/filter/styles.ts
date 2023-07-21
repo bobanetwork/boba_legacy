@@ -20,7 +20,7 @@ export const DropdownContainer = styled.div`
     `}
 `
 
-export const Header = styled.div<{ error: boolean }>`
+export const Header = styled.div<{ error: boolean; isOpen: boolean }>`
   box-sizing: border-box;
   position: relative;
   z-index: 2;
@@ -32,15 +32,13 @@ export const Header = styled.div<{ error: boolean }>`
     props.theme.name === 'light' &&
     css`
       border: 2px solid ${props.theme.colors.gray[600]};
-      ${Icon} {
+      svg {
         fill: ${props.theme.colors.gray[600]};
       }
-      &:hover,
-        &.active {
-          border-color: ${props.theme.colors.gray[800]};
-          ${Icon} {
-            fill: ${props.theme.colors.gray[800]};
-          }
+      &:hover {
+        border-color: ${props.theme.colors.gray[800]};
+        svg {
+          fill: ${props.theme.colors.gray[800]};
         }
       }
     `}
@@ -48,14 +46,13 @@ export const Header = styled.div<{ error: boolean }>`
     props.theme.name === 'dark' &&
     css`
       border: 2px solid ${props.theme.colors.gray[200]};
-      ${Icon} {
+      svg {
         fill: ${props.theme.colors.gray[100]};
       }
-      &:hover,
-      &.active {
+      &:hover {
         color: ${props.theme.colors.gray[50]};
         border-color: ${props.theme.colors.green[300]};
-        ${Icon} {
+        svg {
           fill: ${props.theme.colors.gray[50]};
         }
       }
@@ -64,6 +61,19 @@ export const Header = styled.div<{ error: boolean }>`
     props.error &&
     `
       border-color:${props.theme.colors.red[300]}
+    `}
+  ${({ isOpen, theme }) =>
+    isOpen &&
+    css`
+      color: ${theme.name === 'light' ? 'initial' : theme.colors.gray[50]};
+      border-color: ${theme.name === 'light'
+        ? theme.colors.gray[800]
+        : theme.colors.green[300]};
+      svg {
+        fill: ${theme.name === 'light'
+          ? theme.colors.gray[800]
+          : theme.colors.gray[50]};
+      }
     `}
 `
 
@@ -76,14 +86,20 @@ export const IconContainer = styled.div`
   justify-content: center;
 `
 
-export const Option = styled.div`
+export const Option = styled.div<{ isSelected: boolean }>`
   display: flex;
   align-items: center;
   font-size: ${(props) => props.theme.text.body2};
   font-weight: bold;
   justify-content: flex-start;
   text-align: left;
+  background: inherit;
   color: inherit;
+  ${({ isSelected, theme }) =>
+    isSelected &&
+    css`
+      background: ${theme.colors.gray[400]};
+    `}
 `
 
 export const DefaultIcon = styled.div`
@@ -174,10 +190,8 @@ export const DropdownContent = styled.div`
     border-radius: 8px;
     padding: 8px;
     box-sizing: border-box;
-    background: inherit;
     border: 1px solid rgba(0, 0, 0, 0);
-    &:hover,
-    &.active {
+    &:hover {
       background: ${(props) => props.theme.colors.gray[400]};
     }
     ${(props) =>

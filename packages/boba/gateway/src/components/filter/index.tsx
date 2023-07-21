@@ -72,13 +72,7 @@ export const FilterDropDown: React.FC<IFilterDropdownProps> = ({
 
   return (
     <DropdownContainer className={`dropdown ${className}`} ref={dropdownRef}>
-      <Header
-        onClick={handleDropdown}
-        error={error}
-        className={
-          isOpen ? `dropdown ${className} active` : `dropdown ${className}`
-        }
-      >
+      <Header onClick={handleDropdown} error={error} isOpen={isOpen}>
         {imgSrc && (
           <IconContainer>
             {imgSrc !== 'default' && <Icon src={imgSrc} />}
@@ -92,12 +86,7 @@ export const FilterDropDown: React.FC<IFilterDropdownProps> = ({
             {items.map((item, index) => (
               <Option
                 key={index}
-                className={
-                  item.value &&
-                  (item.value === selectedItem.value
-                    ? `dropdown ${className} active`
-                    : `dropdown ${className}`)
-                }
+                isSelected={item?.value === selectedItem?.value}
                 onClick={() => {
                   selectItem(item)
                 }}
