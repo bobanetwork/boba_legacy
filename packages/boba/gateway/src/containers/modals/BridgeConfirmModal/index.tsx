@@ -17,6 +17,8 @@ import {
   selectTokenToBridge,
 } from 'selectors'
 import { amountToUsd } from 'util/amountConvert'
+import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
+import useBridge from 'hooks/useBridge'
 
 interface Props {
   open: boolean
@@ -29,7 +31,10 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
   const amountToBridge = useSelector(selectAmountToBridge())
   const lookupPrice = useSelector(selectLookupPrice)
 
-  console.log(lookupPrice)
+  const { triggerSubmit } = useBridge()
+
+  const estimatedTime =
+    bridgeType === BRIDGE_TYPE.CLASSIC ? '7 days' : '1 ~ 3 minutes'
 
   const handleClose = () => {
     dispatch(closeModal('bridgeConfirmModal'))
@@ -51,21 +56,25 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
         <Item>
           <ConfirmLabel>Amount to bridge</ConfirmLabel>
           <ConfirmValue>
-            {amountToBridge} {token.symbol}
-          </ConfirmValue>
-        </Item>
-        <Item>
-          <ConfirmLabel>Gas Fee</ConfirmLabel>
-          <ConfirmValue>
-            0.000038 ETH ($
+            {amountToBridge} {token.symbol} ($
             {amountToUsd(amountToBridge, lookupPrice, token).toFixed(2)})
           </ConfirmValue>
         </Item>
         <Item>
-          <ConfirmLabel>Time</ConfirmLabel>
-          <ConfirmValue>1 ~ 4 minutes</ConfirmValue>
+          <ConfirmLabel>Gas Fee</ConfirmLabel>
+          <ConfirmValue>0.000038 ETH</ConfirmValue>
         </Item>
-        <ConfirmActionButton label={<Heading variant="h3">Confirm</Heading>} />
+        <Item>
+          <ConfirmLabel>Time</ConfirmLabel>
+          <ConfirmValue>{estimatedTime}</ConfirmValue>
+        </Item>
+        <ConfirmActionButton
+          onClick={() => {
+            triggerSubmit()
+            handleClose()
+          }}
+          label={<Heading variant="h3">Confirm</Heading>}
+        />
       </ConfirmModalContainer>
     </Modal>
   )
