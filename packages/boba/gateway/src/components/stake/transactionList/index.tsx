@@ -5,19 +5,15 @@ dayjs.extend(duration)
 
 import { connect } from 'react-redux'
 import { openAlert, openError } from 'actions/uiAction'
-import { formatDate } from 'util/dates'
 import { withdrawFS_Savings } from 'actions/fixedAction'
 
 import { Button } from 'components/global/button'
 import { Typography } from 'components/global/typography'
+import { ModalTypography } from 'components/global/modalTypography'
 
 import { TransactionListInterface } from './types'
-import {
-  StakeListItemContainer,
-  StakeItemDetails,
-  StakeItemContent,
-  StakeItemAction,
-} from './styles'
+import { StakeItemDetails, Token } from './styles'
+import { getCoinImage } from 'util/coinImage'
 
 const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
   const [state, setState] = useState({
@@ -52,42 +48,46 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
   const locked = duration_Days <= 14
 
   return (
-    <StakeListItemContainer>
-      <StakeItemDetails>
-        <div>
-          <Typography variant="body2">Staked Boba</Typography>
-          <Typography variant="body2">
-            {state.stakeInfo.depositAmount
-              ? `${state.stakeInfo.depositAmount.toLocaleString(undefined, {
-                  maximumFractionDigits: 2,
-                })}`
-              : `0`}
-          </Typography>
-        </div>
-        <div>
-          <Typography variant="body2">Earned</Typography>
-          <Typography variant="body2">{earned.toFixed(3)}</Typography>
-        </div>
-        <div>
-          <Typography variant="body2">Staked on</Typography>
-          <Typography variant="body2">
-            {timeDeposit.format('YYYY-MM-DD')}
-          </Typography>
-        </div>
-      </StakeItemDetails>
-      <StakeItemContent>
-        <div>
-          <Typography variant="body2">Next unstake window:</Typography>
-          <Typography variant="body2">
-            {unlocktimeNextBegin.format('YYYY-MM-DD')} -
-            {unlocktimeNextEnd.format('YYYY-MM-DD')}
-          </Typography>
-        </div>
-      </StakeItemContent>
-      <StakeItemAction>
-        <Button onClick={handleUnstake} disable={locked} label="Unstake" />
-      </StakeItemAction>
-    </StakeListItemContainer>
+    <StakeItemDetails>
+      <div>
+        <Token src={getCoinImage('boba')} />
+      </div>
+      <div>
+        <Typography variant="body2">
+          {timeDeposit.format('DD MMM YYYY hh:mm A')}
+        </Typography>
+      </div>
+      <div>
+        <ModalTypography variant="body2">Amount Staked </ModalTypography>
+        <Typography variant="body2">
+          {state.stakeInfo.depositAmount
+            ? `${state.stakeInfo.depositAmount.toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+              })}`
+            : `0`}
+        </Typography>
+      </div>
+      <div>
+        <ModalTypography variant="body2">Earned </ModalTypography>
+        <Typography variant="body2">{earned.toFixed(3)}</Typography>
+      </div>
+      <div>
+        <ModalTypography variant="body2">Next unstake window: </ModalTypography>
+        <Typography variant="body2">
+          {` ${unlocktimeNextBegin.format('DD')}-${unlocktimeNextEnd.format(
+            'DD MMM YYYY hh:mm A'
+          )}`}
+        </Typography>
+      </div>
+      <div>
+        <Button
+          onClick={handleUnstake}
+          tiny={true}
+          disable={locked}
+          label="Unstake"
+        />
+      </div>
+    </StakeItemDetails>
   )
 }
 

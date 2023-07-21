@@ -8,7 +8,7 @@ export const StakePageContainer = styled.div`
   flex-direction: column;
   justify-content: space-around;
   padding: 0px 10px 10px 10px;
-  width: 70%;
+  width: 1025px;
 `
 
 export const StakeEarnContainer = styled.div`
@@ -56,12 +56,12 @@ export const StakeContainer = styled.div`
 `
 
 export const StakeItemContainer = styled.div`
-  background: ${(props) => props.theme.colors.box.background};
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: '20px';
+  flex-direction: column;
   width: 100%;
+  gap: 10px 0px;
 `
 
 export const StakeItem = styled.div`
@@ -123,4 +123,21 @@ export const BlockContainer = styled.div`
   border-radius: 12px;
   background: ${(props) => props.theme.colors.box.background};
   border: 1px solid ${(props) => props.theme.colors.box.border};,
+`
+
+export const GridContainer = styled.div`
+  display: flex;
+  gap: 0px 35px;
+  > div {
+    width: 100%;
+    &:first-of-type {
+      max-width: 445px;
+    }
+  }
+`
+
+export const Flex = styled.div`
+  display: flex;
+  padding-right: 35px;
+  justify-content: space-between;
 `

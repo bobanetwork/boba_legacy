@@ -8,6 +8,7 @@ export const Button: FC<ButtonTypes> = ({
   small = false,
   outline = false,
   transparent = false,
+  tiny = false,
   className,
   label,
   onClick,
@@ -17,10 +18,11 @@ export const Button: FC<ButtonTypes> = ({
       type="button"
       disable={disable}
       loading={loading}
-      onClick={onClick}
-      outline={outline}
+      tiny={tiny}
       transparent={transparent}
       small={small}
+      outline={outline}
+      onClick={onClick}
       className={className}
     >
       {loading && <SpinLoader />} {label}

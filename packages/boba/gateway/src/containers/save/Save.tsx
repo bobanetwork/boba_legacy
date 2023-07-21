@@ -206,23 +206,21 @@ const Save = (props: any) => {
         connectToBoba={true}
         layer={netLayer}
       />
-      <div>
+      <S.GridContainer>
         <div>
           <S.BlockContainer>
-            <div>
+            <S.Flex>
               <div>
                 <Typography variant="head">Staked</Typography>
                 <Typography variant="head">{totalBOBAstaked} BOBA</Typography>
               </div>
-            </div>
-            <div>
               <div>
                 <Typography variant="head">Boba Balance</Typography>
                 <Typography variant="head">
                   {state.max_Float_String} BOBA
                 </Typography>
               </div>
-            </div>
+            </S.Flex>
             <div>
               <div>
                 <Typography variant="head">APY</Typography>
@@ -233,9 +231,6 @@ const Save = (props: any) => {
               <div>
                 <Button label="Stake" />
               </div>
-              <div>
-                <Button label="Unstake" outline />
-              </div>
             </div>
           </S.BlockContainer>
         </div>
@@ -245,6 +240,7 @@ const Save = (props: any) => {
               <Typography variant="head">Staking Period</Typography>
               <Typography variant="body3">
                 Each staking period lasts 2 weeks. If you do not unstake after a
+                <br />
                 staking period, your stake will be automatically renewed.
               </Typography>
             </div>
@@ -252,13 +248,15 @@ const Save = (props: any) => {
               <Typography variant="head">Unstaking Window</Typography>
               <Typography variant="body3">
                 The first two days of every staking period, except for the first
+                <br />
                 staking period, are the unstaking window. You can only unstake
+                <br />
                 during the unstaking window.
               </Typography>
             </div>
           </S.BlockContainer>
         </div>
-      </div>
+      </S.GridContainer>
       <div>
         <div>
           <S.StakeInputContainer>
@@ -321,19 +319,14 @@ const Save = (props: any) => {
           {Object.keys(stakeInfo).length === 0 ? (
             <PlaceholderConnect />
           ) : (
-            <div>
+            <S.StakeItemContainer>
               {Object.keys(stakeInfo).map((v, i) => {
-                console.log('stakeInfo', stakeInfo[i])
                 if (stakeInfo[i].isActive) {
-                  return (
-                    <S.StakeItemContainer key={i}>
-                      <TransactionList stakeInfo={stakeInfo[i]} />
-                    </S.StakeItemContainer>
-                  )
+                  return <TransactionList stakeInfo={stakeInfo[i]} key={i} />
                 }
                 return null
               })}
-            </div>
+            </S.StakeItemContainer>
           )}
         </div>
       </div>
