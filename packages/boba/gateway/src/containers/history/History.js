@@ -37,9 +37,15 @@ import {
 
 import { fetchTransactions } from 'actions/networkAction'
 
-import * as S from './History.styles'
 import styles from './TX_All.module.scss'
-import { Table, NoHistory } from './styles'
+import {
+  Table,
+  NoHistory,
+  HistoryPageContainer,
+  TableHeader,
+  TableFilters,
+  NetworkDropdowns,
+} from './styles'
 
 import useInterval from 'hooks/useInterval'
 import { setConnect } from 'actions/setupAction'
@@ -82,21 +88,6 @@ function History() {
   const [searchHistory, setSearchHistory] = useState('')
   const networkName = useSelector(selectActiveNetworkName())
 
-  const networkChangeHandler = () => {
-    console.log(`${fromNetwork['value']} to ${toNetwork['value']}`)
-    if (!(fromNetwork.value + toNetwork.value).includes('All')) {
-      dispatch(
-        setActiveHistoryTab(`${fromNetwork.value} to ${toNetwork.value}`)
-      )
-    } else {
-      dispatch(setActiveHistoryTab('All'))
-    }
-  }
-
-  useEffect(() => {
-    networkChangeHandler()
-  }, [fromNetwork, toNetwork])
-
   const transactions = useSelector(selectTransactions, isEqual)
 
   const getNetworks = () => {
@@ -118,8 +109,6 @@ function History() {
   const getDatePicker = (label) => {
     const dateSelector = (date) => {
       label === 'To' ? setEndDate(date) : setStartDate(date)
-      console.log('end date:', endDate)
-      console.log('start date:', startDate)
     }
     return (
       <>
@@ -148,9 +137,7 @@ function History() {
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
-      console.log('poller called')
       if (new Set(transactions).size !== new Set(newTransactions).size) {
-        console.log('actualizando')
         dispatch(fetchTransactions())
       }
     }
@@ -160,10 +147,10 @@ function History() {
   }, POLL_INTERVAL)
 
   return (
-    <S.HistoryPageContainer>
+    <HistoryPageContainer>
       {layer && (
         <>
-          <S.Header>
+          <TableHeader>
             <div
               className={
                 theme.palette.mode === 'light'
@@ -194,7 +181,7 @@ function History() {
 
               {getDatePicker('To')}
             </div>
-          </S.Header>
+          </TableHeader>
 
           <Table>
             <div
@@ -204,12 +191,12 @@ function History() {
                 flexDirection: 'column',
               }}
             >
-              <S.TableFilters
+              <TableFilters
                 style={{
                   width: '100%',
                 }}
               >
-                <S.NetworkDropDowns>
+                <NetworkDropdowns>
                   <div style={{ fontSize: '16px' }}>From</div>
                   <DropdownNetwork
                     items={getNetworks()}
@@ -228,7 +215,7 @@ function History() {
                       setToNetwork(option)
                     }}
                   />
-                </S.NetworkDropDowns>
+                </NetworkDropdowns>
                 <FilterDropDown
                   items={FILTER_OPTIONS}
                   defaultItem={FILTER_OPTIONS[0]}
@@ -237,7 +224,7 @@ function History() {
                     setTransactionStatus(item.value)
                   }}
                 />
-              </S.TableFilters>
+              </TableFilters>
               <TransactionsTableHeader
                 options={TableOptions}
               ></TransactionsTableHeader>
@@ -271,7 +258,7 @@ function History() {
           />
         </NoHistory>
       )}
-    </S.HistoryPageContainer>
+    </HistoryPageContainer>
   )
 }
 

@@ -1,13 +1,81 @@
 import styled, { css } from 'styled-components'
-import { Svg } from 'components/global/svg'
+import { screen } from 'themes/screens'
 
-export const TransationsTableWrapper = styled.div`
+export const HistoryPageContainer = styled.div`
+  margin: 0px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 10px;
+  padding-top: 0;
+  width: 70%;
+  min-width: 710px;
+  max-width: 1040px;
+  @media ${screen.laptop} {
+    width: 90%;
+    padding: 0px;
+  }
+  @media ${screen.tablet} {
+    width: 90%;
+    padding: 0px;
+  }
+  ${screen.mobile} {
+    width: 100%;
+    padding: 0px;
+  }
+`
+
+export const TableHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  @media ${screen.tablet} {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+`
+
+export const TableFilters = styled.div`
+  padding: 20px;
+  border-radius: 6px 6px 0px 0px;
+  justify-content: space-between;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  @media ${screen.tablet} {
+    margin-bottom: 5px;
+    gap: 20px;
+  }
+`
+
+export const NetworkDropdowns = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 16px;
+`
+export const TransactionsTableWrapper = styled.div`
+  overflow-x: scroll;
+  width: 100%;
+`
+
+export const TransactionsWrapper = styled.div`
   width: 100%;
   overflow-y: auto;
+  overflow-x: unset;
   max-height: 512px;
-  // padding:0px
+  ::-webkit-scrollbar-corner {
+    background: none;
+  }
   &::-webkit-scrollbar {
     width: 24px;
+    height: 24px;
   }
   &::-webkit-scrollbar-track {
     width: 24px;
@@ -154,12 +222,14 @@ export const Table = styled.div`
       border: 1px solid ${props.theme.colors.gray[300]};
       background: ${props.theme.colors.box.background};
     `}
-  @media screen and (max-width: 600px) {
-    flexdirection: 'column';
+  @media ${screen.mobile} {
+    flex-direction: 'column';
+    padding-bottom: 0px;
     gap: 10px;
   }
-  @media screen and (max-width: 900px) {
+  @media ${screen.tablet} {
     marginbottom: '5px';
+    padding-bottom: 0px;
   }
 `
 
