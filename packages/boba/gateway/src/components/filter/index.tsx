@@ -70,10 +70,6 @@ export const FilterDropDown: React.FC<IFilterDropdownProps> = ({
     }
   }, [dropdownRef])
 
-  useEffect(() => {
-    setSelectedItem(defaultItem)
-  }, [defaultItem])
-
   return (
     <DropdownContainer className={`dropdown ${className}`} ref={dropdownRef}>
       <Header
