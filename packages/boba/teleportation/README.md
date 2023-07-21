@@ -43,7 +43,7 @@ Audits outstanding.
 - Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
 
 ### BNB Testnet (L1)
-- Teleportation deployed to: `0x802409d59f02e87392C84618a14ad2eD1081290e`
+- Teleportation deployed to: `0xf07A686af44C6b53391Bc56024f148739D528D27`
 - Proxy__Teleportation deployed to: `0x1b633BdA998507795A4552809be25D1dCe1d881d`
 
 ### Boba Goerli
