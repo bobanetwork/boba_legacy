@@ -3,7 +3,7 @@ import {
   BridgeAction,
   BridgeContent,
   BridgeWrapper,
-  ConnectButton,
+  BridgeActionButton,
 } from './styles'
 import { Heading } from 'components/global'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,6 +15,7 @@ import BridgeAlert from './BridgeAlert'
 import BridgeTypeSelector from './BridgeTypeSelector'
 import BridgeHeader from './BridgeHeader'
 import useBridgeCleanup from 'hooks/useBridgeCleanup'
+import { openModal } from 'actions/uiAction'
 
 const Bridging = () => {
   useBridgeCleanup()
@@ -24,6 +25,10 @@ const Bridging = () => {
 
   const onConnect = () => {
     dispatch(setConnect(true))
+  }
+
+  const onBridge = () => {
+    dispatch(openModal('bridgeConfirmModal'))
   }
 
   return (
@@ -37,12 +42,15 @@ const Bridging = () => {
       </BridgeContent>
       <BridgeAction>
         {!accountEnabled ? (
-          <ConnectButton
+          <BridgeActionButton
             onClick={onConnect}
             label={<Heading variant="h3"> Connect Wallet</Heading>}
           />
         ) : (
-          <ConnectButton label={<Heading variant="h3">Bridge</Heading>} />
+          <BridgeActionButton
+            onClick={onBridge}
+            label={<Heading variant="h3">Bridge</Heading>}
+          />
         )}
       </BridgeAction>
     </BridgeWrapper>

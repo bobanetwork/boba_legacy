@@ -19,6 +19,7 @@ const initialState = {
   bridgeType: 'CLASSIC',
   multiBridgeMode: false,
   bridgeToAddressState: false,
+  amountToBridge: 0,
   alerts: []
 };
 
@@ -114,6 +115,10 @@ function bridgeReducer(state = initialState, action) {
 
     case 'BRIDGE/ALERT/PURGE': {
       return { ...state, alerts: [] }
+    }
+
+    case 'BRIDGE/AMOUNT/SET': {
+      return { ...state, amountToBridge: action.payload }
     }
 
     default:

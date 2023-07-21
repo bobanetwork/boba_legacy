@@ -41,7 +41,7 @@ export const BridgeAction = styled.div`
   align-items: center;
 `
 
-export const ConnectButton = styled(Button).attrs({
+export const BridgeActionButton = styled(Button).attrs({
   style: {
     width: '100%',
   },

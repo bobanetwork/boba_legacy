@@ -43,8 +43,15 @@ export function selectBridgeToAddressState() {
   }
 }
 
+export function selectAmountToBridge() {
+  return function (state) {
+    return state.bridge.amountToBridge
+  }
+}
+
 export function selectBridgeAlerts() {
   return function (state) {
     return state.bridge.alerts
   }
 }
+

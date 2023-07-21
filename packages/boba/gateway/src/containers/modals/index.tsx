@@ -22,6 +22,7 @@ import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 import SettingsModal from './settings'
 import NetworkPickerModal from './networkPicker'
+import BridgeConfirmModal from './BridgeConfirmModal'
 
 /**
  *
@@ -86,6 +87,10 @@ const ModalContainer = () => {
   const castVoteModalState = useSelector(selectModalState('castVoteModal'))
 
   const networkPickerModalState = useSelector(selectModalState('networkPicker'))
+
+  const bridgeConfirmModalState = useSelector(
+    selectModalState('bridgeConfirmModal')
+  )
 
   return (
     <>
@@ -152,6 +157,10 @@ const ModalContainer = () => {
       {!!SettingsModalState && <SettingsModal open={SettingsModalState} />}
       {!!networkPickerModalState && (
         <NetworkPickerModal open={networkPickerModalState} />
+      )}
+
+      {!!bridgeConfirmModalState && (
+        <BridgeConfirmModal open={bridgeConfirmModalState} />
       )}
     </>
   )

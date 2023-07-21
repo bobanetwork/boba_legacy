@@ -6,7 +6,11 @@ import { logAmount } from 'util/amountConvert'
 import InputWithButton from 'components/global/inputWithButton'
 import { LAYER } from 'util/constant'
 import BN from 'bignumber.js'
-import { clearBridgeAlert, setBridgeAlert } from 'actions/bridgeAction'
+import {
+  clearBridgeAlert,
+  setAmountToBridge,
+  setBridgeAlert,
+} from 'actions/bridgeAction'
 
 interface Props {}
 
@@ -58,6 +62,7 @@ const TokenInput = (props: Props) => {
       )
     }
     setTokenAmount(value)
+    dispatch(setAmountToBridge(value))
   }
 
   return (

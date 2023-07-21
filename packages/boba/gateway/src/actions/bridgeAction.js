@@ -78,3 +78,9 @@ export function purgeBridgeAlert(payload) {
     return dispatch({ type: 'BRIDGE/ALERT/PURGE', payload });
   }
 }
+
+export function setAmountToBridge(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/AMOUNT/SET', payload });
+  }
+}
