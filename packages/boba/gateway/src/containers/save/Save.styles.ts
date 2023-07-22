@@ -7,7 +7,7 @@ export const StakePageContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  padding: 0px 10px 10px 10px;
+  padding: 0px 10px 50px 10px;
   width: 1025px;
 `
 
@@ -36,6 +36,7 @@ export const StakeInputContainer = styled.div`
   width: 100%;
 `
 export const StakeHeadContainer = styled.div`
+  display: flex;
   background: ${(props) => props.theme.colors.box.background};
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -61,7 +62,7 @@ export const StakeItemContainer = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  gap: 10px 0px;
+  gap: 20px 0px;
 `
 
 export const StakeItem = styled.div`
@@ -140,4 +141,8 @@ export const Flex = styled.div`
   display: flex;
   padding-right: 35px;
   justify-content: space-between;
+`
+
+export const TitleContainer = styled.div`
+  padding: 25px 0px;
 `

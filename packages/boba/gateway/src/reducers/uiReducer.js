@@ -29,6 +29,7 @@ const initialState = {
   ledgerConnectModal: false,
   addNewTokenModal: false,
   EarnDepositModal: false,
+  StakeDepositModal: false,
   EarnWithdrawModal: false,
   transferDaoModal: false,
   delegateDaoModal: false,

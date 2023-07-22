@@ -27,9 +27,9 @@ import {
 import { Typography } from 'components/global/typography'
 import * as S from './styles'
 import * as LayoutS from 'components/common/common.styles'
-import CloseIcon from 'images/close.svg';
+import CloseIcon from 'images/close.svg'
 import { Svg } from 'components/global/svg'
-
+import { ModalInterface } from './types'
 const _Modal = ({
   children,
   open,
@@ -39,10 +39,11 @@ const _Modal = ({
   transparent,
   maxWidth,
   minHeight,
-  newStyle = false
-}) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  isMobile = false,
+  newStyle = false,
+}: ModalInterface) => {
+  const theme = useTheme()
+  const isMobileDevice = useMediaQuery(theme.breakpoints.down('md'))
 
   return (
     <S.StyledModal
@@ -50,21 +51,17 @@ const _Modal = ({
       aria-describedby="transition-modal-description"
       open={open}
       onClose={onClose}
-      ismobile={isMobile ? 1 : 0}
-      slots={{
-        backdrop: S.Backdrop,
-      }}
       disableAutoFocus={true}
     >
       <Fade in={open}>
         <Container sx={{ maxWidth: '450px !important' }}>
-          <S.Style minHeight={minHeight || '450px'} isMobile={isMobile} transparent={!!transparent || !!isMobile}>
+          <S.Style transparent={!!transparent || !!isMobile}>
             <Box display="flex" flexDirection="column" gap="10px">
               <S.ModalHead>
                 <S.TitleContainer>
-                  <Typography variant="h1" >{title}</Typography>
+                  <Typography variant="h1">{title}</Typography>
                   <S.IconButtonTag onClick={onClose}>
-                    <Svg src={CloseIcon} fill="#fff"/>
+                    <Svg src={CloseIcon} fill="#fff" />
                   </S.IconButtonTag>
                 </S.TitleContainer>
               </S.ModalHead>
@@ -72,11 +69,9 @@ const _Modal = ({
             </Box>
           </S.Style>
         </Container>
-
- 
       </Fade>
     </S.StyledModal>
-  );
+  )
 }
 
-export default _Modal;
+export default _Modal

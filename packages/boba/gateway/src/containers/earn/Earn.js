@@ -19,7 +19,14 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Box, FormControlLabel, Checkbox, Typography, useMediaQuery, useTheme } from '@mui/material'
+import {
+  Box,
+  FormControlLabel,
+  Checkbox,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
 
 import {
