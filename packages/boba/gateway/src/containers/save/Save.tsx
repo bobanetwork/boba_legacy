@@ -177,11 +177,11 @@ const Save = (props: any) => {
             <S.Flex>
               <div>
                 <Typography variant="head">Staked</Typography>
-                <Typography variant="head">{totalBOBAstaked} BOBA</Typography>
+                <Typography variant="title">{totalBOBAstaked} BOBA</Typography>
               </div>
               <div>
                 <Typography variant="head">Boba Balance</Typography>
-                <Typography variant="head">
+                <Typography variant="title">
                   {state.max_Float_String} BOBA
                 </Typography>
               </div>
@@ -189,18 +189,16 @@ const Save = (props: any) => {
             <div>
               <div>
                 <Typography variant="head">APY</Typography>
-                <Typography variant="head">5.22%</Typography>
+                <Typography variant="title">5.22%</Typography>
               </div>
             </div>
             <div>
-              <div>
-                {state.max_Float_String !== '0.0' && (
-                  <Button
-                    label="Stake"
-                    onClick={() => dispatch(openModal('StakeDepositModal'))}
-                  />
-                )}
-              </div>
+              {state.max_Float_String !== '0.0' && (
+                <Button
+                  label="Stake"
+                  onClick={() => dispatch(openModal('StakeDepositModal'))}
+                />
+              )}
             </div>
           </S.BlockContainer>
         </div>

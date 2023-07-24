@@ -11,7 +11,7 @@ import { PlaceholderContainer, Label } from './styles'
 import placehoderIcon from 'images/icons/no-data.svg'
 import { LAYER } from 'util/constant'
 import { PlaceholderConnectInterface } from './types'
-import { getNullableType } from 'graphql'
+
 export const PlaceholderConnect = ({
   isLoading = false,
   preloader = null,
