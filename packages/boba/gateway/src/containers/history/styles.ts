@@ -1,5 +1,9 @@
 import styled, { css } from 'styled-components'
 import { screen } from 'themes/screens'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+
+import { Svg } from 'components/global/svg'
 
 export const HistoryPageContainer = styled.div`
   margin: 0px auto;
@@ -266,4 +270,42 @@ export const NoHistory = styled.div`
         fill: ${props.theme.colors.gray[100]};
       `}
   }
+`
+export const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  white-space: nowrap;
+  gap: 0px 20px;
+  &.react-datepicker-wrapper {
+    flex: 1;
+    margin-bottom: 0;
+    min-width: 250px;
+  }
+  .react-datepicker__tab-loop {
+    margin: 0px -10px;
+  }
+  ${screen.mobile} {
+    width: 100%;
+    > div:first-child {
+      margin-right: 5px;
+    }
+    > div:last-child {
+      margin-left: 5px;
+    }
+  }
+`
+
+export const DatePickerWrapper = styled(DatePicker)`
+  position: relative;
+  width: 136px;
+  height: 44px;
+  margin: 0px;
+  padding: 15px 20px;
+  border-radius: 12px;
+  font-size: ${(props) => props.theme.text.body1};
+  color: inherit;
+  border: 1px solid ${(props) => props.theme.colors.box.border};
+  background: ${(props) => props.theme.colors.gray[500]};
 `
