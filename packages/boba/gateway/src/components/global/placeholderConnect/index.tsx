@@ -10,8 +10,12 @@ import { Button } from 'components/global/button'
 import { PlaceholderContainer, Label } from './styles'
 import placehoderIcon from 'images/icons/no-data.svg'
 import { LAYER } from 'util/constant'
-
-export const PlaceholderConnect = () => {
+import { PlaceholderConnectInterface } from './types'
+import { getNullableType } from 'graphql'
+export const PlaceholderConnect = ({
+  isLoading = false,
+  preloader = null,
+}: PlaceholderConnectInterface) => {
   const layer = useSelector<any>(selectLayer())
   const accountEnabled = useSelector<any>(selectAccountEnabled())
 
@@ -22,13 +26,24 @@ export const PlaceholderConnect = () => {
     dispatch(layer === LAYER.L2 ? setConnectBOBA(true) : setConnect(true))
   }
 
+  const DefaultLabel = () => {
+    return (
+      <>
+        <Svg src={placehoderIcon} fill="" />
+        <Label variant="body2">No {location?.pathname?.substring(1)}</Label>
+      </>
+    )
+  }
+
   return (
     <PlaceholderContainer>
-      <Svg src={placehoderIcon} fill="" />
-      <Label variant="body2">No {location?.pathname?.substring(1)}</Label>
-
+      {isLoading && preloader}
+      {accountEnabled && !isLoading && <DefaultLabel />}
       {!accountEnabled && (
-        <Button small label="Connect Wallet" onClick={handdleConnect} />
+        <>
+          <DefaultLabel />
+          <Button small label="Connect Wallet" onClick={handdleConnect} />
+        </>
       )}
     </PlaceholderContainer>
   )

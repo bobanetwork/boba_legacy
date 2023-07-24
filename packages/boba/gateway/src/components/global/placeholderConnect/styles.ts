@@ -9,6 +9,7 @@ export const PlaceholderContainer = styled.div`
   align-items: center;
   gap: 5px 0px;
   width: 100%;
+  margin: 25px auto;
 `
 
 export const Label = styled(Typography)`

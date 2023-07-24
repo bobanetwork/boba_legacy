@@ -147,13 +147,22 @@ const Save = (props: any) => {
     }
   }
 
-  let totalBOBAstaked = 0
-  Object.keys(stakeInfo).forEach((v, i) => {
-    if (stakeInfo[i].isActive) {
-      totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[i].depositAmount)
+  const totalBOBAstaked = Object.keys(stakeInfo).reduce((accumulator, key) => {
+    if (stakeInfo[key].isActive) {
+      return accumulator + Number(stakeInfo[key].depositAmount)
     }
-  })
+    return accumulator
+  }, 0)
 
+  const Loader = () => {
+    const isLoading = state.fee === '0' ? true : false
+    return (
+      <PlaceholderConnect
+        isLoading={accountEnabled && isLoading}
+        preloader={<>{'loading'}</>}
+      />
+    )
+  }
   return (
     <S.StakePageContainer>
       <Connect
@@ -220,13 +229,13 @@ const Save = (props: any) => {
       </S.GridContainer>
       <div>
         <div>
-          {Object.keys(stakeInfo).length === 0 ? (
-            <PlaceholderConnect />
+          <S.TitleContainer>
+            <Typography variant="head">Staking History</Typography>
+          </S.TitleContainer>
+          {!stakeInfo || !Object.keys(stakeInfo).length ? (
+            <Loader />
           ) : (
             <>
-              <S.TitleContainer>
-                <Typography variant="head">Staking History</Typography>
-              </S.TitleContainer>
               <S.StakeItemContainer>
                 {Object.keys(stakeInfo).map((v, i) => {
                   if (stakeInfo[i].isActive) {
