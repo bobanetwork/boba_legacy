@@ -50,7 +50,7 @@ const BridgeInput: FC<Props> = (props) => {
     if (!isAccountEnabled) {
       return
     }
-    // TODO: refactor and make sure to triggered this once all the tokens are fetch
+    // TODO: refactor and make sure to triggered this once all the tokens are
     // // only run once all the tokens have been added to the tokenList
     if (Object.keys(tokenList).length < networkService.supportedTokens.length) {
       return
