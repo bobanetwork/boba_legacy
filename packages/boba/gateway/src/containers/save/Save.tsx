@@ -34,6 +34,8 @@ import { Button } from 'components/global/button'
 import TransactionList from 'components/stake/transactionList'
 import { PlaceholderConnect } from 'components/global/placeholderConnect'
 import { ModalTypography } from 'components/global/modalTypography'
+import { Preloader } from 'components/dao/preloader'
+
 const Save = (props: any) => {
   const { stakeInfo } = props.fixed
 
@@ -159,7 +161,7 @@ const Save = (props: any) => {
     return (
       <PlaceholderConnect
         isLoading={accountEnabled && isLoading}
-        preloader={<>{'loading'}</>}
+        preloader={<Preloader />}
       />
     )
   }
@@ -193,12 +195,11 @@ const Save = (props: any) => {
               </div>
             </div>
             <div>
-              {state.max_Float_String !== '0.0' && (
-                <Button
-                  label="Stake"
-                  onClick={() => dispatch(openModal('StakeDepositModal'))}
-                />
-              )}
+              <Button
+                label="Stake"
+                disable={!Boolean(state.max_Float_String !== '0.0')}
+                onClick={() => dispatch(openModal('StakeDepositModal'))}
+              />
             </div>
           </S.BlockContainer>
         </div>

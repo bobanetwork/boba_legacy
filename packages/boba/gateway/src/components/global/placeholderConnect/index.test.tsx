@@ -16,13 +16,13 @@ const renderPlaceholderConnect = (props: PlaceholderConnectInterface) => {
           theme: 'light',
         },
         setup: {
-          netLayer: 'L1',
+          netLayer: 'L2',
         },
       })}
     >
       <BrowserRouter>
         <CustomThemeProvider>
-          <PlaceholderConnect />
+          <PlaceholderConnect {...props} />
         </CustomThemeProvider>
       </BrowserRouter>
     </Provider>
