@@ -45,7 +45,7 @@
     "async-mutex": "^0.3.2",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
-    "commander": "^8.3.0",
+    "commander": "^11.0.0",
     "dotenv": "^10.0.0",
     "envalid": "^7.1.0",
     "eslint": "^7.27.0",
