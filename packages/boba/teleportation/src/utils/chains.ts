@@ -32,17 +32,6 @@ export const BobaChains: IBobaChains = {
       '0x68ac1623ACf9eB9F88b65B5F229fE3e2c0d5789e': 'BNB',
     },
   },
-  43288: {
-    url: 'https://replica.avax.boba.network',
-    testnet: false,
-    name: 'Boba Avalanche Mainnet',
-    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
-    height: 25078,
-    supportedAssets: {
-      '0x0000000000000000000000000000000000000000': 'AVAX',
-      '0x4200000000000000000000000000000000000006': 'BOBA',
-    },
-  },
   56288: {
     url: 'https://replica.bnb.boba.network',
     testnet: false,
@@ -63,17 +52,6 @@ export const BobaChains: IBobaChains = {
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0x4200000000000000000000000000000000000023': 'BOBA',
-    },
-  },
-  4328: {
-    url: 'https://replica.testnet.avax.boba.network',
-    testnet: true,
-    name: 'Boba Avalanche Testnet',
-    teleportationAddress: '0xC226F132A686A08018431C913d87693396246024',
-    height: 3148,
-    supportedAssets: {
-      '0x4200000000000000000000000000000000000023': 'AVAX',
-      '0x0000000000000000000000000000000000000000': 'BOBA',
     },
   },
   9728: {
@@ -113,6 +91,17 @@ export const BobaChains: IBobaChains = {
       '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49': 'USDT',
       '0xFC1C82c5EdeB51082CF30FDDb434D2cBDA1f6924': 'BNB',
       '0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1': 'BOBA',
+    },
+  },
+  97: {
+    url: 'https://bsc-testnet.publicnode.com',
+    testnet: true,
+    name: 'BNB Testnet',
+    teleportationAddress: '0x1b633BdA998507795A4552809be25D1dCe1d881d',
+    height: 31747477,
+    supportedAssets: {
+      '0x0000000000000000000000000000000000000000': 'BNB',
+      '0x875cD11fDf085e0E11B0EE6b814b6d0b38fA554C': 'BOBA',
     },
   },
   //#endregion
