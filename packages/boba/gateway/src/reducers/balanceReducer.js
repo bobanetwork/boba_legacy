@@ -184,6 +184,9 @@ function balanceReducer(state = initialState, action) {
         fastExitCost: '',
         l2FeeBalance: '',
         l1lpLiquidity: '',
+        l2BalanceETH: '',
+        l2BalanceBOBA: '',
+        exitFee: '',
       }
     case 'BALANCE/L2/RESET':
       return {

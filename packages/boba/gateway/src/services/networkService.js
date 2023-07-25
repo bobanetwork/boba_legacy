@@ -2113,7 +2113,7 @@ class NetworkService {
       //returns total cost in ETH
       return totalCost
     } catch (error) {
-      console.log(error);
+      console.log(['GetExitCost',error]);
       return 0;
     }
   }

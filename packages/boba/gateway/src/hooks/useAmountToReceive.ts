@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   selectAmountToBridge,
   selectBridgeType,
+  selectL1FeeRateN,
   selectL2FeeRateN,
   selectLayer,
   selectTokenToBridge,
@@ -34,7 +35,8 @@ export const useAmountToReceive = () => {
   const amount = useSelector(selectAmountToBridge())
   const token = useSelector(selectTokenToBridge())
   const layer = useSelector(selectLayer())
-  const feeRateN = useSelector(selectL2FeeRateN)
+  const l2FeeRateN = useSelector(selectL2FeeRateN)
+  const l1FeeRateN = useSelector(selectL1FeeRateN)
 
   const [amountToReceive, setAmountToReceive] = useState<
     string | null | number
@@ -48,7 +50,7 @@ export const useAmountToReceive = () => {
     const formatedAmount = () => {
       return formatTokenAmount({
         ...token,
-        balance: toWei_String(amount, token.decimals),
+        balance: toWei_String(Number(amount), token.decimals),
       })
     }
 
@@ -56,15 +58,18 @@ export const useAmountToReceive = () => {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         setAmountToReceive(formatedAmount())
       } else {
-        const value = Number(amount) * ((100 - Number(feeRateN)) / 100)
+        const value = Number(amount) * ((100 - Number(l2FeeRateN)) / 100)
         setAmountToReceive(value.toFixed(3))
       }
     } else {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         setAmountToReceive(formatedAmount())
+      } else {
+        const value = Number(amount) * ((100 - Number(l1FeeRateN)) / 100)
+        setAmountToReceive(value.toFixed(3))
       }
     }
-  }, [dispatch, layer, token, amount, bridgeType, feeRateN])
+  }, [dispatch, layer, token, amount, bridgeType, l2FeeRateN, l1FeeRateN])
 
   return {
     amount: `${amountToReceive} ${token?.symbol}`,
