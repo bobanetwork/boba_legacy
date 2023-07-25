@@ -18,7 +18,7 @@ function WrongNetworkModal({open}) {
 
   useEffect(() => {
     if (open){
-      dispatch(restTokenList())
+      dispatch(restTokenList());
     }
   }, [dispatch, open])
 
@@ -41,7 +41,10 @@ function WrongNetworkModal({open}) {
           type="primary"
           variant="contained"
           size="large"
-          onClick={()=>dispatch(setConnectETH(true))}
+          onClick={() => {
+            dispatch(setConnectETH(true))
+            dispatch(closeModal('settingsModal'))
+          }}
         >
           Connect to the {network} network
         </Button>

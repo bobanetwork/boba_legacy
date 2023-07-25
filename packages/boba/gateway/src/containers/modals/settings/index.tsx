@@ -10,12 +10,11 @@ import {
   SettingsText,
   SettingsWrapper,
 } from './styles'
-import { SwitchButton, Typography } from 'components/global'
+import { SwitchButton } from 'components/global'
 import { setActiveNetworkType } from 'actions/networkAction'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { selectActiveNetworkType, selectBridgeToAddressState } from 'selectors'
 import { setBridgeToAddress } from 'actions/bridgeAction'
-import useDisconnect from 'hooks/useDisconnect'
 
 interface SettingsModalProps {
   open: boolean
@@ -29,12 +28,6 @@ const SettingsModal: FC<SettingsModalProps> = ({ open }) => {
   const handleClose = () => {
     dispatch(closeModal('settingsModal'))
   }
-
-  /**
-   * //TODO:
-   * On change Network should close modal.
-   * Should show's wrong network modal as soon as closes.
-   */
 
   const onChangeNetworkType = (value: boolean) => {
     dispatch(
@@ -67,7 +60,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ open }) => {
           <SettingsAction>
             <SwitchButton
               isActive={activeNetworkType === NETWORK_TYPE.TESTNET}
-              onStateChange={onChangeNetworkType}
+              onStateChange={(v: boolean) => onChangeNetworkType(v)}
             />
           </SettingsAction>
         </SettingsItem>
