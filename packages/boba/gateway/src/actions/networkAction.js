@@ -233,6 +233,12 @@ export function fetchLookUpPrice(params) {
     networkService.fetchLookUpPrice(params))
 }
 
+export function clearLookupPrice() {
+  return function (dispatch) {
+    return dispatch({ type: 'LOOKUP/PRICE/CLEAR' })
+  }
+}
+
 export function enableBrowserWallet(network) {
   return createAction('ENABLE/BROWSER/WALLET', () => networkService.enableBrowserWallet(network))
 }

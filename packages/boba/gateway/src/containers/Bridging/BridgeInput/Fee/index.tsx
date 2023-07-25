@@ -5,12 +5,14 @@ import { selectBridgeType, selectLayer } from 'selectors'
 import { useSelector } from 'react-redux'
 import { LAYER } from 'util/constant'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
+import useAmountToReceive from 'hooks/useAmountToReceive'
 
 interface Props {}
 
 const Fee = (props: Props) => {
   const bridgeType = useSelector(selectBridgeType())
   const layer = useSelector(selectLayer())
+  const { amount: amountToReceive } = useAmountToReceive()
 
   const estimateTime = () => {
     if (layer === LAYER.L1) {
@@ -37,8 +39,8 @@ const Fee = (props: Props) => {
         <Label>0.000005 ETH</Label>
       </InfoRow>
       <InfoRow>
-        <Label>You will receve</Label>
-        <Label>0.4923 ETH</Label>
+        <Label>You will receive</Label>
+        <Label>{amountToReceive}</Label>
       </InfoRow>
     </BridgeInfoContainer>
   )

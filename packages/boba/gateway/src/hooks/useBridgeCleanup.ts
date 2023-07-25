@@ -1,4 +1,8 @@
-import { purgeBridgeAlert, resetToken } from 'actions/bridgeAction'
+import {
+  purgeBridgeAlert,
+  resetBridgeAmount,
+  resetToken,
+} from 'actions/bridgeAction'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -24,6 +28,7 @@ export const useBridgeCleanup = () => {
     // listen to all change and cleanup bridge token & bridge alert
     dispatch(resetToken())
     dispatch(purgeBridgeAlert())
+    dispatch(resetBridgeAmount())
   }, [
     dispatch,
     activeNetwork,

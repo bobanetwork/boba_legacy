@@ -84,3 +84,9 @@ export function setAmountToBridge(payload) {
     return dispatch({ type: 'BRIDGE/AMOUNT/SET', payload });
   }
 }
+
+export function resetBridgeAmount() {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/AMOUNT/RESET'});
+  }
+}

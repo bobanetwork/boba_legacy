@@ -120,6 +120,9 @@ function bridgeReducer(state = initialState, action) {
     case 'BRIDGE/AMOUNT/SET': {
       return { ...state, amountToBridge: action.payload }
     }
+    case 'BRIDGE/AMOUNT/RESET': {
+      return { ...state, amountToBridge: 0 }
+    }
 
     default:
       return state;

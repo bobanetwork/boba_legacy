@@ -1,24 +1,30 @@
 import { openModal } from 'actions/uiAction'
-import React, { FC, useCallback, useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectAccountEnabled,
   selectBridgeType,
   selectLayer,
   selectTokenToBridge,
-  selectTokens,
 } from 'selectors'
 
+import { clearBridgeAlert, setBridgeAlert } from 'actions/bridgeAction'
+import useBridgeSetup from 'hooks/useBridgeSetup'
 import { getCoinImage } from 'util/coinImage'
+import { LAYER } from 'util/constant'
+
+import useAmountToReceive from 'hooks/useAmountToReceive'
+import { BRIDGE_TYPE } from '../BridgeTypeSelector'
 import { Label } from '../styles'
 import BridgeToAddress from './BridgeToAddress'
 import Fee from './Fee'
+import TokenInput from './TokenInput'
 import {
+  BridgeInputContainer,
+  BridgeInputWrapper,
   DownArrow,
   ReceiveAmount,
   ReceiveContainer,
-  BridgeInputContainer,
-  BridgeInputWrapper,
   TokenLabel,
   TokenPickerIcon,
   TokenSelector,
@@ -26,14 +32,6 @@ import {
   TokenSelectorLabel,
   TokenSymbol,
 } from './styles'
-
-import { LAYER } from 'util/constant'
-import { BRIDGE_TYPE } from '../BridgeTypeSelector'
-import { clearBridgeAlert, setBridgeAlert } from 'actions/bridgeAction'
-import TokenInput from './TokenInput'
-import { formatTokenAmount } from 'util/common'
-import { fetchLookUpPrice } from 'actions/networkAction'
-import networkService from 'services/networkService'
 
 type Props = {}
 
@@ -43,39 +41,8 @@ const BridgeInput: FC<Props> = (props) => {
   const token = useSelector(selectTokenToBridge())
   const layer = useSelector(selectLayer())
   const bridgeType = useSelector(selectBridgeType())
-  const tokenList = useSelector(selectTokens)
-
-  // Fetching lookup price.
-  const getLookupPrice = useCallback(() => {
-    if (!isAccountEnabled) {
-      return
-    }
-    // TODO: refactor and make sure to triggered this once all the tokens are
-    // // only run once all the tokens have been added to the tokenList
-    if (Object.keys(tokenList).length < networkService.supportedTokens.length) {
-      return
-    }
-    const symbolList = Object.values(tokenList).map((i: any) => {
-      if (i.symbolL1 === 'ETH') {
-        return 'ethereum'
-      } else if (i.symbolL1 === 'OMG') {
-        return 'omg'
-      } else if (i.symbolL1 === 'BOBA') {
-        return 'boba-network'
-      } else if (i.symbolL1 === 'OLO') {
-        return 'oolongswap'
-      } else {
-        return i.symbolL1.toLowerCase()
-      }
-    })
-    dispatch(fetchLookUpPrice(symbolList))
-  }, [tokenList, dispatch, isAccountEnabled])
-
-  useEffect(() => {
-    if (isAccountEnabled) {
-      getLookupPrice()
-    }
-  }, [getLookupPrice, isAccountEnabled])
+  const { amount: recievableAmount } = useAmountToReceive()
+  useBridgeSetup()
 
   // TODO: Move to specific hook add specificity on trigering this hook.
   useEffect(() => {
@@ -139,9 +106,7 @@ const BridgeInput: FC<Props> = (props) => {
       {token && (
         <ReceiveContainer>
           <Label>Receive</Label>
-          <ReceiveAmount>
-            {formatTokenAmount(token)} {token.symbol}
-          </ReceiveAmount>
+          <ReceiveAmount>{recievableAmount}</ReceiveAmount>
         </ReceiveContainer>
       )}
       <BridgeToAddress />
