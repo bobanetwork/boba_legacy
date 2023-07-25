@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { openAlert, closeModal } from 'actions/uiAction'
 
 import Modal from 'components/modal/Modal'
-import { isEqual } from 'util/lodash'
 
 import { Button } from 'components/global/button'
 
@@ -18,76 +17,35 @@ import { BigNumber, utils } from 'ethers'
 import { MaxInput } from 'components/global/InputMax'
 
 import { ModalTypography } from 'components/global/modalTypography'
+import { selectFixed, selectSetup, selectBalance } from 'selectors'
 
 const DepositStake = (props: any) => {
-  const { stakeInfo } = props.fixed
-
+  const { stakeInfo } = useSelector(selectFixed())
   const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
-    props.setup
+    useSelector(selectSetup())
+  const balance = useSelector(selectBalance())
+  const { layer2 } = balance
 
-  const { layer2 } = props.balance
   const dispatch = useDispatch<any>()
+
   const [state, setState] = useState({
-    stakeInfo,
-    accountEnabled,
-    netLayer,
-    bobaFeeChoice,
-    bobaFeePriceRatio,
-    layer2,
-    stakeValue: '',
-    stakeValueValid: false,
-    value_Wei_String: '',
-    max_Wei_String: '0',
     max_Float_String: '0.0',
     fee: '0',
-    balance: props.balance,
-    fixed: props.fixed,
-    setup: props.setup,
+    stakeValue: '0.0',
+    value_Wei_String: '',
   })
 
   useEffect(() => {
-    props.dispatch(getFS_Saves())
-    props.dispatch(getFS_Info())
+    dispatch(getFS_Saves())
+    dispatch(getFS_Info())
     getMaxTransferValue()
   }, [])
 
   useEffect(() => {
-    const { stakeInfo } = props.fixed
-
-    const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
-      props.setup
-
-    const { layer2 } = props.balance
-
-    const updateState = (prevState: any) => {
-      return {
-        ...prevState,
-        layer2,
-        stakeInfo,
-        accountEnabled,
-        netLayer,
-        bobaFeeChoice,
-        bobaFeePriceRatio,
-      }
-    }
-
-    if (
-      !isEqual(state.balance.layer2, layer2) ||
-      !isEqual(state.fixed.stakeInfo, stakeInfo) ||
-      !isEqual(state.setup.accountEnabled, accountEnabled) ||
-      !isEqual(state.setup.netLayer, netLayer) ||
-      !isEqual(state.setup.bobaFeeChoice, bobaFeeChoice) ||
-      !isEqual(state.setup.bobaFeePriceRatio, bobaFeePriceRatio) ||
-      !isEqual(state.max_Float_String, props.max_Float_String)
-    ) {
-      setState(updateState)
-    }
     getMaxTransferValue()
-  }, [props])
+  }, [layer2])
 
   const getMaxTransferValue = async () => {
-    const { layer2, bobaFeeChoice, bobaFeePriceRatio, netLayer } = state
-
     // as staking BOBA check the bobabalance
     const token: any = Object.values(layer2).find(
       (t: any) => t['symbolL2'] === 'BOBA'
@@ -161,10 +119,10 @@ const DepositStake = (props: any) => {
 
     setState((prevState) => ({ ...prevState, loading: true }))
 
-    const addTX = await props.dispatch(addFS_Savings(value_Wei_String))
+    const addTX = await dispatch(addFS_Savings(value_Wei_String))
 
     if (addTX) {
-      props.dispatch(openAlert('Your BOBA were staked'))
+      dispatch(openAlert('Your BOBA were staked'))
     }
 
     setState((prevState) => ({
@@ -184,7 +142,7 @@ const DepositStake = (props: any) => {
   })
 
   const handleClose = () => {
-    props.dispatch(closeModal('StakeDepositModal'))
+    dispatch(closeModal('StakeDepositModal'))
   }
 
   return (
@@ -260,11 +218,4 @@ const DepositStake = (props: any) => {
   )
 }
 
-const mapStateToProps = (state: any) => ({
-  ui: state.ui,
-  fixed: state.fixed,
-  setup: state.setup,
-  balance: state.balance,
-})
-
-export default connect(mapStateToProps)(DepositStake)
+export default DepositStake

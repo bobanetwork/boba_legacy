@@ -16,10 +16,9 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 import React, { useState, useEffect, useCallback } from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { isEqual } from 'util/lodash'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
+import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 import { openModal } from 'actions/uiAction'
 
 import * as S from './Save.styles'
@@ -36,75 +35,33 @@ import { PlaceholderConnect } from 'components/global/placeholderConnect'
 import { ModalTypography } from 'components/global/modalTypography'
 import { Preloader } from 'components/dao/preloader'
 
-const Save = (props: any) => {
-  const { stakeInfo } = props.fixed
+import { selectFixed, selectSetup, selectBalance } from 'selectors'
 
+const Save = () => {
+  const { stakeInfo } = useSelector(selectFixed())
   const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
-    props.setup
+    useSelector(selectSetup())
+  const balance = useSelector(selectBalance())
+  const { layer2 } = balance
 
-  const { layer2 } = props.balance
   const dispatch = useDispatch<any>()
+
   const [state, setState] = useState({
-    stakeInfo,
-    accountEnabled,
-    netLayer,
-    bobaFeeChoice,
-    bobaFeePriceRatio,
-    layer2,
-    stakeValue: '',
-    stakeValueValid: false,
-    value_Wei_String: '',
-    max_Wei_String: '0',
     max_Float_String: '0.0',
     fee: '0',
-    balance: props.balance,
-    fixed: props.fixed,
-    setup: props.setup,
   })
 
   useEffect(() => {
-    props.dispatch(getFS_Saves())
-    props.dispatch(getFS_Info())
+    dispatch(getFS_Saves())
+    dispatch(getFS_Info())
     getMaxTransferValue()
   }, [])
 
   useEffect(() => {
-    const { stakeInfo } = props.fixed
-
-    const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
-      props.setup
-
-    const { layer2 } = props.balance
-
-    const updateState = (prevState: any) => {
-      return {
-        ...prevState,
-        layer2,
-        stakeInfo,
-        accountEnabled,
-        netLayer,
-        bobaFeeChoice,
-        bobaFeePriceRatio,
-      }
-    }
-
-    if (
-      !isEqual(state.balance.layer2, layer2) ||
-      !isEqual(state.fixed.stakeInfo, stakeInfo) ||
-      !isEqual(state.setup.accountEnabled, accountEnabled) ||
-      !isEqual(state.setup.netLayer, netLayer) ||
-      !isEqual(state.setup.bobaFeeChoice, bobaFeeChoice) ||
-      !isEqual(state.setup.bobaFeePriceRatio, bobaFeePriceRatio) ||
-      !isEqual(state.max_Float_String, props.max_Float_String)
-    ) {
-      setState(updateState)
-    }
     getMaxTransferValue()
-  }, [props])
+  }, [layer2])
 
   const getMaxTransferValue = async () => {
-    const { layer2, bobaFeeChoice, bobaFeePriceRatio, netLayer } = state
-
     // as staking BOBA check the bobabalance
     const token: any = Object.values(layer2).find(
       (t: any) => t['symbolL2'] === 'BOBA'
@@ -252,10 +209,4 @@ const Save = (props: any) => {
   )
 }
 
-const mapStateToProps = (state: any) => ({
-  fixed: state.fixed,
-  setup: state.setup,
-  balance: state.balance,
-})
-
-export default connect(mapStateToProps)(Save)
+export default Save
