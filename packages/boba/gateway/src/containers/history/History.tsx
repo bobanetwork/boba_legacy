@@ -25,6 +25,7 @@ import { Button } from 'components/global'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
 import transctionService from 'services/transaction.service'
 import { ALL_NETWORKS, FILTER_OPTIONS, TableOptions } from './constants'
+import MagnifyingGlass from 'images/icons/magnifyingGlass.svg'
 
 import {
   selectTransactions,
@@ -46,6 +47,7 @@ import {
   NetworkDropdowns,
   DatePickerWrapper,
   Input,
+  DateDescriptions,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
@@ -152,6 +154,7 @@ const History = () => {
           <TableHeader>
             <SearchInput // search input
             >
+              <Svg src={MagnifyingGlass} />
               <Input // search bar styles
                 placeholder="Search Here"
                 value={searchHistory}
@@ -161,15 +164,11 @@ const History = () => {
               />
             </SearchInput>
             <Actions>
-              {!isMobile ? (
-                <ModalTypography variant="body1">
-                  Date range from
-                </ModalTypography>
-              ) : null}
+              <DateDescriptions variant="body1">
+                Date range from
+              </DateDescriptions>
               {getDatePicker('From')}
-              {!isMobile ? (
-                <ModalTypography variant="body1">to </ModalTypography>
-              ) : null}
+              <DateDescriptions variant="body1">to</DateDescriptions>
 
               {getDatePicker('To')}
             </Actions>

@@ -64,7 +64,11 @@ export const IconContainer = styled.div`
   justify-content: center;
 `
 
-export const Option = styled.div`
+export const Option = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['isSelected'].includes(prop),
+})<{
+  isSelected?: boolean
+}>`
   display: flex;
   align-items: center;
   font-size: ${(props) => props.theme.text.body2};

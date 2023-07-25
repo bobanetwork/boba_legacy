@@ -12,6 +12,14 @@ import {
 import { Dropdown } from 'components/global/dropdown/'
 import { DefaultIcon } from './styles'
 
+const OptionsProps = styled(Option)`
+  ${(props) =>
+    props.isSelected &&
+    css`
+      background: ${props.theme.colors.gray[400]};
+    `}
+`
+
 export const DropdownNetwork = styled(Dropdown)`
   ${DropdownContainer} {
     font-size: 16px;
@@ -97,7 +105,6 @@ export const DropdownNetwork = styled(Dropdown)`
 
   ${Option} {
     display: flex;
-    flexdirection: row;
     align-items: center;
     font-size: 12px;
     font-weight: bold;
@@ -180,7 +187,6 @@ export const DropdownNetwork = styled(Dropdown)`
         box-shadow: ${props.theme.backShadow};
       `}
   }
-
   ${DropdownContent} {
     padding: 0px 10px;
     max-height: 200px;
@@ -196,8 +202,7 @@ export const DropdownNetwork = styled(Dropdown)`
       box-sizing: border-box;
       background: inherit;
       border: 1px solid rgba(0, 0, 0, 0);
-      &:hover,
-      &.active {
+      &:hover {
         background: ${(props) => props.theme.colors.gray[400]};
       }
 
@@ -215,6 +220,12 @@ export const DropdownNetwork = styled(Dropdown)`
             border: 1px solid ${props.theme.colors.gray[100]};
           }
         `};
+
+      ${(props) =>
+        props.isSelected &&
+        css`
+          background: red;
+        `}
     }
   }
 `

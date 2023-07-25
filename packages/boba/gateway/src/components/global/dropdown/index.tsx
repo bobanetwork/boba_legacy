@@ -83,7 +83,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
           isOpen ? `dropdown ${className} active` : `dropdown ${className}`
         }
       >
-        <Option>
+        <Option isSelected={false}>
           {selectedItem.imgSrc && (
             <IconContainer>
               {selectedItem.imgSrc !== 'default' && (
@@ -109,6 +109,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
                     ? `dropdown ${className} active`
                     : `dropdown ${className}`)
                 }
+                isSelected={true}
                 onClick={() => selectItem(item)}
               >
                 {item.imgSrc && (

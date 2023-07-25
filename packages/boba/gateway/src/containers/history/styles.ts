@@ -2,8 +2,7 @@ import styled, { css } from 'styled-components'
 import { screen } from 'themes/screens'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-
-import { Svg } from 'components/global/svg'
+import { Typography } from 'components/global'
 
 export const HistoryPageContainer = styled.div`
   margin: 0px auto;
@@ -73,7 +72,7 @@ export const TransactionsWrapper = styled.div`
   width: 100%;
   overflow-y: auto;
   overflow-x: unset;
-  max-height: 75%;
+  max-height: 512px;
   ::-webkit-scrollbar-corner {
     background: none;
   }
@@ -320,6 +319,10 @@ export const DatePickerWrapper = styled(DatePicker)`
 `
 
 export const SearchInput = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 16px;
   border-radius: 12px;
   ${(props) =>
     props.theme.name === 'light' &&
@@ -327,6 +330,7 @@ export const SearchInput = styled.div`
       background: ${props.theme.colors.gray[50]};
       border: 1px solid ${props.theme.colors.gray[500]};
       color: ${props.theme.colors.gray[600]};
+      fill: ${props.theme.colors.gray[600]};
       &:hover {
         border: 1px solid ${props.theme.colors.green[800]};
       }
@@ -337,6 +341,7 @@ export const SearchInput = styled.div`
       background: ${props.theme.colors.gray[500]};
       border: 1px solid ${props.theme.colors.gray[300]};
       color: ${props.theme.colors.gray[200]};
+      fill: ${props.theme.colors.gray[50]};
       &:hover {
         border: 1px solid ${props.theme.colors.green[300]};
       }
@@ -344,13 +349,20 @@ export const SearchInput = styled.div`
   @media ${screen.mobile} {
     width: 100%;
   }
+  div {
+    padding-left: 5px;
+    display: flex;
+  }
+  svg {
+    width: 16px;
+    height: auto;
+  }
 `
-
+// TODO: get rid of duplicates
 export const Input = styled.input`
   flex: 1;
   padding: 10px;
-  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  color: ${(props) => props.theme.colors.gray[50]};
+
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -358,4 +370,20 @@ export const Input = styled.input`
   box-shadow: none;
   outline: none;
   border: none;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[600]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[200]};
+    `}
+`
+
+export const DateDescriptions = styled(Typography)`
+  @media ${screen.mobile} {
+    display: none;
+  }
 `
