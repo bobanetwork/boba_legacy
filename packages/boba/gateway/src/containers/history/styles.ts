@@ -73,7 +73,7 @@ export const TransactionsWrapper = styled.div`
   width: 100%;
   overflow-y: auto;
   overflow-x: unset;
-  max-height: 512px;
+  max-height: 75%;
   ::-webkit-scrollbar-corner {
     background: none;
   }
@@ -278,15 +278,8 @@ export const Actions = styled.div`
   align-items: center;
   white-space: nowrap;
   gap: 0px 20px;
-  &.react-datepicker-wrapper {
-    flex: 1;
-    margin-bottom: 0;
-    min-width: 250px;
-  }
-  .react-datepicker__tab-loop {
-    margin: 0px -10px;
-  }
-  ${screen.mobile} {
+
+  @media ${screen.mobile} {
     width: 100%;
     > div:first-child {
       margin-right: 5px;
@@ -299,7 +292,7 @@ export const Actions = styled.div`
 
 export const DatePickerWrapper = styled(DatePicker)`
   position: relative;
-  width: 136px;
+
   height: 44px;
   margin: 0px;
   padding: 15px 20px;
@@ -307,5 +300,62 @@ export const DatePickerWrapper = styled(DatePicker)`
   font-size: ${(props) => props.theme.text.body1};
   color: inherit;
   border: 1px solid ${(props) => props.theme.colors.box.border};
-  background: ${(props) => props.theme.colors.gray[500]};
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[50]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: ${props.theme.colors.gray[500]};
+    `}
+  @media ${screen.laptop} {
+    width: 136px;
+  }
+  @media ${screen.mobile} {
+    width: 100%;
+    text-align: center;
+  }
+`
+
+export const SearchInput = styled.div`
+  border-radius: 12px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[50]};
+      border: 1px solid ${props.theme.colors.gray[500]};
+      color: ${props.theme.colors.gray[600]};
+      &:hover {
+        border: 1px solid ${props.theme.colors.green[800]};
+      }
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: ${props.theme.colors.gray[500]};
+      border: 1px solid ${props.theme.colors.gray[300]};
+      color: ${props.theme.colors.gray[200]};
+      &:hover {
+        border: 1px solid ${props.theme.colors.green[300]};
+      }
+    `}
+  @media ${screen.mobile} {
+    width: 100%;
+  }
+`
+
+export const Input = styled.input`
+  flex: 1;
+  padding: 10px;
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+  color: ${(props) => props.theme.colors.gray[50]};
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  border: none;
 `

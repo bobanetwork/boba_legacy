@@ -13,65 +13,66 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { isEqual } from 'util/lodash'
-
-import { useSelector } from 'react-redux'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
+import { ValidValuesFromArray } from 'util/objectManipulation'
 
 import { useMediaQuery, useTheme } from '@mui/material'
-import Input from 'components/input/Input'
+// import Input from 'components/input/Input'
+import { ModalTypography } from 'components/global/modalTypography'
 import { Button } from 'components/global'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
 import transctionService from 'services/transaction.service'
 import { ALL_NETWORKS, FILTER_OPTIONS, TableOptions } from './constants'
 
-import { setActiveHistoryTab } from 'actions/uiAction'
 import {
   selectTransactions,
   selectAccountEnabled,
   selectLayer,
+  selectActiveNetworkName,
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
 
-import styles from './TX_All.module.scss'
 import {
+  Actions,
+  SearchInput,
   Table,
   NoHistory,
   HistoryPageContainer,
   TableHeader,
   TableFilters,
   NetworkDropdowns,
+  DatePickerWrapper,
+  Input,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
 import { setConnect } from 'actions/setupAction'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { selectActiveNetworkName } from 'selectors'
 import FilterIcon from '../../images/filter.svg'
 
 import {
   TransactionsResolver,
   GetSymbolFromNetworkName,
 } from './TransactionsResolver'
+import { TRANSACTION_FILTER_STATUS } from './types'
 import { TransactionsTableHeader } from 'components/global/table/themes'
 import { FilterDropDown } from 'components/filter'
 import { getCoinImage } from 'util/coinImage'
 import noHistoryIcon from '../../images/noHistory.svg'
 import { Svg } from 'components/global/svg'
 
-function History() {
+const History = () => {
   const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
   const [fromNetwork, setFromNetwork] = useState(ALL_NETWORKS)
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<any>()
   const now = new Date()
   const last_6months = new Date(
     now.getFullYear(),
@@ -79,9 +80,9 @@ function History() {
     now.getDate()
   )
 
-  const [startDate, setStartDate] = useState(last_6months)
+  const [filterStartDate, setFilterStartDate] = useState(last_6months)
   const [transactionStatus, setTransactionStatus] = useState('All')
-  const [endDate, setEndDate] = useState(now)
+  const [filterEndDate, setFilterEndDate] = useState(now)
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
 
@@ -106,38 +107,34 @@ function History() {
     ]
   }
 
-  const getDatePicker = (label) => {
-    const dateSelector = (date) => {
-      label === 'To' ? setEndDate(date) : setStartDate(date)
+  const getDatePicker = (label: string) => {
+    const dateSelector = (date: Date) => {
+      label === 'To' ? setFilterEndDate(date) : setFilterStartDate(date)
     }
     return (
-      <>
-        <DatePicker
-          wrapperClassName={
-            theme.palette.mode === 'light'
-              ? styles.datePickerInput
-              : styles.datePickerInputDark
-          }
-          popperClassName={styles.popperStyle}
-          selected={label === 'To' ? endDate : startDate}
-          onChange={(date) => dateSelector(date)}
-          {...(label === 'From'
-            ? { selectsStart: true }
-            : { selectsEnd: true })}
-          calendarClassName={theme.palette.mode}
-          placeholderText={isMobile ? { label } : ''}
-          {...(label === 'From'
-            ? { endDate: new Date(endDate) }
-            : { startDate: new Date(startDate), minDate: new Date(startDate) })}
-          maxDate={new Date(now)}
-        />
-      </>
+      <DatePickerWrapper
+        selected={label === 'To' ? filterEndDate : filterStartDate}
+        onChange={(date) => date && !Array.isArray(date) && dateSelector(date)}
+        {...(label === 'From' ? { selectsStart: true } : { selectsEnd: true })}
+        calendarClassName={theme.palette.mode}
+        placeholderText={label}
+        {...(label === 'From'
+          ? { endDate: new Date(filterEndDate) }
+          : {
+              startDate: new Date(filterStartDate),
+              minDate: new Date(filterStartDate),
+            })}
+        maxDate={new Date(now)}
+      />
     )
   }
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
-      if (new Set(transactions).size !== new Set(newTransactions).size) {
+      if (
+        new Set(ValidValuesFromArray(transactions)).size !==
+        new Set(newTransactions).size
+      ) {
         dispatch(fetchTransactions())
       }
     }
@@ -151,36 +148,29 @@ function History() {
       {layer && (
         <>
           <TableHeader>
-            <div
-              className={
-                theme.palette.mode === 'light'
-                  ? styles.searchInput
-                  : styles.searchInputDark
-              }
+            <SearchInput // search input
             >
-              <Input
-                size="small"
+              <Input // search bar styles
                 placeholder="Search Here"
                 value={searchHistory}
-                onChange={(i) => {
+                onChange={(i: any) => {
                   setSearchHistory(i.target.value)
                 }}
-                className={styles.searchBar}
               />
-            </div>
-            <div className={styles.actions}>
+            </SearchInput>
+            <Actions>
               {!isMobile ? (
-                <div style={{ margin: '0px 10px', opacity: 0.7 }}>
+                <ModalTypography variant="body1">
                   Date range from
-                </div>
+                </ModalTypography>
               ) : null}
               {getDatePicker('From')}
               {!isMobile ? (
-                <div style={{ margin: '0px 10px', opacity: 0.7 }}>to </div>
+                <ModalTypography variant="body1">to </ModalTypography>
               ) : null}
 
               {getDatePicker('To')}
-            </div>
+            </Actions>
           </TableHeader>
 
           <Table>
@@ -204,6 +194,7 @@ function History() {
                     onItemSelected={(option) => {
                       setFromNetwork(option)
                     }}
+                    error={false}
                   />
                   <div style={{ fontSize: '16px', paddingLeft: '16px' }}>
                     To
@@ -214,6 +205,7 @@ function History() {
                     onItemSelected={(option) => {
                       setToNetwork(option)
                     }}
+                    error={false}
                   />
                 </NetworkDropdowns>
                 <FilterDropDown
@@ -223,6 +215,7 @@ function History() {
                   onItemSelected={(item) => {
                     setTransactionStatus(item.value)
                   }}
+                  error={false}
                 />
               </TableFilters>
               <TransactionsTableHeader
@@ -232,15 +225,13 @@ function History() {
             <TransactionsResolver
               transactions={transactions}
               transactionsFilter={{
-                networks: networkName,
-                fromNetwork: fromNetwork.value,
-                toNetwork: toNetwork.value,
-                status: transactionStatus,
+                fromNetwork: fromNetwork.value || 'All',
+                toNetwork: toNetwork.value || 'All',
+                status: transactionStatus as TRANSACTION_FILTER_STATUS,
                 targetHash: searchHistory,
-                startDate: startDate,
-                endDate: endDate,
+                startDate: filterStartDate,
+                endDate: filterEndDate,
               }}
-              style={{ maxHeight: '70%' }}
             ></TransactionsResolver>
           </Table>
         </>

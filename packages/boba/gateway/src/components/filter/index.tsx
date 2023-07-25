@@ -16,7 +16,7 @@ import {
   DropdownContent,
 } from './styles'
 export interface IFilterDropdownItem {
-  value?: string
+  value: string
   label: string | ReactNode
 }
 

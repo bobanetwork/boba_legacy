@@ -10,10 +10,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { validArray } from 'util/objectManipulation'
-
 export function selectTransactions(state) {
-  return validArray(Object.values(state.transaction))
+  return Object.values(state.transaction)
 }
 
 export function selectErc20Deposits(state) {
