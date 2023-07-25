@@ -114,7 +114,9 @@ const History = () => {
     return (
       <DatePickerWrapper
         selected={label === 'To' ? filterEndDate : filterStartDate}
-        onChange={(date) => date && !Array.isArray(date) && dateSelector(date)}
+        onChange={(date: Date) =>
+          date && !Array.isArray(date) && dateSelector(date)
+        }
         {...(label === 'From' ? { selectsStart: true } : { selectsEnd: true })}
         calendarClassName={theme.palette.mode}
         placeholderText={label}
