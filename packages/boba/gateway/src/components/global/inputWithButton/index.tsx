@@ -5,6 +5,7 @@ interface Props {
   placeholder: string
   buttonLabel: string
   name: string
+  error?: boolean
   disabled?: boolean
   type?: string
   value?: any
@@ -18,22 +19,23 @@ const InputWithButton: FC<Props> = ({
   name,
   type,
   value,
+  error,
   disabled,
   onChange,
   placeholder,
 }) => {
   return (
-    <InputContainer>
+    <InputContainer error={error}>
       <Input
         type={type}
         value={value}
-        disabled={disabled}
+        disabled={disabled || error}
         id={name}
         name={name}
         placeholder={placeholder}
         onChange={onChange}
       />
-      <InputActionButton disabled={disabled} onClick={onButtonClick}>
+      <InputActionButton disabled={disabled || error} onClick={onButtonClick}>
         {buttonLabel}
       </InputActionButton>
     </InputContainer>

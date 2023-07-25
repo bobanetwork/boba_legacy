@@ -19,6 +19,13 @@ export const ConfirmValue = styled(Typography).attrs({
   text-transform: capitalize;
 `
 
+export const LayerNames = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+`
+
 export const ConfirmActionButton = styled(Button)`
   width: 100%;
 `

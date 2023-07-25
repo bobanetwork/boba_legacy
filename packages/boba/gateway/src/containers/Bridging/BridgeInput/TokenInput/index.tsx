@@ -38,6 +38,7 @@ const TokenInput = (props: Props) => {
 
   const [tokenAmount, setTokenAmount] = useState('')
   const [maxBalance, setMaxBalance] = useState<any>()
+  const [zeroBalanceError, setZeroBalanceError] = useState<any>(false)
 
   useEffect(() => {
     // on changing token reset token amount.
@@ -49,6 +50,12 @@ const TokenInput = (props: Props) => {
     }
 
     const balance = Number(logAmount(token.balance, token.decimals))
+
+    if (balance === 0) {
+      setZeroBalanceError(true)
+    } else {
+      setZeroBalanceError(false)
+    }
 
     if (layer === LAYER.L2) {
       let cost = classicExitCost || 0
@@ -126,7 +133,7 @@ const TokenInput = (props: Props) => {
 
   return (
     <InputContainer>
-      <InputContainerLabel>
+      <InputContainerLabel error={zeroBalanceError}>
         Balance: {maxBalance} {token ? token.symbol : ''}
       </InputContainerLabel>
       <InputWithButton
@@ -134,6 +141,7 @@ const TokenInput = (props: Props) => {
         buttonLabel="max"
         type="number"
         name="bridgeAmount"
+        error={zeroBalanceError}
         disabled={!token}
         value={tokenAmount}
         onButtonClick={() => onSetMaxAmount(maxBalance)}

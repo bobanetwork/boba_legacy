@@ -12,6 +12,7 @@ export const InputContainer = styled.div`
 export const InputContainerLabel = styled(Typography).attrs({
   variant: 'body2',
 })`
-  color: ${(props) => props.theme.colors.gray[100]};
+  color: ${({ theme, error }) =>
+    error ? theme.colors.red[300] : theme.colors.gray[100]};
   align-self: flex-end;
 `

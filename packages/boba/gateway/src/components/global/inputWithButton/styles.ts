@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 
-export const InputContainer = styled.div`
+export const InputContainer = styled.div<{ error?: boolean }>`
   width: 100%;
   display: flex;
   padding: 5px 16px;
@@ -8,7 +8,9 @@ export const InputContainer = styled.div`
   align-items: center;
   gap: 8px;
   border-radius: 12px;
-  border: 1px solid ${(props) => props.theme.colors.gray[300]};
+  border: 1px solid
+    ${({ theme, error }) =>
+      error ? theme.colors.red[300] : theme.colors.gray[300]};
   background: ${(props) => props.theme.colors.gray[500]};
 `
 
