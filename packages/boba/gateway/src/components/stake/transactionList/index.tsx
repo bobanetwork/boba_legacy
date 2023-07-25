@@ -16,16 +16,16 @@ import { StakeItemDetails, Token } from './styles'
 import { getCoinImage } from 'util/coinImage'
 
 const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
-  const [state, setState] = useState({
+  const [TransactionListState, setTransactionListState] = useState({
     stakeInfo,
   })
 
   useEffect(() => {
-    setState({ stakeInfo })
+    setTransactionListState({ stakeInfo })
   }, [stakeInfo])
 
   const handleUnstake = async () => {
-    const { stakeInfo } = state
+    const { stakeInfo } = TransactionListState
 
     const withdrawTX = await withdrawFS_Savings(stakeInfo.stakeId)
 
@@ -36,11 +36,16 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
     }
   }
 
-  const timeDeposit = dayjs.unix(state.stakeInfo.depositTimestamp)
+  const timeDeposit = dayjs.unix(
+    TransactionListState.stakeInfo.depositTimestamp
+  )
   const timeNow = dayjs()
 
   const duration_Days = timeNow.diff(timeDeposit, 'day')
-  const earned = state.stakeInfo.depositAmount * (0.05 / 365.0) * duration_Days
+  const earned =
+    TransactionListState.stakeInfo.depositAmount *
+    (0.05 / 365.0) *
+    duration_Days
 
   const unlocktimeNextBegin = timeNow.add(14, 'day')
 
@@ -61,10 +66,13 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
       <div>
         <ModalTypography variant="body2">Amount Staked </ModalTypography>
         <Typography variant="body2">
-          {state.stakeInfo.depositAmount
-            ? `${state.stakeInfo.depositAmount.toLocaleString(undefined, {
-                maximumFractionDigits: 2,
-              })}`
+          {TransactionListState.stakeInfo.depositAmount
+            ? `${TransactionListState.stakeInfo.depositAmount.toLocaleString(
+                undefined,
+                {
+                  maximumFractionDigits: 2,
+                }
+              )}`
             : `0`}
         </Typography>
       </div>
@@ -92,8 +100,4 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
   )
 }
 
-const mapStateToProps = (state: any) => ({
-  fixed: state.fixed,
-})
-
-export default connect(mapStateToProps)(TransactionList)
+export default TransactionList
