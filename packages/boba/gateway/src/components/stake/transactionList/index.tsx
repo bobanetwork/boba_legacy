@@ -26,6 +26,7 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
 
   const handleUnstake = async () => {
     const { stakeInfo } = state
+
     const withdrawTX = await withdrawFS_Savings(stakeInfo.stakeId)
 
     if (withdrawTX !== null && withdrawTX !== undefined) {
@@ -81,10 +82,10 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
       </div>
       <div>
         <Button
-          onClick={handleUnstake}
           tiny={true}
           disable={locked}
           label="Unstake"
+          onClick={handleUnstake}
         />
       </div>
     </StakeItemDetails>

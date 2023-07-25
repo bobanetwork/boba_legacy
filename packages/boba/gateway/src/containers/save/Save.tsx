@@ -197,6 +197,7 @@ const Save = (props: any) => {
             <div>
               <Button
                 label="Stake"
+                small
                 disable={!Boolean(state.max_Float_String !== '0.0')}
                 onClick={() => dispatch(openModal('StakeDepositModal'))}
               />
