@@ -45,8 +45,17 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
 
   const { triggerSubmit } = useBridge()
 
-  const estimatedTime =
-    bridgeType === BRIDGE_TYPE.CLASSIC ? '7 days' : '1 ~ 3 minutes'
+  const estimateTime = () => {
+    if (bridgeType === BRIDGE_TYPE.CLASSIC) {
+      return '7 days'
+    } else {
+      if (layer === LAYER.L1) {
+        return '1 ~ 5min.'
+      } else {
+        return '15min ~ 3hrs.'
+      }
+    }
+  }
 
   const handleClose = () => {
     dispatch(closeModal('bridgeConfirmModal'))
@@ -110,7 +119,7 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
         </Item>
         <Item>
           <ConfirmLabel>Time</ConfirmLabel>
-          <ConfirmValue>{estimatedTime}</ConfirmValue>
+          <ConfirmValue>{estimateTime()}</ConfirmValue>
         </Item>
         <ConfirmActionButton
           onClick={() => {
