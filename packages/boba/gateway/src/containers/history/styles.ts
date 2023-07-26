@@ -290,15 +290,17 @@ export const Actions = styled.div`
 `
 
 export const DatePickerWrapper = styled(DatePicker)`
+  width: 100%;
   position: relative;
-
   height: 44px;
   margin: 0px;
   padding: 15px 20px;
   border-radius: 12px;
+  text-align: center;
   font-size: ${(props) => props.theme.text.body1};
   color: inherit;
   border: 1px solid ${(props) => props.theme.colors.box.border};
+  outline: none;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -314,7 +316,6 @@ export const DatePickerWrapper = styled(DatePicker)`
   }
   @media ${screen.mobile} {
     width: 100%;
-    text-align: center;
   }
 `
 

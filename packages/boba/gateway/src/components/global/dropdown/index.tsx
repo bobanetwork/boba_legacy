@@ -79,9 +79,8 @@ export const Dropdown: React.FC<IDropdownProps> = ({
       <Header
         onClick={handleDropdown}
         error={error}
-        className={
-          isOpen ? `dropdown ${className} active` : `dropdown ${className}`
-        }
+        isOpen={isOpen}
+        className={`dropdown ${className}`}
       >
         <Option isSelected={false}>
           {selectedItem.imgSrc && (
@@ -103,13 +102,8 @@ export const Dropdown: React.FC<IDropdownProps> = ({
             {items.map((item, index) => (
               <Option
                 key={index}
-                className={
-                  item.value &&
-                  (item.value === selectedItem.value
-                    ? `dropdown ${className} active`
-                    : `dropdown ${className}`)
-                }
-                isSelected={true}
+                className={`dropdown ${className}`}
+                isSelected={item.value === selectedItem.value}
                 onClick={() => selectItem(item)}
               >
                 {item.imgSrc && (

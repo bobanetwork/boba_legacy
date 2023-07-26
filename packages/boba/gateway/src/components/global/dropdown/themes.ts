@@ -12,14 +12,6 @@ import {
 import { Dropdown } from 'components/global/dropdown/'
 import { DefaultIcon } from './styles'
 
-const OptionsProps = styled(Option)`
-  ${(props) =>
-    props.isSelected &&
-    css`
-      background: ${props.theme.colors.gray[400]};
-    `}
-`
-
 export const DropdownNetwork = styled(Dropdown)`
   ${DropdownContainer} {
     font-size: 16px;
@@ -54,47 +46,6 @@ export const DropdownNetwork = styled(Dropdown)`
     ${Arrow},${Icon} {
       transition: all 0.3s ease;
     }
-
-    ${(props) =>
-      props.theme.name === 'light' &&
-      css`
-        color: ${props.theme.colors.gray[600]};
-        border: 2px solid ${props.theme.colors.gray[600]};
-        background: none;
-
-        ${Arrow}, ${Icon} {
-          fill: ${props.theme.colors.gray[600]};
-        }
-
-        &:hover,
-        &.active {
-          color: ${props.theme.colors.gray[800]};
-          border-color: ${props.theme.colors.gray[800]};
-          background: none;
-          ${Arrow},${Icon} {
-            fill: ${props.theme.colors.gray[800]};
-          }
-        }
-      `}
-    ${(props) =>
-      props.theme.name === 'dark' &&
-      css`
-        color: ${props.theme.colors.gray[100]};
-        border: 2px solid ${props.theme.colors.gray[200]};
-        background: none;
-        ${Arrow}, ${Icon} {
-          fill: ${props.theme.colors.gray[100]};
-        }
-        &:hover,
-        &.active {
-          color: ${props.theme.colors.gray[50]};
-          background: none;
-          border-color: ${props.theme.colors.green[300]};
-          ${Arrow}, ${Icon} {
-            fill: ${props.theme.colors.gray[50]};
-          }
-        }
-      `}
   }
 
   ${IconContainer} {
@@ -165,7 +116,7 @@ export const DropdownNetwork = styled(Dropdown)`
       css`
         color: ${props.theme.colors.gray[800]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        background: ${props.theme.colors.gray[50]};
+        /* background: ${props.theme.colors.gray[50]}; */
         box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.15);
         ${Icon} {
           svg {
@@ -183,7 +134,7 @@ export const DropdownNetwork = styled(Dropdown)`
         }
         color: ${props.theme.colors.gray[100]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        background: ${props.theme.colors.gray[500]};
+        /* background: ${props.theme.colors.gray[500]}; */
         box-shadow: ${props.theme.backShadow};
       `}
   }
@@ -200,7 +151,6 @@ export const DropdownNetwork = styled(Dropdown)`
       border-radius: 8px;
       padding: 5px;
       box-sizing: border-box;
-      background: inherit;
       border: 1px solid rgba(0, 0, 0, 0);
       &:hover {
         background: ${(props) => props.theme.colors.gray[400]};
