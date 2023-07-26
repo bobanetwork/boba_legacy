@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+import store from "store";
+
 export function setToken(token) {
   return function (dispatch) {
     return dispatch({ type: 'BRIDGE/TOKEN/SELECT', payload: token });
@@ -89,4 +91,9 @@ export function resetBridgeAmount() {
   return function (dispatch) {
     return dispatch({ type: 'BRIDGE/AMOUNT/RESET'});
   }
+}
+
+
+export function setFetchDepositTxBlock(payload) {
+  store.dispatch({ type: 'BRIDGE/DEPOSIT_TX/BLOCK', payload})
 }

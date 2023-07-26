@@ -7,6 +7,7 @@ export const InprogressContainer = styled.div`
   align-items: center;
   justify-content: space-around;
   gap: 8px;
+  text-align: center;
 `
 
 const circleAnimation = keyframes`

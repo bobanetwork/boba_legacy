@@ -55,3 +55,9 @@ export function selectBridgeAlerts() {
   }
 }
 
+export function selectIsFetchTxBlockNumber() {
+  return function (state) {
+    return state.bridge.isFetchTxBlockNumber
+  }
+}
+

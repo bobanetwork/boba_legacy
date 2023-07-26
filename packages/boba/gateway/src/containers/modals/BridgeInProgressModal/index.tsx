@@ -1,17 +1,17 @@
 import {
-  resetToken,
   purgeBridgeAlert,
   resetBridgeAmount,
+  resetToken,
 } from 'actions/bridgeAction'
-import { InprogressContainer, MutedText, ProgressLoader } from './index.styles'
 import { closeModal } from 'actions/uiAction'
-import { Heading, Typography } from 'components/global'
+import { Heading } from 'components/global'
 import Modal from 'components/modal/Modal'
-import useInterval from 'hooks/useInterval'
-import React, { FC, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import networkService from 'services/networkService'
-import { POLL_INTERVAL } from 'util/constant'
+import React, { FC } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectLayer } from 'selectors'
+import { LAYER } from 'util/constant'
+import BlockConfirmation from './BlockConfirmation'
+import { InprogressContainer, MutedText, ProgressLoader } from './index.styles'
 
 interface Props {
   open: boolean
@@ -19,8 +19,7 @@ interface Props {
 
 const BridgeInProgressModal: FC<Props> = ({ open }) => {
   const dispatch = useDispatch<any>()
-  const [initialBlock, setInitialBlock] = useState<any>(0)
-  const [latestBlock, setLatestBlock] = useState<any>(0)
+  const layer = useSelector(selectLayer())
 
   const handleClose = () => {
     dispatch(closeModal('bridgeInProgress'))
@@ -29,28 +28,6 @@ const BridgeInProgressModal: FC<Props> = ({ open }) => {
     dispatch(purgeBridgeAlert())
     dispatch(resetBridgeAmount())
   }
-
-  useEffect(() => {
-    const fetchBlockNumber = async () => {
-      const blockN = await networkService.getLatestBlockNumber()
-      setInitialBlock(blockN)
-    }
-    fetchBlockNumber()
-  }, [])
-
-  useInterval(() => {
-    const fetchBlockNumber = async () => {
-      const blockN = await networkService.getLatestBlockNumber()
-      setLatestBlock(blockN)
-    }
-    fetchBlockNumber()
-  }, POLL_INTERVAL)
-
-  useEffect(() => {
-    if (latestBlock - initialBlock === 64) {
-      handleClose()
-    }
-  }, [initialBlock, latestBlock, handleClose])
 
   return (
     <Modal
@@ -63,10 +40,13 @@ const BridgeInProgressModal: FC<Props> = ({ open }) => {
       <InprogressContainer>
         <ProgressLoader />
         <Heading variant="h1">Bridging...</Heading>
-        <Typography variant="head">
-          Current blocks : {latestBlock - initialBlock}/64
-        </Typography>
-        <MutedText>Please wait a moment</MutedText>
+        {layer === LAYER.L1 ? (
+          <BlockConfirmation onClose={handleClose} />
+        ) : (
+          <>
+            <MutedText>Please wait moment.</MutedText>
+          </>
+        )}
       </InprogressContainer>
     </Modal>
   )
