@@ -38,7 +38,8 @@ const BlockConfirmation: FC<Props> = ({ onClose }) => {
   }, POLL_INTERVAL)
 
   useEffect(() => {
-    if (latestBlock - initialBlock === 64) {
+    // close modal as soon as blocks exceeds 64.
+    if (latestBlock - initialBlock > 64) {
       onClose()
     }
   }, [initialBlock, latestBlock, onClose])

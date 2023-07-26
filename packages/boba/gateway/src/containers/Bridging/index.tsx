@@ -7,7 +7,12 @@ import {
 } from './styles'
 import { Heading } from 'components/global'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAccountEnabled } from 'selectors'
+import {
+  selectAccountEnabled,
+  selectAmountToBridge,
+  selectBridgeAlerts,
+  selectTokenToBridge,
+} from 'selectors'
 import { setConnect } from 'actions/setupAction'
 import Chains from './chain'
 import BridgeInput from './BridgeInput'
@@ -22,12 +27,23 @@ const Bridging = () => {
 
   const dispatch = useDispatch<any>()
   const accountEnabled = useSelector<any>(selectAccountEnabled())
+  const token = useSelector(selectTokenToBridge())
+  const amountToBridge = useSelector(selectAmountToBridge())
+  const bridgeAlerts = useSelector(selectBridgeAlerts())
+
+  const isBridgeActionDisabled = () => {
+    const hasError = bridgeAlerts.find((alert: any) => alert.type === 'error')
+    return !token || !amountToBridge || hasError
+  }
 
   const onConnect = () => {
     dispatch(setConnect(true))
   }
 
   const onBridge = () => {
+    if (isBridgeActionDisabled()) {
+      return
+    }
     dispatch(openModal('bridgeConfirmModal'))
   }
 
@@ -48,6 +64,7 @@ const Bridging = () => {
           />
         ) : (
           <BridgeActionButton
+            disable={isBridgeActionDisabled()}
             onClick={onBridge}
             label={<Heading variant="h3">Bridge</Heading>}
           />
