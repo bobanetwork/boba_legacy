@@ -1,4 +1,12 @@
-import { depositETHL2, depositErc20 } from 'actions/networkAction'
+import {
+  approveERC20,
+  depositETHL2,
+  depositErc20,
+  depositL1LP,
+  depositL2LP,
+  exitBOBA,
+} from 'actions/networkAction'
+import { closeModal, openError, openModal } from 'actions/uiAction'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
 import { ethers } from 'ethers'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,6 +17,7 @@ import {
   selectLayer,
   selectTokenToBridge,
 } from 'selectors'
+import networkService from 'services/networkService'
 import { toWei_String } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
 
@@ -42,38 +51,85 @@ export const useBridge = () => {
     }
   */
 
-  const triggerDeposit = async () => {
+  const triggerDeposit = async (amountWei: any) => {
     let receipt
-    const value_Wei_String = toWei_String(amountToBridge, token.decimals)
     if (token.address === ethers.constants.AddressZero) {
       receipt = await dispatch(
         depositETHL2({
           recipient: toL2Account || '',
-          value_Wei_String,
+          value_Wei_String: amountWei,
         })
       )
     } else {
       receipt = await dispatch(
         depositErc20({
           recipient: toL2Account || '',
-          value_Wei_String,
+          value_Wei_String: amountWei,
           currency: token.address,
           currencyL2: token.addressL2,
         })
       )
     }
 
-    console.log(receipt)
-    console.log(['open modal'])
+    return receipt
   }
 
-  const triggerSubmit = () => {
+  const depositNativeToken = async (amountWei: any) => {
+    return dispatch(depositL1LP(token.address, amountWei))
+  }
+
+  const triggerFastDeposit = async (amountWei: any) => {
+    if (token.symbol === networkService.L1NativeTokenSymbol) {
+      return depositNativeToken(amountWei)
+    }
+    // ERC20 token fast bridging.
+    // step -1  approve token
+    // step -2  deposit to L1LP.
+    const allAddresses = networkService.getAllAddresses()
+    const approvalReciept = await dispatch(
+      approveERC20(
+        amountWei,
+        token.address,
+        (allAddresses as any)['L1LPAddress']
+      )
+    )
+
+    if (approvalReciept === false) {
+      dispatch(openError('Failed to approve amount or user rejected signature'))
+      return
+    }
+
+    return dispatch(depositL1LP(token.address, amountWei))
+  }
+
+  const triggerExit = async (amountWei: any) => {
+    return dispatch(exitBOBA(token.address, amountWei))
+  }
+
+  const triggerFastExit = async (amountWei: any) => {
+    return dispatch(depositL2LP(token.address, amountWei))
+  }
+
+  const triggerSubmit = async () => {
+    const amountWei = toWei_String(amountToBridge, token.decimals)
+    let receipt
+    dispatch(openModal('bridgeInProgress'))
     if (layer === LAYER.L1) {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
-        triggerDeposit()
+        receipt = await triggerDeposit(amountWei)
+      } else {
+        receipt = await triggerFastDeposit(amountWei)
       }
     } else {
-      // trigger exits
+      if (bridgeType === BRIDGE_TYPE.CLASSIC) {
+        receipt = await triggerExit(amountWei)
+      } else {
+        receipt = await triggerFastExit(amountWei)
+      }
+    }
+    dispatch(closeModal('bridgeInProgress'))
+    if (receipt) {
+      dispatch(openModal('transactionSuccess'))
     }
   }
 

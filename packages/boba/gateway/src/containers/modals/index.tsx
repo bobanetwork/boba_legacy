@@ -23,6 +23,8 @@ import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 import SettingsModal from './settings'
 import NetworkPickerModal from './networkPicker'
 import BridgeConfirmModal from './BridgeConfirmModal'
+import BridgeInProgressModal from './BridgeInProgressModal'
+import TransactionSuccessModal from './TransactionSuccessModal'
 
 /**
  *
@@ -90,6 +92,14 @@ const ModalContainer = () => {
 
   const bridgeConfirmModalState = useSelector(
     selectModalState('bridgeConfirmModal')
+  )
+
+  const bridgeInProgressModalState = useSelector(
+    selectModalState('bridgeInProgress')
+  )
+
+  const transactionSuccessModalState = useSelector(
+    selectModalState('transactionSuccess')
   )
 
   return (
@@ -161,6 +171,14 @@ const ModalContainer = () => {
 
       {!!bridgeConfirmModalState && (
         <BridgeConfirmModal open={bridgeConfirmModalState} />
+      )}
+
+      {!!bridgeInProgressModalState && (
+        <BridgeInProgressModal open={bridgeInProgressModalState} />
+      )}
+
+      {!!transactionSuccessModalState && (
+        <TransactionSuccessModal open={transactionSuccessModalState} />
       )}
     </>
   )
