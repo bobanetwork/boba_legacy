@@ -45,8 +45,8 @@ import {
   TableHeader,
   TableFilters,
   NetworkDropdowns,
-  DatePickerWrapper,
   Input,
+  DatePickerWrapper,
   DateDescriptions,
 } from './styles'
 
