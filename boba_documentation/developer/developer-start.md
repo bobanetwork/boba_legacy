@@ -27,11 +27,11 @@ The [Mainnet blockexplorer](https://blockexplorer.boba.network) and the [Rinkeby
 
 1. [Turing Monsters](boba_community/hc-monsters/README.md) _NFTs with on-chain svg and using the Turing random number generator_
 
-2. [Truffle ERC20](../../boba_examples/truffle-erc20/README.md) _A basic ERC20 deployment using Truffle_
+2. [Truffle ERC20](boba_examples/truffle-erc20/README.md) _A basic ERC20 deployment using Truffle_
 
-3. [Bitcoin Price Feeds](../../packages/boba/turing/test/005_lending.ts) _A smart contract that pulls price data from a commercial off-chain endpoint_
+3. [Bitcoin Price Feeds](boba_examples/turing-lending/README.md) _A smart contract that pulls price data from a commercial off-chain endpoint_
 
-4. [Stableswap using off-chain compute](../../packages/boba/turing/test/003_stable_swap.ts) _A smart contract using an off-chain compute endpoint to solve the stableswap quadratic using floating point math_
+4. [Stableswap using off-chain compute](boba_examples/turing-stable-swap/README.md) _A smart contract using an off-chain compute endpoint to solve the stableswap quadratic using floating point math_
 
 ## Feature: Using Turing Hybrid Compute
 
