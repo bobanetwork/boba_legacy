@@ -56,8 +56,8 @@ import * as G from 'containers/Global.styles'
 import { fetchBalances } from 'actions/networkAction';
 
 import { TableHeader } from 'components/global/table'
-
-function Earn() {
+import {CheckboxWithLabel} from 'components/global/checkbox'
+const Earn = () => {
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
   const [lpChoice, setLpChoice] = useState(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
@@ -110,7 +110,9 @@ function Earn() {
   return (
     <S.EarnPageContainer>
       <Connect
-        userPrompt={'Connect to MetaMask to see your balances and contribute to the liquidity pool '}
+        userPrompt={
+          'Connect to MetaMask to see your balances and contribute to the liquidity pool '
+        }
         accountEnabled={accountEnabled}
       />
 
@@ -152,29 +154,22 @@ function Earn() {
           </G.PageSwitcher>
 
           <S.EarnAction>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={showMDO}
-                  onChange={(e) => setShowMDO(e.target.checked)}
-                  name="my tokens only"
-                  color="primary"
-                  icon={<S.BpIcon />}
-                />
-              }
-              label="My Tokens Only"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={showMSO}
-                  onChange={e => setShowMSO(e.target.checked)}
-                  name="my stakes only"
-                  color="primary"
-                  icon={<S.BpIcon />}
-                />
-              }
-              label="My Stakes Only"
+            {/*<FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showMDO}
+                    onChange={(e) => setShowMDO(e.target.checked)}
+                    name="my tokens only"
+                    color="primary"
+                    icon={<S.BpIcon />}
+                  />
+                }
+                label="My Tokens Only"
+              />*/}
+            <CheckboxWithLabel
+              label="My stakes only"
+              checked={showMSO}
+              onChange={(isChecked) => setShowMSO(isChecked)}
             />
           </S.EarnAction>
 
