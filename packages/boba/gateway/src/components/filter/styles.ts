@@ -23,7 +23,6 @@ export const DropdownContainer = styled.div`
 export const Header = styled.div<{ error: boolean; isOpen: boolean }>`
   box-sizing: border-box;
   position: relative;
-  z-index: 2;
   color: inherit;
   border-radius: 37px;
   transition: all 0.3s ease;

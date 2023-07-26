@@ -34,6 +34,7 @@ export const DropdownNetwork = styled(Dropdown)`
     font-size: 16px;
     transition: all 0.3s ease;
     display: flex;
+    z-index: unset;
     flex-direction: row;
     align-content: center;
     div {
