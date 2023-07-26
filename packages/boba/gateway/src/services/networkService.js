@@ -1945,7 +1945,7 @@ class NetworkService {
 
       const time_stop = new Date().getTime()
       console.log("TX finish time:", time_stop)
-
+      console.log(`🔚 🏃 `)
       this.getBalances()
 
       return txReceipt
@@ -4753,6 +4753,13 @@ class NetworkService {
       return { methodIndex, result: { err: JSON.stringify(err) }}
     }
    }
+
+  // getting block number;
+
+  async getLatestBlockNumber() {
+    return await this.provider.getBlockNumber();
+  }
+
 }
 
 const networkService = new NetworkService()

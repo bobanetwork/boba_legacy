@@ -20,6 +20,12 @@ import {
 import networkService from 'services/networkService'
 import { toWei_String } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
+import useBridgeCleanup from './useBridgeCleanup'
+import {
+  resetToken,
+  purgeBridgeAlert,
+  resetBridgeAmount,
+} from 'actions/bridgeAction'
 
 export const useBridge = () => {
   const dispatch = useDispatch<any>()
@@ -117,6 +123,7 @@ export const useBridge = () => {
     if (layer === LAYER.L1) {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         receipt = await triggerDeposit(amountWei)
+        console.log(['classic bridging to l2', receipt])
       } else {
         receipt = await triggerFastDeposit(amountWei)
       }
@@ -130,6 +137,9 @@ export const useBridge = () => {
     dispatch(closeModal('bridgeInProgress'))
     if (receipt) {
       dispatch(openModal('transactionSuccess'))
+      dispatch(resetToken())
+      dispatch(purgeBridgeAlert())
+      dispatch(resetBridgeAmount())
     }
   }
 
