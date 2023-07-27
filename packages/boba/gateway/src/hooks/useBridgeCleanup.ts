@@ -11,7 +11,6 @@ import {
   selectBaseEnabled,
   selectBridgeType,
   selectLayer,
-  selectTokenToBridge,
 } from 'selectors'
 
 export const useBridgeCleanup = () => {
@@ -22,11 +21,11 @@ export const useBridgeCleanup = () => {
   const baseEnabled = useSelector(selectBaseEnabled())
   const layer = useSelector(selectLayer())
   const bridgeType = useSelector(selectBridgeType())
-  const token = useSelector(selectTokenToBridge())
 
   useEffect(() => {
     // listen to all change and cleanup bridge token & bridge alert
     dispatch(resetToken())
+    console.log('Dispatch purge alert!!')
     dispatch(purgeBridgeAlert())
     dispatch(resetBridgeAmount())
   }, [
@@ -37,11 +36,6 @@ export const useBridgeCleanup = () => {
     layer,
     bridgeType,
   ])
-
-  // on changing token only cleanup alerts
-  useEffect(() => {
-    dispatch(purgeBridgeAlert())
-  }, [dispatch, token])
 }
 
 export default useBridgeCleanup

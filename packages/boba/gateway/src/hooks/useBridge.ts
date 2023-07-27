@@ -20,7 +20,6 @@ import {
 import networkService from 'services/networkService'
 import { toWei_String } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
-import useBridgeCleanup from './useBridgeCleanup'
 import {
   resetToken,
   purgeBridgeAlert,
@@ -34,28 +33,6 @@ export const useBridge = () => {
   const toL2Account = useSelector(selectBridgeToAddressState())
   const token = useSelector(selectTokenToBridge())
   const amountToBridge = useSelector(selectAmountToBridge())
-
-  /*
-  let toL2Account = enableToL2Account ? recipient : '';
-    // TO check for ETH
-    if (token.address === ethers.constants.AddressZero) {
-      receipt = await dispatch(
-        depositETHL2({
-          recipient: toL2Account,
-          value_Wei_String
-        })
-      )
-    } else {
-      receipt = await dispatch(
-        depositErc20({
-          recipient: toL2Account,
-          value_Wei_String,
-          currency: token.address,
-          currencyL2: token.addressL2,
-        })
-      )
-    }
-  */
 
   const triggerDeposit = async (amountWei: any) => {
     let receipt
