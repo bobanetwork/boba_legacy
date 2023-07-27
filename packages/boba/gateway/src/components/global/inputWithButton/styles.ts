@@ -26,6 +26,7 @@ export const Input = styled.input`
   box-shadow: none;
   outline: none;
   border: none;
+  font-family: Roboto;
 `
 export const InputActionButton = styled.button<{ disabled?: boolean }>`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};

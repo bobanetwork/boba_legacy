@@ -43,7 +43,9 @@ export const ChainIcon = styled.div`
   display: flex;
   align-items: center;
 `
-export const ChainPickerPlaceHolder = styled.div`
+export const ChainPickerPlaceHolder = styled(Typography).attrs({
+  variant: 'body1',
+})`
   flex: 1;
 `
 
@@ -89,4 +91,10 @@ export const SwitchIcon = styled(Svg).attrs({
   fill: '#AEDB01',
 })`
   display: flex;
+`
+
+export const SectionLabel = styled(Typography).attrs({
+  variant: 'body2',
+})`
+  color: ${({ theme }) => theme.colors.gray[100]};
 `

@@ -8,7 +8,6 @@ import { getCoinImage } from 'util/coinImage'
 
 import useAmountToReceive from 'hooks/useAmountToReceive'
 import useBridgeAlerts from 'hooks/useBridgeAlerts'
-import { Label } from '../styles'
 import BridgeToAddress from './BridgeToAddress'
 import Fee from './Fee'
 import TokenInput from './TokenInput'
@@ -22,9 +21,9 @@ import {
   TokenPickerIcon,
   TokenSelector,
   TokenSelectorInput,
-  TokenSelectorLabel,
   TokenSymbol,
 } from './styles'
+import { SectionLabel } from '../chain/styles'
 
 type Props = {}
 
@@ -48,7 +47,7 @@ const BridgeInput: FC<Props> = (props) => {
     <BridgeInputContainer>
       <BridgeInputWrapper>
         <TokenSelector>
-          <TokenSelectorLabel>Amount</TokenSelectorLabel>
+          <SectionLabel>Amount</SectionLabel>
           <TokenSelectorInput onClick={() => openTokenPicker()}>
             {token && (
               <TokenSymbol>
@@ -70,7 +69,7 @@ const BridgeInput: FC<Props> = (props) => {
       </BridgeInputWrapper>
       {token && (
         <ReceiveContainer>
-          <Label>Receive</Label>
+          <SectionLabel>Receive</SectionLabel>
           <ReceiveAmount>{recievableAmount}</ReceiveAmount>
         </ReceiveContainer>
       )}

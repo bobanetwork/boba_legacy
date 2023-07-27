@@ -13,7 +13,7 @@ export const AlertContainer = styled.div<{ type?: AlertType }>`
   padding: 12px 16px;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
   border-radius: 8px;
   ${({ type, theme }) =>
     type === 'warning'

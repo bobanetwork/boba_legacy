@@ -48,7 +48,9 @@ export const BridgeActionButton = styled(Button).attrs({
 })``
 
 export const Label = styled(Typography).attrs({
-  variant: 'body2',
+  variant: 'body3',
 })`
-  color: ${(props) => props.theme.colors.gray[100]};
+  font-weight: 400;
+  line-height: normal;
+  color: ${({ theme, color }) => color || theme.colors.gray[100]};
 `

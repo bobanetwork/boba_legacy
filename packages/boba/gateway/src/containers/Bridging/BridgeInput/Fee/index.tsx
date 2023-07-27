@@ -106,8 +106,8 @@ const Fee = (props: Props) => {
         <Label>{(layer === LAYER.L1 ? l2FeeRateN : l1FeeRateN) || 0}%</Label>
       </InfoRow>
       <InfoRow>
-        <Label>You will receive</Label>
-        <Label>{amountToReceive}</Label>
+        <Label color="white">You will receive</Label>
+        <Label color="white">{amountToReceive}</Label>
       </InfoRow>
     </BridgeInfoContainer>
   )

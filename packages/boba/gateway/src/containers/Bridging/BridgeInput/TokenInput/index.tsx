@@ -14,7 +14,7 @@ import {
 import { logAmount } from 'util/amountConvert'
 import InputWithButton from 'components/global/inputWithButton'
 import { LAYER } from 'util/constant'
-import BN from 'bignumber.js'
+
 import {
   clearBridgeAlert,
   setAmountToBridge,
@@ -98,35 +98,6 @@ const TokenInput = (props: Props) => {
   }
 
   const onAmountChange = (value: string) => {
-    const maxValue = logAmount(token.balance, token.decimals)
-    const underZero = new BN(value).lt(new BN(0.0))
-    const overMax = new BN(value).gt(new BN(maxValue))
-
-    dispatch(
-      clearBridgeAlert({
-        keys: ['VALUE_TOO_SMALL', 'VALUE_TOO_LARGE'],
-      })
-    )
-
-    if (underZero) {
-      dispatch(
-        setBridgeAlert({
-          meta: 'VALUE_TOO_SMALL',
-          type: 'error',
-          text: `Value too small: the value must be greater than 0`,
-        })
-      )
-    } else if (overMax) {
-      dispatch(
-        setBridgeAlert({
-          meta: 'VALUE_TOO_LARGE',
-          type: 'error',
-          text: `Value too large: the value must be smaller than ${Number(
-            maxValue
-          ).toFixed(5)}`,
-        })
-      )
-    }
     setTokenAmount(value)
     dispatch(setAmountToBridge(value))
   }

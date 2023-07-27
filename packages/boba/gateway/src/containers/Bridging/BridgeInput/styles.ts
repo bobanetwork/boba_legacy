@@ -21,11 +21,6 @@ export const TokenSelector = styled.div`
   align-items: flex-start;
   min-width: 25%;
 `
-export const TokenSelectorLabel = styled(Typography).attrs({
-  variant: 'body2',
-})`
-  color: ${(props) => props.theme.colors.gray[100]};
-`
 
 export const TokenSelectorInput = styled.div`
   cursor: pointer;
@@ -36,8 +31,8 @@ export const TokenSelectorInput = styled.div`
   align-items: center;
   gap: 8px;
   border-radius: 12px;
-  border: 1px solid ${(props) => props.theme.colors.gray[300]};
-  background: ${(props) => props.theme.colors.gray[500]};
+  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
+  background: ${({ theme }) => theme.colors.gray[500]};
 `
 
 export const ReceiveContainer = styled.div`
@@ -73,10 +68,10 @@ export const TokenSymbol = styled.div`
   display: flex;
 `
 export const TokenLabel = styled(Typography).attrs({
-  variant: 'body2',
+  variant: 'body1',
 })`
   flex: 1;
-  color: ${(props) => props.theme.colors.gray[50]};
+  color: ${({ theme }) => theme.colors.gray[50]};
 `
 
 export const TokenPickerIcon = styled.div`
@@ -87,14 +82,11 @@ export const DownArrow = styled(Svg).attrs({
   fill: '#fff',
 })``
 
-export const ReceiveAmount = styled.div`
-  display: flex;
+export const ReceiveAmount = styled(Typography).attrs({
+  variant: 'title',
+})`
   padding: 12px 16px;
-  align-items: center;
-  gap: 8px;
   border-radius: 12px;
-  border: 1px solid ${(props) => props.theme.colors.gray[300]};
-  color: ${(props) => props.theme.colors.gray[50]};
-  font-size: 18px;
-  font-weight: 500;
+  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
+  color: ${({ theme }) => theme.colors.gray[50]};
 `

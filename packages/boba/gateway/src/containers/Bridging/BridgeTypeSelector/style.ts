@@ -14,10 +14,13 @@ export const BridgeTabItem = styled.div<{
   width: 100%;
   padding: 8px 50px;
   text-align: center;
-  cursor: pointer;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
   border-radius: 8px;
-  font-weight: bold;
-  font-size: ${(props) => props.theme.text.body2};
+  font-size: ${(props) => props.theme.text.body1};
+  cursor: pointer;
   background: transparent;
   ${(props) =>
     props.active &&

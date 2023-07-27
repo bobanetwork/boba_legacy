@@ -1,26 +1,26 @@
-import React, { FC } from 'react'
-import {
-  ChainContainer,
-  ChainPickerIcon,
-  ChainPicker,
-  ChainPickerContainer,
-  ChainIcon,
-  ChainPickerLabel,
-  ChainPickerPlaceHolder,
-  DownArrow,
-  SwitchChainIcon,
-  SwitchIcon,
-} from './styles'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectActiveNetworkIcon,
   selectActiveNetworkName,
   selectLayer,
 } from 'selectors'
-import { NETWORK_ICONS } from './constant'
-import { DEFAULT_NETWORK, LAYER } from 'util/constant'
-import useSwitchChain from 'hooks/useSwitchChain'
 import { openModal } from 'actions/uiAction'
+import useSwitchChain from 'hooks/useSwitchChain'
+import { DEFAULT_NETWORK, LAYER } from 'util/constant'
+import { NETWORK_ICONS } from './constant'
+import {
+  ChainContainer,
+  ChainIcon,
+  ChainPicker,
+  ChainPickerContainer,
+  ChainPickerIcon,
+  ChainPickerPlaceHolder,
+  DownArrow,
+  SectionLabel,
+  SwitchChainIcon,
+  SwitchIcon,
+} from './styles'
 
 type Props = {}
 
@@ -73,7 +73,7 @@ const Chains = (props: Props) => {
   return (
     <ChainContainer>
       <ChainPickerContainer>
-        <ChainPickerLabel>From</ChainPickerLabel>
+        <SectionLabel>From</SectionLabel>
         <ChainPicker onClick={() => openNetworkPicker('l1')}>
           {!layer || layer === LAYER.L1 ? <L1ChainInfo /> : <L2ChainInfo />}
           <ChainPickerIcon>
@@ -85,7 +85,7 @@ const Chains = (props: Props) => {
         <SwitchIcon />
       </SwitchChainIcon>
       <ChainPickerContainer>
-        <ChainPickerLabel>To</ChainPickerLabel>
+        <SectionLabel>To</SectionLabel>
         <ChainPicker onClick={() => openNetworkPicker('l2')}>
           {!layer || layer === LAYER.L1 ? <L2ChainInfo /> : <L1ChainInfo />}
           <ChainPickerIcon>
