@@ -3,55 +3,55 @@
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="sc-eywOmQ fauosd"
+    class="sc-eAzDjm dXkMYM"
   >
     <div
-      class="sc-eAzDjm kajovC"
+      class="sc-fABZjn jqjreM"
     />
     <div
-      class="sc-hUOJWJ cbCyxP"
+      class="sc-dPwPAC gILGyb"
     >
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-ePzlA-D ddmTCd"
         href="/bridge"
       >
         Bridge
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-ePzlA-D ddmTCd"
         href="/history"
       >
         History
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-ePzlA-D ddmTCd"
         href="/earn"
       >
         Earn
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-ePzlA-D ddmTCd"
         href="/stake"
       >
         Stake
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-ePzlA-D ddmTCd"
         href="/DAO"
       >
         Dao
       </a>
     </div>
     <div
-      class="sc-fABZjn daRNmZ"
+      class="sc-gUMnWI ghBncp"
     >
       <button
-        class="sc-kuWgmH gPrhcx"
+        class="sc-duSInm jNkTqC"
         type="button"
       >
          Connect Wallet
