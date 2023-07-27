@@ -42,7 +42,6 @@ const useBridgeSetup = () => {
   useEffect(() => {
     if (layer === LAYER.L1) {
       if (token && bridgeType === BRIDGE_TYPE.FAST) {
-        console.log(`📥 📥 `)
         /**
          * when we are on l1, but the funds will be paid out to L2.
          * Goal now is to find out the as much we can about the state of L2 pools
@@ -73,7 +72,6 @@ const useBridgeSetup = () => {
       dispatch(fetchExitFee())
 
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
-        console.log(`📤 📤 `)
         // fetching details for classic Exits
         dispatch(fetchClassicExitCost(token.address))
       } else {

@@ -1,13 +1,3 @@
-import {
-  fetchL2LPBalance,
-  fetchL2LPLiquidity,
-  fetchL2LPPending,
-  fetchL2TotalFeeRate,
-  fetchL2FeeRateN,
-  fetchFastDepositCost,
-  fetchL1FeeBalance,
-} from 'actions/balanceAction'
-import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -21,6 +11,7 @@ import {
 import { toWei_String } from 'util/amountConvert'
 import { formatTokenAmount } from 'util/common'
 import { LAYER } from 'util/constant'
+import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
 
 /**
  * This hook is used for getting receivable amount.
