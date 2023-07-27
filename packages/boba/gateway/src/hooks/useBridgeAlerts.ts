@@ -135,7 +135,7 @@ const useBridgeAlerts = () => {
         keys: [ALERT_KEYS.FAST_EXIT_ERROR],
       })
     )
-    if (layer === LAYER.L2 && bridgeType === BRIDGE_TYPE.FAST) {
+    if (layer === LAYER.L2) {
       // trigger only when withdrawing funds.
       let warning = ''
       const balance = Number(logAmount(token.balance, token.decimals))
@@ -169,42 +169,45 @@ const useBridgeAlerts = () => {
         warning = `Insufficient ETH balance to cover ETH Amount and Exit fee.`
       }
 
-      let LpRatio = 0
-      const lbl = Number(logAmount(LPLiquidity, token.decimals))
-      if (lbl > 0) {
-        const lpb = Number(logAmount(LPBalance, token.decimals))
-        const LPR = lpb / lbl
-        LpRatio = Number(LPR)
-      }
-
-      const lpUnits: any = logAmount(LPBalance, token.decimals)
-      const pendingUnits: any = logAmount(LPPending, token.decimals)
-      const pendingExitsBalance = Number(lpUnits) - Number(pendingUnits) // inflight exits (pending exits)
-
-      if (LpRatio < 0.1) {
-        if (Number(amountToBridge) > Number(pendingExitsBalance) * 0.9) {
-          warning = `Insufficient balance in pool and balance / liquidity ratio too low, please reduce amount or use classical exit`
-        } else if (
-          Number(amountToBridge) <=
-          Number(pendingExitsBalance) * 0.9
-        ) {
-          warning = `The pool's balance/liquidity ratio (of ${Number(
-            LpRatio
-          ).toFixed(2)}) is too low.
-          Please use the classic bridge.`
-        } else {
-          warning = `Insufficient balance in pool - reduce amount or use classical exit`
+      if (bridgeType === BRIDGE_TYPE.FAST && balance > 0) {
+        // as in case of fast withdrwal we are using liquidity pools so below checks are required.
+        let LpRatio = 0
+        const lbl = Number(logAmount(LPLiquidity, token.decimals))
+        if (lbl > 0) {
+          const lpb = Number(logAmount(LPBalance, token.decimals))
+          const LPR = lpb / lbl
+          LpRatio = Number(LPR)
         }
-      }
 
-      if (
-        LpRatio >= 0.1 &&
-        Number(amountToBridge) > Number(pendingExitsBalance) * 0.9
-      ) {
-        warning = `The pool's balance (of ${Number(pendingExitsBalance).toFixed(
-          2
-        )} including inflight bridges) is too low.
-          Please use the classic bridge or reduce the amount.`
+        const lpUnits: any = logAmount(LPBalance, token.decimals)
+        const pendingUnits: any = logAmount(LPPending, token.decimals)
+        const pendingExitsBalance = Number(lpUnits) - Number(pendingUnits) // inflight exits (pending exits)
+
+        if (LpRatio < 0.1) {
+          if (Number(amountToBridge) > Number(pendingExitsBalance) * 0.9) {
+            warning = `Insufficient balance in pool and balance / liquidity ratio too low, please reduce amount or use classical exit`
+          } else if (
+            Number(amountToBridge) <=
+            Number(pendingExitsBalance) * 0.9
+          ) {
+            warning = `The pool's balance/liquidity ratio (of ${Number(
+              LpRatio
+            ).toFixed(2)}) is too low.
+            Please use the classic bridge.`
+          } else {
+            warning = `Insufficient balance in pool - reduce amount or use classical exit`
+          }
+        }
+
+        if (
+          LpRatio >= 0.1 &&
+          Number(amountToBridge) > Number(pendingExitsBalance) * 0.9
+        ) {
+          warning = `The pool's balance (of ${Number(
+            pendingExitsBalance
+          ).toFixed(2)} including inflight bridges) is too low.
+            Please use the classic bridge or reduce the amount.`
+        }
       }
 
       if (warning) {

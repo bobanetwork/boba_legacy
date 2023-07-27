@@ -15,7 +15,7 @@ import { logAmount } from 'util/amountConvert'
 import InputWithButton from 'components/global/inputWithButton'
 import { LAYER } from 'util/constant'
 
-import { setAmountToBridge } from 'actions/bridgeAction'
+import { purgeBridgeAlert, setAmountToBridge } from 'actions/bridgeAction'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
 import networkService from 'services/networkService'
 
@@ -49,6 +49,7 @@ const TokenInput = (props: Props) => {
 
     if (balance === 0) {
       setZeroBalanceError(true)
+      dispatch(purgeBridgeAlert())
     } else {
       setZeroBalanceError(false)
     }
