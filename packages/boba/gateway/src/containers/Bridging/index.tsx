@@ -4,6 +4,7 @@ import {
   BridgeContent,
   BridgeWrapper,
   BridgeActionButton,
+  BridginContainer,
 } from './styles'
 import { Heading } from 'components/global'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,6 +22,7 @@ import BridgeTypeSelector from './BridgeTypeSelector'
 import BridgeHeader from './BridgeHeader'
 import useBridgeCleanup from 'hooks/useBridgeCleanup'
 import { openModal } from 'actions/uiAction'
+import ThirdPartyBridges from './ThirdPartyBridges'
 
 const Bridging = () => {
   useBridgeCleanup()
@@ -48,29 +50,32 @@ const Bridging = () => {
   }
 
   return (
-    <BridgeWrapper>
-      <BridgeContent>
-        <BridgeHeader />
-        <BridgeAlert />
-        <BridgeTypeSelector />
-        <Chains />
-        <BridgeInput />
-      </BridgeContent>
-      <BridgeAction>
-        {!accountEnabled ? (
-          <BridgeActionButton
-            onClick={onConnect}
-            label={<Heading variant="h3"> Connect Wallet</Heading>}
-          />
-        ) : (
-          <BridgeActionButton
-            disable={isBridgeActionDisabled()}
-            onClick={onBridge}
-            label={<Heading variant="h3">Bridge</Heading>}
-          />
-        )}
-      </BridgeAction>
-    </BridgeWrapper>
+    <BridginContainer>
+      <BridgeWrapper>
+        <BridgeContent>
+          <BridgeHeader />
+          <BridgeAlert />
+          <BridgeTypeSelector />
+          <Chains />
+          <BridgeInput />
+        </BridgeContent>
+        <BridgeAction>
+          {!accountEnabled ? (
+            <BridgeActionButton
+              onClick={onConnect}
+              label={<Heading variant="h3"> Connect Wallet</Heading>}
+            />
+          ) : (
+            <BridgeActionButton
+              disable={isBridgeActionDisabled()}
+              onClick={onBridge}
+              label={<Heading variant="h3">Bridge</Heading>}
+            />
+          )}
+        </BridgeAction>
+      </BridgeWrapper>
+      <ThirdPartyBridges />
+    </BridginContainer>
   )
 }
 

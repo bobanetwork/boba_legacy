@@ -1,13 +1,20 @@
 import { Button, Typography } from 'components/global'
 import styled from 'styled-components'
 
-export const BridgeWrapper = styled.div`
+export const BridginContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 500px;
   margin: 32px auto;
+`
+
+export const BridgeWrapper = styled.div`
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 500px;
+  width: 100%;
   border-radius: 12px;
   border: 1px solid var(--gray-300, #545454);
   background: var(
@@ -53,4 +60,26 @@ export const Label = styled(Typography).attrs({
   font-weight: 400;
   line-height: normal;
   color: ${({ theme, color }) => color || theme.colors.gray[100]};
+`
+
+export const BridgeItem = styled.a`
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
+`
+export const BridgeIcon = styled.div`
+  height: 32px;
+  width: 32px;
+  border-radius: 200px;
+`
+export const BridgeLabel = styled(Typography).attrs({
+  variant: 'title',
+})`
+  flex: 1;
+  line-height: normal;
+  text-transform: capitalize;
 `
