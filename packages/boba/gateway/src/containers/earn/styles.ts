@@ -53,11 +53,10 @@ export const AlertInfo = styled.div`
   justify-content: space-around;
   align-items: center;
   flex: 1;
-`;
+`
 
 export const Wrapper = styled.div`
   border-radius: 8px;
-
 `
 
 export const GridItemTagContainer = styled.div`
@@ -115,8 +114,7 @@ export const PageSwitcher = styled.div`
     align-items: center;
     &.active {
       color: #031313;
-      background: #BAE21A;
+      background: #bae21a;
     }
   }
 `
-

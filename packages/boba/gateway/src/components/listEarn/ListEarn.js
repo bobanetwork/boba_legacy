@@ -13,9 +13,6 @@ import {
   updateWithdrawToken,
 } from 'actions/earnAction'
 
-import Button from 'components/button/Button';
-
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import networkService from 'services/networkService'
 
@@ -26,7 +23,9 @@ import { Typography } from 'components/global/typography'
 import { AprLabel } from 'components/global/label'
 import { IconLabel } from 'components/global/IconLabel'
 import { TableContent } from 'components/global/table'
-
+import { Button } from 'components/global/button'
+import { Svg } from 'components/global/svg'
+import DotsIcon from 'images/icons/actions.svg'
 
 const ListEarn = (props) => {
   const {
@@ -209,11 +208,21 @@ const ListEarn = (props) => {
       width: 225,
     },
     {
-      content: <Typography variant="body2"> {formatNumber(poolInfo.tokenBalance)}</Typography>,
+      content: (
+        <Typography variant="body2">
+          {' '}
+          {formatNumber(poolInfo.tokenBalance)}
+        </Typography>
+      ),
       width: 145,
     },
     {
-      content: <Typography variant="body2"> {formatNumber(poolInfo.userDepositAmount)} </Typography>,
+      content: (
+        <Typography variant="body2">
+          {' '}
+          {formatNumber(poolInfo.userDepositAmount)}{' '}
+        </Typography>
+      ),
       width: 115,
     },
     {
@@ -234,13 +243,16 @@ const ListEarn = (props) => {
           <Typography variant="body2">
             {userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}
           </Typography>
-          <div>{accountEnabled ? <ExpandMoreIcon /> : <></>}</div>
       </>),
       width:110
     },
     {
-      content: <>...</>,
-      width:50
+      content: (
+        <S.SvgContianer>
+          <Svg src={DotsIcon} />
+        </S.SvgContianer>
+      ),
+      width:75
     }
   ];
 
@@ -275,19 +287,14 @@ const ListEarn = (props) => {
             <S.DropdownWrapper>
               <>
                 <Button
-                  variant="outlined"
                   onClick={() => {
                     handleStakeToken()
                   }}
                   disabled={disabled}
-                  fullWidth
-                  sx={{ flex: 1 }}
-                >
-                  Stake
-                </Button>
+                  label="Stake"
+                />
+
                 <Button
-                  variant="outlined"
-                  fullWidth
                   disabled={
                     logAmount(userReward, decimals) === '0' ||
                     disabled ||
@@ -297,19 +304,16 @@ const ListEarn = (props) => {
                     handleHarvest()
                   }}
                   loading={state.loading}
-                  sx={{ flex: 1 }}
-                >
-                Harvest
-                </Button>
+                  label="Harvest"
+                />
+
                 <Button
-                  variant="contained"
                   disabled={disabled}
                   onClick={() => {
                     !disabled && handleWithdrawToken()
                   }}
-                >
-                  Unstake
-                </Button>
+                  label="Unstake"
+                />
               </>
             </S.DropdownWrapper>
           </S.DropdownContent>

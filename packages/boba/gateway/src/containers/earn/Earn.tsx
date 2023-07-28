@@ -17,11 +17,11 @@
 */
 
 import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
-import {  Typography } from 'components/global/typography'
+import { Typography } from 'components/global/typography'
 
 import {
   selectUserInfo,
@@ -31,7 +31,7 @@ import {
   selectBaseEnabled,
   selectAccountEnabled,
   selectLayer,
-  selectActiveNetworkName
+  selectActiveNetworkName,
 } from 'selectors'
 
 import { getEarnInfo } from 'actions/earnAction'
@@ -40,26 +40,34 @@ import Connect from 'containers/connect/Connect'
 
 import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
-import Tooltip from 'components/tooltip/Tooltip';
+import Tooltip from 'components/tooltip/Tooltip'
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
 
 import networkService from 'services/networkService'
 
-import * as S from './Earn.styles'
+import * as S from './styles'
 import * as G from 'containers/Global.styles'
-import { fetchBalances } from 'actions/networkAction';
+import { fetchBalances } from 'actions/networkAction'
 
+import { TabSwitcher } from 'components/global/tabSwitcher'
 import { TableHeader } from 'components/global/table'
+
 import { CheckboxWithLabel } from 'components/global/checkbox'
+import { TabSwitcherEnum } from './consts'
+import { tabSwitcherTypes } from './types'
 const Earn = () => {
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
-  const [lpChoice, setLpChoice] = useState(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
-  const [poolTab, setPoolTab] = useState(networkService.L1orL2 === 'L1' ? 'Ethereum Pool' : 'Boba L2 Pool')
+  const [lpChoice, setLpChoice] = useState(
+    networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP'
+  )
+  const [poolTab, setPoolTab] = useState(
+    networkService.L1orL2 === 'L1' ? 'Ethereum Pool' : 'Boba L2 Pool'
+  )
 
-  const dispatch = useDispatch();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const dispatch = useDispatch<any>()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const userInfo = useSelector(selectUserInfo())
   const poolInfo = useSelector(selectPoolInfo())
@@ -82,16 +90,15 @@ const Earn = () => {
     }
   }, [dispatch, baseEnabled, accountEnabled])
 
-
-  const getBalance = (address, chain) => {
+  const getBalance = (address: any, chain: any) => {
     const tokens =
       chain === 'L1'
         ? Object.values(layer1Balance)
         : chain === 'L2'
         ? Object.values(layer2Balance)
         : []
-    const token = tokens.find(
-      (t) => t.address.toLowerCase() === address.toLowerCase()
+    const token: any = tokens.find(
+      (t: any) => t.address.toLowerCase() === address.toLowerCase()
     )
     return token ? [token.balance, token.decimals] : [0, 0]
   }
@@ -128,15 +135,20 @@ const Earn = () => {
     },
     {
       name: 'Actions',
-      width: 75
-    }
+      width: 75,
+    },
   ]
 
-  const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP;
+  const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP
   const selectedNetworkConfig =
     lpChoice === 'L1LP'
       ? networkService?.networkConfig?.L1?.chainIdHex
       : networkService?.networkConfig?.L2?.chainIdHex
+
+  const setTabSwitcher = (pool: string) => {
+    setLpChoice(TabSwitcherEnum[pool as keyof tabSwitcherTypes].name)
+    setPoolTab(TabSwitcherEnum[pool as keyof tabSwitcherTypes].tab)
+  }
 
   return (
     <S.EarnPageContainer>
@@ -147,12 +159,14 @@ const Earn = () => {
         accountEnabled={accountEnabled}
       />
 
-      {((layer === 'L2' && lpChoice === 'L1LP') || (layer === 'L1' && lpChoice === 'L2LP')) && (
+      {((layer === 'L2' && lpChoice === 'L1LP') ||
+        (layer === 'L1' && lpChoice === 'L2LP')) && (
         <S.LayerAlert>
           <S.AlertInfo>
-            <AlertIcon sx={{ flex: 1 }} />
+            <AlertIcon />
             <S.AlertText variant="body2" component="p">
-              You are on {layer}. To transact on {layer === 'L1' ? 'L2' : 'L1'}, SWITCH LAYER to {layer === 'L1' ? 'L2' : 'L1'}
+              You are on {layer}. To transact on {layer === 'L1' ? 'L2' : 'L1'},
+              SWITCH LAYER to {layer === 'L1' ? 'L2' : 'L1'}
             </S.AlertText>
           </S.AlertInfo>
           <LayerSwitcher isButton={true} />
@@ -160,43 +174,22 @@ const Earn = () => {
       )}
 
       <Box sx={{ my: 1, width: '100%' }}>
-        <S.EarnActionContainer sx={{ mb: 2, display: 'flex' }}>
-          <G.PageSwitcher>
-            <Typography
-              className={poolTab === 'Ethereum Pool' ? 'active' : ''}
-              onClick={() => {
-                setLpChoice('L1LP')
-                setPoolTab('Ethereum Pool')
-              }}
-              variant="body2"
-              component="span">
-              {activeNetworkName['l1']} Pools
-            </Typography>
-            <Typography
-              className={poolTab === 'Boba L2 Pool' ? 'active' : ''}
-              onClick={() => {
-                setLpChoice('L2LP')
-                setPoolTab('Boba L2 Pool')
-              }}
-              variant="body2"
-              component="span">
-              {activeNetworkName['l2']} Pools
-            </Typography>
-          </G.PageSwitcher>
+        <S.EarnActionContainer>
+          <TabSwitcher
+            tabs={TabSwitcherEnum}
+            onSelect={(pool) => setTabSwitcher(pool)}
+          />
 
           <S.EarnAction>
-
             <CheckboxWithLabel
               label="My stakes only"
               checked={showMSO}
               onChange={(isChecked) => setShowMSO(isChecked)}
             />
           </S.EarnAction>
-
         </S.EarnActionContainer>
 
         <S.Help>
-
           <Typography variant="body3">
             Bridging fees are proportionally distributed to stakers. The bridges
             are not farms. Your earnings only increase when someone uses the
@@ -205,12 +198,14 @@ const Earn = () => {
 
           <Tooltip
             title={
-              <Typography variant="body2" sx={{ mt: 1, fontSize: '0.9em' }}>
+              <Typography variant="body3">
                 <span style={{ fontWeight: '700' }}>Staking example</span>. When
                 you stake 10 OMG into the L2 pool, then the pool's liquidity and
                 balance both increase by 10 OMG.
-                <br /><br />
-                <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
+                <br />
+                <br />
+                <span style={{ fontWeight: '700' }}>Fast Bridge example</span>.
+                When a user bridges 10 OMG from L1 to L2 using the fast bridge,
                 they send 10 OMG to the L1 pool, increasing its balance by 10
                 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2
                 wallet, completing the bridge. Note that bridge operations do
@@ -218,19 +213,22 @@ const Earn = () => {
                 difference between what was deposited into the L1 pool (10 OMG)
                 and what was sent to the user on the L2 (9.99 OMG), equal to
                 0.01 OMG, is sent to the reward pool, for harvesting by stakers.
-                <br /><br />
+                <br />
+                <br />
                 <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In
                 some circumstances, excess balances can accumulate on one chain.
                 For example, if many people bridge from L1 to L2, then L1 pool
                 balances will increase, while L2 balances will decrease. When
                 needed, the pool operator can rebalance the pools, using
                 'classic' deposit and exit operations to move funds from one
-                pool to another. Rebalancing takes 7 days, due to the 7 day
-                7 day fraud proof window, which also applies to the operator.
-                <br /><br />
+                pool to another. Rebalancing takes 7 days, due to the 7 day 7
+                day fraud proof window, which also applies to the operator.
+                <br />
+                <br />
                 <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The
                 pools use an automatic supply-and-demand approach to setting the
-                When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool and vice-versa.
+                When a pool's liquidity is low, the fees are increased to
+                attract more liquidity into that pool and vice-versa.
               </Typography>
             }
           >
@@ -241,7 +239,7 @@ const Earn = () => {
         <TableHeader options={tableHeaderOptions} />
         <S.EarnListContainer>
           {Object.keys(selectedPoolInfo).map((v, i) => {
-            const ret = getBalance(v, lpChoice === 'L1LP' ? 'L1' : 'L2');
+            const ret = getBalance(v, lpChoice === 'L1LP' ? 'L1' : 'L2')
             if (showMDO && Number(ret[0]) === 0) {
               return null
             }
@@ -260,7 +258,7 @@ const Earn = () => {
                 showStakesOnly={showMSO}
                 accountEnabled={accountEnabled}
               />
-            );
+            )
           })}
         </S.EarnListContainer>
       </Box>
@@ -268,4 +266,4 @@ const Earn = () => {
   )
 }
 
-export default React.memo(Earn);
+export default React.memo(Earn)

@@ -37,7 +37,7 @@ const TableContentContainer = styled(Row)`
 
 type TableHeaderOptionType = {
   name: string
-  tooltip: string
+  tooltip?: string
   width: number
 }
 

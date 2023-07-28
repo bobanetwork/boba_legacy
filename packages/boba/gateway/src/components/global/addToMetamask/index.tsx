@@ -1,6 +1,6 @@
 import React from 'react'
 import { getCoinImage } from 'util/coinImage'
-import MetamaskLogo from 'images/metamask.svg'
+import MetamaskLogo from 'images/icons/metamask.svg'
 import networkService from 'services/networkService'
 import styled from 'styled-components'
 
