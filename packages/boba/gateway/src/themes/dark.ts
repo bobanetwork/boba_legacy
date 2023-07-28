@@ -14,7 +14,7 @@ const dark = {
   },
   //new code
   background: '#191919',
-  color: '#FFFFFF',
+  color: '#EEEEEE',
   colors: {
     modalTransparent: 'transparent',
     danger: 'red',

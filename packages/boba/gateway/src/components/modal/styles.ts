@@ -53,7 +53,7 @@ export const Style = styled.div<StyleProps>`
   ${(props) =>
     props.transparent &&
     css`
-      background: ${props.theme.colors.modalTransparent};
+      background: ${props.theme.name === 'light' ? '#fff' : 'transparent'};
     `}
 
   backdrop-filter: ${(props) => (props.transparent ? 'none' : 'blur(15px)')};

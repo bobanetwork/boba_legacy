@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components'
 import BobaLogoImage from 'assets/images/boba-logo.png'
 import { Svg } from 'components/global'
+import { mobile } from 'themes/screens'
 
 export const HeaderContainer = styled.div`
   height: 73px;
@@ -20,6 +21,10 @@ export const HeaderContainer = styled.div`
     css`
       background: rgba(0, 0, 0, 0.05);
     `}
+
+    ${mobile(css`
+    padding: 0px 16px;
+  `)}
 `
 
 export const BobaLogo = styled.div`
@@ -29,6 +34,11 @@ export const BobaLogo = styled.div`
   background: ${({ theme }) => `url(${BobaLogoImage}) no-repeat`};
   background-position: 100%;
   background-size: contain;
+  ${mobile(css`
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+  `)}
 `
 
 export const HeaderAction = styled.div`

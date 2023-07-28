@@ -3,64 +3,62 @@
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="sc-eywOmQ fauosd"
+    class="sc-eAzDjm eZJmjM"
   >
     <div
-      class="sc-eAzDjm kajovC"
+      class="sc-fABZjn dncsHS"
     />
     <div
-      class="sc-hUOJWJ cbCyxP"
+      class="sc-ePzlA-D jgRDPC"
     >
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-gjJAnY bPnvCz"
         href="/bridge"
       >
         Bridge
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-gjJAnY bPnvCz"
         href="/history"
       >
         History
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-gjJAnY bPnvCz"
         href="/earn"
       >
         Earn
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-gjJAnY bPnvCz"
         href="/stake"
       >
         Stake
       </a>
       <a
         activeclassname="active"
-        class="sc-dPwPAC gNHJEr"
+        class="sc-gjJAnY bPnvCz"
         href="/DAO"
       >
         Dao
       </a>
     </div>
     <div
-      class="sc-fABZjn daRNmZ"
+      class="sc-gUMnWI ghBncp"
     >
       <button
-        class="sc-kuWgmH gPrhcx"
+        class="sc-duSInm jNkTqC"
         type="button"
       >
          Connect Wallet
       </button>
-      <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
-        tabindex="0"
+      <div
+        class="sc-dPwPAC RgduB"
         title="light-icon"
-        type="button"
       >
         <div>
           <div>
@@ -70,10 +68,7 @@ exports[`Layout => Header should match the snapshot 1`] = `
             />
           </div>
         </div>
-        <span
-          class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-        />
-      </button>
+      </div>
     </div>
   </div>
 </DocumentFragment>

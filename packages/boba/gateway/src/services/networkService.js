@@ -99,6 +99,7 @@ import walletService from './wallet.service'
 
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
+import { setFetchDepositTxBlock } from 'actions/bridgeAction';
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -1089,9 +1090,7 @@ class NetworkService {
   }) {
 
     try {
-
-      const time_start = new Date().getTime()
-      console.log('Deposit ETH L2 Txs start time:', time_start);
+      setFetchDepositTxBlock(false);
 
       let depositTX;
       if (this.network === NETWORK.ETHEREUM) {
@@ -1142,6 +1141,8 @@ class NetworkService {
         }
       }
 
+      setFetchDepositTxBlock(true);
+
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
@@ -1152,10 +1153,6 @@ class NetworkService {
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
       console.log('completed Deposit! L2 tx hash:', receipt.transactionReceipt)
-
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
-
       return txReceipt
     } catch(error) {
       console.log("NS: depositETHL2 error:",error)
@@ -1863,7 +1860,7 @@ class NetworkService {
       this.account,
       this.addresses.L1StandardBridgeAddress
     )
-
+    setFetchDepositTxBlock(false)
     try {
       /*
       OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then
@@ -1904,12 +1901,7 @@ class NetworkService {
         await approveStatus.wait()
         console.log("ERC20 L1 ops approved:",approveStatus)
       }
-
-      const time_start = new Date().getTime()
-      console.log("TX start time:", time_start)
-
       let depositTX;
-
       if (!recipient) {
         // incase no recipient
         depositTX = await this.L1StandardBridgeContract
@@ -1933,7 +1925,7 @@ class NetworkService {
           utils.formatBytes32String(new Date().getTime().toString())
         )
       }
-
+      setFetchDepositTxBlock(true)
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
@@ -1942,12 +1934,7 @@ class NetworkService {
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
-
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
-
       this.getBalances()
-
       return txReceipt
     } catch (error) {
       console.log("NS: depositErc20 error:", error)
@@ -2113,7 +2100,7 @@ class NetworkService {
       //returns total cost in ETH
       return totalCost
     } catch (error) {
-      console.log(error);
+      console.log(['GetExitCost',error]);
       return 0;
     }
   }
@@ -2571,17 +2558,9 @@ class NetworkService {
   /***** SWAP ON to BOBA by depositing funds to the L1LP *****/
   /***********************************************************/
   async depositL1LP(currency, value_Wei_String) {
-
-    updateSignatureStatus_depositLP(false)
-
-    console.log("depositL1LP:",currency)
-    console.log("value_Wei_String",value_Wei_String)
-
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
-    console.log("Depositing...")
-
     try {
+      updateSignatureStatus_depositLP(false)
+      setFetchDepositTxBlock(false);
 
       let depositTX = await this.L1LPContract
         .connect(this.provider.getSigner())
@@ -2591,14 +2570,10 @@ class NetworkService {
           currency === this.addresses.L1_ETH_Address ? { value: value_Wei_String } : {}
         )
 
-      console.log("depositTX",depositTX)
+      setFetchDepositTxBlock(true);
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
-
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
-      console.log(' block:', block)
-
       updateSignatureStatus_depositLP(true)
 
       const opts = {
@@ -2607,9 +2582,7 @@ class NetworkService {
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
       console.log(' completed swap-on ! L2 tx hash:', txReceipt)
-
       return txReceipt
-
     } catch (error) {
       console.log("NS: depositL1LP error:", error)
       return error
@@ -4753,6 +4726,17 @@ class NetworkService {
       return { methodIndex, result: { err: JSON.stringify(err) }}
     }
    }
+
+  // getting block number;
+
+  async getLatestBlockNumber() {
+    return await this.provider.getBlockNumber();
+  }
+
+  async getBlockTime(blockNumber) {
+    return (await this.provider.getBlock(blockNumber)).timestamp;
+  }
+
 }
 
 const networkService = new NetworkService()

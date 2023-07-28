@@ -116,3 +116,14 @@ $white500: rgba(255, 255, 255, 0.5);
     color: #fff;
   }
 }
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
