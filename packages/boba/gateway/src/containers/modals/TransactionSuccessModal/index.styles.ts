@@ -18,7 +18,8 @@ export const TitleText = styled(Typography).attrs({
 export const MutedText = styled(Typography).attrs({
   variant: 'body3',
 })`
-  color: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[700] : theme.colors.gray[50]};
 `
 
 export const CircleOuter = styled.div`
@@ -28,7 +29,8 @@ export const CircleOuter = styled.div`
   align-items: center;
   height: 150px;
   width: 150px;
-  background: ${({ theme }) => theme.colors.green[500]};
+  background: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.green[300] : theme.colors.green[500]};
 `
 export const CircleInner = styled.div`
   display: flex;
@@ -37,7 +39,8 @@ export const CircleInner = styled.div`
   align-items: center;
   height: 120px;
   width: 120px;
-  background: ${({ theme }) => theme.colors.green[400]};
+  background: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.green[300] : theme.colors.green[400]};
 `
 
 export const SuccessCheck = styled.div`

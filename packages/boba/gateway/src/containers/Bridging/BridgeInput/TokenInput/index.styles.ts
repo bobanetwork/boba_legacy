@@ -13,7 +13,7 @@ export const InputContainerLabel = styled(Typography).attrs({
   variant: 'body3',
 })`
   color: ${({ theme, error }) =>
-    error ? theme.colors.red[300] : theme.colors.gray[100]};
+    error ? theme.colors.red[300] : theme.colors.color};
   align-self: flex-end;
   font-weight: 400;
 `

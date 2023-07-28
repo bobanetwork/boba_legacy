@@ -18,6 +18,7 @@ import { LAYER } from 'util/constant'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
 import useAmountToReceive from 'hooks/useAmountToReceive'
 import networkService from 'services/networkService'
+import { useTheme } from 'styled-components'
 
 interface Props {}
 
@@ -25,7 +26,7 @@ const Fee = (props: Props) => {
   const bridgeType = useSelector(selectBridgeType())
   const layer = useSelector(selectLayer())
   const l2FeeRateN = useSelector(selectL2FeeRateN)
-
+  const theme: any = useTheme()
   const depositFee = useSelector(selectFastDepositCost)
 
   // required on L2 layer
@@ -106,8 +107,24 @@ const Fee = (props: Props) => {
         <Label>{(layer === LAYER.L1 ? l2FeeRateN : l1FeeRateN) || 0}%</Label>
       </InfoRow>
       <InfoRow>
-        <Label color="white">You will receive</Label>
-        <Label color="white">{amountToReceive}</Label>
+        <Label
+          color={`${
+            theme.name === 'light'
+              ? theme.colors.gray[800]
+              : theme.colors.gray[50]
+          }`}
+        >
+          You will receive
+        </Label>
+        <Label
+          color={`${
+            theme.name === 'light'
+              ? theme.colors.gray[800]
+              : theme.colors.gray[50]
+          }`}
+        >
+          {amountToReceive}
+        </Label>
       </InfoRow>
     </BridgeInfoContainer>
   )

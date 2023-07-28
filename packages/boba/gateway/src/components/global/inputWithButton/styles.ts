@@ -10,15 +10,15 @@ export const InputContainer = styled.div<{ error?: boolean }>`
   border-radius: 12px;
   border: 1px solid
     ${({ theme, error }) =>
-      error ? theme.colors.red[300] : theme.colors.gray[300]};
-  background: ${(props) => props.theme.colors.gray[500]};
+      error ? theme.colors.red[300] : theme.colors.box.border};
+  background: ${(props) => props.theme.colors.box.background};
 `
 
 export const Input = styled.input`
   flex: 1;
   padding: 10px;
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  color: ${(props) => props.theme.colors.gray[50]};
+  color: ${(props) => props.theme.color};
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -34,10 +34,25 @@ export const InputActionButton = styled.button<{ disabled?: boolean }>`
   padding: 4px 6px;
   align-items: flex-start;
   gap: 10px;
-  color: ${(props) => props.theme.colors.green[300]};
   font-size: 12px;
   font-weight: 400;
   border-radius: 6px;
-  border: 1px solid ${(props) => props.theme.colors.gray[400]};
-  background: transparent;
+  ${({ theme: { colors, name } }) =>
+    name === 'light'
+      ? css`
+          color: ${colors.gray[600]};
+          border: 1px solid ${colors.gray[600]};
+          background: ${colors.gray[100]};
+          &:hover {
+            background: transparent;
+          }
+        `
+      : css`
+          color: ${colors.green[300]};
+          border: 1px solid ${colors.gray[400]};
+          background: transparent;
+          &:hover {
+            border: 1px solid ${colors.gray[100]};
+          }
+        `}
 `

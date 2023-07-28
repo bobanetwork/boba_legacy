@@ -27,10 +27,11 @@ export const SettingsAction = styled.div`
 export const SettingSubTitle = styled(Typography).attrs({
   variant: 'subtitle',
 })`
-  color: ${(props) => props.theme.colors.gray[100]};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[700] : theme.colors.gray[100]};
 `
 export const SettingTitle = styled(Typography).attrs({
   variant: 'body2',
 })`
-  color: ${(props) => props.theme.colors.gray[50]};
+  color: ${(props) => props.theme.color};
 `

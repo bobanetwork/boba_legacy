@@ -3,7 +3,11 @@ import styled, { css } from 'styled-components'
 export const BridgeTabs = styled.div`
   display: flex;
   justify-content: space-between;
-  background: ${(props) => props.theme.colors.gray[400]};
+  border: 1px solid
+    ${({ theme: { name, colors } }) =>
+      name === 'light' ? colors.gray[400] : 'transperant'};
+  background: ${({ theme: { name, colors } }) =>
+    name === 'light' ? colors.gray[100] : colors.gray[500]};
   border-radius: 8px;
   padding: 5px;
   width: 100%;
@@ -22,10 +26,18 @@ export const BridgeTabItem = styled.div<{
   font-size: ${(props) => props.theme.text.body1};
   cursor: pointer;
   background: transparent;
+  color: ${(props) =>
+    props.theme.name === 'light' ? props.theme.colors.gray[600] : 'inherit'};
+  box-shadow: ${({ theme: { name } }) =>
+    name === 'light'
+      ? '0px 2px 4px 0px rgba(0, 0, 0, 0.10)'
+      : '0px 4px 10px 0px rgba(186, 226, 26, 0.1)'};
   ${(props) =>
     props.active &&
     css`
-      color: ${props.theme.colors.gray[600]};
+      color: ${props.theme.name === 'light'
+        ? props.theme.colors.gray[800]
+        : props.theme.colors.gray[600]};
       background: ${props.theme.colors.green[300]};
     `};
 `

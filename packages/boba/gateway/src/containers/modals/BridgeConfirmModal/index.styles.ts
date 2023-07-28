@@ -10,12 +10,13 @@ export const ConfirmModalContainer = styled.div`
 export const ConfirmLabel = styled(Typography).attrs({
   variant: 'body2',
 })`
-  color: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) => theme.color};
 `
 export const ConfirmValue = styled(Typography).attrs({
   variant: 'body1',
 })`
-  color: ${({ theme }) => theme.colors.gray[50]};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[800] : theme.colors.gray[50]};
   text-transform: capitalize;
 `
 

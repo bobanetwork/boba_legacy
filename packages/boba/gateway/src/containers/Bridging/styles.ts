@@ -16,16 +16,10 @@ export const BridgeWrapper = styled.div`
   gap: 24px;
   width: 100%;
   border-radius: 12px;
-  border: 1px solid var(--gray-300, #545454);
-  background: var(
-    --gradient-glass,
-    linear-gradient(
-      129deg,
-      rgba(48, 48, 48, 0.6) 0%,
-      rgba(48, 48, 48, 0.6) 46.35%,
-      rgba(37, 37, 37, 0.6) 94.51%
-    )
-  );
+  border: 1px solid
+    ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[400] : colors.gray[300]};
+  background: ${({ theme }) => theme.colors.box.background};
   /* Gradient Glass BG Blur */
   backdrop-filter: blur(7.5px);
 `
@@ -59,7 +53,7 @@ export const Label = styled(Typography).attrs({
 })`
   font-weight: 400;
   line-height: normal;
-  color: ${({ theme, color }) => color || theme.colors.gray[100]};
+  color: ${({ theme, color }) => color || theme.colors.gray[700]};
 `
 
 export const BridgeItem = styled.a`
@@ -70,6 +64,11 @@ export const BridgeItem = styled.a`
   gap: 8px;
   border-radius: 12px;
   border: 1px solid ${({ theme }) => theme.colors.gray[300]};
+  color: ${(props) => props.theme.color};
+  text-decoration: none;
+  &:hover {
+    background: ${(props) => props.theme.colors.gray[400]};
+  }
 `
 export const BridgeIcon = styled.div`
   height: 32px;

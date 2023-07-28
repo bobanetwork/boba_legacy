@@ -11,45 +11,50 @@ export const AlertContainer = styled.div<{ type?: AlertType }>`
   width: 100%;
   display: flex;
   padding: 12px 16px;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 16px;
   border-radius: 8px;
-  ${({ type, theme }) =>
+  ${({ type, theme: { name, colors } }) =>
     type === 'warning'
       ? css`
-          border: 1px solid #f7c367;
-          background: #413011;
-          color: #f9d28d;
+          border: 1px solid
+            ${name === 'light' ? colors.yellow[100] : colors.yellow[200]};
+          background: ${name === 'light'
+            ? colors.yellow[50]
+            : colors.yellow[500]};
+          color: ${name === 'light' ? colors.yellow[500] : colors.yellow[200]};
         `
       : ''}
 
-  ${({ type }) =>
+  ${({ type, theme: { name, colors } }) =>
     type === 'error'
       ? css`
-          border: 1px solid #d84f4f;
-          background: var(--red-500, #562020);
-          color: #d84f4f;
+          border: 1px solid
+            ${name === 'light' ? colors.red[100] : colors.red[300]};
+          background: ${name === 'light' ? colors.red[50] : colors.red[500]};
+          color: ${name === 'light' ? colors.red[500] : colors.gray[100]};
         `
       : ''}
-  ${({ type }) =>
+  ${({ type, theme: { name, colors } }) =>
     type === 'info'
       ? css`
-          border: 1px solid #b7c7f0;
-          background: #1e2e57;
-          color: #b7c7f0;
+          border: 1px solid
+            ${name === 'light' ? colors.blue[200] : colors.blue[100]};
+          background: ${name === 'light' ? colors.blue[50] : colors.blue[500]};
+          color: ${name === 'light' ? colors.blue[500] : colors.blue[100]};
         `
       : ''}
 `
 
 export const ErrorIcon = styled(ErrorOutline)`
-  color: ${(props) => props.theme.colors.red[300]};
+  color: ${({ theme: { colors } }) => colors.red[300]};
 `
 export const InfoIcon = styled(InfoOutlined)`
-  color: ${(props) => props.theme.colors.blue[100]};
+  color: ${({ theme: { colors } }) => colors.blue[100]};
 `
 export const WarningIcon = styled(ReportProblemOutlined)`
-  color: ${(props) => props.theme.colors.yellow[200]};
+  color: ${({ theme: { colors } }) => colors.yellow[200]};
 `
 
 export const AlertText = styled(Typography).attrs({

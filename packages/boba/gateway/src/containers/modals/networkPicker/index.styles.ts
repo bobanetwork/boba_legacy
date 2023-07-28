@@ -26,12 +26,12 @@ export const NetworkItem = styled.div<{ selected?: boolean }>`
     css`
       border-radius: 8px;
       border: 1px solid var(--gray-100, #a8a8a8);
-      background: var(--gray-400, #393939);
+      background: ${({ theme: { colors } }) => colors.gray[400]};
     `}
 
   &:hover {
     border-radius: 8px;
-    background: var(--gray-400, #393939);
+    background: ${({ theme: { colors } }) => colors.gray[400]};
   }
 `
 export const NetworkIcon = styled.div`
@@ -40,7 +40,8 @@ export const NetworkIcon = styled.div`
 export const NetworkLabel = styled(Typography).attrs({
   variant: 'body1',
 })`
-  color: ${(props) => props.theme.colors.gray[50]};
+  color: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[700] : colors.gray[50]};
   text-align: right;
 `
 

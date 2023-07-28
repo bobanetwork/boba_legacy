@@ -19,7 +19,11 @@ export const ProgressLoader = styled.div`
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  border: 10px solid ${({ theme }) => theme.colors.green[500]};
+  border: 10px solid
+    ${({ theme }) =>
+      theme.name === 'light'
+        ? theme.colors.gray[400]
+        : theme.colors.green[500]};
   border-top: 10px solid ${({ theme }) => theme.colors.green[300]};
   animation-name: ${circleAnimation};
   animation-duration: 1s;
@@ -31,5 +35,6 @@ export const ProgressLoader = styled.div`
 export const MutedText = styled(Typography).attrs({
   variant: 'subtitle',
 })`
-  color: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[700] : theme.colors.gray[100]};
 `

@@ -35,8 +35,11 @@ export const ChainPicker = styled.div`
   gap: 16px;
   border-radius: 14px;
   width: 100%;
-  border: 1px solid ${(props) => props.theme.colors.gray[300]};
-  background: ${(props) => props.theme.colors.gray[500]};
+  border: 1px solid
+    ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[400] : colors.gray[300]};
+  background: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[100] : colors.gray[500]};
 `
 
 export const ChainIcon = styled.div`
@@ -54,8 +57,11 @@ export const ChainPickerIcon = styled.div`
 `
 export const DownArrow = styled(Svg).attrs({
   src: ArrowDown,
-  fill: '#fff',
-})``
+  fill: 'current',
+})`
+  fill: ${({ theme }: { theme: any }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : '#fff'};
+`
 
 export const SwitchChainIcon = styled.div`
   cursor: pointer;
@@ -67,23 +73,20 @@ export const SwitchChainIcon = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 20px;
-  border: 1px solid var(--gray-200, #5f5f5f);
-  background: var(
-    --gradient-glass,
-    linear-gradient(
-      129deg,
-      rgba(48, 48, 48, 0.6) 0%,
-      rgba(48, 48, 48, 0.6) 46.35%,
-      rgba(37, 37, 37, 0.6) 94.51%
-    )
-  );
+  border: 1px solid ${(props) => props.theme.colors.box.border};
+  background: ${({ theme: { colors } }) => colors.box.background};
 
   &:hover {
-    background: #b9b9b9;
+    border-color: ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[600] : colors.gray[100]};
   }
 
   > div {
     align-self: stretch;
+  }
+  transition: transform 0.3s ease-in-out;
+  &:hover {
+    transform: rotate(180deg);
   }
 `
 export const SwitchIcon = styled(Svg).attrs({
@@ -96,5 +99,6 @@ export const SwitchIcon = styled(Svg).attrs({
 export const SectionLabel = styled(Typography).attrs({
   variant: 'body2',
 })`
-  color: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[700] : colors.gray[100]};
 `

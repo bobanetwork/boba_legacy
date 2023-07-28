@@ -1,8 +1,7 @@
 import React from 'react';
-import { Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Button from 'components/button/Button';
+import {Button} from 'components/global';
 import Modal from 'components/modal/Modal';
 
 import { setActiveNetwork } from 'actions/networkAction';
@@ -39,16 +38,10 @@ function SwitchNetworkModal({open}) {
       title="Switch Network"
       newStyle={true}
     >
-      <Box display="flex" alignItems="center" justifyContent="center">
         <Button
-          type="primary"
-          variant="contained"
-          size="large"
+          label={`Switch to the ${network} network`}
           onClick={()=>onClick()}
-        >
-          Switch to the {network} network
-        </Button>
-      </Box>
+        />
     </Modal>
   )
 }

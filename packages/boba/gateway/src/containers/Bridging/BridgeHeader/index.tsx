@@ -1,16 +1,20 @@
-import React from 'react'
-import SettingsOutlined from '@mui/icons-material/SettingsOutlined'
 import HelpOutlineOutlined from '@mui/icons-material/HelpOutlineOutlined'
-import Tooltip from 'components/tooltip/Tooltip'
-import { BridgeHeaderWrapper } from './styles'
-import { Heading } from 'components/global'
-import { useDispatch } from 'react-redux'
 import { openModal } from 'actions/uiAction'
+import { Heading } from 'components/global'
+import Tooltip from 'components/tooltip/Tooltip'
+import React from 'react'
+import { useDispatch } from 'react-redux'
+import { useTheme } from 'styled-components'
+import { BridgeHeaderWrapper, GearIcon, IconWrapper } from './styles'
 
 type Props = {}
 
 const BridgeHeader = (props: Props) => {
   const dispatch = useDispatch<any>()
+  const theme: any = useTheme()
+
+  const iconColor =
+    theme.name === 'light' ? theme.colors.gray[600] : theme.colors.gray[100]
 
   const openSettingModal = () => {
     dispatch(openModal('settingsModal'))
@@ -27,16 +31,17 @@ const BridgeHeader = (props: Props) => {
                 Fast Bridge:
                 A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient.`}
         >
-          <HelpOutlineOutlined
-            fontSize="small"
-            sx={{ cursor: 'pointer', ml: 1, color: '#A8A8A8' }}
-          />
+          <IconWrapper inline={true} style={{ marginLeft: '5px' }}>
+            <HelpOutlineOutlined
+              fontSize="small"
+              sx={{ cursor: 'pointer', color: iconColor }}
+            />
+          </IconWrapper>
         </Tooltip>
       </Heading>
-      <SettingsOutlined
-        sx={{ cursor: 'pointer', color: '#A8A8A8' }}
-        onClick={openSettingModal}
-      />
+      <IconWrapper>
+        <GearIcon sx={{ color: iconColor }} onClick={openSettingModal} />
+      </IconWrapper>
     </BridgeHeaderWrapper>
   )
 }

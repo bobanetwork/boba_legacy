@@ -31,8 +31,8 @@ export const TokenSelectorInput = styled.div`
   align-items: center;
   gap: 8px;
   border-radius: 12px;
-  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
-  background: ${({ theme }) => theme.colors.gray[500]};
+  border: 1px solid ${({ theme: { colors } }) => colors.box.border};
+  background: ${({ theme: { colors } }) => colors.box.background};
 `
 
 export const ReceiveContainer = styled.div`
@@ -51,8 +51,11 @@ export const BridgeInfoContainer = styled.div`
   align-items: center;
   gap: 8px;
   border-radius: 8px;
-  border: 1px solid var(--green-300-main, #aedb01);
-  background: rgba(238, 238, 238, 0.05);
+  border: 1px solid
+    ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[600] : colors.green[300]};
+  background: ${({ theme: { name } }) =>
+    name === 'light' ? 'transparant' : 'rgba(238, 238, 238, 0.05)'};
 
   /* Green Hilight */
   box-shadow: 0px 4px 10px 0px rgba(186, 226, 26, 0.1);
@@ -71,7 +74,7 @@ export const TokenLabel = styled(Typography).attrs({
   variant: 'body1',
 })`
   flex: 1;
-  color: ${({ theme }) => theme.colors.gray[50]};
+  color: ${({ theme: { colors } }) => colors.color};
 `
 
 export const TokenPickerIcon = styled.div`
@@ -87,6 +90,9 @@ export const ReceiveAmount = styled(Typography).attrs({
 })`
   padding: 12px 16px;
   border-radius: 12px;
-  border: 1px solid ${({ theme }) => theme.colors.gray[300]};
-  color: ${({ theme }) => theme.colors.gray[50]};
+  border: 1px solid
+    ${({ theme }) =>
+      theme.name === 'light' ? theme.colors.gray[500] : theme.colors.gray[300]};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[800] : theme.colors.gray[50]};
 `
