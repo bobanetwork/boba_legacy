@@ -1,73 +1,5 @@
 [
   {
-    "hash": "0xff7923d5f7738b491c1362165ba7c7a6eb665ce0ba142478bd1f9dfd33c81468",
-    "blockNumber": 9328236,
-    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "timeStamp": 1689085644,
-    "contractName": "L1StandardBridge",
-    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "activity": "ERC20DepositInitiated",
-    "depositL2": true,
-    "crossDomainMessage": {
-      "crossDomainMessage": 1,
-      "crossDomainMessageFinalize": 1,
-      "crossDomainMessageSendTime": 1689085644,
-      "crossDomainMessageEstimateFinalizedTime": 1689085764,
-      "fast": 0,
-      "l2Hash": "0xf1421f4f8cc3a5b9a36068d4d19dfe55624672066b427eec6de04d3766e977f5",
-      "l2BlockNumber": 40330,
-      "l2BlockHash": "0x67125bb99e0688aec984477bd2a43f92fe426e003c93b18443782380124d8b0f",
-      "l2From": "0x0000000000000000000000000000000000000000",
-      "l2To": "0x4200000000000000000000000000000000000007"
-    },
-    "action": {
-      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "token": "0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1",
-      "amount": "20000000000000000000",
-      "receive": "20000000000000000000",
-      "feeRate": "0",
-      "fast": 0,
-      "status": "succeeded"
-    },
-    "chain": "L1pending"
-  },
-  {
-    "hash": "0x30c27ee667cd51a2ad4df0f26c707c84404ea124e6fe2dda238afbcdb9bdf98e",
-    "blockNumber": 9328024,
-    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "timeStamp": 1689082296,
-    "contractName": "L1StandardBridge",
-    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "activity": "ETHDepositInitiated",
-    "depositL2": true,
-    "crossDomainMessage": {
-      "crossDomainMessage": 1,
-      "crossDomainMessageFinalize": 1,
-      "crossDomainMessageSendTime": 1689082296,
-      "crossDomainMessageEstimateFinalizedTime": 1689082416,
-      "fast": 0,
-      "l2Hash": "0xc4e42fb83f4bfb876404f29527b2c9906840406fd8f669070cecbb31eb8d011c",
-      "l2BlockNumber": 40329,
-      "l2BlockHash": "0x7a3074ea5381e8a84ba025b963935f80acbe6a9eb7ee59d1e0cb5cd256f64fcc",
-      "l2From": "0x0000000000000000000000000000000000000000",
-      "l2To": "0x4200000000000000000000000000000000000007"
-    },
-    "action": {
-      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "token": "0x0000000000000000000000000000000000000000",
-      "amount": "30000000000000000",
-      "receive": "30000000000000000",
-      "feeRate": "0",
-      "fast": 0,
-      "status": "succeeded"
-    },
-    "chain": "L1pending"
-  },
-  {
     "hash": "0x54b9f38f649f85d4857aa73c278ec531b14790e6f8206326b19978b568a632fb",
     "blockNumber": 40299,
     "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
@@ -102,7 +34,11 @@
       "fast": null,
       "status": "succeeded"
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5,
+    "UserFacingStatus": "Completed"
   },
   {
     "hash": "0x21fa90ccb09937d5dbbeca5945c79b0a744597dd6bededfcbe98474bc7079175",
@@ -139,7 +75,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x2af87df315c53d553ac4b788be0575d524e9c735a858b3977edec162a8214b6b",
@@ -176,7 +115,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x36c3c5dd6c169abc52bff3c52b782a5ed92c910ae8dddcf7e1ef759c88dfe03b",
@@ -213,7 +155,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0xcf4b261400b607ad82a11d2d6cc9e337f965bd68c3f18fce13db7432be21b863",
@@ -250,41 +195,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
-  },
-  {
-    "hash": "0x6d7c3b2c833bf55a4c6fd1e4ae0611f49a8e1471fa9aa12928bf177ba0bc3172",
-    "blockNumber": 9323009,
-    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "timeStamp": 1689005124,
-    "contractName": "L1StandardBridge",
-    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "activity": "ERC20DepositInitiated",
-    "depositL2": true,
-    "crossDomainMessage": {
-      "crossDomainMessage": 1,
-      "crossDomainMessageFinalize": 1,
-      "crossDomainMessageSendTime": 1689005124,
-      "crossDomainMessageEstimateFinalizedTime": 1689005244,
-      "fast": 0,
-      "l2Hash": "0x96d8de3ff0a1ddde0cd4562b9906fe2b780489984c6c3cfb5127f899b4bb8ff3",
-      "l2BlockNumber": 40294,
-      "l2BlockHash": "0xf2c46f385ccf6395637539332c3863cbbb3a1c19f9aefd4826cb5f5ada3387c0",
-      "l2From": "0x0000000000000000000000000000000000000000",
-      "l2To": "0x4200000000000000000000000000000000000007"
-    },
-    "action": {
-      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "token": "0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1",
-      "amount": "20000000000000000000",
-      "receive": "20000000000000000000",
-      "feeRate": "0",
-      "fast": 0,
-      "status": "succeeded"
-    },
-    "chain": "L1pending"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x483ab732b1c870b8f3a2ab4f026db1a4f092ebe7817b93d4df2b1e95985db4e7",
@@ -321,7 +235,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0xa681b7ebeb778c676d375b2cd8cf9b61f61a2a5b04953d9cc1730f989f9f146e",
@@ -358,7 +275,11 @@
       "fast": null,
       "status": "succeeded"
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5,
+    "UserFacingStatus": "Completed"
   },
   {
     "hash": "0xc02413fa53c4012541193bf1df9e997108462a84d7ffd41d8b354141ddc1ad4b",
@@ -395,7 +316,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x1931463f5d6eb9c5a4f1ff7fbfe3d9ba4fde64c78f1ab56fd42f52a3bc95f9ff",
@@ -432,7 +356,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x61f74be0687b1b51a206d881d3ede273be90ec927b9b5c23ab6b00f7a21537da",
@@ -469,7 +396,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x868d172eedeccf438e912eba569ee7473d5849682d69769811573fad85667087",
@@ -506,7 +436,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x1d8a6ff5906f80da7cb5c8565bfda0e96898ca9b657bda4d685e3d522aac67cd",
@@ -543,7 +476,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0xbd32053a927efbd907f2dfe0a28af9f6af487b6d79d118a83ac8fe3408f97c47",
@@ -580,7 +516,11 @@
       "fast": null,
       "status": "succeeded"
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5,
+    "UserFacingStatus": "Completed"
   },
   {
     "hash": "0x97d1976242be4a4b0ba2680267ceecfff42036b6d5be0e7301b284ba97fc3200",
@@ -617,7 +557,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0xedef20eecda1be0ef60c7a99ede5ad46e89ba7708e908eb652261a8aa11603df",
@@ -654,7 +597,11 @@
       "fast": null,
       "status": "succeeded"
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5,
+    "UserFacingStatus": "Completed"
   },
   {
     "hash": "0x31b67a9e8c7ca0a355a10c3f5ae8f311bce66ee9507efca22f22856426f441e2",
@@ -691,7 +638,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x1491815da205c1d5b903afa1cd53a9f95fe460c31d3bc4503dfb59e268733de8",
@@ -728,41 +678,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
-  },
-  {
-    "hash": "0xc590cb9dd4b18d07f9b510b1f665ce0fc173860abe2f3d30fdbe70fb3145e333",
-    "blockNumber": 9295665,
-    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "timeStamp": 1688580696,
-    "contractName": "L1StandardBridge",
-    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
-    "activity": "ETHDepositInitiated",
-    "depositL2": true,
-    "crossDomainMessage": {
-      "crossDomainMessage": 1,
-      "crossDomainMessageFinalize": 1,
-      "crossDomainMessageSendTime": 1688580696,
-      "crossDomainMessageEstimateFinalizedTime": 1688580816,
-      "fast": 0,
-      "l2Hash": "0xcce24215c94ff680320207d12f3beaf2c23cd5ca3260f577b24f1a8c8d581810",
-      "l2BlockNumber": 40123,
-      "l2BlockHash": "0xe92a5b8291a00f247abb5677ad8e18a08ac69eaf51b382cb39a0116c1630f3e3",
-      "l2From": "0x0000000000000000000000000000000000000000",
-      "l2To": "0x4200000000000000000000000000000000000007"
-    },
-    "action": {
-      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
-      "token": "0x0000000000000000000000000000000000000000",
-      "amount": "100000000000000",
-      "receive": "100000000000000",
-      "feeRate": "0",
-      "fast": 0,
-      "status": "succeeded"
-    },
-    "chain": "L1pending"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x6c3c97931034f330c8873d1ea20d1b26b4f430e8da8e76ef65c9a1ce69a86481",
@@ -799,7 +718,11 @@
       "fast": null,
       "status": "succeeded"
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5,
+    "UserFacingStatus": "Completed"
   },
   {
     "hash": "0x6afb17e32dc1dadd9585c434cb652376a43deb5dd421ae67e568f1d1695ff917",
@@ -836,7 +759,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x04c0f0c540d4f505be9504cfa31524179f8d816dd2847d61de287ecacea44837",
@@ -873,7 +799,10 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
   },
   {
     "hash": "0x560759950bea44486efa9af0e4e0e73e92bc2727031be24086422220a0810762",
@@ -910,7 +839,11 @@
       "fast": null,
       "status": "succeeded"
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5,
+    "UserFacingStatus": "Completed"
   },
   {
     "hash": "0x0c8288b8b620b3b0c5394ed2a12d9c1bd9a8c7e474ed46c5cca1de1cc4d66d13",
@@ -947,6 +880,161 @@
       "fast": null,
       "status": null
     },
-    "chain": "L2"
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
+  },
+  {
+    "hash": "0xff7923d5f7738b491c1362165ba7c7a6eb665ce0ba142478bd1f9dfd33c81468",
+    "blockNumber": 9328236,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "timeStamp": 1689085644,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "activity": "ERC20DepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1689085644,
+      "crossDomainMessageEstimateFinalizedTime": 1689085764,
+      "fast": 0,
+      "l2Hash": "0xf1421f4f8cc3a5b9a36068d4d19dfe55624672066b427eec6de04d3766e977f5",
+      "l2BlockNumber": 40330,
+      "l2BlockHash": "0x67125bb99e0688aec984477bd2a43f92fe426e003c93b18443782380124d8b0f",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1",
+      "amount": "20000000000000000000",
+      "receive": "20000000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Goerli",
+    "originChainId": 5,
+    "destinationChainId": 2888,
+    "UserFacingStatus": "Completed"
+  },
+  {
+    "hash": "0x30c27ee667cd51a2ad4df0f26c707c84404ea124e6fe2dda238afbcdb9bdf98e",
+    "blockNumber": 9328024,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "timeStamp": 1689082296,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "activity": "ETHDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1689082296,
+      "crossDomainMessageEstimateFinalizedTime": 1689082416,
+      "fast": 0,
+      "l2Hash": "0xc4e42fb83f4bfb876404f29527b2c9906840406fd8f669070cecbb31eb8d011c",
+      "l2BlockNumber": 40329,
+      "l2BlockHash": "0x7a3074ea5381e8a84ba025b963935f80acbe6a9eb7ee59d1e0cb5cd256f64fcc",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "30000000000000000",
+      "receive": "30000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Goerli",
+    "originChainId": 5,
+    "destinationChainId": 2888,
+    "UserFacingStatus": "Completed"
+  },
+  {
+    "hash": "0x6d7c3b2c833bf55a4c6fd1e4ae0611f49a8e1471fa9aa12928bf177ba0bc3172",
+    "blockNumber": 9323009,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "timeStamp": 1689005124,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "activity": "ERC20DepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1689005124,
+      "crossDomainMessageEstimateFinalizedTime": 1689005244,
+      "fast": 0,
+      "l2Hash": "0x96d8de3ff0a1ddde0cd4562b9906fe2b780489984c6c3cfb5127f899b4bb8ff3",
+      "l2BlockNumber": 40294,
+      "l2BlockHash": "0xf2c46f385ccf6395637539332c3863cbbb3a1c19f9aefd4826cb5f5ada3387c0",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1",
+      "amount": "20000000000000000000",
+      "receive": "20000000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Goerli",
+    "originChainId": 5,
+    "destinationChainId": 2888,
+    "UserFacingStatus": "Completed"
+  },
+  {
+    "hash": "0xc590cb9dd4b18d07f9b510b1f665ce0fc173860abe2f3d30fdbe70fb3145e333",
+    "blockNumber": 9295665,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "timeStamp": 1688580696,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "activity": "ETHDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1688580696,
+      "crossDomainMessageEstimateFinalizedTime": 1688580816,
+      "fast": 0,
+      "l2Hash": "0xcce24215c94ff680320207d12f3beaf2c23cd5ca3260f577b24f1a8c8d581810",
+      "l2BlockNumber": 40123,
+      "l2BlockHash": "0xe92a5b8291a00f247abb5677ad8e18a08ac69eaf51b382cb39a0116c1630f3e3",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "100000000000000",
+      "receive": "100000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Goerli",
+    "originChainId": 5,
+    "destinationChainId": 2888,
+    "UserFacingStatus": "Completed"
   }
 ]

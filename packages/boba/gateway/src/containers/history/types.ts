@@ -96,14 +96,14 @@ export interface ITransaction {
 export interface IProcessedTransaction {
   timeStamp: number
   from: string
-  fromLayer: LAYER
+  fromHash: string
+  toHash: string
   to: string
-  toLayer: LAYER
   tokenSymbol: string
   amount: string
   status?: TRANSACTION_FILTER_STATUS // need to remove the undefined option
-  l1Hash: string
-  l2Hash: string
+  originChainId: number
+  destinationChainId: number
 }
 
 export interface ITransactionsResolverProps {
@@ -113,13 +113,13 @@ export interface ITransactionsResolverProps {
 }
 
 export type ChainMap = {
-  [key in CHAIN_NAME]: ChainInfo
+  [key: string]: ChainInfo
 }
 
 export type ChainInfo = {
-  chainId: string
-  parentChainId?: string
-  layer: string
+  name: string
+  symbol: string
+  transactionUrlPrefix: string
 }
 
 export interface Token {

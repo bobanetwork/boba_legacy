@@ -37,7 +37,6 @@ import {
   selectTransactions,
   selectAccountEnabled,
   selectLayer,
-  selectActiveNetworkName,
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'

@@ -3,114 +3,88 @@
 exports[`Testing history page Test History Page 1`] = `
 <DocumentFragment>
   <div
-    class="sc-gWHAAX DBsUD"
+    class="sc-ccVCaX iTEcVz"
   >
     <div
-      class="sc-ccVCaX bfUWyG"
+      class="sc-jnqLxu kZLqyY"
     >
       <div
-        class="searchInput"
+        class="sc-OKtSx jYaSnu"
       >
-        <div
-          style="width: 100%;"
-        >
-          <div
-            class="MuiBox-root css-347swi"
-            newstyle="0"
-          >
+        <div>
+          <div>
             <div
-              class="MuiBox-root css-hlh5cj"
-            >
-              <div
-                class="MuiFormControl-root MuiTextField-root css-1wgc8ob-MuiFormControl-root-MuiTextField-root"
-                newstyle="0"
-              >
-                <div
-                  class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root"
-                >
-                  <input
-                    aria-invalid="false"
-                    class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1n4twyu-MuiInputBase-input-MuiOutlinedInput-input"
-                    id="mui-1"
-                    placeholder="Search Here"
-                    type="text"
-                    value=""
-                  />
-                  <fieldset
-                    aria-hidden="true"
-                    class="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
-                  >
-                    <legend
-                      class="css-ihdtdm"
-                    >
-                      <span
-                        class="notranslate"
-                      >
-                        ​
-                      </span>
-                    </legend>
-                  </fieldset>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        class="actions"
-      >
-        <div
-          style="margin: 0px 10px; opacity: 0.7;"
-        >
-          Date range from
-        </div>
-        <div
-          class="react-datepicker-wrapper datePickerInput"
-        >
-          <div
-            class="react-datepicker__input-container"
-          >
-            <input
-              class=""
-              placeholder=""
-              type="text"
-              value="01/21/2023"
+              data-src="magnifyingGlass.svg"
+              src=""
             />
           </div>
         </div>
-        <div
-          style="margin: 0px 10px; opacity: 0.7;"
+        <input
+          class="sc-fecFrY bFSDlO"
+          placeholder="Search Here"
+          value=""
+        />
+      </div>
+      <div
+        class="sc-eItWsw hQELIm"
+      >
+        <p
+          class="sc-cJPUEC hqgtEx sc-fwEaKe fuaCkC"
         >
-          to 
-        </div>
+          Date range
+        </p>
+        <p
+          class="sc-cJPUEC hqgtEx sc-bhlPkD fFwcmS"
+        >
+          Date range from
+        </p>
         <div
-          class="react-datepicker-wrapper datePickerInput"
+          class="react-datepicker-wrapper"
         >
           <div
             class="react-datepicker__input-container"
           >
             <input
-              class=""
-              placeholder=""
+              class="sc-fIwssx iNJPrf"
+              placeholder="From"
               type="text"
-              value="07/21/2023"
+              value="01/28/2023"
+            />
+          </div>
+        </div>
+        <p
+          class="sc-cJPUEC hqgtEx sc-bhlPkD fFwcmS"
+        >
+          to
+        </p>
+        <div
+          class="react-datepicker-wrapper"
+        >
+          <div
+            class="react-datepicker__input-container"
+          >
+            <input
+              class="sc-fIwssx iNJPrf"
+              placeholder="To"
+              type="text"
+              value="07/28/2023"
             />
           </div>
         </div>
       </div>
     </div>
     <div
-      class="sc-jNkFXo ejFYjt"
+      class="sc-ksXGtu emqAEv"
     >
       <div
         style="width: 100%; display: flex; flex-direction: column;"
       >
         <div
-          class="sc-jnqLxu dFMjbm"
+          class="sc-ejWHKt bxXOZH"
           style="width: 100%;"
         >
           <div
-            class="sc-ejWHKt hvIljp"
+            class="sc-eWhHU cJVAbP"
           >
             <div
               style="font-size: 16px;"
@@ -118,19 +92,19 @@ exports[`Testing history page Test History Page 1`] = `
               From
             </div>
             <div
-              class="sc-eywOmQ fogmsk dropdown sc-fWFeAW caPvrj"
+              class="sc-eywOmQ fogmsk dropdown sc-gWHAAX hXQzpE"
             >
               <div
-                class="sc-eAzDjm bEWHI dropdown sc-fWFeAW caPvrj"
+                class="sc-eAzDjm gkFcQY dropdown sc-gWHAAX hXQzpE"
               >
                 <div
-                  class="sc-gUMnWI bZJZkP"
+                  class="sc-hUOJWJ iGUWNA"
                 >
                   <div
                     class="sc-fABZjn hnojyv"
                   >
                     <div
-                      class="sc-dPwPAC ioWAkw"
+                      class="sc-ePzlA-D dSxCeu"
                     >
                       <div>
                         <div
@@ -144,7 +118,7 @@ exports[`Testing history page Test History Page 1`] = `
                     All Networks
                   </div>
                   <div
-                    class="sc-hjLWnZ etWDpy dropdown sc-fWFeAW caPvrj"
+                    class="sc-fWFeAW cZVXnP dropdown sc-gWHAAX hXQzpE"
                   >
                     <div>
                       <div
@@ -153,6 +127,20 @@ exports[`Testing history page Test History Page 1`] = `
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-jNkFXo gOWzik"
+            >
+              <div
+                class="sc-kNnbXp kPfyGx"
+              >
+                <div>
+                  <div
+                    data-src="switchButton.svg"
+                    src=""
+                  />
                 </div>
               </div>
             </div>
@@ -162,19 +150,19 @@ exports[`Testing history page Test History Page 1`] = `
               To
             </div>
             <div
-              class="sc-eywOmQ fogmsk dropdown sc-fWFeAW caPvrj"
+              class="sc-eywOmQ fogmsk dropdown sc-gWHAAX hXQzpE"
             >
               <div
-                class="sc-eAzDjm bEWHI dropdown sc-fWFeAW caPvrj"
+                class="sc-eAzDjm gkFcQY dropdown sc-gWHAAX hXQzpE"
               >
                 <div
-                  class="sc-gUMnWI bZJZkP"
+                  class="sc-hUOJWJ iGUWNA"
                 >
                   <div
                     class="sc-fABZjn hnojyv"
                   >
                     <div
-                      class="sc-dPwPAC ioWAkw"
+                      class="sc-ePzlA-D dSxCeu"
                     >
                       <div>
                         <div
@@ -188,7 +176,7 @@ exports[`Testing history page Test History Page 1`] = `
                     All Networks
                   </div>
                   <div
-                    class="sc-hjLWnZ etWDpy dropdown sc-fWFeAW caPvrj"
+                    class="sc-fWFeAW cZVXnP dropdown sc-gWHAAX hXQzpE"
                   >
                     <div>
                       <div
@@ -202,16 +190,16 @@ exports[`Testing history page Test History Page 1`] = `
             </div>
           </div>
           <div
-            class="sc-fIwssx julasc dropdown undefined"
+            class="sc-IeChK bSPmMU dropdown undefined"
           >
             <div
-              class="sc-OKtSx gxPwhf"
+              class="sc-ckPVkh efCtll"
             >
               <div
-                class="sc-fecFrY GYSMO"
+                class="sc-gAigJI fcNWSu"
               >
                 <div
-                  class="sc-hpGEOZ FGqkj"
+                  class="sc-iWxGtA jaHBMb"
                 >
                   <div>
                     <div
@@ -225,10 +213,10 @@ exports[`Testing history page Test History Page 1`] = `
           </div>
         </div>
         <div
-          class="sc-gTRrQi jcFGvU sc-ispOId eNEuZr sc-ksXGtu eazVfL"
+          class="sc-gTRrQi jcFGvU sc-ispOId hQOTaV sc-hpGEOZ fESBLC"
         >
           <div
-            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-ksXGtu eazVfL"
+            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-hpGEOZ fESBLC"
             style="max-width: 168px;"
           >
             <p
@@ -238,7 +226,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-ksXGtu eazVfL"
+            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-hpGEOZ fESBLC"
             style="max-width: 142px;"
           >
             <p
@@ -248,7 +236,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-ksXGtu eazVfL"
+            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-hpGEOZ fESBLC"
             style="max-width: 142px;"
           >
             <p
@@ -258,7 +246,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-ksXGtu eazVfL"
+            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-hpGEOZ fESBLC"
             style="max-width: 90px;"
           >
             <p
@@ -268,7 +256,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-ksXGtu eazVfL"
+            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-hpGEOZ fESBLC"
             style="max-width: 80px;"
           >
             <p
@@ -278,7 +266,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-ksXGtu eazVfL"
+            class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-hpGEOZ fESBLC"
             style="max-width: 88px;"
           >
             <p
@@ -290,8 +278,24 @@ exports[`Testing history page Test History Page 1`] = `
         </div>
       </div>
       <div
-        class="sc-brSOsn bITVeR"
+        class="sc-iCnXOK kQTmSs"
       />
+      <div
+        class="sc-dEsUz hpYjuK"
+        style="margin-left: auto; margin-right: auto; padding: 20px;"
+      >
+        <div>
+          <div>
+            <div
+              data-src="noHistory.svg"
+              src=""
+            />
+          </div>
+        </div>
+        <div>
+          No Transactions Matching Filter.
+        </div>
+      </div>
     </div>
   </div>
 </DocumentFragment>
@@ -300,739 +304,22 @@ exports[`Testing history page Test History Page 1`] = `
 exports[`Testing history page Test transaction resolver 1`] = `
 <DocumentFragment>
   <div
-    class="sc-brSOsn bITVeR"
+    class="sc-iCnXOK kQTmSs"
+  />
+  <div
+    class="sc-dEsUz hpYjuK"
+    style="margin-left: auto; margin-right: auto; padding: 20px;"
   >
-    <div
-      class="sc-gTRrQi jcFGvU sc-kcuKUB ivAQCw sc-dEsUz bxVwCO"
-    >
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 168px;"
-      >
+    <div>
+      <div>
         <div
-          class="sc-kJpdyg gaErlD"
-        >
-          10 Jul 2023 11:31 AM
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/boba.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Boba
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x54...32fb
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/n/a.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Etheruem
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x72...1124
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 90px;"
-      >
-        <div
-          class="sc-eSdRwT fQpFeP"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/undefined.svg"
-            />
-          </div>
-          <div />
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 80px;"
-      >
-        <div
-          class="sc-dyTUbJ gWTttv"
-        >
-          NaN
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 88px;"
-      >
-        <div
-          class="sc-kJwmPe kGnzIU"
-        >
-          Completed
-        </div>
+          data-src="noHistory.svg"
+          src=""
+        />
       </div>
     </div>
-    <div
-      class="sc-gTRrQi jcFGvU sc-kcuKUB ivAQCw sc-dEsUz bxVwCO"
-    >
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 168px;"
-      >
-        <div
-          class="sc-kJpdyg gaErlD"
-        >
-          07 Jul 2023 11:47 AM
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/boba.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Boba
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0xa6...146e
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/n/a.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Etheruem
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x1f...aba4
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 90px;"
-      >
-        <div
-          class="sc-eSdRwT fQpFeP"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/undefined.svg"
-            />
-          </div>
-          <div />
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 80px;"
-      >
-        <div
-          class="sc-dyTUbJ gWTttv"
-        >
-          NaN
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 88px;"
-      >
-        <div
-          class="sc-kJwmPe kGnzIU"
-        >
-          Completed
-        </div>
-      </div>
-    </div>
-    <div
-      class="sc-gTRrQi jcFGvU sc-kcuKUB ivAQCw sc-dEsUz bxVwCO"
-    >
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 168px;"
-      >
-        <div
-          class="sc-kJpdyg gaErlD"
-        >
-          06 Jul 2023 05:25 PM
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/boba.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Boba
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0xbd...7c47
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/n/a.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Etheruem
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0xf1...213a
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 90px;"
-      >
-        <div
-          class="sc-eSdRwT fQpFeP"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/undefined.svg"
-            />
-          </div>
-          <div />
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 80px;"
-      >
-        <div
-          class="sc-dyTUbJ gWTttv"
-        >
-          NaN
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 88px;"
-      >
-        <div
-          class="sc-kJwmPe kGnzIU"
-        >
-          Completed
-        </div>
-      </div>
-    </div>
-    <div
-      class="sc-gTRrQi jcFGvU sc-kcuKUB ivAQCw sc-dEsUz bxVwCO"
-    >
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 168px;"
-      >
-        <div
-          class="sc-kJpdyg gaErlD"
-        >
-          06 Jul 2023 12:29 PM
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/boba.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Boba
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0xed...03df
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/n/a.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Etheruem
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x8f...de8b
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 90px;"
-      >
-        <div
-          class="sc-eSdRwT fQpFeP"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/undefined.svg"
-            />
-          </div>
-          <div />
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 80px;"
-      >
-        <div
-          class="sc-dyTUbJ gWTttv"
-        >
-          NaN
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 88px;"
-      >
-        <div
-          class="sc-kJwmPe kGnzIU"
-        >
-          Completed
-        </div>
-      </div>
-    </div>
-    <div
-      class="sc-gTRrQi jcFGvU sc-kcuKUB ivAQCw sc-dEsUz bxVwCO"
-    >
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 168px;"
-      >
-        <div
-          class="sc-kJpdyg gaErlD"
-        >
-          05 Jul 2023 12:24 PM
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/boba.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Boba
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x6c...6481
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/n/a.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Etheruem
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0xcc...360c
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 90px;"
-      >
-        <div
-          class="sc-eSdRwT fQpFeP"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/undefined.svg"
-            />
-          </div>
-          <div />
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 80px;"
-      >
-        <div
-          class="sc-dyTUbJ gWTttv"
-        >
-          NaN
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 88px;"
-      >
-        <div
-          class="sc-kJwmPe kGnzIU"
-        >
-          Completed
-        </div>
-      </div>
-    </div>
-    <div
-      class="sc-gTRrQi jcFGvU sc-kcuKUB ivAQCw sc-dEsUz bxVwCO"
-    >
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 168px;"
-      >
-        <div
-          class="sc-kJpdyg gaErlD"
-        >
-          03 Jul 2023 07:05 PM
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/boba.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Boba
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x56...0762
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 142px;"
-      >
-        <div
-          class="sc-dmovaM gWDhWf"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/n/a.svg"
-            />
-          </div>
-          <div
-            class="sc-dSbvwS iBJFNa"
-          >
-            <div
-              style="width: 102px; height: 16px;"
-            >
-              Etheruem
-            </div>
-            <a
-              class="sc-iCnXOK fNzufs"
-              href=""
-              rel="noopener noreferrer"
-              style="font-size: 12px;"
-              target="_blank"
-            >
-              Tx: 0x20...04ea
-            </a>
-          </div>
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 90px;"
-      >
-        <div
-          class="sc-eSdRwT fQpFeP"
-        >
-          <div
-            class="sc-emqRaN hUVFnD"
-          >
-            <img
-              class="sc-dzbdsH eIIhCF"
-              src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/undefined.svg"
-            />
-          </div>
-          <div />
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 80px;"
-      >
-        <div
-          class="sc-dyTUbJ gWTttv"
-        >
-          NaN
-        </div>
-      </div>
-      <div
-        class="sc-gTRrQi jcFGvU sc-dcrmVg XppeE sc-dEsUz bxVwCO"
-        style="max-width: 88px;"
-      >
-        <div
-          class="sc-kJwmPe kGnzIU"
-        >
-          Completed
-        </div>
-      </div>
+    <div>
+      No Transactions Matching Filter.
     </div>
   </div>
 </DocumentFragment>

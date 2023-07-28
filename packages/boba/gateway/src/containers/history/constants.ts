@@ -7,52 +7,55 @@ import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, LAYER, ChainMap } from './types'
 
 export const Chains: ChainMap = {
-  [CHAIN_NAME.All_Networks]: {
-    chainId: '0',
-    layer: LAYER.L1,
+  '0': {
+    name: CHAIN_NAME.All_Networks,
+    transactionUrlPrefix: '',
+    symbol: '',
   },
-  [CHAIN_NAME.BNB]: {
-    chainId: '56',
-    layer: LAYER.L1,
+  '56': {
+    name: CHAIN_NAME.BNB,
+    transactionUrlPrefix: 'https://bscscan.com/tx/',
+    symbol: 'BNB',
   },
-  [CHAIN_NAME.Boba_BNB]: {
-    chainId: '56288',
-    parentChainId: '56',
-    layer: LAYER.L2,
+  '56288': {
+    name: CHAIN_NAME.Boba_BNB,
+    transactionUrlPrefix: 'https://blockexplorer.bnb.boba.network/tx/',
+    symbol: 'BOBA',
   },
-  [CHAIN_NAME.BNB_Testnet]: {
-    chainId: '97',
-    layer: LAYER.L1,
+  '97': {
+    name: CHAIN_NAME.BNB_Testnet,
+    transactionUrlPrefix: 'https://testnet.bscscan.com/tx/',
+    symbol: 'BNB',
   },
-  [CHAIN_NAME.Boba_BNB_Testnet]: {
-    chainId: '9728',
-    parentChainId: '97',
-    layer: LAYER.L2,
+  '9728': {
+    name: CHAIN_NAME.Boba_BNB_Testnet,
+    transactionUrlPrefix: 'https://blockexplorer.testnet.bnb.boba.network/tx/',
+    symbol: 'BOBA',
   },
-  [CHAIN_NAME.Ethereum]: {
-    chainId: '1',
-    layer: LAYER.L1,
+  '1': {
+    name: CHAIN_NAME.Ethereum,
+    transactionUrlPrefix: 'https://etherscan.io/tx/',
+    symbol: 'ETH',
   },
-  [CHAIN_NAME.Boba_Ethereum]: {
-    chainId: '288',
-    parentChainId: '1',
-    layer: LAYER.L2,
+  '288': {
+    name: CHAIN_NAME.Boba_Ethereum,
+    transactionUrlPrefix: 'https://bobascan.com/tx/',
+    symbol: 'BOBA',
   },
-  [CHAIN_NAME.Goerli]: {
-    chainId: '5',
-    layer: LAYER.L1,
+  '5': {
+    name: CHAIN_NAME.Goerli,
+    transactionUrlPrefix: 'https://goerli.etherscan.io/tx/',
+    symbol: 'ETH',
   },
-  [CHAIN_NAME.Boba_Goerli]: {
-    parentChainId: '5',
-    chainId: '2888',
-    layer: LAYER.L2,
+  '2888': {
+    name: CHAIN_NAME.Boba_Goerli,
+    transactionUrlPrefix: 'https://testnet.bobascan.com/tx/',
+    symbol: 'BOBA',
   },
 }
 
-// [transaction chain ][address] -> token
-//
 export const ALL_NETWORKS: IDropdownItem = {
-  value: Chains[CHAIN_NAME.All_Networks].chainId,
+  value: '0',
   label: 'All Networks',
   imgSrc: AllNetworksIcon,
   header: false,
@@ -61,25 +64,25 @@ export const ALL_NETWORKS: IDropdownItem = {
 export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   ALL_NETWORKS,
   {
-    value: Chains[CHAIN_NAME.Ethereum].chainId,
+    value: '1',
     label: 'Ethereum',
     imgSrc: getCoinImage('ETH'),
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
-    value: Chains[CHAIN_NAME.BNB].chainId,
+    value: '56',
     label: 'BNB',
     imgSrc: getCoinImage('BNB'),
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
-    value: Chains[CHAIN_NAME.Goerli].chainId,
+    value: '5',
     label: 'Ethereum Goerli',
     imgSrc: getCoinImage('ETH'),
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
-    value: Chains[CHAIN_NAME.BNB_Testnet].chainId,
+    value: '97',
     label: 'BNB Testnet',
     imgSrc: getCoinImage('BNB'),
     headerName: NETWORK_TYPE.TESTNET,
@@ -89,25 +92,25 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
 export const NETWORK_L2_OPTIONS = [
   ALL_NETWORKS,
   {
-    value: Chains[CHAIN_NAME.Boba_Ethereum].chainId,
+    value: '288',
     label: 'Boba Ethereum',
     imgSrc: getCoinImage('BOBA'),
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
-    value: Chains[CHAIN_NAME.Boba_BNB].chainId,
+    value: '56288',
     label: 'Boba BNB',
     imgSrc: getCoinImage('BOBA'),
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
-    value: Chains[CHAIN_NAME.Boba_Goerli].chainId,
+    value: '2888',
     label: 'Boba Goerli',
     imgSrc: getCoinImage('BOBA'),
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
-    value: Chains[CHAIN_NAME.Boba_BNB_Testnet].chainId,
+    value: '9728',
     label: 'Boba BNB Testnet',
     imgSrc: getCoinImage('BOBA'),
     headerName: NETWORK_TYPE.TESTNET,

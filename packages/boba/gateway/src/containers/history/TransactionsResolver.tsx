@@ -1,9 +1,9 @@
 import { TransactionsTableContent } from 'components/global/table/themes'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import React, { useState, useEffect } from 'react'
 import { getCoinImage } from 'util/coinImage'
 import { formatDate, isSameOrAfterDate, isSameOrBeforeDate } from 'util/dates'
-import { Chains } from './constants'
+import { ALL_NETWORKS, Chains } from './constants'
 import { Svg } from 'components/global/svg'
 import { TokenInfo } from 'containers/history/tokenInfo'
 
@@ -30,9 +30,7 @@ import {
   LAYER,
   CHAIN_NAME,
 } from './types'
-import { useSelector } from 'react-redux'
 import { orderBy } from 'util/lodash'
-import { selectTokens, selectActiveNetworkName } from 'selectors'
 import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
 import networkService from 'services/networkService'
@@ -67,8 +65,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     setCurrentTransactions(transactions)
   }, [transactions])
 
-  const activeNetworks = useSelector(selectActiveNetworkName())
-  const tokenFromAddress = useSelector(selectTokens)
   const orderedTransactions = orderBy(
     currentTransactions,
     (i) => i.timeStamp,
@@ -112,7 +108,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     let targetFromNetwork = false
     let targetToNetwork = false
     switch (transactionsFilter.fromNetworkChainId) {
-      case Chains[CHAIN_NAME.All_Networks].chainId: {
+      case ALL_NETWORKS.value: {
         targetFromNetwork = true
         break
       }
@@ -122,7 +118,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       }
     }
     switch (transactionsFilter.toNetworkChainId) {
-      case Chains[CHAIN_NAME.All_Networks].chainId: {
+      case ALL_NETWORKS.value: {
         targetToNetwork = true
         break
       }
@@ -166,8 +162,8 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const hashFilter = (transaction: IProcessedTransaction) => {
     if (transactionsFilter.targetHash) {
       if (
-        !transaction.l1Hash.includes(transactionsFilter.targetHash) &&
-        !transaction.l2Hash.includes(transactionsFilter.targetHash)
+        !transaction.fromHash.includes(transactionsFilter.targetHash) &&
+        !transaction.toHash.includes(transactionsFilter.targetHash)
       ) {
         return false
       }
@@ -190,36 +186,28 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       TokenInfo[transaction.originChainId.toString()][
         transaction.action.token.toLowerCase()
       ]
-    console.log(transaction.originChainId.toString())
-    console.log(transaction.action.token.toLowerCase())
 
     const symbol = token.symbol
 
     amountString = logAmount(transaction.action.amount, token.decimals, 4)
-    let transactionL1Hash = ''
-    let transactionL2Hash = ''
-    if (chain === LAYER.L2) {
-      transactionL2Hash = transaction.hash
-      transactionL1Hash = transaction.crossDomainMessage.l1Hash
-        ? transaction.crossDomainMessage.l1Hash
-        : 'n/a'
-    } else if (chain === LAYER.L1) {
-      transactionL1Hash = transaction.hash
-      transactionL2Hash = transaction.crossDomainMessage.l2Hash
-        ? transaction.crossDomainMessage.l2Hash
-        : 'n/a'
+    const fromHash = transaction.hash
+    let toHash = ''
+    if (chain === LAYER.L2 && transaction.crossDomainMessage.l1Hash) {
+      toHash = transaction.crossDomainMessage.l1Hash
+    } else if (chain === LAYER.L1 && transaction.crossDomainMessage.l2Hash) {
+      toHash = transaction.crossDomainMessage.l2Hash
     }
     const processedTransaction: IProcessedTransaction = {
       timeStamp: transaction.timeStamp,
       from: transaction.from,
-      fromLayer: chain as LAYER,
+      fromHash,
+      toHash,
       to: transaction.to,
-      toLayer: (chain as LAYER) === LAYER.L1 ? LAYER.L2 : LAYER.L1,
       tokenSymbol: symbol,
       amount: amountString,
       status: transaction.UserFacingStatus,
-      l1Hash: transactionL1Hash,
-      l2Hash: transactionL2Hash,
+      originChainId: transaction.originChainId,
+      destinationChainId: transaction.destinationChainId,
     }
     return processedTransaction
   }
@@ -243,11 +231,10 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   }
 
-  const getTransactionChain = (layer: LAYER, hash: string) => {
-    let networkName = layer === LAYER.L1 ? activeNetworks.l1 : activeNetworks.l2
-    networkName = networkName.split(' ')[0]
-    const linkToHash = getNetworkExplorerLink(layer, hash)
-    const symbol = GetSymbolFromNetworkName(networkName)
+  const getTransactionChain = (chainID: string, hash: string) => {
+    const linkToHash = `${Chains[chainID].transactionUrlPrefix}${hash}`
+    const symbol = Chains[chainID].symbol
+    const networkName = Chains[chainID].name
     // href={chainLink({ chain: prefix, hash: detail.hash })}
 
     return (
@@ -282,7 +269,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       <TransactionAmount>Not Available</TransactionAmount>
     )
   }
-  console.log('filtered transactions', filteredProcessedTransactions)
   return (
     <>
       {transactions.length === 0 && (
@@ -307,19 +293,15 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                     },
                     {
                       content: getTransactionChain(
-                        transaction.fromLayer,
-                        transaction.fromLayer === LAYER.L1
-                          ? transaction.l1Hash
-                          : transaction.l2Hash
+                        transaction.originChainId.toString(),
+                        transaction.fromHash
                       ),
                       width: 142,
                     },
                     {
                       content: getTransactionChain(
-                        transaction.toLayer,
-                        transaction.toLayer === LAYER.L1
-                          ? transaction.l1Hash
-                          : transaction.l2Hash
+                        transaction.destinationChainId.toString(),
+                        transaction.toHash
                       ),
                       width: 142,
                     },

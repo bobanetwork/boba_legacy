@@ -159,7 +159,6 @@ export const DropdownBody = styled.div`
       color: ${props.theme.colors.gray[800]};
       border: 1px solid ${props.theme.colors.gray[400]};
       background: ${props.theme.colors.gray[50]};
-      //   box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.15);
     `}
   ${(props) =>
     props.theme.name === 'dark' &&

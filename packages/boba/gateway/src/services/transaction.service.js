@@ -1,6 +1,6 @@
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import networkService from './networkService'
-import { NETWORK, AllNetworkConfigs} from 'util/network/network.util'
+import {AllNetworkConfigs} from 'util/network/network.util'
 
 class TransactionService {
   async getSevens(networkConfig = networkService.networkConfig) {
