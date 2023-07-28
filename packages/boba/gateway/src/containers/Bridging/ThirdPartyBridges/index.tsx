@@ -3,6 +3,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { getCoinImage } from 'util/coinImage'
 import { BridgeItem, BridgeIcon, BridgeLabel, BridgeWrapper } from '../styles'
 import { useSelector } from 'react-redux'
+import Banxa from 'assets/images/bridges/banxa.svg'
 import {
   selectActiveNetwork,
   selectActiveNetworkType,
@@ -58,12 +59,7 @@ const ThirdPartyBridges: FC = () => {
           key="banxa"
         >
           <BridgeIcon>
-            <img
-              src={getCoinImage(token.symbol)}
-              alt={`ETH logo`}
-              width="32px"
-              height="32px"
-            />
+            <img src={Banxa} alt={`ETH logo`} width="32px" height="32px" />
           </BridgeIcon>
           <BridgeLabel>Banxa</BridgeLabel>
         </BridgeItem>
@@ -77,7 +73,7 @@ const ThirdPartyBridges: FC = () => {
         >
           <BridgeIcon>
             <img
-              src={getCoinImage(bridge.icon)}
+              src={bridge.icon}
               alt={`${bridge.name} logo`}
               width="32px"
               height="32px"

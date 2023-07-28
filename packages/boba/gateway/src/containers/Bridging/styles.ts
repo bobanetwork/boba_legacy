@@ -75,6 +75,7 @@ export const BridgeIcon = styled.div`
   height: 32px;
   width: 32px;
   border-radius: 200px;
+  background: #fff;
 `
 export const BridgeLabel = styled(Typography).attrs({
   variant: 'title',
