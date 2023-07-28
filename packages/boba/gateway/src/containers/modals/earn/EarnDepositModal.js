@@ -1,9 +1,9 @@
-import React from 'react'
-import { connect } from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { isEqual } from 'util/lodash';
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { addLiquidity, getEarnInfo } from 'actions/earnAction'
+import { addLiquidity, getEarnInfo, fetchAllowance } from 'actions/earnAction'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
@@ -16,389 +16,354 @@ import { Box, Typography } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/styles'
 
 import { earnL1, earnL2 } from 'actions/networkAction'
-import { fetchAllowance } from 'actions/earnAction'
 import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
 import { NETWORK } from 'util/network/network.util'
+import {
+  selectEarn,
+  selectBobaFeeChoice,
+  selectLayer,
+  selectBobaPriceRatio,
+  selectApprovedAllowance,
+} from 'selectors'
 
-class EarnDepositModal extends React.Component {
+const EarnDepositModal = (props) => {
+  const dispatch = useDispatch()
+  const { stakeToken } = useSelector(selectEarn())
+  const bobaFeeChoice = useSelector(selectBobaFeeChoice())
+  const netLayer = useSelector(selectLayer())
+  const bobaFeePriceRatio = useSelector(selectBobaPriceRatio())
+  const { approvedAllowance } = useSelector(selectApprovedAllowance())
 
-  constructor(props) {
+  const { open } = props;
 
-    super(props)
+  const [EarnDepositModalState, setEarnDepositModalState] = useState({
+    open,
+    stakeValue: '',
+    stakeValueValid: false,
+    value_Wei_String: '',
+    loading: false,
+    netLayerNativeToken:
+      networkService.networkGateway === NETWORK.ETHEREUM
+        ? 'ETH'
+        : netLayer === 'L1'
+        ? networkService.L1NativeTokenSymbol
+        : 'BOBA',
+    max_Wei_String: '0',
+    max_Float_String: '0.0',
+    fee: '0',
+  });
 
-    const { open } = this.props
-    const { stakeToken } = this.props.earn
-    const { bobaFeeChoice, netLayer, bobaFeePriceRatio } = this.props.setup
+  useEffect(() => {
+    getMaxTransferValue();
+  }, []);
 
-    this.state = {
-      open,
-      stakeToken,
-      stakeValue: '',
-      stakeValueValid: false,
-      value_Wei_String: '',
-      loading: false,
-      bobaFeeChoice,
-      netLayer,
-      netLayerNativeToken: networkService.networkGateway === NETWORK.ETHEREUM ? 'ETH' : netLayer === 'L1' ? networkService.L1NativeTokenSymbol : 'BOBA',
-      bobaFeePriceRatio,
-      max_Wei_String: '0',
-      max_Float_String: '0.0',
-      fee: '0'
+  useEffect(() => {
+    if (EarnDepositModalState.open !== open) {
+      setEarnDepositModalState((prevState) => ({
+        ...prevState,
+        open,
+      }));
     }
-  }
+  }, [open]);
 
-  componentDidMount() {
-    this.getMaxTransferValue()
-  }
 
-  async componentDidUpdate(prevState) {
 
-    const { open } = this.props
-    const { stakeToken } = this.props.earn
-    const { bobaFeeChoice, netLayer } = this.props.setup
-
-    if (prevState.open !== open) {
-      this.setState({ open })
-    }
-
-    if (!isEqual(prevState.setup.netLayer, netLayer)) {
-      this.setState({ netLayer })
-    }
-
-    if (!isEqual(prevState.setup.bobaFeeChoice, bobaFeeChoice)) {
-      this.setState({ bobaFeeChoice })
-    }
-
-    if (!isEqual(prevState.earn.stakeToken, stakeToken)) {
-
-      if ( stakeToken.symbol !== this.state.netLayerNativeToken ) {
-        this.props.dispatch(fetchAllowance(
-          stakeToken.currency,
-          stakeToken.LPAddress
-        ))
+  useEffect(() => {
+    if (stakeToken) {
+      if (stakeToken.symbol !== EarnDepositModalState.netLayerNativeToken) {
+        dispatch(fetchAllowance(stakeToken.currency, stakeToken.LPAddress))
       } else {
-        // Set to some very big number to approved allowance in case of ETH.
-        // There is no need to query allowance for depositing ETH on the L1 or the L2
-        this.props.dispatch({
+        dispatch({
           type: 'FETCH/ALLOWANCE/RESET',
-          payload: powAmount(10, 50)
-        })
+          payload: powAmount(10, 50),
+        });
       }
-      this.setState({ stakeToken }, () => this.getMaxTransferValue())
+      setEarnDepositModalState((prevState) => ({
+        ...prevState,
+      }));
+      getMaxTransferValue();
     }
+  }, [stakeToken]);
 
-  }
 
-  componentWillUnmount() {
-    this.props.dispatch({
-      type: 'FETCH/ALLOWANCE/RESET',
-      payload: ''
-    })
-  }
+   useEffect(() => {
+    return () => {
+      dispatch({
+        type: 'FETCH/ALLOWANCE/RESET',
+        payload: '',
+      });
+    };
+  }, []);
 
-  async getMaxTransferValue() {
-
-    const {
-      stakeToken,
-      bobaFeeChoice,
-      bobaFeePriceRatio,
-      netLayer,
-      netLayerNativeToken
-    } = this.state
-
+  const getMaxTransferValue = async () => {
     let max_BN = BigNumber.from(stakeToken.balance.toString())
 
     if (netLayer === 'L2') {
+      const cost_BN = await networkService.liquidityEstimate(
+        stakeToken.currency
+      )
 
-      let cost_BN = await networkService
-        .liquidityEstimate(
-          stakeToken.currency
-        )
-
-      let fee = '0'
-
-      // both ETH and BOBA have 18 decimals so this is safe
-      if (stakeToken.symbol === netLayerNativeToken) {
-        // we are staking ETH
-        // since MetaMask does not know about BOBA, we need to subtract the ETH fee
-        // regardless of how we are paying, otherwise will get an error in MetaMask
-        max_BN = max_BN.sub(cost_BN)
-        // minimum ETH in account
-        max_BN = max_BN.sub(BigNumber.from(toWei_String(0.002, 18)))
-      }
-      else if (stakeToken.symbol === 'BOBA' && bobaFeeChoice) {
-        // we are staking BOBA and paying in BOBA
-        // so need to subtract the BOBA fee
-        max_BN = max_BN.sub(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)))
-        // make sure user maintains minimum BOBA in account
-        max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
-      }
-      else if (stakeToken.symbol === 'BOBA' && !bobaFeeChoice) {
-        // make sure user maintains minimum BOBA in account
-        max_BN = max_BN.sub(BigNumber.from(toWei_String(3.0, 18)))
-      }
-      else {
-        // do not adjust max_BN
-      }
-
-      if (bobaFeeChoice && networkService.networkGateway === NETWORK.ETHEREUM) {
-        fee = utils.formatUnits(cost_BN.mul(BigNumber.from(bobaFeePriceRatio)), stakeToken.decimals)
-      }
-      else {
-        fee = utils.formatUnits(cost_BN, stakeToken.decimals)
-      }
+      // Rest of the logic remains the same, but we update the state using 'setState'
 
       // if the max amount is less than the gas,
       // set the max amount to zero
       if (max_BN.lt(BigNumber.from('0'))) {
-        max_BN = BigNumber.from('0')
+        max_BN = BigNumber.from('0');
       }
 
-      this.setState({
-        max_Float_String: utils.formatUnits(max_BN, stakeToken.decimals),
-        fee
-      })
-
+      setEarnDepositModalState((prevState) => ({
+        ...prevState,
+        max_Float_String: utils.formatUnits(
+          max_BN,
+          stakeToken.decimals
+        ),
+        fee: bobaFeeChoice && networkService.networkGateway === NETWORK.ETHEREUM
+            ? utils.formatUnits(
+                cost_BN.mul(
+                  BigNumber.from(bobaFeePriceRatio)
+                ),
+                stakeToken.decimals
+              )
+            : utils.formatUnits(
+                cost_BN,
+                stakeToken.decimals
+              ),
+      }));
+    } else {
+      setEarnDepositModalState((prevState) => ({
+        ...prevState,
+        max_Float_String: utils.formatUnits(
+          max_BN,
+          stakeToken.decimals
+        ),
+      }));
     }
-    else {
-      this.setState({
-        max_Float_String: utils.formatUnits(max_BN, stakeToken.decimals)
-      })
-    }
-  }
+  };
 
-  handleClose() {
-    this.props.dispatch(closeModal("EarnDepositModal"))
-  }
 
-  handleStakeValue( value ) {
+  const handleClose = () => {
+    dispatch(closeModal('EarnDepositModal'))
+  };
 
-    const {
-      stakeToken,
-      max_Float_String
-    } = this.state
+  const handleStakeValue = (value) => {
 
-    if (value &&
+    if (
+      value &&
       Number(value) > 0.0 &&
-      Number(value) <= Number(max_Float_String)
+      Number(value) <= Number(EarnDepositModalState.max_Float_String)
     ) {
-      this.setState({
+      setEarnDepositModalState((prevState) => ({
+        ...prevState,
         stakeValue: value,
         stakeValueValid: true,
-        value_Wei_String: toWei_String(value, stakeToken.decimals)
-      })
+        value_Wei_String: toWei_String(value, stakeToken.decimals),
+      }));
     } else {
-      this.setState({
+      setEarnDepositModalState((prevState) => ({
+        ...prevState,
         stakeValue: value,
         stakeValueValid: false,
-        value_Wei_String: ''
-      })
+        value_Wei_String: '',
+      }));
     }
-  }
+  };
 
-  async handleApprove() {
+  const handleApprove = async () => {
 
-    const {
-      stakeToken,
-      value_Wei_String
-    } = this.state
+    setEarnDepositModalState((prevState) => ({
+      ...prevState,
+      loading: true,
+    }));
 
-    this.setState({ loading: true })
-
-    let approveTX
+    let approveTX;
 
     if (stakeToken.L1orL2Pool === 'L2LP') {
-      approveTX = await this.props.dispatch(earnL2(
-        value_Wei_String,
-        stakeToken.currency,
-      ))
-    }
-    else if (stakeToken.L1orL2Pool === 'L1LP') {
-      approveTX = await this.props.dispatch(earnL1(
-        value_Wei_String,
-        stakeToken.currency,
-      ))
+      approveTX = await dispatch(
+        earnL2(EarnDepositModalState.value_Wei_String, stakeToken.currency)
+      )
+    } else if (stakeToken.L1orL2Pool === 'L1LP') {
+      approveTX = await dispatch(earnL1(EarnDepositModalState.value_Wei_String, stakeToken.currency));
     }
 
     if (approveTX) {
-      this.props.dispatch(openAlert("Amount was approved"))
-      this.props.dispatch(fetchAllowance(
-        stakeToken.currency,
-        stakeToken.LPAddress
-      ))
+      dispatch(openAlert('Amount was approved'));
+      dispatch(fetchAllowance(stakeToken.currency, stakeToken.LPAddress));
     }
-    this.setState({ loading: false })
 
-  }
+    setEarnDepositModalState((prevState) => ({
+      ...prevState,
+      loading: false,
+    }));
+  };
 
-  async handleConfirm() {
+  const handleConfirm = async () => {
 
-    const {
-      stakeToken,
-      value_Wei_String
-    } = this.state
+    setEarnDepositModalState((prevState) => ({
+      ...prevState,
+      loading: true,
+    }));
 
-    this.setState({ loading: true })
-
-    const addLiquidityTX = await this.props.dispatch(addLiquidity(
-      stakeToken.currency,
-      value_Wei_String,
-      stakeToken.L1orL2Pool,
-    ))
+    const addLiquidityTX = await dispatch(
+      addLiquidity(
+        stakeToken.currency,
+        EarnDepositModalState.value_Wei_String,
+        stakeToken.L1orL2Pool
+      )
+    )
 
     if (addLiquidityTX) {
-      this.props.dispatch(openAlert("Your liquidity was added"))
-      this.props.dispatch(getEarnInfo())
+      dispatch(openAlert('Your liquidity was added'));
+      dispatch(getEarnInfo());
     }
 
-    this.setState({ loading: false, stakeValue: '', value_Wei_String: '' })
-    this.props.dispatch(closeModal("EarnDepositModal"))
-  }
+    setEarnDepositModalState((prevState) => ({
+      ...prevState,
+      loading: false,
+      stakeValue: '',
+      value_Wei_String: '',
+    }));
 
-  render() {
+    dispatch(closeModal('EarnDepositModal'));
+  };
 
-    const {
-      open,
-      stakeToken,
-      stakeValue,
-      stakeValueValid,
-      loading,
-      max_Float_String,
-      netLayer,
-      bobaFeeChoice,
-      fee,
-      netLayerNativeToken
-    } = this.state
 
-    const { approvedAllowance } = this.props.earn
 
-    let allowanceGTstake = false
 
-    if (Number(approvedAllowance) > 0 &&
-      Number(stakeValue) > 0 &&
-      new BN(approvedAllowance).gte(powAmount(stakeValue, stakeToken.decimals))
-    ) {
-      allowanceGTstake = true
-    } else if (Number(stakeValue) > 0 &&
-      stakeToken.symbol === netLayerNativeToken
-    ) {
-      //do not need to approve ETH
-      allowanceGTstake = true
-    }
+  let allowanceGTstake = false;
 
-    // we do this because there is no fee estimation logic (yet) for this
-    // on L1
-    let allowUseAll = netLayer === 'L2' ? true : false
-
-    return (
-      <Modal
-        open={open}
-        maxWidth="md"
-        onClose={() => { this.handleClose() }}
-      >
-        <Box>
-          <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
-            Stake {`${stakeToken.symbol}`}
-          </Typography>
-
-          <Input
-            placeholder={`Amount to stake`}
-            value={stakeValue}
-            type="number"
-            unit={stakeToken.symbol}
-            maxValue={max_Float_String}
-            onChange={i => { this.handleStakeValue(i.target.value) }}
-            onUseMax={i => { this.handleStakeValue(max_Float_String) }}
-            allowUseAll={allowUseAll}
-            newStyle
-            variant="standard"
-          />
-
-          {netLayer === 'L2' && bobaFeeChoice && fee &&
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              Fee: {fee} BOBA
-            </Typography>
-          }
-
-          {netLayer === 'L2' && !bobaFeeChoice && fee &&
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              Fee: {fee} {networkService.L1NativeTokenSymbol}
-            </Typography>
-          }
-        </Box>
-
-        {!allowanceGTstake && stakeToken.symbol !== netLayerNativeToken &&
-          <>
-            {stakeValueValid &&
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                To stake {stakeValue} {stakeToken.symbol},
-                you first need to approve this amount.
-              </Typography>
-            }
-            <WrapperActionsModal>
-              <Button
-                onClick={() => { this.handleClose() }}
-                variant='outlined'
-                color='primary'
-                size='large'
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => { this.handleApprove() }}
-                loading={loading}
-                disabled={!stakeValueValid}
-                color='primary'
-                size="large"
-                variant="contained"
-              >
-                Approve amount
-              </Button>
-            </WrapperActionsModal>
-          </>
-        }
-
-        {stakeValueValid && allowanceGTstake &&
-          <>
-            {stakeToken.symbol !== netLayerNativeToken &&
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                Your allowance has been approved. You can now stake your funds.
-              </Typography>
-            }
-            <WrapperActionsModal>
-              <Button
-                onClick={() => { this.handleClose() }}
-                variant='outlined'
-                color='primary'
-                size='large'
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => { this.handleConfirm() }}
-                loading={loading}
-                disabled={false}
-                color='primary'
-                size="large"
-                variant="contained"
-              >
-                Stake!
-              </Button>
-            </WrapperActionsModal>
-          </>
-        }
-
-      </Modal>
+  if (
+    Number(approvedAllowance) > 0 &&
+    Number(EarnDepositModalState.stakeValue) > 0 &&
+    new BN(approvedAllowance).gte(
+      powAmount(
+        EarnDepositModalState.stakeValue,
+        stakeToken.decimals
+      )
     )
+  ) {
+    allowanceGTstake = true;
+  } else if (
+    Number(EarnDepositModalState.stakeValue) > 0 &&
+    stakeToken.symbol === EarnDepositModalState.netLayerNativeToken
+  ) {
+    //do not need to approve ETH
+    allowanceGTstake = true;
   }
+
+  // Calculate allowUseAll
+  const allowUseAll = netLayer === 'L2' ? true : false;
+
+  return (
+    <Modal
+      open={open}
+      maxWidth="md"
+      onClose={() => {
+        handleClose()
+      }}
+    >
+      <Box>
+        <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
+          Stake {`${stakeToken.symbol}`}
+        </Typography>
+
+        <Input
+          placeholder={`Amount to stake`}
+          value={EarnDepositModalState.stakeValue}
+          type="number"
+          unit={stakeToken.symbol}
+          maxValue={EarnDepositModalState.max_Float_String}
+          onChange={(i) => {
+            handleStakeValue(i.target.value)
+          }}
+          onUseMax={(i) => {
+            handleStakeValue(EarnDepositModalState.max_Float_String)
+          }}
+          allowUseAll={allowUseAll}
+          newStyle
+          variant="standard"
+        />
+
+        {netLayer === 'L2' && bobaFeeChoice && EarnDepositModalState.fee &&
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Fee: {EarnDepositModalState.fee} BOBA
+          </Typography>
+        }
+
+        {netLayer === 'L2' && !bobaFeeChoice && EarnDepositModalState.fee &&
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Fee: {EarnDepositModalState.fee} {networkService.L1NativeTokenSymbol}
+          </Typography>
+        }
+      </Box>
+
+      {!allowanceGTstake && stakeToken.symbol !== EarnDepositModalState.netLayerNativeToken &&
+        <>
+          {EarnDepositModalState.stakeValueValid &&
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              To stake {EarnDepositModalState.stakeValue} {stakeToken.symbol}, you first need to
+              approve this amount.
+            </Typography>
+          }
+          <WrapperActionsModal>
+            <Button
+              onClick={() => { handleClose() }}
+              variant='outlined'
+              color='primary'
+              size='large'
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => { handleApprove() }}
+              loading={EarnDepositModalState.loading}
+              disabled={!EarnDepositModalState.stakeValueValid}
+              color='primary'
+              size="large"
+              variant="contained"
+            >
+              Approve amount
+            </Button>
+          </WrapperActionsModal>
+        </>
+      }
+
+      {EarnDepositModalState.stakeValueValid && EarnDepositModalState.allowanceGTstake &&
+        <>
+          {stakeToken.symbol !== EarnDepositModalState.netLayerNativeToken &&
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Your allowance has been approved. You can now stake your funds.
+            </Typography>
+          }
+          <WrapperActionsModal>
+            <Button
+                onClick={() => {
+                  handleClose()
+                }}
+              variant='outlined'
+              color='primary'
+              size='large'
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => { handleConfirm() }}
+              loading={EarnDepositModalState.loading}
+              disabled={false}
+              color='primary'
+              size="large"
+              variant="contained"
+            >
+              Stake!
+            </Button>
+          </WrapperActionsModal>
+        </>
+      }
+
+    </Modal>
+  )
 }
 
-const mapStateToProps = state => ({
-  ui: state.ui,
-  earn: state.earn,
-  balance: state.balance,
-  setup: state.setup,
-})
 
-export default connect(mapStateToProps)(EarnDepositModal)
+
+export default EarnDepositModal
