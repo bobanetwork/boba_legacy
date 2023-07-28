@@ -3,30 +3,34 @@ description: Learn more about the Bundler SDK for Account Abstraction on Boba Ne
 ---
 
 # Bundler SDK
+
+## Bundler SDK
+
 This section documents the usage of the Bundler SDK that is a major component of Account Abstraction.
 
-# Create and send UserOperation
+## Create and send UserOperation
+
 An UserOperation in simple terms is a pseudo-transaction object that expresses an user's intent.
 
 This package provides 2 APIs for using UserOperations:
 
-- Low-level "walletAPI"
-- High-level Provider
+* Low-level "walletAPI"
+* High-level Provider
 
 Make sure you understand both of them, to use the one that is suited best for your use case.
 
-## LowLevel API
+### LowLevel API
 
+#### BaseAccountAPI
 
-### BaseAccountAPI
+An abstract [base-class](https://github.com/bobanetwork/boba/blob/develop/packages/boba/bundler\_sdk/src/BaseAccountAPI.ts) to create UserOperations for a contract wallet.
 
-An abstract [base-class](https://github.com/bobanetwork/boba/blob/develop/packages/boba/bundler_sdk/src/BaseAccountAPI.ts) to create UserOperations for a contract wallet.
-
-### SimpleAccountAPI
+#### SimpleAccountAPI
 
 An implementation of the `BaseAccountAPI`, for the SimpleAccount sample of account-abstraction.
 
-#### constructor()
+**constructor()**
+
 ```ts
 interface SimpleAccountApiParams {
     factoryAddress?: string;
@@ -43,14 +47,11 @@ interface SimpleAccountApiParams {
 }
 ```
 
-#### Usage
+**Usage**
 
 Note that SimpleAccountAPI either needs the `accountAddress` or the `factoryAddress` to be supplied. If the `factoryAddress` is supplied, also supply a `entryPointWrapperAddress`. Custom reverts are not supported and the sdk would route the call through the entryPointWrapperAddress to compute the account address that will be deployed.
 
-If `accountAddress` is passed, the account is used as a sender when generating the userOp
-If `factoryAddress` is passed, the account will be generated on the fly. The userOp will include initCode and the precomputed address of the account and include it in the userOp.
-
-
+If `accountAddress` is passed, the account is used as a sender when generating the userOp If `factoryAddress` is passed, the account will be generated on the fly. The userOp will include initCode and the precomputed address of the account and include it in the userOp.
 
 The low-level approach above can be used as follows:
 
@@ -85,7 +86,8 @@ const op = await walletAPI.createSignedUserOp({
 })
 ```
 
-#### PaymasterAPI
+**PaymasterAPI**
+
 Add `paymasterAndData` to UserOp.
 
 ```ts
@@ -105,147 +107,143 @@ paymasterAndData = hexConcat([
 
 After adding the PaymasterAPI you can sign your user operation as usual.
 
-##### PaymasterAPI:getPaymasterAndData(Partial\<UserOperationStruct\>)
+**PaymasterAPI:getPaymasterAndData(Partial\<UserOperationStruct>)**
+
 Returns `paymasterAndData` of given UserOp. Returns `0x` if empty.
 
+**getAccountInitCode()**
 
-#### getAccountInitCode()
-Return the value to put into the "initCode" field, if the contract is not yet deployed.
-This value holds the "factory" address, followed by this account's information.
+Return the value to put into the "initCode" field, if the contract is not yet deployed. This value holds the "factory" address, followed by this account's information.
 
 ```ts
 getAccountInitCode(): Promise<string>
 ```
 
+**getNonce()**
 
-#### getNonce()
 Return current account's nonce.
 
 ```ts
 getNonce(): Promise<BigNumber>
 ```
 
+**encodeExecute()**
 
-#### encodeExecute()
 Encode the call from entryPoint through our account to the target contract.
 
 ```ts
 encodeExecute (target: string, value: BigNumberish, data: string): Promise<string>
 ```
 
+**signUserOpHash()**
 
-#### signUserOpHash()
 Sign a userOp's hash (userOpHash).
 
 ```ts
 signUserOpHash (userOpHash: string): Promise<string>
 ```
 
+**checkAccountPhantom()**
 
-#### checkAccountPhantom()
 Check if the contract is already deployed.
 
 ```ts
 checkAccountPhantom(): Promise<boolean>
 ```
 
+**getCounterFactualAddress()**
 
-#### getCounterFactualAddress()
 Calculate the account address even before it is deployed.
 
 ```ts
 getCounterFactualAddress (): Promise<string>
 ```
 
+**getInitCode()**
 
-#### getInitCode()
-Return initCode value to add into the UserOp.
-(either deployment code, or empty hex if contract already deployed)
+Return initCode value to add into the UserOp. (either deployment code, or empty hex if contract already deployed)
 
 ```ts
 getInitCode(): Promise<string>
 ```
 
+**getVerificationGasLimit()**
 
-#### getVerificationGasLimit()
-Return maximum gas used for verification.
-NOTE: createUnsignedUserOp will add to this value the cost of creation, if the contract is not yet created.
-
-```ts
-getVerificationGasLimit(): Promise<BigNumberish>
-```
-
-
-#### getPreVerificationGas()
-Should cover cost of putting calldata on-chain, and some overhead.
-Actual overhead depends on the expected bundle size.
+Return maximum gas used for verification. NOTE: createUnsignedUserOp will add to this value the cost of creation, if the contract is not yet created.
 
 ```ts
 getVerificationGasLimit(): Promise<BigNumberish>
 ```
 
+**getPreVerificationGas()**
 
-#### getUserOpHash()
-Return userOpHash for signing.
-This value matches entryPoint.getUserOpHash (calculated off-chain, to avoid a view call)
+Should cover cost of putting calldata on-chain, and some overhead. Actual overhead depends on the expected bundle size.
+
+```ts
+getVerificationGasLimit(): Promise<BigNumberish>
+```
+
+**getUserOpHash()**
+
+Return userOpHash for signing. This value matches entryPoint.getUserOpHash (calculated off-chain, to avoid a view call)
 
 ```ts
 getUserOpHash(userOp: UserOperationStruct): Promise<string>
 ```
 
+**getAccountAddress()**
 
-#### getAccountAddress()
 ```ts
 getAccountAddress(): Promise<string>
 ```
-Return the account's address.
-This value is valid even before deploying the contract.
 
+Return the account's address. This value is valid even before deploying the contract.
 
-#### createUnsignedUserOp()
+**createUnsignedUserOp()**
+
 Create a UserOperation, filling all details (except signature)
-- if account is not yet created, add initCode to deploy it.
-- if gas or nonce are missing, read them from the chain (note that we can't fill gaslimit before the account is created)
+
+* if account is not yet created, add initCode to deploy it.
+* if gas or nonce are missing, read them from the chain (note that we can't fill gaslimit before the account is created)
+
 ```ts
 createUnsignedUserOp (info: TransactionDetailsForUserOp): Promise<UserOperationStruct>
 ```
 
+**signUserOp()**
 
-#### signUserOp()
 Sign the filled userOp.
 
 ```ts
 signUserOp (userOp: UserOperationStruct): Promise<UserOperationStruct>
 ```
 
+**createSignedUserOp()**
 
-#### createSignedUserOp()
 Helper method: create and sign a user operation.
 
 ```ts
 createSignedUserOp (info: TransactionDetailsForUserOp): Promise<UserOperationStruct>
 ```
 
+**getUserOpReceipt()**
 
-#### getUserOpReceipt()
 Get the transaction that has this userOpHash mined, or null if not found.
 
 ```ts
 getUserOpReceipt (userOpHash: string, timeout = 30000, interval = 5000): Promise<string | null>
 ```
 
----
 
 
-## High-Level Provider API
+### High-Level Provider API
 
-A simplified mode that doesn't require a different wallet extension.
-Instead, the current provider's account is used as wallet owner by calling its "Sign Message" operation.
+A simplified mode that doesn't require a different wallet extension. Instead, the current provider's account is used as wallet owner by calling its "Sign Message" operation.
 
-This can only work for wallets that use an EIP-191 ("Ethereum Signed Message") signatures (like our sample SimpleWallet)
-Also, the UX is not great (the user is asked to sign a hash, and even the wallet address is not mentioned, only the signer)
+This can only work for wallets that use an EIP-191 ("Ethereum Signed Message") signatures (like our sample SimpleWallet) Also, the UX is not great (the user is asked to sign a hash, and even the wallet address is not mentioned, only the signer)
 
-### wrapProvider
+#### wrapProvider
+
 Wrap an existing provider to tunnel requests through Account Abstraction.
 
 ```ts
@@ -258,7 +256,8 @@ async function wrapProvider(
 ): Promise<ERC4337EthersProvider>
 ```
 
-### ClientConfig
+#### ClientConfig
+
 ```ts
 interface ClientConfig {
   /**
@@ -282,10 +281,9 @@ interface ClientConfig {
 }
 ```
 
-### Usage
-Since-
-a) using a remote signer with eth_sendTransaction is not supported on Boba, transactions would need to be sent from an ethers.wallet (object), for the deterministic deployment of SimpleAccountFactory. This is not a requirement if the SimpleAccountFactory has already been deployed
-b) wrapProvider uses the low level API internally, custom reverts are not supported and the sdk would use the entryPointWrapperAddress to compute the account address that will be deployed
+#### Usage
+
+Since- a) using a remote signer with eth\_sendTransaction is not supported on Boba, transactions would need to be sent from an ethers.wallet (object), for the deterministic deployment of SimpleAccountFactory. This is not a requirement if the SimpleAccountFactory has already been deployed b) wrapProvider uses the low level API internally, custom reverts are not supported and the sdk would use the entryPointWrapperAddress to compute the account address that will be deployed
 
 wrapProvider must be passed the parameters `entryPointWrapperAddress` and `wallet` on Boba
 

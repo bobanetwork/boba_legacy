@@ -17,7 +17,7 @@
     * [API Endpoints](hybrid\_compute/examples/aws\_lambda\_setup.md)
     * [BOBA Faucet](hybrid\_compute/examples/hc-captcha-faucet.md)
 * [For Developers](for-developers/README.md)
-  * [Boba is build for developers](boba\_documentation/developer/developer-start.md)
+  * [Boba is built for developers](boba\_documentation/developer/developer-start.md)
   * [Development Stack](boba\_documentation/developer/local-stack.md)
   * [Fees](boba\_documentation/developer/fee-scheme.md)
   * [xDomain Transaction Status](boba\_documentation/developer/xdomain-tx-status.md)

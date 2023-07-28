@@ -12,7 +12,7 @@ Here we'll go over the basics of using this bridge to move ERC20 and ETH assets 
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 1 (20).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 1 (20) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 > Note: **We currently block smart contract wallets from calling the `depositETH` and `depositERC20` functions for security reasons**. If you want to deposit not using an EOA accounts and you know what are doing, you can use `depositETHTo` and `depositERC20To` functions instead.
 
@@ -95,7 +95,7 @@ await depositToTx.wait()
 
 
 
-<figure><img src="../../../.gitbook/assets/Artboard 2 (13).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Artboard 2 (13) (2) (1).png" alt=""><figcaption></figcaption></figure>
 
 ### Withdraw tokens (ERC20s and ETH)
 
