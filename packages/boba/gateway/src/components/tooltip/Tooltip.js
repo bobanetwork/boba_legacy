@@ -8,6 +8,15 @@ function Tooltip({ title, arrow = true, children }) {
   if (title) {
     return (
       <MuiTooltip
+        componentsProps={{
+          tooltip: {
+            sx: {
+              fontSize: '12px',
+              background: '#545454',
+              padding: '16px'
+            }
+          }
+        }}
         title={<S.Title>{title}</S.Title>}
         arrow={arrow}
       >

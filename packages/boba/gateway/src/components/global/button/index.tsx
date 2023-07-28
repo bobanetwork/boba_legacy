@@ -11,9 +11,11 @@ export const Button: FC<ButtonTypes> = ({
   className,
   label,
   onClick,
+  style,
 }) => {
   return (
     <ButtonContainer
+      style={style}
       type="button"
       disable={disable}
       loading={loading}

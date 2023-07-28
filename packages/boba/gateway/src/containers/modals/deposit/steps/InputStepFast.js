@@ -390,7 +390,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
         {!!token && token.symbol === 'OMG' && (
           <Typography variant="body2" sx={{ mt: 2 }}>
-            The OMG Token was minted in 2017 and it does not conform to the
+            The OMG Token was minted in 2017 and it does not confirm to the
             ERC20 token standard. In some cases, three interactions with
             MetaMask are needed.
           </Typography>

@@ -44,6 +44,7 @@ export const useWalletConnect = () => {
    */
 
   const triggerInit = useCallback(() => {
+    console.log(['network', network, networkType])
     const initAccount = async () => {
       const initialized = await networkService.initializeAccount({
         chainIdChanged,
@@ -150,7 +151,6 @@ export const useWalletConnect = () => {
 
   useEffect(() => {
     if (connectRequest && !networkService.walletService.provider) {
-      console.log([connectRequest, networkService.walletService])
       // bypass walletSelectorModal
       if (DISABLE_WALLETCONNECT) {
         triggerInit()
