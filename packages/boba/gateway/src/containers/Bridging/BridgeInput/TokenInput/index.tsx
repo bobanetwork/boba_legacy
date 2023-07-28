@@ -1,5 +1,5 @@
+import InputWithButton from 'components/global/inputWithButton'
 import React, { useEffect, useState } from 'react'
-import { InputContainer, InputContainerLabel } from './index.styles'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectBobaFeeChoice,
@@ -12,8 +12,8 @@ import {
   selectTokenToBridge,
 } from 'selectors'
 import { logAmount } from 'util/amountConvert'
-import InputWithButton from 'components/global/inputWithButton'
 import { LAYER } from 'util/constant'
+import { InputContainer, InputContainerLabel } from './index.styles'
 
 import { purgeBridgeAlert, setAmountToBridge } from 'actions/bridgeAction'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'

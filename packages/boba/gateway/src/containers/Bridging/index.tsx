@@ -1,12 +1,8 @@
-import React from 'react'
-import {
-  BridgeAction,
-  BridgeContent,
-  BridgeWrapper,
-  BridgeActionButton,
-  BridginContainer,
-} from './styles'
+import { setConnect } from 'actions/setupAction'
+import { openModal } from 'actions/uiAction'
 import { Heading } from 'components/global'
+import useBridgeCleanup from 'hooks/useBridgeCleanup'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   selectAccountEnabled,
@@ -14,15 +10,19 @@ import {
   selectBridgeAlerts,
   selectTokenToBridge,
 } from 'selectors'
-import { setConnect } from 'actions/setupAction'
-import Chains from './chain'
-import BridgeInput from './BridgeInput'
 import BridgeAlert from './BridgeAlert'
-import BridgeTypeSelector from './BridgeTypeSelector'
 import BridgeHeader from './BridgeHeader'
-import useBridgeCleanup from 'hooks/useBridgeCleanup'
-import { openModal } from 'actions/uiAction'
+import BridgeInput from './BridgeInput'
+import BridgeTypeSelector from './BridgeTypeSelector'
 import ThirdPartyBridges from './ThirdPartyBridges'
+import Chains from './chain'
+import {
+  BridgeAction,
+  BridgeActionButton,
+  BridgeContent,
+  BridgeWrapper,
+  BridginContainer,
+} from './styles'
 
 const Bridging = () => {
   useBridgeCleanup()

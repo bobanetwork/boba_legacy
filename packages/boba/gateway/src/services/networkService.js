@@ -4733,6 +4733,10 @@ class NetworkService {
     return await this.provider.getBlockNumber();
   }
 
+  async getBlockTime(blockNumber) {
+    return (await this.provider.getBlock(blockNumber)).timestamp;
+  }
+
 }
 
 const networkService = new NetworkService()
