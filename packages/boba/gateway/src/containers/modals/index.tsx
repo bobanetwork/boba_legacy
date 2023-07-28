@@ -21,6 +21,12 @@ import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
 import DepositStake from './stake/DepositStake'
+import SettingsModal from './settings'
+import NetworkPickerModal from './networkPicker'
+import BridgeConfirmModal from './BridgeConfirmModal'
+import BridgeInProgressModal from './BridgeInProgressModal'
+import TransactionSuccessModal from './TransactionSuccessModal'
+
 /**
  *
  * NOTE:TODO: https://github.com/bobanetwork/boba/pull/982#discussion_r1253868688
@@ -59,6 +65,7 @@ const ModalContainer = () => {
   const switchNetworkModalState = useSelector(
     selectModalState('switchNetworkModal')
   )
+  const SettingsModalState = useSelector(selectModalState('settingsModal'))
 
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
@@ -86,6 +93,20 @@ const ModalContainer = () => {
     selectModalState('newProposalModal')
   )
   const castVoteModalState = useSelector(selectModalState('castVoteModal'))
+
+  const networkPickerModalState = useSelector(selectModalState('networkPicker'))
+
+  const bridgeConfirmModalState = useSelector(
+    selectModalState('bridgeConfirmModal')
+  )
+
+  const bridgeInProgressModalState = useSelector(
+    selectModalState('bridgeInProgress')
+  )
+
+  const transactionSuccessModalState = useSelector(
+    selectModalState('transactionSuccess')
+  )
 
   return (
     <>
@@ -151,6 +172,22 @@ const ModalContainer = () => {
       )}
       {!!switchNetworkModalState && (
         <SwitchNetworkModal open={switchNetworkModalState} />
+      )}
+      {!!SettingsModalState && <SettingsModal open={SettingsModalState} />}
+      {!!networkPickerModalState && (
+        <NetworkPickerModal open={networkPickerModalState} />
+      )}
+
+      {!!bridgeConfirmModalState && (
+        <BridgeConfirmModal open={bridgeConfirmModalState} />
+      )}
+
+      {!!bridgeInProgressModalState && (
+        <BridgeInProgressModal open={bridgeInProgressModalState} />
+      )}
+
+      {!!transactionSuccessModalState && (
+        <TransactionSuccessModal open={transactionSuccessModalState} />
       )}
     </>
   )

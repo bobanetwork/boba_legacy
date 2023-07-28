@@ -1,8 +1,7 @@
-import styled from '@emotion/styled';
+import styled from 'styled-components';
 
-export const Title = styled('div')(({ theme }) => ({
-  color: theme.palette.primary.tooltip,
-  padding: '13px 16px 12px',
-  fontSize: '14px',
-  borderRadius: '12px',
-}))
+export const Title = styled('div')`
+  padding: '16px';
+  fontSize: '14px';
+  borderRadius: '12px';
+`

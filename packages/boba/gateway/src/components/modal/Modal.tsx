@@ -15,26 +15,19 @@ limitations under the License. */
 
 import React from 'react'
 
-import {
-  Fade,
-  Container,
-  Box,
-  useMediaQuery,
-  Grid,
-  useTheme,
-} from '@mui/material'
+import { Fade, Container, Box, useMediaQuery, useTheme } from '@mui/material'
 
-import { Typography } from 'components/global/typography'
+import { Heading } from 'components/global'
 import * as S from './styles'
 import * as LayoutS from 'components/common/common.styles'
 import CloseIcon from 'images/close.svg'
 import { Svg } from 'components/global/svg'
 import { ModalInterface } from './types'
+
 const _Modal = ({
   children,
   open,
   onClose,
-  light,
   title,
   transparent,
   maxWidth,
@@ -59,7 +52,7 @@ const _Modal = ({
             <Box display="flex" flexDirection="column" gap="10px">
               <S.ModalHead>
                 <S.TitleContainer>
-                  <Typography variant="h1">{title}</Typography>
+                  <Heading variant="h2">{title}</Heading>
                   <S.IconButtonTag onClick={onClose}>
                     <Svg src={CloseIcon} fill="#fff" />
                   </S.IconButtonTag>

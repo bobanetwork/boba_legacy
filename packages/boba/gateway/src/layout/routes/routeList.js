@@ -13,6 +13,7 @@ import Lock from 'containers/veboba/Lock';
 import Vote from 'containers/VoteAndDao/Vote/Vote';
 import BobaScope from 'containers/bobaScope/BobaScope';
 import DevTools from 'containers/devtools/DevTools';
+import Bridging from 'containers/Bridging';
 
 export const COMMON_ROUTES = [
   {
@@ -39,7 +40,7 @@ export const ROUTE_LIST = [
     children: [
       {
         path: ROUTES_PATH.BRIDGE,
-        element: <Bridge />,
+        element: <Bridging />,
         key: 'Bridge',
       },
       {
