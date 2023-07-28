@@ -28,11 +28,17 @@ const ThemeSwitcher: FC = () => {
   return (
     <>
       {currentTheme === THEME_NAME.LIGHT ? (
-        <IconWrapper onClick={() => onThemeChange(THEME_NAME.DARK)}>
+        <IconWrapper
+          title="dark-icon"
+          onClick={() => onThemeChange(THEME_NAME.DARK)}
+        >
           <Svg src={MoonIcon} fill={theme.colors['gray'][600]} />
         </IconWrapper>
       ) : (
-        <IconWrapper onClick={() => onThemeChange(THEME_NAME.LIGHT)}>
+        <IconWrapper
+          title="light-icon"
+          onClick={() => onThemeChange(THEME_NAME.LIGHT)}
+        >
           <Svg src={SunIcon} fill={theme.colors['gray'][100]} />
         </IconWrapper>
       )}
