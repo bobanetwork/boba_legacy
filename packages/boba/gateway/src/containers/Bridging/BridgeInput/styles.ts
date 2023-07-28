@@ -1,6 +1,7 @@
 import { Svg, Typography } from 'components/global'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import ArrowDown from 'images/icons/arrowdown.svg'
+import { mobile } from 'themes/screens'
 
 export const BridgeInputContainer = styled.div`
   display: flex;
@@ -20,6 +21,9 @@ export const TokenSelector = styled.div`
   gap: 8px;
   align-items: flex-start;
   min-width: 25%;
+  ${mobile(css`
+    min-width: 40%;
+  `)}
 `
 
 export const TokenSelectorInput = styled.div`
@@ -33,6 +37,10 @@ export const TokenSelectorInput = styled.div`
   border-radius: 12px;
   border: 1px solid ${({ theme: { colors } }) => colors.box.border};
   background: ${({ theme: { colors } }) => colors.box.background};
+
+  ${mobile(css`
+    padding: 8px;
+  `)}
 `
 
 export const ReceiveContainer = styled.div`

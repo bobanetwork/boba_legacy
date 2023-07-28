@@ -1,4 +1,5 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const IconWrapper = styled.div`
   border-radius: 50%;
@@ -15,4 +16,7 @@ export const IconWrapper = styled.div`
     justify-content: center;
     align-items: center;
   }
+  ${mobile(css`
+    display: none;
+  `)}
 `

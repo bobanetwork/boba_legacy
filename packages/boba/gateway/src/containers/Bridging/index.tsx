@@ -46,8 +46,7 @@ const Bridging = () => {
     if (isBridgeActionDisabled()) {
       return
     }
-    // dispatch(openModal('bridgeConfirmModal'))
-    dispatch(openModal('transactionSuccess'))
+    dispatch(openModal('bridgeConfirmModal'))
   }
 
   return (

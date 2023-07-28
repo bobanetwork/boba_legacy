@@ -1,4 +1,5 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const StyledFooter = styled.div`
   display: flex;
@@ -11,4 +12,7 @@ export const DividerLine = styled.hr`
   border-color: ${({ theme }) => theme.colors['gray'][200]};
   box-sizing: border-box;
   width: 100%;
+  ${mobile(css`
+    display: none;
+  `)}
 `

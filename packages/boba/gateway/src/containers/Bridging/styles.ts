@@ -1,5 +1,6 @@
 import { Button, Typography } from 'components/global'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const BridginContainer = styled.div`
   display: flex;
@@ -7,6 +8,11 @@ export const BridginContainer = styled.div`
   gap: 32px;
   max-width: 500px;
   margin: 32px auto;
+
+  ${mobile(css`
+    max-width: 360px;
+    margin: 24px auto;
+  `)}
 `
 
 export const BridgeWrapper = styled.div`
@@ -22,6 +28,10 @@ export const BridgeWrapper = styled.div`
   background: ${({ theme }) => theme.colors.box.background};
   /* Gradient Glass BG Blur */
   backdrop-filter: blur(7.5px);
+
+  ${mobile(css`
+    padding: 24px 16px;
+  `)}
 `
 
 export const BridgeContent = styled.div`

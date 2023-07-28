@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const InputContainer = styled.div<{ error?: boolean }>`
   width: 100%;
@@ -12,6 +13,10 @@ export const InputContainer = styled.div<{ error?: boolean }>`
     ${({ theme, error }) =>
       error ? theme.colors.red[300] : theme.colors.box.border};
   background: ${(props) => props.theme.colors.box.background};
+
+  ${mobile(css`
+    padding: 5px;
+  `)}
 `
 
 export const Input = styled.input`
@@ -27,6 +32,7 @@ export const Input = styled.input`
   outline: none;
   border: none;
   font-family: Roboto;
+  width: 80%;
 `
 export const InputActionButton = styled.button<{ disabled?: boolean }>`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
