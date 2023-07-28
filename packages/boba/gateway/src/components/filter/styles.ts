@@ -104,6 +104,9 @@ export const Option = styled.div<{ isSelected: boolean }>`
     css`
       background: ${theme.colors.gray[400]};
     `}
+  @media ${screen.mobile} {
+    font-size: 10px;
+  }
 `
 
 export const DefaultIcon = styled.div`

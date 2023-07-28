@@ -74,7 +74,7 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   },
   {
     value: Chains[CHAIN_NAME.Goerli].chainId,
-    label: 'Ethereum (Goerli)',
+    label: 'Ethereum Goerli',
     imgSrc: getCoinImage('ETH'),
     headerName: NETWORK_TYPE.TESTNET,
   },
@@ -102,13 +102,13 @@ export const NETWORK_L2_OPTIONS = [
   },
   {
     value: Chains[CHAIN_NAME.Boba_Goerli].chainId,
-    label: 'Boba (Goerli)',
+    label: 'Boba Goerli',
     imgSrc: getCoinImage('BOBA'),
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: Chains[CHAIN_NAME.Boba_BNB_Testnet].chainId,
-    label: 'Boba BNB (Testnet)',
+    label: 'Boba BNB Testnet',
     imgSrc: getCoinImage('BOBA'),
     headerName: NETWORK_TYPE.TESTNET,
   },

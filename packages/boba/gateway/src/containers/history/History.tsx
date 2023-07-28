@@ -65,10 +65,7 @@ import { setConnect } from 'actions/setupAction'
 import { POLL_INTERVAL } from 'util/constant'
 import FilterIcon from '../../images/filter.svg'
 
-import {
-  TransactionsResolver,
-  GetSymbolFromNetworkName,
-} from './TransactionsResolver'
+import { TransactionsResolver } from './TransactionsResolver'
 import { CHAIN_NAME, TRANSACTION_FILTER_STATUS } from './types'
 import { TransactionsTableHeader } from 'components/global/table/themes'
 import { FilterDropDown } from 'components/filter'
