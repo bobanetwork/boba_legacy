@@ -63,7 +63,7 @@ export const BobaChains: IBobaChains = {
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'BNB',
       '0x0000000000000000000000000000000000000000': 'BOBA',
-      '0x35d0DaC01d30f270c1571E8Ba22b50b27350115f': 'ETH',
+      '0xc614A66f82e71758Fa7735C91dAD1088c8362f15': 'ETH',
     },
   },
   //#endregion
