@@ -20,8 +20,8 @@ import { openModal } from 'actions/uiAction'
 
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-  selectBridgeTokens, 
+import {
+  selectBridgeTokens,
   selectMultiBridgeMode,
   selectAccountEnabled,
   selectLayer,
@@ -42,7 +42,6 @@ function BridgeTransfer() {
   const accountEnabled = useSelector(selectAccountEnabled())
 
   const layer = useSelector(selectLayer())
-  //const bridgeType = useSelector(selectBridgeType())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
   const tokenList = useSelector(selectTokens)
   const tokens = useSelector(selectBridgeTokens())

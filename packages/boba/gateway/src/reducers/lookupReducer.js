@@ -19,6 +19,8 @@ function lookupReducer(state = initialState, action) {
   switch (action.type) {
     case 'PRICE/GET/SUCCESS':
       return { ...state, ...action.payload };
+    case 'LOOKUP/PRICE/CLEAR':
+      return {};
     default:
       return state;
   }

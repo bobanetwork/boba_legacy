@@ -1,10 +1,15 @@
 import { Typography } from '@mui/material'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const SocialLinksContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  ${mobile(css`
+    flex-direction: column-reverse;
+    gap: 24px;
+  `)}
 `
 
 export const StyledSocialLinks = styled.div`

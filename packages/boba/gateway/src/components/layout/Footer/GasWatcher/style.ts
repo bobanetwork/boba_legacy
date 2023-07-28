@@ -1,11 +1,15 @@
 import { Typography } from 'components/global'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const GasListContainer = styled.div`
   self-align: flex-end;
   display: flex;
   gap: 24px;
   justify-content: flex-end;
+  ${mobile(css`
+    display: none;
+  `)}
 `
 
 export const GasListItem = styled.div`

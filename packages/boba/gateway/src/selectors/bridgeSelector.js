@@ -19,6 +19,12 @@ export function selectBridgeTokens() {
   }
 }
 
+export function selectTokenToBridge() {
+  return function (state) {
+    return state.bridge.tokens[ 0 ]
+  }
+}
+
 export function selectBridgeType() {
   return function (state) {
     return state.bridge.bridgeType
@@ -30,3 +36,28 @@ export function selectMultiBridgeMode() {
     return state.bridge.multiBridgeMode
   }
 }
+
+export function selectBridgeToAddressState() {
+  return function (state) {
+    return state.bridge.bridgeToAddressState
+  }
+}
+
+export function selectAmountToBridge() {
+  return function (state) {
+    return state.bridge.amountToBridge
+  }
+}
+
+export function selectBridgeAlerts() {
+  return function (state) {
+    return state.bridge.alerts
+  }
+}
+
+export function selectIsFetchTxBlockNumber() {
+  return function (state) {
+    return state.bridge.isFetchTxBlockNumber
+  }
+}
+

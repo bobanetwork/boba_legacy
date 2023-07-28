@@ -10,7 +10,7 @@ exports[`SwitchButton SwitchButton Default State 1`] = `
       type="checkbox"
     />
     <span
-      class="sc-bgqQcB hNFcsA"
+      class="sc-bgqQcB fNGpeI"
     />
   </label>
 </DocumentFragment>
@@ -27,7 +27,7 @@ exports[`SwitchButton SwitchButton is Active 1`] = `
       type="checkbox"
     />
     <span
-      class="sc-bgqQcB hNFcsA"
+      class="sc-bgqQcB fNGpeI"
     />
   </label>
 </DocumentFragment>
@@ -45,7 +45,7 @@ exports[`SwitchButton SwitchButton is Disable & Active 1`] = `
       type="checkbox"
     />
     <span
-      class="sc-bgqQcB hNFcsA"
+      class="sc-bgqQcB fNGpeI"
     />
   </label>
 </DocumentFragment>
@@ -62,7 +62,7 @@ exports[`SwitchButton SwitchButton is Disable 1`] = `
       type="checkbox"
     />
     <span
-      class="sc-bgqQcB hNFcsA"
+      class="sc-bgqQcB fNGpeI"
     />
   </label>
 </DocumentFragment>

@@ -14,6 +14,7 @@ export type ComponentType = 'p' | 'span' | 'a'
 export interface TypographyProps {
   variant: VariantType
   color?: string
+  error?: boolean
   children?: ReactNode
   className?: string
   component?: ComponentType
