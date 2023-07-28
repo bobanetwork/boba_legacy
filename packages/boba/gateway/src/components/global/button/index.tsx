@@ -26,6 +26,7 @@ export const Button: FC<ButtonTypes> = ({
       outline={outline}
       onClick={!disable ? onClick : () => {}}
       className={className}
+      label={label}
     >
       {loading && <SpinLoader />} {label}
     </ButtonContainer>
