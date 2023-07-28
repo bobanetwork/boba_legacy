@@ -19,15 +19,9 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  Box,
-  FormControlLabel,
-  Checkbox,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
+import {  Typography } from 'components/global/typography'
 
 import {
   selectUserInfo,
@@ -56,7 +50,7 @@ import * as G from 'containers/Global.styles'
 import { fetchBalances } from 'actions/networkAction';
 
 import { TableHeader } from 'components/global/table'
-import {CheckboxWithLabel} from 'components/global/checkbox'
+import { CheckboxWithLabel } from 'components/global/checkbox'
 const Earn = () => {
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
@@ -89,23 +83,60 @@ const Earn = () => {
   }, [dispatch, baseEnabled, accountEnabled])
 
 
-  function getBalance(address, chain) {
-    const tokens = chain === 'L1' ? Object.values(layer1Balance) : chain === 'L2' ? Object.values(layer2Balance) : []
-    const token = tokens.find(t => t.address.toLowerCase() === address.toLowerCase())
+  const getBalance = (address, chain) => {
+    const tokens =
+      chain === 'L1'
+        ? Object.values(layer1Balance)
+        : chain === 'L2'
+        ? Object.values(layer2Balance)
+        : []
+    const token = tokens.find(
+      (t) => t.address.toLowerCase() === address.toLowerCase()
+    )
     return token ? [token.balance, token.decimals] : [0, 0]
   }
 
   const tableHeaderOptions = [
-    {name:'Token', width:225},
-    {name:'Available Balance', tooltip: 'Available Balance refers to the amount of funds currently in each pool.',width:145},
-    {name:'Total Staked', tooltip: 'Total staked denotes the funds staked by liquidity providers.', width:115},
-    {name:'APR', tooltip: 'The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.',width:85},
-    {name:'Your Stake',width:90},
-    {name:'Earned',width:110},
+    {
+      name: 'Token',
+      width: 225,
+    },
+    {
+      name: 'Available Balance',
+      tooltip:
+        'Available Balance refers to the amount of funds currently in each pool.',
+      width: 145,
+    },
+    {
+      name: 'Total Staked',
+      tooltip: 'Total staked denotes the funds staked by liquidity providers.',
+      width: 115,
+    },
+    {
+      name: 'APR',
+      tooltip:
+        'The APR is the historical APR, which reflects the fees people paid to bridge and the previous usage patterns for each pool.',
+      width: 85,
+    },
+    {
+      name: 'Your Stake',
+      width: 90,
+    },
+    {
+      name: 'Earned',
+      width: 110,
+    },
+    {
+      name: 'Actions',
+      width: 75
+    }
   ]
 
   const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP;
-  const selectedNetworkConfig = lpChoice === 'L1LP' ? networkService?.networkConfig?.L1?.chainIdHex : networkService?.networkConfig?.L2?.chainIdHex;
+  const selectedNetworkConfig =
+    lpChoice === 'L1LP'
+      ? networkService?.networkConfig?.L1?.chainIdHex
+      : networkService?.networkConfig?.L2?.chainIdHex
 
   return (
     <S.EarnPageContainer>
@@ -154,18 +185,7 @@ const Earn = () => {
           </G.PageSwitcher>
 
           <S.EarnAction>
-            {/*<FormControlLabel
-                control={
-                  <Checkbox
-                    checked={showMDO}
-                    onChange={(e) => setShowMDO(e.target.checked)}
-                    name="my tokens only"
-                    color="primary"
-                    icon={<S.BpIcon />}
-                  />
-                }
-                label="My Tokens Only"
-              />*/}
+
             <CheckboxWithLabel
               label="My stakes only"
               checked={showMSO}
@@ -178,27 +198,38 @@ const Earn = () => {
         <S.Help>
 
           <Typography variant="body3">
-            Bridging fees are proportionally distributed to stakers. The bridges are not farms.
-            Your earnings only increase when someone uses the bridge you have staked into.
+            Bridging fees are proportionally distributed to stakers. The bridges
+            are not farms. Your earnings only increase when someone uses the
+            bridge you have staked into.
           </Typography>
 
           <Tooltip
             title={
               <Typography variant="body2" sx={{ mt: 1, fontSize: '0.9em' }}>
-                <span style={{ fontWeight: '700' }}>Staking example</span>. When you stake 10 OMG into the L2 pool, then the pool's liquidity and balance both increase by 10 OMG.
+                <span style={{ fontWeight: '700' }}>Staking example</span>. When
+                you stake 10 OMG into the L2 pool, then the pool's liquidity and
+                balance both increase by 10 OMG.
                 <br /><br />
                 <span style={{ fontWeight: '700' }}>Fast Bridge example</span>. When a user bridges 10 OMG from L1 to L2 using the fast bridge,
-                they send 10 OMG to the L1 pool, increasing its balance by 10 OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2 wallet, completing the bridge.
-                Note that bridge operations do not change the pool's liquidity, but only its balance.
-                The difference between what was deposited into the L1 pool (10 OMG) and what was sent
-                to the user on the L2 (9.99 OMG), equal to 0.01 OMG, is sent to the reward pool, for harvesting by stakers.
+                they send 10 OMG to the L1 pool, increasing its balance by 10
+                OMG. Next, 9.99 OMG flow out from the L2 pool to the user's L2
+                wallet, completing the bridge. Note that bridge operations do
+                not change the pool's liquidity, but only its balance. The
+                difference between what was deposited into the L1 pool (10 OMG)
+                and what was sent to the user on the L2 (9.99 OMG), equal to
+                0.01 OMG, is sent to the reward pool, for harvesting by stakers.
                 <br /><br />
-                <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In some circumstances, excess balances can accumulate on one chain. For example, if many people
-                bridge from L1 to L2, then L1 pool balances will increase, while L2 balances will decrease. When needed, the pool operator can
-                rebalance the pools, using 'classic' deposit and exit operations to move funds from one pool to another. Rebalancing takes 7 days, due to the
+                <span style={{ fontWeight: '700' }}>Pool rebalancing</span>. In
+                some circumstances, excess balances can accumulate on one chain.
+                For example, if many people bridge from L1 to L2, then L1 pool
+                balances will increase, while L2 balances will decrease. When
+                needed, the pool operator can rebalance the pools, using
+                'classic' deposit and exit operations to move funds from one
+                pool to another. Rebalancing takes 7 days, due to the 7 day
                 7 day fraud proof window, which also applies to the operator.
                 <br /><br />
-                <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The pools use an automatic supply-and-demand approach to setting the fees.
+                <span style={{ fontWeight: '700' }}>Dynamic fees</span>. The
+                pools use an automatic supply-and-demand approach to setting the
                 When a pool's liquidity is low, the fees are increased to attract more liquidity into that pool and vice-versa.
               </Typography>
             }
@@ -207,20 +238,21 @@ const Earn = () => {
           </Tooltip>
         </S.Help>
 
-      { !isMobile && (
         <TableHeader options={tableHeaderOptions} />
-        )
-      }
         <S.EarnListContainer>
           {Object.keys(selectedPoolInfo).map((v, i) => {
             const ret = getBalance(v, lpChoice === 'L1LP' ? 'L1' : 'L2');
-            if (showMDO && Number(ret[0]) === 0) return null;
+            if (showMDO && Number(ret[0]) === 0) {
+              return null
+            }
             return (
               <ListEarn
                 chain={selectedNetworkConfig}
                 key={i}
                 poolInfo={selectedPoolInfo[v]}
-                userInfo={lpChoice === 'L1LP' ? userInfo.L1LP[v] : userInfo.L2LP[v]}
+                userInfo={
+                  lpChoice === 'L1LP' ? userInfo.L1LP[v] : userInfo.L2LP[v]
+                }
                 L1orL2Pool={lpChoice}
                 balance={ret[0]}
                 decimals={ret[1]}

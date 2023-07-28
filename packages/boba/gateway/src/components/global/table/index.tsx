@@ -1,10 +1,10 @@
 import React from 'react'
 
 import { Row } from 'components/global/containers'
-import { Text } from 'components/global/text'
 import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import styled from 'styled-components'
+import { ModalTypography } from 'components/global/modalTypography'
 
 const TableRow = styled(Row)`
   &:not(:first-of-type) {
@@ -21,7 +21,11 @@ const TableHeaderContainer = styled(Row)`
   align-items: center;
   justify-content: space-between;
   border-radius: 6px 6px 0 0;
-  background: ${(props) => props.theme.colors.gray[800]};
+  background: ${(props) => props.theme.colors.popup};
+  border-radius: 12px;
+  padding: 15px 25px;
+  box-shadow: 0px 2px 17px 0px rgba(0, 0, 0, 0.15);
+  border: 1px solid ${(props) => props.theme.colors.gray[300]};
   @media (max-width: 960px) {
     margin-bottom: 5px;
   }
@@ -50,7 +54,7 @@ export const TableHeader = ({ options }: TableHeaderType) => {
             key={option.name}
             style={{ maxWidth: option?.width + 'px' }}
           >
-            <Text>{option.name}</Text>
+            <ModalTypography variant="body2">{option.name}</ModalTypography>
             {option.tooltip && (
               <Tooltip title={option.tooltip}>
                 <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
