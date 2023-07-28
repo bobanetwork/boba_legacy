@@ -39,6 +39,7 @@ import NotificationAlert from 'components/alert/Alert'
 import { HomeContainer, HomeContent } from './styles'
 import { useOnboard } from 'hooks/useOnboard'
 import { useWalletConnect } from 'hooks/useWalletConnect'
+import useWalletSwitch from 'hooks/useWalletSwitch'
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -57,6 +58,7 @@ const Home = () => {
   useGoogleAnalytics(); // Invoking GA analysis page view hooks
   useOnboard()
   useNetwork()
+  useWalletSwitch()
   useWalletConnect()
 
   return (

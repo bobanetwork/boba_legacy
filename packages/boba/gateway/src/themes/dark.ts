@@ -14,7 +14,7 @@ const dark = {
   },
   //new code
   background: '#191919',
-  color: '#FFFFFF',
+  color: '#EEEEEE',
   colors: {
     danger: 'red',
     success: 'green',

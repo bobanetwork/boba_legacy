@@ -9,7 +9,8 @@ export const Slider = styled.span`
   bottom: 0;
   will-change: background-color;
   transform: translateZ(0);
-  background-color: ${(props) => props.theme.colors.gray[200]};
+  background-color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[800] : theme.colors.gray[200]};
   -webkit-transition: 0.4s;
   transition: 0.2s;
   border-radius: 34px;
@@ -25,7 +26,7 @@ export const Slider = styled.span`
     left: 2px;
     bottom: 2px;
     transform: translateZ(0);
-    background-color: ${(props) => props.theme.colors.gray[50]};
+    background-color: ${({ theme }) => theme.colors.gray[50]};
     -webkit-transition: 0.4s;
     transition: 0.4s;
   }

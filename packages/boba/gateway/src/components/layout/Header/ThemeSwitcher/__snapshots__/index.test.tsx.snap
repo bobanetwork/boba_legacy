@@ -2,11 +2,9 @@
 
 exports[`Layout => Header => ThemeSwitcher should match the snapshot 1`] = `
 <DocumentFragment>
-  <button
-    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-78trlr-MuiButtonBase-root-MuiIconButton-root"
-    tabindex="0"
+  <div
+    class="sc-eAzDjm bfMTZ"
     title="light-icon"
-    type="button"
   >
     <div>
       <div>
@@ -16,9 +14,6 @@ exports[`Layout => Header => ThemeSwitcher should match the snapshot 1`] = `
         />
       </div>
     </div>
-    <span
-      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-    />
-  </button>
+  </div>
 </DocumentFragment>
 `;

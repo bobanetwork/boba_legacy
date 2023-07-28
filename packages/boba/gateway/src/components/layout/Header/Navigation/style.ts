@@ -1,9 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const StyledNav = styled.div`
   display: flex;
   gap: 24px;
+  ${mobile(css`
+    display: none;
+  `)}
 `
 
 export const NavLinkItem = styled(NavLink)`

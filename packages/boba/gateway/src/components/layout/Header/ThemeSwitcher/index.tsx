@@ -1,13 +1,13 @@
-import { IconButton } from '@mui/material'
 import { Svg } from 'components/global'
 import React, { FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectModalState } from 'selectors'
 
+import { setTheme } from 'actions/uiAction'
 import MoonIcon from 'assets/images/theme-moon.svg'
 import SunIcon from 'assets/images/theme-sun.svg'
-import { setTheme } from 'actions/uiAction'
 import { useTheme } from 'styled-components'
+import { IconWrapper } from './styles'
 
 enum THEME_NAME {
   LIGHT = 'light',
@@ -28,19 +28,19 @@ const ThemeSwitcher: FC = () => {
   return (
     <>
       {currentTheme === THEME_NAME.LIGHT ? (
-        <IconButton
+        <IconWrapper
           title="dark-icon"
           onClick={() => onThemeChange(THEME_NAME.DARK)}
         >
           <Svg src={MoonIcon} fill={theme.colors['gray'][600]} />
-        </IconButton>
+        </IconWrapper>
       ) : (
-        <IconButton
+        <IconWrapper
           title="light-icon"
           onClick={() => onThemeChange(THEME_NAME.LIGHT)}
         >
           <Svg src={SunIcon} fill={theme.colors['gray'][100]} />
-        </IconButton>
+        </IconWrapper>
       )}
     </>
   )

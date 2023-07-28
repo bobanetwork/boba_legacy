@@ -55,17 +55,25 @@ function networkReducer(state = initialState, action) {
         name
       }
     }
-    case 'NETWORK/SET/ACTIVE':{
+    case 'NETWORK/SET_TYPE/ACTIVE': {
+      const { networkType } = action.payload
+      return {
+        ...state,
+        networkType,
+        activeNetworkType: networkType
+      }
+    }
+    case 'NETWORK/SET/ACTIVE': {
       const {
         network: activeNetwork,
-        networkType: activeNetworkType,
+        // networkType: activeNetworkType,
         networkIcon: activeNetworkIcon,
         name: activeNetworkName
       } = state;
       return {
         ...state,
         activeNetwork,
-        activeNetworkType,
+        // activeNetworkType,
         activeNetworkIcon,
         activeNetworkName
       }
