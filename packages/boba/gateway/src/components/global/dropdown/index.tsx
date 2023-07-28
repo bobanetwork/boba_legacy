@@ -15,12 +15,15 @@ import {
   DropdownBody,
   Icon,
   DropdownContent,
+  OptionsHeader,
   Arrow,
 } from './styles'
 export interface IDropdownItem {
   value?: string
   label: string | ReactNode
   imgSrc?: string
+  header?: boolean
+  headerName?: string
 }
 
 export interface IDropdownProps {
@@ -29,6 +32,7 @@ export interface IDropdownProps {
   defaultItem: IDropdownItem
   onItemSelected?: (item: IDropdownItem) => void
   className?: string
+  headers?: string[]
 }
 
 export const Dropdown: React.FC<IDropdownProps> = ({
@@ -37,7 +41,34 @@ export const Dropdown: React.FC<IDropdownProps> = ({
   error = false,
   onItemSelected,
   className,
+  headers = [],
 }) => {
+  if (headers) {
+    let allItems: IDropdownItem[] = []
+    const noHeaders = items.filter((item) => {
+      if (!item.header && !item.headerName) {
+        return true
+      } else {
+        return false
+      }
+    })
+    allItems = [...noHeaders]
+    for (const header of headers) {
+      const headerItem: IDropdownItem = {
+        label: header,
+        header: true,
+      }
+      allItems = [
+        ...allItems,
+        headerItem,
+        ...items.filter((item) => {
+          return item?.headerName === header
+        }),
+      ]
+    }
+    items = allItems
+  }
+
   const [selectedItem, setSelectedItem] = useState<IDropdownItem>(defaultItem)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -99,21 +130,47 @@ export const Dropdown: React.FC<IDropdownProps> = ({
       {isOpen && (
         <DropdownBody>
           <DropdownContent>
-            {items.map((item, index) => (
-              <Option
-                key={index}
-                className={`dropdown ${className}`}
-                isSelected={item.value === selectedItem.value}
-                onClick={() => selectItem(item)}
-              >
-                {item.imgSrc && (
-                  <IconContainer>
-                    {item.imgSrc !== 'default' && <Icon src={item.imgSrc} />}
-                  </IconContainer>
-                )}
-                {item.label}
-              </Option>
-            ))}
+            {items.map((item, index) => {
+              if (item.header) {
+                return (
+                  <OptionsHeader
+                    key={index}
+                    className={`dropdown ${className}`}
+                  >
+                    {item.imgSrc && (
+                      <IconContainer>
+                        {item.imgSrc !== 'default' && (
+                          <Icon src={item.imgSrc} />
+                        )}
+                      </IconContainer>
+                    )}
+                    {item.label}
+                  </OptionsHeader>
+                )
+              } else {
+                return (
+                  <Option
+                    key={index}
+                    className={`dropdown ${className}`}
+                    isSelected={item.value === selectedItem.value}
+                    onClick={() => {
+                      if (!item.header) {
+                        selectItem(item)
+                      }
+                    }}
+                  >
+                    {item.imgSrc && (
+                      <IconContainer>
+                        {item.imgSrc !== 'default' && (
+                          <Icon src={item.imgSrc} />
+                        )}
+                      </IconContainer>
+                    )}
+                    {item.label}
+                  </Option>
+                )
+              }
+            })}
           </DropdownContent>
         </DropdownBody>
       )}

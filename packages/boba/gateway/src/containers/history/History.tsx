@@ -20,11 +20,17 @@ import { ValidValuesFromArray } from 'util/objectManipulation'
 
 import { useMediaQuery, useTheme } from '@mui/material'
 // import Input from 'components/input/Input'
-import { ModalTypography } from 'components/global/modalTypography'
 import { Button } from 'components/global'
 import { DropdownNetwork } from 'components/global/dropdown/themes'
 import transctionService from 'services/transaction.service'
-import { ALL_NETWORKS, FILTER_OPTIONS, TableOptions } from './constants'
+import { NETWORK_TYPE } from 'util/network/network.util'
+import {
+  ALL_NETWORKS,
+  FILTER_OPTIONS,
+  TableOptions,
+  NETWORK_L1_OPTIONS,
+  NETWORK_L2_OPTIONS,
+} from './constants'
 import MagnifyingGlass from 'images/icons/magnifyingGlass.svg'
 
 import {
@@ -48,6 +54,9 @@ import {
   Input,
   DatePickerWrapper,
   DateDescriptions,
+  Icon,
+  MobileDateDescriptions,
+  IconContainer,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
@@ -60,19 +69,20 @@ import {
   TransactionsResolver,
   GetSymbolFromNetworkName,
 } from './TransactionsResolver'
-import { TRANSACTION_FILTER_STATUS } from './types'
+import { CHAIN_NAME, TRANSACTION_FILTER_STATUS } from './types'
 import { TransactionsTableHeader } from 'components/global/table/themes'
 import { FilterDropDown } from 'components/filter'
-import { getCoinImage } from 'util/coinImage'
-import noHistoryIcon from '../../images/noHistory.svg'
+import noHistoryIcon from 'images/noHistory.svg'
+import switchButton from 'images/icons/switchButton.svg'
 import { Svg } from 'components/global/svg'
 
 const History = () => {
   const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
   const [fromNetwork, setFromNetwork] = useState(ALL_NETWORKS)
+  const [transactionsFound, setTransactionsFound] = useState(true)
+  const [switched, setSwitched] = useState(false)
 
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   const dispatch = useDispatch<any>()
   const now = new Date()
@@ -81,6 +91,12 @@ const History = () => {
     now.getMonth() - 6,
     now.getDate()
   )
+  const handleSwitchDropdowns = () => {
+    const temp = fromNetwork
+    setFromNetwork(toNetwork)
+    setToNetwork(temp)
+    setSwitched((current) => !current)
+  }
 
   const [filterStartDate, setFilterStartDate] = useState(last_6months)
   const [transactionStatus, setTransactionStatus] = useState('All')
@@ -89,25 +105,8 @@ const History = () => {
   const accountEnabled = useSelector(selectAccountEnabled())
 
   const [searchHistory, setSearchHistory] = useState('')
-  const networkName = useSelector(selectActiveNetworkName())
 
   const transactions = useSelector(selectTransactions, isEqual)
-
-  const getNetworks = () => {
-    return [
-      ALL_NETWORKS,
-      {
-        label: networkName['l1'],
-        value: networkName['l1'],
-        imgSrc: getCoinImage(GetSymbolFromNetworkName(networkName['l1'])),
-      },
-      {
-        label: networkName['l2'],
-        value: networkName['l2'],
-        imgSrc: getCoinImage(GetSymbolFromNetworkName(networkName['l2'])),
-      },
-    ]
-  }
 
   const getDatePicker = (label: string) => {
     const dateSelector = (date: Date) => {
@@ -135,6 +134,11 @@ const History = () => {
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
+      if (newTransactions.length === 0) {
+        setTransactionsFound(false)
+      } else {
+        setTransactionsFound(true)
+      }
       if (
         new Set(ValidValuesFromArray(transactions)).size !==
         new Set(newTransactions).size
@@ -146,7 +150,6 @@ const History = () => {
   useInterval(async () => {
     await syncTransactions()
   }, POLL_INTERVAL)
-
   return (
     <HistoryPageContainer>
       {layer && (
@@ -164,6 +167,9 @@ const History = () => {
               />
             </SearchInput>
             <Actions>
+              <MobileDateDescriptions variant="body1">
+                Date range
+              </MobileDateDescriptions>
               <DateDescriptions variant="body1">
                 Date range from
               </DateDescriptions>
@@ -190,23 +196,28 @@ const History = () => {
                 <NetworkDropdowns>
                   <div style={{ fontSize: '16px' }}>From</div>
                   <DropdownNetwork
-                    items={getNetworks()}
+                    items={switched ? NETWORK_L2_OPTIONS : NETWORK_L1_OPTIONS}
                     defaultItem={fromNetwork}
-                    onItemSelected={(option) => {
-                      setFromNetwork(option)
-                    }}
+                    onItemSelected={(option) => setFromNetwork(option)}
                     error={false}
+                    headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
                   />
+                  <IconContainer
+                    onClick={() => {
+                      handleSwitchDropdowns()
+                    }}
+                  >
+                    <Icon src={switchButton} />
+                  </IconContainer>
                   <div style={{ fontSize: '16px', paddingLeft: '16px' }}>
                     To
                   </div>
                   <DropdownNetwork
-                    items={getNetworks()}
+                    items={switched ? NETWORK_L1_OPTIONS : NETWORK_L2_OPTIONS}
                     defaultItem={toNetwork}
-                    onItemSelected={(option) => {
-                      setToNetwork(option)
-                    }}
+                    onItemSelected={(option) => setToNetwork(option)}
                     error={false}
+                    headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
                   />
                 </NetworkDropdowns>
                 <FilterDropDown
@@ -223,19 +234,29 @@ const History = () => {
                 options={TableOptions}
               ></TransactionsTableHeader>
             </div>
-            <TransactionsResolver
-              transactions={transactions}
-              transactionsFilter={{
-                fromNetwork: fromNetwork.value || 'All',
-                toNetwork: toNetwork.value || 'All',
-                status: transactionStatus as TRANSACTION_FILTER_STATUS,
-                targetHash: searchHistory,
-                startDate: filterStartDate,
-                endDate: filterEndDate,
-              }}
-            ></TransactionsResolver>
+            {transactionsFound && (
+              <TransactionsResolver
+                transactions={transactions}
+                transactionsFilter={{
+                  fromNetworkChainId: fromNetwork.value as CHAIN_NAME,
+                  toNetworkChainId: toNetwork.value as CHAIN_NAME,
+                  status: transactionStatus as TRANSACTION_FILTER_STATUS,
+                  targetHash: searchHistory,
+                  startDate: filterStartDate,
+                  endDate: filterEndDate,
+                }}
+              ></TransactionsResolver>
+            )}
           </Table>
         </>
+      )}
+      {!transactionsFound && (
+        <NoHistory
+          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
+        >
+          <Svg src={noHistoryIcon} />
+          <div>No Transactions Found.</div>
+        </NoHistory>
       )}
       {!layer && (
         <NoHistory

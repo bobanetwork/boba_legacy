@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components'
 import { Svg } from 'components/global/svg'
+import { screen } from 'themes/screens'
 
 export const DropdownContainer = styled.div`
   display: inline-flex;
@@ -83,6 +84,10 @@ export const IconContainer = styled.div`
   padding: 10px 11px;
   align-items: center;
   justify-content: center;
+  @media ${screen.mobile} {
+    width: 20px;
+    height: 20px;
+  }
 `
 
 export const Option = styled.div<{ isSelected: boolean }>`
@@ -125,6 +130,7 @@ export const Icon = styled(Svg)`
 
   svg {
     max-width: 32px;
+    min-width: 10px;
     height: auto;
   }
 `

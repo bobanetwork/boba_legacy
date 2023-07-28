@@ -3,17 +3,22 @@ import dayjs, { Dayjs } from 'dayjs'
 import React, { useState, useEffect } from 'react'
 import { getCoinImage } from 'util/coinImage'
 import { formatDate, isSameOrAfterDate, isSameOrBeforeDate } from 'util/dates'
+import { Chains } from './constants'
+import { Svg } from 'components/global/svg'
+import { TokenInfo } from 'containers/history/tokenInfo'
 
 import {
   TransactionDate,
   TransactionAmount,
   Icon,
   Status,
-  TransactionChain,
+  NoHistory,
+  TransactionDetails,
   TransactionChainDetails,
   TransactionToken,
   TransactionsWrapper,
   TransactionHash,
+  TransactionChain,
   IconContainer,
 } from './styles'
 import {
@@ -23,6 +28,7 @@ import {
   TRANSACTION_STATUS,
   TRANSACTION_FILTER_STATUS,
   LAYER,
+  CHAIN_NAME,
 } from './types'
 import { useSelector } from 'react-redux'
 import { orderBy } from 'util/lodash'
@@ -30,6 +36,7 @@ import { selectTokens, selectActiveNetworkName } from 'selectors'
 import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
 import networkService from 'services/networkService'
+import noHistoryIcon from '../../images/noHistory.svg'
 
 const NetworkNameToSymbol: { [key: string]: string } = {
   ethereum: 'ETH',
@@ -50,6 +57,7 @@ export const GetSymbolFromNetworkName = (networkName: string): string => {
 export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
   transactionsFilter,
+  loading = false,
 }) => {
   const [currentTransactions, setCurrentTransactions] = useState<
     ITransaction[]
@@ -100,40 +108,26 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   }
 
-  // filter transactions by direction
   const networkFilter = (transaction: ITransaction) => {
     let targetFromNetwork = false
     let targetToNetwork = false
-    switch (transactionsFilter.fromNetwork) {
-      case 'All': {
+    switch (transactionsFilter.fromNetworkChainId) {
+      case Chains[CHAIN_NAME.All_Networks].chainId: {
         targetFromNetwork = true
         break
       }
-      // deposit
-      case activeNetworks.l1: {
-        targetFromNetwork = transaction.depositL2
-          ? transaction.depositL2
-          : false
-        break
-      }
-
-      // exit
-      case activeNetworks.l2: {
-        targetFromNetwork = transaction.exitL2 ? transaction.exitL2 : false
+      case transaction.originChainId.toString(): {
+        targetFromNetwork = true
         break
       }
     }
-    switch (transactionsFilter.toNetwork) {
-      case 'All': {
+    switch (transactionsFilter.toNetworkChainId) {
+      case Chains[CHAIN_NAME.All_Networks].chainId: {
         targetToNetwork = true
         break
       }
-      case activeNetworks.l1: {
-        targetToNetwork = transaction.exitL2 ? transaction.exitL2 : false
-        break
-      }
-      case activeNetworks.l2: {
-        targetToNetwork = transaction.depositL2 ? transaction.depositL2 : false
+      case transaction.destinationChainId.toString(): {
+        targetToNetwork = true
         break
       }
     }
@@ -156,7 +150,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     return TRANSACTION_FILTER_STATUS.Canceled
   }
   const statusFilter = (transaction: ITransaction) => {
-    // filter out transactions whose status does not match
     const status = getTransactionStatus(transaction)
     transaction.UserFacingStatus = status
     if (
@@ -192,17 +185,17 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
   const process_transaction = (transaction: ITransaction) => {
     let amountString = ''
-    const chain = transaction.chain === 'L1pending' ? 'L1' : transaction.chain
-    let token = tokenFromAddress[transaction.action.token.toLowerCase()]
-    if (chain === LAYER.L2 && !token) {
-      token = Object.values(tokenFromAddress).find(
-        (t: any) =>
-          t.addressL2.toLowerCase() === transaction.action.token.toLowerCase()
-      )
-    }
-    const symbol = token[`symbol${chain}`]
+    const chain = transaction.layer === 'L1pending' ? 'L1' : transaction.layer
+    const token =
+      TokenInfo[transaction.originChainId.toString()][
+        transaction.action.token.toLowerCase()
+      ]
+    console.log(transaction.originChainId.toString())
+    console.log(transaction.action.token.toLowerCase())
 
-    amountString = logAmount(transaction.action.amount, token?.decimals, 4)
+    const symbol = token.symbol
+
+    amountString = logAmount(transaction.action.amount, token.decimals, 4)
     let transactionL1Hash = ''
     let transactionL2Hash = ''
     if (chain === LAYER.L2) {
@@ -258,20 +251,19 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     // href={chainLink({ chain: prefix, hash: detail.hash })}
 
     return (
-      <TransactionChain>
+      <TransactionDetails>
         <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
         <TransactionChainDetails>
-          <div style={{ width: '102px', height: '16px' }}>{networkName}</div>
+          <TransactionChain>{networkName}</TransactionChain>
           <TransactionHash
             href={linkToHash}
             target={'_blank'}
             rel="noopener noreferrer"
-            style={{ fontSize: '12px' }}
           >
             {`Tx: ${truncate(hash, 4, 4, '...')}`}
           </TransactionHash>
         </TransactionChainDetails>
-      </TransactionChain>
+      </TransactionDetails>
     )
   }
 
@@ -290,54 +282,77 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       <TransactionAmount>Not Available</TransactionAmount>
     )
   }
-
+  console.log('filtered transactions', filteredProcessedTransactions)
   return (
-    <TransactionsWrapper>
-      {filteredProcessedTransactions.map(
-        (transaction: IProcessedTransaction, index) => {
-          return (
-            <TransactionsTableContent
-              key={`transaction-${index}`}
-              options={[
-                {
-                  content: getTransactionDate(transaction.timeStamp),
-                  width: 168,
-                },
-                {
-                  content: getTransactionChain(
-                    transaction.fromLayer,
-                    transaction.fromLayer === LAYER.L1
-                      ? transaction.l1Hash
-                      : transaction.l2Hash
-                  ),
-                  width: 142,
-                },
-                {
-                  content: getTransactionChain(
-                    transaction.toLayer,
-                    transaction.toLayer === LAYER.L1
-                      ? transaction.l1Hash
-                      : transaction.l2Hash
-                  ),
-                  width: 142,
-                },
-                {
-                  content: getTransactionToken(transaction.tokenSymbol),
-                  width: 90,
-                },
-                {
-                  content: getTransactionAmount(transaction.amount),
-                  width: 80,
-                },
-                {
-                  content: <Status>{transaction.status}</Status>,
-                  width: 88,
-                },
-              ]}
-            />
-          )
-        }
+    <>
+      {transactions.length === 0 && (
+        <NoHistory
+          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
+        >
+          <Svg src={noHistoryIcon} />
+          <div>Transactions Loading...</div>
+        </NoHistory>
       )}
-    </TransactionsWrapper>
+      {filteredProcessedTransactions && (
+        <TransactionsWrapper>
+          {filteredProcessedTransactions.map(
+            (transaction: IProcessedTransaction, index) => {
+              return (
+                <TransactionsTableContent
+                  key={`transaction-${index}`}
+                  options={[
+                    {
+                      content: getTransactionDate(transaction.timeStamp),
+                      width: 168,
+                    },
+                    {
+                      content: getTransactionChain(
+                        transaction.fromLayer,
+                        transaction.fromLayer === LAYER.L1
+                          ? transaction.l1Hash
+                          : transaction.l2Hash
+                      ),
+                      width: 142,
+                    },
+                    {
+                      content: getTransactionChain(
+                        transaction.toLayer,
+                        transaction.toLayer === LAYER.L1
+                          ? transaction.l1Hash
+                          : transaction.l2Hash
+                      ),
+                      width: 142,
+                    },
+                    {
+                      content: getTransactionToken(transaction.tokenSymbol),
+                      width: 90,
+                    },
+                    {
+                      content: getTransactionAmount(transaction.amount),
+                      width: 80,
+                    },
+                    {
+                      content: <Status>{transaction.status}</Status>,
+                      width: 88,
+                    },
+                  ]}
+                />
+              )
+            }
+          )}
+        </TransactionsWrapper>
+      )}
+
+      {filteredProcessedTransactions.length === 0 &&
+        transactions.length !== 0 &&
+        !loading && (
+          <NoHistory
+            style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
+          >
+            <Svg src={noHistoryIcon} />
+            <div>No Transactions Matching Filter.</div>
+          </NoHistory>
+        )}
+    </>
   )
 }

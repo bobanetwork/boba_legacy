@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components'
 import { screen } from 'themes/screens'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { Typography } from 'components/global'
+import { Svg, Typography } from 'components/global'
 
 export const HistoryPageContainer = styled.div`
   margin: 0px auto;
@@ -12,7 +12,7 @@ export const HistoryPageContainer = styled.div`
   padding: 10px;
   padding-top: 0;
   width: 70%;
-  min-width: 710px;
+  min-width: 800px;
   max-width: 1040px;
   @media ${screen.laptop} {
     width: 90%;
@@ -22,7 +22,7 @@ export const HistoryPageContainer = styled.div`
     width: 90%;
     padding: 0px;
   }
-  ${screen.mobile} {
+  @media ${screen.mobile} {
     width: 100%;
     padding: 0px;
   }
@@ -34,10 +34,9 @@ export const TableHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  @media ${screen.tablet} {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
+  @media ${screen.mobile} {
+    padding: 0px;
+    justify-content: flex-start;
   }
 `
 
@@ -62,6 +61,10 @@ export const NetworkDropdowns = styled.div`
   justify-content: center;
   gap: 16px;
   font-size: 16px;
+  align-items: center;
+  @media ${screen.mobile} {
+    font-size: 12px;
+  }
 `
 export const TransactionsTableWrapper = styled.div`
   overflow-x: scroll;
@@ -110,6 +113,43 @@ export const TransactionsWrapper = styled.div`
       }
     `};
 `
+export const TransactionDate = styled.div`
+  font-family: Roboto;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-align: left;
+  width: 168px;
+  white-space: nowrap;
+  @media ${screen.mobile} {
+    width: 110px;
+    font-size: 10px;
+  }
+`
+export const TransactionDetails = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 142px;
+  gap: 8px;
+  text-align: left;
+`
+export const TransactionChainDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  gap: 2px;
+`
+export const TransactionChain = styled.div`
+  width: 102px;
+  height: 16px;
+  @media ${screen.mobile} {
+    font-size: 10px;
+    width: 72px;
+    height: 12px;
+  }
+`
 
 export const TransactionHash = styled.a`
   font-size: 12px;
@@ -126,27 +166,31 @@ export const TransactionHash = styled.a`
     css`
       color: ${props.theme.colors.gray[100]};
     `}
+  @media ${screen.mobile} {
+    font-size: 8px;
+    width: 72px;
+    height: 12px;
+  }
+`
+export const TransactionToken = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  width: 90px;
+  text-align: left;
+  font-size: 14px;
+  @media ${screen.mobile} {
+    font-size: 10px;
+  }
 `
 
 export const TransactionAmount = styled.div`
   font-size: 14px;
   width: 80px;
-`
-
-export const TransactionDate = styled.div`
-  font-family: Roboto;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  text-align: left;
-  width: 168px;
-  white-space: nowrap;
-`
-
-export const Icon = styled.img`
-  width: 32px;
-  height: 32px;
+  @media ${screen.mobile} {
+    font-size: 10px;
+  }
 `
 
 export const Status = styled.div`
@@ -163,43 +207,38 @@ export const Status = styled.div`
     css`
       color: ${props.theme.colors.green[300]};
     `}
+  @media ${screen.mobile} {
+    font-size: 10px;
+  }
 `
 
-export const TransactionChain = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 142px;
-  gap: 8px;
-  text-align: left;
-`
 export const IconContainer = styled.div`
   width: 32px;
   height: 32px;
   direction: flex;
   align-items: center;
   justify-content: center;
-  svg {
-    width: 32px !important;
-    height: auto;
+  @media ${screen.mobile} {
+    width: 24px;
+    height: 26px;
+    margin: 0px;
   }
 `
-
-export const TransactionChainDetails = styled.div`
+export const Icon = styled(Svg)`
   display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  gap: 2px;
-`
-
-export const TransactionToken = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-items: center;
-  width: 90px;
-  text-align: left;
-  font-size: 14px;
+  align-content: center;
+  width: 32px;
+  height: 32px;
+  svg {
+    width: 32px;
+    height: auto;
+  }
+  @media ${screen.mobile} {
+    svg {
+      max-width: 24px;
+      height: auto;
+    }
+  }
 `
 
 export const Table = styled.div`
@@ -277,15 +316,9 @@ export const Actions = styled.div`
   align-items: center;
   white-space: nowrap;
   gap: 0px 20px;
-
   @media ${screen.mobile} {
-    width: 100%;
-    > div:first-child {
-      margin-right: 5px;
-    }
-    > div:last-child {
-      margin-left: 5px;
-    }
+    justify-content: flex-start;
+    margin-left: 20px;
   }
 `
 
@@ -315,7 +348,11 @@ export const DatePickerWrapper = styled(DatePicker)`
     width: 136px;
   }
   @media ${screen.mobile} {
-    width: 100%;
+    min-width: 40px;
+    width: 100px;
+    height: 30px;
+    padding: 3px 4px;
+    font-size: 10px;
   }
 `
 
@@ -347,9 +384,7 @@ export const SearchInput = styled.div`
         border: 1px solid ${props.theme.colors.green[300]};
       }
     `}
-  @media ${screen.mobile} {
-    width: 100%;
-  }
+  
   div {
     padding-left: 5px;
     display: flex;
@@ -358,12 +393,19 @@ export const SearchInput = styled.div`
     width: 16px;
     height: auto;
   }
+  @media ${screen.mobile} {
+    width: 120px;
+    height: 30px;
+    svg {
+      width: 8px;
+      height: auto;
+    }
+  }
 `
 // TODO: get rid of duplicates
 export const Input = styled.input`
   flex: 1;
   padding: 10px;
-
   font-size: 16px;
   font-style: normal;
   font-weight: 500;
@@ -381,10 +423,21 @@ export const Input = styled.input`
     css`
       color: ${props.theme.colors.gray[200]};
     `}
+  @media ${screen.mobile} {
+    width: 120px;
+    font-size: 10px;
+  }
 `
 
 export const DateDescriptions = styled(Typography)`
   @media ${screen.mobile} {
     display: none;
+  }
+`
+export const MobileDateDescriptions = styled(Typography)`
+  display: none;
+  @media ${screen.mobile} {
+    font-size: 12px !important;
+    display: flex;
   }
 `

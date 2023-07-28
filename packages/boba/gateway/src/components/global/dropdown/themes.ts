@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { screen } from 'themes/screens'
 import {
   Arrow,
   Header,
@@ -7,6 +8,7 @@ import {
   Option,
   DropdownBody,
   DropdownContent,
+  OptionsHeader,
   Icon,
 } from 'components/global/dropdown/styles'
 import { Dropdown } from 'components/global/dropdown/'
@@ -25,27 +27,53 @@ export const DropdownNetwork = styled(Dropdown)`
       css`
         color: ${props.theme.colors.gray[100]};
       `};
+    @media ${screen.mobile} {
+      div {
+        font-size: 10px;
+      }
+    }
   }
   ${Header} {
     border-radius: 20px;
     min-width: 0px;
+    width: 210px;
     padding: 6px 16px;
     gap: 8px;
-    font-size: 16px;
     transition: all 0.3s ease;
     display: flex;
     z-index: unset;
     flex-direction: row;
     align-content: center;
     div {
-      font-size: 16px;
+      justify-content: space-between;
+      width: 100%;
       font-family: Roboto;
       font-style: normal;
+      font-size: 16px;
       font-weight: 500;
       line-height: normal;
+      ${IconContainer} {
+        width: 32px;
+      }
+      ${Arrow} {
+        width: 11px;
+      }
     }
-    ${Arrow},${Icon} {
-      transition: all 0.3s ease;
+    @media ${screen.mobile} {
+      width: 154px;
+      padding: 3px 12px;
+      div {
+        font-size: 10px;
+      }
+    }
+  }
+
+  ${Arrow} {
+    @media ${screen.mobile} {
+      svg {
+        width: 6px;
+        height: auto;
+      }
     }
   }
 
@@ -53,34 +81,14 @@ export const DropdownNetwork = styled(Dropdown)`
     width: 16px;
     height: 22px;
     margin: 0px;
-  }
-
-  ${Option} {
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    font-weight: bold;
-    justify-content: flex-start;
-    gap: 8px;
-    border-radius: 10px;
-    text-align: left;
-    color: inherit;
-  }
-
-  ${DefaultIcon} {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    ${(props) =>
-      props.theme.name === 'light' &&
-      css`
-        background: ${props.theme.colors.gray[600]};
-      `}
-    ${(props) =>
-      props.theme.name === 'dark' &&
-      css`
-        background: ${props.theme.colors.gray[200]};
-      `}
+    @media ${screen.mobile} {
+      width: 10px;
+      height: 16px;
+      svg {
+        width: 10px;
+        height: auto;
+      }
+    }
   }
   ${Icon} {
     height: 16px;
@@ -99,6 +107,53 @@ export const DropdownNetwork = styled(Dropdown)`
       height: auto;
     }
     margin: 0px;
+  }
+  ${OptionsHeader} {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0);
+    gap: 8px;
+    border-radius: 10px;
+    text-align: left;
+    color: inherit;
+    @media ${screen.mobile} {
+      font-size: 8px;
+    }
+  }
+
+  ${Option} {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    justify-content: flex-start;
+    gap: 8px;
+    border-radius: 10px;
+    text-align: left;
+    color: inherit;
+    @media ${screen.mobile} {
+      font-size: 10px;
+    }
+  }
+
+  ${DefaultIcon} {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    ${(props) =>
+      props.theme.name === 'light' &&
+      css`
+        background: ${props.theme.colors.gray[600]};
+      `}
+    ${(props) =>
+      props.theme.name === 'dark' &&
+      css`
+        background: ${props.theme.colors.gray[200]};
+      `}
   }
 
   ${DropdownBody} {
@@ -171,12 +226,6 @@ export const DropdownNetwork = styled(Dropdown)`
             border: 1px solid ${props.theme.colors.gray[100]};
           }
         `};
-
-      ${(props) =>
-        props.isSelected &&
-        css`
-          background: red;
-        `}
     }
   }
 `

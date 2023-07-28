@@ -99,8 +99,19 @@ export const IconContainer = styled.div`
   align-items: center;
   justify-content: center;
 `
+export const OptionsHeader = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: ${(props) => props.theme.text.body2};
+  font-weight: bold;
+  justify-content: flex-start;
+  text-align: left;
+  color: inherit;
+`
 
-export const Option = styled.div<{ isSelected: boolean }>`
+export const Option = styled.div<{
+  isSelected: boolean
+}>`
   display: flex;
   align-items: center;
   font-size: ${(props) => props.theme.text.body2};

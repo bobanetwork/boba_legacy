@@ -7,6 +7,7 @@ import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import History from '../History'
 import { TransactionsResolver } from '../TransactionsResolver'
 import {
+  CHAIN_NAME,
   ITransactionFilter,
   ITransactionsResolverProps,
   TRANSACTION_FILTER_STATUS,
@@ -91,8 +92,8 @@ const renderTransactionsResolver = (props: ITransactionsResolverProps) => {
 
 describe('Testing history page', () => {
   const filter: ITransactionFilter = {
-    fromNetwork: 'Boba',
-    toNetwork: 'Etheruem (Goerli)',
+    fromNetworkChainId: CHAIN_NAME.Boba_Goerli,
+    toNetworkChainId: CHAIN_NAME.Goerli,
     status: TRANSACTION_FILTER_STATUS.All,
     targetHash: '',
   }

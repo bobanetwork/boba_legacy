@@ -15,20 +15,36 @@ export interface INetworks {
   l1: string
   l2: string
 }
+
+export enum CHAIN_NAME {
+  All_Networks = 'All Networks',
+  BNB_Testnet = 'BNB Testnet',
+  Boba_BNB_Testnet = 'Boba BNB Testnet',
+  BNB = 'Binance Smart Chain Mainnet',
+  Boba_BNB = 'Boba BNB Mainnet',
+  Ethereum = 'Mainnet',
+  Boba_Ethereum = 'BOBA L2',
+  Goerli = 'Goerli',
+  Boba_Goerli = 'BOBA Goerli L2',
+}
+
 export enum LAYER {
   L1 = 'L1',
   L2 = 'L2',
 }
 
 export interface ITransactionFilter {
-  fromNetwork: string
-  toNetwork: string
+  fromNetworkChainId: string
+  toNetworkChainId: string
   startDate?: Date
   endDate?: Date
   status?: TRANSACTION_FILTER_STATUS
   targetHash?: string
 }
 
+// why would we need to access the parent id of a chain
+// transactionTo's id is the parentID of the transaction
+// transactionFrom's parentID is the chainID of the transaction
 export interface IAction {
   amount: string
   fast: number
@@ -62,7 +78,9 @@ export interface ITransaction {
   action: IAction
   activity?: string
   blockNumber: number
-  chain: string
+  layer: string
+  originChainId: number
+  destinationChainId: number
   contractAddress: string
   contractName: string
   crossDomainMessage: ICrossDomainMessage
@@ -91,4 +109,25 @@ export interface IProcessedTransaction {
 export interface ITransactionsResolverProps {
   transactionsFilter: ITransactionFilter
   transactions: ITransaction[]
+  loading?: boolean
+}
+
+export type ChainMap = {
+  [key in CHAIN_NAME]: ChainInfo
+}
+
+export type ChainInfo = {
+  chainId: string
+  parentChainId?: string
+  layer: string
+}
+
+export interface Token {
+  name: string
+  symbol: string
+  decimals: number
+}
+
+export type TokenInfoMap = {
+  [key: string]: { [key: string]: Token }
 }

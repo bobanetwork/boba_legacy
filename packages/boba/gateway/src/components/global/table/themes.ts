@@ -1,8 +1,7 @@
 import styled, { css } from 'styled-components'
 import { TableHeader, TableContent } from 'components/global/table'
 import { Svg } from 'components/global/svg'
-import { TableContentContainer, TableHeaderContainer, TableRow } from './styles'
-import { Row } from 'components/global/containers'
+import { TableRow } from './styles'
 
 export const TransactionsTableHeader = styled(TableHeader)`
   padding: 8px 24px 4px 24px;
