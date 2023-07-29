@@ -1,6 +1,5 @@
 import { Heading } from 'components/global'
 import React, { FC, useEffect, useState } from 'react'
-import { getCoinImage } from 'util/coinImage'
 import { BridgeItem, BridgeIcon, BridgeLabel, BridgeWrapper } from '../styles'
 import { useSelector } from 'react-redux'
 import Banxa from 'assets/images/bridges/banxa.svg'
