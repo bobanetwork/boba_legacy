@@ -25,7 +25,6 @@ export const useBridgeCleanup = () => {
   useEffect(() => {
     // listen to all change and cleanup bridge token & bridge alert
     dispatch(resetToken())
-    console.log('Dispatch purge alert!!')
     dispatch(purgeBridgeAlert())
     dispatch(resetBridgeAmount())
   }, [

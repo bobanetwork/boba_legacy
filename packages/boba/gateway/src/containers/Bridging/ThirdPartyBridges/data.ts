@@ -1,9 +1,9 @@
-import Synapse from 'assets/images/bridges/synapse.svg'
-import Symbiosis from 'assets/images/bridges/symbiosis.svg'
-import Polybridge from 'assets/images/bridges/polybridge.svg'
-import Celer from 'assets/images/bridges/celer.svg'
-import Anyswap from 'assets/images/bridges/anyswap.svg'
-import BoringDao from 'assets/images/bridges/boringdao.svg'
+import AnyswapLogo from 'assets/images/bridges/logo/anyswap-logo-250.png'
+import BoringdaoLogo from 'assets/images/bridges/logo/Boringdao-logo-250.png'
+import CelerLogo from 'assets/images/bridges/logo/celer-logo-250.png'
+import PolybridgeLogo from 'assets/images/bridges/logo/polybridge-logo-250.png'
+import SymbiosisLogo from 'assets/images/bridges/logo/symbiosis-logo-250.png'
+import SynapseLogo from 'assets/images/bridges/logo/synapse-logo-250.png'
 
 export interface IBridges {
   name: string
@@ -16,42 +16,42 @@ export interface IBridges {
 export const bobaBridges: IBridges[] = [
   {
     name: 'Synapse',
-    icon: Synapse,
+    icon: SynapseLogo,
     type: 'SYNAPSE',
     link: 'https://synapseprotocol.com/',
     tokens: ['ETH', 'nETH', 'gOHM', 'DAI', 'USDC', 'USDT', 'SYN', 'nUSD'],
   },
   {
     name: 'Anyswap',
-    icon: Anyswap,
+    icon: AnyswapLogo,
     type: 'ANYSWAP',
     link: 'https://anyswap.exchange/#/router',
     tokens: ['MIM', 'AVAX', 'FRAX', 'FTM', 'FXS', 'MATIC'],
   },
   {
     name: 'Celer',
-    icon: Celer,
+    icon: CelerLogo,
     type: 'CELER',
     link: 'https://cbridge.celer.network/#/transfer',
     tokens: ['ETH', 'BOBA', 'FRAX', 'OLO'],
   },
   {
     name: 'BoringDAO',
-    icon: BoringDao,
+    icon: BoringdaoLogo,
     type: 'BORINGDAO',
     link: 'https://oportal.boringdao.com/twoway',
     tokens: ['USDT'],
   },
   {
     name: 'PolyBridge',
-    icon: Polybridge,
+    icon: PolybridgeLogo,
     type: 'POLYBRIDGE',
     link: 'https://bridge.poly.network/',
     tokens: ['BOBA'],
   },
   {
     name: 'Symbiosis',
-    icon: Symbiosis,
+    icon: SymbiosisLogo,
     type: 'SYMBIOSIS',
     link: 'https://app.symbiosis.finance/swap',
     tokens: ['USDC'],
