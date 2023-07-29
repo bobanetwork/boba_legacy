@@ -102,7 +102,7 @@ const useBridgeAlerts = () => {
       })
     )
 
-    if (underZero || amountToBridge <= 0) {
+    if (amountToBridge !== '' && (underZero || amountToBridge <= 0)) {
       dispatch(
         setBridgeAlert({
           meta: ALERT_KEYS.VALUE_TOO_SMALL,
@@ -298,7 +298,7 @@ const useBridgeAlerts = () => {
         }
       }
 
-      if (balance > 0) {
+      if (balance > 0 && amountToBridge !== '') {
         let LpRatio = 0
 
         const lbl = Number(logAmount(L1LPLiquidity, token.decimals))

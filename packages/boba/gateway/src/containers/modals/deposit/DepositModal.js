@@ -20,7 +20,7 @@ import Modal from 'components/modal/Modal'
 import { closeModal } from 'actions/uiAction'
 
 import InputStep from './steps/InputStep'
-import InputStepFast from './steps/InputStepFast'
+import TeleportationStepFast from '../teleportation/TeleportationStepFast'
 import InputStepMultiChain from './steps/InputStepMultiChain'
 import { fetchTransactions } from 'actions/networkAction'
 import { BRIDGE_TYPE } from 'util/constant'
@@ -38,7 +38,7 @@ function DepositModal({ open, token, fast }) {
     <Modal open={open} maxWidth="md" onClose={handleClose} minHeight={!!fast ? "fit-content" : "500px"}>
 
       {
-        BRIDGE_TYPE.FAST_BRIDGE === fast ? <InputStepFast handleClose={handleClose} token={token}/> : null
+        BRIDGE_TYPE.FAST_BRIDGE === fast ? <TeleportationStepFast handleClose={handleClose} token={token}/> : null
       }
       {
         BRIDGE_TYPE.CLASSIC_BRIDGE === fast ? <InputStep handleClose={handleClose} token={token}/> : null
