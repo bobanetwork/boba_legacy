@@ -4,7 +4,7 @@ import { IFilterDropdownItem } from 'components/filter'
 import { TableHeaderOptionType } from 'components/global/table'
 import { getCoinImage } from 'util/coinImage'
 import { NETWORK_TYPE } from 'util/network/network.util'
-import { CHAIN_NAME, LAYER, ChainMap } from './types'
+import { CHAIN_NAME, ChainMap } from './types'
 
 export const Chains: ChainMap = {
   '0': {

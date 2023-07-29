@@ -18,10 +18,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
 
-import { useMediaQuery, useTheme } from '@mui/material'
+import { useTheme } from 'styled-components'
 // import Input from 'components/input/Input'
 import { Button } from 'components/global'
-import { DropdownNetwork } from 'components/global/dropdown/themes'
+
 import transctionService from 'services/transaction.service'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import {
@@ -56,6 +56,7 @@ import {
   Icon,
   MobileDateDescriptions,
   IconContainer,
+  DropdownNetwork,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
@@ -78,7 +79,7 @@ const History = () => {
   const [transactionsFound, setTransactionsFound] = useState(true)
   const [switched, setSwitched] = useState(false)
 
-  const theme = useTheme()
+  const theme: any = useTheme()
 
   const dispatch = useDispatch<any>()
   const now = new Date()
@@ -115,7 +116,7 @@ const History = () => {
           date && !Array.isArray(date) && dateSelector(date)
         }
         {...(label === 'From' ? { selectsStart: true } : { selectsEnd: true })}
-        calendarClassName={theme.palette.mode}
+        calendarClassName={theme.name}
         placeholderText={label}
         {...(label === 'From'
           ? { endDate: new Date(filterEndDate) }
@@ -143,9 +144,11 @@ const History = () => {
       }
     }
   }
+
   useInterval(async () => {
     await syncTransactions()
   }, POLL_INTERVAL)
+
   return (
     <HistoryPageContainer>
       {layer && (
