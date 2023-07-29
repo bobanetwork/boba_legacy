@@ -49,11 +49,8 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
     if (bridgeType === BRIDGE_TYPE.CLASSIC) {
       return '7 days'
     } else {
-      if (layer === LAYER.L1) {
-        return '1 ~ 5min.'
-      } else {
-        return '15min ~ 3hrs.'
-      }
+      // Teleportation same speed in all directions
+      return '1 ~ 5min.'
     }
   }
 
