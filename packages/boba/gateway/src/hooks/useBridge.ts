@@ -44,6 +44,7 @@ export const useBridge = () => {
     NetworkList[activeNetworkType] as INetwork[]
   )?.find((n) => n.chain === activeNetwork)?.chainId[destLayer]
   if (!destChainIdBridge) {
+    dispatch(openError('Failed to get destination chain id'))
     console.error(
       'Destination chainId is undefined, this should never happen: ',
       NetworkList,
@@ -101,7 +102,7 @@ export const useBridge = () => {
       }
     }
     return dispatch(
-      depositWithTeleporter(token.address, amountWei, destChainId)
+      depositWithTeleporter(layer, token.address, amountWei, destChainId)
     )
   }
 

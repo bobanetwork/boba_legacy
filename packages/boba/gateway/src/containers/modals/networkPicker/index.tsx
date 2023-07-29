@@ -21,9 +21,7 @@ import {
   selectActiveNetworkType,
   selectModalState,
 } from 'selectors'
-import { getCoinImage } from 'util/coinImage'
-import { depositWithTeleporter, setNetwork } from 'actions/networkAction'
-import { setAmountToBridge } from '../../../actions/bridgeAction'
+import { setNetwork } from 'actions/networkAction'
 
 interface NetworkPickerModalProps {
   open: boolean

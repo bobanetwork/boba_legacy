@@ -53,6 +53,7 @@ import OVM_GasPriceOracleJson from '@eth-optimism/contracts/artifacts/contracts/
 // Boba contracts
 import DiscretionaryExitFeeJson from '@boba/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
 import L1LPJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
 import L2LPJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2SaveJson from '@boba/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
 import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
@@ -91,7 +92,7 @@ import GraphQLService from "./graphql.service"
 
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
-import { MIN_NATIVE_L1_BALANCE } from 'util/constant'
+import {Layer, MIN_NATIVE_L1_BALANCE} from 'util/constant'
 import { getPoolDetail } from 'util/poolDetails'
 import { pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import appService from './app.service'
@@ -138,14 +139,7 @@ class NetworkService {
 
     this.L1_TEST_Contract = null
     this.L2_TEST_Contract = null
-    this.L1_OMG_Contract = null
     this.L2_ETH_Contract = null
-
-    this.ERC721Contract = null
-    this.ERC721RegContract = null
-
-    this.L2TokenPoolContract = null
-    this.AtomicSwapContract = null
 
     this.tokenAddresses = null
 
@@ -161,8 +155,6 @@ class NetworkService {
     this.BobaContract = null
     this.xBobaContract = null
     this.delegateContract = null
-    this.delegatorContract = null
-    this.delegatorContractV2 = null
 
     // Gas oracle
     this.gasOracleContract = null
@@ -458,6 +450,7 @@ class NetworkService {
       }
 
       this.addresses = addresses
+      console.log("LOADED ADDRESSES", this.addresses)
 
       // this.AddressManagerAddress = nw[networkGateway].addressManager
       // console.log("AddressManager address:",this.AddressManagerAddress)
@@ -560,6 +553,18 @@ class NetworkService {
         this.L1Provider
       ) */
       //console.log('L1_OMG_Contract:', this.L1_OMG_Contract)
+
+        // Teleportation
+        this.L1Teleportation = new ethers.Contract(
+            this.addresses.Proxy__L1Teleportation,
+            TeleportationJson.abi,
+            this.L1Provider
+        )
+      this.L2Teleportation = new ethers.Contract(
+          this.addresses.Proxy__L2Teleportation,
+          TeleportationJson.abi,
+          this.L2Provider
+      )
 
       // Liquidity pools
 
@@ -2589,18 +2594,22 @@ class NetworkService {
     }
   }
 
-  async depositWithTeleporter(currency, value_Wei_String, destChainId) {
-    console.log("TELEPORTER: ", currency, value_Wei_String, destChainId)
+  async depositWithTeleporter(layer, currency, value_Wei_String, destChainId) {
+    console.log("TELEPORTER: ", layer, currency, value_Wei_String, destChainId, await this.provider.getNetwork())
     try {
       updateSignatureStatus_depositLP(false)
       setFetchDepositTxBlock(false);
 
-      let depositTX = await this.L1LPContract
+      const teleportationContract = (layer === Layer.L1 ? this.L1Teleportation : this.L2Teleportation)
+      const msgVal = currency === this.addresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+      console.log("TELEP CONTR", teleportationContract, msgVal)
+      let depositTX = await teleportationContract
           .connect(this.provider.getSigner())
-          .clientDepositL1(
-              value_Wei_String,
+          .teleportAsset(
               currency,
-              currency === this.addresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+              value_Wei_String,
+              destChainId,
+              msgVal
           )
 
       setFetchDepositTxBlock(true);
@@ -2614,7 +2623,7 @@ class NetworkService {
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
-      console.log(' completed swap-on ! L2 tx hash:', txReceipt)
+      console.log(' completed swap-on ! tx hash:', txReceipt)
       return txReceipt
     } catch (error) {
       console.log("NS: depositL1LP error:", error)
