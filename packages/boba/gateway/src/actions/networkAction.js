@@ -61,6 +61,12 @@ export function depositL1LP(currency, value, decimals) {
   )
 }
 
+export function depositWithTeleporter(currency, value, destChainId) {
+  return createAction('DEPOSIT/CREATE', () =>
+      networkService.depositWithTeleporter(currency, value, destChainId)
+  )
+}
+
 export function depositL1LPBatch(payload) {
   return createAction('DEPOSIT/CREATE', () =>
     networkService.depositL1LPBatch(payload)

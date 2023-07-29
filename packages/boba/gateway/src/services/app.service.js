@@ -171,6 +171,7 @@ class AppService {
 
     return {
       ...addresses,
+      Teleportation: addresses.Proxy__Teleportation,
       L1LPAddress: addresses.Proxy__L1LiquidityPool,
       L2LPAddress: addresses.Proxy__L2LiquidityPool,
       L2StandardBridgeAddress,

@@ -10,14 +10,20 @@ import Modal from 'components/modal/Modal'
 import React, { ElementType, FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ListLabel } from '../tokenPicker/styles'
-import { L1_ICONS, L2_ICONS, NetworkList } from 'util/network/network.util'
+import {
+  INetwork,
+  L1_ICONS,
+  L2_ICONS,
+  NetworkList,
+} from 'util/network/network.util'
 import {
   selectActiveNetwork,
   selectActiveNetworkType,
   selectModalState,
 } from 'selectors'
 import { getCoinImage } from 'util/coinImage'
-import { setNetwork } from 'actions/networkAction'
+import { depositWithTeleporter, setNetwork } from 'actions/networkAction'
+import { setAmountToBridge } from '../../../actions/bridgeAction'
 
 interface NetworkPickerModalProps {
   open: boolean
@@ -33,16 +39,17 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
     dispatch(closeModal('networkPicker'))
   }
 
-  const networkList = (NetworkList as Record<string, any>)[networkType]
+  const networkList: INetwork[] = NetworkList[networkType]
 
   const l1Icon = L1_ICONS as Record<string, ElementType>
   const l2Icon = L2_ICONS as Record<string, ElementType>
 
-  const onChainChange = (chainDetail: any) => {
+  const onChainChange = (chainDetail: INetwork) => {
     dispatch(
       setNetwork({
         network: chainDetail.chain,
         name: chainDetail.name,
+        chainIds: chainDetail.chainId,
         networkIcon: chainDetail.icon,
         networkType,
       })
@@ -61,7 +68,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
       <ListLabel> Network Names </ListLabel>
       <NetworkPickerModalContainer>
         <NetworkPickerList>
-          {networkList.map((chainDetail: any) => {
+          {networkList.map((chainDetail: INetwork) => {
             const Icon =
               selectionLayer === 'l1'
                 ? l1Icon[chainDetail.icon]

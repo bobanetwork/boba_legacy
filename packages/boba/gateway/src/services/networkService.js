@@ -2589,6 +2589,39 @@ class NetworkService {
     }
   }
 
+  async depositWithTeleporter(currency, value_Wei_String, destChainId) {
+    console.log("TELEPORTER: ", currency, value_Wei_String, destChainId)
+    try {
+      updateSignatureStatus_depositLP(false)
+      setFetchDepositTxBlock(false);
+
+      let depositTX = await this.L1LPContract
+          .connect(this.provider.getSigner())
+          .clientDepositL1(
+              value_Wei_String,
+              currency,
+              currency === this.addresses.L1_ETH_Address ? { value: value_Wei_String } : {}
+          )
+
+      setFetchDepositTxBlock(true);
+
+      //at this point the tx has been submitted, and we are waiting...
+      await depositTX.wait()
+      updateSignatureStatus_depositLP(true)
+
+      const opts = {
+        fromBlock: -4000
+      }
+      const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
+      const txReceipt = receipt.transactionReceipt;
+      console.log(' completed swap-on ! L2 tx hash:', txReceipt)
+      return txReceipt
+    } catch (error) {
+      console.log("NS: depositL1LP error:", error)
+      return error
+    }
+  }
+
   async depositL1LPBatch(payload) {
 
     const updatedPayload = []

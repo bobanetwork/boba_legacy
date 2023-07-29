@@ -20,6 +20,7 @@ const initialState = {
   multiBridgeMode: false,
   bridgeToAddressState: false,
   amountToBridge: 0,
+  destChainIdBridge: 0,
   isFetchTxBlockNumber: false,
   alerts: []
 };
@@ -121,6 +122,12 @@ function bridgeReducer(state = initialState, action) {
     }
     case 'BRIDGE/AMOUNT/RESET': {
       return { ...state, amountToBridge: 0 }
+    }
+    case 'BRIDGE/DEST_CHAIN_ID/SET': {
+      return { ...state, destChainIdBridge: action.payload }
+    }
+    case 'BRIDGE/DEST_CHAIN_ID/RESET': {
+      return { ...state, destChainIdBridge: 0 }
     }
 
     case 'BRIDGE/DEPOSIT_TX/BLOCK': {

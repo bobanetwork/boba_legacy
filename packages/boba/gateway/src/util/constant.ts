@@ -111,7 +111,7 @@ export const PAGES_BY_NETWORK: PagesByNetworkType = {
   avax: ['Bridge', 'Wallet', 'Earn', 'History'],
 }
 
-enum Layer {
+export enum Layer {
   L1 = 'L1',
   L2 = 'L2',
 }
