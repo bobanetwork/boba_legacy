@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components'
 import BobaLogoImage from 'assets/images/boba-logo.png'
+import MenuIcon from 'assets/images/hamburger.svg'
 import { Svg } from 'components/global'
 import { mobile } from 'themes/screens'
 
@@ -43,12 +44,28 @@ export const BobaLogo = styled.div`
 
 export const HeaderAction = styled.div`
   display: flex;
-  gap: 32px;
   align-items: center;
   flex: 1;
   justify-content: flex-end;
+  gap: 32px;
+  ${mobile(css`
+    gap: 8px;
+  `)}
 `
 
-export const ActionIcon = styled(Svg)`
-  cursor: pointer;
+export const HumberIcon = styled(Svg).attrs({
+  src: MenuIcon,
+  fill: '#fff',
+})`
+  display: none;
+
+  ${mobile(css`
+    display: block;
+    height: 34px;
+    width: 32px;
+    div {
+      display: flex;
+      align-items: center;
+    }
+  `)}
 `
