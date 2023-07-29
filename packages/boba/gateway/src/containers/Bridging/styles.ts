@@ -63,7 +63,12 @@ export const Label = styled(Typography).attrs({
 })`
   font-weight: 400;
   line-height: normal;
-  color: ${({ theme, color }) => color || theme.colors.gray[700]};
+  color: ${({ theme, color }) =>
+    color
+      ? color
+      : theme.name === 'light'
+      ? theme.colors.gray[700]
+      : theme.colors.gray[100]};
 `
 
 export const BridgeItem = styled.a`
