@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Typography } from 'components/global/typography'
-import stakeBg from 'images/boba2/stake-balance-bg.png'
+import stakeBg from 'assets/images/boba2/stake-balance-bg.png'
 
 export const StakePageContainer = styled.div`
   margin: 0px auto 20px auto;

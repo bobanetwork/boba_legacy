@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from '@mui/material'
 import Button from 'components/button/Button'
 import * as G from 'containers/Global.styles'
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
+import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
 import {isSameMonth, isSameWeek, isBeforeDate, convertDate} from 'util/dates'
 import React from 'react'
 

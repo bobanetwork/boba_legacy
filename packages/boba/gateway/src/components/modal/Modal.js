@@ -25,7 +25,7 @@ import {
 
 import { Heading } from 'components/global'
 import * as S from './styles'
-import CloseIcon from 'images/close.svg';
+import CloseIcon from 'assets/images/close.svg';
 import { Svg } from 'components/global/svg'
 
 const _Modal = ({

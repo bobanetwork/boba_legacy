@@ -1,5 +1,5 @@
-import TESTLogo from 'images/test.svg'
-import mttLogo from 'images/mtt.png'
+import TESTLogo from 'assets/images/test.svg'
+import mttLogo from 'assets/images/mtt.png'
 
 export const getCoinImage = (symbol: string): string => {
   const logoURIbase =

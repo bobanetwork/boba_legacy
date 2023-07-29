@@ -1,5 +1,5 @@
 import React, { useState, useCallback, ReactNode } from 'react'
-import ArrowDown from '../../../images/icons/arrowdown.svg'
+import ArrowDown from 'assets/images/icons/arrowdown.svg'
 import {
   DropdownContainer,
   Header,

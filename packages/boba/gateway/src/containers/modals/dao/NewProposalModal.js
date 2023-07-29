@@ -29,7 +29,7 @@ import Select from 'components/select/Select'
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold,selectLockRecords } from 'selectors'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
+import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
 
 const NewProposalModal = ({ open }) => {
 

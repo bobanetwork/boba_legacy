@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles'
 import { Box, Typography, Grid, Divider } from "@mui/material"
-import stakeBg from 'images/boba2/stake-balance-bg.png'
+import stakeBg from 'assets/images/boba2/stake-balance-bg.png'
 
 export const StakePageContainer = styled(Box)(({ theme }) => ({
   margin: '0px auto',
