@@ -17,6 +17,7 @@ export const selectPoolInfo = () => (state) => state.earn.poolInfo
 
 export const selectUserInfo = () => (state) => state.earn.userInfo
 export const selectApprovedAllowance = () => (state) => state.earn.approvedAllowance
+export const selectStakeToken = () => (state) => state.earn.stakeToken
 
 export const selectEarn = () => (state) => state.earn
 

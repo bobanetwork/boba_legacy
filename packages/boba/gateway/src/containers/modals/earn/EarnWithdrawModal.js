@@ -3,7 +3,11 @@ import { connect } from 'react-redux'
 import { isEqual } from 'util/lodash';
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { fetchL1LPBalance, fetchL2LPBalance, getEarnInfo } from 'actions/earnAction'
+import {
+  fetchL1LPBalance,
+  fetchL2LPBalance,
+  getEarnInfo,
+} from 'actions/earnAction'
 
 import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
