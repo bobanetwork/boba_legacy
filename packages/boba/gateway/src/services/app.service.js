@@ -177,7 +177,8 @@ class AppService {
       L2MessengerAddress,
       L2_ETH_Address: L2_BOBA_Address,
       L2_BOBA_Address,
-      L1_ETH_Address
+      L1_ETH_Address,
+      NETWORK_NATIVE: '0x4200000000000000000000000000000000000006', // always native
     };
 
   }
