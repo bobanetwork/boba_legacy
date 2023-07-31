@@ -1,6 +1,7 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Typography } from 'components/global/typography'
 import stakeBg from 'images/boba2/stake-balance-bg.png'
+import { sdesktop, mobile } from 'themes/screens'
 
 export const StakePageContainer = styled.div`
   margin: 0px auto 20px auto;
@@ -8,7 +9,8 @@ export const StakePageContainer = styled.div`
   flex-direction: column;
   justify-content: space-around;
   padding: 0px 10px 50px 10px;
-  width: 1025px;
+  width: 100%;
+  max-width: 1024px;
 `
 
 export const StakeEarnContainer = styled.div`
@@ -123,16 +125,30 @@ export const BlockContainer = styled.div`
   gap: 25px 0px;
   border-radius: 12px;
   background: ${(props) => props.theme.colors.box.background};
-  border: 1px solid ${(props) => props.theme.colors.box.border};,
+  border: 1px solid ${(props) => props.theme.colors.box.border};
+  ${sdesktop(css`
+    flex-direction: row;
+    justify-content: space-between;
+  `)}
+  ${mobile(css`
+    flex-direction: column !important;
+  `)}
 `
 
 export const GridContainer = styled.div`
   display: flex;
   gap: 0px 35px;
+  ${sdesktop(css`
+    flex-direction: column;
+    gap: 35px 0px;
+  `)}
   > div {
     width: 100%;
     &:first-of-type {
       max-width: 445px;
+      ${sdesktop(css`
+        max-width: 100%;
+      `)}
     }
   }
 `
@@ -141,6 +157,9 @@ export const Flex = styled.div`
   display: flex;
   padding-right: 35px;
   justify-content: space-between;
+  ${sdesktop(css`
+    gap: 0px 35px;
+  `)}
 `
 
 export const TitleContainer = styled.div`

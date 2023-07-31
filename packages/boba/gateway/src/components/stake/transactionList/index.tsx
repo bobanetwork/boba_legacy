@@ -12,7 +12,7 @@ import { Typography } from 'components/global/typography'
 import { ModalTypography } from 'components/global/modalTypography'
 
 import { TransactionListInterface } from './types'
-import { StakeItemDetails, Token } from './styles'
+import { StakeItemDetails, Token, Flex } from './styles'
 import { getCoinImage } from 'util/coinImage'
 
 const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
@@ -63,34 +63,36 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
     <StakeItemDetails>
       <div>
         <Token src={getCoinImage('boba')} />
-      </div>
-      <div>
         <Typography variant="body2">
           {timeDeposit.format('DD MMM YYYY hh:mm A')}
         </Typography>
       </div>
-      <div>
-        <ModalTypography variant="body2">Amount Staked </ModalTypography>
-        <Typography variant="body2">
-          {stakeInfo.depositAmount
-            ? `${stakeInfo.depositAmount.toLocaleString(undefined, {
-                maximumFractionDigits: 2,
-              })}`
-            : `0`}
-        </Typography>
-      </div>
-      <div>
-        <ModalTypography variant="body2">Earned </ModalTypography>
-        <Typography variant="body2">{earned.toFixed(3)}</Typography>
-      </div>
-      <div>
-        <ModalTypography variant="body2">Next unstake window: </ModalTypography>
-        <Typography variant="body2">
-          {` ${unlocktimeNextBegin.format('DD')}-${unlocktimeNextEnd.format(
-            'DD MMM YYYY hh:mm A'
-          )}`}
-        </Typography>
-      </div>
+      <Flex>
+        <div>
+          <ModalTypography variant="body2">Amount Staked </ModalTypography>
+          <Typography variant="body2">
+            {stakeInfo.depositAmount
+              ? `${stakeInfo.depositAmount.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}`
+              : `0`}
+          </Typography>
+        </div>
+        <div>
+          <ModalTypography variant="body2">Earned </ModalTypography>
+          <Typography variant="body2">{earned.toFixed(3)}</Typography>
+        </div>
+        <div>
+          <ModalTypography variant="body2">
+            Next unstake window:{' '}
+          </ModalTypography>
+          <Typography variant="body2">
+            {` ${unlocktimeNextBegin.format('DD')}-${unlocktimeNextEnd.format(
+              'DD MMM YYYY hh:mm A'
+            )}`}
+          </Typography>
+        </div>
+      </Flex>
       <div>
         <Button
           tiny={true}
