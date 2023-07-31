@@ -7,12 +7,8 @@ import { setTheme } from 'actions/uiAction'
 import MoonIcon from 'assets/images/theme-moon.svg'
 import SunIcon from 'assets/images/theme-sun.svg'
 import { useTheme } from 'styled-components'
+import { THEME_NAME } from '../types'
 import { IconWrapper } from './styles'
-
-enum THEME_NAME {
-  LIGHT = 'light',
-  DARK = 'dark',
-}
 
 const ThemeSwitcher: FC = () => {
   const currentTheme = useSelector(selectModalState('theme'))

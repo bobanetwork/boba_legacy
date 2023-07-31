@@ -1,41 +1,83 @@
+import { Drawer } from '@mui/material'
+import { makeStyles } from '@mui/styles'
+import { SwitchButton } from 'components/global'
 import React, { FC } from 'react'
 import { BobaLogo } from '../styles'
 import {
-  DrawerContainer,
-  DrawerHeader,
-  CloseIcon,
   ActionContainer,
+  ActionIcon,
   ActionItem,
   ActionLabel,
   ActionValue,
+  CloseIcon,
+  DrawerHeader,
+  HeaderDivider,
+  NavLinkItem,
   NavList,
-  NavItem,
+  StyleDrawer,
+  WrapperCloseIcon,
 } from './styles'
+import { MENU_LIST } from '../Navigation/constant'
 
 interface Props {
   onClose: () => void
+  open: boolean
 }
 
-const NavDrawer: FC<Props> = ({ onClose }) => {
+const useStyles = makeStyles({
+  root: {
+    width: '100%',
+    color: 'f00',
+    borderRadius: '0px',
+  },
+})
+
+const NavDrawer: FC<Props> = ({ onClose, open }) => {
+  const classes = (useStyles as any)()
+
   return (
-    <DrawerContainer>
-      <DrawerHeader>
-        <BobaLogo />
-        <CloseIcon onClick={onClose} />
-      </DrawerHeader>
-      <ActionContainer>
-        <ActionItem>
-          <ActionLabel>Light Mode</ActionLabel>
-          <ActionValue>Switch</ActionValue>
-        </ActionItem>
-      </ActionContainer>
-      <NavList>
-        <NavItem>Bridge</NavItem>
-        <NavItem>History</NavItem>
-        <NavItem>Stake</NavItem>
-        <NavItem>DAO</NavItem>
-      </NavList>
-    </DrawerContainer>
+    <Drawer open={open} classes={{ paper: classes.root }}>
+      <StyleDrawer>
+        <DrawerHeader>
+          <BobaLogo />
+          <WrapperCloseIcon>
+            <CloseIcon onClick={onClose} />
+          </WrapperCloseIcon>
+        </DrawerHeader>
+        <HeaderDivider />
+        <ActionContainer>
+          <ActionItem>
+            <ActionIcon />
+            <ActionLabel>Account</ActionLabel>
+            <ActionValue>0x8321....A4E1</ActionValue>
+          </ActionItem>
+          <ActionItem>
+            <ActionIcon />
+            <ActionLabel>Account</ActionLabel>
+            <ActionValue>0x8321....A4E1</ActionValue>
+          </ActionItem>
+          <ActionItem>
+            <ActionIcon />
+            <ActionLabel>Account</ActionLabel>
+            <ActionValue>0x8321....A4E1</ActionValue>
+          </ActionItem>
+        </ActionContainer>
+        <HeaderDivider />
+        <NavList>
+          {MENU_LIST.map((menu) => {
+            return (
+              <NavLinkItem
+                key={menu.label}
+                to={menu.path}
+                activeclassname="active"
+              >
+                {menu.label}
+              </NavLinkItem>
+            )
+          })}
+        </NavList>
+      </StyleDrawer>
+    </Drawer>
   )
 }
 

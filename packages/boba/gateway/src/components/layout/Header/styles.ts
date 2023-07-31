@@ -53,11 +53,22 @@ export const HeaderAction = styled.div`
   `)}
 `
 
+export const MobileMenuIcon = styled.div`
+  display: none;
+
+  ${mobile(css`
+    display: block;
+  `)}
+`
+
 export const HumberIcon = styled(Svg).attrs({
   src: MenuIcon,
-  fill: '#fff',
+  fill: 'current',
 })`
-  display: none;
+  stroke: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : '#fff'};
+  fill: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : '#fff'};
 
   ${mobile(css`
     display: block;

@@ -1,39 +1,115 @@
-import styled, { css } from 'styled-components'
 import Close from 'assets/images/close.svg'
-import { Heading, Svg } from 'components/global'
-import { mobile } from 'themes/screens'
+import { Typography, Svg, Heading } from 'components/global'
+import { NavLink } from 'react-router-dom'
+import styled from 'styled-components'
 
-export const DrawerContainer = styled.div`
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-strech;
-  width: 100vw;
-  height: 100vh;
-  ${mobile(css`
-    display: flex;
-  `)}
-`
-export const DrawerHeader = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px;
-`
 export const CloseIcon = styled(Svg).attrs({
   src: Close,
   fill: '#fff',
 })``
-export const ActionContainer = styled.div``
-export const ActionItem = styled.div``
-export const ActionLabel = styled.div``
-export const ActionValue = styled.div``
-export const NavList = styled.div`
+
+export const StyleDrawer = styled.div`
+  height: 100%;
+  background: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[200] : colors.gray[600]};
+`
+
+export const DrawerHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+`
+
+export const WrapperCloseIcon = styled.div`
+  border-radius: 50%;
+  cursor: pointer;
+  &:hover {
+    background: ${({ theme: { name, colors } }) =>
+      name === 'light' ? colors.gray[400] : colors.gray[300]};
+  }
+  div {
+    padding: 4px;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+  }
+`
+
+export const HeaderDivider = styled.div`
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  border-top: 1px solid ${({ theme }) => theme.colors.gray[300]};
+`
+
+export const ActionContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 40px;
 `
-export const NavItem = styled(Heading).attrs({
-  variant: 'h2',
-})``
+export const ActionItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 8px;
+`
+export const ActionIcon = styled.div`
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+  background: blue;
+  justify-self: flex-start;
+`
+export const ActionLabel = styled(Typography).attrs({
+  variant: 'title',
+})`
+  flex: 1;
+  justify-self: flex-start;
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colors['gray'][800]
+      : theme.colors['gray'][100]};
+`
+export const ActionValue = styled(Typography).attrs({
+  variant: 'title',
+})`
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colors['gray'][800]
+      : theme.colors['gray'][100]};
+`
+
+export const NavList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 40px 16px;
+`
+export const NavLinkItem = styled(NavLink)`
+  padding: 0px 16px;
+  font-family: Montserrat;
+  font-size: 24px;
+  font-style: normal;
+  line-height: normal;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colors['gray'][600]
+      : theme.colors['gray'][100]};
+  &:hover,
+  &.active {
+    color: ${({ theme }) =>
+      theme.name === 'light'
+        ? theme.colors['gray'][800]
+        : theme.colors['green'][300]};
+  }
+`

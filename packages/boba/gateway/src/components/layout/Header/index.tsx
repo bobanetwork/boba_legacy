@@ -1,6 +1,12 @@
 import React, { FC, useState } from 'react'
 import { HeaderProps } from './types'
-import { BobaLogo, HeaderAction, HeaderContainer, HumberIcon } from './styles'
+import {
+  BobaLogo,
+  HeaderAction,
+  HeaderContainer,
+  HumberIcon,
+  MobileMenuIcon,
+} from './styles'
 import { Button } from 'components/global'
 import ThemeSwitcher from './ThemeSwitcher'
 import Navigation from './Navigation'
@@ -26,7 +32,7 @@ export const Header: FC<HeaderProps> = () => {
     <HeaderContainer>
       <BobaLogo />
       <Navigation />
-      {showDrawer ? <NavDrawer onClose={() => setShowDrawer(false)} /> : null}
+      <NavDrawer open={showDrawer} onClose={() => setShowDrawer(false)} />
       <HeaderAction>
         {accountEnabled ? (
           <>
@@ -41,7 +47,9 @@ export const Header: FC<HeaderProps> = () => {
             label="Connect Wallet"
           />
         )}
-        <HumberIcon onClick={() => setShowDrawer(true)} />
+        <MobileMenuIcon>
+          <HumberIcon onClick={() => setShowDrawer(true)} />
+        </MobileMenuIcon>
         <ThemeSwitcher />
       </HeaderAction>
     </HeaderContainer>
