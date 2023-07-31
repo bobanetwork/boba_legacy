@@ -29,12 +29,6 @@ import {logAmount} from 'util/amountConvert'
 import {getToken} from 'actions/tokenAction'
 
 import {
-  addNFT,
-  addMonster,
-  getNFTs
-} from 'actions/nftAction'
-
-import {
   addBobaFee,
 } from 'actions/setupAction'
 
@@ -717,35 +711,6 @@ class NetworkService {
     return await this.walletService.switchChain(targetIDHex, chainParam)
   }
 
-
-  async fetchMyMonsters() {
-
-    try {
-      let monsterList = await GraphQLService.queryMonsterTransfer(this.account)
-
-      const contract = new ethers.Contract(
-        this.addresses.BobaMonsters,
-        TuringMonsterJson.abi,
-        this.L2Provider
-      )
-
-      if (monsterList.hasOwnProperty('data')) {
-        const monsters = monsterList.data.turingMonstersTransferEvents
-        for (let i = 0; i < monsters.length; i++) {
-          const tokenId = monsters[i].tokenId
-          const owner = await contract.ownerOf(tokenId)
-          if (owner.toLowerCase() === this.account.toLowerCase()) {
-            await this.addNFT(this.addresses.BobaMonsters, tokenId)
-          }
-        }
-        await this.checkMonster()
-      }
-    } catch (err) {
-      // Catch needed don't break the fetch monsters button
-      console.error(err);
-    }
-  }
-
   async claimAuthenticatedTestnetTokens(tweetId) {
     // Only Testnet
     const contract = new ethers.Contract(
@@ -759,114 +724,6 @@ class NetworkService {
       tweetId,
     )
     await claim.wait()
-  }
-
-  async checkMonster() {
-
-    const NFTs = getNFTs()
-
-    let validMonsters = []
-
-    try {
-
-      if (!this.addresses.BobaMonsters) return Number('0');
-
-      const contract = new ethers.Contract(
-        this.addresses.BobaMonsters,
-        TuringMonsterJson.abi,
-        this.L2Provider
-      )
-
-      const monsterBalance = await contract.balanceOf(this.account)
-
-      let topMagic = 0
-      let topTop = 0
-
-      if (NFTs && Number(monsterBalance) > 0) {
-
-        for (const [, value] of Object.entries(NFTs)) {
-
-          if (value.name === 'TuringMonster') {
-            const owner = await contract.ownerOf(value.tokenID)
-
-            if (owner.toLowerCase() === this.account.toLowerCase()) {
-              const attributes = {
-                top: value.meta.attributes[3].value,
-                magic: value.meta.attributes[4].value,
-              }
-              if (value.meta.attributes[3].value === 'crown') topTop = 1
-              if (value.meta.attributes[4].value === 'wizzard') topMagic = 1
-              validMonsters.push({tokenID: value.tokenID, attributes})
-            }
-          }
-        }
-
-        if (topMagic === 0 && topTop === 0) {
-          validMonsters.push({monsterType: 'basic'})
-        } else if (topMagic === 0 && topTop === 1) {
-          validMonsters.push({monsterType: 'crowned'})
-        } else if (topMagic === 1 && topTop === 0) {
-          validMonsters.push({monsterType: 'wizard'})
-        } else if (topMagic === 1 && topTop === 1) {
-          validMonsters.push({monsterType: 'crowned wizard'})
-        }
-
-        await addMonster(validMonsters)
-
-      }
-
-      return Number(monsterBalance.toString())
-
-    } catch (error) {
-      console.log("NS: checkMonster error:", error)
-      return error
-    }
-
-  }
-
-  /* This is for manually adding NFTs */
-  async addNFT(address, tokenID) {
-
-    console.log("address", address)
-
-    try {
-
-      const contract = new ethers.Contract(
-        address,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
-
-      const nftName = await contract.name()
-      const nftSymbol = await contract.symbol()
-      const nftMeta = await contract.tokenURI(tokenID)
-      console.log("nftMeta RAW:", nftMeta)
-      const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
-
-      const {url, meta = []} = await getNftImageUrl(nftMeta)
-
-      console.log("meta:", meta)
-
-      const NFT = {
-        UUID,
-        address,
-        name: nftName,
-        tokenID,
-        symbol: nftSymbol,
-        url,
-        meta,
-        account: this.account,
-        network: this.networkGateway,
-        layer: this.L1orL2
-      }
-
-      await addNFT(NFT)
-
-    } catch (error) {
-      console.log("NS: addNFT error:", error)
-      return error
-    }
-
   }
 
   async addTokenList() {
@@ -1155,46 +1012,6 @@ class NetworkService {
       console.log("NS: depositETHL2 error:", error)
       return error
     }
-  }
-
-  async monsterMint() {
-
-    console.log("NS: monsterMint")
-
-    // ONLY SUPPORTED on L2
-    if (this.L1orL2 !== 'L2') return
-
-    // ONLY SUPPORTED on Goerli and Mainnet
-    if (this.networkGateway !== NETWORK.ETHEREUM) {
-      return
-    }
-
-    try {
-
-      const contract = new ethers.Contract(
-        this.addresses.BobaMonsters,
-        TuringMonsterJson.abi,
-        this.L2Provider
-      )
-
-      const tx = await contract
-        .connect(this.provider.getSigner())
-        .mint(1)
-
-      const receipt = await tx.wait()
-      console.log("NS: monsterMint TX:", receipt.logs)
-
-      const rawData = receipt.logs[3].topics[1]
-      const numberHexString = rawData.slice(-64)
-      let tokenID = parseInt(numberHexString, 16)
-      await this.addNFT(this.addresses.BobaMonsters, tokenID)
-
-      return tx
-    } catch (error) {
-      console.log("NS: monsterMint error:", error)
-      return error
-    }
-
   }
 
   async settle_v0() {
@@ -2588,6 +2405,15 @@ class NetworkService {
       console.log("NS: depositL1LP error:", error)
       return error
     }
+  }
+
+  async isTeleportationOfAssetSupported(layer, token, destChainId) {
+    const teleportationAddr = (layer === Layer.L1 ? this.addresses.Proxy__L1Teleportation : this.addresses.Proxy__L2Teleportation)
+    const teleportationContract = this.Teleportation
+      .attach(teleportationAddr)
+      .connect(this.provider.getSigner())
+
+    return await teleportationContract.supportedTokens(token, destChainId)
   }
 
   async depositWithTeleporter(layer, currency, value_Wei_String, destChainId) {

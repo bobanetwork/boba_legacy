@@ -1,6 +1,12 @@
 import React, { FC, useEffect, useState } from 'react'
-import { updateToken } from 'actions/bridgeAction'
-import { fetchBalances } from 'actions/networkAction'
+import {
+  setTeleportationOfAssetSupported,
+  updateToken,
+} from 'actions/bridgeAction'
+import {
+  fetchBalances,
+  isTeleportationOfAssetSupported,
+} from 'actions/networkAction'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import { isEqual } from 'util/lodash'
@@ -10,6 +16,8 @@ import {
   selectTokenToBridge,
   selectlayer1Balance,
   selectlayer2Balance,
+  selectActiveNetwork,
+  selectActiveNetworkType,
 } from 'selectors'
 import { getCoinImage } from 'util/coinImage'
 import { LAYER } from 'util/constant'
@@ -27,6 +35,7 @@ import {
   TokenSymbol,
 } from './styles'
 import { formatTokenAmount } from 'util/common'
+import { NetworkList } from '../../../util/network/network.util'
 
 // the L2 token which can not be exited so exclude from dropdown in case of L2
 const NON_EXITABLE_TOKEN = [
@@ -50,6 +59,8 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
   const l1Balance = useSelector(selectlayer1Balance, isEqual)
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
   const tokenToBridge = useSelector(selectTokenToBridge())
+  const activeNetwork = useSelector(selectActiveNetwork())
+  const activeNetworkType = useSelector(selectActiveNetworkType())
 
   const [isMyToken, setIsMyToken] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -68,8 +79,17 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
     dispatch(closeModal('tokenPicker'))
   }
 
-  const onTokenSelect = (token: any) => {
+  const onTokenSelect = async (token: any) => {
     dispatch(updateToken({ token, tokenIndex: 0 }))
+
+    const destChainId = NetworkList[activeNetworkType].find(
+      (n) => n.chain === activeNetwork
+    ).chainId[layer === LAYER.L1 ? LAYER.L2 : LAYER.L1]
+    const isSupported = await dispatch(
+      isTeleportationOfAssetSupported(layer, token.address, destChainId)
+    )
+    dispatch(setTeleportationOfAssetSupported(isSupported))
+    console.log('TOKEN SELECTED', isSupported, token.address, destChainId)
     handleClose()
   }
 

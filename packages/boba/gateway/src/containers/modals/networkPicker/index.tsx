@@ -1,9 +1,9 @@
 import {
-  NetworkPickerModalContainer,
-  NetworkPickerList,
-  NetworkItem,
   NetworkIcon,
+  NetworkItem,
   NetworkLabel,
+  NetworkPickerList,
+  NetworkPickerModalContainer,
 } from './index.styles'
 import { closeModal } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
@@ -22,12 +22,18 @@ import {
   selectModalState,
 } from 'selectors'
 import { setNetwork } from 'actions/networkAction'
+import { BRIDGE_TYPE } from '../../Bridging/BridgeTypeSelector'
+import { Layer } from '../../../util/constant'
 
 interface NetworkPickerModalProps {
   open: boolean
+  bridgeType: BRIDGE_TYPE
 }
 
-const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
+const NetworkPickerModal: FC<NetworkPickerModalProps> = ({
+  open,
+  bridgeType,
+}: NetworkPickerModalProps) => {
   const dispatch = useDispatch<any>()
   const networkType = useSelector(selectActiveNetworkType())
   const activeNetwork = useSelector(selectActiveNetwork())
@@ -44,6 +50,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
 
   const onChainChange = (chainDetail: INetwork) => {
     dispatch(
+      // destNetworkSelection && bridgeType === BRIDGE_TYPE.FAST ?
       setNetwork({
         network: chainDetail.chain,
         name: chainDetail.name,
@@ -67,10 +74,11 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
       <NetworkPickerModalContainer>
         <NetworkPickerList>
           {networkList.map((chainDetail: INetwork) => {
-            const Icon =
+            const CurrentIcon =
               selectionLayer === 'l1'
                 ? l1Icon[chainDetail.icon]
                 : l2Icon[chainDetail.icon]
+
             return (
               <NetworkItem
                 selected={chainDetail.chain === activeNetwork}
@@ -78,7 +86,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
                 onClick={() => onChainChange(chainDetail)}
               >
                 <NetworkIcon>
-                  <Icon selected />
+                  <CurrentIcon selected />
                 </NetworkIcon>
                 <NetworkLabel>{chainDetail.name[selectionLayer]}</NetworkLabel>
               </NetworkItem>

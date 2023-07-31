@@ -61,6 +61,12 @@ export function depositL1LP(currency, value, decimals) {
   )
 }
 
+export function isTeleportationOfAssetSupported(layer, asset, destChainId) {
+  return createAction('DEPOSIT/TELEPORTATION/TOKEN_SUPPORTED', () =>
+    networkService.isTeleportationOfAssetSupported(layer, asset, destChainId)
+  )
+}
+
 export function depositWithTeleporter(layer, currency, value, destChainId) {
   return createAction('DEPOSIT/CREATE', () =>
       networkService.depositWithTeleporter(layer, currency, value, destChainId)

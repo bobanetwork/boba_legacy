@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 
+import {BigNumberish} from "ethers";
+
 const initialState = {
   tokens: [],
   bridgeType: 'CLASSIC',
@@ -22,6 +24,14 @@ const initialState = {
   amountToBridge: 0,
   destChainIdBridge: 0,
   isFetchTxBlockNumber: false,
+  isTeleportationOfAssetSupported: {
+    supported: false,
+    minDepositAmount: 0,
+    maxDepositAmount: 0,
+    maxTransferAmountPerDay: 0,
+    transferTimestampCheckPoint: 0,
+    transferredAmount: 0,
+  },
   alerts: []
 };
 
@@ -121,17 +131,14 @@ function bridgeReducer(state = initialState, action) {
       return { ...state, amountToBridge: action.payload }
     }
     case 'BRIDGE/AMOUNT/RESET': {
-      return { ...state, amountToBridge: 0 }
+      return {...state, amountToBridge: 0}
     }
-    case 'BRIDGE/DEST_CHAIN_ID/SET': {
-      return { ...state, destChainIdBridge: action.payload }
-    }
-    case 'BRIDGE/DEST_CHAIN_ID/RESET': {
-      return { ...state, destChainIdBridge: 0 }
-    }
-
     case 'BRIDGE/DEPOSIT_TX/BLOCK': {
       return { ...state, isFetchTxBlockNumber: action.payload }
+    }
+    case 'BRIDGE/TELEPORTER/TOKEN_SUPPORTED': {
+      console.log("SET VALUE: ", action.payload)
+      return { ...state, isTeleportationOfAssetSupported: action.payload }
     }
 
     default:

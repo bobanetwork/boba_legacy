@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { selectModalState } from 'selectors'
+import { selectBridgeType, selectModalState } from 'selectors'
 import CDMCompletionModal from './CDMCompletion/CDMCompletionModal'
 import CastVoteModal from './dao/CastVoteModal'
 import DelegateDaoModal from './dao/DelegateDaoModal'
@@ -66,6 +66,7 @@ const ModalContainer = () => {
   )
   const SettingsModalState = useSelector(selectModalState('settingsModal'))
 
+  const bridgeType = useSelector(selectBridgeType())
   const fast = useSelector(selectModalState('fast'))
   const token = useSelector(selectModalState('token'))
   const tokenIndex = useSelector(selectModalState('tokenIndex'))
@@ -166,7 +167,10 @@ const ModalContainer = () => {
       )}
       {!!SettingsModalState && <SettingsModal open={SettingsModalState} />}
       {!!networkPickerModalState && (
-        <NetworkPickerModal open={networkPickerModalState} />
+        <NetworkPickerModal
+          open={networkPickerModalState}
+          bridgeType={bridgeType}
+        />
       )}
 
       {!!bridgeConfirmModalState && (
