@@ -4,7 +4,7 @@ executors:
   intergration-tests-executor:
     resource_class: xlarge
     machine:
-      image: ubuntu-2004:202111-02
+      image: cimg/node:16.15
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
