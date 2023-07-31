@@ -4,7 +4,7 @@ executors:
   intergration-tests-executor:
     resource_class: xlarge
     machine:
-      image: cimg/node:16.15
+      image: ubuntu-2004:202201-02
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
@@ -69,7 +69,6 @@ commands:
     steps:
       - check-changed:
           patterns: common-ts,contracts,core-utils,data-transport-layer,message-relayer,regenesis-surgery,sdk,integration-tests,l2geth,packages/boba/account-abstraction,packages/boba/bobalink,packages/boba/bundler,packages/boba/bundler_sdk,packages/boba/bundler_utils,packages/boba/contracts,packages/boba/gas-price-oracle,packages/boba/register,packages/boba/teleportation,ops,ops_boba
-
       - run:
           name: Build the project
           command: yarn && yarn build
@@ -142,6 +141,7 @@ commands:
           path: /home/circleci/project/ops/result
 
 jobs:
+
   go-lint-test-build:
     parameters:
       binary_name:
