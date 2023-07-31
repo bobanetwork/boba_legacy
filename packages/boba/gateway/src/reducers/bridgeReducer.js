@@ -137,7 +137,6 @@ function bridgeReducer(state = initialState, action) {
       return { ...state, isFetchTxBlockNumber: action.payload }
     }
     case 'BRIDGE/TELEPORTER/TOKEN_SUPPORTED': {
-      console.log("SET VALUE: ", action.payload)
       return { ...state, isTeleportationOfAssetSupported: action.payload }
     }
 

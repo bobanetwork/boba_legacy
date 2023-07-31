@@ -89,7 +89,6 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
       isTeleportationOfAssetSupported(layer, token.address, destChainId)
     )
     dispatch(setTeleportationOfAssetSupported(isSupported))
-    console.log('TOKEN SELECTED', isSupported, token.address, destChainId)
     handleClose()
   }
 
