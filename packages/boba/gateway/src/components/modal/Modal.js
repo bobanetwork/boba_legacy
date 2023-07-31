@@ -14,95 +14,59 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React from 'react'
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 
 import {
   Fade,
-  Typography,
   Container,
   Box,
   useMediaQuery,
-  Grid
+  useTheme,
 } from '@mui/material'
 
-import * as S from "./Modal.styles"
-import * as LayoutS from 'components/common/common.styles';
-import { useTheme } from '@emotion/react'
-import { HighlightOffOutlined } from '@mui/icons-material';
-import CloseIcon from 'components/icons/CloseIcon';
+import { Heading } from 'components/global'
+import * as S from './styles'
+import CloseIcon from 'images/close.svg';
+import { Svg } from 'components/global/svg'
 
-function _Modal({
+const _Modal = ({
   children,
   open,
   onClose,
-  light,
   title,
   transparent,
-  maxWidth,
-  minHeight,
-  newStyle = false
-}) {
+  minHeight
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <S.StyledModal
-      aria-labelledby='transition-modal-title'
-      aria-describedby='transition-modal-description'
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
       open={open}
       onClose={onClose}
       ismobile={isMobile ? 1 : 0}
       slots={{
-        backdrop:S.Backdrop
+        backdrop: S.Backdrop,
       }}
       disableAutoFocus={true}
     >
       <Fade in={open}>
-
-        {
-          !!newStyle ?
-            <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative', maxWidth }}>
-              <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={!!transparent || !!isMobile}>
-                <Box display="flex" flexDirection="column" gap="10px">
-                  <S.ModalHead>
-                    <Box display="flex" alignItems="center" gap="10px">
-                      <BobaGlassIcon />
-                      <Typography variant="body1" sx={{ fontWeight: "700" }}>{title}</Typography>
-                    </Box>
-                    <S.IconButtonTag onClick={onClose}>
-                      <HighlightOffOutlined sx={{ opacity: 0.5 }} />
-                    </S.IconButtonTag>
-                  </S.ModalHead>
-                  <LayoutS.DividerLine sx={{ my: 1 }} />
-                  <S.Content>
-                    {children}
-                  </S.Content>
-                </Box>
-              </S.Style>
-            </Container>
-            : <Container maxWidth={maxWidth || "lg"} sx={{ border: 'none', position: 'relative' }}>
-              <Grid container>
-                <Grid item xs={12} md={title ? 2 : 1}>
-                  <Box sx={{ mr: 8 }}>
-                    <Typography variant="h2" component="h3" sx={{ fontWeight: "700" }}>{title}</Typography>
-                  </Box>
-                </Grid>
-
-                <Grid item xs={12} md={title ? 10 : 9}>
-                  <S.Style minHeight={minHeight || '430px'} isMobile={isMobile} transparent={transparent || isMobile}>
-                    {children}
-                  </S.Style>
-                </Grid>
-
-                <Grid item xs={12} md={1}>
+        <Container sx={{ maxWidth: '450px !important' }}>
+          <S.Style minHeight={minHeight || '450px'} isMobile={isMobile} transparent={!!transparent || !!isMobile}>
+            <Box display="flex" flexDirection="column" gap="10px">
+              <S.ModalHead>
+                <S.TitleContainer>
+                  <Heading variant="h2" >{title}</Heading>
                   <S.IconButtonTag onClick={onClose}>
-                    <CloseIcon />
+                    <Svg src={CloseIcon} fill="#fff"/>
                   </S.IconButtonTag>
-                </Grid>
-
-              </Grid>
-            </Container>
-        }
+                </S.TitleContainer>
+              </S.ModalHead>
+              <S.Content>{children}</S.Content>
+            </Box>
+          </S.Style>
+        </Container>
       </Fade>
     </S.StyledModal>
   );

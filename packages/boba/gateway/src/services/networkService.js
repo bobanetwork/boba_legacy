@@ -99,6 +99,7 @@ import walletService from './wallet.service'
 
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
+import { setFetchDepositTxBlock } from 'actions/bridgeAction';
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -639,7 +640,7 @@ class NetworkService {
     }
   }
 
-  async initializeAccount({ networkGateway: network, networkType, chainIdChanged }) {
+  async initializeAccount({chainIdChanged}) {
 
     try {
 
@@ -655,25 +656,24 @@ class NetworkService {
 
       let chainId = chainIdChanged
       if (!chainId) {
-        chainId = await this.provider.getNetwork().then(network => network.chainId)
+        chainId = await this.provider.getNetwork().then(nt => nt.chainId)
       }
-      this.networkGateway = network
-      this.networkType = networkType
 
       // defines the set of possible networks along with chainId for L1 and L2
       const networkDetail = getNetworkDetail({
-        network,
-        networkType
+        network: this.networkGateway,
+        networkType: this.networkType
       })
+
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
-      if (!!NETWORK[ network ] && chainId === L2ChainId) {
+      if (!!NETWORK[ this.networkGateway ] && chainId === L2ChainId) {
         this.L1orL2 = 'L2';
-      } else if(!!NETWORK[ network ] && chainId === L1ChainId) {
+      } else if(!!NETWORK[ this.networkGateway ] && chainId === L1ChainId) {
         this.L1orL2 = 'L1';
       } else {
         return 'wrongnetwork'
@@ -1090,9 +1090,7 @@ class NetworkService {
   }) {
 
     try {
-
-      const time_start = new Date().getTime()
-      console.log('Deposit ETH L2 Txs start time:', time_start);
+      setFetchDepositTxBlock(false);
 
       let depositTX;
       if (this.network === NETWORK.ETHEREUM) {
@@ -1143,6 +1141,8 @@ class NetworkService {
         }
       }
 
+      setFetchDepositTxBlock(true);
+
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
@@ -1153,10 +1153,6 @@ class NetworkService {
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
       console.log('completed Deposit! L2 tx hash:', receipt.transactionReceipt)
-
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
-
       return txReceipt
     } catch(error) {
       console.log("NS: depositETHL2 error:",error)
@@ -1864,7 +1860,7 @@ class NetworkService {
       this.account,
       this.addresses.L1StandardBridgeAddress
     )
-
+    setFetchDepositTxBlock(false)
     try {
       /*
       OMG IS A SPECIAL CASE - allowance needs to be set to zero, and then
@@ -1905,12 +1901,7 @@ class NetworkService {
         await approveStatus.wait()
         console.log("ERC20 L1 ops approved:",approveStatus)
       }
-
-      const time_start = new Date().getTime()
-      console.log("TX start time:", time_start)
-
       let depositTX;
-
       if (!recipient) {
         // incase no recipient
         depositTX = await this.L1StandardBridgeContract
@@ -1934,7 +1925,7 @@ class NetworkService {
           utils.formatBytes32String(new Date().getTime().toString())
         )
       }
-
+      setFetchDepositTxBlock(true)
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
 
@@ -1943,12 +1934,7 @@ class NetworkService {
       }
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
-
-      const time_stop = new Date().getTime()
-      console.log("TX finish time:", time_stop)
-
       this.getBalances()
-
       return txReceipt
     } catch (error) {
       console.log("NS: depositErc20 error:", error)
@@ -2114,7 +2100,7 @@ class NetworkService {
       //returns total cost in ETH
       return totalCost
     } catch (error) {
-      console.log(error);
+      console.log(['GetExitCost',error]);
       return 0;
     }
   }
@@ -2572,17 +2558,9 @@ class NetworkService {
   /***** SWAP ON to BOBA by depositing funds to the L1LP *****/
   /***********************************************************/
   async depositL1LP(currency, value_Wei_String) {
-
-    updateSignatureStatus_depositLP(false)
-
-    console.log("depositL1LP:",currency)
-    console.log("value_Wei_String",value_Wei_String)
-
-    const time_start = new Date().getTime()
-    console.log("TX start time:", time_start)
-    console.log("Depositing...")
-
     try {
+      updateSignatureStatus_depositLP(false)
+      setFetchDepositTxBlock(false);
 
       let depositTX = await this.L1LPContract
         .connect(this.provider.getSigner())
@@ -2592,14 +2570,10 @@ class NetworkService {
           currency === this.addresses.L1_ETH_Address ? { value: value_Wei_String } : {}
         )
 
-      console.log("depositTX",depositTX)
+      setFetchDepositTxBlock(true);
 
       //at this point the tx has been submitted, and we are waiting...
       await depositTX.wait()
-
-      const block = await this.L1Provider.getTransaction(depositTX.hash)
-      console.log(' block:', block)
-
       updateSignatureStatus_depositLP(true)
 
       const opts = {
@@ -2608,9 +2582,7 @@ class NetworkService {
       const receipt = await this.watcher.waitForMessageReceipt(depositTX, opts)
       const txReceipt = receipt.transactionReceipt;
       console.log(' completed swap-on ! L2 tx hash:', txReceipt)
-
       return txReceipt
-
     } catch (error) {
       console.log("NS: depositL1LP error:", error)
       return error
@@ -3823,7 +3795,6 @@ class NetworkService {
   async withdrawFS_Savings(stakeID) {
 
     if(!this.account) {
-      console.log('NS: withdrawFS_Savings() error - called but account === null')
       return
     }
 
@@ -3845,7 +3816,6 @@ class NetworkService {
   async getFS_Saves() {
 
     if(this.account === null) {
-      console.log('NS: getFS_Saves() error - called but account === null')
       return
     }
 
@@ -4756,6 +4726,17 @@ class NetworkService {
       return { methodIndex, result: { err: JSON.stringify(err) }}
     }
    }
+
+  // getting block number;
+
+  async getLatestBlockNumber() {
+    return await this.provider.getBlockNumber();
+  }
+
+  async getBlockTime(blockNumber) {
+    return (await this.provider.getBlock(blockNumber)).timestamp;
+  }
+
 }
 
 const networkService = new NetworkService()

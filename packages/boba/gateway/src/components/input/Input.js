@@ -22,11 +22,11 @@ import { selectCustomStyles } from './Select.styles'
 
 import Button from 'components/button/Button'
 
-import { Box, Typography } from '@mui/material'
-import { useTheme } from '@emotion/react'
+import { useTheme, Box, Typography } from '@mui/material'
+
 import { getCoinImage } from 'util/coinImage'
 
-function Input({
+export const Input = ({
   placeholder,
   label,
   type = 'text',
@@ -56,9 +56,9 @@ function Input({
   openTokenPicker,
   textarea = false,
   maxRows = 10,
-}) {
+}) => {
 
-  async function handlePaste() {
+  const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText()
       if (text) {
@@ -69,7 +69,7 @@ function Input({
     }
   }
 
-  function handleClickMax() {
+  const handleClickMax = () => {
     onUseMax()
   }
 
@@ -77,7 +77,7 @@ function Input({
   const overMax = new BN(value).gt(new BN(maxValue))
   const theme = useTheme()
 
-  function tokenImageElement(unit) {
+  const tokenImageElement = (unit) => {
     return (
       <>
         <Typography variant="body2" component="div">{unit}</Typography>
@@ -126,8 +126,7 @@ function Input({
   return (
     <div style={{width: '100%'}}>
       <S.Wrapper newstyle={newStyle ? 1 : 0} style={style}>
-
-        {!unit &&
+        {!unit && (
           <S.InputWrapperFull>
             {label && (
               <Typography variant="body2" component="div" sx={{opacity: 0.7, mb: 1}}>
@@ -148,7 +147,7 @@ function Input({
               newstyle={newStyle ? 1 : 0}
             />
           </S.InputWrapperFull>
-        }
+        )}
 
         {unit && (
           <>

@@ -1,6 +1,6 @@
 import { BigNumberish } from 'ethers'
-import { NotPromise } from '@boba/bundler_utils'
-import { UserOperationStruct } from '@boba/accountabstraction'
+import { NotPromise } from '@bobanetwork/bundler_utils'
+import { UserOperationStruct } from '@bobanetwork/accountabstraction'
 
 export enum ValidationErrors {
   InvalidFields = -32602,

@@ -22,6 +22,7 @@ import {
 } from './testutils'
 import { fillAndSign } from './UserOp'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
+import {BigNumber} from "ethers";
 
 describe('BobaDepositPaymaster', () => {
   let entryPoint: EntryPoint
@@ -242,12 +243,37 @@ describe('BobaDepositPaymaster', () => {
       // oracle returns 1:1 conversion
       expect(requiredTokens).to.be.eq(ethBoughtAmount)
     })
+
+    it('should fail for invalid roundId', async () => {
+      const prevRoundId = await testEthOracle.fixedRoundId()
+      await testEthOracle.updateFixedRoundId(0)
+
+      const ethBoughtAmount = ethers.utils.parseEther('1')
+      await expect(bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)).to.be.revertedWith("ETH round failed")
+
+      await testEthOracle.updateFixedRoundId(prevRoundId)
+    })
+
+    it('should fail when last update from oracle was too long ago', async () => {
+      // see constant in BobaDepositPaymaster for current expiration value
+      const maxAgeUpdatedAt = await bobaDepositPaymaster.MAX_AGE_ASSET_PRICE()
+      const currBlockTimeStamp = BigNumber.from((await ethers.provider.getBlock(await ethers.provider.getBlockNumber())).timestamp);
+
+      const prevUpdatedAt = await testEthOracle.fixedUpdatedAt()
+      await testEthOracle.updateFixedUpdatedAt(currBlockTimeStamp.sub(maxAgeUpdatedAt))
+
+      const ethBoughtAmount = ethers.utils.parseEther('1')
+      await expect(bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)).to.be.revertedWith("ETH price expired")
+
+      await testEthOracle.updateFixedUpdatedAt(prevUpdatedAt)
+    })
+
     it('should return correct conversion on different values', async () => {
       // set eth price
-      await testEthOracle.updateFixedRetunValue(125475500000)
+      await testEthOracle.updateFixedReturnValue(125475500000)
       // set token price
       // example boba
-      await testTokenOracle.updateFixedRetunValue(21612500)
+      await testTokenOracle.updateFixedReturnValue(21612500)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
       let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
@@ -265,10 +291,10 @@ describe('BobaDepositPaymaster', () => {
 
       await bobaDepositPaymaster.addToken(tokenAlt.address, testTokenOracle.address, tokenAlt.address, 6)
       // set eth price
-      await testEthOracle.updateFixedRetunValue(125475500000)
+      await testEthOracle.updateFixedReturnValue(125475500000)
       // set token price
       // example usdc, adjust decimals
-      await testTokenOracle.updateFixedRetunValue(100000000)
+      await testTokenOracle.updateFixedReturnValue(100000000)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
       let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)
@@ -282,12 +308,12 @@ describe('BobaDepositPaymaster', () => {
     })
     it('should return correct conversion on different price oracle decimals', async () => {
       // set eth price
-      await testEthOracle.updateFixedRetunValue(125475500000)
+      await testEthOracle.updateFixedReturnValue(125475500000)
       // set token price
       // example boba
       await testTokenOracle.updateDecimals(6)
       // decimal 6
-      await testTokenOracle.updateFixedRetunValue(216125)
+      await testTokenOracle.updateFixedReturnValue(216125)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
       let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(token.address, ethBoughtAmount)
@@ -307,10 +333,10 @@ describe('BobaDepositPaymaster', () => {
       await testTokenOracle.updateDecimals(6)
       await bobaDepositPaymaster.addToken(tokenAlt.address, testTokenOracle.address, tokenAlt.address, 6)
       // set eth price
-      await testEthOracle.updateFixedRetunValue(125475500000)
+      await testEthOracle.updateFixedReturnValue(125475500000)
       // set token price
       // example usdc, adjust priceOracle decimals to 6
-      await testTokenOracle.updateFixedRetunValue(1000000)
+      await testTokenOracle.updateFixedReturnValue(1000000)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
       let requiredTokens = await bobaDepositPaymaster.getTokenValueOfEthTest(tokenAlt.address, ethBoughtAmount)

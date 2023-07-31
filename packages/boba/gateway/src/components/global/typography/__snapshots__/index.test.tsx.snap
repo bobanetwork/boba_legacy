@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Typography should match snapshots body1 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB gBYVeX"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots body2 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB dqFZby"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots body3 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB iarGsq"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots h1 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB emTqjT"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots head 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB gAwGVr"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots subtitle 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB fFoiNn"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;
+
+exports[`Typography should match snapshots title 1`] = `
+<DocumentFragment>
+  <p
+    class="sc-bgqQcB ezCfjW"
+  >
+    Text goes here
+  </p>
+</DocumentFragment>
+`;

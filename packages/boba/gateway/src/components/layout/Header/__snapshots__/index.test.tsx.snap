@@ -1,0 +1,75 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout => Header should match the snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-eAzDjm eZJmjM"
+  >
+    <div
+      class="sc-fABZjn dncsHS"
+    />
+    <div
+      class="sc-ePzlA-D jgRDPC"
+    >
+      <a
+        activeclassname="active"
+        class="sc-gjJAnY bPnvCz"
+        href="/bridge"
+      >
+        Bridge
+      </a>
+      <a
+        activeclassname="active"
+        class="sc-gjJAnY bPnvCz"
+        href="/history"
+      >
+        History
+      </a>
+      <a
+        activeclassname="active"
+        class="sc-gjJAnY bPnvCz"
+        href="/earn"
+      >
+        Earn
+      </a>
+      <a
+        activeclassname="active"
+        class="sc-gjJAnY bPnvCz"
+        href="/stake"
+      >
+        Stake
+      </a>
+      <a
+        activeclassname="active"
+        class="sc-gjJAnY bPnvCz"
+        href="/DAO"
+      >
+        Dao
+      </a>
+    </div>
+    <div
+      class="sc-gUMnWI ghBncp"
+    >
+      <button
+        class="sc-duSInm jNkTqC"
+        type="button"
+      >
+         Connect Wallet
+      </button>
+      <div
+        class="sc-dPwPAC RgduB"
+        title="light-icon"
+      >
+        <div>
+          <div>
+            <div
+              data-src="theme-sun.svg"
+              src=""
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

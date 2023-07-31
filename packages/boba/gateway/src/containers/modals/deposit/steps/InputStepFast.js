@@ -16,9 +16,9 @@ limitations under the License. */
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useTheme } from '@emotion/react'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
+
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
 
 import { depositL1LP, approveERC20 } from 'actions/networkAction'
 
@@ -28,7 +28,7 @@ import { setCDMCompletion } from 'actions/transactionAction'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { WrapperActionsModal } from 'components/modal/styles'
 import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 
@@ -62,8 +62,6 @@ import {
   fetchL1FeeBalance,
   fetchL2LPLiquidity,
 } from 'actions/balanceAction'
-
-import BridgeAlert from './BridgeAlert'
 
 
 function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
@@ -295,7 +293,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
-        <BridgeAlert />
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, mb: 1, color: 'yellow' }}
@@ -320,7 +317,6 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <BridgeAlert />
         {!isBridge && (
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 1 }}>
             Fast Bridge to L2
@@ -394,7 +390,7 @@ function InputStepFast({ handleClose, token, isBridge, openTokenPicker }) {
 
         {!!token && token.symbol === 'OMG' && (
           <Typography variant="body2" sx={{ mt: 2 }}>
-            The OMG Token was minted in 2017 and it does not conform to the
+            The OMG Token was minted in 2017 and it does not confirm to the
             ERC20 token standard. In some cases, three interactions with
             MetaMask are needed.
           </Typography>

@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Heading should match snapshots h1 1`] = `
+<DocumentFragment>
+  <h1
+    class="sc-bgqQcB jYvPsJ"
+  >
+    Test Heading
+  </h1>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h2 1`] = `
+<DocumentFragment>
+  <h2
+    class="sc-bgqQcB hisnER"
+  >
+    Test Heading
+  </h2>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h3 1`] = `
+<DocumentFragment>
+  <h3
+    class="sc-bgqQcB hPrUKN"
+  >
+    Test Heading
+  </h3>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h4 1`] = `
+<DocumentFragment>
+  <h4
+    class="sc-bgqQcB bblAst"
+  >
+    Test Heading
+  </h4>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h5 1`] = `
+<DocumentFragment>
+  <h5
+    class="sc-bgqQcB jfkGcq"
+  >
+    Test Heading
+  </h5>
+</DocumentFragment>
+`;
+
+exports[`Heading should match snapshots h6 1`] = `
+<DocumentFragment>
+  <h6
+    class="sc-bgqQcB jDQrGH"
+  >
+    Test Heading
+  </h6>
+</DocumentFragment>
+`;

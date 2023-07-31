@@ -12,13 +12,12 @@ import Input from 'components/input/Input'
 import { selectLoading, selectLookupPrice, selectActiveNetworkName } from 'selectors'
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
-import { useTheme } from '@emotion/react'
-import { Box, Checkbox, FormControlLabel, Typography, useMediaQuery } from '@mui/material'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+
+import { Box, Checkbox, FormControlLabel, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import BN from 'bignumber.js'
 import { ethers } from 'ethers'
-import BridgeAlert from './BridgeAlert'
 
 function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
 
@@ -106,7 +105,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
     //no token in this account
     return (
       <Box>
-        <BridgeAlert />
         <Typography variant="body2" sx={{ fontWeight: 700, my: 1, color: 'yellow' }}>
           Sorry, nothing to deposit - no {token.symbol} in this wallet
         </Typography>
@@ -127,7 +125,6 @@ function InputStep({ handleClose, token, isBridge, openTokenPicker }) {
   return (
     <>
       <Box>
-        <BridgeAlert />
         {!isBridge &&
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
             Classic Bridge {token && token.symbol ? token.symbol : ''} to L2

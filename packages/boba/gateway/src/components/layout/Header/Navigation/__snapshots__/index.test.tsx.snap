@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout => Header => Menu should match the snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bgqQcB gdKA-Dl"
+  >
+    <a
+      activeclassname="active"
+      class="sc-gTRrQi fGVotN"
+      href="/bridge"
+    >
+      Bridge
+    </a>
+    <a
+      activeclassname="active"
+      class="sc-gTRrQi fGVotN"
+      href="/history"
+    >
+      History
+    </a>
+    <a
+      activeclassname="active"
+      class="sc-gTRrQi fGVotN"
+      href="/earn"
+    >
+      Earn
+    </a>
+    <a
+      activeclassname="active"
+      class="sc-gTRrQi fGVotN"
+      href="/stake"
+    >
+      Stake
+    </a>
+    <a
+      activeclassname="active"
+      class="sc-gTRrQi fGVotN"
+      href="/DAO"
+    >
+      Dao
+    </a>
+  </div>
+</DocumentFragment>
+`;

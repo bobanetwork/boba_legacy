@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SwitchButton SwitchButton Default State 1`] = `
+<DocumentFragment>
+  <label
+    class="sc-ewnqHT byTfLr"
+  >
+    <input
+      class="sc-gTRrQi fYYSjw"
+      type="checkbox"
+    />
+    <span
+      class="sc-bgqQcB fNGpeI"
+    />
+  </label>
+</DocumentFragment>
+`;
+
+exports[`SwitchButton SwitchButton is Active 1`] = `
+<DocumentFragment>
+  <label
+    class="sc-ewnqHT byTfLr"
+  >
+    <input
+      checked=""
+      class="sc-gTRrQi fYYSjw"
+      type="checkbox"
+    />
+    <span
+      class="sc-bgqQcB fNGpeI"
+    />
+  </label>
+</DocumentFragment>
+`;
+
+exports[`SwitchButton SwitchButton is Disable & Active 1`] = `
+<DocumentFragment>
+  <label
+    class="sc-ewnqHT byTfLr"
+  >
+    <input
+      checked=""
+      class="sc-gTRrQi fYYSjw"
+      disabled=""
+      type="checkbox"
+    />
+    <span
+      class="sc-bgqQcB fNGpeI"
+    />
+  </label>
+</DocumentFragment>
+`;
+
+exports[`SwitchButton SwitchButton is Disable 1`] = `
+<DocumentFragment>
+  <label
+    class="sc-ewnqHT byTfLr"
+  >
+    <input
+      class="sc-gTRrQi fYYSjw"
+      disabled=""
+      type="checkbox"
+    />
+    <span
+      class="sc-bgqQcB fNGpeI"
+    />
+  </label>
+</DocumentFragment>
+`;

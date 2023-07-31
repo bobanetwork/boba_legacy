@@ -4,19 +4,16 @@ import { DISABLE_VE_DAO, ROUTES_PATH } from "util/constant";
 
 import Bridge from "containers/bridge/Bridge";
 import Home from "containers/home/Home";
-import Projects from 'containers/ecosystem/Projects';
-import Ecosystem from 'containers/ecosystem/Ecosystem';
-import Wallet from 'containers/wallet/Wallet';
 import OldDao from 'containers/dao/OldDao';
 import History from 'containers/history/History';
 import EarnWrapper from 'containers/earn/EarnWrapper';
 import SaveWrapper from 'containers/save/SaveWrapper';
-import MonsterWrapper from 'containers/monster/MonsterWrapper';
 import { Navigate } from 'react-router-dom';
 import Lock from 'containers/veboba/Lock';
 import Vote from 'containers/VoteAndDao/Vote/Vote';
 import BobaScope from 'containers/bobaScope/BobaScope';
 import DevTools from 'containers/devtools/DevTools';
+import Bridging from 'containers/Bridging';
 
 export const COMMON_ROUTES = [
   {
@@ -43,13 +40,8 @@ export const ROUTE_LIST = [
     children: [
       {
         path: ROUTES_PATH.BRIDGE,
-        element: <Bridge />,
+        element: <Bridging />,
         key: 'Bridge',
-      },
-      {
-        path: ROUTES_PATH.WALLET,
-        element: <Wallet />,
-        key: 'Wallet',
       },
       {
         path: ROUTES_PATH.HISTORY,
@@ -83,22 +75,6 @@ export const ROUTE_LIST = [
         key: 'DAO',
         disable: !!Number(DISABLE_VE_DAO),
       },
-      {
-        path: ROUTES_PATH.MONSTER,
-        element: <MonsterWrapper />,
-        key: 'Monster',
-      },
-      {
-        path: ROUTES_PATH.ECOSYSTEM,
-        element: <Ecosystem />,
-        key: 'Ecosystem',
-        children: [
-          {
-            path: ':category',
-            element: <Projects />
-          }
-        ]
-      }
     ]
   }
 ]

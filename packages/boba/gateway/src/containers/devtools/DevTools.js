@@ -1,7 +1,6 @@
 import React from 'react'
 import {  useSelector } from 'react-redux'
 
-import {PageTitle} from 'components'
 import Connect from 'containers/connect/Connect'
 
 import { selectLayer, selectAccountEnabled } from 'selectors'
@@ -17,7 +16,6 @@ const DevTools = ({projectType}) => {
 
   return (
     <S.PageContainer>
-      <PageTitle title={'Dev Tools'} />
       <Connect
         userPrompt={'Please connect to Boba to enable all features'}
         accountEnabled={accountEnabled}

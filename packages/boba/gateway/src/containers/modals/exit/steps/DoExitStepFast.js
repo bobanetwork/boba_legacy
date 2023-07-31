@@ -21,7 +21,7 @@ import { depositL2LP } from 'actions/networkAction'
 import { openModal } from 'actions/uiAction'
 import { setCDMCompletion } from 'actions/transactionAction'
 
-import { 
+import {
   selectLoading,
   selectSignatureStatus_exitLP,
   selectLookupPrice,
@@ -44,9 +44,9 @@ import BridgeFee from 'components/bridgeFee/BridgeFee'
 
 import { amountToUsd, logAmount, toWei_String } from 'util/amountConvert'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { Box, Typography, useMediaQuery,useTheme } from '@mui/material'
+
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import BN from 'bignumber.js'
 

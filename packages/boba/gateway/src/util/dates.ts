@@ -94,3 +94,10 @@ type isBeforeDateType = (date: string | number | Date) => boolean
 export const isBeforeDate: isBeforeDateType = (date) => {
   return dayjs(date).isBefore(Now())
 }
+
+export const diffBetweenTimeStamp = (time1: number, time2: number) => {
+  const date1 = dayjs.unix(time1)
+  const date2 = dayjs.unix(time2)
+
+  return date1.diff(date2, 'seconds')
+}

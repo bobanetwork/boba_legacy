@@ -18,12 +18,12 @@
 
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { useTheme } from '@emotion/react';
-import { Box, FormControlLabel, Checkbox, Typography, useMediaQuery } from '@mui/material'
+
+import { Box, FormControlLabel, Checkbox, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { HelpOutline } from '@mui/icons-material'
 
-import { 
-  selectUserInfo, 
+import {
+  selectUserInfo,
   selectPoolInfo,
   selectlayer1Balance,
   selectlayer2Balance,
@@ -41,7 +41,6 @@ import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
 import Tooltip from 'components/tooltip/Tooltip';
 import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
-import {PageTitle} from 'components'
 
 import networkService from 'services/networkService'
 
@@ -100,10 +99,9 @@ function Earn() {
 
   const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP;
   const selectedNetworkConfig = lpChoice === 'L1LP' ? networkService?.networkConfig?.L1?.chainIdHex : networkService?.networkConfig?.L2?.chainIdHex;
-  
+
   return (
     <S.EarnPageContainer>
-      <PageTitle title={'Earn'} />
       <Connect
         userPrompt={'Connect to MetaMask to see your balances and contribute to the liquidity pool '}
         accountEnabled={accountEnabled}

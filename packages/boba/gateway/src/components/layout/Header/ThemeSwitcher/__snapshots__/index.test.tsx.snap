@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout => Header => ThemeSwitcher should match the snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-eAzDjm bfMTZ"
+    title="light-icon"
+  >
+    <div>
+      <div>
+        <div
+          data-src="theme-sun.svg"
+          src=""
+        />
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

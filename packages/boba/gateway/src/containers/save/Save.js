@@ -24,20 +24,19 @@ import { openAlert } from 'actions/uiAction'
 
 import * as S from './Save.styles'
 
-import { Box, Typography, Grid } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import { Circle } from '@mui/icons-material'
-import {PageTitle} from 'components'
 
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import Input from 'components/input/Input'
-import Button from 'components/button/Button'
 import ListSave from 'components/listSave/listSave'
 import Connect from 'containers/connect/Connect'
 
 import { toWei_String } from 'util/amountConvert'
 import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
-
+import {Typography} from 'components/global/typography'
+import { Button } from 'components/global/button'
 class Save extends React.Component {
 
   constructor(props) {
@@ -237,16 +236,69 @@ class Save extends React.Component {
 
     return (
       <S.StakePageContainer>
-
-        <PageTitle title={'Stake'} />
-
         <Connect
           userPrompt={'Please connect to Boba to stake'}
           accountEnabled={accountEnabled}
           connectToBoba={true}
           layer={netLayer}
         />
-
+        <Grid container spacing={1} sx={{ my: 2 }}>
+          <Grid item sm={6} xs={12}>
+            <S.BlockContainer>
+              <Grid
+                container
+                spacing={0}
+                sx={{ padding: '0px', gap: '30px 0px' }}
+              >
+                <Grid item sm={6} xs={12}>
+                  <Box>
+                    <Typography variant="head">Staked</Typography>
+                    <Typography variant="head">2.0024 BOBA</Typography>
+                  </Box>
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <Box>
+                    <Typography variant="head">Boba Balance</Typography>
+                    <Typography variant="head">9899.28 BOBA</Typography>
+                  </Box>
+                </Grid>
+                <Grid item sm={6} xs={12}>
+                  <Box>
+                    <Typography variant="head">APY</Typography>
+                    <Typography variant="head">5.22%</Typography>
+                  </Box>
+                </Grid>
+                <Grid container spacing={0} sm={12} xs={12}>
+                  <Grid item sm={6} xs={12}>
+                    <Button label="Stake" style={{ minWidth: 'auto' }} />
+                  </Grid>
+                  <Grid item sm={6} xs={12}>
+                    <Button label="Unstake" outline />
+                  </Grid>
+                </Grid>
+              </Grid>
+            </S.BlockContainer>
+          </Grid>
+          <Grid item sm={6} xs={12}>
+            <S.BlockContainer>
+              <Box>
+                <Typography variant="head">Staking Period</Typography>
+                <Typography variant="body3">
+                  Each staking period lasts 2 weeks. If you do not unstake after
+                  a staking period, your stake will be automatically renewed.
+                </Typography>
+              </Box>
+              <Box>
+                <Typography variant="head">Unstaking Window</Typography>
+                <Typography variant="body3">
+                  The first two days of every staking period, except for the
+                  first staking period, are the unstaking window. You can only
+                  unstake during the unstaking window.
+                </Typography>
+              </Box>
+            </S.BlockContainer>
+          </Grid>
+        </Grid>
         <Grid container spacing={1} sx={{ my: 2 }}>
           <Grid item sm={6} xs={12}>
             <S.StakeEarnContainer>
@@ -311,36 +363,16 @@ class Save extends React.Component {
               }
 
               { netLayer === 'L2' &&
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    onClick={() => {this.handleConfirm()}}
-                    loading={loading}
-                    disabled={!accountEnabled}
-                    fullWidth={true}
-                  >
-                    Stake
-                  </Button>
+                <Button 
+                  onClick={() => {this.handleConfirm()}}
+                  loading={loading}
+                  disabled={!accountEnabled}
+                  label="Stake"
+                />
+
               }
             </S.StakeInputContainer>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px', p: '24px' }} style={{lineHeight: '1.0em'}}>
-              <Box>
-                <Typography variant="body2">
-                  <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> STAKING PERIOD
-                </Typography>
-                <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  Each staking period lasts 2 weeks. If you do not unstake after a staking period, your stake will be automatically renewed.
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" >
-                  <Circle sx={{ height: "6px", color: '#BAE21A', mr: 1, width: "6px" }} /> UNSTAKING WINDOW
-                </Typography>
-                <Typography variant="body3" sx={{ opacity: 0.65 }}>
-                  The first two days of every staking period, except for the first staking period, are the unstaking window. You can only unstake during the unstaking window.
-                </Typography>
-              </Box>
-            </Box>
+
           </Grid>
           <Grid item sm={6} xs={12}>
             <S.StakeHeadContainer>

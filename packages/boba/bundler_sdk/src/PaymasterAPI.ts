@@ -1,4 +1,4 @@
-import { UserOperationStruct } from '@boba/accountabstraction'
+import { UserOperationStruct } from '@bobanetwork/accountabstraction'
 import { hexConcat, hexZeroPad } from 'ethers/lib/utils'
 
 export interface IPaymasterAPIConfig {

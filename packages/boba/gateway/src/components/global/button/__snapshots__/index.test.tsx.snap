@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Button Default Button 1`] = `
+<DocumentFragment>
+  <button
+    class="sc-bgqQcB dtFbmO"
+    type="button"
+  >
+     Test Button
+  </button>
+</DocumentFragment>
+`;
+
+exports[`Button Disable Button 1`] = `
+<DocumentFragment>
+  <button
+    class="sc-bgqQcB ggCAzm"
+    type="button"
+  >
+     Test Button
+  </button>
+</DocumentFragment>
+`;
+
+exports[`Button Loading Button 1`] = `
+<DocumentFragment>
+  <button
+    class="sc-bgqQcB rbfxr"
+    type="button"
+  >
+    <span
+      class="sc-gTRrQi daKBPn"
+    />
+     Test Button
+  </button>
+</DocumentFragment>
+`;
+
+exports[`Button Outline Button 1`] = `
+<DocumentFragment>
+  <button
+    class="sc-bgqQcB beNNKZ"
+    type="button"
+  >
+     Outline Button
+  </button>
+</DocumentFragment>
+`;
+
+exports[`Button Small Button 1`] = `
+<DocumentFragment>
+  <button
+    class="sc-bgqQcB hWWaYy"
+    type="button"
+  >
+     Test Button
+  </button>
+</DocumentFragment>
+`;

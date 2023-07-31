@@ -15,7 +15,7 @@ limitations under the License. */
 
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { isEqual,orderBy } from 'util/lodash';
+import { isEqual, orderBy } from 'util/lodash';
 
 
 import { useSelector } from 'react-redux'
@@ -25,21 +25,18 @@ import "react-datepicker/dist/react-datepicker.css"
 import { setActiveDataTab } from 'actions/uiAction'
 import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
-import { selectBaseEnabled, selectActiveDataTab,selectSevens, selectFastExits } from 'selectors'
+import { selectBaseEnabled, selectActiveDataTab, selectSevens, selectFastExits } from 'selectors'
 
 import Tabs from 'components/tabs/Tabs'
 import Input from 'components/input/Input'
-import { PageTitle }  from 'components'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'
 
-import * as styles from './Transactions.module.scss'
-import * as S from './History.styles'
-
 import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
+import { ContentContainer, Header, ScopePageContainer } from './History.styles';
 
 function BobaScope() {
 
@@ -63,7 +60,7 @@ function BobaScope() {
       dispatch(fetchSevens())
       dispatch(fetchFastExits())
     }
-  }, [dispatch, baseEnabled])
+  }, [ dispatch, baseEnabled ])
 
   useInterval(() => {
     if (baseEnabled) {
@@ -73,42 +70,43 @@ function BobaScope() {
   }, POLL_INTERVAL)
 
   return (
-    <S.ScopePageContainer>
-      <PageTitle title="Boba Scope" />
-      <S.Header>
-        <div className={styles.searchInput}>
+    <ScopePageContainer>
+      <Header>
+        <SearchInputContainer>
           <Input
             size='small'
             placeholder='Search by hash'
             value={searchData}
             onChange={i => { setSearchData(i.target.value) }}
-            className={styles.searchBar}
+            style={{
+              flex: 1,
+              marginBottom: 0,
+              minWidth: '250px',
+            }}
           />
-        </div>
-      </S.Header>
-      <div className={styles.data}>
-        <div className={styles.section}>
-          <Tabs
-            onClick={tab => { dispatch(setActiveDataTab(tab)) }}
-            activeTab={activeTab}
-            tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
-          />
+        </SearchInputContainer>
+      </Header>
+      <ContentContainer>
+        <Tabs
+          onClick={tab => { dispatch(setActiveDataTab(tab)) }}
+          activeTab={activeTab}
+          tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
+        />
 
-          {activeTab === 'Seven Day Queue' && (
-            <Sevens
-              searchData={searchData}
-              sevens={sevens}
-            />
-          )}
-          {activeTab === 'Fast Exits' && (
-            <FastExits
-              searchData={searchData}
-              data={fastExits}
-            />
-          )}
-        </div>
-      </div>
-    </S.ScopePageContainer>
+        {activeTab === 'Seven Day Queue' && (
+          <Sevens
+            searchData={searchData}
+            sevens={sevens}
+          />
+        )}
+        {activeTab === 'Fast Exits' && (
+          <FastExits
+            searchData={searchData}
+            data={fastExits}
+          />
+        )}
+      </ContentContainer>
+    </ScopePageContainer>
   );
 }
 

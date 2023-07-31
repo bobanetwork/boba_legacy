@@ -190,14 +190,14 @@ describe('GPODepositPaymaster', () => {
       gpoDepositPaymaster = await new TestTokenValueGPODepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, token.address, await token.decimals(), gasPriceOracle.address)
     })
     it('should return correct conversion', async () => {
-      await gasPriceOracle.updateFixedRetunValue(78125)
+      await gasPriceOracle.updateFixedReturnValue(78125)
       await gasPriceOracle.updateDecimals(1)
       const ethBoughtAmount = ethers.utils.parseEther('1')
       const requiredTokens = await gpoDepositPaymaster.getTokenValueOfEthTest(ethBoughtAmount)
       expect(requiredTokens).to.be.eq('7812500000000000000000')
     })
     it('should return correct conversion on different priceRatio decimals', async () => {
-      await gasPriceOracle.updateFixedRetunValue(7812500000)
+      await gasPriceOracle.updateFixedReturnValue(7812500000)
       await gasPriceOracle.updateDecimals(6)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')
@@ -212,7 +212,7 @@ describe('GPODepositPaymaster', () => {
 
       gpoDepositPaymaster = await new TestTokenValueGPODepositPaymaster__factory(ethersSigner).deploy(entryPoint.address, tokenAlt.address, await tokenAlt.decimals(), gasPriceOracle.address)
 
-      await gasPriceOracle.updateFixedRetunValue(78125)
+      await gasPriceOracle.updateFixedReturnValue(78125)
       await gasPriceOracle.updateDecimals(1)
 
       let ethBoughtAmount = ethers.utils.parseEther('1')

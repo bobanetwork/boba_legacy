@@ -25,12 +25,12 @@
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
+    "@hc/contracts": "^1.0.0",
     "@mui/material": "^5.6.1",
     "@testing-library/dom": "^8.13.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^14.1.0",
-    "@hc/contracts": "^1.0.0",
     "@uiw/react-textarea-code-editor": "^2.0.1",
     "@usedapp/core": "^0.12.9",
     "babel-plugin-macros": "^3.1.0",
@@ -51,10 +51,10 @@
     ]
   },
   "scripts": {
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "eject": "react-scripts eject",
     "ipfs": "yarn build && ipfs-deploy build/",
-    "start": "react-scripts start",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "test": "react-scripts test"
   },
   "devDependencies": {

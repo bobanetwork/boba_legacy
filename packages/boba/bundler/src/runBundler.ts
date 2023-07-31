@@ -3,7 +3,7 @@
 import fs from 'fs'
 
 import { Command } from 'commander'
-import { erc4337RuntimeVersion } from '@boba/bundler_utils'
+import { erc4337RuntimeVersion } from '@bobanetwork/bundler_utils'
 import { ethers, Wallet } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { BundlerServer } from './BundlerServer'
@@ -13,7 +13,7 @@ import {
   EntryPoint__factory,
   EntryPointWrapper,
   EntryPointWrapper__factory,
-} from '@boba/accountabstraction'
+} from '@bobanetwork/accountabstraction'
 import { BaseProvider } from '@ethersproject/providers'
 import { initServer } from './modules/initServer'
 import { DebugMethodHandler } from './DebugMethodHandler'

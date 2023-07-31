@@ -15,9 +15,9 @@ import {
 } from 'util/amountConvert'
 import { getCoinImage } from 'util/coinImage'
 
-import { Box, Typography, useMediaQuery } from '@mui/material'
-import { useTheme } from '@emotion/react'
-import { WrapperActionsModal } from 'components/modal/Modal.styles'
+import { Box, Typography, useMediaQuery, useTheme} from '@mui/material'
+
+import { WrapperActionsModal } from 'components/modal/styles'
 
 import BN from 'bignumber.js'
 import parse from 'html-react-parser'
@@ -40,9 +40,7 @@ function InputStepMultiChain({ handleClose, token, isBridge, openTokenPicker }) 
 
   const options = [
     { value: 'BNB', label: 'BNB', title: 'BNB', image: getImageComponent("BNB") },
-    { value: 'Avalanche', label: 'Avalanche', title: 'Avalanche', image: getImageComponent('AVAX') },
-    { value: 'Fantom', label: 'Fantom', title: 'Fantom', image: getImageComponent('FTM') },
-    { value: 'Moonbeam', label: 'Moonbeam', title: 'Moonbeam', image: getImageComponent('GLMR') },
+    { value: 'Avalanche', label: 'Avalanche', title: 'Avalanche', image: getImageComponent('AVAX') }
   ].filter(i => networkService.supportedAltL1Chains.includes(i.value))
 
   const dispatch = useDispatch()

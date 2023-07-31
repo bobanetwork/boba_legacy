@@ -20,7 +20,7 @@ export const TextFieldTag = styled(TextField)(({ ...props }) => ({
     "MozAppearance": "textfield"
   },
   '& .MuiInputBase-input': {
-    fontSize: '0.9em',
+    fontSize: '16px',
   },
 }));
 
