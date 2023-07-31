@@ -1,8 +1,8 @@
 import { css } from 'styled-components'
 
 const size = {
-  mobile: '640px',
-  tablet: '1024px',
+  mobile: '767px',
+  tablet: '980px',
   desktop: '1200px',
 }
 

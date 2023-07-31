@@ -1,7 +1,14 @@
 import styled, { css } from 'styled-components'
+import { mobile } from 'themes/screens'
 
 export const TabContainer = styled.div`
   display: flex;
+  ${mobile(css`
+    width: 110%;
+    overflow-x: auto;
+    margin: 10px 0px;
+    padding: 10px 50px 10px 25px;
+  `)}
 `
 
 export const TabItem = styled.div`
