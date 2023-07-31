@@ -31,6 +31,7 @@ import {
   NETWORK_L1_OPTIONS,
   NETWORK_L2_OPTIONS,
 } from './constants'
+
 import MagnifyingGlass from 'images/icons/magnifyingGlass.svg'
 
 import {
@@ -82,6 +83,7 @@ const History = () => {
   const theme: any = useTheme()
 
   const dispatch = useDispatch<any>()
+
   const now = new Date()
   const last_6months = new Date(
     now.getFullYear(),

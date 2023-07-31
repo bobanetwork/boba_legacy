@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 import { screen } from 'themes/screens'
-import DatePickerHook from 'react-datepicker'
+import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Svg, Typography } from 'components/global'
 
@@ -351,7 +351,7 @@ export const Actions = styled.div`
   }
 `
 
-export const DatePickerWrapper = styled(DatePickerHook)`
+export const DatePickerWrapper = styled(DatePicker)`
   width: 100%;
   position: relative;
   height: 44px;
