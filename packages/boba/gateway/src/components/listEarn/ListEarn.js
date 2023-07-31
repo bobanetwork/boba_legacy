@@ -1,65 +1,77 @@
-import React, { useEffect, useState } from 'react'
-import { connect, useDispatch  } from 'react-redux';
+import React from 'react';
+import { connect } from 'react-redux';
+import { isEqual } from 'util/lodash';
 
 import { logAmount, powAmount, formatLargeNumber } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
 import { openAlert, openModal } from 'actions/uiAction';
-import { Fade } from '@mui/material';
 
-import {
-  getEarnInfo,
-  updateStakeToken,
-  updateWithdrawToken,
-} from 'actions/earnAction'
+import { getEarnInfo, updateStakeToken, updateWithdrawToken } from 'actions/earnAction';
 
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import networkService from 'services/networkService'
 
-import * as S from "./ListEarn.styles"
+import { Box,Fade, CircularProgress } from '@mui/material';
+import * as S from "./styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
 
+import {AprLabel} from 'components/global/label'
+import {IconLabel} from 'components/global/IconLabel';
+import {TableContent} from 'components/global/table'
+
 import { Typography } from 'components/global/typography'
-import { AprLabel } from 'components/global/label'
-import { IconLabel } from 'components/global/IconLabel'
-import { TableContent } from 'components/global/table'
 import { Button } from 'components/global/button'
+
+import ActionIcon from 'images/icons/actions.svg'
+import { SvgContianer } from './styles'
 import { Svg } from 'components/global/svg'
-import DotsIcon from 'images/icons/actions.svg'
 
-const ListEarn = (props) => {
-  const {
-    poolInfo,
-    userInfo,
-    L1orL2Pool,
-    balance,
-    showAll,
-    showStakesOnly,
-    accountEnabled,
-    chainId
-  } = props;
+class ListEarn extends React.Component {
 
-  const [state, setState] = useState({
-    balance,
-    L1orL2Pool,
-    chainId,
-    poolInfo,
-    userInfo,
-    showAll,
-    showStakesOnly,
-    dropDownBox: false,
-    dropDownBoxInit: true,
-    loading: false,
-    accountEnabled,
-  });
+  constructor(props) {
 
-  const dispatch = useDispatch();
+    super(props)
 
-  useEffect(() => {
-    dispatch(getAllAddresses());
-  }, [dispatch]);
+    const {
+      poolInfo,
+      userInfo,
+      L1orL2Pool,
+      balance,
+      showAll,
+      showStakesOnly,
+      accountEnabled,
+      chainId
+    } = this.props;
 
-  useEffect(() => {
+    this.state = {
+      balance,
+      L1orL2Pool,
+      chainId,
+      // data
+      poolInfo,
+      userInfo,
+      showAll,
+      showStakesOnly,
+      //drop down box
+      dropDownBox: false,
+      dropDownBoxInit: true,
+      // loading
+      loading: false,
+      // provider status
+      accountEnabled,
+    }
+
+  }
+
+  componentDidMount() {
+    this.props.dispatch(getAllAddresses());
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { chainId, poolInfo, userInfo, balance, showAll, showStakesOnly, accountEnabled } = this.props;
     const config = {
       chainId,
       poolInfo,
@@ -71,259 +83,196 @@ const ListEarn = (props) => {
     };
 
     Object.keys(config).forEach(key => {
-      if (config[key] !== state[key]) {
-        setState((prevState) => ({
-          ...prevState,
-          [key]: config[key]
-        }));
+      if (!isEqual(prevProps[key], this.props[key])) {
+        this.setState({ [key]: this.props[key] });
       }
     });
-  }, [
-    chainId,
-    poolInfo,
-    userInfo,
-    balance,
-    showAll,
-    showStakesOnly,
-    accountEnabled,
-    state,
-  ])
+  }
 
-  const handleStakeToken = async () => {
-    const { poolInfo, L1orL2Pool, balance } = state;
-    const { allAddresses } = props.earn;
-    const updatedToken = {
+  async handleStakeToken() {
+
+    const { poolInfo, L1orL2Pool, balance } = this.state
+
+    const { allAddresses } = this.props.earn
+
+    this.props.dispatch(updateStakeToken({
       symbol: poolInfo.symbol,
-      currency:
-        L1orL2Pool === 'L1LP'
-          ? poolInfo.l1TokenAddress
-          : poolInfo.l2TokenAddress,
-      LPAddress:
-        L1orL2Pool === 'L1LP'
-          ? allAddresses.L1LPAddress
-          : allAddresses.L2LPAddress,
+      currency: L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
+      LPAddress: L1orL2Pool === 'L1LP' ? allAddresses.L1LPAddress : allAddresses.L2LPAddress,
       L1orL2Pool,
       balance,
-      decimals: poolInfo.decimals,
-    }
-    dispatch(updateStakeToken(updatedToken))
+      decimals: poolInfo.decimals
+    }))
 
-    dispatch(openModal('EarnDepositModal'));
-  };
+    this.props.dispatch(openModal('EarnDepositModal'))
+  }
 
+  async handleWithdrawToken() {
 
-  const handleWithdrawToken = async () => {
-    const { poolInfo, L1orL2Pool, balance } = state;
-    const { allAddresses } = props.earn;
-    const updatedToken = {
+    const { poolInfo, L1orL2Pool, balance } = this.state
+
+    const { allAddresses } = this.props.earn
+
+    this.props.dispatch(updateWithdrawToken({
       symbol: poolInfo.symbol,
-      currency:
-        L1orL2Pool === 'L1LP'
-          ? poolInfo.l1TokenAddress
-          : poolInfo.l2TokenAddress,
-      LPAddress:
-        L1orL2Pool === 'L1LP'
-          ? allAddresses.L1LPAddress
-          : allAddresses.L2LPAddress,
+      currency: L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
+      LPAddress: L1orL2Pool === 'L1LP' ? allAddresses.L1LPAddress : allAddresses.L2LPAddress,
       L1orL2Pool,
       balance,
-      decimals: poolInfo.decimals,
-    }
-    dispatch(updateWithdrawToken(updatedToken))
+      decimals: poolInfo.decimals
+    }))
 
-    dispatch(openModal('EarnWithdrawModal'));
-  };
+    this.props.dispatch(openModal('EarnWithdrawModal'))
+  }
 
-  const handleHarvest = async () => {
-    const { poolInfo, L1orL2Pool, userInfo } = state;
-    setState({ ...state, loading: true });
+  async handleHarvest() {
+
+    const { poolInfo, L1orL2Pool, userInfo } = this.state;
+
+    this.setState({ loading: true })
 
     const userReward = BigNumber.from(userInfo.pendingReward).add(
-        BigNumber.from(userInfo.amount)
-          .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
-          .div(BigNumber.from(powAmount(1, 12)))
-          .sub(BigNumber.from(userInfo.rewardDebt))
-      )
-    .toString()
-
-    const getRewardTX = await dispatch(
-      getReward(
-        L1orL2Pool === 'L1LP'
-          ? poolInfo.l1TokenAddress
-          : poolInfo.l2TokenAddress,
-        userReward,
-        L1orL2Pool
-      )
-    );
-
-    if (getRewardTX) {
-      dispatch(
-        openAlert(
-          `${logAmount(userReward, poolInfo.decimals, 2)} ${
-            poolInfo.symbol
-          } was added to your account`
-        )
-      )
-      dispatch(getEarnInfo());
-      setState({ ...state, loading: false });
-    } else {
-      setState({ ...state, loading: false });
-    }
-  };
-
-  const pageLoading = Object.keys(poolInfo).length === 0
-
-  let userReward = 0;
-
-  if (
-    Object.keys(userInfo).length &&
-    Object.keys(poolInfo).length &&
-    accountEnabled
-  ) {
-    userReward = BigNumber.from(userInfo.pendingReward).add(
-        BigNumber.from(userInfo.amount)
+      BigNumber.from(userInfo.amount)
         .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
         .div(BigNumber.from(powAmount(1, 12)))
         .sub(BigNumber.from(userInfo.rewardDebt))
     ).toString()
-  }
 
-  const disabled = !L1orL2Pool?.includes(networkService.L1orL2)
-  const symbol = poolInfo.symbol
-  const name = poolInfo.name
-  const decimals = poolInfo.decimals
-  const address =
-    L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress
+    let getRewardTX = await this.props.dispatch(getReward(
+      L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress,
+      userReward,
+      L1orL2Pool
+    ))
 
-  const formatNumber = (value, limit) => {
-    const limits = limit || 2;
-    return formatLargeNumber(Number(logAmount(value, decimals, limits)))
-  }
-
-  const tableOptions = [
-    {
-      content: (
-        <IconLabel token={{ name, symbol, address, chainId, decimals }} />
-      ),
-      width: 225,
-    },
-    {
-      content: (
-        <Typography variant="body2">
-          {' '}
-          {formatNumber(poolInfo.tokenBalance)}
-        </Typography>
-      ),
-      width: 145,
-    },
-    {
-      content: (
-        <Typography variant="body2">
-          {' '}
-          {formatNumber(poolInfo.userDepositAmount)}{' '}
-        </Typography>
-      ),
-      width: 115,
-    },
-    {
-      content: <AprLabel>{`${logAmount(poolInfo.APR, 0, 2)}`}</AprLabel>,
-      width: 85,
-    },
-    {
-      content: (
-        <Typography variant="body2">
-          {userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`}
-        </Typography>
-      ),
-      width: 90,
-    },
-    {
-      content: (
-        <>
-          <Typography variant="body2">
-            {userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}
-          </Typography>
-      </>),
-      width:110
-    },
-    {
-      content: (
-        <S.SvgContianer>
-          <Svg src={DotsIcon} />
-        </S.SvgContianer>
-      ),
-      width:75
+    if (getRewardTX) {
+      this.props.dispatch(openAlert(`${logAmount(userReward, poolInfo.decimals, 2)} ${poolInfo.symbol} was added to your account`))
+      this.props.dispatch(getEarnInfo())
+      this.setState({ loading: false })
+    } else {
+      this.setState({ loading: false })
     }
-  ];
 
-  if (showAll === false) {
-    if (Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
-      return null
+  }
+
+
+
+  render() {
+    const {
+      poolInfo, userInfo,
+      dropDownBox, showAll, showStakesOnly,
+      loading, L1orL2Pool, accountEnabled,
+      chainId,
+    } = this.state;
+
+    const pageLoading = Object.keys(poolInfo).length === 0;
+
+    let userReward = 0;
+
+    if (Object.keys(userInfo).length && Object.keys(poolInfo).length && accountEnabled) {
+      userReward = BigNumber.from(userInfo.pendingReward).add(
+        BigNumber.from(userInfo.amount)
+          .mul(BigNumber.from(poolInfo.accUserRewardPerShare))
+          .div(BigNumber.from(powAmount(1, 12)))
+          .sub(BigNumber.from(userInfo.rewardDebt))
+      ).toString()
     }
-  }
 
-  if (showStakesOnly === true) {
-    if (Number(logAmount(userInfo.amount, decimals, 2)) < 0.001) {
-      return null
+    const disabled = !L1orL2Pool.includes(networkService.L1orL2)
+    const symbol = poolInfo.symbol
+    const name = poolInfo.name
+    const decimals = poolInfo.decimals
+    const address = L1orL2Pool === 'L1LP' ? poolInfo.l1TokenAddress : poolInfo.l2TokenAddress;
+
+
+
+    const formatNumber = (value,limit) => {
+      const limits = limit || 2;
+      return formatLargeNumber(Number(logAmount(value, decimals, limits)))
     }
-  }
 
-  let enableReward = false
-  if (Number(logAmount(userReward, decimals, 3)) >= 0.001) {
-    enableReward = true
-  }
-
-  return (
-    <S.Wrapper
-      onClick={() => {
-        setState({ dropDownBox: !state.dropDownBox, dropDownBoxInit: false }) }
+    const tableOptions = [
+      { content: <IconLabel token={{ name, symbol, address, chainId, decimals }} />, width:225 },
+      { content: <Typography variant="body2"> {formatNumber(poolInfo.tokenBalance)}</Typography>,width:145 },
+      { content: <Typography variant="body2"> {formatNumber(poolInfo.userDepositAmount)} </Typography>,width:115 },
+      { content: <AprLabel>{`${logAmount(poolInfo.APR, 0, 2)}`}</AprLabel>, width:85 },
+      { content: <Typography variant="body2"> {userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`}</Typography>, width:90 },
+      { content: <Typography variant="body2">{ userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}</Typography>
+         ,
+        width:110
+      },
+      {
+        content: (
+          <SvgContianer>
+            <Svg src={ActionIcon} />
+          </SvgContianer>
+        ),
+        width:75
       }
-    >
+    ];
 
-      <TableContent options={tableOptions} mobileOptions={[0,3]}/>
-      {state.dropDownBox ? (
-        <Fade in={state.dropDownBox}>
-          <S.DropdownContent>
-            <S.DropdownWrapper>
-              <>
+    if (showAll === false) {
+      if (Number(logAmount(poolInfo.tokenBalance, decimals, 2)) > 0.001) {
+        return null
+      }
+    }
+
+    if (showStakesOnly === true) {
+      if (Number(logAmount(userInfo.amount, decimals, 2)) < 0.001) {
+        return null
+      }
+    }
+
+    let enableReward = false
+    if (Number(logAmount(userReward, decimals, 3)) >= 0.001) {
+      enableReward = true
+    }
+
+    return (
+      <S.Wrapper
+        onClick={() => {
+          this.setState({ dropDownBox: !dropDownBox, dropDownBoxInit: false }) }
+        }
+      >
+        {pageLoading ? (
+          <Box sx={{ textAlign: 'center' }}>
+            <CircularProgress color="secondary" />
+          </Box>
+        ) : (
+          <TableContent options={tableOptions} mobileOptions={[0,3]}/>
+        )}
+
+
+        {dropDownBox ? (
+          <Fade in={dropDownBox}>
+            <S.DropdownContent>
+              <S.DropdownWrapper>
                 <Button
-                  onClick={() => {
-                    handleStakeToken()
-                  }}
                   disabled={disabled}
+                  onClick={() => {
+                    !disabled && this.handleStakeToken()
+                  }}
                   label="Stake"
                 />
-
                 <Button
                   disabled={
                     logAmount(userReward, decimals) === '0' ||
                     disabled ||
                     !enableReward
                   }
-                  onClick={() => {
-                    handleHarvest()
-                  }}
-                  loading={state.loading}
+                  onClick={() => { this.handleHarvest() }}
+                  loading={loading}
                   label="Harvest"
                 />
+                <Button disabled={disabled} onClick={() => { !disabled && this.handleWithdrawToken() }} label="Unstake" />
+              </S.DropdownWrapper>
+            </S.DropdownContent>
+          </Fade>
+        ) : null}
 
-                <Button
-                  disabled={disabled}
-                  onClick={() => {
-                    !disabled && handleWithdrawToken()
-                  }}
-                  label="Unstake"
-                />
-              </>
-            </S.DropdownWrapper>
-          </S.DropdownContent>
-        </Fade>
-      ) : null}
-
-    </S.Wrapper>
-  )
+      </S.Wrapper>
+    )
+  }
 }
-
 
 const mapStateToProps = state => ({
   earn: state.earn,

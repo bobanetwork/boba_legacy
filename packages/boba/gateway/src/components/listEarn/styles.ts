@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components'
 
 export const Wrapper = styled.div`
   cursor: pointer;
@@ -9,11 +9,11 @@ export const Wrapper = styled.div`
   &:hover {
     background: ${(props) => props.theme.colors.gray[300]};
   }
-`;
+`
 
 export const DropdownWrapper = styled.div`
   display: flex;
-  flex-direction:column;
+  flex-direction: column;
   gap: 5px;
   width: 100%;
   padding: 10px;
@@ -40,11 +40,11 @@ export const DropdownWrapper = styled.div`
       ? css`
           background: ${colors.gray[50]};
           border: 1px solid ${colors.gray[400]};
-          color:${colors.gray[800]};
+          color: ${colors.gray[800]};
           box-shadow: 2px 2px 25px 0px rgba(0, 0, 0, 0.25);
           backdrop-filter: blur(7.5px);
           button {
-            color:${colors.gray[800]};
+            color: ${colors.gray[800]};
             &:hover {
               background: ${colors.gray[400]};
               color: ${colors.gray[800]};
@@ -53,11 +53,11 @@ export const DropdownWrapper = styled.div`
         `
       : css`
           background: ${colors.gray[500]};
-          border:1px solid ${colors.gray[400]};
-          color:${colors.gray[100]};
+          border: 1px solid ${colors.gray[400]};
+          color: ${colors.gray[100]};
           box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.15);
           button {
-            color:${colors.gray[300]};
+            color: ${colors.gray[300]};
             &:hover {
               background: ${colors.gray[400]};
               color: ${colors.gray[100]};

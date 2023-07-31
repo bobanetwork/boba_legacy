@@ -9,16 +9,25 @@ import {
   getEarnInfo,
 } from 'actions/earnAction'
 
-import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
-import Input from 'components/input/Input'
 import { logAmount, toWei_String } from 'util/amountConvert'
 
-import { Typography } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/styles'
 
 import BN from 'bignumber.js'
 import { withdrawLiquidity } from 'actions/networkAction'
+
+import { MaxInput } from 'components/global/InputMax'
+import { Button } from 'components/global/button'
+import { ModalTypography } from 'components/global/modalTypography'
+
+import {
+  EarnInputContainer,
+  EarnContent,
+  Flex,
+  EarnDetails,
+  ContainerMessage,
+} from './styles'
 
 class EarnWithdrawModal extends React.Component {
 
@@ -203,59 +212,58 @@ class EarnWithdrawModal extends React.Component {
         open={open}
         onClose={()=>{this.handleClose()}}
         maxWidth="md"
+        title={`Withdraw ${withdrawToken.symbol}`}
+
       >
+        <EarnInputContainer>
+          <EarnContent>
+            <Flex>
+              <div>
+                <ModalTypography variant="body2">Amount</ModalTypography>
+              </div>
+              <div>
+                <ModalTypography variant="body3">
+                  Balance: {maxValue} {withdrawToken.symbol}
+                </ModalTypography>
+              </div>
+            </Flex>
+            <MaxInput
+              initialValue={value}
+              max={maxValue_Wei_String}
+              onValueChange={(val) =>
+                this.setAmount(val, toWei_String(val, withdrawToken.decimals))
+              }
+            />
+            {Number(value) > Number(LPBalance) &&
+              <ContainerMessage>
+                  <ModalTypography variant="body3">
+                  Insufficient {withdrawToken.symbol} in the {' '}
+                  {withdrawToken.L1orL2Pool === 'L1LP' ? 'L1' : 'L2'} liquidity
+                  pool to withdraw your full stake. At this time, you can only
+                  withdraw up to
+                  {Number(LPBalance).toFixed(2)} {withdrawToken.symbol}.
+                </ModalTypography>
+              </ContainerMessage>
+            }
 
-        <Typography variant="h2" sx={{fontWeight: 700, mb: 3}}>
-          Withdraw {`${withdrawToken.symbol}`}
-        </Typography>
 
-        <Input
-          placeholder={`Amount to withdraw`}
-          value={value}
-          type="number"
-          unit={withdrawToken.symbol}
-          maxValue={maxValue}
-          onChange={(i)=>{
-            this.setAmount(i.target.value, toWei_String(i.target.value, withdrawToken.decimals))
-          }}
-          allowUseAll={true}
-          onUseMax={(i)=>{
-            this.setAmount(maxValue, maxValue_Wei_String)
-          }}
-          disabledSelect={true}
-          variant="standard"
-          newStyle
-        />
+            <WrapperActionsModal>
+              <Button
+                onClick={()=>{this.handleConfirm()}}
+                label="Confirm"
+                loading={loading}
+                disable={!!disableSubmit}
 
-        {Number(value) > Number(LPBalance) &&
-          <Typography variant="body2" sx={{mt: 2}}>
-            Insufficient {withdrawToken.symbol} in the {' '}
-            {withdrawToken.L1orL2Pool === 'L1LP' ? 'L1' : 'L2'} liquidity pool
-            to withdraw your full stake. At this time, you can only withdraw up to
-            {Number(LPBalance).toFixed(2)} {withdrawToken.symbol}.
-          </Typography>
-        }
+              />
+              <Button
+                onClick={() => { this.handleClose() }}
+                label="Cancel"
+                transparent
+              />
 
-        <WrapperActionsModal>
-          <Button
-            onClick={()=>{this.handleClose()}}
-            variant="outlined"
-            color='primary'
-            size='large'
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={()=>{this.handleConfirm()}}
-            color='primary'
-            size="large"
-            variant="contained"
-            disabled={!!disableSubmit}
-            loading={loading}
-          >
-            Confirm
-          </Button>
-        </WrapperActionsModal>
+            </WrapperActionsModal>
+          </EarnContent>
+        </EarnInputContainer>
       </Modal>
     )
   }

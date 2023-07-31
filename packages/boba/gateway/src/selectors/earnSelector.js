@@ -13,12 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export const selectPoolInfo = () => (state) => state.earn.poolInfo
+export function selectPoolInfo () {
+     return function (state) {
+       return state.earn.poolInfo
+     }
+   }
 
-export const selectUserInfo = () => (state) => state.earn.userInfo
-export const selectApprovedAllowance = () => (state) => state.earn.approvedAllowance
-export const selectStakeToken = () => (state) => state.earn.stakeToken
-
-export const selectEarn = () => (state) => state.earn
-
-
+   export function selectUserInfo () {
+     return function (state) {
+       return state.earn.userInfo
+     }
+   }
