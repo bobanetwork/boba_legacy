@@ -124,14 +124,16 @@ const Save = () => {
   }
   return (
     <S.StakePageContainer>
-      <Connect
-        userPrompt={'Please connect to Boba to stake'}
-        accountEnabled={accountEnabled}
-        connectToBoba={true}
-        layer={netLayer}
-      />
+      <S.PaddingContainer>
+        <Connect
+          userPrompt={'Please connect to Boba to stake'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
+      </S.PaddingContainer>
       <S.GridContainer>
-        <div>
+        <S.PaddingContainer>
           <S.BlockContainer>
             <S.Flex>
               <div>
@@ -160,8 +162,8 @@ const Save = () => {
               />
             </div>
           </S.BlockContainer>
-        </div>
-        <div>
+        </S.PaddingContainer>
+        <S.PaddingContainer>
           <S.BlockContainer>
             <div>
               <Typography variant="head">Staking Period</Typography>
@@ -182,27 +184,33 @@ const Save = () => {
               </ModalTypography>
             </div>
           </S.BlockContainer>
-        </div>
+        </S.PaddingContainer>
       </S.GridContainer>
       <div>
         <div>
-          <S.TitleContainer>
-            <Typography variant="head">Staking History</Typography>
-          </S.TitleContainer>
-          {!stakeInfo || !Object.keys(stakeInfo).length ? (
-            <Loader />
-          ) : (
-            <>
-              <S.StakeItemContainer>
-                {Object.keys(stakeInfo).map((v, i) => {
-                  if (stakeInfo[i].isActive) {
-                    return <TransactionList stakeInfo={stakeInfo[i]} key={i} />
-                  }
-                  return null
-                })}
-              </S.StakeItemContainer>
-            </>
-          )}
+          <S.PaddingContainer>
+            <S.TitleContainer>
+              <Typography variant="head">Staking History</Typography>
+            </S.TitleContainer>
+          </S.PaddingContainer>
+          <S.MobileTableContainer>
+            {!stakeInfo || !Object.keys(stakeInfo).length ? (
+              <Loader />
+            ) : (
+              <>
+                <S.StakeItemContainer>
+                  {Object.keys(stakeInfo).map((v, i) => {
+                    if (stakeInfo[i].isActive) {
+                      return (
+                        <TransactionList stakeInfo={stakeInfo[i]} key={i} />
+                      )
+                    }
+                    return null
+                  })}
+                </S.StakeItemContainer>
+              </>
+            )}
+          </S.MobileTableContainer>
         </div>
       </div>
     </S.StakePageContainer>

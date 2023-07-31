@@ -33,11 +33,7 @@ export const StakeItemDetails = styled.div`
   padding: 20px 35px;
   border-radius: 8px;
   ${sdesktop(css`
-    flex-direction: column;
-    position: relative;
-  `)}
-  ${mobile(css`
-    flex-direction: column;
+    width: 1024px;
   `)}
   > div {
     display: flex;
@@ -48,54 +44,23 @@ export const StakeItemDetails = styled.div`
       margin-left: 0px;
       width: 200px;
       margin-right: 10px;
-      ${sdesktop(css`
-        width: 100%;
-      `)}
     }
     &:last-of-type {
       margin-right: 0px;
       margin-left: 15px;
-      ${sdesktop(css`
-        position: absolute;
-        right: 20px;
-        top: 35px;
-      `)}
-      ${tablet(css`
-        top: 40px;
-      `)}
-      ${mobile(css`
-        position: relative;
-        top: auto;
-        right: auto;
-      `)}
     }
   }
 `
+
 export const Flex = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 0px 10px;
-  ${sdesktop(css`
-    width: 100%;
-    padding: 15px 150px 0px 0px;
-  `)}
-  ${mobile(css`
-    width: 100%;
-    flex-direction: column;
-    padding: 15px 0px;
-  `)}
+
   > div {
     display: flex;
     gap: 0px 5px;
     white-space: initial;
-    ${tablet(css`
-      flex-direction: column;
-    `)}
-    ${mobile(css`
-      width: 100%;
-      flex-direction: row;
-      justify-content: space-between;
-    `)}
   }
 `
 export const Token = styled.img`

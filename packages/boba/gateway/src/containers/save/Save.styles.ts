@@ -11,6 +11,9 @@ export const StakePageContainer = styled.div`
   padding: 0px 10px 50px 10px;
   width: 100%;
   max-width: 1024px;
+  ${sdesktop(css`
+    padding: 0px 0px 50px 0px;
+  `)}
 `
 
 export const StakeEarnContainer = styled.div`
@@ -65,6 +68,11 @@ export const StakeItemContainer = styled.div`
   flex-direction: column;
   width: 100%;
   gap: 20px 0px;
+  ${sdesktop(css`
+    overflow-x: auto;
+    align-items: flex-start;
+    padding-right: 25px;
+  `)}
 `
 
 export const StakeItem = styled.div`
@@ -133,6 +141,15 @@ export const BlockContainer = styled.div`
   ${mobile(css`
     flex-direction: column !important;
   `)}
+   > div {
+    ${mobile(css``)}
+    button {
+      ${mobile(css`
+        width: 100%;
+        border-radius: 8px;
+      `)}
+    }
+  }
 `
 
 export const GridContainer = styled.div`
@@ -142,12 +159,23 @@ export const GridContainer = styled.div`
     flex-direction: column;
     gap: 35px 0px;
   `)}
+  ${mobile(css`
+    flex-direction: column-reverse;
+  `)}
   > div {
     width: 100%;
     &:first-of-type {
       max-width: 445px;
       ${sdesktop(css`
         max-width: 100%;
+      `)}
+    }
+    &:last-of-type {
+      ${mobile(css`
+        > div {
+          background: transparent;
+          border: 0px;
+        }
       `)}
     }
   }
@@ -164,4 +192,17 @@ export const Flex = styled.div`
 
 export const TitleContainer = styled.div`
   padding: 25px 0px;
+`
+
+export const PaddingContainer = styled.div`
+  padding: 0px;
+  ${sdesktop(css`
+    padding: 0px 15px;
+  `)}
+`
+
+export const MobileTableContainer = styled.div`
+  ${sdesktop(css`
+    padding-left: 15px;
+  `)}
 `
