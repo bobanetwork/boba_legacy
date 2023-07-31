@@ -20,9 +20,7 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
     stakeInfo,
   })
 
-  useEffect(() => {
-    setTransactionListState({ stakeInfo })
-  }, [stakeInfo])
+  console.log(stakeInfo)
 
   const handleUnstake = async () => {
     const { stakeInfo } = TransactionListState
@@ -36,22 +34,30 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
     }
   }
 
-  const timeDeposit = dayjs.unix(
-    TransactionListState.stakeInfo.depositTimestamp
-  )
+  const timeDeposit = dayjs.unix(stakeInfo.depositTimestamp)
   const timeNow = dayjs()
 
   const duration_Days = timeNow.diff(timeDeposit, 'day')
-  const earned =
-    TransactionListState.stakeInfo.depositAmount *
-    (0.05 / 365.0) *
-    duration_Days
+  const earned = stakeInfo.depositAmount * (0.05 / 365.0) * duration_Days
 
-  const unlocktimeNextBegin = timeNow.add(14, 'day')
+  const unlocktimeNextBegin = timeDeposit.add(14, 'day')
 
   const unlocktimeNextEnd = unlocktimeNextBegin.add(2, 'day')
 
-  const locked = duration_Days <= 14
+  /* finalize the migration to DAYJs next deploy*/
+  const timeDeposit_S = stakeInfo.depositTimestamp
+  const timeNow_S = Math.round(Date.now() / 1000)
+
+  const duration_S = timeNow_S - timeDeposit_S
+
+  const twoWeeks = 14 * 24 * 60 * 60
+  const twoDays = 2 * 24 * 60 * 60
+  const residual_S = duration_S % (twoWeeks + twoDays)
+
+  let locked = true
+  if (residual_S > twoWeeks) {
+    locked = false
+  }
 
   return (
     <StakeItemDetails>
@@ -66,13 +72,10 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
       <div>
         <ModalTypography variant="body2">Amount Staked </ModalTypography>
         <Typography variant="body2">
-          {TransactionListState.stakeInfo.depositAmount
-            ? `${TransactionListState.stakeInfo.depositAmount.toLocaleString(
-                undefined,
-                {
-                  maximumFractionDigits: 2,
-                }
-              )}`
+          {stakeInfo.depositAmount
+            ? `${stakeInfo.depositAmount.toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+              })}`
             : `0`}
         </Typography>
       </div>
