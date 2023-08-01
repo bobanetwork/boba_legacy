@@ -1,6 +1,6 @@
 import styled, { css, keyframes } from 'styled-components'
 
-const pulseAnimation = keyframes`
+const pulseLightAnimation = keyframes`
   0% {
     background-color: rgba(255,255,255,0.1);
   }
@@ -8,13 +8,29 @@ const pulseAnimation = keyframes`
     background-color: rgba(255,255,255,0.2);
   }
 `
+
+const pulseDarkAnimation = keyframes`
+  0% {
+    background-color: rgba(0,0,0,0.1);
+  }
+  100% {
+    background-color: rgba(0,0,0,0.2);
+  }
+`
+
 const BasePreloader = styled.div`
   height: 22px;
   background: rgba(255, 255, 255, 0.2);
-  animation: ${css`
-    ${pulseAnimation} 0.65s infinite alternate
-  `};
-
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      animation: ${pulseDarkAnimation} 0.65s infinite alternate;
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      animation: ${pulseLightAnimation} 0.65s infinite alternate;
+    `}
   width: 100%;
 `
 export const Number = styled(BasePreloader)`

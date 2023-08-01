@@ -3,10 +3,10 @@
 exports[`NotificationBanner  should match snapshot and check show banner when open set to true 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bgqQcB fPlmlQ open "
+    class="sc-bgqQcB jRFBEO open "
   >
     <div
-      class="sc-gTRrQi hKOjqS"
+      class="sc-gTRrQi hipVoW"
       data-testid="message"
     >
       Alert message goes here
@@ -24,10 +24,10 @@ exports[`NotificationBanner  should match snapshot and check show banner when op
 exports[`NotificationBanner  should match snapshot without message 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bgqQcB fPlmlQ open "
+    class="sc-bgqQcB jRFBEO open "
   >
     <div
-      class="sc-gTRrQi hKOjqS"
+      class="sc-gTRrQi hipVoW"
       data-testid="message"
     >
       Alert message goes here

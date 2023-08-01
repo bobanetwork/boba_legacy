@@ -146,7 +146,9 @@ const OldDao = () => {
               }}
             >
               <Box sx={{ padding: '5px', gap: '10px 0px' }}>
-                <Typography variant="body3" style={{ opacity: '0.5' }}>BOBA:</Typography>
+                <Typography variant="body3" style={{ opacity: '0.5' }}>
+                  BOBA:
+                </Typography>
                 <Typography
                   variant="head"
                   style={{ color: 'rgba(144, 180, 6, 1)' }}
@@ -156,7 +158,9 @@ const OldDao = () => {
               </Box>
               <S.VerticalDivisor />
               <Box sx={{ padding: '5px' }}>
-                <Typography variant="body3" style={{ opacity: '0.5' }}>xBOBA:</Typography>
+                <Typography variant="body3" style={{ opacity: '0.5' }}>
+                  xBOBA:
+                </Typography>
                 <Typography
                   variant="head"
                   style={{ color: 'rgba(144, 180, 6, 1)' }}

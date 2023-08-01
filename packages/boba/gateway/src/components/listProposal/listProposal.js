@@ -124,11 +124,7 @@ const ListProposal = ({ proposal }) => {
         alignItems="center"
       >
         <S.GridItemTag item xs={12} md={12}>
-          <Box
-            display="flex"
-            alignItems="center"
-            sx={{ width: '100%', cursor: 'pointer' }}
-          >
+          <S.ItemHeaderContainer>
             <Typography
               variant="body2"
               component="span"
@@ -150,7 +146,7 @@ const ListProposal = ({ proposal }) => {
             >
               <Svg src={Arrow} fill="#fff"/>
             </Box>
-          </Box>
+          </S.ItemHeaderContainer>
         </S.GridItemTag>
         <Box
           sx={{

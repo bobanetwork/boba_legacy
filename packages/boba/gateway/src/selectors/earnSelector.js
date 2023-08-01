@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 export function selectPoolInfo () {
-  return function (state) {
-    return state.earn.poolInfo
-  }
-}
+     return function (state) {
+       return state.earn.poolInfo
+     }
+   }
 
-export function selectUserInfo () {
-  return function (state) {
-    return state.earn.userInfo
-  }
-}
+   export function selectUserInfo () {
+     return function (state) {
+       return state.earn.userInfo
+     }
+   }
