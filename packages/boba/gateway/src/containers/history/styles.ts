@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { screen } from 'themes/screens'
+import { screen, sdesktop } from 'themes/screens'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Svg, Typography } from 'components/global'
@@ -15,6 +15,7 @@ import {
   OptionsHeader,
   Icon as DropdownIcon,
 } from 'components/global/dropdown/styles'
+
 import { Dropdown } from 'components/global/dropdown/'
 
 export const DefaultIcon = styled.div`
@@ -40,21 +41,8 @@ export const HistoryPageContainer = styled.div`
   justify-content: space-around;
   padding: 10px;
   padding-top: 0;
-  width: 70%;
-  min-width: 800px;
-  max-width: 1040px;
-  @media ${screen.laptop} {
-    width: 90%;
-    padding: 0px;
-  }
-  @media ${screen.tablet} {
-    width: 90%;
-    padding: 0px;
-  }
-  @media ${screen.mobile} {
-    width: 100%;
-    padding: 0px;
-  }
+  width: 100%;
+  max-width: 1024px;
 `
 
 export const TableHeader = styled.div`
@@ -80,6 +68,14 @@ export const TableFilters = styled.div`
   @media ${screen.tablet} {
     margin-bottom: 5px;
     gap: 20px;
+    padding: 10px;
+  }
+  @media ${screen.mobile} {
+    gap: 10px;
+    margin-bottom: 0px;
+    p {
+      font-size: 12px;
+    }
   }
 `
 
@@ -93,18 +89,21 @@ export const NetworkDropdowns = styled.div`
   align-items: center;
   @media ${screen.mobile} {
     font-size: 12px;
+    gap: 0px 5px;
   }
 `
 export const TransactionsTableWrapper = styled.div`
-  overflow-x: scroll;
   width: 100%;
 `
 
 export const TransactionsWrapper = styled.div`
-  width: 100%;
+  width: 1024px;
   overflow-y: auto;
-  overflow-x: unset;
   max-height: 512px;
+  ${sdesktop(css`
+    width: 750px;
+    gap: 0px 30px;
+  `)}
   ::-webkit-scrollbar-corner {
     background: none;
   }
@@ -209,9 +208,6 @@ export const TransactionToken = styled.div`
   width: 90px;
   text-align: left;
   font-size: 14px;
-  @media ${screen.mobile} {
-    font-size: 10px;
-  }
 `
 
 export const TransactionAmount = styled.div`
@@ -299,7 +295,7 @@ export const Table = styled.div`
     gap: 10px;
   }
   @media ${screen.tablet} {
-    marginbottom: '5px';
+    margin-bottom: '5px';
     padding-bottom: 0px;
   }
 `
@@ -314,6 +310,7 @@ export const NoHistory = styled.div`
   padding: 20px;
   font-size: 16px;
   gap: 10px;
+
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -345,9 +342,15 @@ export const Actions = styled.div`
   align-items: center;
   white-space: nowrap;
   gap: 0px 20px;
+
+  .react-datepicker__tab-loop {
+    margin: 0px -10px;
+  }
   @media ${screen.mobile} {
     justify-content: flex-start;
-    margin-left: 20px;
+    margin-right: 0px;
+    margin-left: auto;
+    gap: 0px 10px;
   }
 `
 
@@ -356,13 +359,17 @@ export const DatePickerWrapper = styled(DatePicker)`
   position: relative;
   height: 44px;
   margin: 0px;
-  padding: 15px 20px;
+  padding: 15px;
   border-radius: 12px;
-  text-align: center;
+  text-align: left;
   font-size: ${(props) => props.theme.text.body1};
   color: inherit;
   border: 1px solid ${(props) => props.theme.colors.box.border};
   outline: none;
+  max-width: 115px;
+  + div {
+    margin: 0px -15px;
+  }
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -378,10 +385,11 @@ export const DatePickerWrapper = styled(DatePicker)`
   }
   @media ${screen.mobile} {
     min-width: 40px;
-    width: 100px;
+    width: 75px;
     height: 30px;
-    padding: 3px 4px;
-    font-size: 10px;
+    font-size: 11px;
+    padding: 15px 5px;
+    text-align: center;
   }
 `
 
@@ -454,7 +462,7 @@ export const Input = styled.input`
     `}
   @media ${screen.mobile} {
     width: 120px;
-    font-size: 10px;
+    font-size: 12px;
   }
 `
 
@@ -514,13 +522,18 @@ export const DropdownNetwork = styled(Dropdown)`
       }
       ${Arrow} {
         width: 11px;
+        @media ${screen.mobile} {
+          display: flex;
+          align-items: center;
+        }
       }
     }
     @media ${screen.mobile} {
-      width: 154px;
-      padding: 3px 12px;
+      width: 120px;
+      padding: 3px 5px;
+      white-space: nowrap;
       div {
-        font-size: 10px;
+        font-size: 12px;
       }
     }
   }
@@ -685,4 +698,11 @@ export const DropdownNetwork = styled(Dropdown)`
         `};
     }
   }
+`
+
+export const TableTransactionsContainer = styled.div`
+  width: 100%;
+  ${sdesktop(css`
+    overflow-x: auto;
+  `)}
 `

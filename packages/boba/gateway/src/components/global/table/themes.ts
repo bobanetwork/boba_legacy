@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components'
 import { TableHeader, TableContent } from 'components/global/table'
 import { Svg } from 'components/global/svg'
 import { TableRow } from './styles'
-
+import { sdesktop } from 'themes/screens'
 export const TransactionsTableHeader = styled(TableHeader)`
   padding: 8px 24px 4px 24px;
   background: none;
@@ -29,6 +29,9 @@ export const TransactionsTableHeader = styled(TableHeader)`
       font-size: 12px;
     }
   }
+  ${sdesktop(css`
+    width: 750px;
+  `)}
 `
 
 export const TransactionsTableContent = styled(TableContent)`

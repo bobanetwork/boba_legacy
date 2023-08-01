@@ -58,6 +58,7 @@ import {
   MobileDateDescriptions,
   IconContainer,
   DropdownNetwork,
+  TableTransactionsContainer,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
@@ -73,6 +74,8 @@ import { FilterDropDown } from 'components/filter'
 import noHistoryIcon from 'images/noHistory.svg'
 import switchButton from 'images/icons/switchButton.svg'
 import { Svg } from 'components/global/svg'
+
+import { Typography } from 'components/global/typography'
 
 const History = () => {
   const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
@@ -195,7 +198,7 @@ const History = () => {
                 }}
               >
                 <NetworkDropdowns>
-                  <div style={{ fontSize: '16px' }}>From</div>
+                  <Typography variant="body2">From</Typography>
                   <DropdownNetwork
                     items={switched ? NETWORK_L2_OPTIONS : NETWORK_L1_OPTIONS}
                     defaultItem={fromNetwork}
@@ -210,9 +213,7 @@ const History = () => {
                   >
                     <Icon src={switchButton} />
                   </IconContainer>
-                  <div style={{ fontSize: '16px', paddingLeft: '16px' }}>
-                    To
-                  </div>
+                  <Typography variant="body2">To</Typography>
                   <DropdownNetwork
                     items={switched ? NETWORK_L1_OPTIONS : NETWORK_L2_OPTIONS}
                     defaultItem={toNetwork}
@@ -231,23 +232,25 @@ const History = () => {
                   error={false}
                 />
               </TableFilters>
+            </div>
+            <TableTransactionsContainer>
               <TransactionsTableHeader
                 options={TableOptions}
               ></TransactionsTableHeader>
-            </div>
-            {transactionsFound && (
-              <TransactionsResolver
-                transactions={transactions}
-                transactionsFilter={{
-                  fromNetworkChainId: fromNetwork.value as CHAIN_NAME,
-                  toNetworkChainId: toNetwork.value as CHAIN_NAME,
-                  status: transactionStatus as TRANSACTION_FILTER_STATUS,
-                  targetHash: searchHistory,
-                  startDate: filterStartDate,
-                  endDate: filterEndDate,
-                }}
-              ></TransactionsResolver>
-            )}
+              {transactionsFound && (
+                <TransactionsResolver
+                  transactions={transactions}
+                  transactionsFilter={{
+                    fromNetworkChainId: fromNetwork.value as CHAIN_NAME,
+                    toNetworkChainId: toNetwork.value as CHAIN_NAME,
+                    status: transactionStatus as TRANSACTION_FILTER_STATUS,
+                    targetHash: searchHistory,
+                    startDate: filterStartDate,
+                    endDate: filterEndDate,
+                  }}
+                ></TransactionsResolver>
+              )}
+            </TableTransactionsContainer>
           </Table>
         </>
       )}
