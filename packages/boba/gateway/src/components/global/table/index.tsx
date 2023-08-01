@@ -4,6 +4,7 @@ import { Text } from 'components/global/text'
 import Tooltip from 'components/tooltip/Tooltip'
 import { HelpOutline } from '@mui/icons-material'
 import { TableHeaderContainer, TableRow, TableContentContainer } from './styles'
+import { ModalTypography } from '../modalTypography'
 
 export type TableHeaderOptionType = {
   name: string

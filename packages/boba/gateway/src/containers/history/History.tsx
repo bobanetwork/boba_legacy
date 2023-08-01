@@ -172,18 +172,6 @@ const History = () => {
                 }}
               />
             </SearchInput>
-            <Actions>
-              <MobileDateDescriptions variant="body1">
-                Date range
-              </MobileDateDescriptions>
-              <DateDescriptions variant="body1">
-                Date range from
-              </DateDescriptions>
-              {/* {getDatePicker('From')} */}
-              <DateDescriptions variant="body1">to</DateDescriptions>
-
-              {/* {getDatePicker('To')} */}
-            </Actions>
           </TableHeader>
 
           <Table>
