@@ -24,7 +24,6 @@ export const tablet = (inner: any) => css`
     ${inner};
   }
 `
-
 export const sdesktop = (inner: any) => css`
   @media (max-width: ${size.smallDesktop}) {
     ${inner};

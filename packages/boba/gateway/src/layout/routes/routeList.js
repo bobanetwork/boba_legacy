@@ -2,18 +2,17 @@ import React from 'react';
 
 import { DISABLE_VE_DAO, ROUTES_PATH } from "util/constant";
 
-import Bridge from "containers/bridge/Bridge";
-import Home from "containers/home/Home";
-import OldDao from 'containers/dao/OldDao';
-import History from 'containers/history/History';
-import EarnWrapper from 'containers/earn/EarnWrapper';
-import SaveWrapper from 'containers/save/SaveWrapper';
-import { Navigate } from 'react-router-dom';
-import Lock from 'containers/veboba/Lock';
+import Bridging from 'containers/Bridging';
 import Vote from 'containers/VoteAndDao/Vote/Vote';
 import BobaScope from 'containers/bobaScope/BobaScope';
+import OldDao from 'containers/dao/OldDao';
 import DevTools from 'containers/devtools/DevTools';
-import Bridging from 'containers/Bridging';
+import EarnWrapper from 'containers/earn/EarnWrapper';
+import Home from "containers/home/Home";
+import SaveWrapper from 'containers/save/SaveWrapper';
+import Lock from 'containers/veboba/Lock';
+import { Navigate } from 'react-router-dom';
+import History from 'containers/history/History';
 
 export const COMMON_ROUTES = [
   {

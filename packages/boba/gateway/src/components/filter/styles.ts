@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components'
 import { Svg } from 'components/global/svg'
+import { screen } from 'themes/screens'
 
 export const DropdownContainer = styled.div`
   display: inline-flex;
@@ -23,28 +24,20 @@ export const DropdownContainer = styled.div`
 export const Header = styled.div<{ error: boolean; isOpen: boolean }>`
   box-sizing: border-box;
   position: relative;
-  z-index: 2;
   color: inherit;
-  border-radius: 12px;
-  min-width: 290px;
-  padding: 15px;
-  transition: 0.25s all;
+  border-radius: 37px;
+  transition: all 0.3s ease;
+  background: none;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
-      color: ${props.theme.colors.gray[600]};
       border: 2px solid ${props.theme.colors.gray[600]};
-      background: none;
-
-      ${Arrow}, ${Icon} {
+      svg {
         fill: ${props.theme.colors.gray[600]};
       }
-
       &:hover {
-        color: ${props.theme.colors.gray[800]};
         border-color: ${props.theme.colors.gray[800]};
-        background: none;
-        ${Arrow},${Icon} {
+        svg {
           fill: ${props.theme.colors.gray[800]};
         }
       }
@@ -52,78 +45,68 @@ export const Header = styled.div<{ error: boolean; isOpen: boolean }>`
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
-      color: ${props.theme.colors.gray[100]};
       border: 2px solid ${props.theme.colors.gray[200]};
-      background: none;
-      ${Arrow}, ${Icon} {
+      svg {
         fill: ${props.theme.colors.gray[100]};
       }
       &:hover {
         color: ${props.theme.colors.gray[50]};
-        background: none;
         border-color: ${props.theme.colors.green[300]};
-        ${Arrow}, ${Icon} {
+        svg {
           fill: ${props.theme.colors.gray[50]};
         }
       }
     `}
     ${(props) =>
-    props.isOpen &&
-    props.theme.name === 'light' &&
-    css`
-      color: ${props.theme.colors.gray[800]};
-      border-color: ${props.theme.colors.gray[800]};
-      background: none;
-      ${Arrow},${Icon} {
-        fill: ${props.theme.colors.gray[800]};
-      }
+    props.error &&
+    `
+      border-color:${props.theme.colors.red[300]}
     `}
-    ${(props) =>
-    props.isOpen &&
-    props.theme.name === 'dark' &&
+  ${({ isOpen, theme }) =>
+    isOpen &&
     css`
-      color: ${props.theme.colors.gray[50]};
-      background: none;
-      border-color: ${props.theme.colors.green[300]};
-      ${Arrow}, ${Icon} {
-        fill: ${props.theme.colors.gray[50]};
+      color: ${theme.name === 'light' ? 'initial' : theme.colors.gray[50]};
+      border-color: ${theme.name === 'light'
+        ? theme.colors.gray[800]
+        : theme.colors.green[300]};
+      svg {
+        fill: ${theme.name === 'light'
+          ? theme.colors.gray[800]
+          : theme.colors.gray[50]};
       }
     `}
 `
 
 export const IconContainer = styled.div`
-  width: 32px;
-  height: 32px;
-  margin-right: 8px;
+  width: auto;
+  height: auto;
   display: flex;
+  padding: 10px 11px;
   align-items: center;
   justify-content: center;
-`
-export const OptionsHeader = styled.div`
-  display: flex;
-  align-items: center;
-  font-size: ${(props) => props.theme.text.body2};
-  font-weight: bold;
-  justify-content: flex-start;
-  text-align: left;
-  color: inherit;
+  @media ${screen.mobile} {
+    width: 20px;
+    height: 20px;
+  }
 `
 
-export const Option = styled.div<{
-  isSelected: boolean
-}>`
+export const Option = styled.div<{ isSelected: boolean }>`
   display: flex;
   align-items: center;
   font-size: ${(props) => props.theme.text.body2};
   font-weight: bold;
   justify-content: flex-start;
   text-align: left;
+  background: inherit;
   color: inherit;
-  ${(props) =>
-    props.isSelected &&
+  ${({ isSelected, theme }) =>
+    isSelected &&
     css`
-      background: ${props.theme.colors.gray[400]};
+      background: ${theme.colors.gray[400]};
     `}
+  @media ${screen.mobile} {
+    font-size: 10px;
+  }
 `
 
 export const DefaultIcon = styled.div`
@@ -142,43 +125,52 @@ export const DefaultIcon = styled.div`
     `}
 `
 export const Icon = styled(Svg)`
-  margin-right: 8px;
+  height: 16px;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   svg {
     max-width: 32px;
+    min-width: 10px;
     height: auto;
   }
 `
 
 export const DropdownBody = styled.div`
   transition: 0.25s all;
-  /* background: inherit; */
+  background: inherit;
   position: absolute;
   width: 100%;
-  left: 0px;
-  top: 50px;
+  min-width: 139px;
+  right: 0px;
+  top: 45px;
   z-index: 1;
-  padding: 25px 5px 10px 0px;
+  padding: 8px 8px 8px 8px;
   box-sizing: border-box;
   border: inherit;
   border-top: 0px;
-  border-radius: 0 0 14px 14px;
+  border-radius: 14px;
+  box-shadow: ${(props) => props.theme.backShadow};
   ${(props) =>
     props.theme.name === 'light' &&
     css`
+      color: ${props.theme.colors.gray[800]};
       border: 1px solid ${props.theme.colors.gray[400]};
-      background: ${props.theme.colors.gray[100]};
+      background: ${props.theme.colors.gray[50]};
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
-      border: 1px solid ${props.theme.colors.gray[300]};
+      color: ${props.theme.colors.gray[100]};
+      border: 1px solid ${props.theme.colors.gray[400]};
       background: ${props.theme.colors.gray[500]};
     `}
 `
 export const DropdownContent = styled.div`
   min-height: 80px;
-  padding: 0px 10px 0px 10px;
-  max-height: 100px;
+  max-height: 180px;
   display: flex;
   flex-direction: column;
   gap: 5px 0px;
@@ -202,41 +194,26 @@ export const DropdownContent = styled.div`
 
   & > ${Option} {
     transition: 0.25s all;
-    border-radius: 14px;
-    padding: 5px;
+    border-radius: 8px;
+    padding: 8px;
     box-sizing: border-box;
-    /* background: inherit; */
+    border: 1px solid rgba(0, 0, 0, 0);
+    &:hover {
+      background: ${(props) => props.theme.colors.gray[400]};
+    }
     ${(props) =>
       props.theme.name === 'light' &&
       css`
-        /* background: ${props.theme.colors.gray[100]}; */
         &:hover {
-          background: ${props.theme.colors.gray[300]};
+          border: 1px solid ${props.theme.colors.gray[600]};
         }
       `}
     ${(props) =>
       props.theme.name === 'dark' &&
       css`
-        border: 1px solid ${props.theme.colors.gray[500]};
-        /* background: ${props.theme.colors.gray[500]}; */
         &:hover {
-          border: 1px solid ${props.theme.colors.gray[400]};
-          background: ${props.theme.colors.gray[400]};
+          border: 1px solid ${props.theme.colors.gray[100]};
         }
       `};
   }
-`
-
-export const Arrow = styled(Svg)`
-  margin-left: auto;
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      fill: ${props.theme.colors.gray[100]};
-    `}
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      fill: ${props.theme.colors.gray[600]};
-    `}
 `
