@@ -7,7 +7,9 @@ export const Svg: React.FC<SvgTypes> = ({ src, fill }) => (
   <ReactSVG
     src={src}
     beforeInjection={(svg: SVGElement) => {
-      svg.setAttribute('fill', fill)
+      if (fill) {
+        svg.setAttribute('fill', fill)
+      }
     }}
   />
 )

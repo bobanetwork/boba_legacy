@@ -108,3 +108,6 @@ export function selectUserAndL2LPBalanceBatch (state) {
 export function selectExitFee (state) {
   return state.balance.exitFee
 }
+
+export const selectBalance = () => (state) => state.balance
+

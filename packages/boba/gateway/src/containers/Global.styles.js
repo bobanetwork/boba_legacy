@@ -101,13 +101,14 @@ export const footerLink = styled(IconButton)(({ theme }) => ({
 export const PageSwitcher = styled(Box)(({ theme }) => ({
   width: 'fit-content',
   padding: '3px',
-  background: theme.palette.mode === 'light' ? 'rgba(3, 19, 19, 0.04)' : 'rgba(255, 255, 255, 0.04)',
+  background: theme.palette.mode === 'light' ? '#F0F1EA' : '#262626',
   cursor: 'pointer',
   display: 'flex',
   borderRadius: '12px',
   height: '48px',
+  border:theme.palette.mode === 'light' ? '1px solid #DEE0D8' : '0px',
   'span': {
-    padding: '2px 15px',
+    padding: '2px 25px',
     fontWeight: 'bold',
     borderRadius: '12px',
     display: 'flex',
@@ -115,7 +116,7 @@ export const PageSwitcher = styled(Box)(({ theme }) => ({
     alignItems: 'center',
     '&.active': {
       color: '#031313',
-      background: theme.palette.mode === 'dark'? '#BAE21A' :'#1CD6D1',
+      background: '#AEDB01',
     }
   },
   [ theme.breakpoints.down('sm') ]: {
