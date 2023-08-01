@@ -110,6 +110,8 @@ const History = () => {
 
   const transactions = useSelector(selectTransactions, isEqual)
 
+  /*
+  // TODO: not working as implementation needs be rewrite.
   const getDatePicker = (label: string) => {
     const dateSelector = (date: Date) => {
       label === 'To' ? setFilterEndDate(date) : setFilterStartDate(date)
@@ -132,7 +134,7 @@ const History = () => {
         maxDate={new Date(now)}
       />
     )
-  }
+  } */
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
@@ -177,10 +179,10 @@ const History = () => {
               <DateDescriptions variant="body1">
                 Date range from
               </DateDescriptions>
-              {getDatePicker('From')}
+              {/* {getDatePicker('From')} */}
               <DateDescriptions variant="body1">to</DateDescriptions>
 
-              {getDatePicker('To')}
+              {/* {getDatePicker('To')} */}
             </Actions>
           </TableHeader>
 
