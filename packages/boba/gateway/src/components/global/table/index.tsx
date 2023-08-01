@@ -7,7 +7,7 @@ import { TableHeaderContainer, TableRow, TableContentContainer } from './styles'
 
 export type TableHeaderOptionType = {
   name: string
-  tooltip: string
+  tooltip?: string
   width: number
 }
 
@@ -26,7 +26,7 @@ export const TableHeader = ({ options, className }: TableHeaderType) => {
             key={option.name}
             style={{ maxWidth: option?.width + 'px' }}
           >
-            <Text>{option.name}</Text>
+            <ModalTypography variant="body2">{option.name}</ModalTypography>
             {option.tooltip && (
               <Tooltip title={option.tooltip}>
                 <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />

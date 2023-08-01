@@ -4,7 +4,7 @@ const size = {
   mobile: '767px',
   tablet: '980px',
   smallDesktop: '1023px',
-  desktop: '1240px',
+  desktop: '1200px',
 }
 
 export const screen = {
@@ -29,7 +29,6 @@ export const sdesktop = (inner: any) => css`
     ${inner};
   }
 `
-
 export const desktop = (inner: any) => css`
   @media (max-width: ${size.desktop}) {
     ${inner};

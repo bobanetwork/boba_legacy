@@ -16,19 +16,13 @@
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 import React, { useState, useEffect, useCallback } from 'react'
-import { connect } from 'react-redux'
-import { isEqual } from 'util/lodash'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { getFS_Saves, getFS_Info, addFS_Savings } from 'actions/fixedAction'
-import { openAlert } from 'actions/uiAction'
+import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
+import { openModal } from 'actions/uiAction'
 
 import * as S from './Save.styles'
 
-import { Box, Grid } from '@mui/material'
-
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import Input from 'components/input/Input'
-import ListSave from 'components/listSave/listSave'
 import Connect from 'containers/connect/Connect'
 
 import { toWei_String } from 'util/amountConvert'
@@ -36,77 +30,38 @@ import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
 import { Typography } from 'components/global/typography'
 import { Button } from 'components/global/button'
+import TransactionList from 'components/stake/transactionList'
+import { PlaceholderConnect } from 'components/global/placeholderConnect'
+import { ModalTypography } from 'components/global/modalTypography'
+import { Preloader } from 'components/dao/preloader'
 
-const Save = (props: any) => {
-  const { stakeInfo } = props.fixed
+import { selectFixed, selectSetup, selectBalance } from 'selectors'
 
+const Save = () => {
+  const { stakeInfo } = useSelector(selectFixed())
   const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
-    props.setup
+    useSelector(selectSetup())
+  const balance = useSelector(selectBalance())
+  const { layer2 } = balance
 
-  const { layer2 } = props.balance
+  const dispatch = useDispatch<any>()
 
   const [state, setState] = useState({
-    stakeInfo,
-    accountEnabled,
-    netLayer,
-    bobaFeeChoice,
-    bobaFeePriceRatio,
-    layer2,
-    stakeValue: '',
-    stakeValueValid: false,
-    value_Wei_String: '',
-    max_Wei_String: '0',
     max_Float_String: '0.0',
     fee: '0',
-    balance: props.balance,
-    fixed: props.fixed,
-    setup: props.setup,
   })
 
   useEffect(() => {
-    props.dispatch(getFS_Saves())
-    props.dispatch(getFS_Info())
+    dispatch(getFS_Saves())
+    dispatch(getFS_Info())
     getMaxTransferValue()
   }, [])
 
   useEffect(() => {
-    const { stakeInfo } = props.fixed
-
-    const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
-      props.setup
-
-    const { layer2 } = props.balance
-
-    const updateState = (prevState: any) => {
-      return {
-        ...prevState,
-        layer2: props.balance.layer2,
-        stakeInfo: props.fixed.stakeInfo,
-        accountEnabled: props.setup.accountEnabled,
-        netLayer: props.setup.netLayer,
-        bobaFeeChoice: props.setup.bobaFeeChoice,
-        bobaFeePriceRatio: props.setup.bobaFeePriceRatio,
-      }
-    }
-
-    if (
-      !isEqual(state.balance.layer2, props.balance.layer2) ||
-      !isEqual(state.fixed.stakeInfo, props.fixed.stakeInfo) ||
-      !isEqual(state.setup.accountEnabled, props.setup.accountEnabled) ||
-      !isEqual(state.setup.netLayer, props.setup.netLayer) ||
-      !isEqual(state.setup.bobaFeeChoice, props.setup.bobaFeeChoice) ||
-      !isEqual(state.setup.bobaFeePriceRatio, props.setup.bobaFeePriceRatio) ||
-      !isEqual(state.max_Float_String, props.max_Float_String)
-    ) {
-      console.log('updating state when not equal')
-      setState(updateState)
-    }
     getMaxTransferValue()
-  }, [props])
+  }, [layer2])
 
   const getMaxTransferValue = async () => {
-    const { layer2, bobaFeeChoice, bobaFeePriceRatio, netLayer } = state
-
     // as staking BOBA check the bobabalance
     const token: any = Object.values(layer2).find(
       (t: any) => t['symbolL2'] === 'BOBA'
@@ -151,245 +106,115 @@ const Save = (props: any) => {
     }
   }
 
-  const handleStakeValue = (value: any) => {
-    const { max_Float_String } = state
-
-    if (
-      value &&
-      Number(value) > 0.0 &&
-      Number(value) <= Number(max_Float_String)
-    ) {
-      setState((prevState) => ({
-        ...prevState,
-        stakeValue: value,
-        stakeValueValid: true,
-        value_Wei_String: toWei_String(value, 18),
-      }))
-    } else {
-      setState((prevState) => ({
-        ...prevState,
-        stakeValue: value,
-        stakeValueValid: false,
-        value_Wei_String: '',
-      }))
+  const totalBOBAstaked = Object.keys(stakeInfo).reduce((accumulator, key) => {
+    if (stakeInfo[key].isActive) {
+      return accumulator + Number(stakeInfo[key].depositAmount)
     }
+    return accumulator
+  }, 0)
+
+  const Loader = () => {
+    const isLoading = state.fee === '0' ? true : false
+    return (
+      <PlaceholderConnect
+        isLoading={accountEnabled && isLoading}
+        preloader={<Preloader />}
+      />
+    )
   }
-
-  const handleConfirm = async () => {
-    const { value_Wei_String } = state
-
-    setState((prevState) => ({ ...prevState, loading: true }))
-
-    const addTX = await props.dispatch(addFS_Savings(value_Wei_String))
-
-    if (addTX) {
-      props.dispatch(openAlert('Your BOBA were staked'))
-    }
-
-    setState((prevState) => ({
-      ...prevState,
-      loading: false,
-      stakeValue: '',
-      value_Wei_String: '',
-    }))
-  }
-
-  let totalBOBAstaked = 0
-  Object.keys(stakeInfo).forEach((v, i) => {
-    if (stakeInfo[i].isActive) {
-      totalBOBAstaked = totalBOBAstaked + Number(stakeInfo[i].depositAmount)
-    }
-  })
-
   return (
     <S.StakePageContainer>
-      <Connect
-        userPrompt={'Please connect to Boba to stake'}
-        accountEnabled={accountEnabled}
-        connectToBoba={true}
-        layer={netLayer}
-      />
-      <div>
-        <div>
+      <S.PaddingContainer>
+        <Connect
+          userPrompt={'Please connect to Boba to stake'}
+          accountEnabled={accountEnabled}
+          connectToBoba={true}
+          layer={netLayer}
+        />
+      </S.PaddingContainer>
+      <S.GridContainer>
+        <S.PaddingContainer>
           <S.BlockContainer>
+            <S.Flex>
+              <div>
+                <Typography variant="head">Staked</Typography>
+                <Typography variant="title">{totalBOBAstaked} BOBA</Typography>
+              </div>
+              <div>
+                <Typography variant="head">Boba Balance</Typography>
+                <Typography variant="title">
+                  {state.max_Float_String} BOBA
+                </Typography>
+              </div>
+            </S.Flex>
             <div>
               <div>
-                <div>
-                  <Typography variant="head">Staked</Typography>
-                  <Typography variant="head">2.0024 BOBA</Typography>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Typography variant="head">Boba Balance</Typography>
-                  <Typography variant="head">9899.28 BOBA</Typography>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Typography variant="head">APY</Typography>
-                  <Typography variant="head">5.22%</Typography>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Button label="Stake" />
-                </div>
-                <div>
-                  <Button label="Unstake" outline />
-                </div>
+                <Typography variant="head">APY</Typography>
+                <Typography variant="title">5.22%</Typography>
               </div>
             </div>
+            <div>
+              <Button
+                label="Stake"
+                small
+                disable={!Boolean(state.max_Float_String !== '0.0')}
+                onClick={() => dispatch(openModal('StakeDepositModal'))}
+              />
+            </div>
           </S.BlockContainer>
-        </div>
-        <div>
+        </S.PaddingContainer>
+        <S.PaddingContainer>
           <S.BlockContainer>
             <div>
               <Typography variant="head">Staking Period</Typography>
-              <Typography variant="body3">
+              <ModalTypography variant="body2">
                 Each staking period lasts 2 weeks. If you do not unstake after a
+                <br />
                 staking period, your stake will be automatically renewed.
-              </Typography>
+              </ModalTypography>
             </div>
             <div>
               <Typography variant="head">Unstaking Window</Typography>
-              <Typography variant="body3">
+              <ModalTypography variant="body2">
                 The first two days of every staking period, except for the first
+                <br />
                 staking period, are the unstaking window. You can only unstake
+                <br />
                 during the unstaking window.
-              </Typography>
+              </ModalTypography>
             </div>
           </S.BlockContainer>
-        </div>
-      </div>
+        </S.PaddingContainer>
+      </S.GridContainer>
       <div>
         <div>
-          <S.StakeEarnContainer>
-            <div>
-              <Typography variant="body2"> Stake BOBA Earn BOBA </Typography>
-              <Typography variant="h1"> 5% Fixed APY </Typography>
-            </div>
-            <S.StakeItem>
-              <div>
-                <Typography variant="body2">Active stakes</Typography>
-                <Typography variant="body1">{totalBOBAstaked} BOBA</Typography>
-              </div>
-            </S.StakeItem>
-          </S.StakeEarnContainer>
-          <S.StakeInputContainer>
-            <div>
-              <Typography variant="body2"> BOBA Balance:</Typography>
-              <Typography variant="body2">{state.max_Float_String}</Typography>
-            </div>
-            <Input
-              placeholder={`Amount to stake`}
-              value={props.stakeValue}
-              type="number"
-              // unit={'BOBA'}
-              maxValue={state.max_Float_String}
-              onChange={(i: any) => {
-                handleStakeValue(i.target.value)
-              }}
-              onUseMax={(i: any) => {
-                handleStakeValue(state.max_Float_String)
-              }}
-              newStyle
-              disabled={netLayer !== 'L2'}
-              variant="standard"
-              //FIX ME AFTER REFACTORY INPUT COMPONETNT TO TYPESCRIPT
-              label={undefined}
-              disabledExitAll={undefined}
-              icon={undefined}
-              unit={undefined}
-              onSelect={undefined}
-              sx={undefined}
-              paste={undefined}
-              fullWidth={undefined}
-              size={undefined}
-              loading={undefined}
-              maxLength={undefined}
-              selectOptions={undefined}
-              defaultSelect={undefined}
-              selectValue={undefined}
-              style={undefined}
-              isBridge={undefined}
-              openTokenPicker={undefined}
-            />
-
-            {netLayer === 'L2' && bobaFeeChoice && state.fee && (
-              <Typography variant="body2">Fee: {state.fee} BOBA</Typography>
+          <S.PaddingContainer>
+            <S.TitleContainer>
+              <Typography variant="head">Staking History</Typography>
+            </S.TitleContainer>
+          </S.PaddingContainer>
+          <S.MobileTableContainer>
+            {!stakeInfo || !Object.keys(stakeInfo).length ? (
+              <Loader />
+            ) : (
+              <>
+                <S.StakeItemContainer>
+                  {Object.keys(stakeInfo).map((v, i) => {
+                    if (stakeInfo[i].isActive) {
+                      return (
+                        <TransactionList stakeInfo={stakeInfo[i]} key={i} />
+                      )
+                    }
+                    return null
+                  })}
+                </S.StakeItemContainer>
+              </>
             )}
-
-            {netLayer === 'L2' && !bobaFeeChoice && state.fee && (
-              <Typography variant="body2">Fee: {state.fee} ETH</Typography>
-            )}
-
-            {netLayer === 'L2' && (
-              <Button
-                onClick={() => {
-                  handleConfirm()
-                }}
-                loading={props.loading}
-                disable={!accountEnabled}
-                label="Stake"
-              />
-            )}
-          </S.StakeInputContainer>
-        </div>
-        <div>
-          <S.StakeHeadContainer>
-            <div>
-              <BobaGlassIcon />
-              <Typography variant="body1">Stake BOBA</Typography>
-            </div>
-          </S.StakeHeadContainer>
-          {Object.keys(stakeInfo).length === 0 ? (
-            <S.StakeContainer>
-              <div>
-                <svg
-                  width="32"
-                  height="32"
-                  viewBox="0 0 32 32"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10.1204 2.66504C7.51906 2.66504 5.37107 4.63837 5.37107 7.12371V24.8731C5.37107 27.3585 7.51906 29.3318 10.1204 29.3318H21.9551C24.5564 29.3318 26.7044 27.3585 26.7044 24.8731C26.7044 24.0051 26.7044 14.4757 26.7044 11.9984C26.7044 11.9851 26.7044 11.9704 26.7044 11.9571C26.7044 7.20638 22.1191 2.66504 17.3711 2.66504C11.7524 2.66504 11.7391 2.66504 10.1204 2.66504ZM10.1204 5.33171C11.4417 5.33171 12.9364 5.33171 16.0377 5.33171V8.87307C16.0377 11.3584 18.1857 13.3317 20.7871 13.3317H24.0377C24.0377 16.7144 24.0377 24.0944 24.0377 24.8731C24.0377 25.8251 23.1391 26.6651 21.9551 26.6651H10.1204C8.93639 26.6651 8.03773 25.8251 8.03773 24.8731V7.12371C8.03773 6.17171 8.93639 5.33171 10.1204 5.33171ZM18.7044 5.49838C21.0671 6.12505 23.2591 8.30906 23.8711 10.6651H20.7871C19.6017 10.6651 18.7044 9.82507 18.7044 8.87307V5.49838ZM12.0377 10.6651C11.3017 10.6651 10.7044 11.2624 10.7044 11.9984C10.7044 12.7344 11.3017 13.3317 12.0377 13.3317H13.3711C14.1071 13.3317 14.7044 12.7344 14.7044 11.9984C14.7044 11.2624 14.1071 10.6651 13.3711 10.6651H12.0377ZM12.0377 15.9984C11.3017 15.9984 10.7044 16.5957 10.7044 17.3318C10.7044 18.0678 11.3017 18.6651 12.0377 18.6651H20.0377C20.7737 18.6651 21.3711 18.0678 21.3711 17.3318C21.3711 16.5957 20.7737 15.9984 20.0377 15.9984H12.0377ZM12.0377 21.3318C11.3017 21.3318 10.7044 21.9291 10.7044 22.6651C10.7044 23.4011 11.3017 23.9984 12.0377 23.9984H20.0377C20.7737 23.9984 21.3711 23.4011 21.3711 22.6651C21.3711 21.9291 20.7737 21.3318 20.0377 21.3318H12.0377Z"
-                    fill="white"
-                    fillOpacity="0.65"
-                  />
-                </svg>
-                <Typography variant="body3">
-                  {accountEnabled
-                    ? 'No Content'
-                    : 'Please connect to wallet first'}
-                </Typography>
-              </div>
-            </S.StakeContainer>
-          ) : (
-            <div>
-              {Object.keys(stakeInfo).map((v, i) => {
-                if (stakeInfo[i].isActive) {
-                  return (
-                    <S.StakeItemContainer key={i}>
-                      <ListSave stakeInfo={stakeInfo[i]} />
-                    </S.StakeItemContainer>
-                  )
-                }
-                return null
-              })}
-            </div>
-          )}
+          </S.MobileTableContainer>
         </div>
       </div>
     </S.StakePageContainer>
   )
 }
 
-const mapStateToProps = (state: any) => ({
-  fixed: state.fixed,
-  setup: state.setup,
-  balance: state.balance,
-})
-
-export default connect(mapStateToProps)(Save)
+export default Save
