@@ -31,7 +31,7 @@ import * as S from './History.styles'
 
 const PER_PAGE = 8
 
-function TX_Exits({ searchHistory, transactions, chainLink }) {
+function TX_Exits({ searchHistory, transactions }) {
 
   const [ page, setPage ] = useState(1)
   const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))

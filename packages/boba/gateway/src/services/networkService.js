@@ -14,28 +14,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import {parseEther, formatEther} from '@ethersproject/units'
-import {
-  CrossChainMessenger,
-} from '@eth-optimism/sdk'
+import {formatEther, parseEther} from '@ethersproject/units'
+import {CrossChainMessenger,} from '@eth-optimism/sdk'
 
-import {ethers, BigNumber, utils} from 'ethers'
+import {BigNumber, ethers, utils} from 'ethers'
 
 import store from 'store'
-import {orderBy, groupBy} from 'util/lodash';
+import {groupBy, orderBy} from 'util/lodash';
 import BN from 'bn.js'
 
 import {logAmount} from 'util/amountConvert'
 import {getToken} from 'actions/tokenAction'
 
-import {
-  addBobaFee,
-} from 'actions/setupAction'
+import {addBobaFee,} from 'actions/setupAction'
 
 import {
+  updateSignatureStatus_depositLP,
   updateSignatureStatus_exitLP,
-  updateSignatureStatus_exitTRAD,
-  updateSignatureStatus_depositLP
+  updateSignatureStatus_exitTRAD
 } from 'actions/signAction'
 
 // Base contracts
@@ -53,7 +49,6 @@ import L1LPJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol
 import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
 import L2LPJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 import L2SaveJson from '@boba/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
-import L2ERC721Json from '@boba/contracts/artifacts/contracts/standards/L2StandardERC721.sol/L2StandardERC721.json'
 import Boba from "@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
 import GovernorBravoDelegate
   from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
@@ -80,8 +75,6 @@ import ETHL1BridgeJson from "../deployment/contracts/crosschain/EthBridge.json"
 import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardERC20.json"
 import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
 
-import {getNftImageUrl} from 'util/nftImage'
-
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
@@ -93,7 +86,7 @@ import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import {Layer, MIN_NATIVE_L1_BALANCE} from 'util/constant'
 import {getPoolDetail} from 'util/poolDetails'
-import {pingRpcUrl, getNetworkDetail, NETWORK, NETWORK_TYPE} from 'util/network/network.util'
+import {getNetworkDetail, NETWORK, NETWORK_TYPE, pingRpcUrl} from 'util/network/network.util'
 import appService from './app.service'
 import walletService from './wallet.service'
 
@@ -2407,13 +2400,25 @@ class NetworkService {
     }
   }
 
+  getTeleportationContract(layer) {
+    let teleportationAddr = this.addresses.Proxy__L2Teleportation
+    let provider = this.L2Provider
+    if (layer === Layer.L1) {
+      teleportationAddr = this.addresses.Proxy__L1Teleportation
+      provider = this.L1Provider
+    }
+
+    return this.Teleportation
+      .attach(teleportationAddr)
+      .connect(provider);
+  }
+
   async isTeleportationOfAssetSupported(layer, token, destChainId) {
     const teleportationAddr = (layer === Layer.L1 ? this.addresses.Proxy__L1Teleportation : this.addresses.Proxy__L2Teleportation)
-    const teleportationContract = this.Teleportation
+    const contract = this.Teleportation
       .attach(teleportationAddr)
-      .connect(this.provider.getSigner())
-
-    return await teleportationContract.supportedTokens(token, destChainId)
+      .connect(this.provider.getSigner());
+    return await contract.supportedTokens(token, destChainId)
   }
 
   async depositWithTeleporter(layer, currency, value_Wei_String, destChainId) {

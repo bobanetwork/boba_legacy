@@ -27,7 +27,7 @@ import { selectLoading } from 'selectors'
 
 const PER_PAGE = 8
 
-function TX_Transfers({ searchHistory, transactions, chainLink }) {
+function TX_Transfers({ searchHistory, transactions }) {
 
   const [page, setPage] = useState(1)
   const loading = useSelector(selectLoading(['TRANSACTION/GETALL']))

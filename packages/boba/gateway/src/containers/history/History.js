@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { isEqual,orderBy } from 'util/lodash';
 
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
@@ -30,7 +29,8 @@ import {
   selectActiveHistoryTab,
   selectTransactions,
   selectAccountEnabled,
-  selectLayer
+  selectLayer,
+  selectActiveNetworkName
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
@@ -49,7 +49,6 @@ import Connect from 'containers/connect/Connect'
 import Tabs from 'components/tabs/Tabs'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { selectActiveNetworkName } from 'selectors'
 
 function History() {
 

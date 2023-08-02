@@ -26,6 +26,12 @@ const main = async () => {
   const periodicTransactionService = require('../services/periodicTransaction')
   const bobaStrawMonitorService = require('../services/bobaStrawMonitor')
   const balanceMonitorService = require('../services/balanceMonitor')
+  const TeleportationService = require('../services/teleportationBridgeMonitor');
+
+  const teleportationService = new TeleportationService()
+  await teleportationService.initConnection()
+  console.log('Teleportation ready.')
+  loop(() => teleportationService.startTeleportationMonitor()).catch()
 
   // l1 bridge monitor
   const l1BridgeService = new l1BridgeMonitorService()

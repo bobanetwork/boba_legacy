@@ -31,10 +31,12 @@ const BOBA_DEPLOYER_URL = env.BOBA_DEPLOYER_URL
 const FILTER_ENDPOINT = env.FILTER_ENDPOINT
 
 const ADDRESS_MANAGER_ADDRESS = env.ADDRESS_MANAGER_ADDRESS
+if (!ADDRESS_MANAGER_ADDRESS) throw new Error('Configure AddressManager address')
 const L2_MESSENGER_ADDRESS = '0x4200000000000000000000000000000000000007'
 const OVM_L2_STANDARD_BRIDGE_ADDRESS = '0x4200000000000000000000000000000000000010'
 const L1LiquidityPoolAddress = env.PROXY__L1_LIQUIDITY_POOL_ADDRESS
 const L2LiquidityPoolAddress = env.PROXY__L2_LIQUIDITY_POOL_ADDRESS
+if (!L1LiquidityPoolAddress || !L2LiquidityPoolAddress) throw new Error('L1|L2LiquidityPoolAddress need to be defined')
 
 const TRANSACTION_MONITOR_INTERVAL = env.TRANSACTION_MONITOR_INTERVAL || 3 * second
 const CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL = env.CROSS_DOMAIN_MESSAGE_MONITOR_INTERVAL || 3 * second
@@ -70,6 +72,8 @@ const BOBASTRAW_MONITOR_INTERVAL = env.BOBASTRAW_MONITOR_INTERVAL || 10 * minute
 const L1_BALANCE_MONITOR_ADDRESSES = env.L1_BALANCE_MONITOR_ADDRESSES || ''
 const L2_BALANCE_MONITOR_ADDRESSES = env.L2_BALANCE_MONITOR_ADDRESSES || ''
 const BALANCE_MONITOR_INTERVAL = env.BALANCE_MONITOR_INTERVAL || 10 * minute
+
+const TELEPORTATION_USE_TESTNETS = (env.TELEPORTATION_USE_TESTNETS?.toLowerCase() ?? 'true') === 'true'
 /* eslint-enable */
 
 class GlobalEnv {
@@ -145,6 +149,7 @@ class GlobalEnv {
     this.l1BalanceMonitorAddresses = removeBlankStringInArray(L1_BALANCE_MONITOR_ADDRESSES.split(','))
     this.l2BalanceMonitorAddresses = removeBlankStringInArray(L2_BALANCE_MONITOR_ADDRESSES.split(','))
     this.balanceMonitorInterval = BALANCE_MONITOR_INTERVAL
+    this.teleportationUseTestnets = TELEPORTATION_USE_TESTNETS
 
     this.isAltL1Network = false
     /* eslint-enable */
@@ -206,6 +211,8 @@ class GlobalEnv {
     )
     this.OVM_L1StandardBridgeInterface =
       this.OVM_L1StandardBridgeContract.interface
+
+    this.TeleportationInterface = new ethers.utils.Interface(await getBobaContractABI('Teleportation'))
 
     if (BOBA_DEPLOYER_URL) {
       const response = await fetch(BOBA_DEPLOYER_URL)
