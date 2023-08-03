@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components'
+import { Svg } from 'components/global/svg'
 
 export const DropdownContainer = styled.div`
   display: inline-flex;
@@ -19,7 +20,7 @@ export const DropdownContainer = styled.div`
     `}
 `
 
-export const Header = styled.div<{ error: boolean }>`
+export const Header = styled.div<{ error: boolean; isOpen: boolean }>`
   box-sizing: border-box;
   position: relative;
   z-index: 2;
@@ -31,37 +32,74 @@ export const Header = styled.div<{ error: boolean }>`
   ${(props) =>
     props.theme.name === 'light' &&
     css`
-      border: 1px solid ${props.theme.colors.gray[400]};
-      background: ${props.theme.colors.gray[100]};
+      color: ${props.theme.colors.gray[600]};
+      border: 2px solid ${props.theme.colors.gray[600]};
+      background: none;
+
+      ${Arrow}, ${Icon} {
+        fill: ${props.theme.colors.gray[600]};
+      }
+
       &:hover {
-        border-color: 1px solid ${props.theme.colors.gray[500]};
-        background: ${props.theme.colors.gray[300]};
+        color: ${props.theme.colors.gray[800]};
+        border-color: ${props.theme.colors.gray[800]};
+        background: none;
+        ${Arrow},${Icon} {
+          fill: ${props.theme.colors.gray[800]};
+        }
       }
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
-      border: 1px solid ${props.theme.colors.gray[300]};
-      background: ${props.theme.colors.gray[500]};
+      color: ${props.theme.colors.gray[100]};
+      border: 2px solid ${props.theme.colors.gray[200]};
+      background: none;
+      ${Arrow}, ${Icon} {
+        fill: ${props.theme.colors.gray[100]};
+      }
       &:hover {
-        border-color: ${props.theme.colors.gray[100]};
+        color: ${props.theme.colors.gray[50]};
+        background: none;
+        border-color: ${props.theme.colors.green[300]};
+        ${Arrow}, ${Icon} {
+          fill: ${props.theme.colors.gray[50]};
+        }
       }
     `}
     ${(props) =>
-    props.error &&
-    `
-      border-color:${props.theme.colors.red[300]}
+    props.isOpen &&
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[800]};
+      border-color: ${props.theme.colors.gray[800]};
+      background: none;
+      ${Arrow},${Icon} {
+        fill: ${props.theme.colors.gray[800]};
+      }
+    `}
+    ${(props) =>
+    props.isOpen &&
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[50]};
+      background: none;
+      border-color: ${props.theme.colors.green[300]};
+      ${Arrow}, ${Icon} {
+        fill: ${props.theme.colors.gray[50]};
+      }
     `}
 `
 
 export const IconContainer = styled.div`
-  border-radius: 50%;
   width: 32px;
   height: 32px;
   margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
-
-export const Option = styled.div`
+export const OptionsHeader = styled.div`
   display: flex;
   align-items: center;
   font-size: ${(props) => props.theme.text.body2};
@@ -69,6 +107,23 @@ export const Option = styled.div`
   justify-content: flex-start;
   text-align: left;
   color: inherit;
+`
+
+export const Option = styled.div<{
+  isSelected: boolean
+}>`
+  display: flex;
+  align-items: center;
+  font-size: ${(props) => props.theme.text.body2};
+  font-weight: bold;
+  justify-content: flex-start;
+  text-align: left;
+  color: inherit;
+  ${(props) =>
+    props.isSelected &&
+    css`
+      background: ${props.theme.colors.gray[400]};
+    `}
 `
 
 export const DefaultIcon = styled.div`
@@ -86,15 +141,17 @@ export const DefaultIcon = styled.div`
       background: ${props.theme.colors.gray[200]};
     `}
 `
-export const Icon = styled.img`
-  width: 32px;
-  height: 32px;
+export const Icon = styled(Svg)`
   margin-right: 8px;
+  svg {
+    max-width: 32px;
+    height: auto;
+  }
 `
 
 export const DropdownBody = styled.div`
   transition: 0.25s all;
-  background: inherit;
+  /* background: inherit; */
   position: absolute;
   width: 100%;
   left: 0px;
@@ -148,11 +205,11 @@ export const DropdownContent = styled.div`
     border-radius: 14px;
     padding: 5px;
     box-sizing: border-box;
-    background: inherit;
+    /* background: inherit; */
     ${(props) =>
       props.theme.name === 'light' &&
       css`
-        background: ${props.theme.colors.gray[100]};
+        /* background: ${props.theme.colors.gray[100]}; */
         &:hover {
           background: ${props.theme.colors.gray[300]};
         }
@@ -161,7 +218,7 @@ export const DropdownContent = styled.div`
       props.theme.name === 'dark' &&
       css`
         border: 1px solid ${props.theme.colors.gray[500]};
-        background: ${props.theme.colors.gray[500]};
+        /* background: ${props.theme.colors.gray[500]}; */
         &:hover {
           border: 1px solid ${props.theme.colors.gray[400]};
           background: ${props.theme.colors.gray[400]};
@@ -170,6 +227,16 @@ export const DropdownContent = styled.div`
   }
 `
 
-export const Arrow = styled.img`
+export const Arrow = styled(Svg)`
   margin-left: auto;
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      fill: ${props.theme.colors.gray[100]};
+    `}
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      fill: ${props.theme.colors.gray[600]};
+    `}
 `

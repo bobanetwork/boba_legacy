@@ -1,15 +1,11 @@
 import styled, { keyframes } from 'styled-components'
-
+import { ButtonTypes } from './types'
 export const ButtonContainer = styled.button.withConfig({
   shouldForwardProp: (prop) =>
-    !['loading', 'disable', 'small', 'outline', 'transparent'].includes(prop),
-})<{
-  loading?: boolean
-  disable?: boolean
-  outline?: boolean
-  small?: boolean
-  transparent?: boolean
-}>`
+    !['loading', 'disable', 'small', 'outline', 'transparent', 'tiny'].includes(
+      prop
+    ),
+})<ButtonTypes>`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -28,6 +24,15 @@ export const ButtonContainer = styled.button.withConfig({
 
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
   transition: all 0.25s ease;
+
+  ${(props) =>
+    props.tiny &&
+    `
+    font-size:${props.theme.text.body3};
+    padding:10px 15px;
+    min-width:auto;
+    border-radius:8px;
+  `}
 
   ${(props) =>
     props.disable &&

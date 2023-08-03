@@ -71,10 +71,11 @@ export const Style = styled.div<StyleProps>`
 
 export const WrapperActionsModal = styled(Box)`
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
   justify-content: flex-end;
-  margin-top: 50px;
+  margin-top: 15px;
 `
 
 export const ModalHead = styled(Box)`

@@ -10,26 +10,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-export function selectTransactions (state) {
+export function selectTransactions(state) {
   return Object.values(state.transaction)
 }
 
-export function selectErc20Deposits (state) {
+export function selectErc20Deposits(state) {
   return Object.values(state.deposit.erc20)
 }
 
-export function selectEthDeposits (state) {
+export function selectEthDeposits(state) {
   return Object.values(state.deposit.eth)
 }
 
-export function selectCDMType (state) {
+export function selectCDMType(state) {
   return state.transaction.CDMType
 }
 
-export function selectCDMMessage (state) {
+export function selectCDMMessage(state) {
   return state.transaction.CDMMessage
 }
 
-export function selectCDMTransaction (state) {
+export function selectCDMTransaction(state) {
   return state.transaction.CDMTransaction
 }

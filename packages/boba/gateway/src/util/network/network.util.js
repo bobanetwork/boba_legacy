@@ -168,13 +168,13 @@ export const NetworkList = {
   ]
 }
 
-const networkConfig = {
+export const AllNetworkConfigs = {
   [NETWORK.ETHEREUM] : ethereumConfig,
   [NETWORK.BNB] : bnbConfig,
   [NETWORK.AVAX] : avaxConfig
 }
 
-export const rpcUrls = Object.values(networkConfig).reduce((networkConfigs, networkConfig) => {
+export const rpcUrls = Object.values(AllNetworkConfigs).reduce((networkConfigs, networkConfig) => {
   networkConfigs[networkConfig.Mainnet.L1.chainId] = networkConfig.Mainnet.L1.rpcUrl[0]
   networkConfigs[networkConfig.Mainnet.L2.chainId] = networkConfig.Mainnet.L2.rpcUrl
   networkConfigs[networkConfig.Testnet.L1.chainId] = networkConfig.Testnet.L1.rpcUrl[0]
@@ -186,7 +186,7 @@ export const getNetworkDetail = ({
   network,
   networkType
 }) => {
-  return networkConfig[network][networkType]
+  return AllNetworkConfigs[network][networkType]
 }
 
 export const getBlockExplorerUrl = ({
@@ -194,7 +194,7 @@ export const getBlockExplorerUrl = ({
   networkType,
   layer
 }) => {
-  return networkConfig[network][networkType][layer]?.blockExplorerUrl
+  return AllNetworkConfigs[network][networkType][layer]?.blockExplorerUrl
 }
 
 export const pingRpcUrl = async (

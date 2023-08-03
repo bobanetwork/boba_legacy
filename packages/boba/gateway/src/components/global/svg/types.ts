@@ -3,4 +3,5 @@ export interface SvgTypes {
   fill?: string
   stroke?: string
   onClick?: () => void
+  className?: string
 }
