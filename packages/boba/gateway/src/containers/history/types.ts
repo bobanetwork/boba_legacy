@@ -18,14 +18,18 @@ export interface INetworks {
 
 export enum CHAIN_NAME {
   All_Networks = 'All Networks',
-  BNB_Testnet = 'tBNB',
-  Boba_BNB_Testnet = 'Boba tBNB',
+  BNB_Testnet = 'BNB Testnet',
+  Boba_BNB_Testnet = 'Boba BNB Testnet',
   BNB = 'BNB',
   Boba_BNB = 'Boba BNB',
   Ethereum = 'Ethereum',
-  Boba_Ethereum = 'Boba',
-  Goerli = 'Goerli',
+  Boba_Ethereum = 'Boba Ethereum',
+  Goerli = 'Ethereum Goerli',
   Boba_Goerli = 'Boba Goerli',
+  Avalanche = 'Avalanche',
+  Boba_Avalanche = 'Boba Avalanche',
+  Avalanche_Testnet = 'Avalanche Testnet',
+  Boba_Avalanche_Testnet = 'Boba Avalanche Testnet',
 }
 
 export enum LAYER {
