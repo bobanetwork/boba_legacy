@@ -6,6 +6,7 @@ import { getCoinImage } from 'util/coinImage'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
 import ethereumFlex from 'images/ethereumFlex.svg'
+import bobaIcon from 'images/bobaNetwork.svg'
 
 export const Chains: ChainMap = {
   '0': {
@@ -127,38 +128,38 @@ export const NETWORK_L2_OPTIONS = [
   {
     value: '288',
     label: 'Boba Ethereum',
-    imgSrc: getCoinImage('BOBA'),
+    imgSrc: bobaIcon,
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
     value: '56288',
     label: 'Boba BNB',
-    imgSrc: getCoinImage('BOBA'),
+    imgSrc: bobaIcon,
     headerName: NETWORK_TYPE.MAINNET,
   },
 
   {
     value: '43288',
     label: 'Boba Avalanche',
-    imgSrc: getCoinImage('AVAX'),
+    imgSrc: bobaIcon,
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
     value: '2888',
     label: 'Boba Goerli',
-    imgSrc: getCoinImage('BOBA'),
+    imgSrc: bobaIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '9728',
     label: 'Boba BNB Testnet',
-    imgSrc: getCoinImage('BOBA'),
+    imgSrc: bobaIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '4328',
     label: 'Boba Avalanche Testnet',
-    imgSrc: getCoinImage('AVAX'),
+    imgSrc: bobaIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
 ]
