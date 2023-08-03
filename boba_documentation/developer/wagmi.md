@@ -2,7 +2,7 @@
 
 ## TLDR
 
-The WAGMI incentives program is Boba Network's take on liquidity mining 2.0. In collaboration with UMA protocol, we are be distributing WAGMI options on BOBA token to promising projects building on Boba. Users can earn WAGMI options using their favorite dApps on Boba Network. WAGMI options are KPI (key performance indicators) options redeemable for BOBA tokens based on metrics relating to Boba Network, such as monthly active wallets or project specific TVL. 
+The WAGMI incentives program is Boba Network's take on liquidity mining 2.0. In collaboration with UMA protocol, we are be distributing WAGMI options on BOBA token to promising projects building on Boba. Users can earn WAGMI options using their favorite dApps on Boba Network. WAGMI options are KPI (key performance indicators) options redeemable for BOBA tokens based on metrics relating to Boba Network, such as monthly active wallets or project specific TVL.
 
 WAGMI works by using UMA protocol's [optimistic oracle](https://umaproject.org/optimistic-oracle.html). BOBA tokens are locked up in a smart contract that pays out subject to network KPIs (i.e. TVL of Boba) and secured in WAGMIvX tokens. BOBA is paid out after a 1 month settlement period on KPIs.
 
@@ -33,11 +33,11 @@ collateralToken = getContract("ERC20").at("0x__________")
 await collateralToken
   .methods
   .approve(
-    LongShortPair.options.address, 
+    LongShortPair.options.address,
     web3.utils.toWei("10"))
       .send({
-        gas: 100000, 
-        gasPrice: 2 * 1000000000, 
+        gas: 100000,
+        gasPrice: 2 * 1000000000,
         from: (await web3.eth.getAccounts())[0]
       })
 
@@ -47,8 +47,8 @@ await LongShortPair
   .create(
     web3.utils.toWei("5")
   ).send({
-    gas: 300000, 
-    gasPrice: 2 * 1000000000, 
+    gas: 300000,
+    gasPrice: 2 * 1000000000,
     from: (await web3.eth.getAccounts())[0]
   })
 
@@ -58,8 +58,8 @@ await LongShortPair
   .redeem(
     web3.utils.toWei("2.5")
   ).send({
-    gas: 200000, 
-    gasPrice: 2 * 1000000000, 
+    gas: 200000,
+    gasPrice: 2 * 1000000000,
     from: (await web3.eth.getAccounts())[0]
   })
 ```
@@ -88,7 +88,7 @@ const LongShortPair = new ethers.Contract(
 )
 
 // collateralPerPair: units of collateral are required to mint one pair of synthetic tokens
-const mintTx = await LongShortPair.create(depositBobaAmount.div(collateralPerPair)) 
+const mintTx = await LongShortPair.create(depositBobaAmount.div(collateralPerPair))
 await mintTx.wait()
 ```
 
@@ -104,20 +104,20 @@ TVLDenomination:USD,
 LowerTVLBound:300000000,
 UpperTVLBound:1000000000,
 MinimumPayout:1,
-Rounding:6" 
---optimisticOracleLivenessTime 43200 
+Rounding:6"
+--optimisticOracleLivenessTime 43200
 --fpl Linear --lowerBound 0 --upperBound 2000000000000000000
 ```
 
-## Each WAGMI token needs a new Oracle that provides the goal-specific data 
+## Each WAGMI token needs a new Oracle that provides the goal-specific data
 
-The WAGMIv0 oracle is documented [here](https://github.com/UMAprotocol/UMIPs/blob/master/Implementations/boba-wagmi-tvl.md). Briefly, the WAGMIv0 oracle estimates TVL bridged from L1 to Boba network through the L1 standard bridge contract. It is based on similar calculation logic that is used to estimate Boba network TVL on the Dune Analytics Boba Bridge USD TVL display. 
+The WAGMIv0 oracle is documented [here](https://github.com/UMAprotocol/UMIPs/blob/master/Implementations/boba-wagmi-tvl.md). Briefly, the WAGMIv0 oracle estimates TVL bridged from L1 to Boba network through the L1 standard bridge contract. It is based on similar calculation logic that is used to estimate Boba network TVL on the Dune Analytics Boba Bridge USD TVL display.
 
 [Method doc - Boba TVL](https://github.com/UMAprotocol/UMIPs/blob/master/Implementations/boba-wagmi-tvl.md) (that is referenced in LSP contract ancillary data) has link to example script: https://github.com/Reinis-FRP/boba-tvl.
 
 ## Claims Interface
 
-For the claims interface, the relevant smart contracts are: 
+For the claims interface, the relevant smart contracts are:
 
 * The [LSP contract 0x7F969E3F19355C47f6bc957E502c79C75b373BF3](https://blockexplorer.boba.network/address/0x7F969E3F19355C47f6bc957E502c79C75b373BF3/transactions)
 
@@ -178,7 +178,7 @@ Then, add the new WAGMI token to the **token icon system**:
 ```javascript
 /util/coinImage.js
 
-import wagmiv0Logo from 'images/wagmiv0.png';
+import wagmiv0Logo from 'assets/imageswagmiv0.png';
 ...
   case "WAGMIv0":
     logo = wagmiv0Logo;
@@ -195,7 +195,7 @@ Next, add the new WAGMI token to the **token lookup**:
   } else if (_tokenContractAddressL1 === 'wagmiv0') {
     if(tA['WAGMIv0'].L2 !== null) _tokenContractAddressL2 = tA['WAGMIv0'].L2.toLowerCase()
     tokenContract = new ethers.Contract(
-      _tokenContractAddressL2, 
+      _tokenContractAddressL2,
       erc20abi,
       networkService.L2Provider,
     )

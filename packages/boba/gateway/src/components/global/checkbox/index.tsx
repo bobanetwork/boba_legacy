@@ -4,7 +4,7 @@ import { Typography } from 'components/global/typography'
 import { Label, Checkbox, CheckContainer } from './styles'
 import { Svg } from 'components/global/svg'
 
-import CheckedIcon from 'images/icons/check.svg'
+import CheckedIcon from 'assets/images/icons/check.svg'
 
 export const CheckboxWithLabel: React.FC<CheckboxWithLabelProps> = ({
   label,

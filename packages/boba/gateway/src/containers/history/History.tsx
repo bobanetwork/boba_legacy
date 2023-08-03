@@ -27,53 +27,49 @@ import { NETWORK_TYPE } from 'util/network/network.util'
 import {
   ALL_NETWORKS,
   FILTER_OPTIONS,
-  TableOptions,
   NETWORK_L1_OPTIONS,
   NETWORK_L2_OPTIONS,
+  TableOptions,
 } from './constants'
 
-import MagnifyingGlass from 'images/icons/magnifyingGlass.svg'
+import MagnifyingGlass from 'assets/images/icons/magnifyingGlass.svg'
 
 import {
-  selectTransactions,
   selectAccountEnabled,
   selectLayer,
+  selectTransactions,
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
 
 import {
-  Actions,
+  DropdownNetwork,
+  HistoryPageContainer,
+  Icon,
+  IconContainer,
+  Input,
+  NetworkDropdowns,
+  NoHistory,
   SearchInput,
   Table,
-  NoHistory,
-  HistoryPageContainer,
-  TableHeader,
   TableFilters,
-  NetworkDropdowns,
-  Input,
-  DatePickerWrapper,
-  DateDescriptions,
-  Icon,
-  MobileDateDescriptions,
-  IconContainer,
-  DropdownNetwork,
+  TableHeader,
   TableTransactionsContainer,
 } from './styles'
 
-import useInterval from 'hooks/useInterval'
 import { setConnect } from 'actions/setupAction'
+import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-import FilterIcon from '../../images/filter.svg'
 
+import FilterIcon from 'assets/images/filter.svg'
+import switchButton from 'assets/images/icons/switchButton.svg'
+import noHistoryIcon from 'assets/images/noHistory.svg'
+import { FilterDropDown } from 'components/filter'
+import { Svg } from 'components/global/svg'
+import { TransactionsTableHeader } from 'components/global/table/themes'
 import { TransactionsResolver } from './TransactionsResolver'
 import { CHAIN_NAME, TRANSACTION_FILTER_STATUS } from './types'
-import { TransactionsTableHeader } from 'components/global/table/themes'
-import { FilterDropDown } from 'components/filter'
-import noHistoryIcon from 'images/noHistory.svg'
-import switchButton from 'images/icons/switchButton.svg'
-import { Svg } from 'components/global/svg'
 
 import { Typography } from 'components/global/typography'
 
