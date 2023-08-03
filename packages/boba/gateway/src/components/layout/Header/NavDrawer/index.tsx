@@ -1,7 +1,10 @@
 import { Drawer } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { SwitchButton } from 'components/global'
+import SunIcon from 'assets/images/theme-sun.svg'
+import { Svg, SwitchButton } from 'components/global'
 import React, { FC } from 'react'
+import { useTheme } from 'styled-components'
+import { MENU_LIST } from '../Navigation/constant'
 import { BobaLogo } from '../styles'
 import {
   ActionContainer,
@@ -15,9 +18,16 @@ import {
   NavLinkItem,
   NavList,
   StyleDrawer,
+  ThemeIcon,
   WrapperCloseIcon,
 } from './styles'
-import { MENU_LIST } from '../Navigation/constant'
+import useThemeSwitcher from 'hooks/useThemeSwitcher'
+import { THEME_NAME } from '../types'
+import { getCoinImage } from 'util/coinImage'
+import truncateMiddle from 'truncate-middle'
+import networkService from 'services/networkService'
+import { useSelector } from 'react-redux'
+import { selectAccountEnabled, selectLayer } from 'selectors'
 
 interface Props {
   onClose: () => void
@@ -34,6 +44,11 @@ const useStyles = makeStyles({
 
 const NavDrawer: FC<Props> = ({ onClose, open }) => {
   const classes = (useStyles as any)()
+  const { currentTheme, setThemeDark, setThemeLight } = useThemeSwitcher()
+  const theme: any = useTheme()
+
+  const layer = useSelector(selectLayer())
+  const accountEnabled = useSelector(selectAccountEnabled())
 
   return (
     <Drawer open={open} classes={{ paper: classes.root }}>
@@ -49,17 +64,34 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
           <ActionItem>
             <ActionIcon />
             <ActionLabel>Account</ActionLabel>
-            <ActionValue>0x8321....A4E1</ActionValue>
+            <ActionValue>
+              {truncateMiddle(networkService.account as string, 5, 5, '...')}
+            </ActionValue>
           </ActionItem>
+          {!accountEnabled && layer === 'L2' ? (
+            <ActionItem>
+              <ThemeIcon>
+                <img src={getCoinImage('ETH')} alt="use token" />
+              </ThemeIcon>
+              <ActionLabel>Gas Fee</ActionLabel>
+              <ActionValue>ETH</ActionValue>
+            </ActionItem>
+          ) : null}
           <ActionItem>
-            <ActionIcon />
-            <ActionLabel>Account</ActionLabel>
-            <ActionValue>0x8321....A4E1</ActionValue>
-          </ActionItem>
-          <ActionItem>
-            <ActionIcon />
-            <ActionLabel>Account</ActionLabel>
-            <ActionValue>0x8321....A4E1</ActionValue>
+            <ThemeIcon>
+              <Svg src={SunIcon} fill={theme.colors['gray'][600]} />
+            </ThemeIcon>
+            <ActionLabel>Light Mode</ActionLabel>
+            <SwitchButton
+              isActive={currentTheme === THEME_NAME.DARK}
+              onStateChange={(d: any) => {
+                if (d) {
+                  setThemeDark()
+                } else {
+                  setThemeLight()
+                }
+              }}
+            />
           </ActionItem>
         </ActionContainer>
         <HeaderDivider />
@@ -70,6 +102,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
                 key={menu.label}
                 to={menu.path}
                 activeclassname="active"
+                onClick={onClose}
               >
                 {menu.label}
               </NavLinkItem>

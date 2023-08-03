@@ -50,13 +50,13 @@ export const ActionContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 40px;
+  gap: 2px;
 `
 export const ActionItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 16px;
+  padding: 16px;
   gap: 8px;
 `
 export const ActionIcon = styled.div`
@@ -65,6 +65,21 @@ export const ActionIcon = styled.div`
   border-radius: 50%;
   background: blue;
   justify-self: flex-start;
+`
+export const ThemeIcon = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  div {
+    padding: 4px;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `
 export const ActionLabel = styled(Typography).attrs({
   variant: 'title',
@@ -76,13 +91,31 @@ export const ActionLabel = styled(Typography).attrs({
       ? theme.colors['gray'][800]
       : theme.colors['gray'][100]};
 `
-export const ActionValue = styled(Typography).attrs({
+export const ActionValue = styled.button.attrs({
   variant: 'title',
 })`
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
   color: ${({ theme }) =>
     theme.name === 'light'
       ? theme.colors['gray'][800]
-      : theme.colors['gray'][100]};
+      : theme.colors['gray'][50]};
+
+  &:after {
+    content: '\\27E9';
+    font-size: 19px;
+    font-weight: 600;
+    display: inline-block;
+    padding-left: 10px;
+    color: ${({ theme }) =>
+      theme.name === 'light'
+        ? theme.colors['gray'][800]
+        : theme.colors['gray'][50]};
+  }
 `
 
 export const NavList = styled.div`
