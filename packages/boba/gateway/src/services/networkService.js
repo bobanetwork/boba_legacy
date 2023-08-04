@@ -4737,6 +4737,15 @@ class NetworkService {
     return (await this.provider.getBlock(blockNumber)).timestamp;
   }
 
+  async getBlockExplorerLinks() {
+    if (this.networkConfig) {
+      const l1Explorer = this.networkConfig.L1.blockExplorerUrl
+      const l2Explorer = this.networkConfig.L2.blockExplorerUrl
+      return [l1Explorer, l2Explorer]
+    }
+    return ['https://goerli.etherscan.io/','https://testnet.bobascan.com/']
+  }
+
 }
 
 const networkService = new NetworkService()
