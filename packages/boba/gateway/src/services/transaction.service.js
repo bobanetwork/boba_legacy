@@ -40,7 +40,7 @@ class TransactionService {
   async fetchL2Tx() {
     let L2Txs = []
     try {
-      const responseL2: any = await omgxWatcherAxiosInstance(
+      const responseL2 = await omgxWatcherAxiosInstance(
         networkService.networkConfig
       )
         .post('get.l2.transactions', {
@@ -151,7 +151,7 @@ class TransactionService {
           toRange: 1000,
         })*/
       // TODO
-      const responseTeleportation = assetReceived as any
+      const responseTeleportation = assetReceived
 
       if (responseTeleportation.status === 201) {
         //add the chain: 'teleportation' field
