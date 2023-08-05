@@ -7,33 +7,43 @@ const {sleep} = require('@eth-optimism/core-utils')
 
 const maximumBlockRange = 49999
 const teleportationMonitorInterval = 100000
+
+const getRandomProviderUrl = (providerUrls) => {
+    return providerUrls[Math.floor(Math.random()*providerUrls.length)]
+}
+
 const testnets = [
     {
         name: 'L1:Goerli',
-        provider: new ethers.providers.StaticJsonRpcProvider('https://goerli.gateway.tenderly.co'),
+        provider: () => new ethers.providers.StaticJsonRpcProvider(getRandomProviderUrl([
+            'https://goerli.gateway.tenderly.co', 'https://goerli.blockpi.network/v1/rpc/public', 'https://rpc.ankr.com/eth_goerli', 'https://rpc.goerli.eth.gateway.fm'
+        ])),
         startBlock: '9322135',
-        logInterval: '1000',
+        logInterval: '100',
         contract: '0xC226F132A686A08018431C913d87693396246024',
     },
     {
         name: 'L1:BNB_Testnet',
-        provider: new ethers.providers.StaticJsonRpcProvider('https://endpoints.omniatech.io/v1/bsc/testnet/public'),
+        provider: () => new ethers.providers.StaticJsonRpcProvider(getRandomProviderUrl([
+          // blastapi doesn't support getLogs
+          'https://endpoints.omniatech.io/v1/bsc/testnet/public', 'https://data-seed-prebsc-2-s1.bnbchain.org:8545'
+        ])),
         startBlock: '31747477',
-        logInterval: '1000',
+        logInterval: '100',
         contract: '0x1b633BdA998507795A4552809be25D1dCe1d881d',
     },
     {
         name: 'L2:Goerli',
-        provider: new ethers.providers.StaticJsonRpcProvider('https://replica.goerli.boba.network'),
+        provider: () => new ethers.providers.StaticJsonRpcProvider(getRandomProviderUrl(['https://replica.goerli.boba.network', 'https://goerli.boba.network'])),
         startBlock: '3820',
-        logInterval: '1000',
+        logInterval: '100',
         contract: '0x64bD91c67af8cd17e04BeBDaac675f0EF6527edd',
     },
     {
         name: 'L2:BNB_Testnet',
-        provider: new ethers.providers.StaticJsonRpcProvider('https://replica.testnet.bnb.boba.network'),
+        provider: () => new ethers.providers.StaticJsonRpcProvider(getRandomProviderUrl(['https://replica.testnet.bnb.boba.network', 'https://testnet.bnb.boba.network'])),
         startBlock: '240152',
-        logInterval: '1000',
+        logInterval: '100',
         contract: '0xC226F132A686A08018431C913d87693396246024',
     }
 ]
@@ -58,7 +68,7 @@ class TeleportationBridgeMonitorService extends GlobalEnv {
             const attempts = 10
             for (let i = 0; i < attempts; i++) {
                 try {
-                    await supportedNetwork.provider.detectNetwork()
+                    await supportedNetwork.provider().detectNetwork()
                     this.logger.info(`Successfully connected to ${supportedNetwork.name} network.`)
                     break
                 } catch (err) {
@@ -83,7 +93,7 @@ class TeleportationBridgeMonitorService extends GlobalEnv {
 
         // fetch the last end block
         for (let i = 0; i < this.supportedNetworks.length; i++) {
-            const chainId = (await this.supportedNetworks[i].provider.getNetwork()).chainId
+            const chainId = (await this.supportedNetworks[i].provider().getNetwork()).chainId
             const startBlockQueryObj = (
                 await this.databaseService.getNewestBlockFromTeleportationBridgeTable(chainId)
             )
@@ -113,7 +123,7 @@ class TeleportationBridgeMonitorService extends GlobalEnv {
     }
 
     async startTeleportationMonitorForNetwork(supportedNetwork) {
-        const latestBlock = await supportedNetwork.provider.getBlockNumber()
+        const latestBlock = await supportedNetwork.provider().getBlockNumber()
 
         const endBlock = Math.min(latestBlock, supportedNetwork.endBlock)
         if (supportedNetwork.startBlock > endBlock) {
@@ -121,7 +131,7 @@ class TeleportationBridgeMonitorService extends GlobalEnv {
         }
 
         this.logger.info(`Monitoring new network until latestBlock ${latestBlock}, startBlock ${supportedNetwork.startBlock}, endBlock ${endBlock}`)
-        const teleportationLog = await supportedNetwork.provider.getLogs({
+        const teleportationLog = await supportedNetwork.provider().getLogs({
             address: supportedNetwork.contract,
             fromBlock: Number(supportedNetwork.startBlock),
             toBlock: Number(endBlock),
@@ -143,7 +153,7 @@ class TeleportationBridgeMonitorService extends GlobalEnv {
                     const blockHash = eachEvent.blockHash
                     const blockNumber = eachEvent.blockNumber
                     const timestamp = Number(
-                        (await supportedNetwork.provider.getBlock(blockNumber)).timestamp
+                        (await supportedNetwork.provider().getBlock(blockNumber)).timestamp
                     )
 
                     this.logger.info(`Received event for teleportation for current network: ${TeleportationEvent.name}, hash: ${hash}`)
