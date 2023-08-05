@@ -33,7 +33,7 @@ def watcher_getTeleportationTransactions(event, context):
   with con.cursor() as cur:
     try:
       cur.execute("""SELECT * FROM teleportation
-        WHERE `depositSender`=%s ORDER BY CAST(depositBlockNumber as unsigned) DESC LIMIT %s OFFSET %s""", (address, toRange - fromRange, fromRange))
+        WHERE `depositSender`=%s OR `disburseReceiver`=%s ORDER BY CAST(depositBlockNumber as unsigned) DESC LIMIT %s OFFSET %s""", (address, address, toRange - fromRange, fromRange))
       transactionsDataRaw = cur.fetchall()
 
       for transactionDataRaw in transactionsDataRaw:
