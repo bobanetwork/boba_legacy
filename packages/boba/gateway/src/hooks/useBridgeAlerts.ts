@@ -102,7 +102,7 @@ const useBridgeAlerts = () => {
       })
     )
 
-    if (underZero || amountToBridge <= 0) {
+    if ((underZero || amountToBridge <= 0) && amountToBridge) {
       dispatch(
         setBridgeAlert({
           meta: ALERT_KEYS.VALUE_TOO_SMALL,
