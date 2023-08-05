@@ -7,7 +7,7 @@ export const pageTitleWhiteList = [
   },
   {
     title: 'Earn',
-    slug: 'Participate in voting on proposals concerning the future of Boba Network',
+    slug: 'Stake more, Earn more',
     path: ROUTES_PATH.EARN,
   },
   {
