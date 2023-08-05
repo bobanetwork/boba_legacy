@@ -16,6 +16,7 @@ const light = {
   background: '#FFFFFF',
   color: '#22221E',
   colors: {
+    modalTransparent: '#fff',
     danger: '#FF0000',
     success: 'green',
     info: 'blue',

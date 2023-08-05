@@ -1,50 +1,45 @@
-import { styled } from '@mui/material/styles'
-import { Box, Grid } from '@mui/material'
+import  styled, {css}  from 'styled-components'
+import { mobile } from 'themes/screens'
 
-export const Wrapper = styled(Box)(({ theme, ...props }) => ({
-  border: '1px solid ' + theme.palette.background.glassyBorder,
-  borderRadius: '12px',
-  background: theme.palette.background.glassy,
-  [theme.breakpoints.down('md')]: {
-    padding: '20px 10px',
-  },
-  [theme.breakpoints.up('md')]: {
-    padding: '20px',
-  },
-}));
+export const Wrapper = styled.div`
+  border: 1px solid ${(props)=> props.theme.colors.box.border};
+  border-radius: 12px;
+  background: ${(props)=> props.theme.colors.box.background};
 
-export const GridContainer = styled(Grid)(({theme})=>({
-  [theme.breakpoints.down('md')]:{
-    justifyContent: 'flex-start'
-  }
-}))
+  padding: 20px 10px;
 
-export const GridItemTag = styled(Grid)(({ theme, ...props }) => ({
+`
+
+export const GridContainer = styled.div`
+  ${mobile(css`
+    justify-content: flex-start;
+  `)}
+`
+
+export const GridItemTag = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 8px;
+
+`
+
+export const GridItemTagR = styled.div`
   display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems:'flex-start',
-  paddingLeft: '8px',
+  flex-direction: column,
+  justify-content: space-between,
+  align-items: flex-start;
+  /*
   [theme.breakpoints.down('md')]:{
-    padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`
-  }
-}))
-
-export const GridItemTagR = styled(Grid)(({ theme, ...props }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  //paddingLeft: '8px',
-  [theme.breakpoints.down('md')]:{
-    //padding: `${props.xs === 12 ? '20px 0px 0px': 'inherit'}`,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   }
-}))
+  */
+`
 
-export const DropdownWrapper = styled(Box)`
+export const DropdownWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,17 +52,20 @@ export const DropdownWrapper = styled(Box)`
   text-align: center;
 `;
 
-export const DropdownContent = styled(Box)(({ theme }) => ({
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'space-between',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    gap: '5px',
-    padding: '5px'
-  },
-  [theme.breakpoints.up('md')]: {
-    flexDirection: 'row',
-    gap: '16px',
-  },
-}));
+export const DropdownContent = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  ${mobile(css`
+    padding:15px;
+  `)}
+
+`
+
+export const ItemHeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+`

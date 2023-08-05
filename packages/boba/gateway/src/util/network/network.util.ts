@@ -181,33 +181,33 @@ export const NetworkList: { Mainnet: INetwork[]; Testnet: INetwork[] } = {
   ],
 }
 
-const networkConfig: any = {
+export const AllNetworkConfigs = {
   [NETWORK.ETHEREUM]: ethereumConfig,
   [NETWORK.BNB]: bnbConfig,
   [NETWORK.AVAX]: avaxConfig,
 }
 
-export const rpcUrls = Object.values(networkConfig).reduce(
-  (networkConfigs: any, networkConfigEl: any) => {
-    networkConfigs[networkConfigEl.Mainnet.L1.chainId] =
-      networkConfigEl.Mainnet.L1.rpcUrl[0]
-    networkConfigs[networkConfigEl.Mainnet.L2.chainId] =
-      networkConfigEl.Mainnet.L2.rpcUrl
-    networkConfigs[networkConfigEl.Testnet.L1.chainId] =
-      networkConfigEl.Testnet.L1.rpcUrl[0]
-    networkConfigs[networkConfigEl.Testnet.L2.chainId] =
-      networkConfigEl.Testnet.L2.rpcUrl
+export const rpcUrls = Object.values(AllNetworkConfigs).reduce(
+  (networkConfigs, networkConfig) => {
+    networkConfigs[networkConfig.Mainnet.L1.chainId] =
+      networkConfig.Mainnet.L1.rpcUrl[0]
+    networkConfigs[networkConfig.Mainnet.L2.chainId] =
+      networkConfig.Mainnet.L2.rpcUrl
+    networkConfigs[networkConfig.Testnet.L1.chainId] =
+      networkConfig.Testnet.L1.rpcUrl[0]
+    networkConfigs[networkConfig.Testnet.L2.chainId] =
+      networkConfig.Testnet.L2.rpcUrl
     return networkConfigs
   },
   {}
 )
 
 export const getNetworkDetail = ({ network, networkType }) => {
-  return networkConfig[network][networkType]
+  return AllNetworkConfigs[network][networkType]
 }
 
 export const getBlockExplorerUrl = ({ network, networkType, layer }) => {
-  return networkConfig[network][networkType][layer]?.blockExplorerUrl
+  return AllNetworkConfigs[network][networkType][layer]?.blockExplorerUrl
 }
 
 export const pingRpcUrl = async (rpcUrl) => {

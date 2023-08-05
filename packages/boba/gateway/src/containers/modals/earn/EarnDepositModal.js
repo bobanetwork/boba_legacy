@@ -3,11 +3,9 @@ import { connect } from 'react-redux'
 import { isEqual } from 'util/lodash';
 
 import { closeModal, openAlert } from 'actions/uiAction'
-import { addLiquidity, getEarnInfo } from 'actions/earnAction'
+import { addLiquidity, getEarnInfo, fetchAllowance } from 'actions/earnAction'
 
-import Button from 'components/button/Button'
 import Modal from 'components/modal/Modal'
-import Input from 'components/input/Input'
 
 import { powAmount, toWei_String } from 'util/amountConvert'
 import BN from 'bignumber.js'
@@ -16,11 +14,21 @@ import { Box, Typography } from '@mui/material'
 import { WrapperActionsModal } from 'components/modal/styles'
 
 import { earnL1, earnL2 } from 'actions/networkAction'
-import { fetchAllowance } from 'actions/earnAction'
 import networkService from 'services/networkService'
 import { BigNumber, utils } from 'ethers'
 import { NETWORK } from 'util/network/network.util'
 
+import { MaxInput } from 'components/global/InputMax'
+import { Button } from 'components/global/button'
+import { ModalTypography } from 'components/global/modalTypography'
+
+import {
+  EarnInputContainer,
+  EarnContent,
+  Flex,
+  EarnDetails,
+  ContainerMessage,
+} from './styles'
 class EarnDepositModal extends React.Component {
 
   constructor(props) {
@@ -295,100 +303,102 @@ class EarnDepositModal extends React.Component {
       <Modal
         open={open}
         maxWidth="md"
-        onClose={() => { this.handleClose() }}
+        onClose={() => {
+          this.handleClose()
+        }}
+        title={`Stake ${stakeToken.symbol}`}
       >
-        <Box>
-          <Typography variant="h2" sx={{ fontWeight: 700, mb: 3 }}>
-            Stake {`${stakeToken.symbol}`}
-          </Typography>
+        <EarnInputContainer>
+          <EarnContent>
+            <Flex>
+              <div>
+                <ModalTypography variant="body2">Amount</ModalTypography>
+              </div>
+              <div>
+                <ModalTypography variant="body3">
+                  Balance: {max_Float_String} {stakeToken.symbol}
+                </ModalTypography>
+              </div>
+            </Flex>
+            <MaxInput
+              initialValue={stakeValue}
+              max={max_Float_String}
+              onValueChange={(val)=> this.handleStakeValue(val)}
+            />
+            <EarnDetails>
+              <Flex>
+                <ModalTypography variant="body3">Fees</ModalTypography>
+                <ModalTypography variant="body3">
+                  Fee: {fee} {bobaFeeChoice ? 'BOBA' : 'ETH'}
+                </ModalTypography>
+              </Flex>
+              <Flex>
+                <ModalTypography variant="body3">APY</ModalTypography>
+                <ModalTypography variant="body3">5.0%</ModalTypography>
+              </Flex>
+              <Flex>
+                <ModalTypography variant="body3">Amount</ModalTypography>
+                <ModalTypography variant="body3">
+                  {stakeValue || '-'} {stakeToken.symbol}
+                </ModalTypography>
+              </Flex>
+            </EarnDetails>
+          </EarnContent>
+          {!allowanceGTstake && stakeToken.symbol !== netLayerNativeToken &&
+            <>
+              {stakeValueValid &&
+                <ContainerMessage>
+                  <ModalTypography variant="body3" >
+                    To stake {stakeValue} {stakeToken.symbol}, you first need to
+                    approve this amount.
+                  </ModalTypography>
+                </ContainerMessage>
+              }
+              <WrapperActionsModal>
+                <Button
+                  onClick={() => { this.handleApprove() }}
+                  label="Approve amount"
+                  loading={loading}
+                  disable={!stakeValueValid}
+                />
+                <Button
+                  onClick={() => { this.handleClose() }}
+                  label="Cancel"
+                  transparent
+                />
 
-          <Input
-            placeholder={`Amount to stake`}
-            value={stakeValue}
-            type="number"
-            unit={stakeToken.symbol}
-            maxValue={max_Float_String}
-            onChange={i => { this.handleStakeValue(i.target.value) }}
-            onUseMax={i => { this.handleStakeValue(max_Float_String) }}
-            allowUseAll={allowUseAll}
-            newStyle
-            variant="standard"
-          />
 
-          {netLayer === 'L2' && bobaFeeChoice && fee &&
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              Fee: {fee} BOBA
-            </Typography>
+              </WrapperActionsModal>
+            </>
           }
 
-          {netLayer === 'L2' && !bobaFeeChoice && fee &&
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              Fee: {fee} {networkService.L1NativeTokenSymbol}
-            </Typography>
+          {stakeValueValid && allowanceGTstake &&
+            <>
+              {stakeToken.symbol !== netLayerNativeToken &&
+                <ContainerMessage>
+                  <ModalTypography variant="body3" >
+                    Your allowance has been approved. You can now stake your funds.
+                  </ModalTypography>
+                </ContainerMessage>
+              }
+              <WrapperActionsModal>
+                <Button
+                  onClick={() => { this.handleConfirm() }}
+                  loading={loading}
+                  disable={false}
+                  label="Stake"
+                />
+                <Button
+                  onClick={() => { this.handleClose() }}
+                  label="Cancel"
+                  transparent
+                />
+
+              </WrapperActionsModal>
+            </>
           }
-        </Box>
 
-        {!allowanceGTstake && stakeToken.symbol !== netLayerNativeToken &&
-          <>
-            {stakeValueValid &&
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                To stake {stakeValue} {stakeToken.symbol},
-                you first need to approve this amount.
-              </Typography>
-            }
-            <WrapperActionsModal>
-              <Button
-                onClick={() => { this.handleClose() }}
-                variant='outlined'
-                color='primary'
-                size='large'
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => { this.handleApprove() }}
-                loading={loading}
-                disabled={!stakeValueValid}
-                color='primary'
-                size="large"
-                variant="contained"
-              >
-                Approve amount
-              </Button>
-            </WrapperActionsModal>
-          </>
-        }
-
-        {stakeValueValid && allowanceGTstake &&
-          <>
-            {stakeToken.symbol !== netLayerNativeToken &&
-              <Typography variant="body2" sx={{ mt: 2 }}>
-                Your allowance has been approved. You can now stake your funds.
-              </Typography>
-            }
-            <WrapperActionsModal>
-              <Button
-                onClick={() => { this.handleClose() }}
-                variant='outlined'
-                color='primary'
-                size='large'
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => { this.handleConfirm() }}
-                loading={loading}
-                disabled={false}
-                color='primary'
-                size="large"
-                variant="contained"
-              >
-                Stake!
-              </Button>
-            </WrapperActionsModal>
-          </>
-        }
-
+        </EarnInputContainer>
       </Modal>
     )
   }

@@ -2,29 +2,33 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { isEqual } from 'util/lodash';
 
-import { logAmount, powAmount } from 'util/amountConvert';
+import { logAmount, powAmount, formatLargeNumber } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
 import { openAlert, openModal } from 'actions/uiAction';
 
 import { getEarnInfo, updateStakeToken, updateWithdrawToken } from 'actions/earnAction';
 
-import Button from 'components/button/Button';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import networkService from 'services/networkService'
 
-import { Box, Typography, Fade, CircularProgress } from '@mui/material';
-import * as S from "./ListEarn.styles"
+import { Box,Fade, CircularProgress } from '@mui/material';
+import * as S from "./styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
 
-
-import {Text} from 'components/global/text'
 import {AprLabel} from 'components/global/label'
 import {IconLabel} from 'components/global/IconLabel';
-import {formatLargeNumber} from 'util/amountConvert';
 import {TableContent} from 'components/global/table'
+
+import { Typography } from 'components/global/typography'
+import { Button } from 'components/global/button'
+
+import ActionIcon from 'images/icons/actions.svg'
+import { SvgContianer } from './styles'
+import { Svg } from 'components/global/svg'
+
 class ListEarn extends React.Component {
 
   constructor(props) {
@@ -188,19 +192,21 @@ class ListEarn extends React.Component {
 
     const tableOptions = [
       { content: <IconLabel token={{ name, symbol, address, chainId, decimals }} />, width:225 },
-      { content: <Text> {formatNumber(poolInfo.tokenBalance)}</Text>,width:145 },
-      { content: <Text> {formatNumber(poolInfo.userDepositAmount)} </Text>,width:115 },
+      { content: <Typography variant="body2"> {formatNumber(poolInfo.tokenBalance)}</Typography>,width:145 },
+      { content: <Typography variant="body2"> {formatNumber(poolInfo.userDepositAmount)} </Typography>,width:115 },
       { content: <AprLabel>{`${logAmount(poolInfo.APR, 0, 2)}`}</AprLabel>, width:85 },
-      { content: <Text> {userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`}</Text>, width:90 },
-      { content: <> <Text>{ userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}</Text>
-          <Box
-            disabled={disabled}
-            sx={{ display: 'flex', cursor: 'pointer', color: "#0ebf9a", transform: dropDownBox ? "rotate(-180deg)" : "" }}
-          >
-            {accountEnabled ? <ExpandMoreIcon /> : <></>}
-          </Box>
-        </>, 
+      { content: <Typography variant="body2"> {userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`}</Typography>, width:90 },
+      { content: <Typography variant="body2">{ userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}</Typography>
+         ,
         width:110
+      },
+      {
+        content: (
+          <SvgContianer>
+            <Svg src={ActionIcon} />
+          </SvgContianer>
+        ),
+        width:75
       }
     ];
 
@@ -240,48 +246,24 @@ class ListEarn extends React.Component {
           <Fade in={dropDownBox}>
             <S.DropdownContent>
               <S.DropdownWrapper>
-                <Typography sx={{ flex: 1, display:'inline-flex' }} variant="body2" component="div">Earned</Typography>
-                <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">{logAmount(userReward, decimals, 5)}</Typography>
                 <Button
-                  variant="outlined"
-                  fullWidth
-                  disabled={logAmount(userReward, decimals) === '0' || disabled || !enableReward}
+                  disabled={disabled}
+                  onClick={() => {
+                    !disabled && this.handleStakeToken()
+                  }}
+                  label="Stake"
+                />
+                <Button
+                  disabled={
+                    logAmount(userReward, decimals) === '0' ||
+                    disabled ||
+                    !enableReward
+                  }
                   onClick={() => { this.handleHarvest() }}
                   loading={loading}
-                  sx={{ flex: 1 }}
-                >
-                  Harvest
-                </Button>
-              </S.DropdownWrapper>
-
-              <S.DropdownWrapper>
-                {logAmount(userInfo.amount, decimals) === '0' ?
-                  <>
-                    <Typography sx={{ flex: 1, display:'inline-flex' }} variant="body2" component="div">Staked</Typography>
-                    <Typography sx={{ flex: 1 }} variant="body2" component="div" color="secondary">0.00</Typography>
-                    <Button
-                      variant="outlined"
-                      onClick={() => { this.handleStakeToken() }}
-                      disabled={disabled}
-                      fullWidth
-                      sx={{ flex: 1 }}
-                    >
-                      Stake
-                    </Button>
-                  </> :
-                  <>
-                    <Typography variant="body2" component="div">Staked</Typography>
-                    <Typography variant="body2" component="div" color="secondary">{logAmount(userInfo.amount, decimals, 2)}</Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                      <Button variant="contained" disabled={disabled} onClick={() => { !disabled && this.handleWithdrawToken() }}>
-                        Unstake
-                      </Button>
-                      <Button variant="contained" disabled={disabled} onClick={() => { !disabled && this.handleStakeToken() }}>
-                        Stake More
-                      </Button>
-                    </Box>
-                  </>
-                }
+                  label="Harvest"
+                />
+                <Button disabled={disabled} onClick={() => { !disabled && this.handleWithdrawToken() }} label="Unstake" />
               </S.DropdownWrapper>
             </S.DropdownContent>
           </Fade>

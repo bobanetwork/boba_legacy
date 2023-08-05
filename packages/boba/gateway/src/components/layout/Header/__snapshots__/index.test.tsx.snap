@@ -3,61 +3,62 @@
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="sc-eAzDjm eZJmjM"
+    class="sc-fABZjn iGfxtS"
   >
     <div
-      class="sc-fABZjn dncsHS"
+      class="sc-gUMnWI ervjnC"
     />
     <div
-      class="sc-ePzlA-D jgRDPC"
+      class="sc-gjJAnY gMihvQ"
     >
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-hjLWnZ cgLSXX"
         href="/bridge"
       >
         Bridge
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-hjLWnZ cgLSXX"
         href="/history"
       >
         History
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-hjLWnZ cgLSXX"
         href="/earn"
       >
         Earn
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-hjLWnZ cgLSXX"
         href="/stake"
       >
         Stake
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-hjLWnZ cgLSXX"
         href="/DAO"
       >
         Dao
       </a>
     </div>
     <div
-      class="sc-gUMnWI ghBncp"
+      class="sc-hUOJWJ kmFsJr"
     >
       <button
-        class="sc-duSInm jNkTqC"
+        class="sc-crozmw joSqYT"
+        label="Connect Wallet"
         type="button"
       >
          Connect Wallet
       </button>
       <div
-        class="sc-dPwPAC RgduB"
+        class="sc-ePzlA-D fYkMgT"
         title="light-icon"
       >
         <div>
