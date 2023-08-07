@@ -69,6 +69,6 @@
     "node-fetch": "^2.6.1",
     "prom-client": "^14.0.1",
     "request-promise-native": "^1.0.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^5.0.1"
   }
 }
