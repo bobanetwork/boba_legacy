@@ -9493,7 +9493,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@>=16", "@types/react@^17":
+"@types/react@*", "@types/react@17.0.58", "@types/react@>=16", "@types/react@^17":
   version "17.0.58"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.58.tgz#c8bbc82114e5c29001548ebe8ed6c4ba4d3c9fb0"
   integrity sha512-c1GzVY97P0fGxwGxhYq989j4XwlcHQoto6wQISOC2v6wm3h0PORRWJFHlkRjfGsiG3y1609WdQ+J+tKxvrEd6A==
@@ -26772,6 +26772,11 @@ react-app-rewired@^2.2.1:
   integrity sha512-uFQWTErXeLDrMzOJHKp0h8P1z0LV9HzPGsJ6adOtGlA/B9WfT6Shh4j2tLTTGlXOfiVx6w6iWpp7SOC5pvk+gA==
   dependencies:
     semver "^5.6.0"
+
+react-bootstrap-daterangepicker@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-daterangepicker/-/react-bootstrap-daterangepicker-8.0.0.tgz#5c60670fae3cf9193fa274e4e12d9c878cb40d63"
+  integrity sha512-zwEMHq93/a0f2C2Cc/Q1zxN+jYWF4JsWEwVkJ2xVGp++Oc3Ck/fI2F9kiEqY1n8oKV0WFT4+cTcoagG7sWuXXw==
 
 react-card-flip@^1.1.5:
   version "1.2.0"
