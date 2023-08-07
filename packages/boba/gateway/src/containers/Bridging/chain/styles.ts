@@ -44,7 +44,8 @@ export const ChainPicker = styled.div`
 
 export const ChainIcon = styled.div`
   display: flex;
-  align-items: center;
+  width: 30px;
+  height: 30px;
 `
 export const ChainPickerPlaceHolder = styled(Typography).attrs({
   variant: 'body1',
