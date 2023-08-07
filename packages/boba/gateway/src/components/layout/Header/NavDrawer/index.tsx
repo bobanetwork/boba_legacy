@@ -2,7 +2,7 @@ import { Drawer } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import SunIcon from 'assets/images/theme-sun.svg'
 import { Svg, SwitchButton } from 'components/global'
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { useTheme } from 'styled-components'
 import { MENU_LIST } from '../Navigation/constant'
 import { BobaLogo } from '../styles'
@@ -28,6 +28,7 @@ import truncateMiddle from 'truncate-middle'
 import networkService from 'services/networkService'
 import { useSelector } from 'react-redux'
 import { selectAccountEnabled, selectLayer } from 'selectors'
+import AccountDrawer from './AccountDrawer'
 
 interface Props {
   onClose: () => void
@@ -46,6 +47,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
   const classes = (useStyles as any)()
   const { currentTheme, setThemeDark, setThemeLight } = useThemeSwitcher()
   const theme: any = useTheme()
+  const [userDrawer, setUserDrawer] = useState<boolean>(false)
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -64,7 +66,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
           <ActionItem>
             <ActionIcon />
             <ActionLabel>Account</ActionLabel>
-            <ActionValue>
+            <ActionValue onClick={() => setUserDrawer(true)}>
               {truncateMiddle(networkService.account as string, 5, 5, '...')}
             </ActionValue>
           </ActionItem>
@@ -109,6 +111,13 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
             )
           })}
         </NavList>
+        <AccountDrawer
+          onCloseNav={onClose}
+          open={userDrawer}
+          onClose={() => {
+            setUserDrawer(false)
+          }}
+        />
       </StyleDrawer>
     </Drawer>
   )
