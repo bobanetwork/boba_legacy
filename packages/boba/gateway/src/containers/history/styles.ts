@@ -58,11 +58,10 @@ export const TableHeader = styled.div`
 export const TableFilters = styled.div`
   padding: 20px;
   border-radius: 6px 6px 0px 0px;
-  justify-content: space-between;
   width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
   @media ${screen.tablet} {
     margin-bottom: 5px;
     gap: 20px;
@@ -75,6 +74,23 @@ export const TableFilters = styled.div`
       font-size: 12px;
     }
   }
+`
+
+export const DatePickerContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
+export const DateInput = styled.button`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #545454;
+  border-radius: 8px;
+  background: #262626;
+  padding: 10px 20px;
+  color: ${({ theme }) => theme.color};
 `
 
 export const NetworkDropdowns = styled.div`
@@ -497,7 +513,7 @@ export const DropdownNetwork = styled(Dropdown)`
     }
   }
   ${Header} {
-    border-radius: 20px;
+    border-radius: 12px;
     min-width: 0px;
     width: 210px;
     padding: 6px 16px;

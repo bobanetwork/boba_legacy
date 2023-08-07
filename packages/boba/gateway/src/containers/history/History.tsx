@@ -17,6 +17,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
+import DateRangePicker from 'react-bootstrap-daterangepicker'
 
 import { useTheme } from 'styled-components'
 // import Input from 'components/input/Input'
@@ -59,6 +60,8 @@ import {
   IconContainer,
   DropdownNetwork,
   TableTransactionsContainer,
+  DatePickerContainer,
+  DateInput,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
@@ -76,6 +79,7 @@ import switchButton from 'images/icons/switchButton.svg'
 import { Svg } from 'components/global/svg'
 
 import { Typography } from 'components/global/typography'
+import DatePicker from './DatePicker'
 
 const History = () => {
   const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
@@ -212,6 +216,10 @@ const History = () => {
                     headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
                   />
                 </NetworkDropdowns>
+                <DatePickerContainer>
+                  <Typography variant="body2">Date</Typography>
+                  <DatePicker />
+                </DatePickerContainer>
                 <FilterDropDown
                   items={FILTER_OPTIONS}
                   defaultItem={FILTER_OPTIONS[0]}
