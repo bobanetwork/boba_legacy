@@ -559,20 +559,16 @@ export const DropdownNetwork = styled(Dropdown)`
     }
   }
   ${DropdownIcon} {
-    height: 16px;
-    width: 16px;
+    height: 20px;
+    width: 20px;
     display: flex;
     align-items: center;
     div {
-      height: 18px;
-      width: 16px;
+      height: 20px;
+      width: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    svg {
-      max-width: 16px;
-      height: auto;
     }
     margin: 0px;
   }
