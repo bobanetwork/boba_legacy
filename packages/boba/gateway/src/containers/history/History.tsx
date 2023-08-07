@@ -17,7 +17,6 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
-import DateRangePicker from 'react-bootstrap-daterangepicker'
 
 import { useTheme } from 'styled-components'
 // import Input from 'components/input/Input'
@@ -53,15 +52,15 @@ import {
   TableFilters,
   NetworkDropdowns,
   Input,
-  DatePickerWrapper,
   DateDescriptions,
   Icon,
   MobileDateDescriptions,
   IconContainer,
   DropdownNetwork,
   TableTransactionsContainer,
-  DatePickerContainer,
+  DatePickerWrapper,
   DateInput,
+  MobileDatePickerWrapper,
 } from './styles'
 
 import useInterval from 'hooks/useInterval'
@@ -114,31 +113,25 @@ const History = () => {
 
   const transactions = useSelector(selectTransactions, isEqual)
 
-  /*
   // TODO: not working as implementation needs be rewrite.
-  const getDatePicker = (label: string) => {
+  const getDatePicker = (label: string, range: boolean = false) => {
     const dateSelector = (date: Date) => {
       label === 'To' ? setFilterEndDate(date) : setFilterStartDate(date)
     }
     return (
-      <DatePickerWrapper
+      <DatePicker
         selected={label === 'To' ? filterEndDate : filterStartDate}
         onChange={(date: Date) =>
           date && !Array.isArray(date) && dateSelector(date)
         }
-        {...(label === 'From' ? { selectsStart: true } : { selectsEnd: true })}
-        calendarClassName={theme.name}
-        placeholderText={label}
-        {...(label === 'From'
-          ? { endDate: new Date(filterEndDate) }
-          : {
-              startDate: new Date(filterStartDate),
-              minDate: new Date(filterStartDate),
-            })}
-        maxDate={new Date(now)}
+        timeFormat="MM/DD/YYYY"
+        range={range}
+        {...(range
+          ? { onChangeFrom: setFilterStartDate, onChangeTo: setFilterEndDate }
+          : {})}
       />
     )
-  } */
+  }
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
@@ -176,6 +169,20 @@ const History = () => {
                 }}
               />
             </SearchInput>
+            <DatePickerWrapper>
+              <DateDescriptions variant="body2">
+                Date Range From
+              </DateDescriptions>
+              {getDatePicker('From')}
+              <DateDescriptions variant="body3">To</DateDescriptions>
+              {getDatePicker('To')}
+            </DatePickerWrapper>
+            <MobileDatePickerWrapper>
+              <MobileDateDescriptions variant="body2">
+                Date Range
+              </MobileDateDescriptions>
+              {getDatePicker('', true)}
+            </MobileDatePickerWrapper>
           </TableHeader>
 
           <Table>
@@ -216,10 +223,6 @@ const History = () => {
                     headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
                   />
                 </NetworkDropdowns>
-                <DatePickerContainer>
-                  <Typography variant="body2">Date</Typography>
-                  <DatePicker />
-                </DatePickerContainer>
                 <FilterDropDown
                   items={FILTER_OPTIONS}
                   defaultItem={FILTER_OPTIONS[0]}

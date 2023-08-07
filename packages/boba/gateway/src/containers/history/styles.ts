@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { screen, sdesktop } from 'themes/screens'
+import { mobile, screen, sdesktop } from 'themes/screens'
 import { Svg, Typography } from 'components/global'
 
 import {
@@ -76,10 +76,27 @@ export const TableFilters = styled.div`
   }
 `
 
-export const DatePickerContainer = styled.div`
+export const DatePickerWrapper = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 18px;
   align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  text-align: center;
+  @media ${screen.mobile} {
+    display: none;
+  }
+`
+
+export const MobileDatePickerWrapper = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  text-align: center;
+  @media ${screen.mobile} {
+    display: flex;
+  }
 `
 
 export const DateInput = styled.button`
@@ -368,44 +385,44 @@ export const Actions = styled.div`
   }
 `
 
-export const DatePickerWrapper = styled.div`
-  width: 100%;
-  position: relative;
-  height: 44px;
-  margin: 0px;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: ${(props) => props.theme.text.body1};
-  color: inherit;
-  border: 1px solid ${(props) => props.theme.colors.box.border};
-  outline: none;
-  max-width: 115px;
-  + div {
-    margin: 0px -15px;
-  }
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-    `}
-  @media ${screen.laptop} {
-    width: 136px;
-  }
-  @media ${screen.mobile} {
-    min-width: 40px;
-    width: 75px;
-    height: 30px;
-    font-size: 11px;
-    padding: 15px 5px;
-    text-align: center;
-  }
-`
+// export const DatePickerWrapper = styled.div`
+//   width: 100%;
+//   position: relative;
+//   height: 44px;
+//   margin: 0px;
+//   padding: 15px;
+//   border-radius: 12px;
+//   text-align: left;
+//   font-size: ${(props) => props.theme.text.body1};
+//   color: inherit;
+//   border: 1px solid ${(props) => props.theme.colors.box.border};
+//   outline: none;
+//   max-width: 115px;
+//   + div {
+//     margin: 0px -15px;
+//   }
+//   ${(props) =>
+//     props.theme.name === 'light' &&
+//     css`
+//       background: ${props.theme.colors.gray[50]};
+//     `}
+//   ${(props) =>
+//     props.theme.name === 'dark' &&
+//     css`
+//       background: ${props.theme.colors.gray[500]};
+//     `}
+//   @media ${screen.laptop} {
+//     width: 136px;
+//   }
+//   @media ${screen.mobile} {
+//     min-width: 40px;
+//     width: 75px;
+//     height: 30px;
+//     font-size: 11px;
+//     padding: 15px 5px;
+//     text-align: center;
+//   }
+// `
 
 export const SearchInput = styled.div`
   display: flex;
@@ -719,4 +736,86 @@ export const TableTransactionsContainer = styled.div`
   ${sdesktop(css`
     overflow-x: auto;
   `)}
+`
+
+export const DatePickerHeader = styled.div`
+  box-sizing: border-box;
+  position: relative;
+  width: 136px;
+  height: 44px;
+  display: flex;
+  z-index: 2;
+  font-size: 14px;
+  align-items: center;
+  border-radius: 12px;
+  padding: 10px;
+  justify-content: center;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[50]};
+      border: 1px solid ${props.theme.colors.gray[500]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: ${props.theme.colors.gray[500]};
+      border: 1px solid ${props.theme.colors.gray[300]};
+    `}
+    @media ${screen.mobile} {
+    font-size: 10px;
+  }
+`
+
+export const DatePickerHeadersContainer = styled.div`
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+`
+
+export const DatePickerDropdown = styled.div`
+  transition: 0.25s all;
+  position: absolute;
+  width: 300px;
+  right: 0px;
+  top: 60px;
+  z-index: 1;
+  box-sizing: border-box;
+  border: inherit;
+  border-top: 0px;
+  border-radius: 14px;
+
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: ${props.theme.colors.gray[50]};
+      border: 1px solid ${props.theme.colors.gray[500]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: ${props.theme.colors.gray[500]};
+      border: 1px solid ${props.theme.colors.gray[300]};
+    `}
+`
+
+export const DatePickerContainer = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.25s all;
+  box-sizing: border-box;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[800]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[50]};
+    `}
 `
