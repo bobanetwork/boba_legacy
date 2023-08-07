@@ -4743,7 +4743,7 @@ class NetworkService {
       const l2Explorer = this.networkConfig.L2.blockExplorerUrl
       return [l1Explorer, l2Explorer]
     }
-    return ['https://goerli.etherscan.io/','https://testnet.bobascan.com/']
+    return []
   }
 
 }

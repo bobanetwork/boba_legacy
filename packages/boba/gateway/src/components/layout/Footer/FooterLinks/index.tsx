@@ -2,23 +2,19 @@ import React, { useEffect } from 'react'
 import { FOOTERLINKS, FOOTERLINKS_RIGHT } from './constant'
 import { useSelector, useDispatch } from 'react-redux'
 import { LinkContainer, StyledLink, StyledNavLink } from './style'
-import {
-  selectBlockExplorerLinks,
-  selectActiveNetwork,
-  selectBaseEnabled,
-} from 'selectors'
-import { setActiveBlockExplorerLinks } from 'actions/networkAction'
+import { selectBlockExplorerLinks, selectBaseEnabled } from 'selectors'
+import { fetchBlockExplorerUrls } from 'actions/networkAction'
 
-interface Props {}
-
-const FooterLinks = (props: Props) => {
+const FooterLinks = () => {
   const dispatch = useDispatch<any>()
-  const blockExplorerLinks = useSelector(selectBlockExplorerLinks())
-  const activeNetwork = useSelector(selectActiveNetwork())
+  const links = useSelector(selectBlockExplorerLinks())
   const baseEnabled = useSelector(selectBaseEnabled())
+
   useEffect(() => {
-    dispatch(setActiveBlockExplorerLinks())
-  }, [activeNetwork, baseEnabled])
+    if (!!baseEnabled) {
+      dispatch(fetchBlockExplorerUrls())
+    }
+  }, [baseEnabled])
 
   return (
     <LinkContainer>
@@ -37,25 +33,20 @@ const FooterLinks = (props: Props) => {
             </StyledLink>
           )
         })}
-        {blockExplorerLinks && (
+        {links && links.length > 0 ? (
           <>
-            {' '}
-            <StyledLink
-              key={'Blockexplorer'}
-              href={blockExplorerLinks[0]}
-              target="_blank"
-            >
+            <StyledLink key={'Blockexplorer'} href={links[0]} target="_blank">
               Blockexplorer
             </StyledLink>
             <StyledLink
               key={'BobaBlockexplorer'}
-              href={blockExplorerLinks[1]}
+              href={links[1]}
               target="_blank"
             >
               Boba Blockexplorer
             </StyledLink>
           </>
-        )}
+        ) : null}
       </div>
       <div>
         {FOOTERLINKS_RIGHT.map((link) => (

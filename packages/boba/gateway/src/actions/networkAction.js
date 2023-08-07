@@ -275,6 +275,6 @@ export function setActiveNetworkType(payload) {
   }
 }
 
-export function setActiveBlockExplorerLinks() {
+export function fetchBlockExplorerUrls() {
   return createAction('NETWORK/SET/BLOCK_EXPLORER', () => networkService.getBlockExplorerLinks())
 }

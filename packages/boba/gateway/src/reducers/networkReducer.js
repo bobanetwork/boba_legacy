@@ -36,7 +36,7 @@ const initialState = {
   activeNetwork: NETWORK.ETHEREUM,
   activeNetworkType: NETWORK_TYPE.MAINNET,
   activeNetworkName: {},
-  blockExplorerLinks:['https://goerli.etherscan.io/','https://testnet.bobascan.com/']
+  blockExplorerLinks:[]
 }
 
 function networkReducer(state = initialState, action) {
