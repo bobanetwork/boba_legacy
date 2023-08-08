@@ -29,6 +29,7 @@ import networkService from 'services/networkService'
 import { useSelector } from 'react-redux'
 import { selectAccountEnabled, selectLayer } from 'selectors'
 import AccountDrawer from './AccountDrawer'
+import FeeSwitcherDrawer from './FeeSwitcherDrawer'
 
 interface Props {
   onClose: () => void
@@ -48,6 +49,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
   const { currentTheme, setThemeDark, setThemeLight } = useThemeSwitcher()
   const theme: any = useTheme()
   const [userDrawer, setUserDrawer] = useState<boolean>(false)
+  const [feeSwitcherDrawer, setFeeSwitcherDrawer] = useState<boolean>(false)
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
@@ -70,13 +72,15 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
               {truncateMiddle(networkService.account as string, 5, 5, '...')}
             </ActionValue>
           </ActionItem>
-          {!accountEnabled && layer === 'L2' ? (
+          {!!accountEnabled && layer === 'L2' ? (
             <ActionItem>
               <ThemeIcon>
                 <img src={getCoinImage('ETH')} alt="use token" />
               </ThemeIcon>
               <ActionLabel>Gas Fee</ActionLabel>
-              <ActionValue>ETH</ActionValue>
+              <ActionValue onClick={() => setFeeSwitcherDrawer(true)}>
+                ETH
+              </ActionValue>
             </ActionItem>
           ) : null}
           <ActionItem>
@@ -116,6 +120,13 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
           open={userDrawer}
           onClose={() => {
             setUserDrawer(false)
+          }}
+        />
+        <FeeSwitcherDrawer
+          onCloseNav={onClose}
+          open={feeSwitcherDrawer}
+          onClose={() => {
+            setFeeSwitcherDrawer(false)
           }}
         />
       </StyleDrawer>

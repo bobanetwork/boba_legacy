@@ -1,5 +1,5 @@
 import Drawer from '@mui/material/Drawer'
-import { Button, Typography } from 'components/global'
+import { Button } from 'components/global'
 import React, { FC } from 'react'
 
 import CopyIcon from './icons/copy'
@@ -10,7 +10,7 @@ import {
   Content,
   ItemLabel,
   MenuItemStyle,
-} from './style'
+} from '../styles'
 import networkService from 'services/networkService'
 import useDisconnect from 'hooks/useDisconnect'
 
