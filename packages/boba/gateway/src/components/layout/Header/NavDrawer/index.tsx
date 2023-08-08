@@ -34,7 +34,8 @@ import {
 } from 'selectors'
 import AccountDrawer from './AccountDrawer'
 import FeeSwitcherDrawer from './FeeSwitcherDrawer'
-import bobaLogoPng from 'assets/images/boba-logo.png'
+
+import BobaLogoPng from 'assets/images/Boba_Logo_White_Circle.png'
 
 interface Props {
   onClose: () => void
@@ -82,7 +83,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
             <ActionItem>
               <ThemeIcon>
                 <img
-                  src={feeUseBoba ? bobaLogoPng : getCoinImage('ETH')}
+                  src={feeUseBoba ? BobaLogoPng : getCoinImage('ETH')}
                   alt="use token"
                 />
               </ThemeIcon>

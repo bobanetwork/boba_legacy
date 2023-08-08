@@ -11,7 +11,7 @@ import {
 } from '../styles'
 import networkService from 'services/networkService'
 import { getCoinImage } from 'util/coinImage'
-import BobaLogo from 'assets/images/boba-logo.png'
+import BobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 import useFeeSwitcher from 'hooks/useFeeSwitcher'
 
 interface Props {

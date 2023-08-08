@@ -5,7 +5,7 @@ import { TableHeaderOptionType } from 'components/global/table'
 import { getCoinImage } from 'util/coinImage'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
-import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
+
 import bobaEth from 'assets/images/bobaETH.png'
 import bobaBnb from 'assets/images/bobaBNB.png'
 import bobaAvax from 'assets/images/bobaAvax.png'
