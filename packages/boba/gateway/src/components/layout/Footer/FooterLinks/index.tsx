@@ -1,11 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FOOTERLINKS, FOOTERLINKS_RIGHT } from './constant'
+import { useSelector, useDispatch } from 'react-redux'
 import { LinkContainer, StyledLink, StyledNavLink } from './style'
-import { link } from 'fs'
+import { selectBlockExplorerLinks, selectBaseEnabled } from 'selectors'
+import { fetchBlockExplorerUrls } from 'actions/networkAction'
 
-interface Props {}
+const FooterLinks = () => {
+  const dispatch = useDispatch<any>()
+  const links = useSelector(selectBlockExplorerLinks())
+  const baseEnabled = useSelector(selectBaseEnabled())
 
-const FooterLinks = (props: Props) => {
+  useEffect(() => {
+    if (!!baseEnabled) {
+      dispatch(fetchBlockExplorerUrls())
+    }
+  }, [baseEnabled])
+
   return (
     <LinkContainer>
       <div>
@@ -23,6 +33,20 @@ const FooterLinks = (props: Props) => {
             </StyledLink>
           )
         })}
+        {links && links.length > 0 ? (
+          <>
+            <StyledLink key={'Blockexplorer'} href={links[0]} target="_blank">
+              Blockexplorer
+            </StyledLink>
+            <StyledLink
+              key={'BobaBlockexplorer'}
+              href={links[1]}
+              target="_blank"
+            >
+              Boba Blockexplorer
+            </StyledLink>
+          </>
+        ) : null}
       </div>
       <div>
         {FOOTERLINKS_RIGHT.map((link) => (

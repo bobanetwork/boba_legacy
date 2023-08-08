@@ -1,7 +1,7 @@
 import { Telegram, Twitter } from '@mui/icons-material'
 import DiscordIcon from 'components/icons/DiscordIcon'
 import React from 'react'
-import BobaLogo from '../../images/boba2/logo-boba2.svg'
+import BobaLogo from 'assets/images/boba2/logo-boba2.svg'
 import GasSwitcher from '../mainMenu/gasSwitcher/GasSwitcher'
 import * as S from './PageFooter.styles'
 import { useMediaQuery, useTheme } from '@mui/material'

@@ -20,6 +20,7 @@ import ManageLockModal from './veBoba/ManageLockModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
+import DepositStake from './stake/DepositStake'
 import SettingsModal from './settings'
 import NetworkPickerModal from './networkPicker'
 import BridgeConfirmModal from './BridgeConfirmModal'
@@ -75,6 +76,11 @@ const ModalContainer = () => {
   const EarnDepositModalState = useSelector(
     selectModalState('EarnDepositModal')
   )
+
+  const StakeDepositModalState = useSelector(
+    selectModalState('StakeDepositModal')
+  )
+
   const EarnWithdrawModalState = useSelector(
     selectModalState('EarnWithdrawModal')
   )
@@ -124,6 +130,9 @@ const ModalContainer = () => {
       )}
       {!!EarnWithdrawModalState && (
         <EarnWithdrawModal open={EarnWithdrawModalState} />
+      )}
+      {!!StakeDepositModalState && (
+        <DepositStake open={StakeDepositModalState} />
       )}
       {!!delegateBobaDaoModalState && (
         <DelegateDaoModal open={delegateBobaDaoModalState} />

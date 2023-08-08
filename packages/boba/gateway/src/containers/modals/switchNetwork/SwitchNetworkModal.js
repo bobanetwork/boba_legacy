@@ -1,19 +1,20 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {Button} from 'components/global';
+import { Button } from 'components/global';
 import Modal from 'components/modal/Modal';
 
 import { setActiveNetwork } from 'actions/networkAction';
 import { setBaseState, setConnect, setEnableAccount } from 'actions/setupAction';
 import { closeModal } from 'actions/uiAction';
 
-import { selectNetwork } from 'selectors';
+import { selectActiveNetworkType, selectNetwork } from 'selectors';
 
 function SwitchNetworkModal({open}) {
 
   const dispatch = useDispatch();
   const network = useSelector(selectNetwork());
+  const networkType = useSelector(selectActiveNetworkType())
 
   function onClick() {
     dispatch(setActiveNetwork());
@@ -33,13 +34,12 @@ function SwitchNetworkModal({open}) {
     <Modal
       open={open}
       onClose={handleClose}
-      maxWidth="xs"
       minHeight="180px"
       title="Switch Network"
       newStyle={true}
     >
         <Button
-          label={`Switch to the ${network} network`}
+          label={`Switch to ${network} ${networkType === 'Testnet'? networkType: ''} network`}
           onClick={()=>onClick()}
         />
     </Modal>

@@ -98,3 +98,5 @@ export function selectChainIdChanged () {
     return state.setup['chainIdChanged']
   }
 }
+
+export const selectSetup = () => (state) => state.setup
