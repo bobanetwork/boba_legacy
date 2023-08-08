@@ -681,7 +681,6 @@ export const DropdownNetwork = styled(Dropdown)`
         }
         color: ${props.theme.colors.gray[100]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        /* background: ${props.theme.colors.gray[500]}; */
         box-shadow: ${props.theme.backShadow};
       `}
   }
@@ -736,15 +735,15 @@ export const DatePickerHeader = styled.div`
   align-items: center;
   justify-content: center;
 
-  ${(props) =>
-    props.theme.name === 'light'
+  ${({ theme: { name, colors } }) =>
+    name === 'light'
       ? css`
-          background: ${props.theme.colors.gray[50]};
-          border: 1px solid ${props.theme.colors.gray[500]};
+          background: ${colors?.gray[50]};
+          border: 1px solid ${colors?.gray[500]};
         `
       : css`
-          background: ${props.theme.colors.gray[500]};
-          border: 1px solid ${props.theme.colors.gray[300]};
+          background: ${colors?.gray[500]};
+          border: 1px solid ${colors?.gray[300]};
         `}
 
   ${mobile(css`
