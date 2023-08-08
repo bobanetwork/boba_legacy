@@ -47,3 +47,9 @@ export function selectActiveNetworkName() {
     return state.network['activeNetworkName']
   }
 }
+
+export function selectBlockExplorerLinks() {
+  return function (state) {
+    return state.network['blockExplorerLinks']
+  }
+}

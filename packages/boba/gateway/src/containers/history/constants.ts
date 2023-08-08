@@ -5,6 +5,7 @@ import { TableHeaderOptionType } from 'components/global/table'
 import { getCoinImage } from 'util/coinImage'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
+import ethIcon from 'assets/ethereum.svg'
 
 export const Chains: ChainMap = {
   '0': {
@@ -66,7 +67,7 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   {
     value: '1',
     label: 'Ethereum',
-    imgSrc: getCoinImage('ETH'),
+    imgSrc: ethIcon,
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
@@ -76,15 +77,27 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
+    value: '43114',
+    label: 'AVAX',
+    imgSrc: getCoinImage('AVAX'),
+    headerName: NETWORK_TYPE.MAINNET,
+  },
+  {
     value: '5',
     label: 'Ethereum Goerli',
-    imgSrc: getCoinImage('ETH'),
+    imgSrc: ethIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '97',
     label: 'BNB Testnet',
     imgSrc: getCoinImage('BNB'),
+    headerName: NETWORK_TYPE.TESTNET,
+  },
+  {
+    value: '43113',
+    label: 'Avax Testnet',
+    imgSrc: getCoinImage('AVAX'),
     headerName: NETWORK_TYPE.TESTNET,
   },
 ]
@@ -100,7 +113,13 @@ export const NETWORK_L2_OPTIONS = [
   {
     value: '56288',
     label: 'Boba BNB',
-    imgSrc: getCoinImage('BOBA'),
+    imgSrc: getCoinImage('BNB'),
+    headerName: NETWORK_TYPE.MAINNET,
+  },
+  {
+    value: '43288',
+    label: 'Boba Avax',
+    imgSrc: getCoinImage('AVAX'),
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
@@ -112,7 +131,13 @@ export const NETWORK_L2_OPTIONS = [
   {
     value: '9728',
     label: 'Boba BNB Testnet',
-    imgSrc: getCoinImage('BOBA'),
+    imgSrc: getCoinImage('BNB'),
+    headerName: NETWORK_TYPE.TESTNET,
+  },
+  {
+    value: '4328',
+    label: 'Boba Avax Testnet',
+    imgSrc: getCoinImage('AVAX'),
     headerName: NETWORK_TYPE.TESTNET,
   },
 ]

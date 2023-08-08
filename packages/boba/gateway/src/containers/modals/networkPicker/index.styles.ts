@@ -36,6 +36,8 @@ export const NetworkItem = styled.div<{ selected?: boolean }>`
 `
 export const NetworkIcon = styled.div`
   display: flex;
+  width: 30px;
+  height: 30px;
 `
 export const NetworkLabel = styled(Typography).attrs({
   variant: 'body1',
