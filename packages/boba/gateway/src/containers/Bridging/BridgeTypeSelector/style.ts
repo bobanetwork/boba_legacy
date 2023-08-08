@@ -22,7 +22,6 @@ export const BridgeTabItem = styled.div<{
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  border-radius: 8px;
   font-size: ${(props) => props.theme.text.body1};
   cursor: pointer;
   background: transparent;
@@ -40,4 +39,11 @@ export const BridgeTabItem = styled.div<{
         : props.theme.colors.gray[600]};
       background: ${props.theme.colors.green[300]};
     `};
+
+  &:nth-child(odd) {
+    border-radius: 8px 0 0 8px;
+  }
+  &:nth-child(even) {
+    border-radius: 0 8px 8px 0;
+  }
 `

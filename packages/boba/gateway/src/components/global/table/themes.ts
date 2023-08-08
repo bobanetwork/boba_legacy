@@ -4,7 +4,7 @@ import { Svg } from 'components/global/svg'
 import { TableRow } from './styles'
 import { sdesktop } from 'themes/screens'
 export const TransactionsTableHeader = styled(TableHeader)`
-  padding: 8px 24px 4px 24px;
+  padding: 10px 24px 10px 24px;
   background: none;
   position: sticky;
   top: 0;

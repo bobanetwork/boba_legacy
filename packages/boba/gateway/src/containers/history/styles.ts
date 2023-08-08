@@ -729,35 +729,30 @@ export const TableTransactionsContainer = styled.div`
 `
 
 export const DatePickerHeader = styled.div`
-  box-sizing: border-box;
-  position: relative;
-  width: 136px;
-  height: 44px;
-  display: flex;
-  z-index: 2;
   font-size: 14px;
-  align-items: center;
+  padding: 8px 20px;
   border-radius: 12px;
-  padding: 10px;
+  display: flex;
+  align-items: center;
   justify-content: center;
+
   ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-      border: 1px solid ${props.theme.colors.gray[500]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-      border: 1px solid ${props.theme.colors.gray[300]};
-    `}
-    @media ${screen.mobile} {
+    props.theme.name === 'light'
+      ? css`
+          background: ${props.theme.colors.gray[50]};
+          border: 1px solid ${props.theme.colors.gray[500]};
+        `
+      : css`
+          background: ${props.theme.colors.gray[500]};
+          border: 1px solid ${props.theme.colors.gray[300]};
+        `}
+
+  ${mobile(css`
     height: 30px;
     font-family: roboto;
     width: 130px;
     font-size: 10px;
-  }
+  `)}
 `
 
 export const DatePickerHeadersContainer = styled.div`
@@ -772,40 +767,38 @@ export const DatePickerDropdown = styled.div`
   position: absolute;
   width: 250px;
   right: 0px;
-  top: 60px;
+  top: 40px;
   z-index: 1;
-  box-sizing: border-box;
-  border: inherit;
-  border-top: 0px;
-  border-radius: 14px;
+  border-radius: 12px;
 
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      color: ${props.theme.colors.gray[800]};
-      background: ${props.theme.colors.gray[50]};
-      border: 1px solid ${props.theme.colors.gray[500]};
-      .rdp-day_selected {
-        border: 1px solid ${props.theme.colors.gray[600]};
-        color: ${props.theme.colors.gray[800]};
-      }
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      color: ${props.theme.colors.gray[50]};
-      background: ${props.theme.colors.gray[500]};
-      border: 1px solid ${props.theme.colors.gray[300]};
-      .rdp-day_selected {
-        border: 1px solid ${props.theme.colors.gray[100]};
-      }
-    `}
+  ${({ theme: { colors, name } }) =>
+    name === 'light'
+      ? css`
+          color: ${colors.gray[800]};
+          background: ${colors.gray[50]};
+          border: 1px solid ${colors.gray[500]};
+          .rdp-day_selected {
+            border: 1px solid ${colors.gray[600]};
+            color: ${colors.gray[800]};
+          }
+        `
+      : css`
+          color: ${colors.gray[50]};
+          background: ${colors.gray[500]};
+          border: 1px solid ${colors.gray[300]};
+          .rdp-day_selected {
+            border: 1px solid ${colors.gray[100]};
+          }
+        `}
+
   .rdp-day {
-    border: 20%;
+    border-radius: 20%;
   }
   .rdp {
     --rdp-cell-size: 30px;
-    --rdp-caption-font-size: 18px;
+    --rdp-caption-font-size: 14px;
+    --rdp-caption-font-weight: 400;
+    --rdp-caption-font-family: roboto;
     --rdp-accent-color: ${(props) => props.theme.colors.gray[400]};
     --rdp-background-color: ${(props) => props.theme.colors.gray[400]};
   }

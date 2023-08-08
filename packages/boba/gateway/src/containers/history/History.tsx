@@ -166,14 +166,14 @@ const History = () => {
                 }}
               />
             </SearchInput>
-            <DatePickerWrapper>
+            {/* <DatePickerWrapper>
               <DateDescriptions variant="body2">
                 Date Range From
               </DateDescriptions>
               {getDatePicker('From')}
               <DateDescriptions variant="body3">To</DateDescriptions>
               {getDatePicker('To')}
-            </DatePickerWrapper>
+            </DatePickerWrapper> */}
             <MobileDatePickerWrapper>
               <MobileDateDescriptions variant="body2">
                 Date Range
