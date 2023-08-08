@@ -75,10 +75,9 @@ const deployFn: DeployFunction = async (hre) => {
       `Proxy__Teleportation deployed to: ${Proxy__Teleportation.address}`
     )
   } else {
-
     Proxy__Teleportation = await getBobaContractAt(
       'Teleportation',
-      '0x...................',
+      '0x...................', // TODO: Adapt your address here
       (hre as any).deployConfig.deployer_l2
     )
   }
@@ -91,14 +90,12 @@ const deployFn: DeployFunction = async (hre) => {
   )
 
 
-  const useTestnetRoutes = true // TODO
+  const useTestnetRoutes = true // To prevent developers configuring mainnet<>testnet routes (which wouldn't work due to the Teleportation service anyway)
   const defMinAmount = ethers.utils.parseEther('1')
   const defMaxAmount = ethers.utils.parseEther('100000')
   const defMaxDailyAmount = ethers.utils.parseEther('100000')
 
   // Initialize the Proxy__Teleportation contract
-  //const L2BOBA = await hre.deployments.getOrNull('TK_L2BOBA')
-
   let res = await Proxy__Teleportation.initialize()
   file.log(fileName, `Initialized proxy: ${await res.wait()}`)
   res = await Teleportation.initialize()
@@ -124,7 +121,7 @@ const deployFn: DeployFunction = async (hre) => {
     BNB_TESTNET = 97,
   }
 
-  // TODO: Mainnet
+  // TODO: Add Mainnet routes
   const desiredRoutes = [
     // ETH: ETH <-> ETH BOBA
     {
@@ -202,8 +199,6 @@ const deployFn: DeployFunction = async (hre) => {
     let res = await Proxy__Teleportation.addSupportedToken(tokenAddr, toChainId, defMinAmount, defMaxAmount, defMaxDailyAmount)
     file.log(fileName, `Added route for ${toChainId} chain, and token: ${tokenAddr}, receipt: ${await res.wait()}`)
   }
-
-
 
   for (const route of desiredRoutes) {
     if (currChainId === route.fromChainId) {
