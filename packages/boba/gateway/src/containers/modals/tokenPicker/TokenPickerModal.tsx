@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
 import { updateToken } from 'actions/bridgeAction'
 import { fetchBalances } from 'actions/networkAction'
-import { closeModal } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import { isEqual } from 'util/lodash'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,6 +16,7 @@ import { LAYER } from 'util/constant'
 import {
   ActionLabel,
   ListLabel,
+  PlusIcon,
   TokenBalance,
   TokenLabel,
   TokenListItem,
@@ -27,6 +28,8 @@ import {
   TokenSymbol,
 } from './styles'
 import { formatTokenAmount } from 'util/common'
+import Tooltip from 'components/tooltip/Tooltip'
+import networkService from 'services/networkService'
 
 // the L2 token which can not be exited so exclude from dropdown in case of L2
 const NON_EXITABLE_TOKEN = [
@@ -51,7 +54,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
   const l2Balance = useSelector(selectlayer2Balance, isEqual)
   const tokenToBridge = useSelector(selectTokenToBridge())
 
-  const [isMyToken, setIsMyToken] = useState(false)
+  const [isMyToken, setIsMyToken] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
   let balances = l1Balance
@@ -73,6 +76,12 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
     handleClose()
   }
 
+  const addToMetamask = async (token: any) => {
+    const { symbol } = token || {}
+    const logoURI = getCoinImage(symbol)
+    await networkService.walletService.addTokenToMetaMask({ ...token, logoURI })
+  }
+
   return (
     <Modal
       open={open}
@@ -89,14 +98,14 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
           />
         </TokenSearchContainer>
         <TokenPickerAction>
+          <ActionLabel selected={isMyToken} onClick={() => setIsMyToken(true)}>
+            My Tokens
+          </ActionLabel>
           <ActionLabel
             selected={!isMyToken}
             onClick={() => setIsMyToken(false)}
           >
             All
-          </ActionLabel>
-          <ActionLabel selected={isMyToken} onClick={() => setIsMyToken(true)}>
-            My Tokens
           </ActionLabel>
         </TokenPickerAction>
         <ListLabel> Token Names </ListLabel>
@@ -142,8 +151,18 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                           height="24px"
                         />
                       </TokenSymbol>
-                      <TokenLabel>{token.symbol}</TokenLabel>
-                      <TokenBalance>{amount}</TokenBalance>
+                      <TokenLabel>
+                        {token.symbol}
+                        <TokenBalance>{amount}</TokenBalance>
+                      </TokenLabel>
+                      <Tooltip title="Add token to metamask">
+                        <PlusIcon
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            addToMetamask(token)
+                          }}
+                        />
+                      </Tooltip>
                     </TokenListItem>
                   )
                 })

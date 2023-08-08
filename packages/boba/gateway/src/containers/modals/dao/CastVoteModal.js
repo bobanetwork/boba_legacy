@@ -26,7 +26,7 @@ import Modal from 'components/modal/Modal'
 import { castProposalVote } from 'actions/daoAction'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
 import { selectLockRecords,selectLoading } from 'selectors'
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
+import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
 
 import networkService from 'services/networkService'
 import { Dropdown } from 'components/global/dropdown'

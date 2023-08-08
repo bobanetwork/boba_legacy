@@ -143,10 +143,10 @@ limitations under the License. */
         return await this.connectWalletConnect()
       }
     }
-    
+
     async addTokenToMetaMask(token) {
       const {address,symbol,decimals,logoURI,chain} = token;
-      window.ethereum
+      return window.ethereum
       .request({
         method: "wallet_watchAsset",
         params: {

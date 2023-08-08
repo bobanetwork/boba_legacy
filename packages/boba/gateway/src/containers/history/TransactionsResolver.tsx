@@ -34,7 +34,7 @@ import { orderBy } from 'util/lodash'
 import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
 import networkService from 'services/networkService'
-import noHistoryIcon from '../../images/noHistory.svg'
+import noHistoryIcon from 'assets/images/noHistory.svg'
 
 const NetworkNameToSymbol: { [key: string]: string } = {
   ethereum: 'ETH',

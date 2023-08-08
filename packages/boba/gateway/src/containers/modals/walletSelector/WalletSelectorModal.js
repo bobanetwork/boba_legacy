@@ -12,9 +12,9 @@ import Modal from 'components/modal/Modal'
 import { Typography } from 'components/global/typography'
 import { Svg } from 'components/global/svg'
 import networkService from 'services/networkService'
-import metaMaskLogo from 'images/metamask.svg'
-import walletConnectLogo from 'images/walletconnect.svg'
-import ArrowIcon from 'images/icons/arrowright.svg'
+import metaMaskLogo from 'assets/images/metamask.svg'
+import walletConnectLogo from 'assets/images/walletconnect.svg'
+import ArrowIcon from 'assets/images/icons/arrowright.svg'
 
 import { Wallets, Wallet, Icon, ArrowContainer, IconContainer } from './styles'
 

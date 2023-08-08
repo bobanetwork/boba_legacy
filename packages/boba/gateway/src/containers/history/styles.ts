@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components'
 import { screen, sdesktop } from 'themes/screens'
 import { Svg, Typography } from 'components/global'
+import Switch from 'assets/images/icons/switchIcon.svg'
 
 import {
   Arrow,
@@ -262,6 +263,48 @@ export const Icon = styled(Svg)`
       max-width: 24px;
       height: auto;
     }
+  }
+`
+
+export const SwitchIcon = styled(Svg).attrs({
+  src: Switch,
+  fill: '#AEDB01',
+})`
+  display: flex;
+
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`
+
+export const SwitchChainIcon = styled.div`
+  cursor: pointer;
+  margin: -12px auto;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  border: 2px solid
+    ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[600] : colors.gray[200]};
+  background: ${({ theme: { colors } }) => colors.box.background};
+
+  &:hover {
+    border-color: ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[600] : colors.gray[100]};
+  }
+
+  > div {
+    align-self: stretch;
+  }
+  transition: transform 0.3s ease-in-out;
+  &:hover {
+    transform: rotate(180deg);
   }
 `
 

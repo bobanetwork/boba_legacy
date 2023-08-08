@@ -1,8 +1,8 @@
 import { Svg, Typography } from 'components/global'
 import styled from 'styled-components'
 
-import ArrowDown from 'images/icons/arrowdown.svg'
-import Switch from 'images/icons/switchIcon.svg'
+import ArrowDown from 'assets/images/icons/arrowdown.svg'
+import Switch from 'assets/images/icons/switchIcon.svg'
 
 export const ChainContainer = styled.div`
   display: flex;

@@ -20,8 +20,6 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
     stakeInfo,
   })
 
-  console.log(stakeInfo)
-
   const handleUnstake = async () => {
     const { stakeInfo } = TransactionListState
 
