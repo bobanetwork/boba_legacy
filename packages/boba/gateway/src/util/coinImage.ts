@@ -8,6 +8,7 @@ export const getCoinImage = (symbol: string): string => {
   let url = `${logoURIbase}/${symbol?.toLowerCase()}.svg`
 
   if (symbol === 'BOBA') {
+    console.log([`getCoinImage('BOBA')`, bobaLogo])
     url = bobaLogo
   }
 
@@ -17,6 +18,6 @@ export const getCoinImage = (symbol: string): string => {
   if (symbol === 'mtt') {
     url = mttLogo
   }
-
+  console.log(['url', url])
   return url
 }

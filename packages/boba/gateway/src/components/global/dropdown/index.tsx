@@ -116,9 +116,14 @@ export const Dropdown: React.FC<IDropdownProps> = ({
         <Option isSelected={false}>
           {selectedItem.imgSrc && (
             <IconContainer>
-              {selectedItem.imgSrc !== 'default' && (
-                <Icon src={selectedItem.imgSrc} />
-              )}
+              {selectedItem.imgSrc !== 'default' &&
+                selectedItem.imgSrc.includes('png') && (
+                  <img src={selectedItem.imgSrc} alt="token" width="20px" />
+                )}
+              {selectedItem.imgSrc !== 'default' &&
+                selectedItem.imgSrc.includes('svg') && (
+                  <Icon src={selectedItem.imgSrc} />
+                )}
               {selectedItem.imgSrc === 'default' && <DefaultIcon />}
             </IconContainer>
           )}
@@ -161,9 +166,14 @@ export const Dropdown: React.FC<IDropdownProps> = ({
                   >
                     {item.imgSrc && (
                       <IconContainer>
-                        {item.imgSrc !== 'default' && (
-                          <Icon src={item.imgSrc} />
-                        )}
+                        {item.imgSrc !== 'default' &&
+                          item.imgSrc.includes('png') && (
+                            <img src={item.imgSrc} alt="token" width="20px" />
+                          )}
+                        {item.imgSrc !== 'default' &&
+                          item.imgSrc.includes('svg') && (
+                            <Icon src={item.imgSrc} />
+                          )}
                       </IconContainer>
                     )}
                     {item.label}
