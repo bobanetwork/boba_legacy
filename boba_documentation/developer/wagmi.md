@@ -178,7 +178,7 @@ Then, add the new WAGMI token to the **token icon system**:
 ```javascript
 /util/coinImage.js
 
-import wagmiv0Logo from 'assets/imageswagmiv0.png';
+import wagmiv0Logo from 'images/wagmiv0.png';
 ...
   case "WAGMIv0":
     logo = wagmiv0Logo;
