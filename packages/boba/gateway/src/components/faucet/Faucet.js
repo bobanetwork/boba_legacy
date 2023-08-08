@@ -10,7 +10,7 @@ import { openAlert } from 'actions/uiAction';
 import { NETWORK_TYPE } from 'util/network/network.util';
 import Copy from 'components/copy/Copy';
 import Button from 'components/button/Button';
-import twitter from 'images/twitter.png'
+import twitter from 'assets/images/twitter.png'
 import { Md5 } from 'ts-md5';
 import networkService from 'services/networkService';
 

@@ -19,8 +19,7 @@ import { Fade, Container, Box, useMediaQuery, useTheme } from '@mui/material'
 
 import { Heading } from 'components/global'
 import * as S from './styles'
-import * as LayoutS from 'components/common/common.styles'
-import CloseIcon from 'images/close.svg'
+import CloseIcon from 'assets/images/close.svg'
 import { Svg } from 'components/global/svg'
 import { ModalInterface } from './types'
 
