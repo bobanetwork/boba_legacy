@@ -57,7 +57,6 @@ const DatePicker = (props: DatePickerProps) => {
       setSelectedDate(date)
       props.onChange(date)
     }
-    handleClick()
   }
   const handleRangeChange = (range: DateRange | undefined) => {
     if (range && range !== selectedRange) {
@@ -83,18 +82,17 @@ const DatePicker = (props: DatePickerProps) => {
         <DatePickerHeader onClick={handleClick}>
           {dateRangeString}
         </DatePickerHeader>
-        <DatePickerDropdown>
-          {isOpen && (
+        {isOpen && (
+          <DatePickerDropdown>
             <DayPicker
-              id="test"
+              id="rangeDatePicker"
               mode="range"
               defaultMonth={selectedRange?.from}
               selected={selectedRange}
-              // footer={footer}
               onSelect={(range) => handleRangeChange(range)}
             />
-          )}
-        </DatePickerDropdown>
+          </DatePickerDropdown>
+        )}
       </DatePickerContainer>
     )
   }

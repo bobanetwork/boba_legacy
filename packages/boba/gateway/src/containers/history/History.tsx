@@ -43,7 +43,6 @@ import {
 import { fetchTransactions } from 'actions/networkAction'
 
 import {
-  Actions,
   SearchInput,
   Table,
   NoHistory,
