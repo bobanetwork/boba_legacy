@@ -28,29 +28,11 @@ import {
   TRANSACTION_STATUS,
   TRANSACTION_FILTER_STATUS,
   LAYER,
-  CHAIN_NAME,
 } from './types'
 import { orderBy } from 'util/lodash'
 import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
-import networkService from 'services/networkService'
 import noHistoryIcon from 'assets/images/noHistory.svg'
-
-const NetworkNameToSymbol: { [key: string]: string } = {
-  ethereum: 'ETH',
-  boba: 'BOBA',
-  bnb: 'BNB',
-}
-
-export const GetSymbolFromNetworkName = (networkName: string): string => {
-  const networks: string[] = Object.keys(NetworkNameToSymbol)
-  for (const network of networks) {
-    if (networkName.toLowerCase().includes(network)) {
-      return NetworkNameToSymbol[network]
-    }
-  }
-  return 'N/A'
-}
 
 export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
@@ -70,14 +52,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     (i) => i.timeStamp,
     'desc'
   )
-
-  const getNetworkExplorerLink = (chain: string, hash: string) => {
-    const network = networkService.networkConfig
-    if (!!network && !!network[chain]) {
-      return `${network[chain].transaction}${hash}`
-    }
-    return ''
-  }
 
   const dateFilter = (transaction: ITransaction) => {
     const txnAfterStartDate = transactionsFilter.startDate
@@ -223,6 +197,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   )
 
   const getTransactionToken = (symbol: string) => {
+    console.log(getCoinImage(symbol))
     return (
       <TransactionToken>
         <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
