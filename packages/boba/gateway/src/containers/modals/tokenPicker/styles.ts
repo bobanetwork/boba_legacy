@@ -1,5 +1,7 @@
 import { Typography } from 'components/global'
 import styled, { css } from 'styled-components'
+import PlusIconOutline from '@mui/icons-material/AddCircleOutlineOutlined'
+
 export const TokenPickerModalContainer = styled.div`
   width: 100%;
   display: flex;
@@ -81,11 +83,16 @@ export const TokenLabel = styled(Typography).attrs({
     name === 'light' ? colors.gray[700] : colors.gray[50]};
 `
 
-export const TokenBalance = styled(Typography).attrs({
-  variant: 'body2',
-})`
+export const TokenBalance = styled.span`
+  font-family: Roboto;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: inline;
+  margin-left: 5px;
   color: ${({ theme: { colors, name } }) =>
-    name === 'light' ? colors.gray[700] : colors.gray[50]};
+    name === 'light' ? colors.gray[600] : colors.gray[100]};
 `
 
 export const TokenPickerAction = styled.div`
@@ -122,4 +129,8 @@ export const ActionLabel = styled.div<{ selected?: boolean }>`
     color: ${({ theme: { colors, name } }) =>
       name === 'light' ? colors.gray[800] : '#fff'};
   }
+`
+
+export const PlusIcon = styled(PlusIconOutline)`
+  color: ${({ theme: { colors } }) => colors.color};
 `

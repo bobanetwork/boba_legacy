@@ -7,8 +7,8 @@ import { setConnect, setConnectETH } from 'actions/setupAction'
 import { restTokenList } from 'actions/tokenAction'
 import { closeModal } from 'actions/uiAction'
 
-import { selectNetwork } from 'selectors'
 import { Button } from 'components/global'
+import { selectActiveNetworkType, selectNetwork } from 'selectors'
 
 interface Props {
   open: boolean
@@ -17,6 +17,7 @@ interface Props {
 const WrongNetworkModal: FC<Props> = ({ open }) => {
   const dispatch = useDispatch<any>()
   const network = useSelector(selectNetwork())
+  const networkType = useSelector(selectActiveNetworkType())
 
   useEffect(() => {
     if (open) {
@@ -38,7 +39,7 @@ const WrongNetworkModal: FC<Props> = ({ open }) => {
       transparent={false}
     >
       <Button
-        label={`Connect to the ${network} network`}
+        label={`Connect to the ${network} ${networkType} network`}
         onClick={() => {
           dispatch(setConnectETH(true))
           dispatch(closeModal('settingsModal'))

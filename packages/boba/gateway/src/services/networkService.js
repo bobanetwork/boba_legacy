@@ -344,7 +344,6 @@ class NetworkService {
       const response = await metaTransactionAxiosInstance(
         this.networkConfig
       ).post(swapUrl, { owner, spender, value, deadline, signature, data })
-      console.log(['meta tx fee res', response])
       await this.getBobaFeeChoice()
     } catch (error) {
       let errorData = error.response.data.error
@@ -2100,7 +2099,6 @@ class NetworkService {
       //returns total cost in ETH
       return totalCost
     } catch (error) {
-      console.log(['GetExitCost',error]);
       return 0;
     }
   }

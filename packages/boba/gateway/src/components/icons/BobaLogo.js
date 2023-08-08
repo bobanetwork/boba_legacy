@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTheme } from '@mui/material';
-import { ReactComponent as LogoBoba2 } from 'images/boba2/logo-boba2.svg';
-import {ReactComponent as LogoBoba2dark} from 'images/boba2/logo-boba2-dark.svg';
+import { ReactComponent as LogoBoba2 } from 'assets/images/boba2/logo-boba2.svg';
+import {ReactComponent as LogoBoba2dark} from 'assets/images/boba2/logo-boba2-dark.svg';
 
 function BobaLogo() {
 

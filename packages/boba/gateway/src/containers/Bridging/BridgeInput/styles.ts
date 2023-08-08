@@ -1,6 +1,6 @@
 import { Svg, Typography } from 'components/global'
 import styled, { css } from 'styled-components'
-import ArrowDown from 'images/icons/arrowdown.svg'
+import ArrowDown from 'assets/images/icons/arrowdown.svg'
 import { mobile } from 'themes/screens'
 
 export const BridgeInputContainer = styled.div`

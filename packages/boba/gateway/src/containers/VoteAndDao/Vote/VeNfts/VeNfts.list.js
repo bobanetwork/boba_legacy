@@ -5,7 +5,7 @@ import CheckMarkIcon from '@mui/icons-material/CheckCircleOutline'
 import Carousel from 'react-multi-carousel'
 import "react-multi-carousel/lib/styles.css";
 
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
+import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
 
 import * as G from 'containers/Global.styles'
 
