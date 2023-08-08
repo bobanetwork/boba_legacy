@@ -256,6 +256,7 @@ export const Icon = styled(Svg)`
     width: 32px;
     height: auto;
   }
+
   @media ${screen.mobile} {
     svg {
       max-width: 24px;
