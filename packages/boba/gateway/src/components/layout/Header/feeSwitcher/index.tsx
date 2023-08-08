@@ -31,11 +31,12 @@ import networkService from 'services/networkService.js'
 import useFeeSwitcher from 'hooks/useFeeSwitcher'
 import { getCoinImage } from 'util/coinImage'
 import { FeeSwitcherIcon, FeeSwitcherLabel, FeeSwitcherWrapper } from './styles'
+import BobaLogo from 'assets/images/boba-logo.png'
 
 const OptionBoba = () => ({
   value: 'BOBA',
   title: 'BOBA',
-  icon: getCoinImage('BOBA'),
+  icon: BobaLogo,
 })
 
 const OptionNativeToken = () => ({

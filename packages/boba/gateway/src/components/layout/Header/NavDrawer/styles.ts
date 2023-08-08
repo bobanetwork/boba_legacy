@@ -72,6 +72,10 @@ export const ThemeIcon = styled.div`
   align-items: center;
   border-radius: 50%;
   cursor: pointer;
+  img {
+    height: 30px;
+    width: 30px;
+  }
   div {
     padding: 4px;
     height: 32px;
@@ -162,12 +166,18 @@ export const MenuItemStyle = styled.button.attrs({
   border-radius: 8px;
   background: var(--gray-400, #393939);
   border: none;
-  padding: 15px 10px;
+  padding: 10px;
   margin-bottom: 5px;
   gap: 10px !important;
   display: flex !important;
   align-items: center;
   justify-content: flex-start;
+
+  img {
+    height: 30px;
+    width: 30px;
+    padding: 5px;
+  }
 `
 
 export const AccountContainer = styled.div`

@@ -27,9 +27,14 @@ import { getCoinImage } from 'util/coinImage'
 import truncateMiddle from 'truncate-middle'
 import networkService from 'services/networkService'
 import { useSelector } from 'react-redux'
-import { selectAccountEnabled, selectLayer } from 'selectors'
+import {
+  selectAccountEnabled,
+  selectBobaFeeChoice,
+  selectLayer,
+} from 'selectors'
 import AccountDrawer from './AccountDrawer'
 import FeeSwitcherDrawer from './FeeSwitcherDrawer'
+import bobaLogoPng from 'assets/images/boba-logo.png'
 
 interface Props {
   onClose: () => void
@@ -53,6 +58,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
 
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const feeUseBoba = useSelector(selectBobaFeeChoice())
 
   return (
     <Drawer open={open} classes={{ paper: classes.root }}>
@@ -75,11 +81,14 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
           {!!accountEnabled && layer === 'L2' ? (
             <ActionItem>
               <ThemeIcon>
-                <img src={getCoinImage('ETH')} alt="use token" />
+                <img
+                  src={feeUseBoba ? bobaLogoPng : getCoinImage('ETH')}
+                  alt="use token"
+                />
               </ThemeIcon>
               <ActionLabel>Gas Fee</ActionLabel>
               <ActionValue onClick={() => setFeeSwitcherDrawer(true)}>
-                ETH
+                {feeUseBoba ? 'BOBA' : networkService.L1NativeTokenSymbol}
               </ActionValue>
             </ActionItem>
           ) : null}
@@ -123,7 +132,6 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
           }}
         />
         <FeeSwitcherDrawer
-          onCloseNav={onClose}
           open={feeSwitcherDrawer}
           onClose={() => {
             setFeeSwitcherDrawer(false)
