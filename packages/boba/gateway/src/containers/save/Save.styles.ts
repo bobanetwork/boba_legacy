@@ -51,7 +51,7 @@ export const StakeHeadContainer = styled.div`
 `
 
 export const StakeContainer = styled.div`
-  display: flex,
+  display: flex;
   justify-content: center;
   align-items: center;
   background: ${(props) => props.theme.colors.box.background};

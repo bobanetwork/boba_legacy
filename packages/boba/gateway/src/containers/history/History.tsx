@@ -51,6 +51,8 @@ import {
   NetworkDropdowns,
   NoHistory,
   SearchInput,
+  SwitchChainIcon,
+  SwitchIcon,
   Table,
   TableFilters,
   TableHeader,
@@ -192,13 +194,13 @@ const History = () => {
                     error={false}
                     headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
                   />
-                  <IconContainer
+                  <SwitchChainIcon
                     onClick={() => {
                       handleSwitchDropdowns()
                     }}
                   >
-                    <Icon src={switchButton} />
-                  </IconContainer>
+                    <SwitchIcon />
+                  </SwitchChainIcon>
                   <Typography variant="body2">To</Typography>
                   <DropdownNetwork
                     items={switched ? NETWORK_L1_OPTIONS : NETWORK_L2_OPTIONS}
