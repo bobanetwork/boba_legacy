@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { openModal } from 'actions/uiAction'
 import { selectAccountEnabled, selectTokenToBridge } from 'selectors'
@@ -47,7 +47,7 @@ const BridgeInput: FC<Props> = (props) => {
     <BridgeInputContainer>
       <BridgeInputWrapper>
         <TokenSelector>
-          <SectionLabel>Amount</SectionLabel>
+          <SectionLabel>Token</SectionLabel>
           <TokenSelectorInput onClick={() => openTokenPicker()}>
             {token && (
               <TokenSymbol>

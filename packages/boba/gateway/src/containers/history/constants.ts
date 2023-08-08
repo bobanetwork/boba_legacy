@@ -2,7 +2,6 @@ import allNetworksIcon from '../../images/allNetworks.svg'
 import { IDropdownItem } from 'components/global/dropdown'
 import { IFilterDropdownItem } from 'components/filter'
 import { TableHeaderOptionType } from 'components/global/table'
-import { getCoinImage } from 'util/coinImage'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
 import ethereumIcon from 'images/ethereumFlex.svg'
@@ -117,7 +116,7 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   {
     value: '43114',
     label: 'Avalanche',
-    imgSrc: getCoinImage('AVAX'),
+    imgSrc: avalancheIcon,
     headerName: NETWORK_TYPE.MAINNET,
   },
   {
@@ -135,7 +134,7 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   {
     value: '43113',
     label: 'Avalanche Testnet',
-    imgSrc: getCoinImage('AVAX'),
+    imgSrc: avalancheIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
 ]
