@@ -1,4 +1,4 @@
-import allNetworksIcon from '../../images/allNetworks.svg'
+import allNetworksIcon from 'assets/images/allNetworks.svg'
 import { IDropdownItem } from 'components/global/dropdown'
 import { IFilterDropdownItem } from 'components/filter'
 import { TableHeaderOptionType } from 'components/global/table'
