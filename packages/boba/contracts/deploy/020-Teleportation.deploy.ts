@@ -29,11 +29,9 @@ const file = {
 }
 
 const deployFn: DeployFunction = async (hre) => {
-  const deployer = (hre as any).deployConfig.deployer_l1
-  console.log("DEPLOYER", deployer)
   const addressManager = getContractFactory('Lib_AddressManager')
-    .connect(deployer)
-    .attach('0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148') as any
+    .connect((hre as any).deployConfig.deployer_l1)
+    .attach(process.env.ADDRESS_MANAGER_ADDRESS) as any
 
 
   console.log(`'Deploying Teleportation contract...`)
