@@ -281,6 +281,7 @@ export const IconContainer = styled.div`
     margin: 0px;
   }
 `
+
 export const Icon = styled(Svg)`
   display: flex;
   align-content: center;
@@ -296,6 +297,13 @@ export const Icon = styled(Svg)`
       height: auto;
     }
   }
+`
+
+export const Image = styled.img`
+  display: flex;
+  align-content: center;
+  width: 32px;
+  height: 32px;
 `
 
 export const SwitchIcon = styled(Svg).attrs({

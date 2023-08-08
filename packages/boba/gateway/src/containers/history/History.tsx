@@ -19,7 +19,7 @@ import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
 
 import { useTheme } from 'styled-components'
-// import Input from 'components/input/Input'
+
 import { Button } from 'components/global'
 
 import transctionService from 'services/transaction.service'
@@ -67,7 +67,6 @@ import useInterval from 'hooks/useInterval'
 import { POLL_INTERVAL } from 'util/constant'
 
 import FilterIcon from 'assets/images/filter.svg'
-import switchButton from 'assets/images/icons/switchButton.svg'
 import noHistoryIcon from 'assets/images/noHistory.svg'
 import { FilterDropDown } from 'components/filter'
 import { Svg } from 'components/global/svg'
