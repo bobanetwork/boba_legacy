@@ -40,10 +40,5 @@ module.exports = (config, env) => {
     })
   )
 
-  config.module.rules.push({
-    test: /\.(png|svg)$/,
-    use: ['file-loader'],
-  })
-
   return config
 }
