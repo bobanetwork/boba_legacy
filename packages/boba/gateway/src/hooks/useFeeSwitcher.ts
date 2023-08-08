@@ -37,7 +37,6 @@ const useFeeSwitcher = () => {
         tooSmallBOBA = true
       } else {
         //check actual balance
-        console.log(['boba balance', logAmount(balanceBOBA.balance, 18)])
         tooSmallBOBA = new BN(logAmount(balanceBOBA.balance, 18)).lt(new BN(1))
       }
 
