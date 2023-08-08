@@ -213,7 +213,7 @@ const useBridgeAlerts = () => {
             ).toFixed(2)}) is too low.
             Please use the classic bridge.`
           } else {
-            warning = `Insufficient balance in pool - reduce amount or use classical exit`
+            warning = `There is not enough liquidity in the fast bridge pool - please reduce amount or use classical bridge`
           }
         }
 
@@ -329,7 +329,7 @@ const useBridgeAlerts = () => {
              ${Number(LpRatio).toFixed(2)}) is too low. Please use the classic
             bridge.`
           } else {
-            warning = `Insufficient balance in pool - reduce amount or use classical exit`
+            warning = `There is not enough liquidity in the fast bridge pool - reduce your amount or use the Classic Bridge`
           }
         }
 
