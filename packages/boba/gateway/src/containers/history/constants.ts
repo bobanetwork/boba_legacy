@@ -4,12 +4,12 @@ import { IFilterDropdownItem } from 'components/filter'
 import { TableHeaderOptionType } from 'components/global/table'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
-import ethereumIcon from 'images/ethereumFlex.svg'
-import bnbIcon from 'images/bnb.svg'
-import avalancheIcon from 'images/avax.svg'
-import bobaAvalanche from 'images/bobaAvax.svg'
-import bobaEthereum from 'images/bobaEth.svg'
-import bobaBNB from 'images/bobaBNB.svg'
+import ethereumIcon from 'assets/images/ethereumFlex.svg'
+import bnbIcon from 'assets/images/bnb.svg'
+import avalancheIcon from 'assets/images/avax.svg'
+import bobaAvalanche from 'assets/images/bobaAvax.svg'
+import bobaEthereum from 'assets/images/bobaEth.svg'
+import bobaBNB from 'assets/images/bobaBNB.svg'
 
 export const Chains: ChainMap = {
   '0': {
