@@ -56,7 +56,6 @@ function balanceReducer(state = initialState, action) {
         gas: action.payload
       }
     case 'FETCH/L1LP/BALANCE/SUCCESS':
-      console.log([`FETCH/L1LP/BALANCE/SUCCESS`,action.payload])
       return {
         ...state,
         l1LpBalanceWeiString: action.payload

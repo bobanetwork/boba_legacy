@@ -25,7 +25,7 @@ import * as S from './listProposal.styles'
 import { formatDate } from 'util/dates'
 import { Label } from 'components/dao/label'
 import { Svg } from 'components/global/svg'
-import Arrow from 'images/icons/arrowdown.svg';
+import Arrow from 'assets/images/icons/arrowdown.svg';
 
 import { LinearProgress } from 'components/dao/LinearProgress'
 

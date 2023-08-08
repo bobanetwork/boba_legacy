@@ -155,7 +155,7 @@ exports[`Testing history page Test History Page 1`] = `
               >
                 <div>
                   <div
-                    data-src="switchButton.svg"
+                    data-src="switchIcon.svg"
                     src=""
                   />
                 </div>

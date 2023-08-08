@@ -35,7 +35,6 @@ class FaucetService {
       const response = await metaTransactionAxiosInstance(
         networkService.networkConfig
       ).post('/send.getTestnetETH', { hashedMsg, signature, tweetId, walletAddress: networkService.account })
-      console.log(["metaTransactionAxiosInstance res",response])
     } catch (error) {
       let errorMsg = error?.response?.data?.error?.error?.body
       if (errorMsg) {
