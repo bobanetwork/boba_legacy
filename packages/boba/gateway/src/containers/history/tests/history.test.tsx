@@ -3,9 +3,9 @@ import React from 'react'
 import CustomThemeProvider from 'themes'
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
-import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
 import History from '../History'
 import { TransactionsResolver } from '../TransactionsResolver'
+import DatePicker, { IDatePickerProps } from '../DatePicker'
 import {
   CHAIN_NAME,
   ITransactionFilter,
@@ -68,6 +68,12 @@ const renderTransactionsResolver = (props: ITransactionsResolverProps) => {
   )
 }
 
+const renderDatePicker = (props: IDatePickerProps) => {
+  return render(
+    <DatePicker selected={props.selected} onChange={props.onChange} />
+  )
+}
+
 describe('Testing history page', () => {
   const filter: ITransactionFilter = {
     fromNetworkChainId: CHAIN_NAME.Boba_Goerli,
@@ -84,6 +90,14 @@ describe('Testing history page', () => {
   })
   test('Test History Page', () => {
     const { asFragment } = renderHistory({})
+    expect(asFragment()).toMatchSnapshot()
+  })
+
+  test('Date Picker', () => {
+    const { asFragment } = renderDatePicker({
+      selected: new Date(1970, 4, 10),
+      onChange: (date: Date) => console.log(date),
+    })
     expect(asFragment()).toMatchSnapshot()
   })
 })

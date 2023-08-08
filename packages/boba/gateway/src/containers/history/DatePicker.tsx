@@ -9,7 +9,7 @@ import { formatDate } from 'util/dates'
 import { DayPicker, DateRange } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 
-interface DatePickerProps {
+export interface IDatePickerProps {
   selected: Date
   timeFormat?: string
   onChange: Function
@@ -18,7 +18,7 @@ interface DatePickerProps {
   onChangeTo?: Function
 }
 
-const DatePicker = (props: DatePickerProps) => {
+const DatePicker = (props: IDatePickerProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const handleClickOutside = (e: Event) => {
