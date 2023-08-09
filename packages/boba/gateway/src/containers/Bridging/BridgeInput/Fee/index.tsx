@@ -43,7 +43,11 @@ const Fee = (props: Props) => {
 
   const estimateTime = () => {
     if (bridgeType === BRIDGE_TYPE.CLASSIC) {
-      return '7 days'
+      if (layer === LAYER.L1) {
+        return '13 ~ 14mins.'
+      } else {
+        return '7 days'
+      }
     } else {
       if (layer === LAYER.L1) {
         return '1 ~ 5min.'
