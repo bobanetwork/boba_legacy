@@ -24,12 +24,12 @@ export enum CHAIN_NAME {
   Boba_BNB = 'Boba BNB',
   Ethereum = 'Ethereum',
   Boba_Ethereum = 'Boba Ethereum',
-  Goerli = 'Ethereum Goerli',
+  Goerli = 'Goerli',
   Boba_Goerli = 'Boba Goerli',
   Avalanche = 'Avalanche',
   Boba_Avalanche = 'Boba Avalanche',
-  Avalanche_Testnet = 'Avalanche Testnet',
-  Boba_Avalanche_Testnet = 'Boba Avalanche Testnet',
+  Fuji = 'Fuji',
+  Boba_Fuji = 'Boba Fuji',
 }
 
 export enum LAYER {
