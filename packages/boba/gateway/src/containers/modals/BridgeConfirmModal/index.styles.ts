@@ -25,6 +25,12 @@ export const LayerNames = styled.div`
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
+
+  svg,
+  img {
+    height: 30px;
+    width: 30px;
+  }
 `
 
 export const ConfirmActionButton = styled(Button)`
