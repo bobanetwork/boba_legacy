@@ -116,7 +116,8 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       this.logger.info('Boba supported: ', { isSupported })
 
       if (!isSupported || !isSupported[0]) {
-        throw new Error(
+        // do not fail, as secured on-chain anyway & run.ts just returns all testnets/mainnets - thus just ignore networks that don't support Boba
+        this.logger.error(
           `Chain ${chainId} is not supported by the contract ${
             this.state.Teleportation.address
           } on chain ${
