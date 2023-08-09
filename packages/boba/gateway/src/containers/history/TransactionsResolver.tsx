@@ -21,6 +21,7 @@ import {
   TransactionChain,
   IconContainer,
   Image,
+  IncompleteTransactionHash,
 } from './styles'
 import {
   ITransactionsResolverProps,
@@ -117,6 +118,9 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
         case TRANSACTION_STATUS.Pending: {
           return TRANSACTION_FILTER_STATUS.Pending
         }
+        case TRANSACTION_STATUS.Failed: {
+          return TRANSACTION_FILTER_STATUS.Canceled
+        }
       }
     }
     return TRANSACTION_FILTER_STATUS.Canceled
@@ -155,23 +159,40 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   })
 
-  const process_transaction = (transaction: ITransaction) => {
+  const processTransaction = (transaction: ITransaction) => {
     let amountString = ''
     const chain = transaction.layer === 'L1pending' ? 'L1' : transaction.layer
-    const token =
+
+    let token = {
+      name: 'Etheruem',
+      symbol: 'ETH',
+      decimals: 18,
+    }
+    if (
       TokenInfo[transaction.originChainId.toString()][
         transaction.action.token.toLowerCase()
       ]
-
+    ) {
+      token =
+        TokenInfo[transaction.originChainId.toString()][
+          transaction.action.token.toLowerCase()
+        ]
+    }
     const symbol = token.symbol
 
     amountString = logAmount(transaction.action.amount, token.decimals, 4)
-    const fromHash = transaction.hash
+    let fromHash = transaction.hash
     let toHash = ''
     if (chain === LAYER.L2 && transaction.crossDomainMessage.l1Hash) {
       toHash = transaction.crossDomainMessage.l1Hash
     } else if (chain === LAYER.L1 && transaction.crossDomainMessage.l2Hash) {
       toHash = transaction.crossDomainMessage.l2Hash
+    }
+    if (fromHash === '') {
+      fromHash = transaction.UserFacingStatus
+    }
+    if (toHash === '') {
+      toHash = transaction.UserFacingStatus
     }
     const processedTransaction: IProcessedTransaction = {
       timeStamp: transaction.timeStamp,
@@ -189,7 +210,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   }
 
   const processedTransactions = filteredTransactions.map((transaction) => {
-    return process_transaction(transaction)
+    return processTransaction(transaction)
   })
 
   const filteredProcessedTransactions = processedTransactions.filter(
@@ -199,7 +220,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   )
 
   const getTransactionToken = (symbol: string) => {
-    console.log(getCoinImage(symbol))
     return (
       <TransactionToken>
         <IconContainer>
@@ -214,7 +234,16 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   }
 
-  const getTransactionChain = (chainID: string, hash: string) => {
+  const isHash = (hash: string) => {
+    const regExpHash = new RegExp(/^0x([A-Fa-f0-9]{64})$/)
+    return regExpHash.test(hash)
+  }
+
+  const getTransactionChain = (
+    chainID: string,
+    hash: string,
+    transactionStatus: TRANSACTION_FILTER_STATUS
+  ) => {
     const linkToHash = `${Chains[chainID].transactionUrlPrefix}${hash}`
     const networkName = Chains[chainID].name
     const imgSrc = Chains[chainID].imgSrc
@@ -224,13 +253,22 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
         <IconContainer>{<Icon src={imgSrc} />}</IconContainer>
         <TransactionChainDetails>
           <TransactionChain>{networkName}</TransactionChain>
-          <TransactionHash
-            href={linkToHash}
-            target={'_blank'}
-            rel="noopener noreferrer"
-          >
-            {`Tx: ${truncate(hash, 4, 4, '...')}`}
-          </TransactionHash>
+          {(transactionStatus === TRANSACTION_FILTER_STATUS.Completed ||
+            transactionStatus === TRANSACTION_FILTER_STATUS.All ||
+            isHash(hash)) && (
+            <TransactionHash
+              href={linkToHash}
+              target={'_blank'}
+              rel="noopener noreferrer"
+            >
+              {`Tx: ${truncate(hash, 4, 4, '...')}`}
+            </TransactionHash>
+          )}
+          {transactionStatus !== TRANSACTION_FILTER_STATUS.Completed &&
+            transactionStatus !== TRANSACTION_FILTER_STATUS.All &&
+            !isHash(hash) && (
+              <IncompleteTransactionHash>{`Tx: ${hash}`}</IncompleteTransactionHash>
+            )}
         </TransactionChainDetails>
       </TransactionDetails>
     )
@@ -276,14 +314,16 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                     {
                       content: getTransactionChain(
                         transaction.originChainId.toString(),
-                        transaction.fromHash
+                        transaction.fromHash,
+                        transaction.status
                       ),
                       width: 142,
                     },
                     {
                       content: getTransactionChain(
                         transaction.destinationChainId.toString(),
-                        transaction.toHash
+                        transaction.toHash,
+                        transaction.status
                       ),
                       width: 142,
                     },

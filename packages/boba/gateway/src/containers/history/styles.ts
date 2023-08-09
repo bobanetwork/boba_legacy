@@ -232,6 +232,28 @@ export const TransactionHash = styled.a`
     height: 12px;
   }
 `
+
+export const IncompleteTransactionHash = styled.div`
+  font-size: 12px;
+  width: 102px;
+  height: 16px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[100]};
+    `}
+  @media ${screen.mobile} {
+    font-size: 8px;
+    width: 72px;
+    height: 12px;
+  }
+`
+
 export const TransactionToken = styled.div`
   display: flex;
   flex-direction: row;

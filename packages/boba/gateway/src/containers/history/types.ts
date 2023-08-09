@@ -80,13 +80,11 @@ export interface ICrossDomainMessage {
 
 export interface ITransaction {
   action: IAction
-  activity?: string
   blockNumber: number
   layer: string
   originChainId: number
   destinationChainId: number
   contractAddress: string
-  contractName: string
   crossDomainMessage: ICrossDomainMessage
   depositL2?: boolean
   exitL2?: boolean
@@ -94,7 +92,7 @@ export interface ITransaction {
   hash: string
   timeStamp: number
   to: string
-  UserFacingStatus?: TRANSACTION_FILTER_STATUS
+  UserFacingStatus: TRANSACTION_FILTER_STATUS
 }
 
 export interface IProcessedTransaction {
@@ -105,7 +103,7 @@ export interface IProcessedTransaction {
   to: string
   tokenSymbol: string
   amount: string
-  status?: TRANSACTION_FILTER_STATUS // need to remove the undefined option
+  status: TRANSACTION_FILTER_STATUS
   originChainId: number
   destinationChainId: number
 }

@@ -132,7 +132,6 @@ class TransactionService {
    */
   async getTransactions(networkConfig = networkService.networkConfig) {
     let networksArray = Array.from(Object.values(AllNetworkConfigs))
-    networksArray = networksArray.filter(config => config.Mainnet.L1.symbol !== "AVAX")
 
     // need to know wether it's an l2 txn, l
     const networkConfigsArray = networksArray.flatMap((network) => {
@@ -145,7 +144,7 @@ class TransactionService {
         this.fetchL1PendingTx(config)]
     }
     ))
-
+    console.log(allNetworksTransactions)
     const filteredResults = allNetworksTransactions.reduce((acc, res) => [...acc, ...res], [])
     return filteredResults?.filter((transaction) => transaction.hash)
   }
