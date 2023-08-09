@@ -144,7 +144,6 @@ class TransactionService {
         this.fetchL1PendingTx(config)]
     }
     ))
-    console.log(allNetworksTransactions)
     const filteredResults = allNetworksTransactions.reduce((acc, res) => [...acc, ...res], [])
     return filteredResults?.filter((transaction) => transaction.hash)
   }
