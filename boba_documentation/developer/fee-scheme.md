@@ -27,8 +27,8 @@ To obtain ETH and BOBA on Boba Network you can deposit ETH via[ https://gateway.
 
 <figure><img src="../../.gitbook/assets/Artboard 1 (10).png" alt=""><figcaption></figcaption></figure>
 
-* You must send your transaction with a tx.gasPrice that is greater than or equal to the sequencer's l2 gas price. You can read this value from the Sequencer by querying the `OVM_GasPriceOracle` contract (`OVM_GasPriceOracle.gasPrice`) or by simply making an RPC query to `eth_gasPrice`. If you don't specify your `gasPrice` as an override when sending a transaction , `ethers` by default queries `eth_gasPrice` which will return the lowest acceptable L2 gas price.
-* You can set your `tx.gasLimit` however you might normally set it (e.g. via `eth_estimateGas`). The gas usage for transactions on Boba Network will be larger than the gas usage on Ethereum, becuase the `l1SecurityFee` is included in the gas usage.
+* You must send your transaction with a tx.gasPrice that is greater than or equal to the sequencer's l2 gas price. You can read this value from the Sequencer by querying the `OVM_GasPriceOracle` contract (`OVM_GasPriceOracle.gasPrice`) or by simply making an RPC query to `eth_gasPrice`. If you don't specify your `gasPrice` as an override when sending a transaction, `ethers` by default queries `eth_gasPrice` which will return the lowest acceptable L2 gas price.
+* You can set your `tx.gasLimit` however you might normally set it (e.g. via `eth_estimateGas`). The gas usage for transactions on Boba Network will be larger than the gas usage on Ethereum, because the `l1SecurityFee` is included in the gas usage.
 * We recommend building error handling around the `Fee too Low` error detailed below, to allow users to re-calculate their `tx.gasLimit` and resend their transaction if L1 gas price spikes.
 
 
