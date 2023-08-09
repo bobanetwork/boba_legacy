@@ -37,7 +37,7 @@ Hybrid Compute is invoked when needed during the normal EVM execution flow, and 
 
 <figure><img src="../../.gitbook/assets/Artboard 6 (2) (1).png" alt=""><figcaption></figcaption></figure>
 
-As noted, Hybrid Compute is not an Oracle. However, Hybrid Compute writes all initial calldata and server responses to Ethereum Mainnet, and therefore, external parties can see those inputs and outputs. In theory, this many allow third parties to detect fraud or even challenge Hybrid Compute calls, but such functionality remains to be developed.
+As noted, Hybrid Compute is not an Oracle. However, Hybrid Compute writes all initial calldata and server responses to Ethereum Mainnet, and therefore, external parties can see those inputs and outputs. In theory, this may allow third parties to detect fraud or even challenge Hybrid Compute calls, but such functionality remains to be developed.
 
 <figure><img src="../../.gitbook/assets/Artboard 7 (3).png" alt=""><figcaption></figcaption></figure>
 
