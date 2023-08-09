@@ -24,6 +24,7 @@ import {
   TokenSymbol,
 } from './styles'
 import { SectionLabel } from '../chain/styles'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 type Props = {}
 
@@ -52,7 +53,11 @@ const BridgeInput: FC<Props> = (props) => {
             {token && (
               <TokenSymbol>
                 <img
-                  src={getCoinImage(token.symbol)}
+                  src={
+                    token.symbol === 'BOBA'
+                      ? bobaLogo
+                      : getCoinImage(token.symbol)
+                  }
                   alt={`ETH logo`}
                   width="32px"
                   height="32px"

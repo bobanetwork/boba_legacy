@@ -20,6 +20,7 @@ import {
   TransactionHash,
   TransactionChain,
   IconContainer,
+  Image,
 } from './styles'
 import {
   ITransactionsResolverProps,
@@ -33,6 +34,7 @@ import { orderBy } from 'util/lodash'
 import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
 import noHistoryIcon from 'assets/images/noHistory.svg'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
@@ -200,7 +202,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     console.log(getCoinImage(symbol))
     return (
       <TransactionToken>
-        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
+        <IconContainer>
+          {symbol === 'BOBA' ? (
+            <Image src={bobaLogo} alt="boba network" />
+          ) : (
+            <Icon src={getCoinImage(symbol)} />
+          )}
+        </IconContainer>
         <div>{symbol}</div>
       </TransactionToken>
     )
