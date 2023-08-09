@@ -31,7 +31,8 @@ import networkService from 'services/networkService.js'
 import useFeeSwitcher from 'hooks/useFeeSwitcher'
 import { getCoinImage } from 'util/coinImage'
 import { FeeSwitcherIcon, FeeSwitcherLabel, FeeSwitcherWrapper } from './styles'
-import BobaLogo from 'assets/images/boba-logo.png'
+
+import BobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 const OptionBoba = () => ({
   value: 'BOBA',

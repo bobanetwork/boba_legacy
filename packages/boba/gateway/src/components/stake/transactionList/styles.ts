@@ -32,9 +32,7 @@ export const StakeItemDetails = styled.div`
   box-sizing: border-box;
   padding: 20px 35px;
   border-radius: 8px;
-  ${sdesktop(css`
-    width: 1024px;
-  `)}
+
   > div {
     display: flex;
     margin: 0px auto;

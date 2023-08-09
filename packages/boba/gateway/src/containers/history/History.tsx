@@ -19,7 +19,7 @@ import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
 
 import { useTheme } from 'styled-components'
-// import Input from 'components/input/Input'
+
 import { Button } from 'components/global'
 
 import transctionService from 'services/transaction.service'
@@ -43,20 +43,22 @@ import {
 import { fetchTransactions } from 'actions/networkAction'
 
 import {
-  DropdownNetwork,
-  HistoryPageContainer,
-  Icon,
-  IconContainer,
-  Input,
-  NetworkDropdowns,
-  NoHistory,
   SearchInput,
+  Table,
+  NoHistory,
+  HistoryPageContainer,
+  TableHeader,
+  TableFilters,
+  NetworkDropdowns,
+  DateDescriptions,
+  Input,
   SwitchChainIcon,
   SwitchIcon,
-  Table,
-  TableFilters,
-  TableHeader,
   TableTransactionsContainer,
+  DatePickerWrapper,
+  DropdownNetwork,
+  MobileDateDescriptions,
+  MobileDatePickerWrapper,
 } from './styles'
 
 import { setConnect } from 'actions/setupAction'
@@ -65,7 +67,6 @@ import useInterval from 'hooks/useInterval'
 import { POLL_INTERVAL } from 'util/constant'
 
 import FilterIcon from 'assets/images/filter.svg'
-import switchButton from 'assets/images/icons/switchButton.svg'
 import noHistoryIcon from 'assets/images/noHistory.svg'
 import { FilterDropDown } from 'components/filter'
 import { Svg } from 'components/global/svg'
@@ -74,6 +75,7 @@ import { TransactionsResolver } from './TransactionsResolver'
 import { CHAIN_NAME, TRANSACTION_FILTER_STATUS } from './types'
 
 import { Typography } from 'components/global/typography'
+import DatePicker from './DatePicker'
 
 const History = () => {
   const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
@@ -108,31 +110,25 @@ const History = () => {
 
   const transactions = useSelector(selectTransactions, isEqual)
 
-  /*
   // TODO: not working as implementation needs be rewrite.
-  const getDatePicker = (label: string) => {
+  const getDatePicker = (label: string, range: boolean = false) => {
     const dateSelector = (date: Date) => {
       label === 'To' ? setFilterEndDate(date) : setFilterStartDate(date)
     }
     return (
-      <DatePickerWrapper
+      <DatePicker
         selected={label === 'To' ? filterEndDate : filterStartDate}
         onChange={(date: Date) =>
           date && !Array.isArray(date) && dateSelector(date)
         }
-        {...(label === 'From' ? { selectsStart: true } : { selectsEnd: true })}
-        calendarClassName={theme.name}
-        placeholderText={label}
-        {...(label === 'From'
-          ? { endDate: new Date(filterEndDate) }
-          : {
-              startDate: new Date(filterStartDate),
-              minDate: new Date(filterStartDate),
-            })}
-        maxDate={new Date(now)}
+        timeFormat="MM/DD/YYYY"
+        range={range}
+        {...(range
+          ? { onChangeFrom: setFilterStartDate, onChangeTo: setFilterEndDate }
+          : {})}
       />
     )
-  } */
+  }
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
@@ -170,6 +166,20 @@ const History = () => {
                 }}
               />
             </SearchInput>
+            <DatePickerWrapper>
+              <DateDescriptions variant="body2">
+                Date Range From
+              </DateDescriptions>
+              {getDatePicker('From')}
+              <DateDescriptions variant="body3">To</DateDescriptions>
+              {getDatePicker('To')}
+            </DatePickerWrapper>
+            <MobileDatePickerWrapper>
+              <MobileDateDescriptions variant="body2">
+                Date Range
+              </MobileDateDescriptions>
+              {getDatePicker('', true)}
+            </MobileDatePickerWrapper>
           </TableHeader>
 
           <Table>

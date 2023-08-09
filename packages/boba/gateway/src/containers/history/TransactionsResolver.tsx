@@ -20,6 +20,7 @@ import {
   TransactionHash,
   TransactionChain,
   IconContainer,
+  Image,
 } from './styles'
 import {
   ITransactionsResolverProps,
@@ -35,6 +36,7 @@ import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
 import networkService from 'services/networkService'
 import noHistoryIcon from 'assets/images/noHistory.svg'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 const NetworkNameToSymbol: { [key: string]: string } = {
   ethereum: 'ETH',
@@ -225,7 +227,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const getTransactionToken = (symbol: string) => {
     return (
       <TransactionToken>
-        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
+        <IconContainer>
+          {symbol === 'BOBA' ? (
+            <Image src={bobaLogo} alt="boba network" />
+          ) : (
+            <Icon src={getCoinImage(symbol)} />
+          )}
+        </IconContainer>
         <div>{symbol}</div>
       </TransactionToken>
     )
@@ -239,7 +247,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
     return (
       <TransactionDetails>
-        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
+        <IconContainer>
+          {symbol === 'BOBA' ? (
+            <Image src={bobaLogo} alt="boba network" />
+          ) : (
+            <Icon src={getCoinImage(symbol)} />
+          )}
+        </IconContainer>
         <TransactionChainDetails>
           <TransactionChain>{networkName}</TransactionChain>
           <TransactionHash
