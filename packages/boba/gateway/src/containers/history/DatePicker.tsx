@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState, useEffect, useCallback } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { subMonths } from 'date-fns'
 import {
   DatePickerDropdown,
@@ -13,6 +13,8 @@ export interface IDatePickerProps {
   selected: Date
   timeFormat?: string
   onChange: Function
+  minDate?: Date
+  maxDate?: Date
   range?: boolean
   onChangeFrom?: Function
   onChangeTo?: Function
@@ -38,8 +40,17 @@ const DatePicker = (props: IDatePickerProps) => {
   }, [dropdownRef])
 
   const [selectedDate, setSelectedDate] = useState<Date>(props.selected)
-  const [isOpen, setIsOpen] = useState(false)
   const today = new Date()
+  const pastDate = new Date(2015, 7, 30)
+
+  const disabledPeriod = {
+    before: props.minDate ? props.minDate : pastDate,
+    after: props.maxDate ? props.maxDate : today,
+  }
+  const disabledDays = [disabledPeriod]
+
+  const [isOpen, setIsOpen] = useState(false)
+
   const defaultSelectedRange: DateRange = {
     from: subMonths(today, 6),
     to: today,
@@ -83,13 +94,14 @@ const DatePicker = (props: IDatePickerProps) => {
           {dateRangeString}
         </DatePickerHeader>
         {isOpen && (
-          <DatePickerDropdown>
+          <DatePickerDropdown isRange={true}>
             <DayPicker
               id="rangeDatePicker"
               mode="range"
-              defaultMonth={selectedRange?.from}
+              defaultMonth={selectedRange?.to}
               selected={selectedRange}
               onSelect={(range) => handleRangeChange(range)}
+              disabled={disabledDays}
             />
           </DatePickerDropdown>
         )}
@@ -103,12 +115,13 @@ const DatePicker = (props: IDatePickerProps) => {
         {formatDate(selectedDate.getTime() / 1000, props.timeFormat)}
       </DatePickerHeader>
       {isOpen && (
-        <DatePickerDropdown>
+        <DatePickerDropdown isRange={false}>
           <DayPicker
             mode="single"
             defaultMonth={selectedDate}
             selected={selectedDate}
             onSelect={(date) => handleDateChange(date)}
+            disabled={disabledDays}
           />
         </DatePickerDropdown>
       )}
