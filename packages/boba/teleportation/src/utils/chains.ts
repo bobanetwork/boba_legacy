@@ -48,7 +48,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Boba Ethereum Goerli',
     teleportationAddress: '0xB43EE846Aa266228FeABaD1191D6cB2eD9808894',
-    height: 3820,
+    height: 40822,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0x4200000000000000000000000000000000000023': 'BOBA',
@@ -59,7 +59,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Boba BNB Testnet',
     teleportationAddress: '0xf4d179d3a083Fa3Eede935FaF4C679D32d514186',
-    height: 240152,
+    height: 295353,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'BNB',
       '0x0000000000000000000000000000000000000000': 'BOBA',
@@ -86,7 +86,7 @@ export const BobaChains: IBobaChains = {
     testnet: true,
     name: 'Goerli Testnet',
     teleportationAddress: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13',
-    height: 9244943,
+    height: 9484025,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49': 'USDT',
@@ -95,11 +95,11 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://bsc-testnet.publicnode.com',
+    url: 'https://endpoints.omniatech.io/v1/bsc/testnet/public',
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',
-    height: 31747477,
+    height: 32272487,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'BNB',
       '0x875cD11fDf085e0E11B0EE6b814b6d0b38fA554C': 'BOBA',

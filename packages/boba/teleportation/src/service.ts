@@ -93,23 +93,29 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         `Disburser wallet ${kmsSignerAddress} is not the disburser of the contract ${disburserAddress}`
       )
     }
+    this.logger.info('Got disburser: ', {address: disburserAddress})
 
     // check if all chains are supported
     // if the chain is supported, then store the contract of the chain and the balance info
     // to the state
     this.state.supportedChains = []
     this.state.depositTeleportations = []
+    const bobaTokenContractAddr = Object.keys(this.options.ownSupportedAssets).find(
+      (k) => this.options.ownSupportedAssets[k] === 'BOBA'
+    )
+
     for (const chain of this.options.selectedBobaChains) {
       const chainId = chain.chainId
       // assuming BOBA is enabled on supported networks to retain battle-tested logic
-      const bobaTokenContract = Object.keys(chain.supportedAssets).find(
-        (k) => chain.supportedAssets[k] === 'BOBA'
-      )
+
+      this.logger.info('Check if Boba supported for chainId: ', {chainId, bobaTokenContractAddr})
       const isSupported = await this.state.Teleportation.supportedTokens(
-        bobaTokenContract,
+        bobaTokenContractAddr,
         chainId
       )
-      if (!isSupported) {
+      this.logger.info('Boba supported: ', { isSupported })
+
+      if (!isSupported || !isSupported[0]) {
         throw new Error(
           `Chain ${chainId} is not supported by the contract ${
             this.state.Teleportation.address
@@ -129,6 +135,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDeposits = await depositTeleportation.totalDeposits(
           this.options.chainId
         )
+        this.logger.info('Total disbursements for chain', {chainId, totalDisbursements})
 
         this.state.depositTeleportations.push({
           Teleportation: depositTeleportation,
@@ -158,6 +165,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             events,
             latestBlock
           )
+          this.logger.info('Disbursed teleportations for network', { latestBlock })
         } catch (err) {
           this.logger.error('Error while running teleportation', {
             err,
