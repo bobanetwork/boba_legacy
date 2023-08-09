@@ -3,7 +3,7 @@
 exports[`Testing history page Date Picker 1`] = `
 <DocumentFragment>
   <div
-    class="sc-cNNTdL bOhmqZ"
+    class="sc-cNNTdL XooGL"
   >
     <div
       class="sc-iWxGtA kjxmRV"
@@ -48,7 +48,7 @@ exports[`Testing history page Test History Page 1`] = `
           Date Range From
         </p>
         <div
-          class="sc-cNNTdL kTLOBq"
+          class="sc-cNNTdL iedVlo"
         >
           <div
             class="sc-iWxGtA cdSvk"
@@ -62,7 +62,7 @@ exports[`Testing history page Test History Page 1`] = `
           To
         </p>
         <div
-          class="sc-cNNTdL kTLOBq"
+          class="sc-cNNTdL iedVlo"
         >
           <div
             class="sc-iWxGtA cdSvk"
@@ -80,7 +80,7 @@ exports[`Testing history page Test History Page 1`] = `
           Date Range
         </p>
         <div
-          class="sc-cNNTdL kTLOBq"
+          class="sc-cNNTdL iedVlo"
         >
           <div
             class="sc-iWxGtA cdSvk"

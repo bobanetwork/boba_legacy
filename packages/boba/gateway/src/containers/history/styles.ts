@@ -761,7 +761,7 @@ export const DatePickerHeadersContainer = styled.div`
   flex-direction: row;
 `
 
-export const DatePickerDropdown = styled.div`
+export const DatePickerDropdown = styled.div<{ isRange?: boolean }>`
   transition: 0.25s all;
   position: absolute;
   width: 250px;
@@ -776,23 +776,20 @@ export const DatePickerDropdown = styled.div`
           color: ${colors.gray[800]};
           background: ${colors.gray[50]};
           border: 1px solid ${colors.gray[500]};
-          .rdp-day_selected {
-            border: 1px solid ${colors.gray[600]};
-            color: ${colors.gray[800]};
-          }
         `
       : css`
           color: ${colors.gray[50]};
           background: ${colors.gray[500]};
           border: 1px solid ${colors.gray[300]};
-          .rdp-day_selected {
-            border: 1px solid ${colors.gray[100]};
-          }
+          ${(isRange) =>
+            !isRange &&
+            css`
+              .rdp-day_selected {
+                border: 1px solid ${colors.gray[100]};
+              }
+            `}
         `}
 
-  .rdp-day {
-    border-radius: 20%;
-  }
   .rdp {
     --rdp-cell-size: 30px;
     --rdp-caption-font-size: 14px;
@@ -801,6 +798,38 @@ export const DatePickerDropdown = styled.div`
     --rdp-accent-color: ${(props) => props.theme.colors.gray[400]};
     --rdp-background-color: ${(props) => props.theme.colors.gray[400]};
   }
+  ${(props) =>
+    props.isRange &&
+    props.theme.name === 'light' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[600]};
+        color: ${props.theme.colors.gray[800]};
+      }
+    `}
+  ${(props) =>
+    !props.isRange &&
+    props.theme.name === 'dark' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[100]};
+      }
+    `}
+    
+  ${(props) =>
+    !props.isRange &&
+    css`
+      .rdp-day {
+        border-radius: 20%;
+      }
+    `}
+  ${(props) =>
+    props.isRange &&
+    css`
+      .rdp-day {
+        border: none !important;
+      }
+    `}
 `
 
 export const DatePickerContainer = styled.div`
@@ -811,6 +840,7 @@ export const DatePickerContainer = styled.div`
   width: 100%;
   transition: 0.25s all;
   box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -820,5 +850,5 @@ export const DatePickerContainer = styled.div`
     props.theme.name === 'dark' &&
     css`
       color: ${props.theme.colors.gray[50]};
-    `}
+    `};
 `

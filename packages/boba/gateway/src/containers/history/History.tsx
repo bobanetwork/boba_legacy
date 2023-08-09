@@ -126,6 +126,9 @@ const History = () => {
         {...(range
           ? { onChangeFrom: setFilterStartDate, onChangeTo: setFilterEndDate }
           : {})}
+        {...(label === 'To'
+          ? { minDate: filterStartDate }
+          : { maxDate: filterEndDate })}
       />
     )
   }
