@@ -687,20 +687,10 @@ export const DropdownNetwork = styled(Dropdown)`
         border: 1px solid ${props.theme.colors.gray[400]};
         /* background: ${props.theme.colors.gray[50]}; */
         box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.15);
-        ${Icon} {
-          svg {
-            fill: ${props.theme.colors.gray[800]};
-          }
-        }
       `}
     ${(props) =>
       props.theme.name === 'dark' &&
       css`
-        ${Icon} {
-          svg {
-            fill: ${props.theme.colors.gray[100]};
-          }
-        }
         color: ${props.theme.colors.gray[100]};
         border: 1px solid ${props.theme.colors.gray[400]};
         box-shadow: ${props.theme.backShadow};
@@ -727,6 +717,9 @@ export const DropdownNetwork = styled(Dropdown)`
       ${(props) =>
         props.theme.name === 'light' &&
         css`
+          svg {
+            fill: ${props.theme.colors.gray[800]};
+          }
           &:hover {
             border: 1px solid ${props.theme.colors.gray[600]};
           }
@@ -734,6 +727,9 @@ export const DropdownNetwork = styled(Dropdown)`
       ${(props) =>
         props.theme.name === 'dark' &&
         css`
+          svg {
+            fill: ${props.theme.colors.gray[100]};
+          }
           &:hover {
             border: 1px solid ${props.theme.colors.gray[100]};
           }
