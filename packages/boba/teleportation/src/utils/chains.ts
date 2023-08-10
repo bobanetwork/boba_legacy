@@ -95,7 +95,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://endpoints.omniatech.io/v1/bsc/testnet/public',
+    url: 'https://bsc-testnet.public.blastapi.io',
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',

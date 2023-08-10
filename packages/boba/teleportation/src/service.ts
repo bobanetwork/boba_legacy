@@ -224,6 +224,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           const emitter = event.args.emitter
           const destChainId = event.args.toChainId
 
+          if (destChainId.toString() !== this.options.chainId.toString()) {
+            this.logger.info('Ignoring event as different destination chainId: ', {destChainId, currChainId: this.options.chainId})
+            continue;
+          }
+
           // we disburse tokens only if depositId is greater or equal to the last disbursement
           if (depositId.gte(lastDisbursement)) {
             const destChainTokenAddr =
@@ -259,10 +264,14 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           }
         }
 
-        // sort disbursement
-        disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-        // disbure the token but only if all disbursements could have been processed to avoid missing events due to updating the latestBlock
-        await this._disburseTx(disbursement, chainId, latestBlock)
+        if (disbursement?.length) {
+          // sort disbursement
+          disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+          // disbure the token but only if all disbursements could have been processed to avoid missing events due to updating the latestBlock
+          await this._disburseTx(disbursement, chainId, latestBlock)
+        } else {
+          this.logger.info('No suitable disbursement event for current network', {chainId})
+        }
       } catch (e) {
         // Catch outside loop to stop at first failing depositID as all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
         this.logger.error(e.message)
