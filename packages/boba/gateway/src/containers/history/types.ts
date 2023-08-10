@@ -120,6 +120,7 @@ export type ChainInfo = {
   name: string
   symbol: string
   transactionUrlPrefix: string
+  imgSrc: string
 }
 
 export interface Token {

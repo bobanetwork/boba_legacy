@@ -6,9 +6,9 @@ import { getCoinImage } from 'util/coinImage'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
 
-import bobaEth from 'assets/images/bobaETH.png'
-import bobaBnb from 'assets/images/bobaBNB.png'
-import bobaAvax from 'assets/images/bobaAvax.png'
+import bobaEth from 'assets/bobaEth.svg'
+import bobaBnb from 'assets/bobaBNB.svg'
+import bobaAvax from 'assets/bobaAvax.svg'
 
 import ethIcon from 'assets/ethereum.svg'
 
@@ -17,46 +17,55 @@ export const Chains: ChainMap = {
     name: CHAIN_NAME.All_Networks,
     transactionUrlPrefix: '',
     symbol: '',
+    imgSrc: ethIcon,
   },
   '56': {
     name: CHAIN_NAME.BNB,
     transactionUrlPrefix: 'https://bscscan.com/tx/',
     symbol: 'BNB',
+    imgSrc: getCoinImage('BNB'),
   },
   '56288': {
     name: CHAIN_NAME.Boba_BNB,
     transactionUrlPrefix: 'https://blockexplorer.bnb.boba.network/tx/',
     symbol: 'BOBA',
+    imgSrc: bobaBnb,
   },
   '97': {
     name: CHAIN_NAME.BNB_Testnet,
     transactionUrlPrefix: 'https://testnet.bscscan.com/tx/',
     symbol: 'BNB',
+    imgSrc: getCoinImage('BNB'),
   },
   '9728': {
     name: CHAIN_NAME.Boba_BNB_Testnet,
     transactionUrlPrefix: 'https://blockexplorer.testnet.bnb.boba.network/tx/',
     symbol: 'BOBA',
+    imgSrc: bobaBnb,
   },
   '1': {
     name: CHAIN_NAME.Ethereum,
     transactionUrlPrefix: 'https://etherscan.io/tx/',
     symbol: 'ETH',
+    imgSrc: ethIcon,
   },
   '288': {
     name: CHAIN_NAME.Boba_Ethereum,
     transactionUrlPrefix: 'https://bobascan.com/tx/',
     symbol: 'BOBA',
+    imgSrc: bobaEth,
   },
   '5': {
     name: CHAIN_NAME.Goerli,
     transactionUrlPrefix: 'https://goerli.etherscan.io/tx/',
     symbol: 'ETH',
+    imgSrc: ethIcon,
   },
   '2888': {
     name: CHAIN_NAME.Boba_Goerli,
     transactionUrlPrefix: 'https://testnet.bobascan.com/tx/',
     symbol: 'BOBA',
+    imgSrc: bobaEth,
   },
 }
 
