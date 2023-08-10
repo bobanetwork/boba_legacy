@@ -10,11 +10,14 @@ import {
   selectNetworkType,
   selectBaseEnabled,
   selectLayer,
+  selectAccountEnabled,
 } from 'selectors'
+
 import { LAYER } from 'util/constant'
 
 const useWalletSwitch = () => {
   const dispatch = useDispatch<any>()
+  const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
   const activeNetwork = useSelector(selectActiveNetwork())
   const networkType = useSelector(selectNetworkType())
@@ -39,8 +42,10 @@ const useWalletSwitch = () => {
   }, [layer, reconnect, baseEnabled, dispatch])
 
   useEffect(() => {
-    if (activeNetwork !== network || activeNetworkType !== networkType) {
-      dispatch(openModal('switchNetworkModal'))
+    if (accountEnabled) {
+      if (activeNetwork !== network || activeNetworkType !== networkType) {
+        dispatch(openModal('switchNetworkModal'))
+      }
     }
   }, [activeNetwork, activeNetworkType, network, networkType, dispatch])
 }
