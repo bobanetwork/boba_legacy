@@ -233,17 +233,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     status: string
   ) => {
     const linkToHash = `${Chains[chainID].transactionUrlPrefix}${hash}`
-    const symbol = Chains[chainID].symbol
     const networkName = Chains[chainID].name
+    const imgSrc = Chains[chainID].imgSrc
 
     return (
       <TransactionDetails>
         <IconContainer>
-          {symbol === 'BOBA' ? (
-            <Image src={bobaLogo} alt="boba network" />
-          ) : (
-            <Icon src={getCoinImage(symbol)} />
-          )}
+          <Icon src={imgSrc} />
         </IconContainer>
         <TransactionChainDetails>
           <TransactionChain>{networkName}</TransactionChain>
