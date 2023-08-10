@@ -115,13 +115,13 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   },
   {
     value: '97',
-    label: 'BNB Testnet',
+    label: 'tBNB',
     imgSrc: getCoinImage('BNB'),
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '43113',
-    label: 'Avax Testnet',
+    label: 'Fuji',
     imgSrc: getCoinImage('AVAX'),
     headerName: NETWORK_TYPE.TESTNET,
   },
@@ -155,13 +155,13 @@ export const NETWORK_L2_OPTIONS = [
   },
   {
     value: '9728',
-    label: 'Boba BNB Testnet',
+    label: 'Boba tBNB',
     imgSrc: bobaBnb,
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '4328',
-    label: 'Boba Avax Testnet',
+    label: 'Boba Fuji',
     imgSrc: bobaAvax,
     headerName: NETWORK_TYPE.TESTNET,
   },

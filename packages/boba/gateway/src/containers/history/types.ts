@@ -94,7 +94,7 @@ export interface ITransaction {
   hash: string
   timeStamp: number
   to: string
-  UserFacingStatus?: TRANSACTION_FILTER_STATUS
+  UserFacingStatus: TRANSACTION_FILTER_STATUS
 }
 
 export interface IProcessedTransaction {
@@ -105,7 +105,7 @@ export interface IProcessedTransaction {
   to: string
   tokenSymbol: string
   amount: string
-  status?: TRANSACTION_FILTER_STATUS // need to remove the undefined option
+  status: TRANSACTION_FILTER_STATUS // need to remove the undefined option
   originChainId: number
   destinationChainId: number
 }
