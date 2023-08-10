@@ -58,6 +58,26 @@ export const Chains: ChainMap = {
     transactionUrlPrefix: 'https://testnet.bobascan.com/tx/',
     symbol: 'BOBA',
   },
+  '43114': {
+    name: CHAIN_NAME.Avalanche,
+    transactionUrlPrefix: 'https://snowtrace.io/tx/',
+    symbol: 'AVAX',
+  },
+  '43288': {
+    name: CHAIN_NAME.Boba_Avalanche,
+    transactionUrlPrefix: 'https://blockexplorer.avax.boba.network/tx/',
+    symbol: 'BOBA',
+  },
+  '43113': {
+    name: CHAIN_NAME.Avalanche_Testnet,
+    transactionUrlPrefix: 'https://testnet.snowtrace.io/tx/',
+    symbol: 'AVAX',
+  },
+  '4328': {
+    name: CHAIN_NAME.Boba_Avalanche_Testnet,
+    transactionUrlPrefix: 'https://blockexplorer.testnet.avax.boba.network/tx/',
+    symbol: 'BOBA',
+  },
 }
 
 export const ALL_NETWORKS: IDropdownItem = {

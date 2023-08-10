@@ -452,4 +452,132 @@ export const TokenInfo: TokenInfoMap = {
       decimals: 18,
     },
   },
+  '43114': {
+    '0x0000000000000000000000000000000000000000': {
+      name: 'Avalanche',
+      symbol: 'AVAX',
+      decimals: 18,
+    },
+    '0x3cD790449CF7D187a143d4Bd7F4654d4f2403e02': {
+      name: 'BOBA Token',
+      symbol: 'BOBA',
+      decimals: 18,
+    },
+    '0x42006Ab57701251B580bDFc24778C43c9ff589A1': {
+      name: 'EVO',
+      symbol: 'EVO',
+      decimals: 18,
+    },
+    '0xc7198437980c041c805A1EDcbA50c1Ce5db95118': {
+      name: 'Tether USD',
+      symbol: 'USDT.e',
+      decimals: 6,
+    },
+    '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7': {
+      name: 'TetherToken',
+      symbol: 'USDt',
+      decimals: 6,
+    },
+    '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E': {
+      name: 'USD Coin',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664': {
+      name: 'USD Coin',
+      symbol: 'USDC.e',
+      decimals: 6,
+    },
+    '0x19860CCB0A68fd4213aB9D8266F7bBf05A8dDe98': {
+      name: 'Binance USD',
+      symbol: 'BUSD.e',
+      decimals: 18,
+    },
+    '0x9C9e5fD8bbc25984B178FdCE6117Defa39d2db39': {
+      name: 'BUSD Token',
+      symbol: 'BUSD',
+      decimals: 18,
+    },
+    '0xd586E7F844cEa2F87f50152665BCbc2C279D8d70': {
+      name: 'Dai Stablecoin',
+      symbol: 'DAI.e',
+      decimals: 18,
+    },
+  },
+  '43288': {
+    '0x4200000000000000000000000000000000000006': {
+      name: 'BOBA Token',
+      symbol: 'BOBA',
+      decimals: 18,
+    },
+    '0xc8849f32138de93F6097199C5721a9EfD91ceE01': {
+      name: 'EVO',
+      symbol: 'EVO',
+      decimals: 18,
+    },
+    '0x4ED96c1dc969d7E2310D9582A68c39556C005912': {
+      name: 'Tether USD',
+      symbol: 'USDT.e',
+      decimals: 6,
+    },
+    '0xfaA13D82756f1e0e4dec9416b83121db3Fc35199': {
+      name: 'TetherToken',
+      symbol: 'USDt',
+      decimals: 6,
+    },
+    '0x12bb1A120dcF8Cb7152eDAC9f04d176DD7f41F7e': {
+      name: 'USD Coin',
+      symbol: 'USDC',
+      decimals: 6,
+    },
+    '0x126969743a6d300bab08F303f104f0f7DBAfbe20': {
+      name: 'USD Coin',
+      symbol: 'USDC.e',
+      decimals: 6,
+    },
+    '0xb8B0034CFD89925944C07Ac6CcB2834d1774cfb6': {
+      name: 'Binance USD',
+      symbol: 'BUSD.e',
+      decimals: 18,
+    },
+    '0x87e062dE99Ed71aF9b22dDA63e1b6D43333798f8': {
+      name: 'BUSD Token',
+      symbol: 'BUSD',
+      decimals: 18,
+    },
+    '0x69B7d24f0E03Ff21949081C95dA7288fEa5C844D': {
+      name: 'Dai Stablecoin',
+      symbol: 'DAI.e',
+      decimals: 18,
+    },
+    '0x4200000000000000000000000000000000000023': {
+      name: 'Avalanche',
+      symbol: 'AVAX',
+      decimals: 18,
+    },
+  },
+  '43113': {
+    '0x0000000000000000000000000000000000000000': {
+      name: 'Avalanche',
+      symbol: 'AVAX',
+      decimals: 18,
+    },
+    '0xEaE78E78cC22690719361F65a50734A15aaE698C': {
+      name: 'BOBA Token',
+      symbol: 'BOBA',
+      decimals: 18,
+    },
+  },
+  '4328': {
+    '0x4200000000000000000000000000000000000006': {
+      name: 'BOBA Token',
+      symbol: 'BOBA',
+      decimals: 18,
+    },
+    '0x4200000000000000000000000000000000000023': {
+      name: 'Avalanche',
+      symbol: 'AVAX',
+      decimals: 18,
+    },
+  },
 }
