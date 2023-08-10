@@ -25,6 +25,7 @@ import {
 } from './styles'
 import { SectionLabel } from '../chain/styles'
 import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
+import EmergencySwap from './EmergencySwap'
 
 type Props = {}
 
@@ -80,6 +81,7 @@ const BridgeInput: FC<Props> = (props) => {
       )}
       <BridgeToAddress />
       {token && <Fee />}
+      <EmergencySwap />
     </BridgeInputContainer>
   )
 }
