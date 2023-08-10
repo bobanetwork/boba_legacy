@@ -9,11 +9,18 @@ export const ExitsWrapper = styled.div`
     props.theme.name === 'light' &&
     css`
       border: solid 1px ${props.theme.colors.gray[400]};
+      &:hover {
+        background: ${props.theme.colors.gray[300]};
+        border: solid 1px ${props.theme.colors.gray[500]};
+      }
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
       border: solid 1px ${props.theme.colors.gray[300]};
+      &:hover {
+        background: ${props.theme.colors.gray[300]};
+      }
     `}
 `
 
