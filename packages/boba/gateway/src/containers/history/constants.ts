@@ -109,7 +109,7 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   },
   {
     value: '5',
-    label: 'Ethereum Goerli',
+    label: 'Goerli',
     imgSrc: ethIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
