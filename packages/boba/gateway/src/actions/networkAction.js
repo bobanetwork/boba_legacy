@@ -286,3 +286,7 @@ export function setActiveNetworkType(payload) {
     return dispatch({ type: 'NETWORK/SET_TYPE/ACTIVE', payload })
   }
 }
+
+export function fetchBlockExplorerUrls() {
+  return createAction('NETWORK/SET/BLOCK_EXPLORER', () => networkService.getBlockExplorerLinks())
+}

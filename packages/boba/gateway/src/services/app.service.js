@@ -214,7 +214,7 @@ class AppService {
       payload: {
         currency: L1_ETH_Address,
         addressL1: L1_ETH_Address,
-        addressL2: L2_BOBA_Address,
+        addressL2: L2_SECONDARYFEETOKEN_ADDRESS,
         symbolL1: l1Token,
         symbolL2: l1Token,
         decimals: 18,

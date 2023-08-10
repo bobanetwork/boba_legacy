@@ -1,8 +1,8 @@
 import { Svg, Typography } from 'components/global'
 import styled from 'styled-components'
 
-import ArrowDown from 'images/icons/arrowdown.svg'
-import Switch from 'images/icons/switchIcon.svg'
+import ArrowDown from 'assets/images/icons/arrowdown.svg'
+import Switch from 'assets/images/icons/switchIcon.svg'
 
 export const ChainContainer = styled.div`
   display: flex;
@@ -44,7 +44,8 @@ export const ChainPicker = styled.div`
 
 export const ChainIcon = styled.div`
   display: flex;
-  align-items: center;
+  width: 30px;
+  height: 30px;
 `
 export const ChainPickerPlaceHolder = styled(Typography).attrs({
   variant: 'body1',

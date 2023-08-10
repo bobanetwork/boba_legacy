@@ -25,7 +25,7 @@ import {TableContent} from 'components/global/table'
 import { Typography } from 'components/global/typography'
 import { Button } from 'components/global/button'
 
-import ActionIcon from 'images/icons/actions.svg'
+import ActionIcon from 'assets/images/icons/actions.svg'
 import { SvgContianer } from './styles'
 import { Svg } from 'components/global/svg'
 

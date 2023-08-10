@@ -20,6 +20,8 @@ import {
   TransactionHash,
   TransactionChain,
   IconContainer,
+  Image,
+  IncompleteTransactionHash,
 } from './styles'
 import {
   ITransactionsResolverProps,
@@ -28,29 +30,12 @@ import {
   TRANSACTION_STATUS,
   TRANSACTION_FILTER_STATUS,
   LAYER,
-  CHAIN_NAME,
 } from './types'
 import { orderBy } from 'util/lodash'
 import truncate from 'truncate-middle'
 import { logAmount } from 'util/amountConvert'
-import networkService from 'services/networkService'
-import noHistoryIcon from '../../images/noHistory.svg'
-
-const NetworkNameToSymbol: { [key: string]: string } = {
-  ethereum: 'ETH',
-  boba: 'BOBA',
-  bnb: 'BNB',
-}
-
-export const GetSymbolFromNetworkName = (networkName: string): string => {
-  const networks: string[] = Object.keys(NetworkNameToSymbol)
-  for (const network of networks) {
-    if (networkName.toLowerCase().includes(network)) {
-      return NetworkNameToSymbol[network]
-    }
-  }
-  return 'N/A'
-}
+import noHistoryIcon from 'assets/images/noHistory.svg'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   transactions,
@@ -70,14 +55,6 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     (i) => i.timeStamp,
     'desc'
   )
-
-  const getNetworkExplorerLink = (chain: string, hash: string) => {
-    const network = networkService.networkConfig
-    if (!!network && !!network[chain]) {
-      return `${network[chain].transaction}${hash}`
-    }
-    return ''
-  }
 
   const dateFilter = (transaction: ITransaction) => {
     const txnAfterStartDate = transactionsFilter.startDate
@@ -182,10 +159,23 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const process_transaction = (transaction: ITransaction) => {
     let amountString = ''
     const chain = transaction.layer === 'L1pending' ? 'L1' : transaction.layer
-    const token =
+
+    // TODO: have a unknown token to use
+    let token = {
+      name: 'Etheruem',
+      symbol: 'ETH',
+      decimals: 18,
+    }
+    if (
       TokenInfo[transaction.originChainId.toString()][
         transaction.action.token.toLowerCase()
       ]
+    ) {
+      token =
+        TokenInfo[transaction.originChainId.toString()][
+          transaction.action.token.toLowerCase()
+        ]
+    }
 
     const symbol = token.symbol
 
@@ -225,30 +215,46 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const getTransactionToken = (symbol: string) => {
     return (
       <TransactionToken>
-        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
+        <IconContainer>
+          {symbol === 'BOBA' ? (
+            <Image src={bobaLogo} alt="boba network" />
+          ) : (
+            <Icon src={getCoinImage(symbol)} />
+          )}
+        </IconContainer>
         <div>{symbol}</div>
       </TransactionToken>
     )
   }
 
-  const getTransactionChain = (chainID: string, hash: string) => {
+  const getTransactionChain = (
+    chainID: string,
+    hash: string,
+    status: string
+  ) => {
     const linkToHash = `${Chains[chainID].transactionUrlPrefix}${hash}`
-    const symbol = Chains[chainID].symbol
     const networkName = Chains[chainID].name
-    // href={chainLink({ chain: prefix, hash: detail.hash })}
+    const imgSrc = Chains[chainID].imgSrc
 
     return (
       <TransactionDetails>
-        <IconContainer>{<Icon src={getCoinImage(symbol)} />}</IconContainer>
+        <IconContainer>
+          <Icon src={imgSrc} />
+        </IconContainer>
         <TransactionChainDetails>
           <TransactionChain>{networkName}</TransactionChain>
-          <TransactionHash
-            href={linkToHash}
-            target={'_blank'}
-            rel="noopener noreferrer"
-          >
-            {`Tx: ${truncate(hash, 4, 4, '...')}`}
-          </TransactionHash>
+          {hash && (
+            <TransactionHash
+              href={linkToHash}
+              target={'_blank'}
+              rel="noopener noreferrer"
+            >
+              {`Tx: ${truncate(hash, 4, 4, '...')}`}
+            </TransactionHash>
+          )}
+          {!hash && (
+            <IncompleteTransactionHash>{`Tx: ${status}`}</IncompleteTransactionHash>
+          )}
         </TransactionChainDetails>
       </TransactionDetails>
     )
@@ -294,14 +300,16 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                     {
                       content: getTransactionChain(
                         transaction.originChainId.toString(),
-                        transaction.fromHash
+                        transaction.fromHash,
+                        transaction.status
                       ),
                       width: 142,
                     },
                     {
                       content: getTransactionChain(
                         transaction.destinationChainId.toString(),
-                        transaction.toHash
+                        transaction.toHash,
+                        transaction.status
                       ),
                       width: 142,
                     },

@@ -7,7 +7,7 @@ import {
   fetchBalances,
   isTeleportationOfAssetSupported,
 } from 'actions/networkAction'
-import { closeModal } from 'actions/uiAction'
+import { closeModal, openAlert } from 'actions/uiAction'
 import Modal from 'components/modal/Modal'
 import { isEqual } from 'util/lodash'
 import { useDispatch, useSelector } from 'react-redux'
@@ -24,6 +24,7 @@ import { LAYER } from 'util/constant'
 import {
   ActionLabel,
   ListLabel,
+  PlusIcon,
   TokenBalance,
   TokenLabel,
   TokenListItem,
@@ -36,6 +37,9 @@ import {
 } from './styles'
 import { formatTokenAmount } from 'util/common'
 import { NetworkList } from '../../../util/network/network.util'
+import Tooltip from 'components/tooltip/Tooltip'
+import networkService from 'services/networkService'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 // the L2 token which can not be exited so exclude from dropdown in case of L2
 const NON_EXITABLE_TOKEN = [
@@ -62,7 +66,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
   const activeNetwork = useSelector(selectActiveNetwork())
   const activeNetworkType = useSelector(selectActiveNetworkType())
 
-  const [isMyToken, setIsMyToken] = useState(false)
+  const [isMyToken, setIsMyToken] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
   let balances = l1Balance
@@ -92,12 +96,18 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
     handleClose()
   }
 
+  const addToMetamask = async (token: any) => {
+    const { symbol } = token || {}
+    const logoURI = getCoinImage(symbol)
+    await networkService.walletService.addTokenToMetaMask({ ...token, logoURI })
+  }
+
   return (
     <Modal
       open={open}
       onClose={handleClose}
       minHeight="180px"
-      title="Select Network"
+      title="Select Token"
       transparent={false}
     >
       <TokenPickerModalContainer>
@@ -108,14 +118,14 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
           />
         </TokenSearchContainer>
         <TokenPickerAction>
+          <ActionLabel selected={isMyToken} onClick={() => setIsMyToken(true)}>
+            My Tokens
+          </ActionLabel>
           <ActionLabel
             selected={!isMyToken}
             onClick={() => setIsMyToken(false)}
           >
             All
-          </ActionLabel>
-          <ActionLabel selected={isMyToken} onClick={() => setIsMyToken(true)}>
-            My Tokens
           </ActionLabel>
         </TokenPickerAction>
         <ListLabel> Token Names </ListLabel>
@@ -155,14 +165,28 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                     >
                       <TokenSymbol>
                         <img
-                          src={getCoinImage(token.symbol)}
+                          src={
+                            token.symbol === 'BOBA'
+                              ? bobaLogo
+                              : getCoinImage(token.symbol)
+                          }
                           alt={`${token.symbol} logo`}
                           width="24px"
                           height="24px"
                         />
                       </TokenSymbol>
-                      <TokenLabel>{token.symbol}</TokenLabel>
-                      <TokenBalance>{amount}</TokenBalance>
+                      <TokenLabel>
+                        {token.symbol}
+                        <TokenBalance>{amount}</TokenBalance>
+                      </TokenLabel>
+                      <Tooltip title="Add token to metamask">
+                        <PlusIcon
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            addToMetamask(token)
+                          }}
+                        />
+                      </Tooltip>
                     </TokenListItem>
                   )
                 })

@@ -9,56 +9,71 @@ exports[`Layout => Header should match the snapshot 1`] = `
       class="sc-gUMnWI ervjnC"
     />
     <div
-      class="sc-gjJAnY gMihvQ"
+      class="sc-hjLWnZ kFZkac"
     >
       <a
         activeclassname="active"
-        class="sc-hjLWnZ cgLSXX"
+        class="sc-fWFeAW dJFBmS"
         href="/bridge"
       >
         Bridge
       </a>
       <a
         activeclassname="active"
-        class="sc-hjLWnZ cgLSXX"
+        class="sc-fWFeAW dJFBmS"
         href="/history"
       >
         History
       </a>
       <a
         activeclassname="active"
-        class="sc-hjLWnZ cgLSXX"
+        class="sc-fWFeAW dJFBmS"
         href="/earn"
       >
         Earn
       </a>
       <a
         activeclassname="active"
-        class="sc-hjLWnZ cgLSXX"
+        class="sc-fWFeAW dJFBmS"
         href="/stake"
       >
         Stake
       </a>
       <a
         activeclassname="active"
-        class="sc-hjLWnZ cgLSXX"
+        class="sc-fWFeAW dJFBmS"
         href="/DAO"
       >
         Dao
       </a>
     </div>
     <div
-      class="sc-hUOJWJ kmFsJr"
+      class="sc-hUOJWJ lgjkOK"
     >
       <button
         class="sc-crozmw joSqYT"
         label="Connect Wallet"
+        style="white-space: nowrap;"
         type="button"
       >
          Connect Wallet
       </button>
       <div
-        class="sc-ePzlA-D fYkMgT"
+        class="sc-dPwPAC UluVn"
+      >
+        <div
+          class="sc-ePzlA-D hiWbI"
+        >
+          <div>
+            <div
+              data-src="hamburger.svg"
+              src=""
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gjJAnY imSQnB"
         title="light-icon"
       >
         <div>

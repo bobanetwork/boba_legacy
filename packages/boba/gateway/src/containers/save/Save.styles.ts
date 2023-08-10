@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 import { Typography } from 'components/global/typography'
-import stakeBg from 'images/boba2/stake-balance-bg.png'
+import stakeBg from 'assets/images/boba2/stake-balance-bg.png'
 import { sdesktop, mobile } from 'themes/screens'
 
 export const StakePageContainer = styled.div`
@@ -51,7 +51,7 @@ export const StakeHeadContainer = styled.div`
 `
 
 export const StakeContainer = styled.div`
-  display: flex,
+  display: flex;
   justify-content: center;
   align-items: center;
   background: ${(props) => props.theme.colors.box.background};

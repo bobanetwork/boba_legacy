@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { openModal } from 'actions/uiAction'
 import { selectAccountEnabled, selectTokenToBridge } from 'selectors'
@@ -24,6 +24,8 @@ import {
   TokenSymbol,
 } from './styles'
 import { SectionLabel } from '../chain/styles'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
+import EmergencySwap from './EmergencySwap'
 
 type Props = {}
 
@@ -47,12 +49,16 @@ const BridgeInput: FC<Props> = (props) => {
     <BridgeInputContainer>
       <BridgeInputWrapper>
         <TokenSelector>
-          <SectionLabel>Amount</SectionLabel>
+          <SectionLabel>Token</SectionLabel>
           <TokenSelectorInput onClick={() => openTokenPicker()}>
             {token && (
               <TokenSymbol>
                 <img
-                  src={getCoinImage(token.symbol)}
+                  src={
+                    token.symbol === 'BOBA'
+                      ? bobaLogo
+                      : getCoinImage(token.symbol)
+                  }
                   alt={`ETH logo`}
                   width="32px"
                   height="32px"
@@ -75,6 +81,7 @@ const BridgeInput: FC<Props> = (props) => {
       )}
       <BridgeToAddress />
       {token && <Fee />}
+      <EmergencySwap />
     </BridgeInputContainer>
   )
 }

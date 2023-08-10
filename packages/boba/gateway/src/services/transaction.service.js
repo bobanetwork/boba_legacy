@@ -132,17 +132,14 @@ class TransactionService {
    *
    */
   async getTransactions(networkConfig = networkService.networkConfig) {
-    let networksArray = Array.from(Object.values(AllNetworkConfigs))
-    networksArray = networksArray.filter(config => config.Mainnet.L1.symbol !== "AVAX")
+    const networksArray = Array.from(Object.values(AllNetworkConfigs))
 
-    // need to know wether it's an l2 txn, l
     const networkConfigsArray = networksArray.flatMap((network) => {
       return [network.Testnet, network.Mainnet]
     })
 
     const allNetworksTransactions = await Promise.all(networkConfigsArray.flatMap((config) => {
       return [this.fetchL2Tx(config),
-        // this.fetchL0Tx(config),
         this.fetchL1PendingTx(config)]
     }
     ))

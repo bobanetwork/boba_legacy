@@ -8,7 +8,7 @@ import { Svg } from 'components/global/svg'
 import { Button } from 'components/global/button'
 
 import { PlaceholderContainer, Label } from './styles'
-import placehoderIcon from 'images/icons/no-data.svg'
+import placehoderIcon from 'assets/images/icons/no-data.svg'
 import { LAYER } from 'util/constant'
 import { PlaceholderConnectInterface } from './types'
 

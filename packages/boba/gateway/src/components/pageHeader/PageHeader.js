@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import BobaLogo from '../icons/BobaLogo'
-import { ReactComponent as BobaLogoM } from '../../images/boba2/logo-boba2-m.svg'
+import { ReactComponent as BobaLogoM } from 'assets/images/boba2/logo-boba2-m.svg'
 import { useSelector } from 'react-redux'
 import {
   HeaderWrapper,

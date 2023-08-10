@@ -2,6 +2,9 @@ import React, { FC } from 'react'
 import { StyledNav, NavLinkItem } from './style'
 import { MENU_LIST } from './constant'
 import { MenuProps } from './types'
+import { useSelector } from 'react-redux'
+import { selectActiveNetwork } from 'selectors'
+import { NETWORK } from 'util/network/network.util'
 
 /**
  *
@@ -24,9 +27,18 @@ import { MenuProps } from './types'
  */
 
 const Navigation: FC<MenuProps> = ({ isOpen }) => {
+  const activeNetwork = useSelector(selectActiveNetwork())
+
   return (
     <StyledNav>
       {MENU_LIST.map((menu) => {
+        if (
+          activeNetwork !== NETWORK.ETHEREUM &&
+          ['Stake', 'Dao'].includes(menu.label)
+        ) {
+          return null
+        }
+
         return (
           <NavLinkItem
             key={menu.label}

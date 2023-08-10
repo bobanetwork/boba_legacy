@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components'
-import { screen, sdesktop } from 'themes/screens'
+import { mobile, screen, sdesktop } from 'themes/screens'
 import { Svg, Typography } from 'components/global'
+import Switch from 'assets/images/icons/switchIcon.svg'
 
 import {
   Arrow,
@@ -51,18 +52,16 @@ export const TableHeader = styled.div`
   margin-bottom: 20px;
   @media ${screen.mobile} {
     padding: 0px;
-    justify-content: flex-start;
   }
 `
 
 export const TableFilters = styled.div`
   padding: 20px;
   border-radius: 6px 6px 0px 0px;
-  justify-content: space-between;
   width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
   @media ${screen.tablet} {
     margin-bottom: 5px;
     gap: 20px;
@@ -75,6 +74,41 @@ export const TableFilters = styled.div`
       font-size: 12px;
     }
   }
+`
+
+export const DatePickerWrapper = styled.div`
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  text-align: center;
+  @media ${screen.mobile} {
+    display: none;
+  }
+`
+
+export const MobileDatePickerWrapper = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  text-align: center;
+  gap: 8px;
+  @media ${screen.mobile} {
+    display: flex;
+  }
+`
+
+export const DateInput = styled.button`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #545454;
+  border-radius: 8px;
+  background: #262626;
+  padding: 10px 20px;
+  color: ${({ theme }) => theme.color};
 `
 
 export const NetworkDropdowns = styled.div`
@@ -198,6 +232,28 @@ export const TransactionHash = styled.a`
     height: 12px;
   }
 `
+
+export const IncompleteTransactionHash = styled.div`
+  font-size: 12px;
+  width: 102px;
+  height: 16px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[100]};
+    `}
+@media ${screen.mobile} {
+    font-size: 8px;
+    width: 72px;
+    height: 12px;
+  }
+`
+
 export const TransactionToken = styled.div`
   display: flex;
   flex-direction: row;
@@ -247,6 +303,7 @@ export const IconContainer = styled.div`
     margin: 0px;
   }
 `
+
 export const Icon = styled(Svg)`
   display: flex;
   align-content: center;
@@ -261,6 +318,55 @@ export const Icon = styled(Svg)`
       max-width: 24px;
       height: auto;
     }
+  }
+`
+
+export const Image = styled.img`
+  display: flex;
+  align-content: center;
+  width: 32px;
+  height: 32px;
+`
+
+export const SwitchIcon = styled(Svg).attrs({
+  src: Switch,
+  fill: '#AEDB01',
+})`
+  display: flex;
+
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`
+
+export const SwitchChainIcon = styled.div`
+  cursor: pointer;
+  margin: -12px auto;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  border: 2px solid
+    ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[600] : colors.gray[200]};
+  background: ${({ theme: { colors } }) => colors.box.background};
+
+  &:hover {
+    border-color: ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[600] : colors.gray[100]};
+  }
+
+  > div {
+    align-self: stretch;
+  }
+  transition: transform 0.3s ease-in-out;
+  &:hover {
+    transform: rotate(180deg);
   }
 `
 
@@ -331,63 +437,6 @@ export const NoHistory = styled.div`
       css`
         fill: ${props.theme.colors.gray[100]};
       `}
-  }
-`
-export const Actions = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  white-space: nowrap;
-  gap: 0px 20px;
-
-  .react-datepicker__tab-loop {
-    margin: 0px -10px;
-  }
-  @media ${screen.mobile} {
-    justify-content: flex-start;
-    margin-right: 0px;
-    margin-left: auto;
-    gap: 0px 10px;
-  }
-`
-
-export const DatePickerWrapper = styled.div`
-  width: 100%;
-  position: relative;
-  height: 44px;
-  margin: 0px;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: ${(props) => props.theme.text.body1};
-  color: inherit;
-  border: 1px solid ${(props) => props.theme.colors.box.border};
-  outline: none;
-  max-width: 115px;
-  + div {
-    margin: 0px -15px;
-  }
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-    `}
-  @media ${screen.laptop} {
-    width: 136px;
-  }
-  @media ${screen.mobile} {
-    min-width: 40px;
-    width: 75px;
-    height: 30px;
-    font-size: 11px;
-    padding: 15px 5px;
-    text-align: center;
   }
 `
 
@@ -497,7 +546,7 @@ export const DropdownNetwork = styled(Dropdown)`
     }
   }
   ${Header} {
-    border-radius: 20px;
+    border-radius: 12px;
     min-width: 0px;
     width: 210px;
     padding: 6px 16px;
@@ -559,20 +608,16 @@ export const DropdownNetwork = styled(Dropdown)`
     }
   }
   ${DropdownIcon} {
-    height: 16px;
-    width: 16px;
+    height: 20px;
+    width: 20px;
     display: flex;
     align-items: center;
     div {
-      height: 18px;
-      width: 16px;
+      height: 20px;
+      width: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    svg {
-      max-width: 16px;
-      height: auto;
     }
     margin: 0px;
   }
@@ -658,7 +703,6 @@ export const DropdownNetwork = styled(Dropdown)`
         }
         color: ${props.theme.colors.gray[100]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        /* background: ${props.theme.colors.gray[500]}; */
         box-shadow: ${props.theme.backShadow};
       `}
   }
@@ -703,4 +747,130 @@ export const TableTransactionsContainer = styled.div`
   ${sdesktop(css`
     overflow-x: auto;
   `)}
+`
+
+export const DatePickerHeader = styled.div`
+  font-size: 14px;
+  padding: 8px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ${({ theme: { name, colors } }) =>
+    name === 'light'
+      ? css`
+          background: ${colors?.gray[50]};
+          border: 1px solid ${colors?.gray[500]};
+        `
+      : css`
+          background: ${colors?.gray[500]};
+          border: 1px solid ${colors?.gray[300]};
+        `}
+
+  ${mobile(css`
+    height: 30px;
+    font-family: roboto;
+    width: 130px;
+    font-size: 10px;
+  `)}
+`
+
+export const DatePickerHeadersContainer = styled.div`
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+`
+
+export const DatePickerDropdown = styled.div<{ isRange?: boolean }>`
+  transition: 0.25s all;
+  position: absolute;
+  width: 250px;
+  right: 0px;
+  top: 40px;
+  z-index: 1;
+  border-radius: 12px;
+
+  ${({ theme: { colors, name } }) =>
+    name === 'light'
+      ? css`
+          color: ${colors.gray[800]};
+          background: ${colors.gray[50]};
+          border: 1px solid ${colors.gray[500]};
+        `
+      : css`
+          color: ${colors.gray[50]};
+          background: ${colors.gray[500]};
+          border: 1px solid ${colors.gray[300]};
+          ${(isRange) =>
+            !isRange &&
+            css`
+              .rdp-day_selected {
+                border: 1px solid ${colors.gray[100]};
+              }
+            `}
+        `}
+
+  .rdp {
+    --rdp-cell-size: 30px;
+    --rdp-caption-font-size: 14px;
+    --rdp-caption-font-weight: 400;
+    --rdp-caption-font-family: roboto;
+    --rdp-accent-color: ${(props) => props.theme.colors.gray[400]};
+    --rdp-background-color: ${(props) => props.theme.colors.gray[400]};
+  }
+  ${(props) =>
+    props.isRange &&
+    props.theme.name === 'light' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[600]};
+        color: ${props.theme.colors.gray[800]};
+      }
+    `}
+  ${(props) =>
+    !props.isRange &&
+    props.theme.name === 'dark' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[100]};
+      }
+    `}
+    
+  ${(props) =>
+    !props.isRange &&
+    css`
+      .rdp-day {
+        border-radius: 20%;
+      }
+    `}
+  ${(props) =>
+    props.isRange &&
+    css`
+      .rdp-day {
+        border: none !important;
+      }
+    `}
+`
+
+export const DatePickerContainer = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.25s all;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[800]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[50]};
+    `};
 `

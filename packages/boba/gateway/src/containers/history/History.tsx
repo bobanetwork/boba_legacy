@@ -19,7 +19,7 @@ import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
 
 import { useTheme } from 'styled-components'
-// import Input from 'components/input/Input'
+
 import { Button } from 'components/global'
 
 import transctionService from 'services/transaction.service'
@@ -27,23 +27,22 @@ import { NETWORK_TYPE } from 'util/network/network.util'
 import {
   ALL_NETWORKS,
   FILTER_OPTIONS,
-  TableOptions,
   NETWORK_L1_OPTIONS,
   NETWORK_L2_OPTIONS,
+  TableOptions,
 } from './constants'
 
-import MagnifyingGlass from 'images/icons/magnifyingGlass.svg'
+import MagnifyingGlass from 'assets/images/icons/magnifyingGlass.svg'
 
 import {
-  selectTransactions,
   selectAccountEnabled,
   selectLayer,
+  selectTransactions,
 } from 'selectors'
 
 import { fetchTransactions } from 'actions/networkAction'
 
 import {
-  Actions,
   SearchInput,
   Table,
   NoHistory,
@@ -51,31 +50,32 @@ import {
   TableHeader,
   TableFilters,
   NetworkDropdowns,
-  Input,
-  DatePickerWrapper,
   DateDescriptions,
-  Icon,
-  MobileDateDescriptions,
-  IconContainer,
-  DropdownNetwork,
+  Input,
+  SwitchChainIcon,
+  SwitchIcon,
   TableTransactionsContainer,
+  DatePickerWrapper,
+  DropdownNetwork,
+  MobileDateDescriptions,
+  MobileDatePickerWrapper,
 } from './styles'
 
-import useInterval from 'hooks/useInterval'
 import { setConnect } from 'actions/setupAction'
+import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-import FilterIcon from '../../images/filter.svg'
 
+import FilterIcon from 'assets/images/filter.svg'
+import noHistoryIcon from 'assets/images/noHistory.svg'
+import { FilterDropDown } from 'components/filter'
+import { Svg } from 'components/global/svg'
+import { TransactionsTableHeader } from 'components/global/table/themes'
 import { TransactionsResolver } from './TransactionsResolver'
 import { CHAIN_NAME, TRANSACTION_FILTER_STATUS } from './types'
-import { TransactionsTableHeader } from 'components/global/table/themes'
-import { FilterDropDown } from 'components/filter'
-import noHistoryIcon from 'images/noHistory.svg'
-import switchButton from 'images/icons/switchButton.svg'
-import { Svg } from 'components/global/svg'
 
 import { Typography } from 'components/global/typography'
+import DatePicker from './DatePicker'
 
 const History = () => {
   const [toNetwork, setToNetwork] = useState(ALL_NETWORKS)
@@ -110,31 +110,28 @@ const History = () => {
 
   const transactions = useSelector(selectTransactions, isEqual)
 
-  /*
   // TODO: not working as implementation needs be rewrite.
-  const getDatePicker = (label: string) => {
+  const getDatePicker = (label: string, range: boolean = false) => {
     const dateSelector = (date: Date) => {
       label === 'To' ? setFilterEndDate(date) : setFilterStartDate(date)
     }
     return (
-      <DatePickerWrapper
+      <DatePicker
         selected={label === 'To' ? filterEndDate : filterStartDate}
         onChange={(date: Date) =>
           date && !Array.isArray(date) && dateSelector(date)
         }
-        {...(label === 'From' ? { selectsStart: true } : { selectsEnd: true })}
-        calendarClassName={theme.name}
-        placeholderText={label}
-        {...(label === 'From'
-          ? { endDate: new Date(filterEndDate) }
-          : {
-              startDate: new Date(filterStartDate),
-              minDate: new Date(filterStartDate),
-            })}
-        maxDate={new Date(now)}
+        timeFormat="MM/DD/YYYY"
+        range={range}
+        {...(range
+          ? { onChangeFrom: setFilterStartDate, onChangeTo: setFilterEndDate }
+          : {})}
+        {...(label === 'To'
+          ? { minDate: filterStartDate }
+          : { maxDate: filterEndDate })}
       />
     )
-  } */
+  }
   const syncTransactions = async () => {
     if (accountEnabled) {
       const newTransactions = await transctionService.getTransactions()
@@ -172,6 +169,20 @@ const History = () => {
                 }}
               />
             </SearchInput>
+            <DatePickerWrapper>
+              <DateDescriptions variant="body2">
+                Date Range From
+              </DateDescriptions>
+              {getDatePicker('From')}
+              <DateDescriptions variant="body3">To</DateDescriptions>
+              {getDatePicker('To')}
+            </DatePickerWrapper>
+            <MobileDatePickerWrapper>
+              <MobileDateDescriptions variant="body2">
+                Date Range
+              </MobileDateDescriptions>
+              {getDatePicker('', true)}
+            </MobileDatePickerWrapper>
           </TableHeader>
 
           <Table>
@@ -196,13 +207,13 @@ const History = () => {
                     error={false}
                     headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
                   />
-                  <IconContainer
+                  <SwitchChainIcon
                     onClick={() => {
                       handleSwitchDropdowns()
                     }}
                   >
-                    <Icon src={switchButton} />
-                  </IconContainer>
+                    <SwitchIcon />
+                  </SwitchChainIcon>
                   <Typography variant="body2">To</Typography>
                   <DropdownNetwork
                     items={switched ? NETWORK_L1_OPTIONS : NETWORK_L2_OPTIONS}

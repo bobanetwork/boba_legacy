@@ -327,8 +327,7 @@ class NetworkService {
       const swapUrl = this.networkGateway === NETWORK.ETHEREUM ? '/send.swapBOBAForETH' : '/send.swapSecondaryFeeToken'
       const response = await metaTransactionAxiosInstance(
         this.networkConfig
-      ).post(swapUrl, {owner, spender, value, deadline, signature, data})
-      console.log(['meta tx fee res', response])
+      ).post(swapUrl, { owner, spender, value, deadline, signature, data })
       await this.getBobaFeeChoice()
     } catch (error) {
       let errorData = error.response.data.error
@@ -1905,7 +1904,6 @@ class NetworkService {
       //returns total cost in ETH
       return totalCost
     } catch (error) {
-      console.log(['GetExitCost', error]);
       return 0;
     }
   }
@@ -4630,6 +4628,15 @@ class NetworkService {
 
   async getBlockTime(blockNumber) {
     return (await this.provider.getBlock(blockNumber)).timestamp;
+  }
+
+  async getBlockExplorerLinks() {
+    if (this.networkConfig) {
+      const l1Explorer = this.networkConfig.L1.blockExplorerUrl
+      const l2Explorer = this.networkConfig.L2.blockExplorerUrl
+      return [l1Explorer, l2Explorer]
+    }
+    return []
   }
 
 }

@@ -27,7 +27,7 @@ const BridgeHeader = (props: Props) => {
         <Tooltip
           title={`
                 Classic Bridge:
-                This option is always available but has a 7 day delay before receiving your funds.
+                Although this option is always available, it takes 7 days to receive your funds when withdrawing from L2 to L1.
                 Fast Bridge:
                 A swap-based bridge to Boba L2. This option is only available if the pool balance is sufficient.`}
         >

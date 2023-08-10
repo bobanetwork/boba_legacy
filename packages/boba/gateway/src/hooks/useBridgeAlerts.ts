@@ -116,7 +116,7 @@ const useBridgeAlerts = () => {
       })
     )
 
-    if (amountToBridge !== '' && (underZero || amountToBridge <= 0)) {
+    if ((underZero || amountToBridge <= 0) && amountToBridge) {
       dispatch(
         setBridgeAlert({
           meta: ALERT_KEYS.VALUE_TOO_SMALL,
@@ -226,7 +226,7 @@ const useBridgeAlerts = () => {
             ).toFixed(2)}) is too low.
             Please use the classic bridge.`
           } else {
-            warning = `Insufficient balance in pool - reduce amount or use classical exit`
+            warning = `There is not enough liquidity in the fast bridge pool - please reduce amount or use classical bridge`
           }
         }
 
@@ -287,30 +287,75 @@ const useBridgeAlerts = () => {
       const type = 'error'
       const balance = Number(logAmount(token.balance, token.decimals))
 
-      /*if (fastDepositCost > L1feeBalance) {
-        warning = `Insufficient native balance to cover Gas fee`
-      }*/
-      console.log(
-        'ERROR FAST',
-        tokenForTeleportationSupported,
-        tokenForTeleportationSupported?.supported
-      )
-      if (amountToBridge > balance) {
-        warning = `Not enough balance to bridge`
-      } else if (!tokenForTeleportationSupported?.supported) {
-        warning = `Token for selected destination chain not supported`
-      } else if (
-        tokenForTeleportationSupported?.minDepositAmount > amountToBridge
-      ) {
-        warning = `You need to bridge at least ${utils.formatEther(
-          tokenForTeleportationSupported.minDepositAmount
-        )}`
-      } else if (
-        tokenForTeleportationSupported?.maxDepositAmount < amountToBridge
-      ) {
-        warning = `You can bridge at maximum ${utils.formatEther(
-          tokenForTeleportationSupported.maxDepositAmount
-        )}`
+      if (fastDepositCost > L1feeBalance) {
+        warning = `Insufficient L1 ETH balance to cover Gas fee`
+      }
+      if (token.symbol === 'ETH') {
+        if (Number(amountToBridge) + fastDepositCost > L1feeBalance) {
+          warning = `Insufficient L1 ETH balance to cover Amount and Gas fee`
+        }
+        if (Number(amountToBridge) + fastDepositCost > L1feeBalance * 0.96) {
+          warning = `Your L1 ETH balance ${L1feeBalance.toFixed(4)}
+          is very close to the estimated total (gas fee + amount).
+          Transaction might fail`
+          type = 'warning'
+        }
+      } else {
+        if (fastDepositCost > L1feeBalance) {
+          warning = `Insufficient L1 ETH balance to cover Gas fee`
+        }
+        if (fastDepositCost > L1feeBalance * 0.96) {
+          warning = `Your L1 ETH balance ${L1feeBalance.toFixed(4)}
+          is very close to the gas fee + amount.
+          Transaction might fail, it would be safe to have slightly more ETH in your L1 wallet to cover gas fee`
+          type = 'warning'
+        }
+      }
+
+      if (balance > 0) {
+        let LpRatio = 0
+
+        const lbl = Number(logAmount(L1LPLiquidity, token.decimals))
+        if (lbl > 0) {
+          const lbp = Number(logAmount(L1LPBalance, token.decimals))
+          const LPR = lbp / lbl
+          LpRatio = Number(LPR)
+        }
+        const L1lpUnits = logAmount(L1LPBalance, token.decimals)
+        const pendingUnits = logAmount(L1LPPending, token.decimals)
+        const pendingDepositBalance = Number(L1lpUnits) - Number(pendingUnits) ////subtract the in flight exits
+
+        if (LpRatio < 0.1) {
+          //not enough balance/liquidity ratio
+          //we always want some balance for unstaking
+
+          if (Number(amountToBridge) > pendingDepositBalance * 0.9) {
+            //not enough absolute balance
+            //we don't want one large bridge to wipe out the entire balance
+            //NOTE - this logic still allows bridgers to drain the entire pool, but just more slowly than before
+            //this is because the every time someone exits, the limit is recalculated
+            //via Number(LPBalance) * 0.9, and LPBalance changes over time
+
+            warning = `The ${token.symbol} pool's balance and balance/liquidity ratio is
+            low. Please use the classic bridge.`
+          } else if (Number(amountToBridge) <= pendingDepositBalance * 0.9) {
+            warning = `The ${token.symbol} pool's balance/liquidity ratio (of
+             ${Number(LpRatio).toFixed(2)}) is too low. Please use the classic
+            bridge.`
+          } else {
+            warning = `There is not enough liquidity in the fast bridge pool - reduce your amount or use the Classic Bridge`
+          }
+        }
+
+        if (
+          LpRatio >= 0.1 &&
+          Number(amountToBridge) > Number(pendingDepositBalance) * 0.9
+        ) {
+          warning = `The ${token.symbol} pool's balance of
+          ${Number(pendingDepositBalance).toFixed(2)}
+          (including inflight bridges) is too low.
+          Please use the classic bridge or reduce the amount.`
+        }
       }
 
       if (warning) {
