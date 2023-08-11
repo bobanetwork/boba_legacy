@@ -16,9 +16,7 @@ limitations under the License. */
 import React from 'react'
 
 import { Typography } from '@mui/material'
-
-import * as S from './Transaction.styles'
-import { Hash, ExitsWrapper, ExitWrapper, HashContainer } from './styles'
+import { Hash, ExitWrapper, HashContainer } from './styles'
 
 import networkService from 'services/networkService'
 
@@ -53,47 +51,30 @@ function Seven({
   }
 
     return (
-      <ExitsWrapper>
-          <S.GridContainer container
-            spacing={2}
-            direction="row"
-            justifyContent="flex-start"
-            alignItems="center"
-          >
-            <S.GridItemTag item
-              xs={12}
-              md={12}
-              style={{
-                justifyContent: 'flex-start',
-                alignItems:'center',
-              }}
-            >
-                <ExitWrapper>
-                  <Typography variant="overline" style={{fontSize: '0.9em', lineHeight: '1.0em'}}>{blockNumber}</Typography>
-                  {overdue < 0 &&
-                    <Typography variant="overline" style={{lineHeight: '1.0em', color: 'yellow'}}>
-                      {timeLabel}
-                    </Typography>
-                  }
-                  {overdue > 0 &&
-                    <Typography variant="overline" style={{lineHeight: '1.0em', color: 'green'}}>
-                      {timeLabel}
-                    </Typography>
-                  }
-                  <HashContainer variant="body3">
-                    Hash:&nbsp;
-                    <Hash
-                      href={chainLink({hash:oriHash})}
-                      target={'_blank'}
-                      rel='noopener noreferrer'
-                    >
-                      {oriHash}
-                    </Hash>
-                  </HashContainer>
-                </ExitWrapper>
-            </S.GridItemTag>
-          </S.GridContainer>
-        </ExitsWrapper>
+            <ExitWrapper>
+              <Typography variant="overline" style={{width:'20%',fontSize: '0.9em', lineHeight: '1.0em'}}>{blockNumber}</Typography>
+             
+              <HashContainer variant="body3">
+                Hash:&nbsp;
+                <Hash
+                  href={chainLink({hash:oriHash})}
+                  target={'_blank'}
+                  rel='noopener noreferrer'
+                >
+                  {oriHash}
+                </Hash>
+        </HashContainer>
+        {overdue < 0 &&
+                <Typography variant="overline" style={{lineHeight: '1.0em', color: 'yellow'}}>
+                  {timeLabel}
+                </Typography>
+              }
+              {overdue > 0 &&
+                <Typography variant="overline" style={{lineHeight: '1.0em', color: 'green'}}>
+                  {timeLabel}
+                </Typography>
+              }
+            </ExitWrapper>
       )
 
 }

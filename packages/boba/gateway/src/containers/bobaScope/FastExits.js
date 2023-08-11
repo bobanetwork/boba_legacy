@@ -22,10 +22,11 @@ import { selectLoading } from 'selectors'
 import { Pager } from 'components'
 import FastExit from 'components/seven/FastExit'
 
-import styles from './Transactions.module.scss'
-import { HistoryContainer, Content } from './styles'
+import { Svg } from 'components/global/svg'
+import noHistoryIcon from 'assets/images/noHistory.svg'
+import { HistoryContainer, Content, Disclaimer } from './styles'
 
-const PER_PAGE = 10
+const PER_PAGE = 6
 
 function FastExits({ searchData, data }) {
 
@@ -49,7 +50,6 @@ function FastExits({ searchData, data }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <div className={styles.transactionSection}>
       <HistoryContainer>
         <Pager
           currentPage={page}
@@ -62,11 +62,17 @@ function FastExits({ searchData, data }) {
         <Grid item xs={12}>
           <Box>
             <Content>
-              {!paginatedData.length && !loading && (
-                <div className={styles.disclaimer}>Scanning for pending fast exits...</div>
-              )}
+            {!paginatedData.length && !loading && (
+              <Disclaimer>
+                <Svg src={noHistoryIcon} />
+                <div>No Pending fast exits.</div>
+              </Disclaimer>
+            )}
               {!paginatedData.length && loading && (
-                <div className={styles.disclaimer}>Loading pending fast exits...</div>
+                <Disclaimer>
+                  <Svg src={noHistoryIcon}/>
+                  <div>Loading pending fast exits...</div>
+                </Disclaimer>
               )}
               {paginatedData.map((i, index) => {
                 return (
@@ -84,7 +90,6 @@ function FastExits({ searchData, data }) {
           </Box>
         </Grid>
       </HistoryContainer>
-    </div>
   );
 }
 
