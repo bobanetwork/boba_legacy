@@ -6,8 +6,6 @@ import {
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-  selectActiveNetwork,
-  selectActiveNetworkType,
   selectAmountToBridge,
   selectBobaFeeChoice,
   selectBobaPriceRatio,
@@ -32,13 +30,7 @@ import { logAmount } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
 import BN from 'bignumber.js'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
-import {
-  depositWithTeleporter,
-  isTeleportationOfAssetSupported,
-} from '../actions/networkAction'
-import { NetworkList } from '../util/network/network.util'
-import networkService from '../services/networkService'
-import { BigNumberish, utils } from 'ethers'
+import { BigNumberish } from 'ethers'
 
 enum ALERT_KEYS {
   OMG_INFO = 'OMG_INFO',
@@ -63,8 +55,16 @@ const useBridgeAlerts = () => {
   const bridgeType = useSelector(selectBridgeType())
   const token = useSelector(selectTokenToBridge())
   const amountToBridge = useSelector(selectAmountToBridge())
+
   const tokenForTeleportationSupported: ITeleportationTokenSupport =
     useSelector(selectIsTeleportationOfAssetSupported())
+
+  // fast input layer 1
+  const L1LPBalance = useSelector(selectL2LPBalanceString)
+  const L1LPPending = useSelector(selectL2LPPendingString)
+  const L1LPLiquidity = useSelector(selectL2LPLiquidity)
+  const L1feeBalance = useSelector(selectL1FeeBalance)
+  const fastDepositCost = useSelector(selectFastDepositCost)
 
   // imports needed for layer= 2;
   const feeBalanceETH = useSelector(selectL2BalanceETH)
@@ -162,7 +162,8 @@ const useBridgeAlerts = () => {
         keys: [ALERT_KEYS.FAST_EXIT_ERROR],
       })
     )
-    if (layer === LAYER.L2 && bridgeType !== BRIDGE_TYPE.FAST) {
+    if (layer === LAYER.L2) {
+      // trigger only when withdrawing funds.
       let warning = ''
       const balance = Number(logAmount(token.balance, token.decimals))
       const ethCost = Number(fastExitCost) * 1.04 // 1.04 == safety margin on the cost.
@@ -268,7 +269,7 @@ const useBridgeAlerts = () => {
     LPPending,
   ])
 
-  // alerts for fast deposit (teleportation).
+  // alerts for fast deposit L1.
 
   useEffect(() => {
     if (!token) {
@@ -281,10 +282,9 @@ const useBridgeAlerts = () => {
       })
     )
 
-    // Teleportation
-    if (bridgeType === BRIDGE_TYPE.FAST) {
+    if (layer === LAYER.L1 && bridgeType === BRIDGE_TYPE.FAST) {
       let warning = ''
-      const type = 'error'
+      let type = 'error'
       const balance = Number(logAmount(token.balance, token.decimals))
 
       if (fastDepositCost > L1feeBalance) {
@@ -368,7 +368,18 @@ const useBridgeAlerts = () => {
         )
       }
     }
-  }, [dispatch, layer, bridgeType, amountToBridge, token])
+  }, [
+    dispatch,
+    layer,
+    bridgeType,
+    amountToBridge,
+    token,
+    L1LPBalance,
+    L1LPPending,
+    L1LPLiquidity,
+    L1feeBalance,
+    fastDepositCost,
+  ])
 
   // on changing bridgeType only cleanup alerts
   useEffect(() => {
