@@ -23,7 +23,7 @@ import { Pager } from 'components'
 import FastExit from 'components/seven/FastExit'
 
 import styles from './Transactions.module.scss'
-import * as S from './History.styles'
+import { HistoryContainer, Content } from './styles'
 
 const PER_PAGE = 10
 
@@ -50,7 +50,7 @@ function FastExits({ searchData, data }) {
 
   return (
     <div className={styles.transactionSection}>
-      <S.HistoryContainer>
+      <HistoryContainer>
         <Pager
           currentPage={page}
           isLastPage={paginatedData.length < PER_PAGE}
@@ -61,7 +61,7 @@ function FastExits({ searchData, data }) {
 
         <Grid item xs={12}>
           <Box>
-            <S.Content>
+            <Content>
               {!paginatedData.length && !loading && (
                 <div className={styles.disclaimer}>Scanning for pending fast exits...</div>
               )}
@@ -80,10 +80,10 @@ function FastExits({ searchData, data }) {
                   />
                 )
               })}
-            </S.Content>
+            </Content>
           </Box>
         </Grid>
-      </S.HistoryContainer>
+      </HistoryContainer>
     </div>
   );
 }
