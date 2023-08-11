@@ -93,24 +93,31 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         `Disburser wallet ${kmsSignerAddress} is not the disburser of the contract ${disburserAddress}`
       )
     }
+    this.logger.info('Got disburser: ', {address: disburserAddress})
 
     // check if all chains are supported
     // if the chain is supported, then store the contract of the chain and the balance info
     // to the state
     this.state.supportedChains = []
     this.state.depositTeleportations = []
+    const bobaTokenContractAddr = Object.keys(this.options.ownSupportedAssets).find(
+      (k) => this.options.ownSupportedAssets[k] === 'BOBA'
+    )
+
     for (const chain of this.options.selectedBobaChains) {
       const chainId = chain.chainId
       // assuming BOBA is enabled on supported networks to retain battle-tested logic
-      const bobaTokenContract = Object.keys(chain.supportedAssets).find(
-        (k) => chain.supportedAssets[k] === 'BOBA'
-      )
+
+      this.logger.info('Check if Boba supported for chainId: ', {chainId, bobaTokenContractAddr})
       const isSupported = await this.state.Teleportation.supportedTokens(
-        bobaTokenContract,
+        bobaTokenContractAddr,
         chainId
       )
-      if (!isSupported) {
-        throw new Error(
+      this.logger.info('Boba supported: ', { isSupported })
+
+      if (!isSupported || !isSupported[0]) {
+        // do not fail, as secured on-chain anyway & run.ts just returns all testnets/mainnets - thus just ignore networks that don't support Boba
+        this.logger.error(
           `Chain ${chainId} is not supported by the contract ${
             this.state.Teleportation.address
           } on chain ${
@@ -129,6 +136,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const totalDeposits = await depositTeleportation.totalDeposits(
           this.options.chainId
         )
+        this.logger.info('Total disbursements for chain', {chainId, totalDisbursements})
 
         this.state.depositTeleportations.push({
           Teleportation: depositTeleportation,
@@ -158,6 +166,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             events,
             latestBlock
           )
+          this.logger.info('Disbursed teleportations for network', { latestBlock })
         } catch (err) {
           this.logger.error('Error while running teleportation', {
             err,
@@ -215,6 +224,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           const emitter = event.args.emitter
           const destChainId = event.args.toChainId
 
+          if (destChainId.toString() !== this.options.chainId.toString()) {
+            this.logger.info('Ignoring event as different destination chainId: ', {destChainId, currChainId: this.options.chainId})
+            continue;
+          }
+
           // we disburse tokens only if depositId is greater or equal to the last disbursement
           if (depositId.gte(lastDisbursement)) {
             const destChainTokenAddr =
@@ -250,10 +264,14 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           }
         }
 
-        // sort disbursement
-        disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-        // disbure the token but only if all disbursements could have been processed to avoid missing events due to updating the latestBlock
-        await this._disburseTx(disbursement, chainId, latestBlock)
+        if (disbursement?.length) {
+          // sort disbursement
+          disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+          // disbure the token but only if all disbursements could have been processed to avoid missing events due to updating the latestBlock
+          await this._disburseTx(disbursement, chainId, latestBlock)
+        } else {
+          this.logger.info('No suitable disbursement event for current network', {chainId})
+        }
       } catch (e) {
         // Catch outside loop to stop at first failing depositID as all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
         this.logger.error(e.message)
@@ -281,7 +299,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         for (const disb of slicedDisbursement) {
           tokens.set(
             disb.token,
-            BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
+            BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? BigNumber.from('0'))
           )
         }
         // do separate approves if necessary & sum up native requirement

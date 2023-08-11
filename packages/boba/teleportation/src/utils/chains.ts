@@ -47,8 +47,8 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.goerli.boba.network',
     testnet: true,
     name: 'Boba Ethereum Goerli',
-    teleportationAddress: '0x64bD91c67af8cd17e04BeBDaac675f0EF6527edd',
-    height: 3820,
+    teleportationAddress: '0xB43EE846Aa266228FeABaD1191D6cB2eD9808894',
+    height: 40822,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0x4200000000000000000000000000000000000023': 'BOBA',
@@ -58,8 +58,8 @@ export const BobaChains: IBobaChains = {
     url: 'https://replica.testnet.bnb.boba.network',
     testnet: true,
     name: 'Boba BNB Testnet',
-    teleportationAddress: '0xC226F132A686A08018431C913d87693396246024',
-    height: 240152,
+    teleportationAddress: '0xf4d179d3a083Fa3Eede935FaF4C679D32d514186',
+    height: 295353,
     supportedAssets: {
       '0x4200000000000000000000000000000000000023': 'BNB',
       '0x0000000000000000000000000000000000000000': 'BOBA',
@@ -82,11 +82,11 @@ export const BobaChains: IBobaChains = {
     },
   },
   5: {
-    url: 'https://goerli.gateway.tenderly.co',
+    url: 'https://ethereum-goerli.publicnode.com', //'https://goerli.gateway.tenderly.co',
     testnet: true,
     name: 'Goerli Testnet',
-    teleportationAddress: '0xC226F132A686A08018431C913d87693396246024',
-    height: 9244943,
+    teleportationAddress: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13',
+    height: 9484025,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'ETH',
       '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49': 'USDT',
@@ -95,11 +95,11 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://bsc-testnet.publicnode.com',
+    url: 'https://api.zan.top/node/v1/bsc/testnet/public',
     testnet: true,
     name: 'BNB Testnet',
-    teleportationAddress: '0x1b633BdA998507795A4552809be25D1dCe1d881d',
-    height: 31747477,
+    teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',
+    height: 32272487,
     supportedAssets: {
       '0x0000000000000000000000000000000000000000': 'BNB',
       '0x875cD11fDf085e0E11B0EE6b814b6d0b38fA554C': 'BOBA',
