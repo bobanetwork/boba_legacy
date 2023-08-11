@@ -55,5 +55,3 @@ export const Hash = styled.a`
       color: ${props.theme.colors.gray[50]};
     `}
 `
-
-export const TimeLabel = styled(Typography)``
