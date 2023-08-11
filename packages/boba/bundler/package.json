@@ -19,7 +19,7 @@
     "hardhat-node": "npx hardhat node --no-deploy"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.2",
+    "@openzeppelin/contracts": "^4.9.3",
     "@bobanetwork/accountabstraction": "^1.0.0",
     "@bobanetwork/bundler_sdk": "^0.3.1-beta.0",
     "@bobanetwork/bundler_utils": "^0.2.3",
