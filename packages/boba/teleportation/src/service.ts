@@ -299,7 +299,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         for (const disb of slicedDisbursement) {
           tokens.set(
             disb.token,
-            BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? '0')
+            BigNumber.from(disb.amount).add(tokens.get(disb.token) ?? BigNumber.from('0'))
           )
         }
         // do separate approves if necessary & sum up native requirement

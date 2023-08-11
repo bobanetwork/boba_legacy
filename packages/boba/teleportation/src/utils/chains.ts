@@ -82,7 +82,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   5: {
-    url: 'https://goerli.gateway.tenderly.co',
+    url: 'https://ethereum-goerli.publicnode.com', //'https://goerli.gateway.tenderly.co',
     testnet: true,
     name: 'Goerli Testnet',
     teleportationAddress: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13',
@@ -95,7 +95,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://bsc-testnet.public.blastapi.io',
+    url: 'https://api.zan.top/node/v1/bsc/testnet/public',
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',
