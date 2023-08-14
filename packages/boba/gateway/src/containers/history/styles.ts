@@ -247,7 +247,7 @@ export const IncompleteTransactionHash = styled.div`
     css`
       color: ${props.theme.colors.gray[100]};
     `}
-  @media ${screen.mobile} {
+@media ${screen.mobile} {
     font-size: 8px;
     width: 72px;
     height: 12px;
@@ -441,78 +441,78 @@ export const NoHistory = styled.div`
   }
 `
 
-export const SearchInput = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  font-size: 16px;
-  border-radius: 12px;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-      border: 1px solid ${props.theme.colors.gray[500]};
-      color: ${props.theme.colors.gray[600]};
-      fill: ${props.theme.colors.gray[600]};
-      &:hover {
-        border: 1px solid ${props.theme.colors.green[800]};
-      }
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-      border: 1px solid ${props.theme.colors.gray[300]};
-      color: ${props.theme.colors.gray[200]};
-      fill: ${props.theme.colors.gray[50]};
-      &:hover {
-        border: 1px solid ${props.theme.colors.green[300]};
-      }
-    `}
+// export const SearchInput = styled(BaseSearchInput)`
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+//   font-size: 16px;
+//   border-radius: 12px;
+//   ${(props) =>
+//     props.theme.name === 'light' &&
+//     css`
+//       background: ${props.theme.colors.gray[50]};
+//       border: 1px solid ${props.theme.colors.gray[500]};
+//       color: ${props.theme.colors.gray[600]};
+//       fill: ${props.theme.colors.gray[600]};
+//       &:hover {
+//         border: 1px solid ${props.theme.colors.green[800]};
+//       }
+//     `}
+//   ${(props) =>
+//     props.theme.name === 'dark' &&
+//     css`
+//       background: ${props.theme.colors.gray[500]};
+//       border: 1px solid ${props.theme.colors.gray[300]};
+//       color: ${props.theme.colors.gray[200]};
+//       fill: ${props.theme.colors.gray[50]};
+//       &:hover {
+//         border: 1px solid ${props.theme.colors.green[300]};
+//       }
+//     `}
 
-  div {
-    padding-left: 5px;
-    display: flex;
-  }
-  svg {
-    width: 16px;
-    height: auto;
-  }
-  @media ${screen.mobile} {
-    width: 120px;
-    height: 30px;
-    svg {
-      width: 8px;
-      height: auto;
-    }
-  }
-`
-// TODO: get rid of duplicates
-export const Input = styled.input`
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  background: transparent;
-  box-shadow: none;
-  outline: none;
-  border: none;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      color: ${props.theme.colors.gray[600]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      color: ${props.theme.colors.gray[200]};
-    `}
-  @media ${screen.mobile} {
-    width: 120px;
-    font-size: 12px;
-  }
-`
+//   div {
+//     padding-left: 5px;
+//     display: flex;
+//   }
+//   svg {
+//     width: 16px;
+//     height: auto;
+//   }
+//   @media ${screen.mobile} {
+//     width: 120px;
+//     height: 30px;
+//     svg {
+//       width: 8px;
+//       height: auto;
+//     }
+//   }
+// `
+// // TODO: get rid of duplicates
+// export const Input = styled.input`
+//   flex: 1;
+//   padding: 10px;
+//   font-size: 16px;
+//   font-style: normal;
+//   font-weight: 500;
+//   background: transparent;
+//   box-shadow: none;
+//   outline: none;
+//   border: none;
+//   ${(props) =>
+//     props.theme.name === 'light' &&
+//     css`
+//       color: ${props.theme.colors.gray[600]};
+//     `}
+//   ${(props) =>
+//     props.theme.name === 'dark' &&
+//     css`
+//       color: ${props.theme.colors.gray[200]};
+//     `}
+//   @media ${screen.mobile} {
+//     width: 120px;
+//     font-size: 12px;
+//   }
+// `
 
 export const DateDescriptions = styled(Typography)`
   @media ${screen.mobile} {
@@ -780,7 +780,7 @@ export const DatePickerHeadersContainer = styled.div`
   flex-direction: row;
 `
 
-export const DatePickerDropdown = styled.div`
+export const DatePickerDropdown = styled.div<{ isRange?: boolean }>`
   transition: 0.25s all;
   position: absolute;
   width: 250px;
@@ -795,23 +795,20 @@ export const DatePickerDropdown = styled.div`
           color: ${colors.gray[800]};
           background: ${colors.gray[50]};
           border: 1px solid ${colors.gray[500]};
-          .rdp-day_selected {
-            border: 1px solid ${colors.gray[600]};
-            color: ${colors.gray[800]};
-          }
         `
       : css`
           color: ${colors.gray[50]};
           background: ${colors.gray[500]};
           border: 1px solid ${colors.gray[300]};
-          .rdp-day_selected {
-            border: 1px solid ${colors.gray[100]};
-          }
+          ${(isRange) =>
+            !isRange &&
+            css`
+              .rdp-day_selected {
+                border: 1px solid ${colors.gray[100]};
+              }
+            `}
         `}
 
-  .rdp-day {
-    border-radius: 20%;
-  }
   .rdp {
     --rdp-cell-size: 30px;
     --rdp-caption-font-size: 14px;
@@ -820,6 +817,38 @@ export const DatePickerDropdown = styled.div`
     --rdp-accent-color: ${(props) => props.theme.colors.gray[400]};
     --rdp-background-color: ${(props) => props.theme.colors.gray[400]};
   }
+  ${(props) =>
+    props.isRange &&
+    props.theme.name === 'light' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[600]};
+        color: ${props.theme.colors.gray[800]};
+      }
+    `}
+  ${(props) =>
+    !props.isRange &&
+    props.theme.name === 'dark' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[100]};
+      }
+    `}
+    
+  ${(props) =>
+    !props.isRange &&
+    css`
+      .rdp-day {
+        border-radius: 20%;
+      }
+    `}
+  ${(props) =>
+    props.isRange &&
+    css`
+      .rdp-day {
+        border: none !important;
+      }
+    `}
 `
 
 export const DatePickerContainer = styled.div`
@@ -830,6 +859,7 @@ export const DatePickerContainer = styled.div`
   width: 100%;
   transition: 0.25s all;
   box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -839,5 +869,5 @@ export const DatePickerContainer = styled.div`
     props.theme.name === 'dark' &&
     css`
       color: ${props.theme.colors.gray[50]};
-    `}
+    `};
 `

@@ -4,91 +4,91 @@ import { IFilterDropdownItem } from 'components/filter'
 import { TableHeaderOptionType } from 'components/global/table'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import { CHAIN_NAME, ChainMap } from './types'
-import ethereumIcon from 'assets/images/ethereumFlex.svg'
-import bnbIcon from 'assets/images/bnb.svg'
-import avalancheIcon from 'assets/images/avax.svg'
-import bobaAvalanche from 'assets/images/bobaAvax.svg'
-import bobaEthereum from 'assets/images/bobaEth.svg'
-import bobaBNB from 'assets/images/bobaBNB.svg'
+
+import bobaEth from 'assets/bobaEth.svg'
+import bobaBnb from 'assets/bobaBNB.svg'
+import bobaAvax from 'assets/bobaAvax.svg'
+
+import ethIcon from 'assets/ethereum.svg'
 
 export const Chains: ChainMap = {
   '0': {
     name: CHAIN_NAME.All_Networks,
     transactionUrlPrefix: '',
     symbol: '',
-    imgSrc: allNetworksIcon,
-  },
-  '1': {
-    name: CHAIN_NAME.Ethereum,
-    transactionUrlPrefix: 'https://etherscan.io/tx/',
-    symbol: 'ETH',
-    imgSrc: ethereumIcon,
-  },
-  '5': {
-    name: CHAIN_NAME.Goerli,
-    transactionUrlPrefix: 'https://goerli.etherscan.io/tx/',
-    symbol: 'ETH',
-    imgSrc: ethereumIcon,
+    imgSrc: ethIcon,
   },
   '56': {
     name: CHAIN_NAME.BNB,
     transactionUrlPrefix: 'https://bscscan.com/tx/',
     symbol: 'BNB',
-    imgSrc: bnbIcon,
-  },
-  '97': {
-    name: CHAIN_NAME.BNB_Testnet,
-    transactionUrlPrefix: 'https://testnet.bscscan.com/tx/',
-    symbol: 'BNB',
-    imgSrc: bnbIcon,
-  },
-  '288': {
-    name: CHAIN_NAME.Boba_Ethereum,
-    transactionUrlPrefix: 'https://bobascan.com/tx/',
-    symbol: 'BOBA',
-    imgSrc: bobaEthereum,
-  },
-  '2888': {
-    name: CHAIN_NAME.Boba_Goerli,
-    transactionUrlPrefix: 'https://testnet.bobascan.com/tx/',
-    symbol: 'BOBA',
-    imgSrc: bobaEthereum,
-  },
-  '4328': {
-    name: CHAIN_NAME.Boba_Fuji,
-    transactionUrlPrefix: 'https://blockexplorer.testnet.avax.boba.network/tx/',
-    symbol: 'BOBA',
-    imgSrc: bobaAvalanche,
-  },
-  '9728': {
-    name: CHAIN_NAME.Boba_BNB_Testnet,
-    transactionUrlPrefix: 'https://blockexplorer.testnet.bnb.boba.network/tx/',
-    symbol: 'BOBA',
-    imgSrc: bobaBNB,
-  },
-  '43113': {
-    name: CHAIN_NAME.Fuji,
-    transactionUrlPrefix: 'https://testnet.snowtrace.io/tx/',
-    symbol: 'AVAX',
-    imgSrc: avalancheIcon,
-  },
-  '43114': {
-    name: CHAIN_NAME.Avalanche,
-    transactionUrlPrefix: 'https://snowtrace.io/tx/',
-    symbol: 'AVAX',
-    imgSrc: avalancheIcon,
-  },
-  '43288': {
-    name: CHAIN_NAME.Boba_Avalanche,
-    transactionUrlPrefix: 'https://blockexplorer.avax.boba.network/tx/',
-    symbol: 'BOBA',
-    imgSrc: bobaAvalanche,
+    imgSrc: getCoinImage('BNB'),
   },
   '56288': {
     name: CHAIN_NAME.Boba_BNB,
     transactionUrlPrefix: 'https://blockexplorer.bnb.boba.network/tx/',
     symbol: 'BOBA',
-    imgSrc: bobaBNB,
+    imgSrc: bobaBnb,
+  },
+  '97': {
+    name: CHAIN_NAME.BNB_Testnet,
+    transactionUrlPrefix: 'https://testnet.bscscan.com/tx/',
+    symbol: 'BNB',
+    imgSrc: getCoinImage('BNB'),
+  },
+  '9728': {
+    name: CHAIN_NAME.Boba_BNB_Testnet,
+    transactionUrlPrefix: 'https://blockexplorer.testnet.bnb.boba.network/tx/',
+    symbol: 'BOBA',
+    imgSrc: bobaBnb,
+  },
+  '1': {
+    name: CHAIN_NAME.Ethereum,
+    transactionUrlPrefix: 'https://etherscan.io/tx/',
+    symbol: 'ETH',
+    imgSrc: ethIcon,
+  },
+  '288': {
+    name: CHAIN_NAME.Boba_Ethereum,
+    transactionUrlPrefix: 'https://bobascan.com/tx/',
+    symbol: 'BOBA',
+    imgSrc: bobaEth,
+  },
+  '5': {
+    name: CHAIN_NAME.Goerli,
+    transactionUrlPrefix: 'https://goerli.etherscan.io/tx/',
+    symbol: 'ETH',
+    imgSrc: ethIcon,
+  },
+  '2888': {
+    name: CHAIN_NAME.Boba_Goerli,
+    transactionUrlPrefix: 'https://testnet.bobascan.com/tx/',
+    symbol: 'BOBA',
+    imgSrc: bobaEth,
+  },
+  '43114': {
+    name: CHAIN_NAME.Avalanche,
+    transactionUrlPrefix: 'https://snowtrace.io/tx/',
+    symbol: 'AVAX',
+    imgSrc: getCoinImage('AVAX'),
+  },
+  '43288': {
+    name: CHAIN_NAME.Boba_Avalanche,
+    transactionUrlPrefix: 'https://blockexplorer.avax.boba.network/tx/',
+    symbol: 'BOBA',
+    imgSrc: bobaAvax,
+  },
+  '43113': {
+    name: CHAIN_NAME.Avalanche_Testnet,
+    transactionUrlPrefix: 'https://testnet.snowtrace.io/tx/',
+    symbol: 'AVAX',
+    imgSrc: getCoinImage('AVAX'),
+  },
+  '4328': {
+    name: CHAIN_NAME.Boba_Avalanche_Testnet,
+    transactionUrlPrefix: 'https://blockexplorer.testnet.avax.boba.network/tx/',
+    symbol: 'BOBA',
+    imgSrc: bobaAvax,
   },
 }
 
@@ -121,20 +121,20 @@ export const NETWORK_L1_OPTIONS: IDropdownItem[] = [
   },
   {
     value: '5',
-    label: CHAIN_NAME.Goerli,
-    imgSrc: ethereumIcon,
+    label: 'Goerli',
+    imgSrc: ethIcon,
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '97',
-    label: CHAIN_NAME.BNB_Testnet,
-    imgSrc: bnbIcon,
+    label: 'tBNB',
+    imgSrc: getCoinImage('BNB'),
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '43113',
-    label: CHAIN_NAME.Fuji,
-    imgSrc: avalancheIcon,
+    label: 'Fuji',
+    imgSrc: getCoinImage('AVAX'),
     headerName: NETWORK_TYPE.TESTNET,
   },
 ]
@@ -168,14 +168,14 @@ export const NETWORK_L2_OPTIONS = [
   },
   {
     value: '9728',
-    label: CHAIN_NAME.Boba_BNB_Testnet,
-    imgSrc: bobaBNB,
+    label: 'Boba tBNB',
+    imgSrc: bobaBnb,
     headerName: NETWORK_TYPE.TESTNET,
   },
   {
     value: '4328',
-    label: CHAIN_NAME.Boba_Fuji,
-    imgSrc: bobaAvalanche,
+    label: 'Boba Fuji',
+    imgSrc: bobaAvax,
     headerName: NETWORK_TYPE.TESTNET,
   },
 ]

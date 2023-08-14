@@ -32,8 +32,6 @@ import {
   TableOptions,
 } from './constants'
 
-import MagnifyingGlass from 'assets/images/icons/magnifyingGlass.svg'
-
 import {
   selectAccountEnabled,
   selectLayer,
@@ -43,7 +41,6 @@ import {
 import { fetchTransactions } from 'actions/networkAction'
 
 import {
-  SearchInput,
   Table,
   NoHistory,
   HistoryPageContainer,
@@ -51,7 +48,6 @@ import {
   TableFilters,
   NetworkDropdowns,
   DateDescriptions,
-  Input,
   SwitchChainIcon,
   SwitchIcon,
   TableTransactionsContainer,
@@ -73,6 +69,7 @@ import { Svg } from 'components/global/svg'
 import { TransactionsTableHeader } from 'components/global/table/themes'
 import { TransactionsResolver } from './TransactionsResolver'
 import { CHAIN_NAME, TRANSACTION_FILTER_STATUS } from './types'
+import { SearchInput } from 'components/global/searchInput'
 
 import { Typography } from 'components/global/typography'
 import DatePicker from './DatePicker'
@@ -126,6 +123,9 @@ const History = () => {
         {...(range
           ? { onChangeFrom: setFilterStartDate, onChangeTo: setFilterEndDate }
           : {})}
+        {...(label === 'To'
+          ? { minDate: filterStartDate }
+          : { maxDate: filterEndDate })}
       />
     )
   }
@@ -155,17 +155,13 @@ const History = () => {
       {layer && (
         <>
           <TableHeader>
-            <SearchInput // search input
-            >
-              <Svg src={MagnifyingGlass} />
-              <Input // search bar styles
-                placeholder="Search Here"
-                value={searchHistory}
-                onChange={(i: any) => {
-                  setSearchHistory(i.target.value)
-                }}
-              />
-            </SearchInput>
+            <SearchInput
+              placeholder="Search Here"
+              value={searchHistory}
+              onChange={(i: any) => {
+                setSearchHistory(i.target.value)
+              }}
+            />
             <DatePickerWrapper>
               <DateDescriptions variant="body2">
                 Date Range From

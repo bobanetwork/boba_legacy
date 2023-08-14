@@ -163,6 +163,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     let amountString = ''
     const chain = transaction.layer === 'L1pending' ? 'L1' : transaction.layer
 
+    // TODO: have a unknown token to use
     let token = {
       name: 'Etheruem',
       symbol: 'ETH',
@@ -178,6 +179,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
           transaction.action.token.toLowerCase()
         ]
     }
+
     const symbol = token.symbol
 
     amountString = logAmount(transaction.action.amount, token.decimals, 4)
@@ -234,15 +236,10 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     )
   }
 
-  const isHash = (hash: string) => {
-    const regExpHash = new RegExp(/^0x([A-Fa-f0-9]{64})$/)
-    return regExpHash.test(hash)
-  }
-
   const getTransactionChain = (
     chainID: string,
     hash: string,
-    transactionStatus: TRANSACTION_FILTER_STATUS
+    status: string
   ) => {
     const linkToHash = `${Chains[chainID].transactionUrlPrefix}${hash}`
     const networkName = Chains[chainID].name
@@ -250,12 +247,12 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
     return (
       <TransactionDetails>
-        <IconContainer>{<Icon src={imgSrc} />}</IconContainer>
+        <IconContainer>
+          <Icon src={imgSrc} />
+        </IconContainer>
         <TransactionChainDetails>
           <TransactionChain>{networkName}</TransactionChain>
-          {(transactionStatus === TRANSACTION_FILTER_STATUS.Completed ||
-            transactionStatus === TRANSACTION_FILTER_STATUS.All ||
-            isHash(hash)) && (
+          {hash && (
             <TransactionHash
               href={linkToHash}
               target={'_blank'}
@@ -264,11 +261,9 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
               {`Tx: ${truncate(hash, 4, 4, '...')}`}
             </TransactionHash>
           )}
-          {transactionStatus !== TRANSACTION_FILTER_STATUS.Completed &&
-            transactionStatus !== TRANSACTION_FILTER_STATUS.All &&
-            !isHash(hash) && (
-              <IncompleteTransactionHash>{`Tx: ${hash}`}</IncompleteTransactionHash>
-            )}
+          {!hash && (
+            <IncompleteTransactionHash>{`Tx: ${status}`}</IncompleteTransactionHash>
+          )}
         </TransactionChainDetails>
       </TransactionDetails>
     )
