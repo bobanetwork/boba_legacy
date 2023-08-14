@@ -15,7 +15,7 @@ limitations under the License. */
 
 import React from 'react'
 
-import { Typography } from '@mui/material'
+import { Typography } from 'components/global'
 
 import { ExitWrapper, Hash, HashContainer } from './styles'
 
@@ -28,9 +28,9 @@ function FastExit({
 }) {
 
 
-  const chainLink = ({hash}) => {
+  const chainLink = ({ hash }) => {
     if (networkService.networkConfig[ 'L2' ]) {
-      return `${networkService.networkConfig['L2'].transaction}${hash}`
+      return `${networkService.networkConfig[ 'L2' ].transaction}${hash}`
     }
     return ''
   }
@@ -39,24 +39,23 @@ function FastExit({
   let timeLabel = `Fast Exit was started ${secondsAgo} seconds ago`
 
   return (
-          <ExitWrapper>
-            <Typography variant="overline">{blockNumber}</Typography>
-            
-            <HashContainer variant="body3">
-              Hash:&nbsp;
-              <Hash
-                href={chainLink({hash:oriHash})}
-                target={'_blank'}
-                rel='noopener noreferrer'
-              >
-                {oriHash}
-              </Hash>
+    <ExitWrapper>
+      <Typography variant="title">{blockNumber}</Typography>
+      <HashContainer variant="body3">
+        Hash:&nbsp;
+        <Hash
+          href={chainLink({ hash: oriHash })}
+          target={'_blank'}
+          rel='noopener noreferrer'
+        >
+          {oriHash}
+        </Hash>
       </HashContainer>
-      <Typography variant="overline" style={{color: 'green'}}>
-              {timeLabel}
-            </Typography>
-          </ExitWrapper>
-      )
+      <Typography variant="body2" style={{ color: 'green' }}>
+        {timeLabel}
+      </Typography>
+    </ExitWrapper>
+  )
 
 }
 

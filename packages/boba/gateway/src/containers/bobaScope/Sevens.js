@@ -24,6 +24,7 @@ import Seven from 'components/seven/Seven'
 import { Svg } from 'components/global/svg'
 import noHistoryIcon from 'assets/images/noHistory.svg'
 import { HistoryContainer, Content, Disclaimer } from './styles'
+import { Typography } from 'components/global'
 
 const PER_PAGE = 6
 
@@ -64,13 +65,13 @@ function Sevens({ searchData, sevens }) {
             {!paginatedSevens.length && !loading && (
               <Disclaimer>
                 <Svg src={noHistoryIcon} />
-                <div>No Pending 7 day exits.</div>
+                <Typography variant='body2'>No Pending 7 day exits.</Typography>
               </Disclaimer>
             )}
               {!paginatedSevens.length && loading && (
                 <Disclaimer>
                   <Svg src={noHistoryIcon}/>
-                  <div>Loading pending 7 day exits...</div>
+                <Typography variant='body2'>Loading pending 7 day exits...</Typography>
                 </Disclaimer>
               )}
               {paginatedSevens.map((i, index) => {

@@ -16,7 +16,7 @@ limitations under the License. */
 import React, { useState, useEffect } from 'react'
 import { Grid, Box } from '@mui/material'
 import { useSelector } from 'react-redux'
-import {formatDate} from 'util/dates'
+import { formatDate } from 'util/dates'
 
 import { selectLoading } from 'selectors'
 import { Pager } from 'components'
@@ -25,16 +25,17 @@ import FastExit from 'components/seven/FastExit'
 import { Svg } from 'components/global/svg'
 import noHistoryIcon from 'assets/images/noHistory.svg'
 import { HistoryContainer, Content, Disclaimer } from './styles'
+import { Typography } from 'components/global'
 
 const PER_PAGE = 6
 
 function FastExits({ searchData, data }) {
 
-  const [page, setPage] = useState(1)
+  const [ page, setPage ] = useState(1)
 
-  const loading = useSelector(selectLoading(['FASTEXITS/GETALL']))
+  const loading = useSelector(selectLoading([ 'FASTEXITS/GETALL' ]))
 
-  useEffect(() => {setPage(1)}, [searchData])
+  useEffect(() => { setPage(1) }, [ searchData ])
 
   const _data = data.filter(i => {
     return i.hash.includes(searchData) && i.to !== null
@@ -50,46 +51,46 @@ function FastExits({ searchData, data }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-      <HistoryContainer>
-        <Pager
-          currentPage={page}
-          isLastPage={paginatedData.length < PER_PAGE}
-          totalPages={totalNumberOfPages}
-          onClickNext={()=>setPage(page + 1)}
-          onClickBack={()=>setPage(page - 1)}
-        />
+    <HistoryContainer>
+      <Pager
+        currentPage={page}
+        isLastPage={paginatedData.length < PER_PAGE}
+        totalPages={totalNumberOfPages}
+        onClickNext={() => setPage(page + 1)}
+        onClickBack={() => setPage(page - 1)}
+      />
 
-        <Grid item xs={12}>
-          <Box>
-            <Content>
+      <Grid item xs={12}>
+        <Box>
+          <Content>
             {!paginatedData.length && !loading && (
               <Disclaimer>
                 <Svg src={noHistoryIcon} />
-                <div>No Pending fast exits.</div>
+                <Typography variant='body2'>No Pending fast exits.</Typography>
               </Disclaimer>
             )}
-              {!paginatedData.length && loading && (
-                <Disclaimer>
-                  <Svg src={noHistoryIcon}/>
-                  <div>Loading pending fast exits...</div>
-                </Disclaimer>
-              )}
-              {paginatedData.map((i, index) => {
-                return (
-                  <FastExit
-                    key={index}
-                    title={`Hash: ${i.hash}`}
-                    blockNumber={`Block ${i.blockNumber}`}
-                    oriHash={i.hash}
-                    age={formatDate(i.timestamp, 'lll')}
-                    unixTime={i.timestamp}
-                  />
-                )
-              })}
-            </Content>
-          </Box>
-        </Grid>
-      </HistoryContainer>
+            {!paginatedData.length && loading && (
+              <Disclaimer>
+                <Svg src={noHistoryIcon} />
+                <Typography variant='body2'>Loading pending fast exits...</Typography>
+              </Disclaimer>
+            )}
+            {paginatedData.map((i, index) => {
+              return (
+                <FastExit
+                  key={index}
+                  title={`Hash: ${i.hash}`}
+                  blockNumber={`Block ${i.blockNumber}`}
+                  oriHash={i.hash}
+                  age={formatDate(i.timestamp, 'lll')}
+                  unixTime={i.timestamp}
+                />
+              )
+            })}
+          </Content>
+        </Box>
+      </Grid>
+    </HistoryContainer>
   );
 }
 

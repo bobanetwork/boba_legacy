@@ -15,11 +15,10 @@ limitations under the License. */
 
 import React from 'react'
 
-import { Typography } from '@mui/material'
+import { Typography } from 'components/global'
 import { Hash, ExitWrapper, HashContainer } from './styles'
 
 import networkService from 'services/networkService'
-
 function Seven({
   blockNumber,
   oriHash,
@@ -27,9 +26,9 @@ function Seven({
 }) {
 
 
-  const chainLink = ({hash}) => {
+  const chainLink = ({ hash }) => {
     if (networkService.networkConfig[ 'L2' ]) {
-      return `${networkService.networkConfig['L2'].transaction}${hash}`
+      return `${networkService.networkConfig[ 'L2' ].transaction}${hash}`
     }
     return ''
   }
@@ -39,43 +38,36 @@ function Seven({
   const hoursAgo = Math.round((secondsAgo % (3600 * 24)) / 3600)
   let timeLabel = `Exit was started ${daysAgo} days and ${hoursAgo} hours ago`
 
-  const overdue = secondsAgo - (7*24*60*60)
+  const overdue = secondsAgo - (7 * 24 * 60 * 60)
 
-  if( overdue > 0) {
-    if(hoursAgo <= 1)
+  if (overdue > 0) {
+    if (hoursAgo <= 1)
       timeLabel = `Funds will exit soon. The 7 day window just passed`
-    else if(hoursAgo <= 2)
+    else if (hoursAgo <= 2)
       timeLabel = `Funds will exit soon. The 7 day window recently passed`
-    else if(hoursAgo > 2)
+    else if (hoursAgo > 2)
       timeLabel = `Funds will exit soon. The 7 day window passed ${hoursAgo} hours ago`
   }
 
-    return (
-            <ExitWrapper>
-              <Typography variant="overline" style={{width:'20%',fontSize: '0.9em', lineHeight: '1.0em'}}>{blockNumber}</Typography>
-             
-              <HashContainer variant="body3">
-                Hash:&nbsp;
-                <Hash
-                  href={chainLink({hash:oriHash})}
-                  target={'_blank'}
-                  rel='noopener noreferrer'
-                >
-                  {oriHash}
-                </Hash>
-        </HashContainer>
-        {overdue < 0 &&
-                <Typography variant="overline" style={{lineHeight: '1.0em', color: 'yellow'}}>
-                  {timeLabel}
-                </Typography>
-              }
-              {overdue > 0 &&
-                <Typography variant="overline" style={{lineHeight: '1.0em', color: 'green'}}>
-                  {timeLabel}
-                </Typography>
-              }
-            </ExitWrapper>
-      )
+  return (
+    <ExitWrapper>
+      <Typography variant="title">{blockNumber}</Typography>
+
+      <HashContainer variant="body3">
+        Hash:&nbsp;
+        <Hash
+          href={chainLink({ hash: oriHash })}
+          target={'_blank'}
+          rel='noopener noreferrer'
+        >
+          {oriHash}
+        </Hash>
+      </HashContainer>
+      <Typography variant="body2" style={{ color: `${overdue < 0 ? 'yellow' : 'green'}` }}>
+        {timeLabel}
+      </Typography>
+    </ExitWrapper>
+  )
 
 }
 
