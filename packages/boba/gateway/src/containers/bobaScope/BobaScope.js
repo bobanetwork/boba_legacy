@@ -28,7 +28,6 @@ import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 import { selectBaseEnabled, selectActiveDataTab, selectSevens, selectFastExits } from 'selectors'
 
 import Tabs from 'components/tabs/Tabs'
-import Input from 'components/input/Input'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'
@@ -36,7 +35,9 @@ import FastExits from './FastExits'
 import useInterval from 'hooks/useInterval'
 
 import { POLL_INTERVAL } from 'util/constant'
-import { ContentContainer, Header, ScopePageContainer } from './History.styles';
+import {Header, BobaScopeContainer, ContentContainer} from './styles'
+import { TabComponent } from 'components/global/tabs';
+import { SearchInput } from 'components/global/searchInput';
 
 function BobaScope() {
 
@@ -70,43 +71,32 @@ function BobaScope() {
   }, POLL_INTERVAL)
 
   return (
-    <ScopePageContainer>
+    <BobaScopeContainer>
       <Header>
-        <SearchInputContainer>
-          <Input
-            size='small'
-            placeholder='Search by hash'
-            value={searchData}
-            onChange={i => { setSearchData(i.target.value) }}
-            style={{
-              flex: 1,
-              marginBottom: 0,
-              minWidth: '250px',
-            }}
-          />
-        </SearchInputContainer>
+        <SearchInput
+        placeholder='Search by hash'
+        value={searchData}
+        onChange={i => { setSearchData(i.target.value) }}/>
       </Header>
       <ContentContainer>
-        <Tabs
-          onClick={tab => { dispatch(setActiveDataTab(tab)) }}
-          activeTab={activeTab}
-          tabs={[ 'Seven Day Queue', 'Fast Exits' ]}
+      <TabComponent
+          tabs={[
+            {label:"Seven Day Queue",
+              content:(<Sevens
+                searchData={searchData}
+                sevens={sevens}
+              />)
+            },
+            {label:"Fast Exits",
+              content:(          <FastExits
+                searchData={searchData}
+                data={fastExits}
+              />)
+            }
+        ]}
         />
-
-        {activeTab === 'Seven Day Queue' && (
-          <Sevens
-            searchData={searchData}
-            sevens={sevens}
-          />
-        )}
-        {activeTab === 'Fast Exits' && (
-          <FastExits
-            searchData={searchData}
-            data={fastExits}
-          />
-        )}
       </ContentContainer>
-    </ScopePageContainer>
+    </BobaScopeContainer>
   );
 }
 
