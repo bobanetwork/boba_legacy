@@ -12,6 +12,7 @@ import { ethereumConfig } from './config/ethereum'
 import { bnbConfig } from './config/bnb'
 import { avaxConfig } from './config/avax'
 import { Layer, LAYER } from 'util/constant'
+import { number } from 'prop-types'
 
 export const L1_ICONS = {
   ethereum: EthereumIcon,
@@ -41,61 +42,74 @@ export const CHAIN_ID_LIST = {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.ETHEREUM,
     layer: LAYER.L1,
+    name: 'Goerli',
   },
   2888: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.ETHEREUM,
     layer: LAYER.L2,
+    name: 'Boba Goerli',
   },
   1: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.ETHEREUM,
     layer: LAYER.L1,
+    name: 'Ethereum',
   },
   288: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.ETHEREUM,
     layer: LAYER.L2,
+    name: 'Boba Eth',
   },
+  // TODO: Remove Avax once down
   43113: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.AVAX,
     layer: LAYER.L1,
+    name: 'Fuji',
   },
   4328: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.AVAX,
     layer: LAYER.L2,
+    name: 'Boba Fuji',
   },
   43114: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.AVAX,
     layer: LAYER.L1,
+    name: 'Avax',
   },
   43288: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.AVAX,
     layer: LAYER.L2,
+    name: 'Boba Avax',
   },
   97: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.BNB,
     layer: LAYER.L1,
+    name: 'Bnb Testnet',
   },
   9728: {
     networkType: NETWORK_TYPE.TESTNET,
     chain: NETWORK.BNB,
     layer: LAYER.L2,
+    name: 'Boba Bnb Testnet',
   },
   56: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.BNB,
     layer: LAYER.L1,
+    name: 'Bnb',
   },
   56288: {
     networkType: NETWORK_TYPE.MAINNET,
     chain: NETWORK.BNB,
     layer: LAYER.L2,
+    name: 'Boba Bnb',
   },
 }
 
@@ -204,6 +218,24 @@ export const rpcUrls = Object.values(AllNetworkConfigs).reduce(
 
 export const getNetworkDetail = ({ network, networkType }) => {
   return AllNetworkConfigs[network][networkType]
+}
+
+export const getRpcUrlByChainId = (chainId): string => {
+  const network = CHAIN_ID_LIST[chainId]
+  return getRpcUrl({
+    network: network.chain,
+    layer: network.layer,
+    networkType: network.networkType,
+  })
+}
+
+export const getRpcUrl = ({ network, networkType, layer }): string => {
+  const rpcs = AllNetworkConfigs[network][networkType][layer]?.rpcUrl
+  let randomRpc = rpcs
+  if (Array.isArray(rpcs)) {
+    randomRpc = rpcs[Math.floor(Math.random() * rpcs.length)]
+  }
+  return randomRpc
 }
 
 export const getBlockExplorerUrl = ({ network, networkType, layer }) => {

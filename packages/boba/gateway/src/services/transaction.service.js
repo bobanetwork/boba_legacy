@@ -1,6 +1,10 @@
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import networkService from './networkService'
-import {AllNetworkConfigs} from 'util/network/network.util'
+import {AllNetworkConfigs, CHAIN_ID_LIST, getRpcUrlByChainId} from 'util/network/network.util'
+import {TRANSACTION_STATUS} from "../containers/history/types";
+import {teleportationGraphQLService} from "./graphql.service";
+import {ethers, providers} from "ethers";
+import {isDevBuild} from "../util/constant";
 
 class TransactionService {
   async getSevens(networkConfig = networkService.networkConfig) {
@@ -139,50 +143,112 @@ class TransactionService {
     })
 
     const allNetworksTransactions = await Promise.all(networkConfigsArray.flatMap((config) => {
-      return [this.fetchL2Tx(config),
-        this.fetchL1PendingTx(config)]
-    }
+        return [this.fetchL2Tx(config),
+          this.fetchL1PendingTx(config),
+          this.fetchTeleportationTransactions(config)]
+      }
     ))
     const filteredResults = allNetworksTransactions.reduce((acc, res) => [...acc, ...res], [])
     return filteredResults?.filter((transaction) => transaction.hash)
   }
 
-  async fetchTeleportationTransactions() {
-    let txTeleportation = []
-    try {
-      const contract = networkService.getTeleportationContract(Layer.L2)
-      console.log('EVENT::CONTRA', contract)
-      // TODO: Redeploy teleportation contracts, to match event signature etc.
-      const assetSent = contract.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
-      const assetReceived = contract.filters.DisbursementSuccess()
-      const eventsSent = await contract.queryFilter(assetSent, 40005) // TODO
-      console.log('ASSETS:::SENT', assetSent, eventsSent)
-      console.log('ASSETS:RECEIVED', assetReceived)
-      /* TODO
-      const responseTeleportation = await omgxWatcherAxiosInstance(networkService.networkConfig)
-        .post('get.teleportation.transactions', {
-          address: networkService.account,
-          fromRange: 0,
-          toRange: 1000,
-        })*/
-      // TODO
-      const responseTeleportation = assetReceived
+  async fetchTeleportationTransactions(networkConfig = networkService.networkConfig) {
+    let rawTx = []
 
-      if (responseTeleportation.status === 201) {
-        //add the chain: 'teleportation' field
-        txTeleportation = responseTeleportation.data.map((v) => ({
-          ...v,
-          chain: 'teleportation',
-        }))
+    const contractL1 = networkService.getTeleportationContract(networkConfig.L1.chainId)
+    const contractL2 = networkService.getTeleportationContract(networkConfig.L2.chainId)
+
+    const mapEventToTransaction = async (sendEvent, disburseEvent, contract) => {
+      const txReceipt = await contract.provider.getTransactionReceipt(sendEvent.txHash)
+      let crossDomainMessageFinalize
+
+      if (disburseEvent) {
+        crossDomainMessageFinalize = disburseEvent.blockTimestamp
       }
-      return txTeleportation
-    } catch (error) {
-      console.log('TS: getTeleportationTransactions', error)
-      return txTeleportation
+
+      const crossDomainMessage = {
+        crossDomainMessage: disburseEvent?.depositId,
+        crossDomainMessageEstimateFinalizedTime: crossDomainMessageFinalize ?? (parseInt(sendEvent.blockTimestamp) + 180), // should never take longer than a few minutes
+        crossDomainMessageFinalize,
+        crossDomainMessageSendTime: sendEvent.blockTimestamp,
+        fromHash: sendEvent.txHash,
+      }
+
+      let status = txReceipt?.status ? TRANSACTION_STATUS.Pending : TRANSACTION_STATUS.Failed
+      if (disburseEvent && status === TRANSACTION_STATUS.Pending) {
+        const rpc = new providers.JsonRpcProvider(getRpcUrlByChainId(sendEvent.toChainId))
+        const disburseTxReceipt = await rpc.getTransactionReceipt(disburseEvent.txHash)
+        status = disburseTxReceipt.status === 1 ? TRANSACTION_STATUS.Succeeded : TRANSACTION_STATUS.Failed
+        if (status === TRANSACTION_STATUS.Succeeded && disburseEvent.__typename === "TeleportationDisbursementFailedEvent") {
+          // won't go in here if already retried
+          status = TRANSACTION_STATUS.Failed // TODO: but can be retried
+        }
+        crossDomainMessage.toHash = disburseEvent.txHash
+      }
+
+      const action = {
+        amount: sendEvent.amount?.toString(),
+        sender: sendEvent.emitter,
+        status,
+        to: sendEvent.emitter,
+        token: sendEvent.token,
+      }
+      const networkConfigForChainId = CHAIN_ID_LIST[sendEvent.sourceChainId]
+      return {
+        ...sendEvent,
+        ...txReceipt,
+        disburseEvent,
+        timeStamp: sendEvent.blockTimestamp,
+        layer: networkConfigForChainId.layer,
+        chainName: networkConfigForChainId.name,
+        originChainId: sendEvent.sourceChainId,
+        destinationChainId: sendEvent.toChainId,
+        UserFacingStatus: status,
+        contractAddress: contract.address,
+        hash: sendEvent.txHash,
+        crossDomainMessage,
+        contractName: 'Teleportation',
+        from: sendEvent.emitter,
+        to: sendEvent.emitter,
+        action,
+        isTeleportation: true,
+      };
     }
+
+    const getEventsForTeleportation = async (contract, sourceChainId) => {
+      if (contract) {
+        let sentEvents = []
+        try {
+          sentEvents = await teleportationGraphQLService.queryAssetReceivedEvent(networkService.account, sourceChainId)
+        } catch (err) {
+          console.error(err)
+        }
+
+        if (!sentEvents || !sentEvents?.length) return []
+        return await Promise.all(sentEvents.map(async sentEvent => {
+          let receiveEvent = await teleportationGraphQLService.queryDisbursementSuccessEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.token, sentEvent.amount, sentEvent.depositId)
+          if (!receiveEvent && sentEvent.token === ethers.constants.AddressZero) {
+            // Native assets can fail and retried
+            receiveEvent = await teleportationGraphQLService.queryDisbursementFailedEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.amount, sentEvent.depositId)
+            if (receiveEvent) {
+              // check if successfully retried
+              receiveEvent = await teleportationGraphQLService.queryDisbursementRetrySuccessEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.amount, sentEvent.depositId)
+            }
+            receiveEvent.token = ethers.constants.AddressZero
+          }
+          return await mapEventToTransaction(sentEvent, receiveEvent, contract)
+        }))
+      } else if (isDevBuild()) {
+        console.log("DEV: Teleportation not supported on network")
+      }
+      return []
+    }
+
+    rawTx = rawTx.concat(await getEventsForTeleportation(contractL1, networkConfig.L1.chainId))
+    return rawTx.concat(await getEventsForTeleportation(contractL2, networkConfig.L2.chainId))
   }
 }
 
-const transctionService = new TransactionService()
+const transactionService = new TransactionService()
 
-export default transctionService
+export default transactionService

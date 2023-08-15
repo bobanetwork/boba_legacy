@@ -81,6 +81,19 @@ export const BobaChains: IBobaChains = {
       '0xB8c77482e45F1F44dE1745F52C74426C631bDD52': 'BNB',
     },
   },
+  56: {
+    url: 'https://rpc.ankr.com/bsc',
+    testnet: false,
+    name: 'BNB Mainnet',
+    teleportationAddress: '0x0',
+    height: 30907682,
+    supportedAssets: {
+      /*'0x0000000000000000000000000000000000000000': 'ETH',
+      '0x42bBFa2e77757C645eeaAd1655E0911a7553Efbc': 'BOBA',
+      '0xdAC17F958D2ee523a2206206994597C13D831ec7': 'USDT',
+      '0xB8c77482e45F1F44dE1745F52C74426C631bDD52': 'BNB',*/
+    },
+  },
   5: {
     url: 'https://ethereum-goerli.publicnode.com', //'https://goerli.gateway.tenderly.co',
     testnet: true,

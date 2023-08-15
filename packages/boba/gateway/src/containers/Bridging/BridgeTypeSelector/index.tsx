@@ -7,6 +7,7 @@ import { setBridgeType } from 'actions/bridgeAction'
 export enum BRIDGE_TYPE {
   CLASSIC = 'CLASSIC',
   FAST = 'FAST',
+  TELEPORTATION = 'TELEPORTATION',
 }
 
 const BridgeTypeSelector = () => {
@@ -30,6 +31,12 @@ const BridgeTypeSelector = () => {
         onClick={() => onTabClick(BRIDGE_TYPE.FAST)}
       >
         Fast
+      </BridgeTabItem>
+      <BridgeTabItem
+        active={bridgeType === BRIDGE_TYPE.TELEPORTATION}
+        onClick={() => onTabClick(BRIDGE_TYPE.TELEPORTATION)}
+      >
+        Now
       </BridgeTabItem>
     </BridgeTabs>
   )

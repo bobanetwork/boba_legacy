@@ -163,5 +163,31 @@ dataSources:
           handler: handleTuringHelperDeployed
       file: ./src/TuringHelperFactoryMapping.ts
 
+  - kind: ethereum/contract
+    name: Teleportation
+    network: {{network}}
+    source:
+      address: '{{contracts.Teleportation.address}}'
+      abi: Teleportation
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Teleportation
+      abis:
+        - name: Teleportation
+          file: ./abis/Teleportation.json
+      eventHandlers:
+        - event: AssetReceived(address,uint32,indexed uint32,indexed uint256,indexed address,uint256)
+          handler: handleTeleportationAssetReceived
+        - event: DisbursementSuccess(indexed uint256,indexed address,indexed address,uint256,uint32)
+          handler: handleTeleportationDisbursementSuccess
+        - event: DisbursementFailed(indexed uint256,indexed address,uint256,uint32)
+          handler: handleTeleportationDisbursementFailed
+        - event: DisbursementRetrySuccess(indexed uint256,indexed address,uint256,uint32)
+          handler: handleTeleportationDisbursementRetrySuccess
+      file: ./src/TeleportationMapping.ts
+
 
 

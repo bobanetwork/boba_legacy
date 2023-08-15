@@ -15,7 +15,7 @@ limitations under the License. */
 
 import gasService from 'services/gas.service'
 import networkService from 'services/networkService'
-import transctionService from 'services/transaction.service'
+import transactionService from 'services/transaction.service'
 import { createAction } from './createAction'
 
 export function fetchBalances() {
@@ -32,19 +32,19 @@ export function addTokenList() {
 
 export function fetchTransactions() {
   return createAction('TRANSACTION/GETALL', () =>
-    transctionService.getTransactions()
+    transactionService.getTransactions()
   )
 }
 
 export function fetchSevens() {
   return createAction('SEVENS/GETALL', () =>
-    transctionService.getSevens()
+    transactionService.getSevens()
   )
 }
 
 export function fetchFastExits() {
   return createAction('FASTEXITS/GETALL', () =>
-    transctionService.getFastExits()
+    transactionService.getFastExits()
   )
 }
 

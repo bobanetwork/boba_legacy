@@ -18,6 +18,9 @@
   },
     "TuringMonsters": {
       "address": "0x757b8E819d91659844E44F2141402831B60Fa4EE"
+    },
+    "Teleportation": {
+      "address": "0xB43EE846Aa266228FeABaD1191D6cB2eD9808894"
     }
   }
 }

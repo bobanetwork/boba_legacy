@@ -81,7 +81,7 @@ export const useBridge = () => {
     amountWei: BigNumberish,
     destChainId: BigNumberish
   ) => {
-    if (token.symbol !== networkService.L1NativeTokenSymbol) {
+    if (token.address !== ethers.constants.AddressZero) {
       // ERC20 token fast bridging.
       // step -1  approve token
       // step -2  deposit to Teleportation.

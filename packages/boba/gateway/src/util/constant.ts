@@ -15,6 +15,7 @@ export const GAS_POLL_INTERVAL: EnvType =
 export const GA4_MEASUREMENT_ID: EnvType =
   process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV: EnvType = process.env.REACT_APP_ENV || 'dev'
+export const isDevBuild = () => APP_ENV === 'dev'
 export const SENTRY_DSN: EnvType = process.env.REACT_APP_SENTRY_DSN || null
 export const INFURA_ID: EnvType = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG: EnvType =
