@@ -160,70 +160,86 @@ class TransactionService {
     const contractL1 = networkService.getTeleportationContract(networkConfig.L1.chainId)
     const contractL2 = networkService.getTeleportationContract(networkConfig.L2.chainId)
 
-    const mapEventToTransaction = async (t) => {
-      const txReceipt = await t.getTransactionReceipt()
-      const block = await t.getBlock()
+    const mapEventToTransaction = async (sendEvent, disburseEvent) => {
+      const txReceipt = await sendEvent.getTransactionReceipt()
+      const block = await sendEvent.getBlock()
+      let crossDomainMessageFinalize
+      if (disburseEvent) {
+        crossDomainMessageFinalize = (await disburseEvent.getBlock()).timestamp
+      }
 
-      // TODO: search disburse tx########################################
       const crossDomainMessage = {
+        crossDomainMessage: disburseEvent?.args?.depositId,
+        crossDomainMessageEstimateFinalizedTime: block.timestamp, // TODO
+        crossDomainMessageFinalize,
+        crossDomainMessageSendTime: block.timestamp,
+      }
 
+      let status = txReceipt?.status ? TRANSACTION_STATUS.Pending : TRANSACTION_STATUS.Failed
+      if (disburseEvent && status === TRANSACTION_STATUS.Pending) {
+        status = (await disburseEvent.getTransactionReceipt()).status === 1 ? TRANSACTION_STATUS.Succeeded : TRANSACTION_STATUS.Failed
       }
 
       const action = {
-        amount: t.args.amount?.toString(),
-        sender: t.args.emitter,
-        status: txReceipt?.status ? TRANSACTION_STATUS.Pending : TRANSACTION_STATUS.Failed, // TODO: Search disburse tx
-        to: t.args.emitter,
-        token: t.args.token,
+        amount: sendEvent.args.amount?.toString(),
+        sender: sendEvent.args.emitter,
+        status, // TODO: Search disburse tx
+        to: sendEvent.args.emitter,
+        token: sendEvent.args.token,
       }
       return {
-        ...t,
+        ...sendEvent,
         ...txReceipt,
+        disburseEvent,
         timeStamp: block.timestamp,
         layer: Layer.L1,
         chainName: networkConfig.L1.name,
-        originChainId: t.args.sourceChainId,
-        destinationChainId: t.args.toChainId,
+        originChainId: sendEvent.args.sourceChainId,
+        destinationChainId: sendEvent.args.toChainId,
         UserFacingStatus: TRANSACTION_STATUS.Pending, // TODO: Search disburse tx
-        contractAddress: t.address,
-        hash: t.transactionHash,
+        contractAddress: sendEvent.address,
+        hash: sendEvent.transactionHash,
         crossDomainMessage,
         contractName: 'Teleportation',
-        from: t.args.emitter,
-        to: t.args.emitter,
+        from: sendEvent.args.emitter,
+        to: sendEvent.args.emitter,
         action,
         isTeleportation: true,
       }
     }
 
-    if (contractL1) {
-      const currBlockNumber = await contractL1.provider.getBlockNumber() // TODO
-      const assetSent = contractL1.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
-      const assetReceived = contractL1.filters.DisbursementSuccess()
-      const eventsSent = await contractL1.queryFilter(assetSent, currBlockNumber - 500) // TODO
-      rawTx = rawTx.concat(await Promise.all(eventsSent.map(async t => {
-        return await mapEventToTransaction(t)
-      })))
-      console.log('ASSETS:::SENT', assetSent, eventsSent)
-      console.log('ASSETS:RECEIVED', assetReceived)
-    } else {
-      console.log("Teleportation not supported on network: ", networkConfig.L1)
+    const getEventsForContract = async (contract) => {
+      if (contract) {
+        const currBlockNumber = await contract.provider.getBlockNumber() // TODO
+        const assetSent = contract.filters.AssetReceived() // todo: null, null, null, null, null/*networkService.account*/, null)
+        const assetReceived = contract.filters.DisbursementSuccess()
+        let sentEvents = []
+        try {
+          sentEvents = await contract.queryFilter(assetSent, currBlockNumber - 500) // TODO
+        } catch (err) {
+          console.error(err)
+        }
+        let receiveEvents = []
+        try {
+          receiveEvents = receiveEvents.concat(await contract.queryFilter(assetReceived, currBlockNumber - 500))
+        } catch (err) {
+          console.error(err)
+        }
+
+        return await Promise.all(sentEvents.map(async sentEvent => {
+          const receiveEvent = receiveEvents.find(re => re.args.sourceChainId === sentEvent.args.toChainId
+            && re.args.amount === sentEvent.args.amount && re.args.to === sentEvent.args.emitter) // TODO: Add time constraint
+          return await mapEventToTransaction(sentEvent, receiveEvent)
+        }))
+      } else {
+        console.log("Teleportation not supported on network")
+      }
+      return []
     }
 
-    // TODO: Events duplicate on both networks?
-    if (contractL2) {
-      const currBlockNumber = await contractL2.provider.getBlockNumber() // TODO
-      const assetSent = contractL1.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
-      const assetReceived = contractL1.filters.DisbursementSuccess()
-      const eventsSent = await contractL1.queryFilter(assetSent, currBlockNumber - 500) // TODO
-      rawTx = rawTx.concat(await Promise.all(eventsSent.map(async t => {
-        return await mapEventToTransaction(t)
-      })))
-      console.log('ASSETS:::SENT', assetSent, eventsSent)
-      console.log('ASSETS:RECEIVED', assetReceived)
-    } else {
-      console.log("Teleportation not supported on network: ", networkConfig.L2)
-    }
+    rawTx = rawTx.concat(await getEventsForContract(contractL1))
+    rawTx = rawTx.concat(await getEventsForContract(contractL2))
+
     try {
 
       /* TODO
@@ -242,8 +258,8 @@ class TransactionService {
       console.log("RESP TELEPO", responseTeleportation)
 
       if (responseTeleportation.status === 201) {
-        //add the chain: 'teleportation' field
-        /*txTeleportation = responseTeleportation.data.map((v) => ({
+        // add the chain: 'teleportation' field
+        /* todo txTeleportation = responseTeleportation.data.map((v) => ({
           ...v, layer: networkConfig.layer, chainName: networkConfig.L2.name,
           originChainId: networkConfig.L2.chainId,
           destinationChainId: networkConfig.L1.chainId
