@@ -12,6 +12,7 @@ import { ethereumConfig } from './config/ethereum'
 import { bnbConfig } from './config/bnb'
 import { avaxConfig } from './config/avax'
 import { Layer, LAYER } from 'util/constant'
+import { number } from 'prop-types'
 
 export const L1_ICONS = {
   ethereum: EthereumIcon,
@@ -204,6 +205,15 @@ export const rpcUrls = Object.values(AllNetworkConfigs).reduce(
 
 export const getNetworkDetail = ({ network, networkType }) => {
   return AllNetworkConfigs[network][networkType]
+}
+
+export const getRpcUrl = ({ network, networkType, layer }): string => {
+  const rpcs = AllNetworkConfigs[network][networkType][layer]?.rpcUrl
+  let randomRpc = rpcs
+  if (Array.isArray(rpcs)) {
+    randomRpc = rpcs[Math.floor(Math.random() * rpcs.length)]
+  }
+  return randomRpc
 }
 
 export const getBlockExplorerUrl = ({ network, networkType, layer }) => {

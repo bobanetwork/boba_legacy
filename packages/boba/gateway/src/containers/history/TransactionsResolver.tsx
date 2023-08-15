@@ -76,9 +76,8 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   // should filter out transactions that aren't cross domain
   const crossDomainFilter = (transaction: ITransaction) => {
     return (
-      transaction.isTeleportation ||
-      (transaction.crossDomainMessage &&
-        transaction.crossDomainMessage.crossDomainMessage)
+      transaction.crossDomainMessage &&
+      transaction.crossDomainMessage.crossDomainMessage
     )
   }
 

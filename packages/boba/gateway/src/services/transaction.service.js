@@ -155,13 +155,19 @@ class TransactionService {
 
   async fetchTeleportationTransactions(networkConfig = networkService.networkConfig) {
     let txTeleportation = []
+    let rawTx = []
 
-    const contractL1 = networkService.getTeleportationContract(Layer.L1)
-    const contractL2 = networkService.getTeleportationContract(Layer.L2)
+    const contractL1 = networkService.getTeleportationContract(networkConfig.L1.chainId)
+    const contractL2 = networkService.getTeleportationContract(networkConfig.L2.chainId)
 
     const mapEventToTransaction = async (t) => {
       const txReceipt = await t.getTransactionReceipt()
       const block = await t.getBlock()
+
+      // TODO: search disburse tx########################################
+      const crossDomainMessage = {
+
+      }
 
       const action = {
         amount: t.args.amount?.toString(),
@@ -181,6 +187,7 @@ class TransactionService {
         UserFacingStatus: TRANSACTION_STATUS.Pending, // TODO: Search disburse tx
         contractAddress: t.address,
         hash: t.transactionHash,
+        crossDomainMessage,
         contractName: 'Teleportation',
         from: t.args.emitter,
         to: t.args.emitter,
@@ -189,11 +196,11 @@ class TransactionService {
       }
     }
 
-    let rawTx = []
     if (contractL1) {
+      const currBlockNumber = await contractL1.provider.getBlockNumber() // TODO
       const assetSent = contractL1.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
       const assetReceived = contractL1.filters.DisbursementSuccess()
-      const eventsSent = await contractL1.queryFilter(assetSent, 40005) // TODO
+      const eventsSent = await contractL1.queryFilter(assetSent, currBlockNumber - 500) // TODO
       rawTx = rawTx.concat(await Promise.all(eventsSent.map(async t => {
         return await mapEventToTransaction(t)
       })))
@@ -205,9 +212,10 @@ class TransactionService {
 
     // TODO: Events duplicate on both networks?
     if (contractL2) {
+      const currBlockNumber = await contractL2.provider.getBlockNumber() // TODO
       const assetSent = contractL1.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
       const assetReceived = contractL1.filters.DisbursementSuccess()
-      const eventsSent = await contractL1.queryFilter(assetSent, 40005) // TODO
+      const eventsSent = await contractL1.queryFilter(assetSent, currBlockNumber - 500) // TODO
       rawTx = rawTx.concat(await Promise.all(eventsSent.map(async t => {
         return await mapEventToTransaction(t)
       })))

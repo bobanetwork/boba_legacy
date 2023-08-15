@@ -86,13 +86,14 @@ import tokenInfo from "@boba/register/addresses/tokenInfo"
 
 import {Layer, MIN_NATIVE_L1_BALANCE} from 'util/constant'
 import {getPoolDetail} from 'util/poolDetails'
-import {getNetworkDetail, NETWORK, NETWORK_TYPE, pingRpcUrl} from 'util/network/network.util'
+import {CHAIN_ID_LIST, getNetworkDetail, getRpcUrl, NETWORK, NETWORK_TYPE, pingRpcUrl} from 'util/network/network.util'
 import appService from './app.service'
 import walletService from './wallet.service'
 
 import BobaGasPriceOracleABI from './abi/BobaGasPriceOracle.abi'
 import L1StandardBridgeABI from './abi/L1StandardBridge.abi'
 import {setFetchDepositTxBlock} from 'actions/bridgeAction';
+import {LAYER} from "../containers/history/types";
 
 const ERROR_ADDRESS = '0x0000000000000000000000000000000000000000'
 const L1_ETH_Address = '0x0000000000000000000000000000000000000000'
@@ -2398,12 +2399,22 @@ class NetworkService {
     }
   }
 
-  getTeleportationContract(layer) {
-    let teleportationAddr = this.addresses.Proxy__L2Teleportation
-    let provider = this.L2Provider
-    if (layer === Layer.L1) {
-      teleportationAddr = this.addresses.Proxy__L1Teleportation
-      provider = this.L1Provider
+  getTeleportationContract(chainId) {
+    const networkConfig = CHAIN_ID_LIST[chainId]
+    if (!networkConfig) {
+      throw new Error(`Unknown chainId to retrieve teleportation contract from: ${chainId}`)
+    }
+    if (networkConfig.networkType !== NETWORK_TYPE.TESTNET) {
+      console.log("Teleportation is only supported on testnet for now, chainId: ", chainId)
+      return;
+    }
+    const addresses = appService.fetchAddresses({networkType: networkConfig.networkType, network: networkConfig.chain})
+
+    const rpc = getRpcUrl({networkType: networkConfig.networkType, network: networkConfig.chain, layer: networkConfig.layer})
+    const provider = new ethers.providers.StaticJsonRpcProvider(rpc)
+    let teleportationAddr = addresses.Proxy__L2Teleportation
+    if (networkConfig.layer === LAYER.L1) {
+      teleportationAddr = addresses.Proxy__L1Teleportation
     }
     if (!teleportationAddr) return;
 
