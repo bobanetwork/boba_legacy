@@ -2,13 +2,15 @@ import styled, { css } from 'styled-components'
 import { TableHeader, TableContent } from 'components/global/table'
 import { Svg } from 'components/global/svg'
 import { TableRow } from './styles'
-import { sdesktop } from 'themes/screens'
+import { mobile, sdesktop } from 'themes/screens'
 export const TransactionsTableHeader = styled(TableHeader)`
   padding: 10px 24px 10px 24px;
-  background: none;
   position: sticky;
   top: 0;
+  background: unset;
   border-radius: unset;
+  border: unset;
+  box-shadow: none;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -32,6 +34,11 @@ export const TransactionsTableHeader = styled(TableHeader)`
   ${sdesktop(css`
     width: 750px;
   `)}
+  ${mobile(css`
+    p {
+      font-size: 10px;
+    }
+  `)}
 `
 
 export const TransactionsTableContent = styled(TableContent)`
@@ -51,16 +58,4 @@ export const TransactionsTableContent = styled(TableContent)`
     margin: 0px;
     padding: 0px;
   }
-`
-export const AllNetworksIcon = styled(Svg)`
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      fill: ${props.theme.colors.gray[100]};
-    `}
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      fill: ${props.theme.colors.gray[600]};
-    `}
 `
