@@ -95,6 +95,7 @@ export interface ITransaction {
   timeStamp: number
   to: string
   UserFacingStatus: TRANSACTION_FILTER_STATUS
+  isTeleportation?: boolean
 }
 
 export interface IProcessedTransaction {

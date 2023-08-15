@@ -17,8 +17,8 @@ limitations under the License. */
 import BigNumber from 'bignumber.js';
 
 export function logAmount(amount, power, truncate = 0) {
-
-  const x = new BigNumber(amount);
+  // toString as some methods seem to supply BigNumber
+  const x = new BigNumber(amount?.toString());
   const exp = new BigNumber(10).pow(power);
 
   const calculated = x.div(exp);

@@ -1,6 +1,11 @@
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import networkService from './networkService'
 import {AllNetworkConfigs} from 'util/network/network.util'
+import {Layer} from "../util/constant";
+import {useSelector} from "react-redux";
+import {selectLayer} from "../selectors";
+import {TRANSACTION_STATUS} from "../containers/history/types";
+import {ethers} from "ethers";
 
 class TransactionService {
   async getSevens(networkConfig = networkService.networkConfig) {
@@ -139,25 +144,80 @@ class TransactionService {
     })
 
     const allNetworksTransactions = await Promise.all(networkConfigsArray.flatMap((config) => {
-      return [this.fetchL2Tx(config),
-        this.fetchL1PendingTx(config)]
-    }
+        return [this.fetchL2Tx(config),
+          this.fetchL1PendingTx(config),
+          this.fetchTeleportationTransactions(config)]
+      }
     ))
     const filteredResults = allNetworksTransactions.reduce((acc, res) => [...acc, ...res], [])
     return filteredResults?.filter((transaction) => transaction.hash)
   }
 
-  async fetchTeleportationTransactions() {
+  async fetchTeleportationTransactions(networkConfig = networkService.networkConfig) {
     let txTeleportation = []
-    try {
-      const contract = networkService.getTeleportationContract(Layer.L2)
-      console.log('EVENT::CONTRA', contract)
-      // TODO: Redeploy teleportation contracts, to match event signature etc.
-      const assetSent = contract.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
-      const assetReceived = contract.filters.DisbursementSuccess()
-      const eventsSent = await contract.queryFilter(assetSent, 40005) // TODO
+
+    const contractL1 = networkService.getTeleportationContract(Layer.L1)
+    const contractL2 = networkService.getTeleportationContract(Layer.L2)
+
+    const mapEventToTransaction = async (t) => {
+      const txReceipt = await t.getTransactionReceipt()
+      const block = await t.getBlock()
+
+      const action = {
+        amount: t.args.amount?.toString(),
+        sender: t.args.emitter,
+        status: txReceipt?.status ? TRANSACTION_STATUS.Pending : TRANSACTION_STATUS.Failed, // TODO: Search disburse tx
+        to: t.args.emitter,
+        token: t.args.token,
+      }
+      return {
+        ...t,
+        ...txReceipt,
+        timeStamp: block.timestamp,
+        layer: Layer.L1,
+        chainName: networkConfig.L1.name,
+        originChainId: t.args.sourceChainId,
+        destinationChainId: t.args.toChainId,
+        UserFacingStatus: TRANSACTION_STATUS.Pending, // TODO: Search disburse tx
+        contractAddress: t.address,
+        hash: t.transactionHash,
+        contractName: 'Teleportation',
+        from: t.args.emitter,
+        to: t.args.emitter,
+        action,
+        isTeleportation: true,
+      }
+    }
+
+    let rawTx = []
+    if (contractL1) {
+      const assetSent = contractL1.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
+      const assetReceived = contractL1.filters.DisbursementSuccess()
+      const eventsSent = await contractL1.queryFilter(assetSent, 40005) // TODO
+      rawTx = rawTx.concat(await Promise.all(eventsSent.map(async t => {
+        return await mapEventToTransaction(t)
+      })))
       console.log('ASSETS:::SENT', assetSent, eventsSent)
       console.log('ASSETS:RECEIVED', assetReceived)
+    } else {
+      console.log("Teleportation not supported on network: ", networkConfig.L1)
+    }
+
+    // TODO: Events duplicate on both networks?
+    if (contractL2) {
+      const assetSent = contractL1.filters.AssetReceived() //null, null, null, null, null/*networkService.account*/, null)
+      const assetReceived = contractL1.filters.DisbursementSuccess()
+      const eventsSent = await contractL1.queryFilter(assetSent, 40005) // TODO
+      rawTx = rawTx.concat(await Promise.all(eventsSent.map(async t => {
+        return await mapEventToTransaction(t)
+      })))
+      console.log('ASSETS:::SENT', assetSent, eventsSent)
+      console.log('ASSETS:RECEIVED', assetReceived)
+    } else {
+      console.log("Teleportation not supported on network: ", networkConfig.L2)
+    }
+    try {
+
       /* TODO
       const responseTeleportation = await omgxWatcherAxiosInstance(networkService.networkConfig)
         .post('get.teleportation.transactions', {
@@ -166,14 +226,21 @@ class TransactionService {
           toRange: 1000,
         })*/
       // TODO
-      const responseTeleportation = assetReceived
+      const responseTeleportation = {
+        status: 201,
+        data: rawTx,
+      }
+
+      console.log("RESP TELEPO", responseTeleportation)
 
       if (responseTeleportation.status === 201) {
         //add the chain: 'teleportation' field
-        txTeleportation = responseTeleportation.data.map((v) => ({
-          ...v,
-          chain: 'teleportation',
-        }))
+        /*txTeleportation = responseTeleportation.data.map((v) => ({
+          ...v, layer: networkConfig.layer, chainName: networkConfig.L2.name,
+          originChainId: networkConfig.L2.chainId,
+          destinationChainId: networkConfig.L1.chainId
+        }))*/
+        txTeleportation = responseTeleportation.data
       }
       return txTeleportation
     } catch (error) {

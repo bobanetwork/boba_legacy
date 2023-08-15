@@ -73,11 +73,12 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     return txnAfterStartDate && txnBeforeEndDate
   }
 
-  // should filter out transctions that aren't cross domain
+  // should filter out transactions that aren't cross domain
   const crossDomainFilter = (transaction: ITransaction) => {
     return (
-      transaction.crossDomainMessage &&
-      transaction.crossDomainMessage.crossDomainMessage
+      transaction.isTeleportation ||
+      (transaction.crossDomainMessage &&
+        transaction.crossDomainMessage.crossDomainMessage)
     )
   }
 
@@ -108,8 +109,9 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   }
   const getTransactionStatus = (transaction: ITransaction) => {
     if (
-      transaction.action &&
-      transaction.crossDomainMessage.crossDomainMessageSendTime
+      transaction.isTeleportation ||
+      (transaction.action &&
+        transaction.crossDomainMessage.crossDomainMessageSendTime)
     ) {
       switch (transaction.action.status) {
         case TRANSACTION_STATUS.Succeeded: {
@@ -162,18 +164,18 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
     // TODO: have a unknown token to use
     let token = {
-      name: 'Etheruem',
+      name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18,
     }
     if (
       TokenInfo[transaction.originChainId.toString()][
-        transaction.action.token.toLowerCase()
+        transaction?.action?.token?.toLowerCase()
       ]
     ) {
       token =
         TokenInfo[transaction.originChainId.toString()][
-          transaction.action.token.toLowerCase()
+          transaction?.action?.token?.toLowerCase()
         ]
     }
 
@@ -187,6 +189,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     } else if (chain === LAYER.L1 && transaction.crossDomainMessage.l2Hash) {
       toHash = transaction.crossDomainMessage.l2Hash
     }
+
     const processedTransaction: IProcessedTransaction = {
       timeStamp: transaction.timeStamp,
       from: transaction.from,

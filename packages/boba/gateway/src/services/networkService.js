@@ -2405,6 +2405,7 @@ class NetworkService {
       teleportationAddr = this.addresses.Proxy__L1Teleportation
       provider = this.L1Provider
     }
+    if (!teleportationAddr) return;
 
     return this.Teleportation
       .attach(teleportationAddr)
@@ -2421,9 +2422,8 @@ class NetworkService {
 
   async depositWithTeleporter(layer, currency, value_Wei_String, destChainId) {
     try {
-      console.log("TELEPORTATION START", layer, currency, value_Wei_String, destChainId)
-      updateSignatureStatus_depositLP(false) // TODO: Verify
-      setFetchDepositTxBlock(false); // TODO --/--
+      updateSignatureStatus_depositLP(false)
+      setFetchDepositTxBlock(false);
 
       const teleportationAddr = (layer === Layer.L1 ? this.addresses.Proxy__L1Teleportation : this.addresses.Proxy__L2Teleportation)
       const msgVal = currency === this.addresses.L1_ETH_Address || currency === this.addresses.NETWORK_NATIVE ? {value: value_Wei_String} : {}
@@ -2439,9 +2439,6 @@ class NetworkService {
         console.error("Teleportation: Asset not supported for chainId", assetSupport, tokenAddress, destChainId)
         return new Error(`Teleportation: Asset ${tokenAddress} not supported for chainId ${destChainId}`)
       }
-
-      console.log("TELELELEL", teleportationAddr, msgVal, tokenAddress, assetSupport, value_Wei_String)
-
 
       let depositTX = await teleportationContract
         .teleportAsset(
