@@ -48,7 +48,7 @@ import { DEFAULT_NETWORK, LAYER } from 'util/constant'
 import { AvailableBridges } from 'components'
 
 
-function BobaBridge() {
+const BobaBridge = () => {
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
@@ -73,7 +73,7 @@ function BobaBridge() {
     setToL2(isL1);
   }, [isL1]);
 
-  async function switchDirection() {
+  const switchDirection = async () => {
     if (accountEnabled) {
       if (isL1) dispatch(setConnectBOBA(true))
       else dispatch(setConnectETH(true))

@@ -63,12 +63,12 @@ import Button from 'components/button/Button'
 import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 import { LAYER, DISABLE_WALLETCONNECT } from 'util/constant'
 
-function LayerSwitcher({ visisble = true, isButton = false }) {
+const LayerSwitcher = ({ visisble = true, isButton = false }) => {
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const baseEnabled = useSelector(selectBaseEnabled())
 
-  let layer = useSelector(selectLayer())
+  const layer = useSelector(selectLayer())
   const network = useSelector(selectActiveNetwork())
   const networkType = useSelector(selectActiveNetworkType())
   const networkName = useSelector(selectActiveNetworkName())
@@ -91,10 +91,10 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
     : ''
 
   const dispatchBootAccount = useCallback(() => {
-    if ((!accountEnabled && baseEnabled) || chainIdChanged) initializeAccount()
-
-    async function initializeAccount() {
-
+    if ((!accountEnabled && baseEnabled) || chainIdChanged) {
+      initializeAccount()
+    }
+    const initializeAccount = async () => {
       const initialized = await networkService.initializeAccount({
         networkGateway: network,
         networkType,
@@ -126,12 +126,11 @@ function LayerSwitcher({ visisble = true, isButton = false }) {
   }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged])
 
   const doConnectToLayer = useCallback((layer) => {
-    function resetConnectChain() {
+    const resetConnectChain = () => {
       dispatch(setConnect(false))
       dispatch(setConnectETH(false))
     }
-
-    async function doConnect() {
+    const doConnect = async () => {
       try {
         if (networkService.walletService.provider) {
           if (await networkService.switchChain(layer)) {

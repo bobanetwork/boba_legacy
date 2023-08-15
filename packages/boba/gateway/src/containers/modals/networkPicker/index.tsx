@@ -62,6 +62,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
       <NetworkPickerModalContainer>
         <NetworkPickerList>
           {networkList.map((chainDetail: any) => {
+            console.log('changeDetail', chainDetail)
             const Icon =
               selectionLayer === 'l1'
                 ? l1Icon[chainDetail.icon]

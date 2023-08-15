@@ -35,9 +35,10 @@ import { PlaceholderConnect } from 'components/global/placeholderConnect'
 import { ModalTypography } from 'components/global/modalTypography'
 import { Preloader } from 'components/dao/preloader'
 
-import { selectFixed, selectSetup, selectBalance } from 'selectors'
+import { selectFixed, selectSetup, selectBalance, selectLayer } from 'selectors'
 
 const Save = () => {
+  const layer = useSelector(selectLayer())
   const { stakeInfo } = useSelector(selectFixed())
   const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
     useSelector(selectSetup())
@@ -45,7 +46,7 @@ const Save = () => {
   const { layer2 } = balance
 
   const dispatch = useDispatch<any>()
-
+  console.log(layer)
   const [state, setState] = useState({
     max_Float_String: '0.0',
     fee: '0',
@@ -153,14 +154,16 @@ const Save = () => {
                 <Typography variant="title">5.22%</Typography>
               </div>
             </div>
-            <div>
-              <Button
-                label="Stake"
-                small
-                disable={!Boolean(state.max_Float_String !== '0.0')}
-                onClick={() => dispatch(openModal('StakeDepositModal'))}
-              />
-            </div>
+            {layer === 'L2' && (
+              <div>
+                <Button
+                  label="Stake"
+                  small
+                  disable={!Boolean(state.max_Float_String !== '0.0')}
+                  onClick={() => dispatch(openModal('StakeDepositModal'))}
+                />
+              </div>
+            )}
           </S.BlockContainer>
         </S.PaddingContainer>
         <S.PaddingContainer>
@@ -194,7 +197,8 @@ const Save = () => {
             </S.TitleContainer>
           </S.PaddingContainer>
           <S.MobileTableContainer>
-            {!stakeInfo || !Object.keys(stakeInfo).length ? (
+            {(!stakeInfo && layer === 'L2') ||
+            (!Object.keys(stakeInfo).length && layer === 'L2') ? (
               <Loader />
             ) : (
               <>
