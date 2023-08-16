@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+
 dayjs.extend(duration)
 
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { openAlert, openError } from 'actions/uiAction'
 import { withdrawFS_Savings } from 'actions/fixedAction'
 
@@ -16,21 +17,7 @@ import { StakeItemDetails, Token, Flex } from './styles'
 import { getCoinImage } from 'util/coinImage'
 
 const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
-  const [TransactionListState, setTransactionListState] = useState({
-    stakeInfo,
-  })
-
-  const handleUnstake = async () => {
-    const { stakeInfo } = TransactionListState
-
-    const withdrawTX = await withdrawFS_Savings(stakeInfo.stakeId)
-
-    if (withdrawTX !== null && withdrawTX !== undefined) {
-      openAlert('Your BOBA were unstaked')
-    } else {
-      openError('Failed to unstake BOBA')
-    }
-  }
+  const dispatch = useDispatch<any>()
 
   const timeDeposit = dayjs.unix(stakeInfo.depositTimestamp)
   const timeNow = dayjs()
@@ -51,6 +38,16 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
   const twoWeeks = 14 * 24 * 60 * 60
   const twoDays = 2 * 24 * 60 * 60
   const residual_S = duration_S % (twoWeeks + twoDays)
+
+  const handleUnstake = async () => {
+    const withdrawTX = await dispatch(withdrawFS_Savings(stakeInfo.stakeId))
+
+    if (withdrawTX !== null && withdrawTX !== undefined) {
+      openAlert('Your BOBA were unstaked')
+    } else {
+      openError('Failed to unstake BOBA')
+    }
+  }
 
   let locked = true
   if (residual_S > twoWeeks) {
