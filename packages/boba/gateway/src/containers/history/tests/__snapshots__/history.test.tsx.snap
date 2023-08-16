@@ -53,7 +53,7 @@ exports[`Testing history page Test History Page 1`] = `
           <div
             class="sc-hCnrGf EeSxa"
           >
-            02/11/2023
+            02/16/2023
           </div>
         </div>
         <p
@@ -67,7 +67,7 @@ exports[`Testing history page Test History Page 1`] = `
           <div
             class="sc-hCnrGf EeSxa"
           >
-            08/11/2023
+            08/16/2023
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@ exports[`Testing history page Test History Page 1`] = `
           <div
             class="sc-hCnrGf EeSxa"
           >
-            02/11/2023 - 08/11/2023
+            02/16/2023 - 08/16/2023
           </div>
         </div>
       </div>
@@ -101,7 +101,8 @@ exports[`Testing history page Test History Page 1`] = `
           style="width: 100%;"
         >
           <div
-            class="sc-dzbdsH eHaKuX"
+            class="sc-dzbdsH iliEGE"
+            data-testid="network-dropdowns"
           >
             <p
               class="sc-duSInm bFEZbS"
@@ -146,7 +147,8 @@ exports[`Testing history page Test History Page 1`] = `
               </div>
             </div>
             <div
-              class="sc-hpGEOZ hfOtSw"
+              class="sc-hpGEOZ hwKYKi"
+              data-testid="switch-icon"
             >
               <div
                 class="sc-fwEaKe cVrwVB"
@@ -297,22 +299,2481 @@ exports[`Testing history page Test History Page 1`] = `
           </div>
         </div>
         <div
-          class="sc-dmovaM iZsvzA"
-        />
-        <div
-          class="sc-hIiahf hfPvZO"
-          style="margin-left: auto; margin-right: auto; padding: 20px;"
+          class="sc-dmovaM fJIbAT"
         >
-          <div>
-            <div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
               <div
-                data-src="noHistory.svg"
-                src=""
-              />
+                class="sc-emqRaN foEFRI"
+              >
+                10 Aug 2023 11:15 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.snowtrace.io/tx/0xaf0ee848eec86c1dfd78f90d516cc05091a7fc85601230a886b08b0ee8ed8852"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xaf...8852
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaAvax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://blockexplorer.testnet.avax.boba.network/tx/0xfcf1dc9ad39d6430b49b211e1fccccbfcdd3c7cf45aec49770f7789c339c580c"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xfc...580c
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  AVAX
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.0100
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
             </div>
           </div>
-          <div>
-            No Transactions Matching Filter.
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                10 Aug 2023 09:36 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.snowtrace.io/tx/0x0a5f2f1d77aaeb4795992eb0cf4a44c4073d14ae1df216baedd1e4d6b1ac6bd3"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x0a...6bd3
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaAvax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://blockexplorer.testnet.avax.boba.network/tx/0x5a6e65827640f2264e17c6a781ab8eeff4c99a393cb80e5824ac1eb27670a7d9"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x5a...a7d9
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  AVAX
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.1000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                10 Aug 2023 09:36 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0xc42be534ff9b7305ad2b6761a144ced848fe3383cc41891931b2e7571d9e9936"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xc4...9936
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0x9b1f95c2a32da9624cad48818523d65e392406d01fb1944ac79034f5511e9900"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x9b...9900
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                20.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                09 Aug 2023 02:29 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.snowtrace.io/tx/0x4ecd6f6855f9b86628a10a7c87219ff39391a87c5ffa58f49f1713a8d758893a"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x4e...893a
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaAvax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://blockexplorer.testnet.avax.boba.network/tx/0x8dcc76215d8e36323d0424b3da50e52624eebe26bb2fc16b748800cbe2d86f74"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x8d...6f74
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  AVAX
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.1000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                09 Aug 2023 09:37 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.snowtrace.io/tx/0xa6a6d71f93f933193c43e27cc8c8894b6a1f619083d20a19228995c1fed08530"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xa6...8530
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaAvax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://blockexplorer.testnet.avax.boba.network/tx/0xb2c8bd384a9158eabc75094321f01d9c54b47a4f1a822a3bb9c87d93da45c9c0"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xb2...c9c0
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  AVAX
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.1000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                08 Aug 2023 03:05 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xcfc49960c3926ff813eb060b7bdb01246c8eb9e9d71523db7daa5dc9b758c56d"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xcf...c56d
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <div
+                    class="sc-ksXGtu bipGbl"
+                  >
+                    Tx: Pending
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  ETH
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.0100
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Pending
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                08 Aug 2023 02:59 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0x24967eb38ed526d8bcc6d42a40924f75328e9634dd7eab861879b714fd39a0e9"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x24...a0e9
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <div
+                    class="sc-ksXGtu bipGbl"
+                  >
+                    Tx: Pending
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  ETH
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.0150
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Pending
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                12 Jul 2023 12:50 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.snowtrace.io/tx/0xeacd6df29cee2c387391d7f60dbf93f339bdcc49136f4eb5ddeed1811ead2f66"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xea...2f66
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaAvax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Fuji
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://blockexplorer.testnet.avax.boba.network/tx/0xa54e53f24ccd935daeaedb81138499f839f48f91ad64561561d3f146538fbc42"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xa5...bc42
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  AVAX
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.5000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                11 Jul 2023 04:27 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0xff7923d5f7738b491c1362165ba7c7a6eb665ce0ba142478bd1f9dfd33c81468"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xff...1468
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xf1421f4f8cc3a5b9a36068d4d19dfe55624672066b427eec6de04d3766e977f5"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xf1...77f5
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                20.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                11 Jul 2023 03:31 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0x30c27ee667cd51a2ad4df0f26c707c84404ea124e6fe2dda238afbcdb9bdf98e"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x30...f98e
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xc4e42fb83f4bfb876404f29527b2c9906840406fd8f669070cecbb31eb8d011c"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xc4...011c
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  ETH
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.0300
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                10 Jul 2023 06:31 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0x54b9f38f649f85d4857aa73c278ec531b14790e6f8206326b19978b568a632fb"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x54...32fb
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0x7237046849fedbfa5cca30eb6ce4454302a2e37531ab9af44ed6a0d587cb1124"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x72...1124
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                13.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                10 Jul 2023 06:05 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0x6d7c3b2c833bf55a4c6fd1e4ae0611f49a8e1471fa9aa12928bf177ba0bc3172"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x6d...3172
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0x96d8de3ff0a1ddde0cd4562b9906fe2b780489984c6c3cfb5127f899b4bb8ff3"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x96...8ff3
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                20.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                07 Jul 2023 06:47 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xa681b7ebeb778c676d375b2cd8cf9b61f61a2a5b04953d9cc1730f989f9f146e"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xa6...146e
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0x1f21a5b056f06d645d33d268e24cd4ba6525f310c95150b51e41598a5223aba4"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x1f...aba4
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                15.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                07 Jul 2023 12:25 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xbd32053a927efbd907f2dfe0a28af9f6af487b6d79d118a83ac8fe3408f97c47"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xbd...7c47
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0xf1e7b97e267eba6e8fc8ab063e50d720a310c23598dab3d2cb09734f9435213a"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xf1...213a
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                20.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                06 Jul 2023 07:29 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xedef20eecda1be0ef60c7a99ede5ad46e89ba7708e908eb652261a8aa11603df"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xed...03df
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0x8ff4ef323cb1b208133896369f1637a7c457d55f089a3570194371c0697ede8b"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x8f...de8b
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                30.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                05 Jul 2023 08:11 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0xc590cb9dd4b18d07f9b510b1f665ce0fc173860abe2f3d30fdbe70fb3145e333"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xc5...e333
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0xcce24215c94ff680320207d12f3beaf2c23cd5ca3260f577b24f1a8c8d581810"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xcc...1810
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  ETH
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.0001
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                05 Jul 2023 07:24 PM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0x6c3c97931034f330c8873d1ea20d1b26b4f430e8da8e76ef65c9a1ce69a86481"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x6c...6481
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0xccf6ea1f7896e13897bca15616ebb821e3afdf6a5a5274624c474e98e290360c"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0xcc...360c
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <img
+                    alt="boba network"
+                    class="sc-bhlPkD ilvQFE"
+                    src="Boba_Logo_White_Circle.png"
+                  />
+                </div>
+                <div>
+                  BOBA
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                20.0000
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+          >
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 168px;"
+            >
+              <div
+                class="sc-emqRaN foEFRI"
+              >
+                04 Jul 2023 02:05 AM
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="bobaEth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Boba Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://testnet.bobascan.com/tx/0x560759950bea44486efa9af0e4e0e73e92bc2727031be24086422220a0810762"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x56...0762
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 142px;"
+            >
+              <div
+                class="sc-dSbvwS iXkFNY"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="ethereum.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="sc-eSdRwT iyiMCi"
+                >
+                  <div
+                    class="sc-jNkFXo iinsvq"
+                  >
+                    Goerli
+                  </div>
+                  <a
+                    class="sc-kNnbXp cGdAbt"
+                    href="https://goerli.etherscan.io/tx/0x206b55825e96adae5f9b0593035b018b74e882e8ac94651227ee08cabf1d04ea"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Tx: 0x20...04ea
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 90px;"
+            >
+              <div
+                class="sc-dEsUz hgyAqQ"
+              >
+                <div
+                  class="sc-OKtSx gXAUtK"
+                >
+                  <div
+                    class="sc-fecFrY hWIbWu"
+                  >
+                    <div>
+                      <div
+                        data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  ETH
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 80px;"
+            >
+              <div
+                class="sc-eItWsw ilNURY"
+              >
+                0.0001
+              </div>
+            </div>
+            <div
+              class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+              style="max-width: 88px;"
+            >
+              <div
+                class="sc-fIwssx kzYLLs"
+              >
+                Completed
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -324,22 +2785,2481 @@ exports[`Testing history page Test History Page 1`] = `
 exports[`Testing history page Test transaction resolver 1`] = `
 <DocumentFragment>
   <div
-    class="sc-dmovaM iZsvzA"
-  />
-  <div
-    class="sc-hIiahf hfPvZO"
-    style="margin-left: auto; margin-right: auto; padding: 20px;"
+    class="sc-dmovaM fJIbAT"
   >
-    <div>
-      <div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
         <div
-          data-src="noHistory.svg"
-          src=""
-        />
+          class="sc-emqRaN foEFRI"
+        >
+          10 Aug 2023 11:15 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.snowtrace.io/tx/0xaf0ee848eec86c1dfd78f90d516cc05091a7fc85601230a886b08b0ee8ed8852"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xaf...8852
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaAvax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://blockexplorer.testnet.avax.boba.network/tx/0xfcf1dc9ad39d6430b49b211e1fccccbfcdd3c7cf45aec49770f7789c339c580c"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xfc...580c
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            AVAX
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.0100
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
       </div>
     </div>
-    <div>
-      No Transactions Matching Filter.
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          10 Aug 2023 09:36 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.snowtrace.io/tx/0x0a5f2f1d77aaeb4795992eb0cf4a44c4073d14ae1df216baedd1e4d6b1ac6bd3"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x0a...6bd3
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaAvax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://blockexplorer.testnet.avax.boba.network/tx/0x5a6e65827640f2264e17c6a781ab8eeff4c99a393cb80e5824ac1eb27670a7d9"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x5a...a7d9
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            AVAX
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.1000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          10 Aug 2023 09:36 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0xc42be534ff9b7305ad2b6761a144ced848fe3383cc41891931b2e7571d9e9936"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xc4...9936
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0x9b1f95c2a32da9624cad48818523d65e392406d01fb1944ac79034f5511e9900"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x9b...9900
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          20.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          09 Aug 2023 02:29 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.snowtrace.io/tx/0x4ecd6f6855f9b86628a10a7c87219ff39391a87c5ffa58f49f1713a8d758893a"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x4e...893a
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaAvax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://blockexplorer.testnet.avax.boba.network/tx/0x8dcc76215d8e36323d0424b3da50e52624eebe26bb2fc16b748800cbe2d86f74"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x8d...6f74
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            AVAX
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.1000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          09 Aug 2023 09:37 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.snowtrace.io/tx/0xa6a6d71f93f933193c43e27cc8c8894b6a1f619083d20a19228995c1fed08530"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xa6...8530
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaAvax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://blockexplorer.testnet.avax.boba.network/tx/0xb2c8bd384a9158eabc75094321f01d9c54b47a4f1a822a3bb9c87d93da45c9c0"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xb2...c9c0
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            AVAX
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.1000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          08 Aug 2023 03:05 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xcfc49960c3926ff813eb060b7bdb01246c8eb9e9d71523db7daa5dc9b758c56d"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xcf...c56d
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <div
+              class="sc-ksXGtu bipGbl"
+            >
+              Tx: Pending
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            ETH
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.0100
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Pending
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          08 Aug 2023 02:59 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0x24967eb38ed526d8bcc6d42a40924f75328e9634dd7eab861879b714fd39a0e9"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x24...a0e9
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <div
+              class="sc-ksXGtu bipGbl"
+            >
+              Tx: Pending
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            ETH
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.0150
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Pending
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          12 Jul 2023 12:50 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.snowtrace.io/tx/0xeacd6df29cee2c387391d7f60dbf93f339bdcc49136f4eb5ddeed1811ead2f66"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xea...2f66
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaAvax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Fuji
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://blockexplorer.testnet.avax.boba.network/tx/0xa54e53f24ccd935daeaedb81138499f839f48f91ad64561561d3f146538fbc42"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xa5...bc42
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/avax.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            AVAX
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.5000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          11 Jul 2023 04:27 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0xff7923d5f7738b491c1362165ba7c7a6eb665ce0ba142478bd1f9dfd33c81468"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xff...1468
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xf1421f4f8cc3a5b9a36068d4d19dfe55624672066b427eec6de04d3766e977f5"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xf1...77f5
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          20.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          11 Jul 2023 03:31 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0x30c27ee667cd51a2ad4df0f26c707c84404ea124e6fe2dda238afbcdb9bdf98e"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x30...f98e
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xc4e42fb83f4bfb876404f29527b2c9906840406fd8f669070cecbb31eb8d011c"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xc4...011c
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            ETH
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.0300
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          10 Jul 2023 06:31 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0x54b9f38f649f85d4857aa73c278ec531b14790e6f8206326b19978b568a632fb"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x54...32fb
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0x7237046849fedbfa5cca30eb6ce4454302a2e37531ab9af44ed6a0d587cb1124"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x72...1124
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          13.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          10 Jul 2023 06:05 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0x6d7c3b2c833bf55a4c6fd1e4ae0611f49a8e1471fa9aa12928bf177ba0bc3172"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x6d...3172
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0x96d8de3ff0a1ddde0cd4562b9906fe2b780489984c6c3cfb5127f899b4bb8ff3"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x96...8ff3
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          20.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          07 Jul 2023 06:47 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xa681b7ebeb778c676d375b2cd8cf9b61f61a2a5b04953d9cc1730f989f9f146e"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xa6...146e
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0x1f21a5b056f06d645d33d268e24cd4ba6525f310c95150b51e41598a5223aba4"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x1f...aba4
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          15.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          07 Jul 2023 12:25 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xbd32053a927efbd907f2dfe0a28af9f6af487b6d79d118a83ac8fe3408f97c47"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xbd...7c47
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0xf1e7b97e267eba6e8fc8ab063e50d720a310c23598dab3d2cb09734f9435213a"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xf1...213a
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          20.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          06 Jul 2023 07:29 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xedef20eecda1be0ef60c7a99ede5ad46e89ba7708e908eb652261a8aa11603df"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xed...03df
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0x8ff4ef323cb1b208133896369f1637a7c457d55f089a3570194371c0697ede8b"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x8f...de8b
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          30.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          05 Jul 2023 08:11 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0xc590cb9dd4b18d07f9b510b1f665ce0fc173860abe2f3d30fdbe70fb3145e333"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xc5...e333
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0xcce24215c94ff680320207d12f3beaf2c23cd5ca3260f577b24f1a8c8d581810"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xcc...1810
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            ETH
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.0001
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          05 Jul 2023 07:24 PM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0x6c3c97931034f330c8873d1ea20d1b26b4f430e8da8e76ef65c9a1ce69a86481"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x6c...6481
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0xccf6ea1f7896e13897bca15616ebb821e3afdf6a5a5274624c474e98e290360c"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0xcc...360c
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <img
+              alt="boba network"
+              class="sc-bhlPkD ilvQFE"
+              src="Boba_Logo_White_Circle.png"
+            />
+          </div>
+          <div>
+            BOBA
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          20.0000
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-kFDfur cHHVkv"
+    >
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 168px;"
+      >
+        <div
+          class="sc-emqRaN foEFRI"
+        >
+          04 Jul 2023 02:05 AM
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="bobaEth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Boba Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://testnet.bobascan.com/tx/0x560759950bea44486efa9af0e4e0e73e92bc2727031be24086422220a0810762"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x56...0762
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 142px;"
+      >
+        <div
+          class="sc-dSbvwS iXkFNY"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="ethereum.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-eSdRwT iyiMCi"
+          >
+            <div
+              class="sc-jNkFXo iinsvq"
+            >
+              Goerli
+            </div>
+            <a
+              class="sc-kNnbXp cGdAbt"
+              href="https://goerli.etherscan.io/tx/0x206b55825e96adae5f9b0593035b018b74e882e8ac94651227ee08cabf1d04ea"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Tx: 0x20...04ea
+            </a>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 90px;"
+      >
+        <div
+          class="sc-dEsUz hgyAqQ"
+        >
+          <div
+            class="sc-OKtSx gXAUtK"
+          >
+            <div
+              class="sc-fecFrY hWIbWu"
+            >
+              <div>
+                <div
+                  data-src="https://raw.githubusercontent.com/bobanetwork/token-list/main/assets/eth.svg"
+                  src=""
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            ETH
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 80px;"
+      >
+        <div
+          class="sc-eItWsw ilNURY"
+        >
+          0.0001
+        </div>
+      </div>
+      <div
+        class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur cHHVkv"
+        style="max-width: 88px;"
+      >
+        <div
+          class="sc-fIwssx kzYLLs"
+        >
+          Completed
+        </div>
+      </div>
     </div>
   </div>
 </DocumentFragment>
