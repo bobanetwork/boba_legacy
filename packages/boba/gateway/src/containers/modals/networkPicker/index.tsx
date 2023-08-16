@@ -39,6 +39,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
   const l2Icon = L2_ICONS as Record<string, ElementType>
 
   const onChainChange = (chainDetail: any) => {
+    console.log(chainDetail)
     dispatch(
       setNetwork({
         network: chainDetail.chain,
