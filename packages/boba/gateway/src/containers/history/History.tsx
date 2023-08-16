@@ -167,7 +167,7 @@ const History = () => {
                 Date Range From
               </DateDescriptions>
               {getDatePicker('From')}
-              <DateDescriptions variant="body3">To</DateDescriptions>
+              <DateDescriptions variant="body2">To</DateDescriptions>
               {getDatePicker('To')}
             </DatePickerWrapper>
             <MobileDatePickerWrapper>
