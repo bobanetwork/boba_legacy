@@ -71,8 +71,17 @@ export const FilterDropDown: React.FC<IFilterDropdownProps> = ({
   }, [dropdownRef])
 
   return (
-    <DropdownContainer className={`dropdown ${className}`} ref={dropdownRef}>
-      <Header onClick={handleDropdown} error={error} isOpen={isOpen}>
+    <DropdownContainer
+      className={`dropdown ${className}`}
+      ref={dropdownRef}
+      data-testid={'status_filter_dropdown'}
+    >
+      <Header
+        onClick={handleDropdown}
+        error={error}
+        isOpen={isOpen}
+        data-testid={'status_filter_dropdown_header'}
+      >
         {imgSrc && (
           <IconContainer>
             {imgSrc !== 'default' && <Icon src={imgSrc} />}

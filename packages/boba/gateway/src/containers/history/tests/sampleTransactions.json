@@ -1,5 +1,125 @@
 [
   {
+    "hash": "0xcfc49960c3926ff813eb060b7bdb01246c8eb9e9d71523db7daa5dc9b758c56d",
+    "blockNumber": 40819,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xF39fC83ccd7D01c3F276Ab35d1F80bdB34F40c89",
+    "timeStamp": 1691499909,
+    "exitL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 0,
+      "crossDomainMessageSendTime": 1691500512,
+      "crossDomainMessageEstimateFinalizedTime": 1692105312,
+      "fast": null,
+      "l1Hash": null,
+      "l1BlockNumber": null,
+      "l1BlockHash": null,
+      "l1From": null,
+      "l1To": null
+    },
+    "stateRoot": {
+      "stateRootHash": "0xf68f42a5d3ef9fe93300f0519b1f2fcf5b5824641dea19a3685084954b6fc596",
+      "stateRootBlockNumber": 9483184,
+      "stateRootBlockHash": "0xf2caae70048cb56bebf8d3e6bb4c4dff7965d49fd83fbca7394e1e766c860bae",
+      "stateRootBlockTimeStamp": 1691500512
+    },
+    "action": {
+      "sender": "0xF39fC83ccd7D01c3F276Ab35d1F80bdB34F40c89",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x4200000000000000000000000000000000000006",
+      "amount": "10000000000000000",
+      "receive": "10000000000000000",
+      "feeRate": "0",
+      "fast": null,
+      "status": "pending"
+    },
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
+  },
+  {
+    "hash": "0x24967eb38ed526d8bcc6d42a40924f75328e9634dd7eab861879b714fd39a0e9",
+    "blockNumber": 40817,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xF39fC83ccd7D01c3F276Ab35d1F80bdB34F40c89",
+    "timeStamp": 1691499540,
+    "exitL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 0,
+      "crossDomainMessageSendTime": 1691499852,
+      "crossDomainMessageEstimateFinalizedTime": 1692104652,
+      "fast": null,
+      "l1Hash": null,
+      "l1BlockNumber": null,
+      "l1BlockHash": null,
+      "l1From": null,
+      "l1To": null
+    },
+    "stateRoot": {
+      "stateRootHash": "0x4a97e474cd1e3c0460ed7bd2055374c0c71ee3d0fb84eba3621665b7b653b1d3",
+      "stateRootBlockNumber": 9483135,
+      "stateRootBlockHash": "0xf81795ce9187e2f8012c954609f355fb34e3c9707f518d044c80ccd9c0e81b48",
+      "stateRootBlockTimeStamp": 1691499852
+    },
+    "action": {
+      "sender": "0xF39fC83ccd7D01c3F276Ab35d1F80bdB34F40c89",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x4200000000000000000000000000000000000006",
+      "amount": "15000000000000000",
+      "receive": "15000000000000000",
+      "feeRate": "0",
+      "fast": null,
+      "status": "pending"
+    },
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
+  },
+  {
+    "hash": "0x71a84bb0ffaf8b294a3d8a34e93759d9bc057a577504c580011aa625ea41b23d",
+    "blockNumber": 40816,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0x4200000000000000000000000000000000000023",
+    "timeStamp": 1691499530,
+    "exitL2": false,
+    "crossDomainMessage": {
+      "crossDomainMessage": 0,
+      "crossDomainMessageFinalize": 0,
+      "crossDomainMessageSendTime": null,
+      "crossDomainMessageEstimateFinalizedTime": null,
+      "fast": null,
+      "l1Hash": null,
+      "l1BlockNumber": null,
+      "l1BlockHash": null,
+      "l1From": null,
+      "l1To": null
+    },
+    "stateRoot": {
+      "stateRootHash": "0x4a97e474cd1e3c0460ed7bd2055374c0c71ee3d0fb84eba3621665b7b653b1d3",
+      "stateRootBlockNumber": 9483135,
+      "stateRootBlockHash": "0xf81795ce9187e2f8012c954609f355fb34e3c9707f518d044c80ccd9c0e81b48",
+      "stateRootBlockTimeStamp": 1691499852
+    },
+    "action": {
+      "sender": null,
+      "to": null,
+      "token": null,
+      "amount": null,
+      "receive": null,
+      "feeRate": null,
+      "fast": null,
+      "status": null
+    },
+    "layer": "L2",
+    "chainName": "BOBA Goerli L2",
+    "originChainId": 2888,
+    "destinationChainId": 5
+  },
+  {
     "hash": "0x54b9f38f649f85d4857aa73c278ec531b14790e6f8206326b19978b568a632fb",
     "blockNumber": 40299,
     "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
@@ -37,8 +157,7 @@
     "layer": "L2",
     "chainName": "BOBA Goerli L2",
     "originChainId": 2888,
-    "destinationChainId": 5,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 5
   },
   {
     "hash": "0x21fa90ccb09937d5dbbeca5945c79b0a744597dd6bededfcbe98474bc7079175",
@@ -278,8 +397,7 @@
     "layer": "L2",
     "chainName": "BOBA Goerli L2",
     "originChainId": 2888,
-    "destinationChainId": 5,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 5
   },
   {
     "hash": "0xc02413fa53c4012541193bf1df9e997108462a84d7ffd41d8b354141ddc1ad4b",
@@ -519,8 +637,7 @@
     "layer": "L2",
     "chainName": "BOBA Goerli L2",
     "originChainId": 2888,
-    "destinationChainId": 5,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 5
   },
   {
     "hash": "0x97d1976242be4a4b0ba2680267ceecfff42036b6d5be0e7301b284ba97fc3200",
@@ -600,8 +717,7 @@
     "layer": "L2",
     "chainName": "BOBA Goerli L2",
     "originChainId": 2888,
-    "destinationChainId": 5,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 5
   },
   {
     "hash": "0x31b67a9e8c7ca0a355a10c3f5ae8f311bce66ee9507efca22f22856426f441e2",
@@ -721,8 +837,7 @@
     "layer": "L2",
     "chainName": "BOBA Goerli L2",
     "originChainId": 2888,
-    "destinationChainId": 5,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 5
   },
   {
     "hash": "0x6afb17e32dc1dadd9585c434cb652376a43deb5dd421ae67e568f1d1695ff917",
@@ -842,8 +957,7 @@
     "layer": "L2",
     "chainName": "BOBA Goerli L2",
     "originChainId": 2888,
-    "destinationChainId": 5,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 5
   },
   {
     "hash": "0x0c8288b8b620b3b0c5394ed2a12d9c1bd9a8c7e474ed46c5cca1de1cc4d66d13",
@@ -886,6 +1000,43 @@
     "destinationChainId": 5
   },
   {
+    "hash": "0xc42be534ff9b7305ad2b6761a144ced848fe3383cc41891931b2e7571d9e9936",
+    "blockNumber": 9493057,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "timeStamp": 1691652972,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0xDBD71249Fe60c9f9bF581b3594734E295EAfA9b2",
+    "activity": "ERC20DepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1691652972,
+      "crossDomainMessageEstimateFinalizedTime": 1691653092,
+      "fast": 0,
+      "l2Hash": "0x9b1f95c2a32da9624cad48818523d65e392406d01fb1944ac79034f5511e9900",
+      "l2BlockNumber": 40853,
+      "l2BlockHash": "0xb1da548ea2358f353e78f8a65760d709881baf1d10c4c23b73588a29c61f306b",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0xeCCD355862591CBB4bB7E7dD55072070ee3d0fC1",
+      "amount": "20000000000000000000",
+      "receive": "20000000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Goerli",
+    "originChainId": 5,
+    "destinationChainId": 2888
+  },
+  {
     "hash": "0xff7923d5f7738b491c1362165ba7c7a6eb665ce0ba142478bd1f9dfd33c81468",
     "blockNumber": 9328236,
     "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
@@ -920,8 +1071,7 @@
     "layer": "L1pending",
     "chainName": "Goerli",
     "originChainId": 5,
-    "destinationChainId": 2888,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 2888
   },
   {
     "hash": "0x30c27ee667cd51a2ad4df0f26c707c84404ea124e6fe2dda238afbcdb9bdf98e",
@@ -958,8 +1108,7 @@
     "layer": "L1pending",
     "chainName": "Goerli",
     "originChainId": 5,
-    "destinationChainId": 2888,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 2888
   },
   {
     "hash": "0x6d7c3b2c833bf55a4c6fd1e4ae0611f49a8e1471fa9aa12928bf177ba0bc3172",
@@ -996,8 +1145,7 @@
     "layer": "L1pending",
     "chainName": "Goerli",
     "originChainId": 5,
-    "destinationChainId": 2888,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 2888
   },
   {
     "hash": "0xc590cb9dd4b18d07f9b510b1f665ce0fc173860abe2f3d30fdbe70fb3145e333",
@@ -1034,7 +1182,191 @@
     "layer": "L1pending",
     "chainName": "Goerli",
     "originChainId": 5,
-    "destinationChainId": 2888,
-    "UserFacingStatus": "Completed"
+    "destinationChainId": 2888
+  },
+  {
+    "hash": "0xaf0ee848eec86c1dfd78f90d516cc05091a7fc85601230a886b08b0ee8ed8852",
+    "blockNumber": 24899253,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "timeStamp": 1691658908,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "activity": "NativeTokenDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1691658908,
+      "crossDomainMessageEstimateFinalizedTime": 1691659028,
+      "fast": 0,
+      "l2Hash": "0xfcf1dc9ad39d6430b49b211e1fccccbfcdd3c7cf45aec49770f7789c339c580c",
+      "l2BlockNumber": 3166,
+      "l2BlockHash": "0x79912af359db54a10dd5eec79c96f9c7881d68925c3b8da3f19b46c2cee0ccc0",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "10000000000000000",
+      "receive": "10000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Avalanche Testnet",
+    "originChainId": 43113,
+    "destinationChainId": 4328
+  },
+  {
+    "hash": "0x0a5f2f1d77aaeb4795992eb0cf4a44c4073d14ae1df216baedd1e4d6b1ac6bd3",
+    "blockNumber": 24896970,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "timeStamp": 1691652999,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "activity": "NativeTokenDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1691652999,
+      "crossDomainMessageEstimateFinalizedTime": 1691653119,
+      "fast": 0,
+      "l2Hash": "0x5a6e65827640f2264e17c6a781ab8eeff4c99a393cb80e5824ac1eb27670a7d9",
+      "l2BlockNumber": 3165,
+      "l2BlockHash": "0x402ffc4cad06b1cc7d63acd8fc93f290d73063d1647d6266ec115a3151ec4eb8",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "100000000000000000",
+      "receive": "100000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Avalanche Testnet",
+    "originChainId": 43113,
+    "destinationChainId": 4328
+  },
+  {
+    "hash": "0x4ecd6f6855f9b86628a10a7c87219ff39391a87c5ffa58f49f1713a8d758893a",
+    "blockNumber": 24875273,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "timeStamp": 1691584178,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "activity": "NativeTokenDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1691584178,
+      "crossDomainMessageEstimateFinalizedTime": 1691584298,
+      "fast": 0,
+      "l2Hash": "0x8dcc76215d8e36323d0424b3da50e52624eebe26bb2fc16b748800cbe2d86f74",
+      "l2BlockNumber": 3164,
+      "l2BlockHash": "0xd386ec667d0cf73bde68e33d8619499b0c59fed76ad7fb7013d205cf652b0c10",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "100000000000000000",
+      "receive": "100000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Avalanche Testnet",
+    "originChainId": 43113,
+    "destinationChainId": 4328
+  },
+  {
+    "hash": "0xa6a6d71f93f933193c43e27cc8c8894b6a1f619083d20a19228995c1fed08530",
+    "blockNumber": 24869548,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "timeStamp": 1691566634,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "activity": "NativeTokenDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1691566634,
+      "crossDomainMessageEstimateFinalizedTime": 1691566754,
+      "fast": 0,
+      "l2Hash": "0xb2c8bd384a9158eabc75094321f01d9c54b47a4f1a822a3bb9c87d93da45c9c0",
+      "l2BlockNumber": 3163,
+      "l2BlockHash": "0x362edb2bb928a3e52660b02a57c315699a9af10e1043d3803798a219b5e16f59",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "100000000000000000",
+      "receive": "100000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Avalanche Testnet",
+    "originChainId": 43113,
+    "destinationChainId": 4328
+  },
+  {
+    "hash": "0xeacd6df29cee2c387391d7f60dbf93f339bdcc49136f4eb5ddeed1811ead2f66",
+    "blockNumber": 24058596,
+    "from": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+    "to": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "timeStamp": 1689115823,
+    "contractName": "L1StandardBridge",
+    "contractAddress": "0x07B606934b5B5D6A9E1f8b78A0B26215FF58Ad56",
+    "activity": "NativeTokenDepositInitiated",
+    "depositL2": true,
+    "crossDomainMessage": {
+      "crossDomainMessage": 1,
+      "crossDomainMessageFinalize": 1,
+      "crossDomainMessageSendTime": 1689115823,
+      "crossDomainMessageEstimateFinalizedTime": 1689115943,
+      "fast": 0,
+      "l2Hash": "0xa54e53f24ccd935daeaedb81138499f839f48f91ad64561561d3f146538fbc42",
+      "l2BlockNumber": 3162,
+      "l2BlockHash": "0xf3a989136686394530dd87b3e3347ff054c9765f1b378b8c713acc996f92affe",
+      "l2From": "0x0000000000000000000000000000000000000000",
+      "l2To": "0x4200000000000000000000000000000000000007"
+    },
+    "action": {
+      "sender": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "to": "0x1e2855A0EA33d5f293E5Ba2018874FAB9a7F05B3",
+      "token": "0x0000000000000000000000000000000000000000",
+      "amount": "500000000000000000",
+      "receive": "500000000000000000",
+      "feeRate": "0",
+      "fast": 0,
+      "status": "succeeded"
+    },
+    "layer": "L1pending",
+    "chainName": "Avalanche Testnet",
+    "originChainId": 43113,
+    "destinationChainId": 4328
   }
 ]

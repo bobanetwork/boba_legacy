@@ -127,7 +127,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
               {selectedItem.imgSrc === 'default' && <DefaultIcon />}
             </IconContainer>
           )}
-          <div>{selectedItem.label}</div>
+          {selectedItem.label}
 
           <Arrow src={ArrowDown} className={`dropdown ${className}`} />
         </Option>

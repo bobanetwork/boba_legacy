@@ -17,6 +17,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { isEqual } from 'util/lodash'
 import { ValidValuesFromArray } from 'util/objectManipulation'
+import { addDays, subMilliseconds } from 'date-fns'
 
 import { useTheme } from 'styled-components'
 
@@ -103,11 +104,14 @@ const History = () => {
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
 
+  const extendEndDate = (endDate: Date) => {
+    return subMilliseconds(addDays(endDate, 1), 1)
+  }
+
   const [searchHistory, setSearchHistory] = useState('')
 
   const transactions = useSelector(selectTransactions, isEqual)
 
-  // TODO: not working as implementation needs be rewrite.
   const getDatePicker = (label: string, range: boolean = false) => {
     const dateSelector = (date: Date) => {
       label === 'To' ? setFilterEndDate(date) : setFilterStartDate(date)
@@ -191,7 +195,7 @@ const History = () => {
                   width: '100%',
                 }}
               >
-                <NetworkDropdowns>
+                <NetworkDropdowns data-testid={'network-dropdowns'}>
                   <Typography variant="body2">From</Typography>
                   <DropdownNetwork
                     items={switched ? NETWORK_L2_OPTIONS : NETWORK_L1_OPTIONS}
@@ -204,6 +208,7 @@ const History = () => {
                     onClick={() => {
                       handleSwitchDropdowns()
                     }}
+                    data-testid={'switch-icon'}
                   >
                     <SwitchIcon />
                   </SwitchChainIcon>
@@ -227,7 +232,7 @@ const History = () => {
                 />
               </TableFilters>
             </div>
-            <TableTransactionsContainer>
+            <TableTransactionsContainer data-testid={'transactions-table'}>
               <TransactionsTableHeader
                 options={TableOptions}
               ></TransactionsTableHeader>
@@ -240,7 +245,7 @@ const History = () => {
                     status: transactionStatus as TRANSACTION_FILTER_STATUS,
                     targetHash: searchHistory,
                     startDate: filterStartDate,
-                    endDate: filterEndDate,
+                    endDate: extendEndDate(filterEndDate),
                   }}
                 ></TransactionsResolver>
               )}

@@ -45,11 +45,9 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const [currentTransactions, setCurrentTransactions] = useState<
     ITransaction[]
   >([])
-
   useEffect(() => {
     setCurrentTransactions(transactions)
   }, [transactions])
-
   const orderedTransactions = orderBy(
     currentTransactions,
     (i) => i.timeStamp,
