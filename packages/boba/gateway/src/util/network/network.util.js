@@ -110,7 +110,7 @@ export const NetworkList = {
       key: 'ethereum',
       name: {
         l1: 'Ethereum',
-        l2: 'Boba'
+        l2: 'Boba ETH'
       }
     },
     {
@@ -142,7 +142,7 @@ export const NetworkList = {
       key: 'ethereum',
       name: {
         l1: 'Ethereum (Goerli)',
-        l2: 'Boba',
+        l2: 'Boba (Goerli)',
       }
     },
     {

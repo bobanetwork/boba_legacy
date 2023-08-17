@@ -120,6 +120,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                   return true
                 })
                 .map((token: any) => {
+                  console.log([token.symbol, token.address, token])
                   const amount = formatTokenAmount(token)
 
                   if (isMyToken && Number(amount) <= 0) {
@@ -160,7 +161,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                         {token.symbol}
                         <TokenBalance>{amount}</TokenBalance>
                       </TokenLabel>
-                      <Tooltip title="Add token to metamask">
+                      <Tooltip title="Add token to wallet">
                         <PlusIcon
                           onClick={(e) => {
                             e.stopPropagation()
