@@ -44,6 +44,8 @@ const Chains = (props: Props) => {
     dispatch(openModal('networkPicker', null, null, null, null, null, sLayer))
   }
 
+  console.log(['networkNames', networkNames])
+
   const L1ChainInfo = () => {
     return (
       <>
