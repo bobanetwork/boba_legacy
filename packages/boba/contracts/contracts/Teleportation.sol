@@ -336,8 +336,8 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
             } else {
                 // slither-disable-next-line calls-loop,reentrancy-events
                 IERC20(_token).safeTransfer(_addr, _amount);
+                emit DisbursementSuccess(_depositId, _addr, _token, _amount, _sourceChainId);
             }
-            emit DisbursementSuccess(_depositId, _addr, _token, _amount, _sourceChainId);
         }
     }
 
