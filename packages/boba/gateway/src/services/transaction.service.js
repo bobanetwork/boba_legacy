@@ -164,13 +164,14 @@ class TransactionService {
       const txReceipt = await sendEvent.getTransactionReceipt()
       const block = await sendEvent.getBlock()
       let crossDomainMessageFinalize
+
       if (disburseEvent) {
         crossDomainMessageFinalize = (await disburseEvent.getBlock()).timestamp
       }
 
       const crossDomainMessage = {
         crossDomainMessage: disburseEvent?.args?.depositId,
-        crossDomainMessageEstimateFinalizedTime: block.timestamp, // TODO
+        crossDomainMessageEstimateFinalizedTime: crossDomainMessageFinalize ?? (block.timestamp + 180), // should never take longer than a few minutes
         crossDomainMessageFinalize,
         crossDomainMessageSendTime: block.timestamp,
       }
@@ -183,7 +184,7 @@ class TransactionService {
       const action = {
         amount: sendEvent.args.amount?.toString(),
         sender: sendEvent.args.emitter,
-        status, // TODO: Search disburse tx
+        status,
         to: sendEvent.args.emitter,
         token: sendEvent.args.token,
       }
@@ -196,7 +197,7 @@ class TransactionService {
         chainName: networkConfig.L1.name,
         originChainId: sendEvent.args.sourceChainId,
         destinationChainId: sendEvent.args.toChainId,
-        UserFacingStatus: TRANSACTION_STATUS.Pending, // TODO: Search disburse tx
+        UserFacingStatus: status,
         contractAddress: sendEvent.address,
         hash: sendEvent.transactionHash,
         crossDomainMessage,
@@ -210,12 +211,12 @@ class TransactionService {
 
     const getEventsForContract = async (contract) => {
       if (contract) {
-        const currBlockNumber = await contract.provider.getBlockNumber() // TODO
-        const assetSent = contract.filters.AssetReceived() // todo: null, null, null, null, null/*networkService.account*/, null)
-        const assetReceived = contract.filters.DisbursementSuccess()
+        const currBlockNumber = await contract.provider.getBlockNumber()
+        const assetSent = contract.filters.AssetReceived(null, null, null, null, networkService.account, null)
+        const assetReceived = contract.filters.DisbursementSuccess(null, networkService.account, null, null, null)
         let sentEvents = []
         try {
-          sentEvents = await contract.queryFilter(assetSent, currBlockNumber - 500) // TODO
+          sentEvents = await contract.queryFilter(assetSent, currBlockNumber - 500) // TODO --> use external service, e.g. GraphQL
         } catch (err) {
           console.error(err)
         }
@@ -228,7 +229,8 @@ class TransactionService {
 
         return await Promise.all(sentEvents.map(async sentEvent => {
           const receiveEvent = receiveEvents.find(re => re.args.sourceChainId === sentEvent.args.toChainId
-            && re.args.amount === sentEvent.args.amount && re.args.to === sentEvent.args.emitter) // TODO: Add time constraint
+            && re.args.amount.toString() === sentEvent.args.amount.toString() && re.args.to === sentEvent.args.emitter
+          && sentEvent.args.depositId.toString() === re.args.depositId.toString())
           return await mapEventToTransaction(sentEvent, receiveEvent)
         }))
       } else {
@@ -274,6 +276,6 @@ class TransactionService {
   }
 }
 
-const transctionService = new TransactionService()
+const transactionService = new TransactionService()
 
-export default transctionService
+export default transactionService
