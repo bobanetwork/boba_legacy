@@ -403,12 +403,14 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
     {
         if (address(0) == _token) {
             uint256 _balance = address(this).balance;
+            require(_balance > 0, "Nothing to send");
             (bool sent,) = owner.call{gas: 2300, value: _balance}("");
             require(sent, "Failed to send Ether");
             emit AssetBalanceWithdrawn(_token, owner, _balance);
         } else {
             // no supportedToken check in case of generally lost tokens
             uint256 _balance = IERC20(_token).balanceOf(address(this));
+            require(_balance > 0, "Nothing to send");
             IERC20(_token).safeTransfer(owner, _balance);
             emit AssetBalanceWithdrawn(_token, owner, _balance);
         }
