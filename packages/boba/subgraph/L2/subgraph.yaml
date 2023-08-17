@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 description: L2 Bridges
 repository: https://github.com/omgnetwork/optimism
 schema:
@@ -162,6 +162,32 @@ dataSources:
         - event: TuringHelperDeployed(indexed address,address,uint256)
           handler: handleTuringHelperDeployed
       file: ./src/TuringHelperFactoryMapping.ts
+
+  - kind: ethereum/contract
+    name: Teleportation
+    network: boba
+    source:
+      address: '0xB43EE846Aa266228FeABaD1191D6cB2eD9808894'
+      abi: Teleportation
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Teleportation
+      abis:
+        - name: Teleportation
+          file: ./abis/Teleportation.json
+      eventHandlers:
+        - event: AssetReceived(address,uint32,indexed uint32,indexed uint256,indexed address,uint256)
+          handler: handleTeleportationAssetReceived
+        - event: DisbursementSuccess(indexed uint256,indexed address,indexed address,uint256,uint32)
+          handler: handleTeleportationDisbursementSuccess
+        - event: DisbursementFailed(indexed uint256,indexed address,uint256,uint32)
+          handler: handleTeleportationDisbursementFailed
+        - event: DisbursementRetrySuccess(indexed uint256,indexed address,uint256,uint32)
+          handler: handleTeleportationDisbursementRetrySuccess
+      file: ./src/TeleportationMapping.ts
 
 
 

@@ -179,3 +179,38 @@ type TuringMonstersTransferEvent @entity {
   to: Bytes
   tokenId: String
 }
+
+type TeleportationAssetReceivedEvent @entity {
+  id: ID!
+  token: Bytes
+  sourceChainId: String
+  toChainId: String
+  depositId: String
+  emitter: Bytes
+  amount: String
+}
+
+type TeleportationDisbursementSuccessEvent @entity {
+  id: ID!
+  depositId: String
+  to: Bytes
+  token: Bytes
+  amount: String
+  sourceChainId: String
+}
+
+type TeleportationDisbursementFailedEvent @entity {
+  id: ID!
+  depositId: String
+  to: Bytes
+  amount: String
+  sourceChainId: String
+}
+
+type TeleportationDisbursementRetrySuccessEvent @entity {
+  id: ID!
+  depositId: String
+  to: Bytes
+  amount: String
+  sourceChainId: String
+}
