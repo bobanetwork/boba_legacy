@@ -144,7 +144,7 @@ export const NETWORK_L2_OPTIONS = [
   ALL_NETWORKS,
   {
     value: '288',
-    label: 'Boba Ethereum',
+    label: 'Boba ETH',
     imgSrc: bobaEth,
     headerName: NETWORK_TYPE.MAINNET,
   },

@@ -23,7 +23,7 @@ export enum CHAIN_NAME {
   BNB = 'BNB',
   Boba_BNB = 'Boba BNB',
   Ethereum = 'Ethereum',
-  Boba_Ethereum = 'Boba Ethereum',
+  Boba_Ethereum = 'Boba ETH',
   Goerli = 'Goerli',
   Boba_Goerli = 'Boba Goerli',
   Avalanche = 'Avax',
