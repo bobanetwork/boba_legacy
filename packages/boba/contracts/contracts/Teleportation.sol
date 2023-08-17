@@ -263,12 +263,12 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         }
 
         supportedTokens[_token][_toChainId] = supToken;
+        totalDeposits[_toChainId] += 1;
         if (_token != address(0)) {
             IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
-        emit AssetReceived(_token, uint32(block.chainid), _toChainId, totalDeposits[_toChainId], msg.sender, _amount);
-        totalDeposits[_toChainId] += 1;
+        emit AssetReceived(_token, uint32(block.chainid), _toChainId, totalDeposits[_toChainId] - 1, msg.sender, _amount);
     }
 
     /**
