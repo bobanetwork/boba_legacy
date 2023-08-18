@@ -188,6 +188,9 @@ type TeleportationAssetReceivedEvent @entity {
   depositId: String
   emitter: Bytes
   amount: String
+  txHash: Bytes
+  blockNumber: String
+  blockTimestamp: String
 }
 
 type TeleportationDisbursementSuccessEvent @entity {
@@ -197,6 +200,9 @@ type TeleportationDisbursementSuccessEvent @entity {
   token: Bytes
   amount: String
   sourceChainId: String
+  txHash: Bytes
+  blockNumber: String
+  blockTimestamp: String
 }
 
 type TeleportationDisbursementFailedEvent @entity {
@@ -205,6 +211,9 @@ type TeleportationDisbursementFailedEvent @entity {
   to: Bytes
   amount: String
   sourceChainId: String
+  txHash: Bytes
+  blockNumber: String
+  blockTimestamp: String
 }
 
 type TeleportationDisbursementRetrySuccessEvent @entity {
@@ -213,4 +222,7 @@ type TeleportationDisbursementRetrySuccessEvent @entity {
   to: Bytes
   amount: String
   sourceChainId: String
+  txHash: Bytes
+  blockNumber: String
+  blockTimestamp: String
 }

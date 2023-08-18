@@ -80,7 +80,7 @@ import coinGeckoAxiosInstance from 'api/coinGeckoAxios'
 import metaTransactionAxiosInstance from 'api/metaTransactionAxios'
 
 import {sortRawTokens} from 'util/common'
-import GraphQLService from "./graphql.service"
+import { graphQLService } from "./graphql.service"
 
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
@@ -2418,6 +2418,8 @@ class NetworkService {
     }
     if (!teleportationAddr) return;
 
+    console.log("Teleportation supported: ::::", rpc)
+
     return this.Teleportation
       .attach(teleportationAddr)
       .connect(provider);
@@ -3394,7 +3396,7 @@ class NetworkService {
       /// @notice An event emitted when a new proposal is create
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
-      const descriptionList = await GraphQLService.queryBridgeProposalCreated()
+      const descriptionList = await graphQLService.queryBridgeProposalCreated()
       const proposalGroup = groupBy(descriptionList.data.governorProposalCreateds, 'to');
       const delegatorList = [this.addresses.GovernorBravoDelegator, this.addresses.GovernorBravoDelegatorV2];
 
@@ -4498,7 +4500,7 @@ class NetworkService {
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
 
-      let descriptionList = await GraphQLService.queryBridgeProposalCreated()
+      let descriptionList = await graphQLService.queryBridgeProposalCreated()
 
       for (let i = 0; i < totalProposals; i++) {
         const proposalRaw = descriptionList.data.governorProposalCreateds[i]

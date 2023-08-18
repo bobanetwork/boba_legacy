@@ -1,5 +1,6 @@
 import { AssetReceived, DisbursementSuccess, DisbursementFailed, DisbursementRetrySuccess } from '../generated/Teleportation/Teleportation'
 import { TeleportationAssetReceivedEvent, TeleportationDisbursementSuccessEvent, TeleportationDisbursementFailedEvent, TeleportationDisbursementRetrySuccessEvent } from '../generated/schema'
+import {ethereum} from "@graphprotocol/graph-ts";
 
 export function handleTeleportationAssetReceived(event: AssetReceived): void {
   let id = `${event.transaction.hash.toHex()}_${event.params.depositId.toString()}`
@@ -11,6 +12,9 @@ export function handleTeleportationAssetReceived(event: AssetReceived): void {
   eventObj.depositId = event.params.depositId.toString()
   eventObj.emitter = event.params.emitter
   eventObj.amount = event.params.amount.toString()
+  eventObj.txHash = event.transaction.hash
+  eventObj.blockNumber = event.block.number.toString()
+  eventObj.blockTimestamp = event.block.timestamp.toString()
   eventObj.save()
 }
 
@@ -23,6 +27,9 @@ export function handleTeleportationDisbursementSuccess(event: DisbursementSucces
   eventObj.token = event.params.token
   eventObj.amount = event.params.amount.toString()
   eventObj.sourceChainId = event.params.sourceChainId.toString()
+  eventObj.txHash = event.transaction.hash
+  eventObj.blockNumber = event.block.number.toString()
+  eventObj.blockTimestamp = event.block.timestamp.toString()
   eventObj.save()
 }
 
@@ -34,6 +41,9 @@ export function handleTeleportationDisbursementFailed(event: DisbursementFailed)
   eventObj.to = event.params.to
   eventObj.amount = event.params.amount.toString()
   eventObj.sourceChainId = event.params.sourceChainId.toString()
+  eventObj.txHash = event.transaction.hash
+  eventObj.blockNumber = event.block.number.toString()
+  eventObj.blockTimestamp = event.block.timestamp.toString()
   eventObj.save()
 }
 
@@ -45,6 +55,9 @@ export function handleTeleportationDisbursementRetrySuccess(event: DisbursementR
   eventObj.to = event.params.to
   eventObj.amount = event.params.amount.toString()
   eventObj.sourceChainId = event.params.sourceChainId.toString()
+  eventObj.txHash = event.transaction.hash
+  eventObj.blockNumber = event.block.number.toString()
+  eventObj.blockTimestamp = event.block.timestamp.toString()
   eventObj.save()
 }
 

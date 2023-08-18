@@ -1,0 +1,26 @@
+{
+  "network": "boba",
+  "contracts": {
+    "L2LiquidityPool": {
+      "address": "0x8d3866a79aA780BA3DC1a300a1567635F3754a0e"
+    },
+    "OVM_L2StandardBridge": {
+      "address": "0x4200000000000000000000000000000000000010"
+    },
+    "GovernorBravoDelegate": {
+      "address": "0x472e5C097C790c6a44366a89a987Ec996A4d83e0"
+    },
+    "Boba_GasPriceOracle": {
+      "address": "0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b"
+    },
+    "TuringHelperFactory": {
+      "address": "0x58dDFB37998584991d8b75F87baf0A3428dD095e"
+  },
+    "TuringMonsters": {
+      "address": "0x757b8E819d91659844E44F2141402831B60Fa4EE"
+    },
+    "Teleportation": {
+      "address": "0xB43EE846Aa266228FeABaD1191D6cB2eD9808894"
+    }
+  }
+}

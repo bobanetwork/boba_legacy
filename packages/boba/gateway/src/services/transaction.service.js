@@ -1,11 +1,9 @@
 import omgxWatcherAxiosInstance from 'api/omgxWatcherAxios'
 import networkService from './networkService'
-import {AllNetworkConfigs} from 'util/network/network.util'
+import {AllNetworkConfigs, CHAIN_ID_LIST} from 'util/network/network.util'
 import {Layer} from "../util/constant";
-import {useSelector} from "react-redux";
-import {selectLayer} from "../selectors";
 import {TRANSACTION_STATUS} from "../containers/history/types";
-import {ethers} from "ethers";
+import {teleportationGraphQLService} from "./graphql.service";
 
 class TransactionService {
   async getSevens(networkConfig = networkService.networkConfig) {
@@ -154,84 +152,86 @@ class TransactionService {
   }
 
   async fetchTeleportationTransactions(networkConfig = networkService.networkConfig) {
-    let txTeleportation = []
     let rawTx = []
 
     const contractL1 = networkService.getTeleportationContract(networkConfig.L1.chainId)
     const contractL2 = networkService.getTeleportationContract(networkConfig.L2.chainId)
 
-    const mapEventToTransaction = async (sendEvent, disburseEvent) => {
-      const txReceipt = await sendEvent.getTransactionReceipt()
-      const block = await sendEvent.getBlock()
+    const mapEventToTransaction = async (sendEvent, disburseEvent, contract) => {
+      const txReceipt = await contract.provider.getTransactionReceipt(sendEvent.txHash)
       let crossDomainMessageFinalize
 
       if (disburseEvent) {
-        crossDomainMessageFinalize = (await disburseEvent.getBlock()).timestamp
+        crossDomainMessageFinalize = disburseEvent.blockTimestamp
       }
 
       const crossDomainMessage = {
-        crossDomainMessage: disburseEvent?.args?.depositId,
-        crossDomainMessageEstimateFinalizedTime: crossDomainMessageFinalize ?? (block.timestamp + 180), // should never take longer than a few minutes
+        crossDomainMessage: disburseEvent?.depositId,
+        crossDomainMessageEstimateFinalizedTime: crossDomainMessageFinalize ?? (parseInt(sendEvent.blockTimestamp) + 180), // should never take longer than a few minutes
         crossDomainMessageFinalize,
-        crossDomainMessageSendTime: block.timestamp,
+        crossDomainMessageSendTime: sendEvent.blockTimestamp,
       }
 
       let status = txReceipt?.status ? TRANSACTION_STATUS.Pending : TRANSACTION_STATUS.Failed
       if (disburseEvent && status === TRANSACTION_STATUS.Pending) {
-        status = (await disburseEvent.getTransactionReceipt()).status === 1 ? TRANSACTION_STATUS.Succeeded : TRANSACTION_STATUS.Failed
+        const disburseTxReceipt = await contract.provider.getTransactionReceipt(disburseEvent.txHash)
+        status = disburseTxReceipt.status === 1 ? TRANSACTION_STATUS.Succeeded : TRANSACTION_STATUS.Failed
       }
 
       const action = {
-        amount: sendEvent.args.amount?.toString(),
-        sender: sendEvent.args.emitter,
+        amount: sendEvent.amount?.toString(),
+        sender: sendEvent.emitter,
         status,
-        to: sendEvent.args.emitter,
-        token: sendEvent.args.token,
+        to: sendEvent.emitter,
+        token: sendEvent.token,
       }
-      return {
+      const res = {
         ...sendEvent,
         ...txReceipt,
         disburseEvent,
-        timeStamp: block.timestamp,
+        timeStamp: sendEvent.blockTimestamp,
         layer: Layer.L1,
         chainName: networkConfig.L1.name,
-        originChainId: sendEvent.args.sourceChainId,
-        destinationChainId: sendEvent.args.toChainId,
+        originChainId: sendEvent.sourceChainId,
+        destinationChainId: sendEvent.toChainId,
         UserFacingStatus: status,
-        contractAddress: sendEvent.address,
-        hash: sendEvent.transactionHash,
+        contractAddress: contract.address,
+        hash: sendEvent.txHash,
         crossDomainMessage,
         contractName: 'Teleportation',
-        from: sendEvent.args.emitter,
-        to: sendEvent.args.emitter,
+        from: sendEvent.emitter,
+        to: sendEvent.emitter,
         action,
         isTeleportation: true,
       }
+      console.log("RERER", res)
+      return res;
     }
 
-    const getEventsForContract = async (contract) => {
+    const getEventsForTeleportation = async (contract, chainId) => {
       if (contract) {
         const currBlockNumber = await contract.provider.getBlockNumber()
-        const assetSent = contract.filters.AssetReceived(null, null, null, null, networkService.account, null)
-        const assetReceived = contract.filters.DisbursementSuccess(null, networkService.account, null, null, null)
+        const currNetwork = CHAIN_ID_LIST[chainId]
         let sentEvents = []
         try {
-          sentEvents = await contract.queryFilter(assetSent, currBlockNumber - 500) // TODO --> use external service, e.g. GraphQL
+          // TODO: Block range
+          sentEvents = await teleportationGraphQLService.queryAssetReceivedEvent(networkService.account, currNetwork.networkType, currNetwork.network, currNetwork.layer)
         } catch (err) {
           console.error(err)
         }
         let receiveEvents = []
         try {
-          receiveEvents = receiveEvents.concat(await contract.queryFilter(assetReceived, currBlockNumber - 500))
+          // TODO: Block range
+          receiveEvents = receiveEvents.concat(await teleportationGraphQLService.queryDisbursementSuccessEvent(networkService.account, currNetwork.networkType, currNetwork.network, currNetwork.layer))
         } catch (err) {
           console.error(err)
         }
 
         return await Promise.all(sentEvents.map(async sentEvent => {
-          const receiveEvent = receiveEvents.find(re => re.args.sourceChainId === sentEvent.args.toChainId
-            && re.args.amount.toString() === sentEvent.args.amount.toString() && re.args.to === sentEvent.args.emitter
-          && sentEvent.args.depositId.toString() === re.args.depositId.toString())
-          return await mapEventToTransaction(sentEvent, receiveEvent)
+          const receiveEvent = receiveEvents.find(re => re.sourceChainId === sentEvent.toChainId
+            && re.amount.toString() === sentEvent.amount.toString() && re.to === sentEvent.emitter
+          && sentEvent.depositId.toString() === re.depositId.toString())
+          return await mapEventToTransaction(sentEvent, receiveEvent, contract)
         }))
       } else {
         console.log("Teleportation not supported on network")
@@ -239,40 +239,8 @@ class TransactionService {
       return []
     }
 
-    rawTx = rawTx.concat(await getEventsForContract(contractL1))
-    rawTx = rawTx.concat(await getEventsForContract(contractL2))
-
-    try {
-
-      /* TODO
-      const responseTeleportation = await omgxWatcherAxiosInstance(networkService.networkConfig)
-        .post('get.teleportation.transactions', {
-          address: networkService.account,
-          fromRange: 0,
-          toRange: 1000,
-        })*/
-      // TODO
-      const responseTeleportation = {
-        status: 201,
-        data: rawTx,
-      }
-
-      console.log("RESP TELEPO", responseTeleportation)
-
-      if (responseTeleportation.status === 201) {
-        // add the chain: 'teleportation' field
-        /* todo txTeleportation = responseTeleportation.data.map((v) => ({
-          ...v, layer: networkConfig.layer, chainName: networkConfig.L2.name,
-          originChainId: networkConfig.L2.chainId,
-          destinationChainId: networkConfig.L1.chainId
-        }))*/
-        txTeleportation = responseTeleportation.data
-      }
-      return txTeleportation
-    } catch (error) {
-      console.log('TS: getTeleportationTransactions', error)
-      return txTeleportation
-    }
+    rawTx = rawTx.concat(await getEventsForTeleportation(contractL1, networkConfig.L1.chainId))
+    return rawTx.concat(await getEventsForTeleportation(contractL2, networkConfig.L2.chainId))
   }
 }
 
