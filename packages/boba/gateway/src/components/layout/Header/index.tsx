@@ -18,6 +18,7 @@ import { LAYER } from 'util/constant'
 import FeeSwitcher from './feeSwitcher'
 import NavDrawer from './NavDrawer'
 import { NetworkSelector } from 'components/NetworkSelector'
+
 export const Header: FC<HeaderProps> = () => {
   const dispatch = useDispatch<any>()
   const layer = useSelector<any>(selectLayer())

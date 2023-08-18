@@ -1,5 +1,7 @@
 import styled, { css } from 'styled-components'
 import { Svg } from 'components/global/svg'
+import { mobile } from 'themes/screens'
+import { ChainLabelContainer } from 'components/bridge/ChainLabel/styles'
 
 export const NetworkContainer = styled.div`
   display: flex;
@@ -21,6 +23,13 @@ export const NetworkContainer = styled.div`
     css`
       background: ${props.theme.colors.gray[400]};
     `}
+
+    ${mobile(css`
+    ${ChainLabelContainer} {
+      font-size: 0px;
+      gap: 0px;
+    }
+  `)}
 `
 
 export const Arrow = styled(Svg)`
@@ -50,8 +59,26 @@ export const Dropdown = styled.div`
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 50px;
-  border-radius: inherit;
+  top: 65px;
+  border-radius: 8px;
   background: inherit;
-  gap: 10px;
+  gap: 5px;
+  padding: 10px 15px;
+  img,
+  svg {
+    max-width: 24px;
+  }
+  > div {
+    > div {
+      padding: 5px 10px;
+    }
+  }
+  ${mobile(css`
+    width: 100%;
+    position: fixed;
+    left: 0px;
+    padding: 25px;
+    border-radius: 0px;
+    top: 72px;
+  `)}
 `
