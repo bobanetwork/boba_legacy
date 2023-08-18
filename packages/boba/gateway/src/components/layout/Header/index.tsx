@@ -17,7 +17,7 @@ import { WalletAddress } from './WalletAddress'
 import { LAYER } from 'util/constant'
 import FeeSwitcher from './feeSwitcher'
 import NavDrawer from './NavDrawer'
-
+import { NetworkSelector } from 'components/NetworkSelector'
 export const Header: FC<HeaderProps> = () => {
   const dispatch = useDispatch<any>()
   const layer = useSelector<any>(selectLayer())
@@ -36,6 +36,7 @@ export const Header: FC<HeaderProps> = () => {
       <HeaderAction>
         {accountEnabled ? (
           <>
+            <NetworkSelector />
             {layer === LAYER.L2 ? <FeeSwitcher /> : null}
             <WalletAddress />
           </>

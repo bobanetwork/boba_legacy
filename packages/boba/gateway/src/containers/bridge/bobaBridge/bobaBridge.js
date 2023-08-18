@@ -35,30 +35,25 @@ import {
   selectBridgeTokens,
   selectMultiBridgeMode,
   selectActiveNetworkIcon,
-  selectActiveNetworkName,
 } from 'selectors'
 
 
 import { resetToken, setMultiBridgeMode } from 'actions/bridgeAction'
 import { setConnectETH, setConnectBOBA } from 'actions/setupAction'
 
-import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 
-import { DEFAULT_NETWORK, LAYER } from 'util/constant'
+import { LAYER } from 'util/constant'
 import { AvailableBridges } from 'components'
-
+import { ChainLabel } from 'components/bridge/ChainLabel'
 
 const BobaBridge = () => {
   const layer = useSelector(selectLayer())
   const accountEnabled = useSelector(selectAccountEnabled())
   const multibridgeMode = useSelector(selectMultiBridgeMode())
   const tokens = useSelector(selectBridgeTokens())
-  const networkName = useSelector(selectActiveNetworkName())
-  const icon = useSelector(selectActiveNetworkIcon())
   const userWallet = useSelector(selectWalletAddress())
 
-  const L1Icon = L1_ICONS[icon]
-  const L2Icon = L2_ICONS[icon]
+ 
 
   const dispatch = useDispatch()
   const [toL2, setToL2] = useState(true)
@@ -90,19 +85,7 @@ const BobaBridge = () => {
     await dispatch(multibridgeMode ? resetToken() : setMultiBridgeMode(!multibridgeMode))
   }
 
-  const L1ChainLabel = () => {
-    return (<S.ChainLabel component="p" variant="body">
-      <L1Icon selected />
-      {networkName[ 'l1' ] || DEFAULT_NETWORK.NAME.L1}
-    </S.ChainLabel>)
-  }
 
-  const L2ChainLabel = () => {
-    return (<S.ChainLabel component="p" variant="body">
-      <L2Icon selected />
-      {networkName[ 'l2' ] || DEFAULT_NETWORK.NAME.L2}
-    </S.ChainLabel>)
-  }
 
   const ChainSwitchIcon = () => {
     return <S.IconSwitcher
@@ -128,10 +111,6 @@ const BobaBridge = () => {
   }
 
   const Bridge = () => {
-    const config = () => ({
-      from: toL2? <L1ChainLabel/> : <L2ChainLabel/>,
-      to: toL2? <L2ChainLabel/> : <L1ChainLabel/>
-    });
 
     return (
       <>
@@ -141,7 +120,7 @@ const BobaBridge = () => {
             From
           </S.ChainDirectionLabel>
           <S.ChainInput>
-            { config().from }
+            <ChainLabel direction="from"/>
           </S.ChainInput>
         </Box>
         <Box
@@ -157,7 +136,7 @@ const BobaBridge = () => {
             To
           </S.ChainDirectionLabel>
           <S.ChainInput>
-              { config().to }
+            <ChainLabel direction="to"/>
           </S.ChainInput>
         </Box>
       </S.BobaContent>

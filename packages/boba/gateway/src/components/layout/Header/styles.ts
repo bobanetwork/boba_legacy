@@ -47,7 +47,7 @@ export const HeaderAction = styled.div`
   align-items: center;
   flex: 1;
   justify-content: flex-end;
-  gap: 32px;
+  gap: 15px;
   ${mobile(css`
     gap: 8px;
   `)}
