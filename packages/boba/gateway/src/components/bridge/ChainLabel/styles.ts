@@ -9,5 +9,7 @@ export const ChainLabelContainer = styled(Typography)`
   svg,
   img {
     max-width: 24px;
+    width: 100%;
+    height: auto;
   }
 `

@@ -11,7 +11,7 @@ export const NetworkContainer = styled.div`
   border-radius: 33px;
   gap: 10px;
   user-select: none;
-
+  height: 40px;
   cursor: pointer;
   ${(props) =>
     props.theme.name === 'light' &&
@@ -67,6 +67,9 @@ export const Dropdown = styled.div`
   img,
   svg {
     max-width: 24px;
+    width: 100%;
+    height: 100%;
+    max-height: 34px;
   }
   > div {
     > div {

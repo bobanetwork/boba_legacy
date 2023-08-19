@@ -11,6 +11,7 @@ import {
   selectActiveNetwork,
   selectActiveNetworkType,
   selectModalState,
+  selectLayer,
 } from 'selectors'
 
 import { setNetwork } from 'actions/networkAction'
@@ -27,12 +28,14 @@ export const NetworkList = () => {
   const networkType = useSelector(selectActiveNetworkType())
   const activeNetwork = useSelector(selectActiveNetwork())
   const selectionLayer = useSelector(selectModalState('selectionLayer'))
+  const layer = useSelector<any>(selectLayer())
 
   const l1Icon = L1_ICONS as Record<string, ElementType>
   const l2Icon = L2_ICONS as Record<string, ElementType>
 
   const networks = (NetworkLists as Record<string, any>)[networkType]
-
+  const currentLayer = selectionLayer || (layer as string).toLowerCase()
+  console.log(currentLayer, selectionLayer, currentLayer)
   const onChainChange = (chainDetail: any) => {
     dispatch(
       setNetwork({
@@ -48,7 +51,7 @@ export const NetworkList = () => {
     <NetworkPickerList>
       {networks.map((chainDetail: any) => {
         const Icon =
-          selectionLayer === 'l1'
+          currentLayer === 'l1'
             ? l1Icon[chainDetail.icon]
             : l2Icon[chainDetail.icon]
         return (
@@ -60,7 +63,7 @@ export const NetworkList = () => {
             <NetworkIcon>
               <Icon selected />
             </NetworkIcon>
-            <NetworkLabel>{chainDetail.name[selectionLayer]}</NetworkLabel>
+            <NetworkLabel>{chainDetail.name[currentLayer]}</NetworkLabel>
           </NetworkItem>
         )
       })}
