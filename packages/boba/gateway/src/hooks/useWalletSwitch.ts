@@ -45,7 +45,6 @@ const useWalletSwitch = () => {
 
   useEffect(() => {
     if (accountEnabled) {
-      console.log(walletInfo)
       if (activeNetwork !== network || activeNetworkType !== networkType) {
         dispatch(openModal('switchNetworkModal'))
       }

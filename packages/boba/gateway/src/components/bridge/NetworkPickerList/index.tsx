@@ -35,8 +35,14 @@ export const NetworkList = () => {
 
   const networks = (NetworkLists as Record<string, any>)[networkType]
   const currentLayer = selectionLayer || (layer as string).toLowerCase()
-  console.log(currentLayer, selectionLayer, currentLayer)
   const onChainChange = (chainDetail: any) => {
+    console.log('chainDetial', {
+      network: chainDetail.chain,
+      name: chainDetail.name,
+      networkIcon: chainDetail.icon,
+      networkType,
+    })
+
     dispatch(
       setNetwork({
         network: chainDetail.chain,

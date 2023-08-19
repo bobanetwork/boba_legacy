@@ -15,6 +15,7 @@ const useSwitchChain = () => {
   const layer = useSelector(selectLayer())
 
   const switchChain = () => {
+    console.log('im here')
     if (accountEnabled) {
       if (!layer || layer === LAYER.L2) {
         dispatch(setConnectETH(true))

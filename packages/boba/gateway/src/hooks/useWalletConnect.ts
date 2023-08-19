@@ -49,7 +49,6 @@ export const useWalletConnect = () => {
         chainIdChanged,
       })
 
-      console.log(initialized)
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'))
         return false
