@@ -12,6 +12,7 @@ export const HeaderContainer = styled.div`
   align-items: center;
   justify-content: flex-start;
   backdrop-filter: blur(7.5px);
+  z-index: 9999;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
@@ -47,7 +48,7 @@ export const HeaderAction = styled.div`
   align-items: center;
   flex: 1;
   justify-content: flex-end;
-  gap: 32px;
+  gap: 15px;
   ${mobile(css`
     gap: 8px;
   `)}
