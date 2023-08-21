@@ -1,4 +1,5 @@
-import { NETWORK, NETWORK_TYPE } from "util/network/network.util";
+import {NETWORK, NETWORK_TYPE} from "../util/network/network.util";
+
 // testnet addresss
 import addresses_Goerli from "@boba/register/addresses/addressesGoerli_0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148"
 import addresses_BobaFuji from "@boba/register/addresses/addressBobaFuji_0xcE78de95b85212BC348452e91e0e74c17cf37c79"

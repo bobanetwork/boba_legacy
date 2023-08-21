@@ -205,7 +205,7 @@ class TeleportationGraphQLService extends GraphQLService {
       amount: amount.toString(),
       depositId: depositId.toString(),
     }
-    const events = (await this.conductQuery(query, variables, networkType, network, layer, this.useLocal))?.data?.teleportationDisbursementRetrySuccessEvents
+    const events = (await this.conductQuery(query, variables, destChainId, this.useLocal))?.data?.teleportationDisbursementRetrySuccessEvents
     if (events?.length) {
       if (events.length > 1) {
         console.warn('Found more than one disbursementRetrySuccessEvent, should always be 1:', events)

@@ -40,12 +40,13 @@ export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
 
   const networks = (NetworkLists as Record<string, any>)[networkType]
   const currentLayer = selectionLayer || (layer as string).toLowerCase()
-  const onChainChange = (chainDetail: any) => {
+  const onChainChange = (chainDetail: INetwork) => {
     dispatch(
       setNetwork({
         network: chainDetail.chain,
         name: chainDetail.name,
         networkIcon: chainDetail.icon,
+        chainIds: chainDetail.chainId,
         networkType,
       })
     )
@@ -56,7 +57,7 @@ export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
     <NetworkPickerList>
       {networks.map((chainDetail: INetwork) => {
         const CurrentIcon =
-          selectionLayer === 'l1'
+          currentLayer === 'l1'
             ? l1Icon[chainDetail.icon]
             : l2Icon[chainDetail.icon]
 
@@ -69,7 +70,7 @@ export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
             <NetworkIcon>
               <CurrentIcon selected />
             </NetworkIcon>
-            <NetworkLabel>{chainDetail.name[selectionLayer]}</NetworkLabel>
+            <NetworkLabel>{chainDetail.name[currentLayer]}</NetworkLabel>
           </NetworkItem>
         )
       })}
