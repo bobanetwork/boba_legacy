@@ -39,6 +39,7 @@
       "@eth-optimism/common-ts": "0.2.2",
       "@eth-optimism/contracts": "0.5.11",
       "@ethereumjs/tx": "4.2.0",
+     "@ethereumjs/common": "^3.2.0",
       "@ethersproject/keccak256": "^5.7.0",
       "asn1.js": "^5.4.1",
       "bcfg": "^0.2.1",
