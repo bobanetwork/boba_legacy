@@ -37,8 +37,8 @@ export const Header: FC<HeaderProps> = () => {
       <HeaderAction>
         {accountEnabled ? (
           <>
-            <NetworkSelector />
             {layer === LAYER.L2 ? <FeeSwitcher /> : null}
+            <NetworkSelector />
             <WalletAddress />
           </>
         ) : (

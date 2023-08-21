@@ -46,7 +46,7 @@ const Save = () => {
   const { layer2 } = balance
 
   const dispatch = useDispatch<any>()
-  console.log(layer)
+
   const [state, setState] = useState({
     max_Float_String: '0.0',
     fee: '0',

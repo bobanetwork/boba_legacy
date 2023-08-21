@@ -19,7 +19,7 @@ limitations under the License. */
   import { rpcUrls } from 'util/network/network.util'
   import store from 'store'
   import { CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
-  import { setNetwork } from 'actions/networkAction'
+import { setActiveNetwork, setNetwork } from 'actions/networkAction'
 
   class WalletService {
     constructor() {
@@ -62,11 +62,21 @@ limitations under the License. */
 
       window.ethereum.on('chainChanged', (chainId) => {
         const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
-        const selectedNetwork = NetworkList[networkType].find(network => network.chain === chain);
+        const {
+          chain: network,
+          icon: networkIcon,
+          name
+        } = NetworkList[ networkType ].find(network => network.chain === chain);
         store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
         store.dispatch(
-          setNetwork(selectedNetwork)
+          setNetwork({
+            networkType,
+            network,
+            networkIcon,
+            name
+          })
         )
+        store.dispatch(setActiveNetwork())
       })
     }
 

@@ -91,9 +91,7 @@ const LayerSwitcher = ({ visisble = true, isButton = false }) => {
     : ''
 
   const dispatchBootAccount = useCallback(() => {
-    if ((!accountEnabled && baseEnabled) || chainIdChanged) {
-      initializeAccount()
-    }
+
     const initializeAccount = async () => {
       const initialized = await networkService.initializeAccount({
         networkGateway: network,
@@ -122,6 +120,10 @@ const LayerSwitcher = ({ visisble = true, isButton = false }) => {
       } else {
         return false
       }
+    }
+
+    if ((!accountEnabled && baseEnabled) || chainIdChanged) {
+      initializeAccount()
     }
   }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged])
 

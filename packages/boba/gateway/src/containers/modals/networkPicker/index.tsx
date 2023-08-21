@@ -27,7 +27,7 @@ const NetworkPickerModal: FC<NetworkPickerModalProps> = ({ open }) => {
       <ListLabel> Network Names </ListLabel>
 
       <NetworkPickerModalContainer>
-        <NetworkList />
+        <NetworkList close={handleClose} />
       </NetworkPickerModalContainer>
     </Modal>
   )

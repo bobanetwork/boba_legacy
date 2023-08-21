@@ -23,7 +23,11 @@ import {
   NetworkLabel,
 } from './styles'
 
-export const NetworkList = () => {
+interface NetworkListProps {
+  close?: () => void
+}
+
+export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
   const dispatch = useDispatch<any>()
   const networkType = useSelector(selectActiveNetworkType())
   const activeNetwork = useSelector(selectActiveNetwork())
@@ -36,13 +40,6 @@ export const NetworkList = () => {
   const networks = (NetworkLists as Record<string, any>)[networkType]
   const currentLayer = selectionLayer || (layer as string).toLowerCase()
   const onChainChange = (chainDetail: any) => {
-    console.log('chainDetial', {
-      network: chainDetail.chain,
-      name: chainDetail.name,
-      networkIcon: chainDetail.icon,
-      networkType,
-    })
-
     dispatch(
       setNetwork({
         network: chainDetail.chain,
@@ -51,6 +48,7 @@ export const NetworkList = () => {
         networkType,
       })
     )
+    close()
   }
 
   return (
