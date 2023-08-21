@@ -73,7 +73,6 @@ const L1_BALANCE_MONITOR_ADDRESSES = env.L1_BALANCE_MONITOR_ADDRESSES || ''
 const L2_BALANCE_MONITOR_ADDRESSES = env.L2_BALANCE_MONITOR_ADDRESSES || ''
 const BALANCE_MONITOR_INTERVAL = env.BALANCE_MONITOR_INTERVAL || 10 * minute
 
-const TELEPORTATION_USE_TESTNETS = (env.TELEPORTATION_USE_TESTNETS?.toLowerCase() ?? 'true') === 'true'
 /* eslint-enable */
 
 class GlobalEnv {
@@ -149,7 +148,6 @@ class GlobalEnv {
     this.l1BalanceMonitorAddresses = removeBlankStringInArray(L1_BALANCE_MONITOR_ADDRESSES.split(','))
     this.l2BalanceMonitorAddresses = removeBlankStringInArray(L2_BALANCE_MONITOR_ADDRESSES.split(','))
     this.balanceMonitorInterval = BALANCE_MONITOR_INTERVAL
-    this.teleportationUseTestnets = TELEPORTATION_USE_TESTNETS
 
     this.isAltL1Network = false
     /* eslint-enable */
@@ -211,8 +209,6 @@ class GlobalEnv {
     )
     this.OVM_L1StandardBridgeInterface =
       this.OVM_L1StandardBridgeContract.interface
-
-    this.TeleportationInterface = new ethers.utils.Interface(await getBobaContractABI('Teleportation'))
 
     if (BOBA_DEPLOYER_URL) {
       const response = await fetch(BOBA_DEPLOYER_URL)

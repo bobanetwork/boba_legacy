@@ -181,11 +181,19 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     const symbol = token.symbol
 
     amountString = logAmount(transaction.action.amount, token.decimals, 4)
-    const fromHash = transaction.hash
-    let toHash = ''
-    if (chain === LAYER.L2 && transaction.crossDomainMessage.l1Hash) {
+    const fromHash = transaction.hash ?? transaction.crossDomainMessage.fromHash
+    let toHash = transaction.crossDomainMessage.toHash ?? ''
+    if (
+      !toHash &&
+      chain === LAYER.L2 &&
+      transaction.crossDomainMessage.l1Hash
+    ) {
       toHash = transaction.crossDomainMessage.l1Hash
-    } else if (chain === LAYER.L1 && transaction.crossDomainMessage.l2Hash) {
+    } else if (
+      !toHash &&
+      chain === LAYER.L1 &&
+      transaction.crossDomainMessage.l2Hash
+    ) {
       toHash = transaction.crossDomainMessage.l2Hash
     }
 

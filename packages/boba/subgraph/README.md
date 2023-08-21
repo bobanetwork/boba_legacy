@@ -96,3 +96,4 @@ Here is some example queries to get you started:
 3. Replace `mainnet:` with `boba:` in the `ethereum:` property.
 4. Run `docker-compose up` in the `./docker` directory of the repo.
 5. Use the `*:local` commands from the `package.json` in the `boba` repo.
+6. The GraphQL interface will be available here: http://127.0.0.1:8000/subgraphs/name/boba/Bridges

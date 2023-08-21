@@ -1,38 +1,50 @@
 import {ApolloClient, gql, HttpLink, InMemoryCache} from '@apollo/client';
 import fetch from 'cross-fetch';
-import {NETWORK, NETWORK_TYPE} from 'util/network/network.util';
+import {CHAIN_ID_LIST, NETWORK, NETWORK_TYPE} from 'util/network/network.util';
 import networkService from './networkService';
 import {Layer, LAYER} from "../util/constant";
 
 class GraphQLService {
 
-  LOCAL_GRAPHQL_ENDPOINT = "http://127.0.0.1:8000/subgraphs/name/boba/Bridges"
   GRAPHQL_ENDPOINTS = {
-    [NETWORK_TYPE.MAINNET]: {
-      [NETWORK.ETHEREUM]: {
-        [LAYER.L2]: "https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph"
-      }
+    // Boba ETH
+    288: {
+      gql: "https://api.thegraph.com/subgraphs/name/bobanetwork/boba-l2-subgraph",
+      local: ""
     },
-    [NETWORK_TYPE.TESTNET]: {
-
+    // Boba BNB
+    56288: {
+      gql: "", // TODO
+      local: ""
+    },
+    // Goerli
+    5: {
+      gql: "http://graph-loadb-52c7fb91q45b-f7b94f4b90ec39e9.elb.us-east-1.amazonaws.com:8000/subgraphs/name/boba/Bridges", // TODO DNS
+      local: ""
+    },
+    // BNB testnet
+    97: {
+      gql: "http://graph-loadb-bayigwg78i9q-886961d31fa377af.elb.us-east-1.amazonaws.com:8000/subgraphs/name/boba/Bridges", // TODO: DNS
+      local: "",
+    },
+    // Boba Goerli
+    2888: {
+      gql: "http://graph-loadb-1mh7y9k4wlhg2-7ecc2a39c66258e5.elb.us-east-1.amazonaws.com:8000/subgraphs/name/boba/Bridges", // TODO DNS
+      local: "http://127.0.0.1:8000/subgraphs/name/boba/Bridges"
+    },
+    // Boba BNB testnet
+    9728: {
+      gql: "http://graph-loadb-c2yef63eachk-3a7ebb678a869b0a.elb.us-east-1.amazonaws.com:8000/subgraphs/name/boba/Bridges", // TODO dns
+      local: "http://127.0.0.1:8002/subgraphs/name/boba/Bridges"
     }
   }
 
-  getBridgeEndpoint = (networkType = networkService.networkType, network = networkService.network, layer = networkService.L1orL2, useLocal = false) => {
-    if (useLocal) {
-      return this.LOCAL_GRAPHQL_ENDPOINT
-    }
-    // Network type always filled
-    const networkObj = this.GRAPHQL_ENDPOINTS[networkType][network]
-    if (!networkObj) {
-      console.warn(`Could not find graphql endpoint for network: ${networkService.network}`)
-      return "";
-    }
-    return networkObj[layer]
+  getBridgeEndpoint = (chainId, useLocal = false) => {
+    return this.GRAPHQL_ENDPOINTS[chainId][useLocal ? 'local' : 'gql']
   }
 
-  async conductQuery(query, variables = {}, networkType = networkService.networkType, network = networkService.network, layer = networkService.L1orL2, useLocal = false){
-    const uri = this.getBridgeEndpoint(networkType, network, layer, useLocal)
+  async conductQuery(query, variables = {}, sourceChainId, useLocalGraphEndpoint = false){
+    const uri = this.getBridgeEndpoint(sourceChainId, useLocalGraphEndpoint)
     const client = new ApolloClient({
       uri,
       link: new HttpLink({
@@ -78,31 +90,37 @@ class GraphQLService {
 }
 
 class TeleportationGraphQLService extends GraphQLService {
-  useLocal = true // TODO: Set to false
+  useLocal = false
 
-  async queryAssetReceivedEvent(walletAddress, networkType = networkService.networkType, network = networkService.network, layer = networkService.L1orL2) {
-    const query = gql(`query Teleportation($wallet: Bytes!)
-    { teleportationAssetReceivedEvents(where: {emitter: $wallet}) {
-      token,
-      sourceChainId
-      toChainId
-      depositId
-      emitter
-      amount
-      blockNumber
-      blockTimestamp
-      txHash
-  } }`)
+  async queryAssetReceivedEvent(walletAddress, sourceChainId) {
+    const query = gql(`query Teleportation($wallet: Bytes!, $sourceChainId: String!) {
+  teleportationAssetReceivedEvents(
+    where: { and: [{ emitter: $wallet }, { sourceChainId: $sourceChainId }] }
+  ) {
+    token
+    sourceChainId
+    toChainId
+    depositId
+    emitter
+    amount
+    blockNumber
+    blockTimestamp
+    txHash
+  }
+}`)
 
     const variables = {
-      wallet: walletAddress
+      wallet: walletAddress,
+      sourceChainId: sourceChainId.toString()
     }
-    return (await this.conductQuery(query, variables, networkType, network, layer, this.useLocal))?.data?.teleportationAssetReceivedEvents
+    return (await this.conductQuery(query, variables, sourceChainId, this.useLocal))?.data?.teleportationAssetReceivedEvents
   }
 
-  async queryDisbursementSuccessEvent(walletAddress, networkType = networkService.networkType, network = networkService.network, layer = networkService.L1orL2) {
-    const query = gql(`query Teleportation($wallet: Bytes!)
-      { teleportationDisbursementSuccessEvents(where: {to: $wallet}) {
+  async queryDisbursementSuccessEvent(walletAddress, sourceChainId, destChainId, token, amount, depositId) {
+    const query = gql(`query Teleportation($wallet: Bytes!, $sourceChainId: String!, $token: Bytes!, $amount: String!, $depositId: String!) {
+  teleportationDisbursementSuccessEvents(
+    where: { and: [{ to: $wallet }, { sourceChainId: $sourceChainId }, { token: $token }, { amount: $amount }, { depositId: $depositId }] }
+  ) {
     depositId
     to
     token
@@ -111,17 +129,32 @@ class TeleportationGraphQLService extends GraphQLService {
     blockNumber
     blockTimestamp
     txHash
-  } }`)
+  }
+}
+`)
 
     const variables = {
-      wallet: walletAddress
+      wallet: walletAddress,
+      sourceChainId: sourceChainId.toString(),
+      token,
+      amount: amount.toString(),
+      depositId: depositId.toString()
     }
-    return (await this.conductQuery(query, variables, networkType, network, layer, this.useLocal))?.data?.teleportationDisbursementSuccessEvents
+    const events = (await this.conductQuery(query, variables, destChainId, this.useLocal))?.data?.teleportationDisbursementSuccessEvents
+    if (events?.length) {
+      if (events.length > 1) {
+        console.warn('Found more than one disbursementSuccessEvent, should always be 1:', events)
+      }
+      return events[0]; // just first (should always just be one)
+    }
+    return undefined;
   }
 
-  async queryDisbursementFailedEvent(walletAddress, networkType = networkService.networkType, network = networkService.network, layer = networkService.L1orL2) {
-    const query = gql(`query Teleportation($wallet: Bytes!)
-      { teleportationDisbursementFailedEvents(where: {to: $wallet}) {
+  async queryDisbursementFailedEvent(walletAddress, sourceChainId, destChainId, amount, depositId) {
+    const query = gql(`query Teleportation($wallet: Bytes!, $sourceChainId: String!, $amount: String!, $depositId: String!) {
+  teleportationDisbursementFailedEvents(
+    where: { and: [{ to: $wallet }, { sourceChainId: $sourceChainId }, { amount: $amount }, { depositId: $depositId }] }
+  ) {
     depositId
     to
     amount
@@ -129,17 +162,31 @@ class TeleportationGraphQLService extends GraphQLService {
     blockNumber
     blockTimestamp
     txHash
-  } }`)
+  }
+}
+`)
 
     const variables = {
-      wallet: walletAddress
+      wallet: walletAddress,
+      sourceChainId: sourceChainId.toString(),
+      amount: amount.toString(),
+      depositId: depositId.toString(),
     }
-    return (await this.conductQuery(query, variables, networkType, network, layer, this.useLocal))?.data?.teleportationDisbursementFailedEvents
+    const events = (await this.conductQuery(query, variables, destChainId, this.useLocal))?.data?.teleportationDisbursementFailedEvents
+    if (events?.length) {
+      if (events.length > 1) {
+        console.warn('Found more than one disbursementFailedEvent, should always be 1:', events)
+      }
+      return events[0]; // just first (should always just be one)
+    }
+    return undefined;
   }
 
-  async queryDisbursementRetrySuccessEvent(walletAddress, networkType = networkService.networkType, network = networkService.network, layer = networkService.L1orL2) {
-    const query = gql(`query Teleportation($wallet: Bytes!)
-      { teleportationDisbursementRetrySuccessEvents(where: {to: $wallet}) {
+  async queryDisbursementRetrySuccessEvent(walletAddress, sourceChainId, destChainId, amount, depositId) {
+    const query = gql(`query Teleportation($wallet: Bytes!, $sourceChainId: String!, $amount: String!, $depositId: String!) {
+  teleportationDisbursementRetrySuccessEvents(
+    where: { and: [{ to: $wallet }, { sourceChainId: $sourceChainId }, { amount: $amount }, { depositId: $depositId }] }
+  ) {
     depositId
     to
     amount
@@ -147,12 +194,24 @@ class TeleportationGraphQLService extends GraphQLService {
     blockNumber
     blockTimestamp
     txHash
-  } }`)
+  }
+}
+`)
 
     const variables = {
-      wallet: walletAddress
+      wallet: walletAddress,
+      sourceChainId: sourceChainId.toString(),
+      amount: amount.toString(),
+      depositId: depositId.toString(),
     }
-    return (await this.conductQuery(query, variables, networkType, network, layer, this.useLocal))?.data?.teleportationDisbursementFailedEvents
+    const events = (await this.conductQuery(query, variables, networkType, network, layer, this.useLocal))?.data?.teleportationDisbursementRetrySuccessEvents
+    if (events?.length) {
+      if (events.length > 1) {
+        console.warn('Found more than one disbursementRetrySuccessEvent, should always be 1:', events)
+      }
+      return events[0]; // just first (should always just be one)
+    }
+    return undefined;
   }
 
 

@@ -84,7 +84,7 @@ import { graphQLService } from "./graphql.service"
 
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
-import {Layer, MIN_NATIVE_L1_BALANCE} from 'util/constant'
+import {isDevBuild, Layer, MIN_NATIVE_L1_BALANCE} from 'util/constant'
 import {getPoolDetail} from 'util/poolDetails'
 import {CHAIN_ID_LIST, getNetworkDetail, getRpcUrl, NETWORK, NETWORK_TYPE, pingRpcUrl} from 'util/network/network.util'
 import appService from './app.service'
@@ -2405,7 +2405,9 @@ class NetworkService {
       throw new Error(`Unknown chainId to retrieve teleportation contract from: ${chainId}`)
     }
     if (networkConfig.networkType !== NETWORK_TYPE.TESTNET) {
-      console.log("Teleportation is only supported on testnet for now, chainId: ", chainId)
+      if (isDevBuild()) {
+        console.log("DEV: Teleportation is only supported on testnet for now, chainId: ", chainId)
+      }
       return;
     }
     const addresses = appService.fetchAddresses({networkType: networkConfig.networkType, network: networkConfig.chain})
@@ -2417,8 +2419,6 @@ class NetworkService {
       teleportationAddr = addresses.Proxy__L1Teleportation
     }
     if (!teleportationAddr) return;
-
-    console.log("Teleportation supported: ::::", rpc)
 
     return this.Teleportation
       .attach(teleportationAddr)
