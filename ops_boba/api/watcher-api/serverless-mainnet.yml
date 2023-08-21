@@ -13,23 +13,6 @@ package:
   individually: true
 
 functions:
-  watcher_getTeleportationTransactions:
-    handler: watcher_getTeleportationTransactions.watcher_getTeleportationTransactions
-    memorySize: 10240 # optional, in MB, default is 1024
-    timeout: 60 # optional, in seconds, default is 6
-    vpc:
-      securityGroupIds:
-        - ${file(env.yml):SECURITY_GROUPS}
-      subnetIds:
-        - ${file(env.yml):SUBNET_ID_1}
-        - ${file(env.yml):SUBNET_ID_2}
-    events:
-      - http:
-          path: get.teleportation.transactions
-          method: post
-          cors: true
-    layers:
-      - ${file(env.yml):LAYERS}
   watcher_getL2Transactions:
     handler: watcher_getL2Transactions.watcher_getL2Transactions
     memorySize: 10240 # optional, in MB, default is 1024

@@ -162,28 +162,6 @@ class DatabaseService extends GlobalEnv {
         reference VARCHAR(255),
         PRIMARY KEY ( hash, blockNumber)
       )`)
-    await query(`CREATE TABLE IF NOT EXISTS teleportation
-      (
-        depositHash VARCHAR(255) NOT NULL,
-        depositBlockHash VARCHAR(255) NOT NULL,
-        depositBlockNumber INT NOT NULL,
-        depositSender VARCHAR(255),
-        depositChainId INT NOT NULL,
-        depositId INT NOT NULL,
-        depositToken VARCHAR(255),
-        depositAmount VARCHAR(255),
-
-        disburseHash VARCHAR(255),
-        disburseBlockHash VARCHAR(255),
-        disburseBlockNumber INT,
-        disburseReceiver VARCHAR(255),
-        disburseChainId INT,
-        disburseToken VARCHAR(255),
-
-        lastUpdatedTimestamp INT,
-        status VARCHAR(255),
-        PRIMARY KEY ( depositHash, depositId, depositToken, depositAmount )
-      )`)
     con.end()
     this.logger.info('Initialized the database.')
   }
@@ -435,57 +413,6 @@ class DatabaseService extends GlobalEnv {
     con.end()
   }
 
-  async insertTeleportationAssetReceived(teleportationData) {
-    const con = mysql.createConnection({
-      host: this.MySQLHostURL,
-      port: this.MySQLPort,
-      user: this.MySQLUsername,
-      password: this.MySQLPassword,
-    })
-    const query = util.promisify(con.query).bind(con)
-    await query(`USE ${this.MySQLDatabaseName}`)
-
-    await query(`INSERT IGNORE INTO teleportation
-      SET depositHash='${teleportationData.depositHash}',
-        depositBlockHash='${teleportationData.depositBlockHash}',
-        depositBlockNumber=${Number(teleportationData.depositBlockNumber)},
-        depositSender='${teleportationData.depositSender}',
-        depositChainId=${Number(teleportationData.depositChainId)},
-        depositId=${Number(teleportationData.depositId)},
-        depositToken='${teleportationData.depositToken}',
-        depositAmount='${teleportationData.depositAmount}',
-        disburseChainId=Number(teleportationData.disburseChainId),
-        lastUpdatedTimestamp=Number(teleportationData.lastUpdatedTimestamp),
-        status='${teleportationData.status}'
-    `)
-
-    con.end()
-  }
-
-    async insertTeleportationDisbursement(teleportationData) {
-        const con = mysql.createConnection({
-            host: this.MySQLHostURL,
-            port: this.MySQLPort,
-            user: this.MySQLUsername,
-            password: this.MySQLPassword,
-        })
-        const query = util.promisify(con.query).bind(con)
-        await query(`USE ${this.MySQLDatabaseName}`)
-
-        await query(`UPDATE teleportation
-      SET disburseHash='${teleportationData.disburseHash}',
-        disburseBlockHash='${teleportationData.disburseBlockHash}',
-        disburseBlockNumber=${teleportationData.disburseBlockNumber ? Number(teleportationData.disburseBlockNumber) : null},
-        disburseReceiver='${teleportationData.disburseReceiver}',
-        disburseToken='${teleportationData.disburseToken}',
-        lastUpdatedTimestamp=${Number(teleportationData.lastUpdatedTimestamp)},
-        status='${teleportationData.status}'
-            WHERE depositId=${Number(teleportationData.depositId)} AND depositChainId=${Number(teleportationData.depositChainId)} AND depositAmount='${teleportationData.depositAmount}'
-    `)
-
-        con.end()
-    }
-
   async insertDepositL2(depositL2Data) {
     const con = mysql.createConnection({
       host: this.MySQLHostURL,
@@ -683,23 +610,6 @@ class DatabaseService extends GlobalEnv {
     await query(`USE ${this.MySQLDatabaseName}`)
     const blockNumber = await query(`SELECT MAX(blockNumber) from l1Bridge`)
     con.end()
-    return blockNumber
-  }
-
-  async getNewestBlockFromTeleportationBridgeTable(chainId) {
-    if (!chainId) throw new Error(`ChainId not defined: ${chainId}`)
-    const con = mysql.createConnection({
-      host: this.MySQLHostURL,
-      port: this.MySQLPort,
-      user: this.MySQLUsername,
-      password: this.MySQLPassword,
-    })
-    const query = util.promisify(con.query).bind(con)
-    await query(`USE ${this.MySQLDatabaseName}`)
-    const blockNumber = await query(`SELECT GREATEST(depositBlockNumber, COALESCE(disburseBlockNumber, 0)) as maxBlock from teleportation WHERE depositChainId=${chainId} or disburseChainId=${chainId}`)
-    const b = await query(`SELECT * from teleportation`)
-    con.end()
-    this.logger.info(`getNewestBlockFromTeleportationBridgeTable: ${blockNumber} / ${b} / ${chainId}`)
     return blockNumber
   }
 
