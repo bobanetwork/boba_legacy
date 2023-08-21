@@ -18,17 +18,13 @@ import React from 'react'
 import { Typography } from '@mui/material'
 
 import * as S from './Transaction.styles'
+import { Hash, ExitsWrapper, ExitWrapper, HashContainer } from './styles'
 
 import networkService from 'services/networkService'
 
 function Seven({
-  link,
-  status,
-  chain,
   blockNumber,
-  oriChain,
   oriHash,
-  age,
   unixTime
 }) {
 
@@ -57,7 +53,7 @@ function Seven({
   }
 
     return (
-      <S.Wrapper>
+      <ExitsWrapper>
           <S.GridContainer container
             spacing={2}
             direction="row"
@@ -72,7 +68,7 @@ function Seven({
                 alignItems:'center',
               }}
             >
-                <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems:'flex-start'}}>
+                <ExitWrapper>
                   <Typography variant="overline" style={{fontSize: '0.9em', lineHeight: '1.0em'}}>{blockNumber}</Typography>
                   {overdue < 0 &&
                     <Typography variant="overline" style={{lineHeight: '1.0em', color: 'yellow'}}>
@@ -84,21 +80,20 @@ function Seven({
                       {timeLabel}
                     </Typography>
                   }
-                  <Typography variant="body3" style={{fontSize: '0.7em', lineHeight: '1.0em'}}>
+                  <HashContainer variant="body3">
                     Hash:&nbsp;
-                    <a
+                    <Hash
                       href={chainLink({hash:oriHash})}
                       target={'_blank'}
                       rel='noopener noreferrer'
-                      style={{ color: 'rgba(255, 255, 255, 0.3)', fontFamily: 'MessinaSB', fontSize: '0.8em'}}
                     >
                       {oriHash}
-                    </a>
-                  </Typography>
-                </div>
+                    </Hash>
+                  </HashContainer>
+                </ExitWrapper>
             </S.GridItemTag>
           </S.GridContainer>
-        </S.Wrapper>
+        </ExitsWrapper>
       )
 
 }

@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PlaceholderConnect PlaceholderConnect is loading 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-fFGjHI eWYtNO"
+  >
+    loading
+    <div>
+      <div>
+        <div
+          data-src="no-data.svg"
+          src=""
+        />
+      </div>
+    </div>
+    <p
+      class="sc-ewnqHT coSJgb sc-dicizt bnlGel"
+    >
+      No 
+    </p>
+    <button
+      class="sc-bgqQcB hCCYhJ"
+      label="Connect Wallet"
+      type="button"
+    >
+       Connect Wallet
+    </button>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`PlaceholderConnect PlaceholderConnect is not loading 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-fFGjHI eWYtNO"
+  >
+    <div>
+      <div>
+        <div
+          data-src="no-data.svg"
+          src=""
+        />
+      </div>
+    </div>
+    <p
+      class="sc-ewnqHT coSJgb sc-dicizt bnlGel"
+    >
+      No 
+    </p>
+    <button
+      class="sc-bgqQcB hCCYhJ"
+      label="Connect Wallet"
+      type="button"
+    >
+       Connect Wallet
+    </button>
+  </div>
+</DocumentFragment>
+`;

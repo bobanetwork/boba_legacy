@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { closeModal } from 'actions/uiAction'
@@ -12,9 +12,9 @@ import Modal from 'components/modal/Modal'
 import { Typography } from 'components/global/typography'
 import { Svg } from 'components/global/svg'
 import networkService from 'services/networkService'
-import metaMaskLogo from 'images/metamask.svg'
-import walletConnectLogo from 'images/walletconnect.svg'
-import ArrowIcon from 'images/icons/arrowright.svg'
+import metaMaskLogo from 'assets/images/metamask.svg'
+import walletConnectLogo from 'assets/images/walletconnect.svg'
+import ArrowIcon from 'assets/images/icons/arrowright.svg'
 
 import { Wallets, Wallet, Icon, ArrowContainer, IconContainer } from './styles'
 
@@ -26,6 +26,8 @@ const WalletSelectorModal = ({ open }) => {
   const { triggerInit } = useWalletConnect()
 
   const dispatch = useDispatch()
+
+  const [ walletNotFound, setWalletNotFound ] = useState(false)
 
   const connectToWallet = async (type) => {
     const resetConnectChain = () => {
@@ -60,28 +62,46 @@ const WalletSelectorModal = ({ open }) => {
       newStyle={true}
       maxWidth="450px"
       minHeight="200px"
-      title="Connect Wallet"
+      title={walletNotFound ? "No MetaMask Install" : "Connect Wallet"}
     >
-      <Wallets>
-        <Wallet onClick={() => connectToWallet('metamask')}>
+
+      {walletNotFound ? <Wallets>
+        <Wallet onClick={() => {
+          window.open('https://metamask.io/download/', '_blank');
+          setWalletNotFound(false);
+        }}>
           <IconContainer>
             <Icon src={metaMaskLogo} alt="metamask" />
           </IconContainer>
-          <Typography variant="title">MetaMask</Typography>
-          <ArrowContainer>
-            <Svg fill="#fff" src={ArrowIcon} />
-          </ArrowContainer>
+          <Typography variant="title">Download MetaMask wallet</Typography>
         </Wallet>
-        <Wallet onClick={() => connectToWallet('walletconnect')}>
-          <IconContainer>
-            <Icon src={walletConnectLogo} alt="walletconnect" />
-          </IconContainer>
-          <Typography variant="title">WalletConnect</Typography>
-          <ArrowContainer>
-            <Svg fill="#fff" src={ArrowIcon} />
-          </ArrowContainer>
-        </Wallet>
-      </Wallets>
+      </Wallets> :
+        <Wallets>
+          <Wallet onClick={() => {
+            if (window.ethereum) {
+              connectToWallet('metamask')
+            } else {
+              setWalletNotFound(true);
+            }
+          }}>
+            <IconContainer>
+              <Icon src={metaMaskLogo} alt="metamask" />
+            </IconContainer>
+            <Typography variant="title">MetaMask</Typography>
+            <ArrowContainer>
+              <Svg fill="#fff" src={ArrowIcon} />
+            </ArrowContainer>
+          </Wallet>
+          <Wallet onClick={() => connectToWallet('walletconnect')}>
+            <IconContainer>
+              <Icon src={walletConnectLogo} alt="walletconnect" />
+            </IconContainer>
+            <Typography variant="title">WalletConnect</Typography>
+            <ArrowContainer>
+              <Svg fill="#fff" src={ArrowIcon} />
+            </ArrowContainer>
+          </Wallet>
+        </Wallets>}
     </Modal>
   )
 }

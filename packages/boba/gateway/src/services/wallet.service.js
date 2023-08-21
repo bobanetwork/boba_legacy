@@ -18,6 +18,8 @@ limitations under the License. */
   import WalletConnectProvider from "@walletconnect/web3-provider"
   import { rpcUrls } from 'util/network/network.util'
   import store from 'store'
+  import { CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
+import { setActiveNetwork, setNetwork } from 'actions/networkAction'
 
   class WalletService {
     constructor() {
@@ -27,6 +29,8 @@ limitations under the License. */
       this.walletConnectProvider = null
       this.walletType = null
     }
+
+
 
     async connectMetaMask() {
       try {
@@ -57,8 +61,22 @@ limitations under the License. */
       })
 
       window.ethereum.on('chainChanged', (chainId) => {
-        console.log(`MetaMask chain changed to ${Number(chainId)}`)
+        const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
+        const {
+          chain: network,
+          icon: networkIcon,
+          name
+        } = NetworkList[ networkType ].find(network => network.chain === chain);
         store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
+        store.dispatch(
+          setNetwork({
+            networkType,
+            network,
+            networkIcon,
+            name
+          })
+        )
+        store.dispatch(setActiveNetwork())
       })
     }
 
@@ -143,10 +161,10 @@ limitations under the License. */
         return await this.connectWalletConnect()
       }
     }
-    
+
     async addTokenToMetaMask(token) {
       const {address,symbol,decimals,logoURI,chain} = token;
-      window.ethereum
+      return window.ethereum
       .request({
         method: "wallet_watchAsset",
         params: {

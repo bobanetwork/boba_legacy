@@ -32,12 +32,13 @@ export const GridBackground = styled.div`
   height: ${gridHeight};
   overflow: hidden;
   perspective: calc(${gridHeight} * 90);
+  background-color: ${({ theme }) =>
+    theme.name === 'light' ? '#E5E5E1' : 'transperant'};
 `
 
 export const GridFade = styled.div<BackgroundProps>`
   width: 100%;
   height: 100%;
-  max-width: 1441px;
   max-height: 870px;
   position: absolute;
   z-index: 1;
@@ -49,12 +50,11 @@ export const GridFade = styled.div<BackgroundProps>`
   background-image: ${(props) => gradientColor(props.theme.name)};
   background-clip: padding-box;
   background-origin: content-box;
-
   ${({ position }) =>
     position === 'top' &&
     `
     transform:translate(-50%, -150%);
-  `}
+  `};
 `
 
 const playAnimation = keyframes`

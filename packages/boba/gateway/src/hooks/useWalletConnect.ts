@@ -44,11 +44,11 @@ export const useWalletConnect = () => {
    */
 
   const triggerInit = useCallback(() => {
-    console.log(['network', network, networkType])
     const initAccount = async () => {
       const initialized = await networkService.initializeAccount({
         chainIdChanged,
       })
+
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'))
         return false

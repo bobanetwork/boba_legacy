@@ -23,7 +23,7 @@ import { Pager } from 'components'
 import Seven from 'components/seven/Seven'
 
 import styles from './Transactions.module.scss'
-import * as S from './History.styles'
+import { HistoryContainer, Content } from './styles'
 
 const PER_PAGE = 10
 
@@ -49,8 +49,8 @@ function Sevens({ searchData, sevens }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <div className={styles.transactionSection}>
-      <S.HistoryContainer>
+    <div>
+      <HistoryContainer>
         <Pager
           currentPage={page}
           isLastPage={paginatedSevens.length < PER_PAGE}
@@ -61,7 +61,7 @@ function Sevens({ searchData, sevens }) {
 
         <Grid item xs={12}>
           <Box>
-            <S.Content>
+            <Content>
               {!paginatedSevens.length && !loading && (
                 <div className={styles.disclaimer}>Scanning for pending 7 day exits...</div>
               )}
@@ -80,10 +80,10 @@ function Sevens({ searchData, sevens }) {
                   />
                 )
               })}
-            </S.Content>
+            </Content>
           </Box>
         </Grid>
-      </S.HistoryContainer>
+      </HistoryContainer>
     </div>
   );
 }

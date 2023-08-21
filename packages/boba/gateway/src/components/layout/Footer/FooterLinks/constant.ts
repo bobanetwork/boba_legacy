@@ -21,14 +21,6 @@ export const FOOTERLINKS: Array<LinkProps> = [
     path: ROUTES_PATH.BOBASCOPE,
     isNav: true,
   },
-  /*
-  TODO:
-  FIXME:
-  as it's depenedent on network connect consider fixing it once bridge page setup.
-  {
-    label: 'Blockexplorer',
-    path: '',
-  }, */
 ]
 
 export const FOOTERLINKS_RIGHT: Array<LinkProps> = [

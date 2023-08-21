@@ -29,7 +29,8 @@ import Select from 'components/select/Select'
 import { createDaoProposal } from 'actions/daoAction'
 import { selectProposalThreshold,selectLockRecords } from 'selectors'
 import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg'
+import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
+import { Dropdown } from 'components/global/dropdown'
 
 const NewProposalModal = ({ open }) => {
 
@@ -203,25 +204,30 @@ const NewProposalModal = ({ open }) => {
               change to the bridge fee limits for the L1 and L2 bridge pools.
             </Typography>
           }
-          <Select
-            label={'Select Nft type'}
-            options={nftOptions}
-            onSelect={(value)=> setTokens(value)}
-            styles={customStyles}
-            sx={{ marginBottom: '20px' }}
-            value={tokens}
-            newSelect={true}
-            isMulti={true}
+
+          <Dropdown
+            style={{ zIndex: 3 }}
+            onItemSelected={(val)=> setTokens(val)}
+            defaultItem={{
+                value: null,
+                label: 'Select Nft type',
+            }}
+            items={nftOptions}
           />
-          <Select
-            label={'Proposal type'}
-            options={options}
-            onSelect={onActionChange}
-            styles={customStyles}
-            sx={{ marginBottom: '20px' }}
-            value={selectedAction}
-            newSelect={true}
+
+
+          <Dropdown
+            style={{ zIndex: 1 }}
+            onItemSelected={onActionChange}
+            defaultItem={{
+                value: null,
+                label: 'Select Proposal type',
+            }}
+            items={options}
           />
+
+
+
           {action === 'change-threshold' &&
             <>
               <Typography variant="body2"

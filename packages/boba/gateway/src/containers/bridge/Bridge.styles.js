@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import {Box, Typography} from "@mui/material"
-import bobaGlassIcon from 'images/boba2/boba_glass.svg'
+import bobaGlassIcon from 'assets/images/boba2/boba_glass.svg'
 export const PageContainer = styled(Box)(({ theme }) => ({
   margin: '20px auto',
   marginBottom: theme.palette.spacing.toFooter,

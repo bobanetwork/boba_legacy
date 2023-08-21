@@ -132,7 +132,7 @@ type DefaultNetworkType = {
 export const DEFAULT_NETWORK: DefaultNetworkType = {
   NAME: {
     L1: 'Ethereum',
-    L2: 'Boba',
+    L2: 'Boba ETH',
   },
   ICON: {
     L1: 'ethereum',

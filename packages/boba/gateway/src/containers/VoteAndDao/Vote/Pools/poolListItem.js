@@ -17,7 +17,7 @@ import React, { useEffect, useState } from 'react'
 import { Box, Typography, Slider, styled } from '@mui/material'
 
 import Button from 'components/button/Button'
-import bobaLogo from 'images/boba-token.svg'
+import bobaLogo from 'assets/images/boba-token.svg'
 
 import * as G from 'containers/Global.styles'
 

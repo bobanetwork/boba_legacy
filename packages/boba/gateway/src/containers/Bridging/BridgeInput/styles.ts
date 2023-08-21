@@ -1,6 +1,6 @@
 import { Svg, Typography } from 'components/global'
 import styled, { css } from 'styled-components'
-import ArrowDown from 'images/icons/arrowdown.svg'
+import ArrowDown from 'assets/images/icons/arrowdown.svg'
 import { mobile } from 'themes/screens'
 
 export const BridgeInputContainer = styled.div`
@@ -88,10 +88,10 @@ export const TokenLabel = styled(Typography).attrs({
 export const TokenPickerIcon = styled.div`
   justify-self: flex-end;
 `
-export const DownArrow = styled(Svg).attrs({
+export const DownArrow = styled(Svg).attrs(({ theme }) => ({
   src: ArrowDown,
-  fill: '#fff',
-})``
+  fill: `${theme.name === 'light' ? '#000' : '#fff'}`,
+}))``
 
 export const ReceiveAmount = styled(Typography).attrs({
   variant: 'title',

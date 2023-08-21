@@ -1,0 +1,347 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing history page Date Picker 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-cNNTdL XooGL"
+  >
+    <div
+      class="sc-iWxGtA kjxmRV"
+    >
+      05/10/1970 12:00 am
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Testing history page Test History Page 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-eWhHU dDMUmU"
+  >
+    <div
+      class="sc-brSOsn bhYExN"
+    >
+      <div
+        class="sc-bxiBER mubpP"
+      >
+        <div>
+          <div>
+            <div
+              data-src="magnifyingGlass.svg"
+              src=""
+            />
+          </div>
+        </div>
+        <input
+          class="sc-iHDLbo knCggh"
+          placeholder="Search Here"
+          value=""
+        />
+      </div>
+      <div
+        class="sc-dyTUbJ hUdBAf"
+      >
+        <p
+          class="sc-duSInm bFEZbS sc-ckPVkh bOmlMV"
+        >
+          Date Range From
+        </p>
+        <div
+          class="sc-cNNTdL iedVlo"
+        >
+          <div
+            class="sc-iWxGtA cdSvk"
+          >
+            02/21/2023
+          </div>
+        </div>
+        <p
+          class="sc-duSInm bFEZbS sc-ckPVkh bOmlMV"
+        >
+          To
+        </p>
+        <div
+          class="sc-cNNTdL iedVlo"
+        >
+          <div
+            class="sc-iWxGtA cdSvk"
+          >
+            08/21/2023
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-kJpdyg gLZWIR"
+      >
+        <p
+          class="sc-duSInm bFEZbS sc-gAigJI lktCJV"
+        >
+          Date Range
+        </p>
+        <div
+          class="sc-cNNTdL iedVlo"
+        >
+          <div
+            class="sc-iWxGtA cdSvk"
+          >
+            02/21/2023 - 08/21/2023
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="sc-hIiahf kVSiNY"
+    >
+      <div
+        style="width: 100%; display: flex; flex-direction: column;"
+      >
+        <div
+          class="sc-iCnXOK eRHODK"
+          style="width: 100%;"
+        >
+          <div
+            class="sc-kJwmPe ctcryJ"
+          >
+            <p
+              class="sc-duSInm bFEZbS"
+            >
+              From
+            </p>
+            <div
+              class="sc-fABZjn eemHrn dropdown sc-gCkVGe Mbgmo"
+            >
+              <div
+                class="sc-gUMnWI dvASPu dropdown sc-gCkVGe Mbgmo"
+              >
+                <div
+                  class="sc-ePzlA-D qoYai"
+                >
+                  <div
+                    class="sc-hUOJWJ fJPHZV"
+                  >
+                    <div
+                      class="sc-hjLWnZ dcydmI"
+                    >
+                      <div>
+                        <div
+                          data-src="allNetworks.svg"
+                          src=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    All Networks
+                  </div>
+                  <div
+                    class="sc-ccVCaX gXCdOf dropdown sc-gCkVGe Mbgmo"
+                  >
+                    <div>
+                      <div
+                        data-src="arrowdown.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="sc-pDgPE kbbFqH"
+            >
+              <div
+                class="sc-hpGEOZ flecyt"
+              >
+                <div>
+                  <div
+                    data-src="switchIcon.svg"
+                    src=""
+                  />
+                </div>
+              </div>
+            </div>
+            <p
+              class="sc-duSInm bFEZbS"
+            >
+              To
+            </p>
+            <div
+              class="sc-fABZjn eemHrn dropdown sc-gCkVGe Mbgmo"
+            >
+              <div
+                class="sc-gUMnWI dvASPu dropdown sc-gCkVGe Mbgmo"
+              >
+                <div
+                  class="sc-ePzlA-D qoYai"
+                >
+                  <div
+                    class="sc-hUOJWJ fJPHZV"
+                  >
+                    <div
+                      class="sc-hjLWnZ dcydmI"
+                    >
+                      <div>
+                        <div
+                          data-src="allNetworks.svg"
+                          src=""
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    All Networks
+                  </div>
+                  <div
+                    class="sc-ccVCaX gXCdOf dropdown sc-gCkVGe Mbgmo"
+                  >
+                    <div>
+                      <div
+                        data-src="arrowdown.svg"
+                        src=""
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="sc-ehYhRg jxAxWZ dropdown undefined"
+          >
+            <div
+              class="sc-fia-DRh jfQAMp"
+            >
+              <div
+                class="sc-hYqwXO ljMLMN"
+              >
+                <div
+                  class="sc-lpcdUm hXxTAM"
+                >
+                  <div>
+                    <div
+                      data-src="filter.svg"
+                      src=""
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-hCnrGf hXGTTH"
+      >
+        <div
+          class="sc-gTRrQi jcFGvU sc-kcuKUB jWaUpl sc-kFDfur diVmzM"
+        >
+          <div
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
+            style="max-width: 168px;"
+          >
+            <p
+              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+            >
+              Date
+            </p>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
+            style="max-width: 142px;"
+          >
+            <p
+              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+            >
+              From
+            </p>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
+            style="max-width: 142px;"
+          >
+            <p
+              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+            >
+              To
+            </p>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
+            style="max-width: 90px;"
+          >
+            <p
+              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+            >
+              Token
+            </p>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
+            style="max-width: 80px;"
+          >
+            <p
+              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+            >
+              Amount
+            </p>
+          </div>
+          <div
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
+            style="max-width: 88px;"
+          >
+            <p
+              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+            >
+              Status
+            </p>
+          </div>
+        </div>
+        <div
+          class="sc-emqRaN cCQJsf"
+        />
+        <div
+          class="sc-IeChK iNxsQx"
+          style="margin-left: auto; margin-right: auto; padding: 20px;"
+        >
+          <div>
+            <div>
+              <div
+                data-src="noHistory.svg"
+                src=""
+              />
+            </div>
+          </div>
+          <div>
+            No Transactions Matching Filter.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Testing history page Test transaction resolver 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-emqRaN cCQJsf"
+  />
+  <div
+    class="sc-IeChK iNxsQx"
+    style="margin-left: auto; margin-right: auto; padding: 20px;"
+  >
+    <div>
+      <div>
+        <div
+          data-src="noHistory.svg"
+          src=""
+        />
+      </div>
+    </div>
+    <div>
+      No Transactions Matching Filter.
+    </div>
+  </div>
+</DocumentFragment>
+`;

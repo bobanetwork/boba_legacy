@@ -7,7 +7,7 @@ import { withdrawLock } from 'actions/veBobaAction';
 
 import Button from 'components/button/Button';
 
-import BobaNFTGlass from 'images/boba2/BobaNFTGlass.svg';
+import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg';
 
 import * as G from 'containers/Global.styles';
 

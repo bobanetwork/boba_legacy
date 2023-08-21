@@ -3,61 +3,77 @@
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="sc-eAzDjm eZJmjM"
+    class="sc-fABZjn hJKxpE"
   >
     <div
-      class="sc-fABZjn dncsHS"
+      class="sc-gUMnWI ervjnC"
     />
     <div
-      class="sc-ePzlA-D jgRDPC"
+      class="sc-hjLWnZ kFZkac"
     >
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-fWFeAW dJFBmS"
         href="/bridge"
       >
         Bridge
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-fWFeAW dJFBmS"
         href="/history"
       >
         History
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-fWFeAW dJFBmS"
         href="/earn"
       >
         Earn
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-fWFeAW dJFBmS"
         href="/stake"
       >
         Stake
       </a>
       <a
         activeclassname="active"
-        class="sc-gjJAnY bPnvCz"
+        class="sc-fWFeAW dJFBmS"
         href="/DAO"
       >
         Dao
       </a>
     </div>
     <div
-      class="sc-gUMnWI ghBncp"
+      class="sc-hUOJWJ kkAMsz"
     >
       <button
-        class="sc-duSInm jNkTqC"
+        class="sc-crozmw joSqYT"
+        label="Connect Wallet"
+        style="white-space: nowrap;"
         type="button"
       >
          Connect Wallet
       </button>
       <div
-        class="sc-dPwPAC RgduB"
+        class="sc-dPwPAC UluVn"
+      >
+        <div
+          class="sc-ePzlA-D hiWbI"
+        >
+          <div>
+            <div
+              data-src="hamburger.svg"
+              src=""
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-gjJAnY imSQnB"
         title="light-icon"
       >
         <div>
