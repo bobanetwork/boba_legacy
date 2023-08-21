@@ -30,6 +30,7 @@ import {
 import { formatTokenAmount } from 'util/common'
 import Tooltip from 'components/tooltip/Tooltip'
 import networkService from 'services/networkService'
+import bobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
 // the L2 token which can not be exited so exclude from dropdown in case of L2
 const NON_EXITABLE_TOKEN = [
@@ -145,7 +146,11 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                     >
                       <TokenSymbol>
                         <img
-                          src={getCoinImage(token.symbol)}
+                          src={
+                            token.symbol === 'BOBA'
+                              ? bobaLogo
+                              : getCoinImage(token.symbol)
+                          }
                           alt={`${token.symbol} logo`}
                           width="24px"
                           height="24px"
@@ -155,7 +160,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                         {token.symbol}
                         <TokenBalance>{amount}</TokenBalance>
                       </TokenLabel>
-                      <Tooltip title="Add token to metamask">
+                      <Tooltip title="Add token to wallet">
                         <PlusIcon
                           onClick={(e) => {
                             e.stopPropagation()

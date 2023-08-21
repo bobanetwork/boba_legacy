@@ -29,20 +29,20 @@ const GasWatcher: FC = () => {
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>Savings</GasListItemLabel>
-        <GasListItemValue>{savings.toFixed(0)}x</GasListItemValue>
+        <GasListItemValue>{savings?.toFixed(0)}x</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>L1</GasListItemLabel>
-        <GasListItemValue>{gas.blockL1}</GasListItemValue>
+        <GasListItemValue>{gas?.blockL1}</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>L2</GasListItemLabel>
-        <GasListItemValue>{gas.blockL2}</GasListItemValue>
+        <GasListItemValue>{gas?.blockL2}</GasListItemValue>
       </GasListItem>
       <GasListItem>
         <GasListItemLabel>Last Verified Block</GasListItemLabel>
         <GasListItemValue>
-          {Number(verifierStatus?.matchedBlock)}
+          {Number(verifierStatus?.matchedBlock || 0)}
         </GasListItemValue>
       </GasListItem>
     </GasListContainer>

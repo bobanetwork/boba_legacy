@@ -10,13 +10,14 @@ import { closeModal } from 'actions/uiAction';
 
 import { selectActiveNetworkType, selectNetwork } from 'selectors';
 
-function SwitchNetworkModal({open}) {
-
-  const dispatch = useDispatch();
+const SwitchNetworkModal = ({open}) => {
+  const dispatch = useDispatch()
   const network = useSelector(selectNetwork());
   const networkType = useSelector(selectActiveNetworkType())
 
-  function onClick() {
+  console.log('network', network)
+
+  const onClick = () => {
     dispatch(setActiveNetwork());
     // reset baseState to false to trigger initialization on chain change.
     // and trigger the connect to BOBA & ETH base on current chain.
@@ -25,7 +26,7 @@ function SwitchNetworkModal({open}) {
     dispatch(closeModal('switchNetworkModal'));
   }
 
-  function handleClose() {
+  const handleClose = () => {
     dispatch(setConnect(false));
     dispatch(closeModal('switchNetworkModal'));
   }
@@ -38,10 +39,12 @@ function SwitchNetworkModal({open}) {
       title="Switch Network"
       newStyle={true}
     >
-        <Button
-          label={`Switch to ${network} ${networkType === 'Testnet'? networkType: ''} network`}
-          onClick={()=>onClick()}
-        />
+      <Button
+        label={`Switch to ${network} ${
+          networkType === 'Testnet' ? networkType : ''
+        } network`}
+        onClick={() => onClick()}
+      />
     </Modal>
   )
 }

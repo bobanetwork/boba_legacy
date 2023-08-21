@@ -1,15 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Testing history page Date Picker 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-cNNTdL XooGL"
+  >
+    <div
+      class="sc-iWxGtA kjxmRV"
+    >
+      05/10/1970 12:00 am
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
 exports[`Testing history page Test History Page 1`] = `
 <DocumentFragment>
   <div
-    class="sc-ejWHKt liqSho"
+    class="sc-eWhHU dDMUmU"
   >
     <div
-      class="sc-eWhHU fBhcFv"
+      class="sc-brSOsn bhYExN"
     >
       <div
-        class="sc-hpGEOZ goCRFq"
+        class="sc-bxiBER mubpP"
       >
         <div>
           <div>
@@ -20,24 +34,74 @@ exports[`Testing history page Test History Page 1`] = `
           </div>
         </div>
         <input
-          class="sc-pDgPE iIPzxH"
+          class="sc-iHDLbo knCggh"
           placeholder="Search Here"
           value=""
         />
       </div>
+      <div
+        class="sc-dyTUbJ hUdBAf"
+      >
+        <p
+          class="sc-duSInm bFEZbS sc-ckPVkh bOmlMV"
+        >
+          Date Range From
+        </p>
+        <div
+          class="sc-cNNTdL iedVlo"
+        >
+          <div
+            class="sc-iWxGtA cdSvk"
+          >
+            02/21/2023
+          </div>
+        </div>
+        <p
+          class="sc-duSInm bFEZbS sc-ckPVkh bOmlMV"
+        >
+          To
+        </p>
+        <div
+          class="sc-cNNTdL iedVlo"
+        >
+          <div
+            class="sc-iWxGtA cdSvk"
+          >
+            08/21/2023
+          </div>
+        </div>
+      </div>
+      <div
+        class="sc-kJpdyg gLZWIR"
+      >
+        <p
+          class="sc-duSInm bFEZbS sc-gAigJI lktCJV"
+        >
+          Date Range
+        </p>
+        <div
+          class="sc-cNNTdL iedVlo"
+        >
+          <div
+            class="sc-iWxGtA cdSvk"
+          >
+            02/21/2023 - 08/21/2023
+          </div>
+        </div>
+      </div>
     </div>
     <div
-      class="sc-OKtSx euUHqn"
+      class="sc-hIiahf kVSiNY"
     >
       <div
         style="width: 100%; display: flex; flex-direction: column;"
       >
         <div
-          class="sc-brSOsn dUjmAr"
+          class="sc-iCnXOK eRHODK"
           style="width: 100%;"
         >
           <div
-            class="sc-iCnXOK bbmDuA"
+            class="sc-kJwmPe ctcryJ"
           >
             <p
               class="sc-duSInm bFEZbS"
@@ -45,10 +109,10 @@ exports[`Testing history page Test History Page 1`] = `
               From
             </p>
             <div
-              class="sc-fABZjn eemHrn dropdown sc-ckPVkh kFHnmp"
+              class="sc-fABZjn eemHrn dropdown sc-gCkVGe Mbgmo"
             >
               <div
-                class="sc-gUMnWI dvASPu dropdown sc-ckPVkh kFHnmp"
+                class="sc-gUMnWI dvASPu dropdown sc-gCkVGe Mbgmo"
               >
                 <div
                   class="sc-ePzlA-D qoYai"
@@ -71,7 +135,7 @@ exports[`Testing history page Test History Page 1`] = `
                     All Networks
                   </div>
                   <div
-                    class="sc-ccVCaX gXCdOf dropdown sc-ckPVkh kFHnmp"
+                    class="sc-ccVCaX gXCdOf dropdown sc-gCkVGe Mbgmo"
                   >
                     <div>
                       <div
@@ -84,10 +148,10 @@ exports[`Testing history page Test History Page 1`] = `
               </div>
             </div>
             <div
-              class="sc-fIwssx cCmqsX"
+              class="sc-pDgPE kbbFqH"
             >
               <div
-                class="sc-eItWsw dPkDYD"
+                class="sc-hpGEOZ flecyt"
               >
                 <div>
                   <div
@@ -103,10 +167,10 @@ exports[`Testing history page Test History Page 1`] = `
               To
             </p>
             <div
-              class="sc-fABZjn eemHrn dropdown sc-ckPVkh kFHnmp"
+              class="sc-fABZjn eemHrn dropdown sc-gCkVGe Mbgmo"
             >
               <div
-                class="sc-gUMnWI dvASPu dropdown sc-ckPVkh kFHnmp"
+                class="sc-gUMnWI dvASPu dropdown sc-gCkVGe Mbgmo"
               >
                 <div
                   class="sc-ePzlA-D qoYai"
@@ -129,7 +193,7 @@ exports[`Testing history page Test History Page 1`] = `
                     All Networks
                   </div>
                   <div
-                    class="sc-ccVCaX gXCdOf dropdown sc-ckPVkh kFHnmp"
+                    class="sc-ccVCaX gXCdOf dropdown sc-gCkVGe Mbgmo"
                   >
                     <div>
                       <div
@@ -143,16 +207,16 @@ exports[`Testing history page Test History Page 1`] = `
             </div>
           </div>
           <div
-            class="sc-gCkVGe enWZxv dropdown undefined"
+            class="sc-ehYhRg jxAxWZ dropdown undefined"
           >
             <div
-              class="sc-hCnrGf jDDZuS"
+              class="sc-fia-DRh jfQAMp"
             >
               <div
-                class="sc-iWxGtA ljFHJp"
+                class="sc-hYqwXO ljMLMN"
               >
                 <div
-                  class="sc-cNNTdL iKDIcA"
+                  class="sc-lpcdUm hXxTAM"
                 >
                   <div>
                     <div
@@ -167,13 +231,13 @@ exports[`Testing history page Test History Page 1`] = `
         </div>
       </div>
       <div
-        class="sc-gAigJI igDbgG"
+        class="sc-hCnrGf hXGTTH"
       >
         <div
-          class="sc-gTRrQi jcFGvU sc-kcuKUB jWaUpl sc-hYqwXO dzGPdF"
+          class="sc-gTRrQi jcFGvU sc-kcuKUB jWaUpl sc-kFDfur diVmzM"
         >
           <div
-            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-hYqwXO dzGPdF"
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
             style="max-width: 168px;"
           >
             <p
@@ -183,7 +247,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-hYqwXO dzGPdF"
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
             style="max-width: 142px;"
           >
             <p
@@ -193,7 +257,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-hYqwXO dzGPdF"
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
             style="max-width: 142px;"
           >
             <p
@@ -203,7 +267,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-hYqwXO dzGPdF"
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
             style="max-width: 90px;"
           >
             <p
@@ -213,7 +277,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-hYqwXO dzGPdF"
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
             style="max-width: 80px;"
           >
             <p
@@ -223,7 +287,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
           </div>
           <div
-            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-hYqwXO dzGPdF"
+            class="sc-gTRrQi jcFGvU sc-kuWgmH iGlDXy sc-kFDfur diVmzM"
             style="max-width: 88px;"
           >
             <p
@@ -234,10 +298,10 @@ exports[`Testing history page Test History Page 1`] = `
           </div>
         </div>
         <div
-          class="sc-kJpdyg eQoUrv"
+          class="sc-emqRaN cCQJsf"
         />
         <div
-          class="sc-fecFrY cwSHds"
+          class="sc-IeChK iNxsQx"
           style="margin-left: auto; margin-right: auto; padding: 20px;"
         >
           <div>
@@ -261,10 +325,10 @@ exports[`Testing history page Test History Page 1`] = `
 exports[`Testing history page Test transaction resolver 1`] = `
 <DocumentFragment>
   <div
-    class="sc-kJpdyg eQoUrv"
+    class="sc-emqRaN cCQJsf"
   />
   <div
-    class="sc-fecFrY cwSHds"
+    class="sc-IeChK iNxsQx"
     style="margin-left: auto; margin-right: auto; padding: 20px;"
   >
     <div>

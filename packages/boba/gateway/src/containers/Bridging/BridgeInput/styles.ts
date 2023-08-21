@@ -88,10 +88,10 @@ export const TokenLabel = styled(Typography).attrs({
 export const TokenPickerIcon = styled.div`
   justify-self: flex-end;
 `
-export const DownArrow = styled(Svg).attrs({
+export const DownArrow = styled(Svg).attrs(({ theme }) => ({
   src: ArrowDown,
-  fill: '#fff',
-})``
+  fill: `${theme.name === 'light' ? '#000' : '#fff'}`,
+}))``
 
 export const ReceiveAmount = styled(Typography).attrs({
   variant: 'title',

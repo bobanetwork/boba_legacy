@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { screen, sdesktop } from 'themes/screens'
+import { mobile, sdesktop, tablet } from 'themes/screens'
 import { Svg, Typography } from 'components/global'
 import Switch from 'assets/images/icons/switchIcon.svg'
 
@@ -42,6 +42,11 @@ export const HistoryPageContainer = styled.div`
   padding-top: 0;
   width: 100%;
   max-width: 1024px;
+  min-width: 480px;
+  ${sdesktop(css`
+    max-width: 750px;
+    gap: 0px 30px;
+  `)}
 `
 
 export const TableHeader = styled.div`
@@ -50,32 +55,67 @@ export const TableHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  @media ${screen.mobile} {
-    padding: 0px;
-    justify-content: flex-start;
-  }
+  ${mobile(
+    css`
+      padding: 0px;
+    `
+  )}
 `
 
 export const TableFilters = styled.div`
   padding: 20px;
   border-radius: 6px 6px 0px 0px;
-  justify-content: space-between;
   width: 100%;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  @media ${screen.tablet} {
+  justify-content: space-between;
+  align-items: center;
+  ${tablet(css`
     margin-bottom: 5px;
     gap: 20px;
     padding: 10px;
-  }
-  @media ${screen.mobile} {
+  `)}
+  ${mobile(css`
     gap: 10px;
     margin-bottom: 0px;
     p {
       font-size: 12px;
     }
-  }
+  `)}
+`
+
+export const DatePickerWrapper = styled.div`
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  text-align: center;
+  ${mobile(css`
+    display: none;
+  `)}
+`
+
+export const MobileDatePickerWrapper = styled.div`
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+  text-align: center;
+  gap: 8px;
+  ${mobile(css`
+    display: flex;
+  `)}
+`
+
+export const DateInput = styled.button`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid #545454;
+  border-radius: 8px;
+  background: #262626;
+  padding: 10px 20px;
+  color: ${({ theme }) => theme.color};
 `
 
 export const NetworkDropdowns = styled.div`
@@ -86,17 +126,17 @@ export const NetworkDropdowns = styled.div`
   gap: 16px;
   font-size: 16px;
   align-items: center;
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 12px;
     gap: 0px 5px;
-  }
+  `)}
 `
 export const TransactionsTableWrapper = styled.div`
   width: 100%;
 `
 
 export const TransactionsWrapper = styled.div`
-  width: 1024px;
+  width: 100%;
   overflow-y: auto;
   max-height: 512px;
   ${sdesktop(css`
@@ -149,10 +189,10 @@ export const TransactionDate = styled.div`
   text-align: left;
   width: 168px;
   white-space: nowrap;
-  @media ${screen.mobile} {
+  ${mobile(css`
     width: 110px;
     font-size: 10px;
-  }
+  `)}
 `
 export const TransactionDetails = styled.div`
   display: flex;
@@ -171,11 +211,11 @@ export const TransactionChainDetails = styled.div`
 export const TransactionChain = styled.div`
   width: 102px;
   height: 16px;
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 10px;
     width: 72px;
     height: 12px;
-  }
+  `)}
 `
 
 export const TransactionHash = styled.a`
@@ -193,12 +233,34 @@ export const TransactionHash = styled.a`
     css`
       color: ${props.theme.colors.gray[100]};
     `}
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 8px;
     width: 72px;
     height: 12px;
-  }
+  `)}
 `
+
+export const IncompleteTransactionHash = styled.div`
+  font-size: 12px;
+  width: 102px;
+  height: 16px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[100]};
+    `}
+${mobile(css`
+    font-size: 8px;
+    width: 72px;
+    height: 12px;
+  `)}
+`
+
 export const TransactionToken = styled.div`
   display: flex;
   flex-direction: row;
@@ -207,14 +269,18 @@ export const TransactionToken = styled.div`
   width: 90px;
   text-align: left;
   font-size: 14px;
+  ${mobile(css`
+    font-size: 10px;
+  `)}
 `
 
 export const TransactionAmount = styled.div`
   font-size: 14px;
   width: 80px;
-  @media ${screen.mobile} {
+  text-align: left;
+  ${mobile(css`
     font-size: 10px;
-  }
+  `)}
 `
 
 export const Status = styled.div`
@@ -231,9 +297,9 @@ export const Status = styled.div`
     css`
       color: ${props.theme.colors.green[300]};
     `}
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 10px;
-  }
+  `)}
 `
 
 export const IconContainer = styled.div`
@@ -242,12 +308,13 @@ export const IconContainer = styled.div`
   direction: flex;
   align-items: center;
   justify-content: center;
-  @media ${screen.mobile} {
+  ${mobile(css`
     width: 24px;
     height: 26px;
     margin: 0px;
-  }
+  `)}
 `
+
 export const Icon = styled(Svg)`
   display: flex;
   align-content: center;
@@ -257,12 +324,19 @@ export const Icon = styled(Svg)`
     width: 32px;
     height: auto;
   }
-  @media ${screen.mobile} {
+  ${mobile(css`
     svg {
       max-width: 24px;
       height: auto;
     }
-  }
+  `)}
+`
+
+export const Image = styled.img`
+  display: flex;
+  align-content: center;
+  width: 32px;
+  height: 32px;
 `
 
 export const SwitchIcon = styled(Svg).attrs({
@@ -276,6 +350,12 @@ export const SwitchIcon = styled(Svg).attrs({
     justify-content: center;
     align-items: center;
   }
+  ${mobile(css`
+    svg {
+      max-width: 14px;
+      height: auto;
+    }
+  `)}
 `
 
 export const SwitchChainIcon = styled.div`
@@ -305,6 +385,10 @@ export const SwitchChainIcon = styled.div`
   &:hover {
     transform: rotate(180deg);
   }
+  ${mobile(css`
+    width: 25px;
+    height: 25px;
+  `)}
 `
 
 export const Table = styled.div`
@@ -330,15 +414,15 @@ export const Table = styled.div`
       border: 1px solid ${props.theme.colors.gray[300]};
       background: ${props.theme.colors.box.background};
     `}
-  @media ${screen.mobile} {
+  ${mobile(css`
     flex-direction: 'column';
     padding-bottom: 0px;
     gap: 10px;
-  }
-  @media ${screen.tablet} {
+  `)}
+  ${tablet(css`
     margin-bottom: '5px';
     padding-bottom: 0px;
-  }
+  `)}
 `
 
 export const NoHistory = styled.div`
@@ -376,148 +460,18 @@ export const NoHistory = styled.div`
       `}
   }
 `
-export const Actions = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  white-space: nowrap;
-  gap: 0px 20px;
-
-  .react-datepicker__tab-loop {
-    margin: 0px -10px;
-  }
-  @media ${screen.mobile} {
-    justify-content: flex-start;
-    margin-right: 0px;
-    margin-left: auto;
-    gap: 0px 10px;
-  }
-`
-
-export const DatePickerWrapper = styled.div`
-  width: 100%;
-  position: relative;
-  height: 44px;
-  margin: 0px;
-  padding: 15px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: ${(props) => props.theme.text.body1};
-  color: inherit;
-  border: 1px solid ${(props) => props.theme.colors.box.border};
-  outline: none;
-  max-width: 115px;
-  + div {
-    margin: 0px -15px;
-  }
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-    `}
-  @media ${screen.laptop} {
-    width: 136px;
-  }
-  @media ${screen.mobile} {
-    min-width: 40px;
-    width: 75px;
-    height: 30px;
-    font-size: 11px;
-    padding: 15px 5px;
-    text-align: center;
-  }
-`
-
-export const SearchInput = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  font-size: 16px;
-  border-radius: 12px;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-      border: 1px solid ${props.theme.colors.gray[500]};
-      color: ${props.theme.colors.gray[600]};
-      fill: ${props.theme.colors.gray[600]};
-      &:hover {
-        border: 1px solid ${props.theme.colors.green[800]};
-      }
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-      border: 1px solid ${props.theme.colors.gray[300]};
-      color: ${props.theme.colors.gray[200]};
-      fill: ${props.theme.colors.gray[50]};
-      &:hover {
-        border: 1px solid ${props.theme.colors.green[300]};
-      }
-    `}
-
-  div {
-    padding-left: 5px;
-    display: flex;
-  }
-  svg {
-    width: 16px;
-    height: auto;
-  }
-  @media ${screen.mobile} {
-    width: 120px;
-    height: 30px;
-    svg {
-      width: 8px;
-      height: auto;
-    }
-  }
-`
-// TODO: get rid of duplicates
-export const Input = styled.input`
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  background: transparent;
-  box-shadow: none;
-  outline: none;
-  border: none;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      color: ${props.theme.colors.gray[600]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      color: ${props.theme.colors.gray[200]};
-    `}
-  @media ${screen.mobile} {
-    width: 120px;
-    font-size: 12px;
-  }
-`
 
 export const DateDescriptions = styled(Typography)`
-  @media ${screen.mobile} {
+  ${mobile(css`
     display: none;
-  }
+  `)}
 `
 export const MobileDateDescriptions = styled(Typography)`
   display: none;
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 12px !important;
     display: flex;
-  }
+  `)}
 `
 
 export const DropdownNetwork = styled(Dropdown)`
@@ -533,11 +487,11 @@ export const DropdownNetwork = styled(Dropdown)`
       css`
         color: ${props.theme.colors.gray[100]};
       `};
-    @media ${screen.mobile} {
+    ${mobile(css`
       div {
         font-size: 10px;
       }
-    }
+    `)}
   }
   ${Header} {
     border-radius: 20px;
@@ -563,43 +517,43 @@ export const DropdownNetwork = styled(Dropdown)`
       }
       ${Arrow} {
         width: 11px;
-        @media ${screen.mobile} {
+        ${mobile(css`
           display: flex;
           align-items: center;
-        }
+        `)}
       }
     }
-    @media ${screen.mobile} {
-      width: 120px;
+    ${mobile(css`
+      width: 148px;
       padding: 3px 5px;
       white-space: nowrap;
       div {
         font-size: 12px;
       }
-    }
+    `)}
   }
 
   ${Arrow} {
-    @media ${screen.mobile} {
+    ${mobile(css`
       svg {
         width: 6px;
         height: auto;
       }
-    }
+    `)}
   }
 
   ${DropdownIconContianer} {
     width: 16px;
     height: 22px;
     margin: 0px;
-    @media ${screen.mobile} {
+    ${mobile(css`
       width: 10px;
       height: 16px;
       svg {
         width: 10px;
         height: auto;
       }
-    }
+    `)}
   }
   ${DropdownIcon} {
     height: 20px;
@@ -627,9 +581,9 @@ export const DropdownNetwork = styled(Dropdown)`
     border-radius: 10px;
     text-align: left;
     color: inherit;
-    @media ${screen.mobile} {
+    ${mobile(css`
       font-size: 8px;
-    }
+    `)}
   }
 
   ${Option} {
@@ -642,9 +596,9 @@ export const DropdownNetwork = styled(Dropdown)`
     border-radius: 10px;
     text-align: left;
     color: inherit;
-    @media ${screen.mobile} {
+    ${mobile(css`
       font-size: 10px;
-    }
+    `)}
   }
 
   ${DefaultIcon} {
@@ -679,25 +633,13 @@ export const DropdownNetwork = styled(Dropdown)`
       css`
         color: ${props.theme.colors.gray[800]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        /* background: ${props.theme.colors.gray[50]}; */
         box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.15);
-        ${Icon} {
-          svg {
-            fill: ${props.theme.colors.gray[800]};
-          }
-        }
       `}
     ${(props) =>
       props.theme.name === 'dark' &&
       css`
-        ${Icon} {
-          svg {
-            fill: ${props.theme.colors.gray[100]};
-          }
-        }
         color: ${props.theme.colors.gray[100]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        /* background: ${props.theme.colors.gray[500]}; */
         box-shadow: ${props.theme.backShadow};
       `}
   }
@@ -722,6 +664,9 @@ export const DropdownNetwork = styled(Dropdown)`
       ${(props) =>
         props.theme.name === 'light' &&
         css`
+          svg {
+            fill: ${props.theme.colors.gray[800]};
+          }
           &:hover {
             border: 1px solid ${props.theme.colors.gray[600]};
           }
@@ -729,6 +674,9 @@ export const DropdownNetwork = styled(Dropdown)`
       ${(props) =>
         props.theme.name === 'dark' &&
         css`
+          svg {
+            fill: ${props.theme.colors.gray[100]};
+          }
           &:hover {
             border: 1px solid ${props.theme.colors.gray[100]};
           }
@@ -742,4 +690,130 @@ export const TableTransactionsContainer = styled.div`
   ${sdesktop(css`
     overflow-x: auto;
   `)}
+`
+
+export const DatePickerHeader = styled.div`
+  font-size: 14px;
+  padding: 8px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ${({ theme: { name, colors } }) =>
+    name === 'light'
+      ? css`
+          background: ${colors?.gray[50]};
+          border: 1px solid ${colors?.gray[500]};
+        `
+      : css`
+          background: ${colors?.gray[500]};
+          border: 1px solid ${colors?.gray[300]};
+        `}
+
+  ${mobile(css`
+    height: 30px;
+    font-family: roboto;
+    width: 130px;
+    font-size: 10px;
+  `)}
+`
+
+export const DatePickerHeadersContainer = styled.div`
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+`
+
+export const DatePickerDropdown = styled.div<{ isRange?: boolean }>`
+  transition: 0.25s all;
+  position: absolute;
+  width: 250px;
+  right: 0px;
+  top: 40px;
+  z-index: 1;
+  border-radius: 12px;
+
+  ${({ theme: { colors, name } }) =>
+    name === 'light'
+      ? css`
+          color: ${colors.gray[800]};
+          background: ${colors.gray[50]};
+          border: 1px solid ${colors.gray[500]};
+        `
+      : css`
+          color: ${colors.gray[50]};
+          background: ${colors.gray[500]};
+          border: 1px solid ${colors.gray[300]};
+          ${(isRange) =>
+            !isRange &&
+            css`
+              .rdp-day_selected {
+                border: 1px solid ${colors.gray[100]};
+              }
+            `}
+        `}
+
+  .rdp {
+    --rdp-cell-size: 30px;
+    --rdp-caption-font-size: 14px;
+    --rdp-caption-font-weight: 400;
+    --rdp-caption-font-family: roboto;
+    --rdp-accent-color: ${(props) => props.theme.colors.gray[400]};
+    --rdp-background-color: ${(props) => props.theme.colors.gray[400]};
+  }
+  ${(props) =>
+    props.isRange &&
+    props.theme.name === 'light' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[600]};
+        color: ${props.theme.colors.gray[800]};
+      }
+    `}
+  ${(props) =>
+    !props.isRange &&
+    props.theme.name === 'dark' &&
+    css`
+      .rdp-day_selected {
+        border: 1px solid ${props.theme.colors.gray[100]};
+      }
+    `}
+    
+  ${(props) =>
+    !props.isRange &&
+    css`
+      .rdp-day {
+        border-radius: 20%;
+      }
+    `}
+  ${(props) =>
+    props.isRange &&
+    css`
+      .rdp-day {
+        border: none !important;
+      }
+    `}
+`
+
+export const DatePickerContainer = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.25s all;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[800]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[50]};
+    `};
 `

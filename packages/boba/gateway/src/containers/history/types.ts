@@ -23,9 +23,13 @@ export enum CHAIN_NAME {
   BNB = 'BNB',
   Boba_BNB = 'Boba BNB',
   Ethereum = 'Ethereum',
-  Boba_Ethereum = 'Boba',
+  Boba_Ethereum = 'Boba Ethereum',
   Goerli = 'Goerli',
   Boba_Goerli = 'Boba Goerli',
+  Avalanche = 'Avax',
+  Boba_Avalanche = 'Boba Avax',
+  Avalanche_Testnet = 'Fuji',
+  Boba_Avalanche_Testnet = 'Boba Fuji',
 }
 
 export enum LAYER {
@@ -90,7 +94,7 @@ export interface ITransaction {
   hash: string
   timeStamp: number
   to: string
-  UserFacingStatus?: TRANSACTION_FILTER_STATUS
+  UserFacingStatus: TRANSACTION_FILTER_STATUS
 }
 
 export interface IProcessedTransaction {
@@ -101,7 +105,7 @@ export interface IProcessedTransaction {
   to: string
   tokenSymbol: string
   amount: string
-  status?: TRANSACTION_FILTER_STATUS // need to remove the undefined option
+  status: TRANSACTION_FILTER_STATUS // need to remove the undefined option
   originChainId: number
   destinationChainId: number
 }
@@ -120,6 +124,7 @@ export type ChainInfo = {
   name: string
   symbol: string
   transactionUrlPrefix: string
+  imgSrc: string
 }
 
 export interface Token {
