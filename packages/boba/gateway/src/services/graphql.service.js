@@ -45,6 +45,7 @@ class GraphQLService {
 
   async conductQuery(query, variables = {}, sourceChainId, useLocalGraphEndpoint = false){
     const uri = this.getBridgeEndpoint(sourceChainId, useLocalGraphEndpoint)
+    if (!uri) return;
     const client = new ApolloClient({
       uri,
       link: new HttpLink({
