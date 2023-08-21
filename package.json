@@ -17,8 +17,7 @@
       "go/op-exporter",
       "ops/docker/rpc-proxy",
       "ops/docker/hardhat",
-      "go/batch-submitter",
-      "e2e-tests"
+      "go/batch-submitter"
     ],
     "nohoist": [
       "examples/*"
