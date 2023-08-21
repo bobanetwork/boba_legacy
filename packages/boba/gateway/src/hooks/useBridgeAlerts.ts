@@ -30,7 +30,7 @@ import { logAmount } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
 import BN from 'bignumber.js'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
-import { BigNumberish } from 'ethers'
+import { BigNumberish, ethers } from 'ethers'
 
 enum ALERT_KEYS {
   OMG_INFO = 'OMG_INFO',
@@ -38,6 +38,7 @@ enum ALERT_KEYS {
   VALUE_TOO_LARGE = 'VALUE_TOO_LARGE',
   FAST_EXIT_ERROR = 'FAST_EXIT_ERROR',
   FAST_DEPOSIT_ERROR = 'FAST_DEPOSIT_ERROR',
+  TELEPORTATION_ASSET_NOT_SUPPORTED = 'TELEPORTER_ASSET_NOT_SUPPORTED',
 }
 
 interface ITeleportationTokenSupport {
@@ -76,6 +77,54 @@ const useBridgeAlerts = () => {
   const LPBalance = useSelector(selectL1LPBalanceString)
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
+
+  useEffect(() => {
+    if (bridgeType === BRIDGE_TYPE.TELEPORTATION) {
+      if (!tokenForTeleportationSupported.supported) {
+        dispatch(
+          clearBridgeAlert({
+            keys: [ALERT_KEYS.VALUE_TOO_LARGE, ALERT_KEYS.VALUE_TOO_SMALL],
+          })
+        )
+        dispatch(
+          setBridgeAlert({
+            meta: ALERT_KEYS.TELEPORTATION_ASSET_NOT_SUPPORTED,
+            type: 'error',
+            text: `Asset not supported, please choose different asset or one of our other bridge modes.`,
+          })
+        )
+      } else {
+        dispatch(
+          clearBridgeAlert({
+            keys: [ALERT_KEYS.TELEPORTATION_ASSET_NOT_SUPPORTED],
+          })
+        )
+        if (amountToBridge < tokenForTeleportationSupported.minDepositAmount) {
+          dispatch(
+            setBridgeAlert({
+              meta: ALERT_KEYS.VALUE_TOO_SMALL,
+              type: 'error',
+              text: `For this asset you need to bridge at least ${ethers.utils.formatEther(
+                tokenForTeleportationSupported.minDepositAmount
+              )}.`,
+            })
+          )
+        } else if (
+          amountToBridge > tokenForTeleportationSupported.maxDepositAmount
+        ) {
+          dispatch(
+            setBridgeAlert({
+              meta: ALERT_KEYS.VALUE_TOO_LARGE,
+              type: 'error',
+              text: `For this asset you are allowed to bridge at maximum ${ethers.utils.formatEther(
+                tokenForTeleportationSupported.maxDepositAmount
+              )} per transaction.`,
+            })
+          )
+        }
+      }
+    }
+  }, [tokenForTeleportationSupported, bridgeType])
 
   // show infor to user about to OMG token when
   // connected to layer 1 ETH as token is specific to ethereum only.

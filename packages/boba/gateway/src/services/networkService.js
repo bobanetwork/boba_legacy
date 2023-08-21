@@ -113,6 +113,7 @@ class NetworkService {
     this.L1Provider = null // L1 Infura
     this.L2Provider = null // L2 to Boba replica
     this.provider = null   // from MetaMask
+    this.chainId = null // from Metamask
 
     this.environment = null
 
@@ -635,6 +636,7 @@ class NetworkService {
 
       // connect to the wallet
       this.provider = this.walletService.provider
+      this.chainId = (await this.provider.getNetwork()).chainId
       this.account = await this.provider.getSigner().getAddress()
 
       let chainId = chainIdChanged
@@ -2399,7 +2401,10 @@ class NetworkService {
     }
   }
 
-  getTeleportationContract(chainId) {
+  getTeleportationAddress(chainId) {
+    if (!chainId) {
+      chainId = this.chainId
+    }
     const networkConfig = CHAIN_ID_LIST[chainId]
     if (!networkConfig) {
       throw new Error(`Unknown chainId to retrieve teleportation contract from: ${chainId}`)
@@ -2408,17 +2413,23 @@ class NetworkService {
       if (isDevBuild()) {
         console.log("DEV: Teleportation is only supported on testnet for now, chainId: ", chainId)
       }
-      return;
+      return {teleportationAddr: undefined, networkConfig}
     }
     const addresses = appService.fetchAddresses({networkType: networkConfig.networkType, network: networkConfig.chain})
 
-    const rpc = getRpcUrl({networkType: networkConfig.networkType, network: networkConfig.chain, layer: networkConfig.layer})
-    const provider = new ethers.providers.StaticJsonRpcProvider(rpc)
     let teleportationAddr = addresses.Proxy__L2Teleportation
     if (networkConfig.layer === LAYER.L1) {
       teleportationAddr = addresses.Proxy__L1Teleportation
     }
+    return {teleportationAddr, networkConfig};
+  }
+
+  getTeleportationContract(chainId) {
+    const {teleportationAddr, networkConfig} = this.getTeleportationAddress(chainId)
     if (!teleportationAddr) return;
+
+    const rpc = getRpcUrl({networkType: networkConfig.networkType, network: networkConfig.chain, layer: networkConfig.layer})
+    const provider = new ethers.providers.StaticJsonRpcProvider(rpc)
 
     return this.Teleportation
       .attach(teleportationAddr)
@@ -4653,6 +4664,11 @@ class NetworkService {
       return [l1Explorer, l2Explorer]
     }
     return []
+  }
+
+  async getCurrentChainId() {
+    const {chainId} = await this.provider?.getNetwork()
+    return chainId;
   }
 
 }

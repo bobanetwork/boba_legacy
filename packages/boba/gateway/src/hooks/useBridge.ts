@@ -85,13 +85,10 @@ export const useBridge = () => {
       // ERC20 token fast bridging.
       // step -1  approve token
       // step -2  deposit to Teleportation.
-      const allAddresses = networkService.getAllAddresses()
+
+      const { teleportationAddr } = networkService.getTeleportationAddress()
       const approvalReceipt = await dispatch(
-        approveERC20(
-          amountWei,
-          token.address,
-          (allAddresses as any)['Teleportation']
-        )
+        approveERC20(amountWei, token.address, teleportationAddr)
       )
 
       if (approvalReceipt === false) {
