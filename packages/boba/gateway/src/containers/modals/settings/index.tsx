@@ -52,8 +52,10 @@ const SettingsModal: FC<SettingsModalProps> = ({ open }) => {
       <SettingsWrapper>
         <SettingsItem>
           <SettingsText>
-            <SettingTitle>Use Testnet</SettingTitle>
-            <SettingSubTitle>Use bridge on testnets</SettingSubTitle>
+            <SettingTitle>Show Testnets</SettingTitle>
+            <SettingSubTitle>
+              Testnets will be available to bridge
+            </SettingSubTitle>
           </SettingsText>
           <SettingsAction>
             <SwitchButton

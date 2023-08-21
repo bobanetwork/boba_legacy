@@ -12,7 +12,6 @@ import { ethereumConfig } from './config/ethereum'
 import { bnbConfig } from './config/bnb'
 import { avaxConfig } from './config/avax'
 import { Layer, LAYER } from 'util/constant'
-import { number } from 'prop-types'
 
 export const L1_ICONS = {
   ethereum: EthereumIcon,
@@ -127,11 +126,11 @@ export const NetworkList: { Mainnet: INetwork[]; Testnet: INetwork[] } = {
     {
       icon: 'ethereum',
       chain: NETWORK.ETHEREUM,
-      label: 'Ethereum <> Boba',
+      label: 'Ethereum <> Boba ETH',
       key: 'ethereum',
       name: {
         l1: 'Ethereum',
-        l2: 'Boba',
+        l2: 'Boba ETH',
       },
       chainId: { [Layer.L1]: '1', [Layer.L2]: '288' },
     },
@@ -162,11 +161,11 @@ export const NetworkList: { Mainnet: INetwork[]; Testnet: INetwork[] } = {
     {
       icon: 'ethereum',
       chain: NETWORK.ETHEREUM,
-      label: 'Ethereum (Goerli) <> Boba',
+      label: 'Ethereum (Goerli) <> Boba (Goerli)',
       key: 'ethereum',
       name: {
         l1: 'Ethereum (Goerli)',
-        l2: 'Boba',
+        l2: 'Boba (Goerli)',
       },
       chainId: { [Layer.L1]: '5', [Layer.L2]: '2888' },
     },

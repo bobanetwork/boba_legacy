@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export const StyleMenuButton = styled.div`
   display: flex;
@@ -7,6 +7,16 @@ export const StyleMenuButton = styled.div`
   padding: 8px 24px;
   border-radius: 33px;
   gap: 10px;
-  background: ${(props) => props.theme.colors.gray[400]};
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      background: #fff;
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      background: props.theme.colors.gray[400];
+    `}
+
   cursor: pointer;
 `

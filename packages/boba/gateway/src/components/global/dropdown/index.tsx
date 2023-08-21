@@ -4,6 +4,7 @@ import React, {
   ReactNode,
   useEffect,
   useRef,
+  CSSProperties,
 } from 'react'
 import ArrowDown from 'assets/images/icons/arrowdown.svg'
 import {
@@ -17,7 +18,10 @@ import {
   DropdownContent,
   OptionsHeader,
   Arrow,
+  NoOptions,
 } from './styles'
+
+import { ModalTypography } from 'components/global/modalTypography'
 export interface IDropdownItem {
   value?: string
   label: string | ReactNode
@@ -33,6 +37,7 @@ export interface IDropdownProps {
   onItemSelected?: (item: IDropdownItem) => void
   className?: string
   headers?: string[]
+  style?: CSSProperties
 }
 
 export const Dropdown: React.FC<IDropdownProps> = ({
@@ -42,6 +47,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
   onItemSelected,
   className,
   headers = [],
+  style,
 }) => {
   if (headers) {
     let allItems: IDropdownItem[] = []
@@ -106,7 +112,11 @@ export const Dropdown: React.FC<IDropdownProps> = ({
   }, [defaultItem])
 
   return (
-    <DropdownContainer className={`dropdown ${className}`} ref={dropdownRef}>
+    <DropdownContainer
+      className={`dropdown ${className}`}
+      ref={dropdownRef}
+      style={style}
+    >
       <Header
         onClick={handleDropdown}
         error={error}
@@ -134,54 +144,62 @@ export const Dropdown: React.FC<IDropdownProps> = ({
       </Header>
       {isOpen && (
         <DropdownBody>
-          <DropdownContent>
-            {items.map((item, index) => {
-              if (item.header) {
-                return (
-                  <OptionsHeader
-                    key={index}
-                    className={`dropdown ${className}`}
-                  >
-                    {item.imgSrc && (
-                      <IconContainer>
-                        {item.imgSrc !== 'default' && (
-                          <Icon src={item.imgSrc} />
-                        )}
-                      </IconContainer>
-                    )}
-                    {item.label}
-                  </OptionsHeader>
-                )
-              } else {
-                return (
-                  <Option
-                    key={index}
-                    className={`dropdown ${className}`}
-                    isSelected={item.value === selectedItem.value}
-                    onClick={() => {
-                      if (!item.header) {
-                        selectItem(item)
-                      }
-                    }}
-                  >
-                    {item.imgSrc && (
-                      <IconContainer>
-                        {item.imgSrc !== 'default' &&
-                          item.imgSrc.includes('png') && (
-                            <img src={item.imgSrc} alt="token" width="20px" />
-                          )}
-                        {item.imgSrc !== 'default' &&
-                          item.imgSrc.includes('svg') && (
+          {items.length ? (
+            <DropdownContent>
+              {items.map((item, index) => {
+                if (item.header) {
+                  return (
+                    <OptionsHeader
+                      key={index}
+                      className={`dropdown ${className}`}
+                    >
+                      {item.imgSrc && (
+                        <IconContainer>
+                          {item.imgSrc !== 'default' && (
                             <Icon src={item.imgSrc} />
                           )}
-                      </IconContainer>
-                    )}
-                    {item.label}
-                  </Option>
-                )
-              }
-            })}
-          </DropdownContent>
+                        </IconContainer>
+                      )}
+                      {item.label}
+                    </OptionsHeader>
+                  )
+                } else {
+                  return (
+                    <Option
+                      key={index}
+                      className={`dropdown ${className}`}
+                      isSelected={item.value === selectedItem.value}
+                      onClick={() => {
+                        if (!item.header) {
+                          selectItem(item)
+                        }
+                      }}
+                    >
+                      {item.imgSrc && (
+                        <IconContainer>
+                          {item.imgSrc !== 'default' &&
+                            item.imgSrc.includes('png') && (
+                              <img src={item.imgSrc} alt="token" width="20px" />
+                            )}
+                          {item.imgSrc !== 'default' &&
+                            item.imgSrc.includes('svg') && (
+                              <Icon src={item.imgSrc} />
+                            )}
+                        </IconContainer>
+                      )}
+                      {item.label}
+                    </Option>
+                  )
+                }
+              })}
+            </DropdownContent>
+          ) : (
+            <NoOptions>
+              <ModalTypography variant="body3">
+                No available options
+              </ModalTypography>
+            </NoOptions>
+          )}
         </DropdownBody>
       )}
     </DropdownContainer>
