@@ -6,11 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
@@ -19,13 +15,8 @@
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "src",
-    "types": ["jest", "testing-library__jest-dom"],
+    "types": ["jest", "testing-library__jest-dom", "cypress"]
   },
-  "exclude": [
-    "node_modules",
-    "types/custom.d.ts",
-  ],
-  "include": [
-    "src"
-  ]
+  "exclude": ["node_modules", "types/custom.d.ts"],
+  "include": ["src"]
 }
