@@ -1,12 +1,8 @@
-
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { closeModal } from 'actions/uiAction'
-import {
-  setConnectBOBA,
-  setConnectETH,
-} from 'actions/setupAction.js'
+import { setConnectBOBA, setConnectETH } from 'actions/setupAction.js'
 
 import Modal from 'components/modal/Modal'
 import { Typography } from 'components/global/typography'
@@ -22,12 +18,11 @@ import { useWalletConnect } from 'hooks/useWalletConnect'
 import { setConnect } from 'actions/setupAction'
 
 const WalletSelectorModal = ({ open }) => {
-
   const { triggerInit } = useWalletConnect()
 
   const dispatch = useDispatch()
 
-  const [ walletNotFound, setWalletNotFound ] = useState(false)
+  const [walletNotFound, setWalletNotFound] = useState(false)
 
   const connectToWallet = async (type) => {
     const resetConnectChain = () => {
@@ -38,7 +33,7 @@ const WalletSelectorModal = ({ open }) => {
     try {
       if (await networkService.walletService.connectWallet(type)) {
         dispatch(closeModal('walletSelectorModal'))
-        triggerInit();
+        triggerInit()
       } else {
         resetConnectChain()
       }
@@ -62,28 +57,34 @@ const WalletSelectorModal = ({ open }) => {
       newStyle={true}
       maxWidth="450px"
       minHeight="200px"
-      title={walletNotFound ? "No MetaMask Install" : "Connect Wallet"}
+      title={walletNotFound ? 'No MetaMask Install' : 'Connect Wallet'}
     >
-
-      {walletNotFound ? <Wallets>
-        <Wallet onClick={() => {
-          window.open('https://metamask.io/download/', '_blank');
-          setWalletNotFound(false);
-        }}>
-          <IconContainer>
-            <Icon src={metaMaskLogo} alt="metamask" />
-          </IconContainer>
-          <Typography variant="title">Download MetaMask wallet</Typography>
-        </Wallet>
-      </Wallets> :
+      {walletNotFound ? (
         <Wallets>
-          <Wallet onClick={() => {
-            if (window.ethereum) {
-              connectToWallet('metamask')
-            } else {
-              setWalletNotFound(true);
-            }
-          }}>
+          <Wallet
+            onClick={() => {
+              window.open('https://metamask.io/download/', '_blank')
+              setWalletNotFound(false)
+            }}
+          >
+            <IconContainer>
+              <Icon src={metaMaskLogo} alt="metamask" />
+            </IconContainer>
+            <Typography variant="title">Download MetaMask wallet</Typography>
+          </Wallet>
+        </Wallets>
+      ) : (
+        <Wallets>
+          <Wallet
+            onClick={() => {
+              if (window.ethereum) {
+                connectToWallet('metamask')
+              } else {
+                setWalletNotFound(true)
+              }
+            }}
+            id="connectMetaMask"
+          >
             <IconContainer>
               <Icon src={metaMaskLogo} alt="metamask" />
             </IconContainer>
@@ -92,7 +93,10 @@ const WalletSelectorModal = ({ open }) => {
               <Svg fill="#fff" src={ArrowIcon} />
             </ArrowContainer>
           </Wallet>
-          <Wallet onClick={() => connectToWallet('walletconnect')}>
+          <Wallet
+            onClick={() => connectToWallet('walletconnect')}
+            id="connectWalletConnect"
+          >
             <IconContainer>
               <Icon src={walletConnectLogo} alt="walletconnect" />
             </IconContainer>
@@ -101,7 +105,8 @@ const WalletSelectorModal = ({ open }) => {
               <Svg fill="#fff" src={ArrowIcon} />
             </ArrowContainer>
           </Wallet>
-        </Wallets>}
+        </Wallets>
+      )}
     </Modal>
   )
 }
