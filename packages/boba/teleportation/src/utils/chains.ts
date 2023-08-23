@@ -95,7 +95,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   5: {
-    url: 'https://ethereum-goerli.publicnode.com', //'https://goerli.gateway.tenderly.co',
+    url: 'https://goerli.gateway.tenderly.co',
     testnet: true,
     name: 'Goerli Testnet',
     teleportationAddress: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13',

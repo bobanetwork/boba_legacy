@@ -539,11 +539,14 @@ class NetworkService {
       )
 
       // Teleportation
-      this.Teleportation = new ethers.Contract(
-        // correct one is used accordingly
-        this.addresses.Proxy__L1Teleportation,
-        TeleportationJson.abi,
-      )
+      if (this.addresses.Proxy__L1Teleportation) {
+        // not deployed on mainnets yet
+        this.Teleportation = new ethers.Contract(
+          // correct one is used accordingly
+          this.addresses.Proxy__L1Teleportation,
+          TeleportationJson.abi,
+        )
+      }
 
       // Liquidity pools
 

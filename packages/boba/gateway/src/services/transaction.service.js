@@ -221,7 +221,7 @@ class TransactionService {
         try {
           sentEvents = await teleportationGraphQLService.queryAssetReceivedEvent(networkService.account, sourceChainId)
         } catch (err) {
-          console.error(err)
+          console.log(err?.message)
         }
 
         if (!sentEvents || !sentEvents?.length) return []
