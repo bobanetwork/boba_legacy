@@ -190,14 +190,14 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         __Pausable_init_unchained();
         __Multicall_init_unchained();
 
-        emit DisburserTransferred(owner);
-        emit OwnershipTransferred(owner);
+        emit DisburserTransferred(msg.sender);
+        emit OwnershipTransferred(msg.sender);
     }
 
     /**
     * @dev Add support of a specific ERC20 token on this network.
     *
-    * @param _token Token address to support or ZeroAddress for native
+    * @param _token Token address to support or ZeroAddress for native asset.
     */
     function addSupportedToken(address _token, uint32 _toChainId, uint256 _minDepositAmount, uint256 _maxDepositAmount, uint256 _maxTransferAmountPerDay) public onlyOwner() onlyInitialized() {
         require(supportedTokens[_token][_toChainId].supported == false, "Already supported");
@@ -235,7 +235,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      * minDepositAmount, the amount is greater than the current
      * maxDepositAmount.
      *
-     * @param _token ERC20 address of the token to deposit.
+     * @param _token ERC20 address of the token to deposit. Zero-Address indicates native asset.
      * @param _amount The amount of token or native asset to deposit (must be the same as msg.value if native asset)
      * @param _toChainId The destination chain ID.
      */
@@ -253,7 +253,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
-        if (block.timestamp < supToken.transferTimestampCheckPoint + 86400) {
+        if (block.timestamp < supToken.transferTimestampCheckPoint + 1 days) {
             supToken.transferredAmount += _amount;
             require(supToken.transferredAmount <= supToken.maxTransferAmountPerDay, "max amount per day exceeded");
         } else {
@@ -292,7 +292,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
         require(_numDisbursements > 0, "No disbursements");
 
         // Process disbursements.
-        uint remainingValue = msg.value;
+        uint256 remainingValue = msg.value;
         for (uint256 i = 0; i < _numDisbursements; i++) {
 
             uint256 _amount = _disbursements[i].amount;
@@ -365,7 +365,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
             // slither-disable-next-line calls-loop,reentrancy-events
             (bool success,) = _addr.call{gas: 3000, value: _amount}("");
             if (success) {
-                failedNativeDisbursements[_depositIds[i]].failed = false;
+                delete failedNativeDisbursements[_depositIds[i]];
                 emit DisbursementRetrySuccess(_depositIds[i], _addr, _amount, _sourceChainId);
             }
         }
@@ -448,6 +448,7 @@ contract Teleportation is PausableUpgradeable, MulticallUpgradeable {
      * @notice Sets the minimum amount that can be deposited in a receive.
      *
      * @param _token configure for which token or ZeroAddress for native
+     * @param _toChainId The destination network associated with the minimum deposit amount.
      * @param _minDepositAmount The new minimum deposit amount.
      */
     function setMinAmount(address _token, uint32 _toChainId, uint256 _minDepositAmount) external onlyOwner() {
