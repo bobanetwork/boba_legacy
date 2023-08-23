@@ -15,6 +15,8 @@ const SwitchNetworkModal = ({open}) => {
   const network = useSelector(selectNetwork());
   const networkType = useSelector(selectActiveNetworkType())
 
+  console.log('network', network)
+
   const onClick = () => {
     dispatch(setActiveNetwork());
     // reset baseState to false to trigger initialization on chain change.

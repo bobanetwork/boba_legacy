@@ -11,12 +11,14 @@ import {
   selectBaseEnabled,
   selectLayer,
   selectAccountEnabled,
+  selectSetup,
 } from 'selectors'
 
 import { LAYER } from 'util/constant'
 
 const useWalletSwitch = () => {
   const dispatch = useDispatch<any>()
+  const walletInfo = useSelector(selectSetup())
   const accountEnabled = useSelector(selectAccountEnabled())
   const network = useSelector(selectNetwork())
   const activeNetwork = useSelector(selectActiveNetwork())

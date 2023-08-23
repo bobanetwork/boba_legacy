@@ -48,6 +48,7 @@ export const useWalletConnect = () => {
       const initialized = await networkService.initializeAccount({
         chainIdChanged,
       })
+
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'))
         return false

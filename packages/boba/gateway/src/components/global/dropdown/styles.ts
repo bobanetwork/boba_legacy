@@ -240,3 +240,9 @@ export const Arrow = styled(Svg)`
       fill: ${props.theme.colors.gray[600]};
     `}
 `
+
+export const NoOptions = styled.div`
+  text-align: center;
+  width: 100%;
+  padding-bottom: 15px;
+`
