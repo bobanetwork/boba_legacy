@@ -1497,11 +1497,11 @@ describe('Asset Teleportation Tests', async () => {
         const failedDisbursement =
           await Proxy__Teleportation.failedNativeDisbursements(0)
         expect(failedDisbursement.failed).to.be.eq(false)
-        expect(failedDisbursement.disbursement.amount).to.be.eq(_amount)
+        expect(failedDisbursement.disbursement.amount).to.be.eq('0')
         expect(failedDisbursement.disbursement.addr).to.be.eq(
-          PausedReceiver.address
+          ethers.constants.AddressZero
         )
-        expect(failedDisbursement.disbursement.sourceChainId).to.be.eq(4)
+        expect(failedDisbursement.disbursement.sourceChainId).to.be.eq(0)
         expect(failedDisbursement.disbursement.depositId).to.be.eq(0)
         expect(
           await ethers.provider.getBalance(Proxy__Teleportation.address)
@@ -1591,28 +1591,28 @@ describe('Asset Teleportation Tests', async () => {
         const failedDisbursementRetried1 =
           await Proxy__Teleportation.failedNativeDisbursements(2)
         expect(failedDisbursementRetried1.failed).to.be.eq(false)
-        expect(failedDisbursementRetried1.disbursement.amount).to.be.eq(_amount)
+        expect(failedDisbursementRetried1.disbursement.amount).to.be.eq('0')
         expect(failedDisbursementRetried1.disbursement.addr).to.be.eq(
-          PausedReceiver.address
+          ethers.constants.AddressZero
         )
         expect(failedDisbursementRetried1.disbursement.sourceChainId).to.be.eq(
-          4
+          0
         )
-        expect(failedDisbursementRetried1.disbursement.depositId).to.be.eq(2)
+        expect(failedDisbursementRetried1.disbursement.depositId).to.be.eq(0)
 
         const failedDisbursementRetried2 =
           await Proxy__Teleportation.failedNativeDisbursements(3)
         expect(failedDisbursementRetried2.failed).to.be.eq(false)
         expect(failedDisbursementRetried2.disbursement.amount).to.be.eq(
-          ethers.utils.parseEther('1')
+          '0'
         )
         expect(failedDisbursementRetried2.disbursement.addr).to.be.eq(
-          PausedReceiver.address
+          ethers.constants.AddressZero
         )
         expect(failedDisbursementRetried2.disbursement.sourceChainId).to.be.eq(
-          4
+          0
         )
-        expect(failedDisbursementRetried2.disbursement.depositId).to.be.eq(3)
+        expect(failedDisbursementRetried2.disbursement.depositId).to.be.eq(0)
         expect(
           await ethers.provider.getBalance(Proxy__Teleportation.address)
         ).to.be.eq(0)
