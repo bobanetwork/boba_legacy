@@ -27,7 +27,7 @@ const MenuItems = ({
     let fMenu = menuList
       .filter(
         (m) =>
-          intersection([m.key], PAGES_BY_NETWORK[network.toLowerCase()]).length
+          intersection([m.key], PAGES_BY_NETWORK[network?.toLowerCase()])?.length
       )
       .filter((m) => !m.disable)
 

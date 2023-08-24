@@ -120,7 +120,6 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                   return true
                 })
                 .map((token: any) => {
-                  console.log([token.symbol, token.address, token])
                   const amount = formatTokenAmount(token)
 
                   if (isMyToken && Number(amount) <= 0) {
