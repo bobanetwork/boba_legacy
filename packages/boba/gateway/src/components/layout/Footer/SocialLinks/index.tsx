@@ -14,12 +14,12 @@ interface Props {}
 
 const SocialLinks = (props: Props) => {
   return (
-    <SocialLinksContainer>
+    <SocialLinksContainer id="socialLinks">
       <StyledSocialLinks>
         <SocialLinkItem
           href="https://docs.boba.network"
           target="_blank"
-          aria-label="bobadocs"
+          aria-label="bobaDocs"
         >
           <DocsIcon />
         </SocialLinkItem>

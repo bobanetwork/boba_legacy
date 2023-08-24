@@ -30,7 +30,7 @@ export const Header: FC<HeaderProps> = () => {
   }
 
   return (
-    <HeaderContainer>
+    <HeaderContainer id="header">
       <BobaLogo />
       <Navigation />
       <NavDrawer open={showDrawer} onClose={() => setShowDrawer(false)} />

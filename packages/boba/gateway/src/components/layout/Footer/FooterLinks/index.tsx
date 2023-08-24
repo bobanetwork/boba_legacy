@@ -17,7 +17,7 @@ const FooterLinks = () => {
   }, [baseEnabled])
 
   return (
-    <LinkContainer>
+    <LinkContainer id="footerLinks">
       <div>
         {FOOTERLINKS.map((link) => {
           if (link.isNav) {

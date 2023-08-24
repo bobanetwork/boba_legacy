@@ -12,7 +12,7 @@ export const NetworkSelector = () => {
     setOpenDropdown((currentStatus) => !currentStatus)
   }
   return (
-    <NetworkContainer onClick={handleSelectNetwork}>
+    <NetworkContainer onClick={handleSelectNetwork} id="networkSelector">
       <ChainLabel direction="from" /> <Arrow src={ArrowDown} />
       {openDropdown && (
         <Dropdown>
