@@ -10,10 +10,6 @@ describe('Page', () => {
     page.connectMetamask()
   })
   describe.only('Page Header', () => {
-    beforeEach(() => {
-      page.visit()
-      page.header.requestMetamaskConnect()
-    })
     it('Navigation List', () => {
       page.checkNavigationListEthereum()
     })
@@ -26,10 +22,6 @@ describe('Page', () => {
     })
   })
   describe.only('Page Footer', () => {
-    beforeEach(() => {
-      page.visit()
-      page.header.requestMetamaskConnect()
-    })
     it('Social Media Links', () => {
       page.checkSocialMediaLinks()
     })
