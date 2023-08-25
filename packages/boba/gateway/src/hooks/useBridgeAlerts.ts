@@ -39,6 +39,7 @@ enum ALERT_KEYS {
   FAST_EXIT_ERROR = 'FAST_EXIT_ERROR',
   FAST_DEPOSIT_ERROR = 'FAST_DEPOSIT_ERROR',
   TELEPORTATION_ASSET_NOT_SUPPORTED = 'TELEPORTER_ASSET_NOT_SUPPORTED',
+  TELEPORTATION_NO_UNCONVENTIONAL_WALLETS = 'TELEPORTATION_NO_UNCONVENTIONAL_WALLETS',
 }
 
 interface ITeleportationTokenSupport {
@@ -99,6 +100,14 @@ const useBridgeAlerts = () => {
             keys: [ALERT_KEYS.TELEPORTATION_ASSET_NOT_SUPPORTED],
           })
         )
+        dispatch(
+          setBridgeAlert({
+            meta: ALERT_KEYS.TELEPORTATION_NO_UNCONVENTIONAL_WALLETS,
+            type: 'info',
+            text: `This bridge doesn't support smart-contract wallets that use a costly fallback method.`,
+          })
+        )
+
         if (amountToBridge < tokenForTeleportationSupported.minDepositAmount) {
           dispatch(
             setBridgeAlert({
