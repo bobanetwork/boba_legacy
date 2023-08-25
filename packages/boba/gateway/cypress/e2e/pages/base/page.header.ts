@@ -10,7 +10,7 @@ export default class PageHeader extends Base {
   }
 
   getNetworkSwitcher() {
-    return cy.get('#networkSelector').should('exist')
+    return cy.get('#networkSelector')
   }
 
   getLightThemeSwitcher() {
