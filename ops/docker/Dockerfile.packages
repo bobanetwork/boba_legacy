@@ -104,7 +104,6 @@ COPY --from=builder /opt/optimism/packages/boba/bundler_sdk ./packages/boba/bund
 COPY --from=builder /opt/optimism/packages/contracts ./packages/contracts
 COPY --from=builder /opt/optimism/packages/boba/contracts ./packages/boba/contracts
 COPY --from=builder /opt/optimism/packages/boba/turing ./packages/boba/turing
-COPY --from=builder /opt/optimism/packages/boba/teleportation ./packages/boba/teleportation
 
 FROM packages as deployer
 WORKDIR /opt/optimism/packages/contracts

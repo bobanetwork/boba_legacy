@@ -9,7 +9,6 @@ import {
   getBobaContractAt,
 } from '../src/hardhat-deploy-ethers'
 import fs from 'fs'
-import {BobaChains} from "@boba/teleportation/src";
 
 let Proxy__Teleportation: Contract
 let Teleportation: Contract
@@ -55,7 +54,7 @@ const deployFn: DeployFunction = async (hre) => {
   let fileName
 
   let isL2 = true;
-  for (let deployer of [(hre as any).deployConfig.deployer_l2, (hre as any).deployConfig.deployer_l1]) {
+  for (const deployer of [(hre as any).deployConfig.deployer_l2, (hre as any).deployConfig.deployer_l1]) {
     const redeploy = true
     if (redeploy) {
       Teleportation = await deployBobaContract(
@@ -105,7 +104,6 @@ const deployFn: DeployFunction = async (hre) => {
       deployer
     )
 
-    const useTestnetRoutes = true // To prevent developers configuring mainnet<>testnet routes (which wouldn't work due to the Teleportation service anyway)
     const defMinAmount = ethers.utils.parseEther('1')
     const defMaxAmount = ethers.utils.parseEther('100000')
     const defMaxDailyAmount = ethers.utils.parseEther('100000')
@@ -115,14 +113,6 @@ const deployFn: DeployFunction = async (hre) => {
     file.log(fileName, `Initialized proxy: ${await res.wait()}`)
     res = await Teleportation.initialize()
     file.log(fileName, `Teleportation initialized: ${await res.wait()}`)
-
-    const chains: any = {}
-    for (const [chainId, chainConfig] of Object.entries(BobaChains)) {
-      const tmpChainConfig = chainConfig
-      if (tmpChainConfig.testnet === useTestnetRoutes) {
-        chains[chainId] = tmpChainConfig
-      }
-    }
 
     // TODO: Add Mainnet routes
     const desiredRoutes = [
