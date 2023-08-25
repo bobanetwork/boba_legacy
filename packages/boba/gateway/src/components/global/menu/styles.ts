@@ -10,12 +10,12 @@ export const StyleMenuButton = styled.div`
   ${(props) =>
     props.theme.name === 'light' &&
     css`
-      background: #fff;
+      background: ${props.theme.colors.gray[50]};
     `}
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
-      background: props.theme.colors.gray[400];
+      background: ${props.theme.colors.gray[400]};
     `}
 
   cursor: pointer;

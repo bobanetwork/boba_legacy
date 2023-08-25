@@ -62,7 +62,9 @@ const BlockConfirmation: FC<Props> = ({ onClose }) => {
         <Typography variant="body2">
           Estimated time to complete :{' '}
           {!!latestBlock
-            ? ((64 - (latestBlock - initialBlock)) * blockTime) / 60
+            ? (((64 - (latestBlock - initialBlock)) * blockTime) / 60).toFixed(
+                2
+              )
             : 0}{' '}
           min.
         </Typography>

@@ -1,6 +1,8 @@
 import React from 'react'
+import { generateAvatarURL } from '@cfx-kit/wallet-avatar'
+
 import networkService from 'services/networkService'
-import { CircleIndicator, MenuItemStyle } from './style'
+import { CircleIndicator, MenuItemStyle, ProfileIndicator } from './style'
 import truncate from 'truncate-middle'
 import { Heading } from 'components/global'
 import Menu from 'components/global/menu'
@@ -37,6 +39,8 @@ export const WalletAddress = ({}: Props) => {
     disconnect()
   }
 
+  const profile = generateAvatarURL(networkService.account as string)
+
   return (
     <Menu
       name="walletAddress"
@@ -52,7 +56,7 @@ export const WalletAddress = ({}: Props) => {
       ]}
     >
       <>
-        <CircleIndicator />
+        <ProfileIndicator src={profile} />
         <Heading variant="h5">
           {truncate(networkService.account, 6, 4, '...')}
         </Heading>

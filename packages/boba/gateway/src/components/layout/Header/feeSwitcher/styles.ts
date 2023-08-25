@@ -5,7 +5,7 @@ import { mobile } from 'themes/screens'
 
 export const FeeSwitcherWrapper = styled.div`
   display: flex;
-  gap: 5px;
+  gap: 8px;
   align-items: center;
   justify-content: space-around;
   ${mobile(css`
@@ -20,7 +20,9 @@ export const FeeSwitcherLabel = styled(Heading).attrs({
   padding: 5px 10px;
 `
 
-export const FeeSwitcherIcon = styled(HelpOutline)``
+export const FeeSwitcherIcon = styled(HelpOutline)`
+  color: ${({ theme }) => theme.colors.gray[100]};
+`
 
 export const MenuItemStyle = styled(Typography).attrs({
   variant: 'body3',
@@ -30,4 +32,17 @@ export const MenuItemStyle = styled(Typography).attrs({
   display: flex !important;
   align-items: center;
   justify-content: space-around;
+`
+
+export const FeeSwitcherLabelWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+`
+export const FeeLabel = styled(Typography).attrs({
+  variant: 'body2',
+})`
+  color: ${({ theme: { name, colors } }) =>
+    name === 'light' ? colors.gray[600] : colors.gray[100]};
 `
