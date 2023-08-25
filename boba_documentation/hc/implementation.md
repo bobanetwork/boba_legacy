@@ -36,7 +36,7 @@ To obtain **Twitter** or **Spotify** data you could set up a system like this:
 
 ###
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (3) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/feature highlights.png" alt=""><figcaption></figcaption></figure>
 
 ### Feature Highlight 1: Using Turing to mint an NFT with 256 random attributes in a single transaction
 
@@ -128,13 +128,13 @@ You should lock down your off-chain endpoint to only accept queries from your sm
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/aws and google cloud functions.png" alt=""><figcaption></figcaption></figure>
 
 Your external API will need to accept calls from the L2Geth and return data in a way that can be understood by the L2Geth. Examples are provided in `./packages/boba/turing/AWS_code`. Specific instructions for setting up AWS lambda endpoints are [here](AWS\_code/AWS\_lambda\_setup.md) - note that _all_ APIs can be used, not just AWS Lambda endpoints.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard-3.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/important properties of hybrid.png" alt=""><figcaption></figcaption></figure>
 
 * Only one Turing call per execution
 * There is **1200 ms timeout** on API responses. Please make sure that your API responds promptly. If you are using AWS, note that some of their services take several seconds to spin up from a 'coldstart', resulting in persistent failure of your first call to your endpoint.
@@ -218,7 +218,7 @@ You can return anything you want - e.g. numbers, strings, ... - and this informa
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard-4.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/hybridcompute architecture.png" alt=""><figcaption></figcaption></figure>
 
 The modified Turing L2Geth, `L2TGeth`, monitors calldata for particular Keccak methodIDs of functions such as `GetRandom(uint32 rType, uint256 _random)` and `GetResponse(uint32 rType, string memory _url, bytes memory _payload)`. Upon finding such methodIDs in the execution flow, at any level, L2TGeth parses the calldata for additional information, such as external URLs, and uses that information to either directly prepare a response (e.g. generate a random number) or to call an external API. After new information is generated (or has returned from the external API), L2TGeth then runs the function with updated inputs, such that the new information flows back to the caller (via overloaded variables and a system for conditionally bypassing `requires`). Put simply, L2TGeth intercepts function calls, adds new information to the inputs, and then runs the function with the updated inputs.
 
@@ -226,7 +226,7 @@ In general, this system would lead to disagreement about the correct state of th
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard-5.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/quickstart for hybrid.png" alt=""><figcaption></figcaption></figure>
 
 Open a terminal window and from the top level:
 
@@ -335,7 +335,7 @@ $ hardhat --network boba_local test
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 6 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/technical appendix.png" alt=""><figcaption></figcaption></figure>
 
 #### Step 1: Invoking Turing for inside a Smart contract
 
