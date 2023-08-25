@@ -29,7 +29,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 
 
 
-<figure><img src=".gitbook/assets/Artboard 2 (14) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/directory-structure.png" alt=""><figcaption></figcaption></figure>
 
 **Base Layer (generally similar to Optimistic Ethereum)**
 

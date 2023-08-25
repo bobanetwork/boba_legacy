@@ -128,7 +128,7 @@ In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 our
 
 ## ![Developer FAQ](<.gitbook/assets/Artboard 2 (1) (1) (1).png>)
 
-
+***
 
 ![Smart Contracts](<.gitbook/assets/Artboard 3 (1) (1).png>)
 
