@@ -1,19 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Testing history page Date Picker 1`] = `
-<DocumentFragment>
-  <div
-    class="sc-cNNTdL XooGL"
-  >
-    <div
-      class="sc-iWxGtA kjxmRV"
-    >
-      05/10/1970 12:00 am
-    </div>
-  </div>
-</DocumentFragment>
-`;
-
 exports[`Testing history page Test History Page 1`] = `
 <DocumentFragment>
   <div
