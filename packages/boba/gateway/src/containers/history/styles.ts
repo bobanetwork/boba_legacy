@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { mobile, screen, sdesktop } from 'themes/screens'
+import { mobile, sdesktop, tablet } from 'themes/screens'
 import { Svg, Typography } from 'components/global'
 import Switch from 'assets/images/icons/switchIcon.svg'
 
@@ -42,6 +42,11 @@ export const HistoryPageContainer = styled.div`
   padding-top: 0;
   width: 100%;
   max-width: 1024px;
+  min-width: 480px;
+  ${sdesktop(css`
+    max-width: 750px;
+    gap: 0px 30px;
+  `)}
 `
 
 export const TableHeader = styled.div`
@@ -50,9 +55,11 @@ export const TableHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  @media ${screen.mobile} {
-    padding: 0px;
-  }
+  ${mobile(
+    css`
+      padding: 0px;
+    `
+  )}
 `
 
 export const TableFilters = styled.div`
@@ -62,18 +69,18 @@ export const TableFilters = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  @media ${screen.tablet} {
+  ${tablet(css`
     margin-bottom: 5px;
     gap: 20px;
     padding: 10px;
-  }
-  @media ${screen.mobile} {
+  `)}
+  ${mobile(css`
     gap: 10px;
     margin-bottom: 0px;
     p {
       font-size: 12px;
     }
-  }
+  `)}
 `
 
 export const DatePickerWrapper = styled.div`
@@ -83,9 +90,9 @@ export const DatePickerWrapper = styled.div`
   justify-content: space-between;
   white-space: nowrap;
   text-align: center;
-  @media ${screen.mobile} {
+  ${mobile(css`
     display: none;
-  }
+  `)}
 `
 
 export const MobileDatePickerWrapper = styled.div`
@@ -95,9 +102,9 @@ export const MobileDatePickerWrapper = styled.div`
   white-space: nowrap;
   text-align: center;
   gap: 8px;
-  @media ${screen.mobile} {
+  ${mobile(css`
     display: flex;
-  }
+  `)}
 `
 
 export const DateInput = styled.button`
@@ -119,17 +126,17 @@ export const NetworkDropdowns = styled.div`
   gap: 16px;
   font-size: 16px;
   align-items: center;
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 12px;
     gap: 0px 5px;
-  }
+  `)}
 `
 export const TransactionsTableWrapper = styled.div`
   width: 100%;
 `
 
 export const TransactionsWrapper = styled.div`
-  width: 1024px;
+  width: 100%;
   overflow-y: auto;
   max-height: 512px;
   ${sdesktop(css`
@@ -182,10 +189,10 @@ export const TransactionDate = styled.div`
   text-align: left;
   width: 168px;
   white-space: nowrap;
-  @media ${screen.mobile} {
+  ${mobile(css`
     width: 110px;
     font-size: 10px;
-  }
+  `)}
 `
 export const TransactionDetails = styled.div`
   display: flex;
@@ -204,11 +211,11 @@ export const TransactionChainDetails = styled.div`
 export const TransactionChain = styled.div`
   width: 102px;
   height: 16px;
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 10px;
     width: 72px;
     height: 12px;
-  }
+  `)}
 `
 
 export const TransactionHash = styled.a`
@@ -226,11 +233,11 @@ export const TransactionHash = styled.a`
     css`
       color: ${props.theme.colors.gray[100]};
     `}
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 8px;
     width: 72px;
     height: 12px;
-  }
+  `)}
 `
 
 export const IncompleteTransactionHash = styled.div`
@@ -247,11 +254,11 @@ export const IncompleteTransactionHash = styled.div`
     css`
       color: ${props.theme.colors.gray[100]};
     `}
-@media ${screen.mobile} {
+${mobile(css`
     font-size: 8px;
     width: 72px;
     height: 12px;
-  }
+  `)}
 `
 
 export const TransactionToken = styled.div`
@@ -262,14 +269,18 @@ export const TransactionToken = styled.div`
   width: 90px;
   text-align: left;
   font-size: 14px;
+  ${mobile(css`
+    font-size: 10px;
+  `)}
 `
 
 export const TransactionAmount = styled.div`
   font-size: 14px;
   width: 80px;
-  @media ${screen.mobile} {
+  text-align: left;
+  ${mobile(css`
     font-size: 10px;
-  }
+  `)}
 `
 
 export const Status = styled.div`
@@ -286,9 +297,9 @@ export const Status = styled.div`
     css`
       color: ${props.theme.colors.green[300]};
     `}
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 10px;
-  }
+  `)}
 `
 
 export const IconContainer = styled.div`
@@ -297,11 +308,11 @@ export const IconContainer = styled.div`
   direction: flex;
   align-items: center;
   justify-content: center;
-  @media ${screen.mobile} {
+  ${mobile(css`
     width: 24px;
     height: 26px;
     margin: 0px;
-  }
+  `)}
 `
 
 export const Icon = styled(Svg)`
@@ -313,12 +324,12 @@ export const Icon = styled(Svg)`
     width: 32px;
     height: auto;
   }
-  @media ${screen.mobile} {
+  ${mobile(css`
     svg {
       max-width: 24px;
       height: auto;
     }
-  }
+  `)}
 `
 
 export const Image = styled.img`
@@ -339,6 +350,12 @@ export const SwitchIcon = styled(Svg).attrs({
     justify-content: center;
     align-items: center;
   }
+  ${mobile(css`
+    svg {
+      max-width: 14px;
+      height: auto;
+    }
+  `)}
 `
 
 export const SwitchChainIcon = styled.div`
@@ -368,6 +385,10 @@ export const SwitchChainIcon = styled.div`
   &:hover {
     transform: rotate(180deg);
   }
+  ${mobile(css`
+    width: 25px;
+    height: 25px;
+  `)}
 `
 
 export const Table = styled.div`
@@ -393,15 +414,15 @@ export const Table = styled.div`
       border: 1px solid ${props.theme.colors.gray[300]};
       background: ${props.theme.colors.box.background};
     `}
-  @media ${screen.mobile} {
+  ${mobile(css`
     flex-direction: 'column';
     padding-bottom: 0px;
     gap: 10px;
-  }
-  @media ${screen.tablet} {
+  `)}
+  ${tablet(css`
     margin-bottom: '5px';
     padding-bottom: 0px;
-  }
+  `)}
 `
 
 export const NoHistory = styled.div`
@@ -441,16 +462,16 @@ export const NoHistory = styled.div`
 `
 
 export const DateDescriptions = styled(Typography)`
-  @media ${screen.mobile} {
+  ${mobile(css`
     display: none;
-  }
+  `)}
 `
 export const MobileDateDescriptions = styled(Typography)`
   display: none;
-  @media ${screen.mobile} {
+  ${mobile(css`
     font-size: 12px !important;
     display: flex;
-  }
+  `)}
 `
 
 export const DropdownNetwork = styled(Dropdown)`
@@ -466,14 +487,14 @@ export const DropdownNetwork = styled(Dropdown)`
       css`
         color: ${props.theme.colors.gray[100]};
       `};
-    @media ${screen.mobile} {
+    ${mobile(css`
       div {
         font-size: 10px;
       }
-    }
+    `)}
   }
   ${Header} {
-    border-radius: 12px;
+    border-radius: 20px;
     min-width: 0px;
     width: 210px;
     padding: 6px 16px;
@@ -496,43 +517,43 @@ export const DropdownNetwork = styled(Dropdown)`
       }
       ${Arrow} {
         width: 11px;
-        @media ${screen.mobile} {
+        ${mobile(css`
           display: flex;
           align-items: center;
-        }
+        `)}
       }
     }
-    @media ${screen.mobile} {
-      width: 120px;
+    ${mobile(css`
+      width: 148px;
       padding: 3px 5px;
       white-space: nowrap;
       div {
         font-size: 12px;
       }
-    }
+    `)}
   }
 
   ${Arrow} {
-    @media ${screen.mobile} {
+    ${mobile(css`
       svg {
         width: 6px;
         height: auto;
       }
-    }
+    `)}
   }
 
   ${DropdownIconContianer} {
     width: 16px;
     height: 22px;
     margin: 0px;
-    @media ${screen.mobile} {
+    ${mobile(css`
       width: 10px;
       height: 16px;
       svg {
         width: 10px;
         height: auto;
       }
-    }
+    `)}
   }
   ${DropdownIcon} {
     height: 20px;
@@ -560,9 +581,9 @@ export const DropdownNetwork = styled(Dropdown)`
     border-radius: 10px;
     text-align: left;
     color: inherit;
-    @media ${screen.mobile} {
+    ${mobile(css`
       font-size: 8px;
-    }
+    `)}
   }
 
   ${Option} {
@@ -575,9 +596,9 @@ export const DropdownNetwork = styled(Dropdown)`
     border-radius: 10px;
     text-align: left;
     color: inherit;
-    @media ${screen.mobile} {
+    ${mobile(css`
       font-size: 10px;
-    }
+    `)}
   }
 
   ${DefaultIcon} {
@@ -612,22 +633,11 @@ export const DropdownNetwork = styled(Dropdown)`
       css`
         color: ${props.theme.colors.gray[800]};
         border: 1px solid ${props.theme.colors.gray[400]};
-        /* background: ${props.theme.colors.gray[50]}; */
         box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.15);
-        ${Icon} {
-          svg {
-            fill: ${props.theme.colors.gray[800]};
-          }
-        }
       `}
     ${(props) =>
       props.theme.name === 'dark' &&
       css`
-        ${Icon} {
-          svg {
-            fill: ${props.theme.colors.gray[100]};
-          }
-        }
         color: ${props.theme.colors.gray[100]};
         border: 1px solid ${props.theme.colors.gray[400]};
         box-shadow: ${props.theme.backShadow};
@@ -654,6 +664,9 @@ export const DropdownNetwork = styled(Dropdown)`
       ${(props) =>
         props.theme.name === 'light' &&
         css`
+          svg {
+            fill: ${props.theme.colors.gray[800]};
+          }
           &:hover {
             border: 1px solid ${props.theme.colors.gray[600]};
           }
@@ -661,6 +674,9 @@ export const DropdownNetwork = styled(Dropdown)`
       ${(props) =>
         props.theme.name === 'dark' &&
         css`
+          svg {
+            fill: ${props.theme.colors.gray[100]};
+          }
           &:hover {
             border: 1px solid ${props.theme.colors.gray[100]};
           }
