@@ -4,7 +4,7 @@ description: Frequently asked questions
 
 # FAQ
 
-![What is Boba Network](<.gitbook/assets/Artboard 1 (2) (1) (1).png>)
+<figure><img src=".gitbook/assets/What is Boba Network.png" alt=""><figcaption></figcaption></figure>
 
 \
 
@@ -123,14 +123,11 @@ In order to ease the withdrawal UX, we relay L2->L1 messages for users on L1 our
 
 `DiscretionaryExitFee` is also a contract that we use to route Standard Exits through on our interface (the gateway). The purpose of this contract is to not burn native tokens for the compensation, but instead collect Boba token from the user. This contract uses the `L2BillingContract` to get the correct amount of `exitFee`, and then transfer the amount to the billing contract. The contract then proceeds with the withdrawal on the standard bridge. This again serves the purpose of voluntary collection.
 
-\
 
-
-## ![Developer FAQ](<.gitbook/assets/Artboard 2 (1) (1) (1).png>)
 
 ***
 
-![Smart Contracts](<.gitbook/assets/Artboard 3 (1) (1).png>)
+<figure><img src=".gitbook/assets/Smart contracts.png" alt=""><figcaption></figcaption></figure>
 
 ## Why am I getting the 'contract size exceeds limit' error?
 
@@ -165,7 +162,7 @@ Technically, an L1 token can have multiple representations on L2. This mean that
 \
 
 
-![Testing and Testnet](<.gitbook/assets/Artboard 4 (4).png>)
+<figure><img src=".gitbook/assets/testing and testnet.png" alt=""><figcaption></figcaption></figure>
 
 ## Does Boba Network Have a testnet/How do I get Testnet Boba or Eth?
 
@@ -211,7 +208,7 @@ We have the graph node on Ethereum Mainnet L2 and Goerli L2. The Goerli graph no
 \
 
 
-![Transactions](<.gitbook/assets/Artboard 5 (1) (1).png>)
+<figure><img src=".gitbook/assets/transactions.png" alt=""><figcaption></figcaption></figure>
 
 ## Why am I getting an error that says the gas limit is 1,000,000,000,000,000 Wei?
 
@@ -296,7 +293,7 @@ LP floating fee rate refers to the change in the fee logic on LPs. LP fee consis
 \
 
 
-![Hybrid Compute](<.gitbook/assets/Artboard 6 (1) (1).png>)
+<figure><img src=".gitbook/assets/hybridcompute.png" alt=""><figcaption></figcaption></figure>
 
 ## What are the limits on Hybrid Compute Web2 calls?
 
