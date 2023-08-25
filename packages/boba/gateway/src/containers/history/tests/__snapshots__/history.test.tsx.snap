@@ -53,7 +53,7 @@ exports[`Testing history page Test History Page 1`] = `
           <div
             class="sc-iWxGtA cdSvk"
           >
-            02/21/2023
+            02/25/2023
           </div>
         </div>
         <p
@@ -67,7 +67,7 @@ exports[`Testing history page Test History Page 1`] = `
           <div
             class="sc-iWxGtA cdSvk"
           >
-            08/21/2023
+            08/25/2023
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@ exports[`Testing history page Test History Page 1`] = `
           <div
             class="sc-iWxGtA cdSvk"
           >
-            02/21/2023 - 08/21/2023
+            02/25/2023 - 08/25/2023
           </div>
         </div>
       </div>
@@ -302,7 +302,6 @@ exports[`Testing history page Test History Page 1`] = `
         />
         <div
           class="sc-IeChK iNxsQx"
-          style="margin-left: auto; margin-right: auto; padding: 20px;"
         >
           <div>
             <div>
@@ -329,7 +328,6 @@ exports[`Testing history page Test transaction resolver 1`] = `
   />
   <div
     class="sc-IeChK iNxsQx"
-    style="margin-left: auto; margin-right: auto; padding: 20px;"
   >
     <div>
       <div>
