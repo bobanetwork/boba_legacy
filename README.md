@@ -17,7 +17,7 @@ Boba is built on the Optimistic Rollup developed by [Optimism](https://optimism.
 
 
 
-<figure><img src=".gitbook/assets/1-Welcome-to-Boba---Documentation.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/documentation.png" alt=""><figcaption></figcaption></figure>
 
 User focused documentation is available [on the Boba docs website](http://docs.boba.network/). Developer-focused documentation lives in [`./boba_documentation`](https://github.com/bobanetwork/boba/blob/develop/boba\_documentation) and within the service and contract directories. If you have questions or feel like something is missing check out our [Discord server](https://discord.com/invite/YFweUKCb8a) where we are actively responding, or [open an issue](https://github.com/bobanetwork/boba/issues) in the GitHub repo for this site.
 
@@ -63,7 +63,7 @@ User focused documentation is available [on the Boba docs website](http://docs.b
 
 
 
-<figure><img src=".gitbook/assets/Artboard 3 (2) (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/contributing.png" alt=""><figcaption></figcaption></figure>
 
 Follow these instructions to set up your local development environment.
 
@@ -98,7 +98,7 @@ $ BUILD=1 DAEMON=0 ./up_local.sh
 
 
 
-<figure><img src=".gitbook/assets/Artboard 4 (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/spinning up the stack.png" alt=""><figcaption></figcaption></figure>
 
 Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialization. Recommended settings in docker - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
 
@@ -116,7 +116,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 
 
-<figure><img src=".gitbook/assets/Artboard 5 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/helpful commands.png" alt=""><figcaption></figcaption></figure>
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
@@ -124,7 +124,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 
 
-<figure><img src=".gitbook/assets/Artboard 6 (3) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/running unit tests.png" alt=""><figcaption></figcaption></figure>
 
 To run unit tests for a specific package:
 
@@ -135,7 +135,7 @@ yarn test
 
 
 
-<figure><img src=".gitbook/assets/Artboard 7 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/running integration tests.png" alt=""><figcaption></figcaption></figure>
 
 Make sure you are in the `ops` folder and then run
 
@@ -147,7 +147,7 @@ Expect the full test suite with more than 110 tests including load tests to comp
 
 
 
-<figure><img src=".gitbook/assets/Artboard 8 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/viewing docker container logs.png" alt=""><figcaption></figcaption></figure>
 
 By default, the `docker-compose up` command will show logs from all services, and that can be hard to filter through. In order to view the logs from a specific service, you can run:
 
@@ -157,7 +157,7 @@ docker-compose logs --follow <service name>
 
 
 
-<figure><img src=".gitbook/assets/Artboard 9.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/license.png" alt=""><figcaption></figcaption></figure>
 
 Code forked from [`go-ethereum`](https://github.com/ethereum/go-ethereum) under the name [`l2geth`](https://github.com/ethereum-optimism/optimism/tree/master/l2geth) is licensed under the [GNU GPLv3](https://gist.github.com/kn9ts/cbe95340d29fc1aaeaa5dd5c059d2e60) in accordance with the [original license](https://github.com/ethereum/go-ethereum/blob/master/COPYING).
 
