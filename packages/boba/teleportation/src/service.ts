@@ -271,6 +271,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           await this._disburseTx(disbursement, chainId, latestBlock)
         } else {
           this.logger.info('No suitable disbursement event for current network', {chainId})
+          await this._putDepositInfo(chainId, latestBlock)
         }
       } catch (e) {
         // Catch outside loop to stop at first failing depositID as all subsequent disbursements as depositId = amountDisbursements and would fail when disbursing
