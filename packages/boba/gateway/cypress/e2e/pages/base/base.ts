@@ -13,4 +13,7 @@ export default class Base {
   getBody() {
     return cy.get('body')
   }
+  clearAllCookies() {
+    cy.clearAllCookies()
+  }
 }
