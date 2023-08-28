@@ -2,8 +2,8 @@ import styled from 'styled-components'
 
 export const IconContainer = styled.div`
   display: 'flex';
-  justifycontent: 'center';
-  alignitems: 'center';
+  justify-content: 'center';
+  align-items: 'center';
   height: 20px;
   width: 20px;
 `
@@ -18,9 +18,42 @@ export const ValueContainer = styled.div`
     background: ${({ theme }) => theme.bg.secondary};
   }
 `
-export const OptionContainer = styled.div``
 
 export const StyledMenu = styled.div`
   padding: 10px 5px;
-  postion: absolute;
+  position: absolute;
+`
+export const SelectedContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 40px;
+  border-radius: 10px;
+  background: ${(props) => props.theme.palette.background.secondary};
+`
+
+export const Details = styled.div`
+  text-align: left;
+  margin-right: 10px;
+`
+
+export const Subtitle = styled.div`
+  white-space: nowrap;
+`
+export const Field = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid ${(props) => props.theme.background.secondary};
+  transition: all 200ms ease-in-out;
+  border-radius: 12px;
+`
+export const Label = styled.div`
+  margin-bottom: 10px;
+`
+
+export const SelectContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
 `

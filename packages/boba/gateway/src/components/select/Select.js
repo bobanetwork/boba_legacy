@@ -17,14 +17,20 @@ import React from 'react';
 import ReactSelect from 'react-select';
 import { useTheme as useThemeStyle } from 'styled-components';
 import { Select as MuiSelect, MenuItem, useTheme, Typography, Box } from '@mui/material';
-import styles from './Select.module.scss';
-import * as S from './Select.style';
 import { ArrowDropDownOutlined } from '@mui/icons-material';
 import {
   Option,
   MultiValue,
   SingleValue
 } from './Custom.select';
+import {
+  SelectedContainer,
+  Details,
+  Subtitle,
+  Field,
+  Label,
+  SelectContainer
+} from './styles'
 
 function Select({
   label,
@@ -65,16 +71,15 @@ function Select({
   }
 
   const renderLoading = (
-    <S.SelectedContainer className={[ styles.selected, styles.loading ].join(' ')}>
+    <SelectedContainer>
       Loading...
-    </S.SelectedContainer>
+    </SelectedContainer>
   );
 
   const renderSelect = (
     <>
       <MuiSelect
         IconComponent={() => <ArrowDropDownOutlined />}
-        className={styles.select}
         value={value}
         onChange={onSelect}
         autoWidth
@@ -104,27 +109,25 @@ function Select({
           </MenuItem>
         ))}
       </MuiSelect>
-      <S.SelectedContainer>
-        <div className={styles.details}>
-          <div className={styles.title}>{selected ? selected.title : error}</div>
-          <div className={styles.subTitle}>{selected ? selected.subTitle : ''}</div>
-        </div>
+      <SelectedContainer>
+        <Details>
+          <div>{selected ? selected.title : error}</div>
+          <Subtitle >{selected ? selected.subTitle : ''}</Subtitle>
+        </Details>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8.71038 12.4393C9.29616 13.0251 10.2459 13.0251 10.8317 12.4393L13.9814 9.28962C14.9264 8.34468 14.2571 6.72896 12.9208 6.72896L6.62132 6.72896C5.28496 6.72896 4.61571 8.34467 5.56066 9.28962L8.71038 12.4393Z"
             fill={theme.palette.text.primary}
             fillOpacity="0.45" />
         </svg>
-      </S.SelectedContainer>
+      </SelectedContainer>
     </>
   );
 
   // TODO: Make use of react-select across all.
   if (newSelect) {
-    return <Box className={[
-      styles.Select,
-      className
-    ].join(' ')}>
-      {label && <Box className={styles.label}>{label}</Box>}
+    return <SelectContainer className={
+      className}>
+      {label && <Label>{label}</Label>}
       <ReactSelect
         value={value}
         onChange={onSelect}
@@ -178,21 +181,17 @@ function Select({
           SingleValue,
         }}
       />
-    </Box>
+    </SelectContainer>
   }
 
   return (
-    <div
-      className={[
-        styles.Select,
-        className
-      ].join(' ')}
-    >
-      {label && <div className={styles.label}>{label}</div>}
-      <S.Field>
+    <SelectContainer>
+      
+      {label && <Label>{label}</Label>}
+      <Field>
         {loading ? renderLoading : renderSelect}
-      </S.Field>
-    </div>
+      </Field>
+    </SelectContainer>
   );
 }
 
