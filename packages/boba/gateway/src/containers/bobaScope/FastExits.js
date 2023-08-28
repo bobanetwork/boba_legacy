@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import { Grid, Box } from '@mui/material'
+import { Box } from '@mui/material'
 import { useSelector } from 'react-redux'
 import {formatDate} from 'util/dates'
 
@@ -22,8 +22,7 @@ import { selectLoading } from 'selectors'
 import { Pager } from 'components'
 import FastExit from 'components/seven/FastExit'
 
-import styles from './Transactions.module.scss'
-import { HistoryContainer, Content } from './styles'
+import { HistoryContainer, Content, TransactionSection, Disclaimer } from './styles'
 
 const PER_PAGE = 10
 
@@ -49,7 +48,7 @@ function FastExits({ searchData, data }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <div className={styles.transactionSection}>
+    <TransactionSection>
       <HistoryContainer>
         <Pager
           currentPage={page}
@@ -58,15 +57,13 @@ function FastExits({ searchData, data }) {
           onClickNext={()=>setPage(page + 1)}
           onClickBack={()=>setPage(page - 1)}
         />
-
-        <Grid item xs={12}>
           <Box>
             <Content>
               {!paginatedData.length && !loading && (
-                <div className={styles.disclaimer}>Scanning for pending fast exits...</div>
+                <Disclaimer>Scanning for pending fast exits...</Disclaimer>
               )}
               {!paginatedData.length && loading && (
-                <div className={styles.disclaimer}>Loading pending fast exits...</div>
+                <Disclaimer>Loading pending fast exits...</Disclaimer>
               )}
               {paginatedData.map((i, index) => {
                 return (
@@ -82,9 +79,8 @@ function FastExits({ searchData, data }) {
               })}
             </Content>
           </Box>
-        </Grid>
       </HistoryContainer>
-    </div>
+    </TransactionSection>
   );
 }
 

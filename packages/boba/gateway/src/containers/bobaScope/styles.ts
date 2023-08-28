@@ -37,3 +37,22 @@ export const Content = styled.div`
   margin-bottom: 10px;
   border-radius: 6px;
 `
+
+export const TransactionSection = styled.div`
+  margin-bottom: 20px;
+`
+
+export const Disclaimer = styled.div`
+  margin: 5px 10px;
+  margin-top: 20px;
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[100]};
+    `}
+`

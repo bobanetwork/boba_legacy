@@ -22,8 +22,7 @@ import { selectLoading } from 'selectors'
 import { Pager } from 'components'
 import Seven from 'components/seven/Seven'
 
-import styles from './Transactions.module.scss'
-import { HistoryContainer, Content } from './styles'
+import { HistoryContainer, Content, TransactionSection, Disclaimer } from './styles'
 
 const PER_PAGE = 10
 
@@ -49,7 +48,7 @@ function Sevens({ searchData, sevens }) {
   if (totalNumberOfPages === 0) totalNumberOfPages = 1
 
   return (
-    <div>
+    <TransactionSection>
       <HistoryContainer>
         <Pager
           currentPage={page}
@@ -59,14 +58,13 @@ function Sevens({ searchData, sevens }) {
           onClickBack={()=>setPage(page - 1)}
         />
 
-        <Grid item xs={12}>
           <Box>
             <Content>
               {!paginatedSevens.length && !loading && (
-                <div className={styles.disclaimer}>Scanning for pending 7 day exits...</div>
+                <Disclaimer>Scanning for pending 7 day exits...</Disclaimer>
               )}
               {!paginatedSevens.length && loading && (
-                <div className={styles.disclaimer}>Loading pending 7 day exits...</div>
+                <Disclaimer>Loading pending 7 day exits...</Disclaimer>
               )}
               {paginatedSevens.map((i, index) => {
                 return (
@@ -82,9 +80,8 @@ function Sevens({ searchData, sevens }) {
               })}
             </Content>
           </Box>
-        </Grid>
       </HistoryContainer>
-    </div>
+    </TransactionSection>
   );
 }
 
