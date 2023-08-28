@@ -40,7 +40,11 @@ const BridgeHeader = (props: Props) => {
         </Tooltip>
       </Heading>
       <IconWrapper>
-        <GearIcon sx={{ color: iconColor }} onClick={openSettingModal} />
+        <GearIcon
+          sx={{ color: iconColor }}
+          onClick={openSettingModal}
+          id="settings"
+        />
       </IconWrapper>
     </BridgeHeaderWrapper>
   )
