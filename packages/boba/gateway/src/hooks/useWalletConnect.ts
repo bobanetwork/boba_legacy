@@ -45,7 +45,6 @@ export const useWalletConnect = () => {
 
   const triggerInit = useCallback(() => {
     const initAccount = async () => {
-      console.log('reinitialized account')
       const initialized = await networkService.initializeAccount({
         chainIdChanged,
       })
@@ -54,7 +53,7 @@ export const useWalletConnect = () => {
         dispatch(openModal('noMetaMaskModal'))
         return false
       } else if (initialized === 'wrongnetwork') {
-        console.log('wrong network')
+        //if all good fine we can remove the condition
         return false
       } else if (initialized === false) {
         dispatch(setEnableAccount(false))
