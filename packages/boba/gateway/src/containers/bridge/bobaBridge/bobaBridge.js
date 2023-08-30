@@ -53,7 +53,6 @@ const BobaBridge = () => {
   const tokens = useSelector(selectBridgeTokens())
   const userWallet = useSelector(selectWalletAddress())
 
- 
 
   const dispatch = useDispatch()
   const [toL2, setToL2] = useState(true)
@@ -86,6 +85,9 @@ const BobaBridge = () => {
   }
 
 
+  
+
+
 
   const ChainSwitchIcon = () => {
     return <S.IconSwitcher
@@ -111,7 +113,6 @@ const BobaBridge = () => {
   }
 
   const Bridge = () => {
-
     return (
       <>
       <S.BobaContent>

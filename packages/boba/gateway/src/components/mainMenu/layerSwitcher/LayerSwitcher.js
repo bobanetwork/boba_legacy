@@ -64,6 +64,7 @@ import { L1_ICONS, L2_ICONS } from 'util/network/network.util'
 import { LAYER, DISABLE_WALLETCONNECT } from 'util/constant'
 
 const LayerSwitcher = ({ visisble = true, isButton = false }) => {
+
   const dispatch = useDispatch()
   const accountEnabled = useSelector(selectAccountEnabled())
   const baseEnabled = useSelector(selectBaseEnabled())
@@ -125,7 +126,7 @@ const LayerSwitcher = ({ visisble = true, isButton = false }) => {
     if ((!accountEnabled && baseEnabled) || chainIdChanged) {
       initializeAccount()
     }
-  }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged])
+  }, [dispatch, accountEnabled, network, networkType, baseEnabled, chainIdChanged, layer])
 
   const doConnectToLayer = useCallback((layer) => {
     const resetConnectChain = () => {

@@ -58,11 +58,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
   const [isMyToken, setIsMyToken] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
-  let balances = l1Balance
-
-  if (layer === 'L2') {
-    balances = l2Balance
-  }
+  const balances = layer === 'L2' ? l2Balance : l1Balance
 
   useEffect(() => {
     dispatch(fetchBalances())

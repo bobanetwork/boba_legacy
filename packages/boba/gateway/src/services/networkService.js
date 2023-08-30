@@ -1036,9 +1036,13 @@ class NetworkService {
         }
       })
 
-      const tokenBalances = await Promise.all(getBalancePromise)
+      const tokenBalances = await Promise.allSettled(getBalancePromise)
 
-      tokenBalances.forEach((token) => {
+      tokenBalances.forEach((result) => {
+        const {status} = result;
+        if (status === 'fulfilled') {
+          const { value: token } = result
+
           if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
             token.symbol !== 'WAGMIv0' &&
@@ -1048,9 +1052,10 @@ class NetworkService {
             token.symbol !== 'WAGMIv3' &&
             token.symbol !== 'WAGMIv3-Oolong'
           ) {
-          layer1Balances.push(token)
-        } else if (token.layer === 'L2') {
-          layer2Balances.push(token)
+            layer1Balances.push(token)
+          } else if (token.layer === 'L2') {
+            layer2Balances.push(token)
+          }
         }
       })
 

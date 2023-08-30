@@ -7,6 +7,7 @@ import {
   selectActiveNetwork,
   selectActiveNetworkType,
   selectVerifierStatus,
+  selectChainIdChanged,
 } from 'selectors'
 import networkService from 'services/networkService'
 import { NETWORK, NETWORK_TYPE } from 'util/network/network.util'
@@ -37,6 +38,7 @@ const useGasWatcher = () => {
   const networkName = useSelector(selectActiveNetworkName())
   const activeNetwork = useSelector(selectActiveNetwork())
   const activeNetworkType = useSelector(selectActiveNetworkType())
+  const chainIdChanged = useSelector(selectChainIdChanged())
 
   const [savings, setSavings] = useState<number>(1)
 
