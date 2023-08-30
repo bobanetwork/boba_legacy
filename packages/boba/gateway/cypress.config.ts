@@ -16,5 +16,9 @@ export default defineConfig({
     },
     baseUrl: 'http://localhost:3000',
     supportFile: 'cypress/support/e2e.ts',
+    specPattern: [
+      'cypress/e2e/**/page.spec.cy.ts',
+      'cypress/e2e/**/bridge.spec.cy.ts',
+    ],
   },
 })

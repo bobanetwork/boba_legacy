@@ -34,3 +34,9 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root')
 )
+
+
+// expose store when running in Cypress
+if (window.Cypress) {
+  window.store = store
+}

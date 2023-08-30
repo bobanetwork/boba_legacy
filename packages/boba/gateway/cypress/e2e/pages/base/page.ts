@@ -67,6 +67,7 @@ export default class Page extends Base {
       .getNetworkSwitcher()
       .contains('Avalanche Mainnet C-Chain')
       .should('exist')
+
     this.header.getNetworkSwitcher().click()
   }
   checkNetworkSwitcherTestnet() {
@@ -155,5 +156,12 @@ export default class Page extends Base {
           'Terms of Service',
         ])
       })
+  }
+  switchThroughMainnetNetworks() {
+    this.header.switchNetwork('Binance', 'BNB', false)
+    cy.wait(500)
+    this.header.switchNetwork('Avalanche Mainnet', 'AVAX', false)
+    cy.wait(500)
+    this.header.switchNetwork('Ethereum', 'ETHEREUM', false)
   }
 }

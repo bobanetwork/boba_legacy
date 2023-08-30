@@ -6,6 +6,7 @@ export const SwitchButton: React.FC<SwitchButtonTypes> = ({
   isDisable = false,
   isActive = false,
   onStateChange,
+  title,
 }) => {
   const [isChecked, setIsChecked] = useState(isActive)
 
@@ -26,7 +27,7 @@ export const SwitchButton: React.FC<SwitchButtonTypes> = ({
   }
 
   return (
-    <Switch>
+    <Switch title={title}>
       <Input
         type="checkbox"
         checked={isChecked}

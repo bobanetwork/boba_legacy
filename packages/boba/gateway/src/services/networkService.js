@@ -1036,7 +1036,12 @@ class NetworkService {
         }
       })
 
-      const tokenBalances = await Promise.all(getBalancePromise)
+      const tokenBalances = await Promise.allSettled(getBalancePromise).then(
+        (results) =>
+          results
+            .filter((result) => result.status === 'fulfilled')
+            .map((result) => result.value)
+      )
 
       tokenBalances.forEach((token) => {
           if (token.layer === 'L1' &&
