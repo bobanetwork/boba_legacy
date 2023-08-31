@@ -22,9 +22,7 @@ const renderHistory = ({ options = null }: any) => {
         ui: {
           theme: 'dark',
         },
-        transaction: {
-          transaction: sampleTransactions,
-        },
+        transaction: sampleTransactions,
         setup: {
           accountEnabled: false,
           netLayer: true,
@@ -48,13 +46,6 @@ const renderTransactionsResolver = (props: ITransactionsResolverProps) => {
         ui: {
           theme: 'dark',
         },
-        transaction: {
-          transaction: sampleTransactions,
-        },
-        setup: {
-          accountEnabled: true,
-          netLayer: true,
-        },
       })}
     >
       <CustomThemeProvider>
@@ -68,6 +59,13 @@ const renderTransactionsResolver = (props: ITransactionsResolverProps) => {
 }
 
 describe('Testing history page', () => {
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(new Date(2023, 7, 24))
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   const filter: ITransactionFilter = {
     fromNetworkChainId: CHAIN_NAME.Boba_Goerli,
     toNetworkChainId: CHAIN_NAME.Goerli,
