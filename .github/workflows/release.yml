@@ -16,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Setup git user
         run: |
             git config --global user.name noreply@github.com
@@ -23,7 +25,8 @@ jobs:
       - name: Run
         run: |
           git fetch
-          LAST_COMMIT=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/pulls/${{ github.event.inputs.last_release_pr }}/commits | jq '.[-1].commit.message' | grep -o -E -e "[0-9a-f]{40}")
+          #this might break if there's more then 400 commits in a PR
+          LAST_COMMIT=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/pulls/${{ github.event.inputs.last_release_pr }}/commits?per_page=400 | jq '.[-1].commit.message' | grep -o -E -e "[0-9a-f]{40}")
           echo 'LAST_COMMIT'
           echo $LAST_COMMIT
           TIP_OF_DEVELOP=$(gh api   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   /repos/bobanetwork/boba/commits?per_page=1 | jq '.[-1].sha' | tr -d '"')

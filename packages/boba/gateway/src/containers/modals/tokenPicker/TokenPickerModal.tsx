@@ -160,7 +160,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
                         {token.symbol}
                         <TokenBalance>{amount}</TokenBalance>
                       </TokenLabel>
-                      <Tooltip title="Add token to metamask">
+                      <Tooltip title="Add token to wallet">
                         <PlusIcon
                           onClick={(e) => {
                             e.stopPropagation()

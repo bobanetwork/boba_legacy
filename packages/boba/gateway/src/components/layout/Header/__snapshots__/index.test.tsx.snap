@@ -3,7 +3,7 @@
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="sc-fABZjn iGfxtS"
+    class="sc-fABZjn hJKxpE"
   >
     <div
       class="sc-gUMnWI ervjnC"
@@ -48,7 +48,7 @@ exports[`Layout => Header should match the snapshot 1`] = `
       </a>
     </div>
     <div
-      class="sc-hUOJWJ lgjkOK"
+      class="sc-hUOJWJ kkAMsz"
     >
       <button
         class="sc-crozmw joSqYT"

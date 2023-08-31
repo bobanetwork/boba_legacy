@@ -52,7 +52,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ open }) => {
       <SettingsWrapper>
         <SettingsItem>
           <SettingsText>
-            <SettingTitle>Show Testnet</SettingTitle>
+            <SettingTitle>Show Testnets</SettingTitle>
             <SettingSubTitle>
               Testnets will be available to bridge
             </SettingSubTitle>
