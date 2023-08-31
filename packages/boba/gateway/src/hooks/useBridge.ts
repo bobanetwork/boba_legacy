@@ -114,13 +114,13 @@ export const useBridge = () => {
     if (layer === LAYER.L1) {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         receipt = await triggerDeposit(amountWei)
-      } else {
+      } else if (bridgeType === BRIDGE_TYPE.TELEPORTATION) {
         receipt = await triggerTeleportAsset(amountWei, destChainIdBridge!)
       }
     } else {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         receipt = await triggerExit(amountWei)
-      } else {
+      } else if (bridgeType === BRIDGE_TYPE.TELEPORTATION) {
         receipt = await triggerTeleportAsset(amountWei, destChainIdBridge!)
       }
     }

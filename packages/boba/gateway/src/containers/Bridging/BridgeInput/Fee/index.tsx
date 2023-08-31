@@ -103,7 +103,7 @@ const Fee = (props: Props) => {
         <Label>Destination gas fee</Label>
         <Label>{gasFee}</Label>
       </InfoRow>
-      {layer === LAYER.L2 ? (
+      {layer === LAYER.L2 && bridgeType !== BRIDGE_TYPE.TELEPORTATION ? (
         <InfoRow>
           <Label>xChain Relay Fee</Label>
           <Label>{exitFee} BOBA</Label>
@@ -111,7 +111,12 @@ const Fee = (props: Props) => {
       ) : null}
       <InfoRow>
         <Label>Bridge Fee</Label>
-        <Label>{(layer === LAYER.L1 ? l2FeeRateN : l1FeeRateN) || 0}%</Label>
+        <Label>
+          {(layer === LAYER.L1 && bridgeType !== BRIDGE_TYPE.TELEPORTATION
+            ? l2FeeRateN
+            : l1FeeRateN) || 0}
+          %
+        </Label>
       </InfoRow>
       <InfoRow>
         <Label

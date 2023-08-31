@@ -4668,12 +4668,6 @@ class NetworkService {
     }
     return []
   }
-
-  async getCurrentChainId() {
-    const {chainId} = await this.provider?.getNetwork()
-    return chainId;
-  }
-
 }
 
 const networkService = new NetworkService()

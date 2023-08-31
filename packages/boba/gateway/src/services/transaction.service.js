@@ -234,7 +234,10 @@ class TransactionService {
               // check if successfully retried
               receiveEvent = await teleportationGraphQLService.queryDisbursementRetrySuccessEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.amount, sentEvent.depositId)
             }
-            receiveEvent.token = ethers.constants.AddressZero
+            if (receiveEvent) {
+              // do in both cases, receiveEvent may still be undefined
+              receiveEvent.token = ethers.constants.AddressZero
+            }
           }
           return await mapEventToTransaction(sentEvent, receiveEvent, contract)
         }))

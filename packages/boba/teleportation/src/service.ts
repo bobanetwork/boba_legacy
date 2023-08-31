@@ -105,46 +105,50 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     )
 
     for (const chain of this.options.selectedBobaChains) {
-      const chainId = chain.chainId
-      // assuming BOBA is enabled on supported networks to retain battle-tested logic
+      try {
+        const chainId = chain.chainId
+        // assuming BOBA is enabled on supported networks to retain battle-tested logic
 
-      this.logger.info('Check if Boba supported for chainId: ', {chainId, bobaTokenContractAddr})
-      const isSupported = await this.state.Teleportation.supportedTokens(
-        bobaTokenContractAddr,
-        chainId
-      )
-      this.logger.info('Boba supported: ', { isSupported })
+        this.logger.info('Check if Boba supported for chainId: ', {chainId, bobaTokenContractAddr})
+        const isSupported = await this.state.Teleportation.supportedTokens(
+          bobaTokenContractAddr,
+          chainId
+        )
+        this.logger.info('Boba supported: ', {isSupported})
 
-      if (!isSupported || !isSupported[0]) {
-        // do not fail, as secured on-chain anyway & run.ts just returns all testnets/mainnets - thus just ignore networks that don't support Boba
-        this.logger.error(
-          `Chain ${chainId} is not supported by the contract ${
-            this.state.Teleportation.address
-          } on chain ${
-            (await this.state.Teleportation.provider.getNetwork()).chainId
-          }`
-        )
-      } else {
-        this.state.supportedChains = [...this.state.supportedChains, chain]
-        const depositTeleportation = await getBobaContractAt(
-          'Teleportation',
-          chain.teleportationAddress,
-          chain.provider
-        )
-        const totalDisbursements =
-          await this.state.Teleportation.totalDisbursements(chainId)
-        const totalDeposits = await depositTeleportation.totalDeposits(
-          this.options.chainId
-        )
-        this.logger.info('Total disbursements for chain', {chainId, totalDisbursements})
+        if (!isSupported || !isSupported[0]) {
+          // do not fail, as secured on-chain anyway & run.ts just returns all testnets/mainnets - thus just ignore networks that don't support Boba
+          this.logger.error(
+            `Chain ${chainId} is not supported by the contract ${
+              this.state.Teleportation.address
+            } on chain ${
+              (await this.state.Teleportation.provider.getNetwork()).chainId
+            }`
+          )
+        } else {
+          this.state.supportedChains = [...this.state.supportedChains, chain]
+          const depositTeleportation = await getBobaContractAt(
+            'Teleportation',
+            chain.teleportationAddress,
+            chain.provider
+          )
+          const totalDisbursements =
+            await this.state.Teleportation.totalDisbursements(chainId)
+          const totalDeposits = await depositTeleportation.totalDeposits(
+            this.options.chainId
+          )
+          this.logger.info('Total disbursements for chain', {chainId, totalDisbursements})
 
-        this.state.depositTeleportations.push({
-          Teleportation: depositTeleportation,
-          chainId,
-          totalDisbursements,
-          totalDeposits,
-          height: chain.height,
-        })
+          this.state.depositTeleportations.push({
+            Teleportation: depositTeleportation,
+            chainId,
+            totalDisbursements,
+            totalDeposits,
+            height: chain.height,
+          })
+        }
+      } catch(err) {
+        this.logger.error(`Could not initialize network to disburse on: ${chain.chainId}, ${chain.url}, ${chain.name}`)
       }
     }
     this.logger.info('Teleportation service initialized successfully.')
@@ -239,12 +243,12 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
             const [isTokenSupported, , , , ,] =
               await this.state.Teleportation.supportedTokens(
-                sourceChainTokenAddr,
+                destChainTokenAddr,
                 sourceChainId
               )
             if (!isTokenSupported) {
               throw new Error(
-                `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
+                `Token '${destChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
               )
             } else {
               disbursement = [
