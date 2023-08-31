@@ -19,6 +19,7 @@ export default defineConfig({
     specPattern: [
       'cypress/e2e/**/page.spec.cy.ts',
       'cypress/e2e/**/bridge.spec.cy.ts',
+      'cypress/e2e/**/history.spec.cy.ts',
     ],
   },
 })

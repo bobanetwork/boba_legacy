@@ -1,6 +1,10 @@
 import { MetamaskNetwork } from '../../types'
 
 export default class Base {
+  id: string
+  constructor() {
+    this.id = ''
+  }
   connectMetamask() {
     cy.acceptMetamaskAccess()
   }

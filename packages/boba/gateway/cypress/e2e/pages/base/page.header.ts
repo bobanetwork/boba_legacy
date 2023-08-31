@@ -3,6 +3,7 @@ import Base from './base'
 export default class PageHeader extends Base {
   constructor() {
     super()
+    this.id = 'header'
   }
 
   getNavigationLinks() {
@@ -21,8 +22,14 @@ export default class PageHeader extends Base {
     return cy.get('div[title="dark-icon"]').should('exist')
   }
 
+  connectWallet() {
+    cy.get('#header')
+      .find('button[label|="Connect Wallet"]')
+      .should('exist')
+      .click()
+  }
   requestMetamaskConnect() {
-    cy.get('button[label|="Connect Wallet"]').should('exist').click()
+    this.connectWallet()
     cy.get('#connectMetaMask').should('exist').click()
   }
 
@@ -51,5 +58,12 @@ export default class PageHeader extends Base {
       .click()
     cy.wait(500)
     this.allowNetworkSwitch()
+  }
+  disconnectWallet() {
+    cy.get('#header')
+      .contains(/^0x[a-fA-F0-9]{4}...[a-fA-F0-9]{4}$/g)
+      .should('exist')
+      .click()
+    cy.get('ul').contains('li', 'Disconnect').should('exist').click()
   }
 }

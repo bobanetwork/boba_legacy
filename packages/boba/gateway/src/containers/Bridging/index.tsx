@@ -50,7 +50,7 @@ const Bridging = () => {
   }
 
   return (
-    <BridginContainer>
+    <BridginContainer id={'bridge'}>
       <BridgeWrapper>
         <BridgeContent>
           <BridgeHeader />

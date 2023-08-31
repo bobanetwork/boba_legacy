@@ -5,14 +5,27 @@ import PageFooter from './page.footer'
 export default class Page extends Base {
   header: PageHeader
   footer: PageFooter
+  walletConnectButtonText: string
   constructor() {
     super()
     this.header = new PageHeader()
     this.footer = new PageFooter()
+    this.id = 'header'
+    this.walletConnectButtonText = 'Connect Wallet'
   }
 
   visit() {
-    cy.visit('/')
+    cy.visit(`/${this.id}`)
+  }
+  connectWallet() {
+    cy.get(`#${this.id}`)
+      .contains('button', this.walletConnectButtonText)
+      .should('exist')
+      .click()
+  }
+  requestMetamaskConnect() {
+    this.connectWallet()
+    cy.get('#connectMetaMask').should('exist').click()
   }
 
   checkNavigationListEthereum() {

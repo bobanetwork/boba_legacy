@@ -151,7 +151,7 @@ const History = () => {
   }, POLL_INTERVAL)
 
   return (
-    <HistoryPageContainer>
+    <HistoryPageContainer id={'history'}>
       {layer && (
         <>
           <TableHeader>

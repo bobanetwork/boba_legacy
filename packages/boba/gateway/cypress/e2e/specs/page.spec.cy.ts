@@ -12,7 +12,9 @@ describe('Page', () => {
     page.header.requestMetamaskConnect()
     page.connectMetamask()
   })
-
+  after(() => {
+    page.header.disconnectWallet()
+  })
   describe.only('Page Header', () => {
     it('Navigation List', () => {
       page.checkNavigationListEthereum()

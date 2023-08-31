@@ -4,6 +4,8 @@ import Page from './base/page'
 export default class Bridge extends Page {
   constructor() {
     super()
+    this.id = 'bridge'
+    this.walletConnectButtonText = 'Connect Wallet'
   }
   switchToTestnet() {
     cy.get('#settings').should('exist').click()
