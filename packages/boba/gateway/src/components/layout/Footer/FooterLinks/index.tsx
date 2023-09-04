@@ -50,7 +50,7 @@ const FooterLinks = () => {
       </div>
       <div>
         {FOOTERLINKS_RIGHT.map((link) => (
-          <StyledLink key={link.label} href={link.path}>
+          <StyledLink target="_blank" key={link.label} href={link.path}>
             {link.label}
           </StyledLink>
         ))}

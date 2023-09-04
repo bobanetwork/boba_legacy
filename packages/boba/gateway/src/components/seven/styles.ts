@@ -1,7 +1,12 @@
 import styled, { css } from 'styled-components'
 import { Typography } from 'components/global'
 
-export const ExitsWrapper = styled.div`
+export const ExitWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 5px;
   background: ${(props) => props.theme.colors.popup};
   padding: 10px;
   border-radius: 12px;
@@ -24,15 +29,8 @@ export const ExitsWrapper = styled.div`
     `}
 `
 
-export const ExitWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 5px;
-`
-
 export const HashContainer = styled(Typography)`
+  width: 20%;
   ${(props) =>
     props.theme.name === 'light' &&
     css`
