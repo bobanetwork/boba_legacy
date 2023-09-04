@@ -43,6 +43,7 @@ const Save = () => {
   const { accountEnabled, netLayer, bobaFeeChoice, bobaFeePriceRatio } =
     useSelector(selectSetup())
   const balance = useSelector(selectBalance())
+  console.log(balance)
   const { layer2 } = balance
 
   const dispatch = useDispatch<any>()
@@ -206,6 +207,7 @@ const Save = () => {
               <>
                 <S.StakeItemContainer>
                   {Object.keys(stakeInfo).map((v, i) => {
+                    console.log(stakeInfo)
                     if (stakeInfo[i].isActive) {
                       return (
                         <TransactionList stakeInfo={stakeInfo[i]} key={i} />
