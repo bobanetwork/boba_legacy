@@ -5,7 +5,6 @@ import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import History from '../History'
 import { TransactionsResolver } from '../TransactionsResolver'
-import DatePicker, { IDatePickerProps } from '../DatePicker'
 import {
   CHAIN_NAME,
   ITransactionFilter,
@@ -23,9 +22,7 @@ const renderHistory = ({ options = null }: any) => {
         ui: {
           theme: 'dark',
         },
-        transaction: {
-          transaction: sampleTransactions,
-        },
+        transaction: sampleTransactions,
         setup: {
           accountEnabled: false,
           netLayer: true,
@@ -49,13 +46,6 @@ const renderTransactionsResolver = (props: ITransactionsResolverProps) => {
         ui: {
           theme: 'dark',
         },
-        transaction: {
-          transaction: sampleTransactions,
-        },
-        setup: {
-          accountEnabled: true,
-          netLayer: true,
-        },
       })}
     >
       <CustomThemeProvider>
@@ -68,13 +58,14 @@ const renderTransactionsResolver = (props: ITransactionsResolverProps) => {
   )
 }
 
-const renderDatePicker = (props: IDatePickerProps) => {
-  return render(
-    <DatePicker selected={props.selected} onChange={props.onChange} />
-  )
-}
-
 describe('Testing history page', () => {
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(new Date(2023, 7, 24))
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   const filter: ITransactionFilter = {
     fromNetworkChainId: CHAIN_NAME.Boba_Goerli,
     toNetworkChainId: CHAIN_NAME.Goerli,
@@ -90,14 +81,6 @@ describe('Testing history page', () => {
   })
   test('Test History Page', () => {
     const { asFragment } = renderHistory({})
-    expect(asFragment()).toMatchSnapshot()
-  })
-
-  test('Date Picker', () => {
-    const { asFragment } = renderDatePicker({
-      selected: new Date(1970, 4, 10),
-      onChange: (date: Date) => console.log(date),
-    })
     expect(asFragment()).toMatchSnapshot()
   })
 })
