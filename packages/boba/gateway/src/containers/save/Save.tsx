@@ -140,19 +140,21 @@ const Save = () => {
             <S.Flex>
               <div>
                 <Typography variant="head">Staked</Typography>
-                <Typography variant="title">{totalBOBAstaked} BOBA</Typography>
+                <Typography variant="title">
+                  {Number(totalBOBAstaked).toFixed(4)} BOBA
+                </Typography>
               </div>
               <div>
                 <Typography variant="head">Boba Balance</Typography>
                 <Typography variant="title">
-                  {state.max_Float_String} BOBA
+                  {Number(state.max_Float_String).toFixed(4)} BOBA
                 </Typography>
               </div>
             </S.Flex>
             <div>
               <div>
                 <Typography variant="head">APY</Typography>
-                <Typography variant="title">5.22%</Typography>
+                <Typography variant="title">5.0%</Typography>
               </div>
             </div>
             {layer === 'L2' && (
