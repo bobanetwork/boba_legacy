@@ -26,8 +26,8 @@ export const LayerAlert = styled.div`
   align-items: center;
   gap: 30px;
   border-radius: 8px;
-  margin: 20px 0px;
-  padding: 25px;
+  margin: 8px 0px;
+  padding: 10px;
   background: ${(props) => props.theme.colors.box.background};
 `
 
