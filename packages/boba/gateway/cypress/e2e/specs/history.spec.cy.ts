@@ -5,16 +5,30 @@ const history = new History()
 describe('History', () => {
   before(() => {
     history.visit()
-    cy.wait(1000)
+    history.waitForPageToLoad()
     history.requestMetamaskConnect()
   })
-  describe('Filters', () => {
-    it('should have a hash search field', () => {
-      history.getSearchInput()
+  describe('transactions', () => {
+    it('should load', () => {
+      history.waitForTransactionsToLoad()
     })
-    it('should have two date pickers', () => {
+  })
+  describe('filters', () => {
+    it('search bar', () => {
+      history.checkSearchInput()
+    })
+    it('date pickers', () => {
       history.getFromDatePicker()
       history.getToDatePicker()
+      history.checkDatePickers()
+    })
+
+    it('network dropdowns', () => {
+      history.checkNetworkDropdowns()
+      history.getNetworksSwitchIcon()
+    })
+    it('status filter', () => {
+      history.getStatusFilter()
     })
   })
 })

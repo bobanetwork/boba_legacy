@@ -17,8 +17,11 @@ export default class Page extends Base {
   visit() {
     cy.visit(`/${this.id}`)
   }
+  withinPage() {
+    return cy.get(`#${this.id}`)
+  }
   connectWallet() {
-    cy.get(`#${this.id}`)
+    this.withinPage()
       .contains('button', this.walletConnectButtonText)
       .should('exist')
       .click()
@@ -176,5 +179,14 @@ export default class Page extends Base {
     this.header.switchNetwork('Avalanche Mainnet', 'AVAX', false)
     cy.wait(500)
     this.header.switchNetwork('Ethereum', 'ETHEREUM', false)
+  }
+
+  waitForPageToLoad() {
+    cy.window()
+      .its('store')
+      .invoke('getState')
+      .its('setup')
+      .its('baseEnabled')
+      .should('be.true')
   }
 }

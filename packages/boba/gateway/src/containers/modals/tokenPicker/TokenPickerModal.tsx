@@ -110,7 +110,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
           </ActionLabel>
         </TokenPickerAction>
         <ListLabel> Token Names </ListLabel>
-        <TokenPickerList>
+        <TokenPickerList title="tokenList">
           {balances.length > 0
             ? balances
                 .filter((token: any, index: number) => {

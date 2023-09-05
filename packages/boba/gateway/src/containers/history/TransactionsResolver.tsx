@@ -202,9 +202,13 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     return processedTransaction
   }
 
-  const processedTransactions = filteredTransactions.map((transaction) => {
-    return process_transaction(transaction)
-  })
+  const processedTransactions = filteredTransactions
+    .filter((transaction) => {
+      return transaction.UserFacingStatus !== TRANSACTION_FILTER_STATUS.Canceled
+    })
+    .map((transaction) => {
+      return process_transaction(transaction)
+    })
 
   const filteredProcessedTransactions = processedTransactions.filter(
     (transaction) => {
@@ -262,7 +266,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
   const getTransactionDate = (timeStamp: number) => {
     return (
-      <TransactionDate>
+      <TransactionDate title="transactionDate">
         {formatDate(timeStamp, 'DD MMM YYYY hh:mm A')}
       </TransactionDate>
     )
@@ -286,7 +290,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
         </NoHistory>
       )}
       {filteredProcessedTransactions && (
-        <TransactionsWrapper>
+        <TransactionsWrapper id={'transactionList'}>
           {filteredProcessedTransactions.map(
             (transaction: IProcessedTransaction, index) => {
               return (

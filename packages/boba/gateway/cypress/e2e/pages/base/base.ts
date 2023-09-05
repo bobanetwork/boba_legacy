@@ -15,12 +15,18 @@ export default class Base {
   allowNetworkSwitch() {
     cy.allowMetamaskToSwitchNetwork()
   }
-  confirmTransaction() {
+  confirmTransactionOnMetamask() {
     cy.confirmMetamaskTransaction()
   }
 
   addNetwork(network: MetamaskNetwork) {
     cy.addMetamaskNetwork(network)
+  }
+  allowNetworkToBeAdded() {
+    cy.allowMetamaskToAddNetwork()
+  }
+  allowNetworkToBeAddedAndSwitchedTo() {
+    cy.allowMetamaskToAddAndSwitchNetwork()
   }
 
   readLocalStorage() {
@@ -29,6 +35,9 @@ export default class Base {
 
   getBody() {
     return cy.get('body')
+  }
+  getModal() {
+    return cy.get('div[aria-labelledby="transition-modal-title"]')
   }
   clearAllCookies() {
     cy.clearAllCookies()

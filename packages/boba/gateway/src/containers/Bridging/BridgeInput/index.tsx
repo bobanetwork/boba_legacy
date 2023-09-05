@@ -50,7 +50,10 @@ const BridgeInput: FC<Props> = (props) => {
       <BridgeInputWrapper>
         <TokenSelector>
           <SectionLabel>Token</SectionLabel>
-          <TokenSelectorInput onClick={() => openTokenPicker()}>
+          <TokenSelectorInput
+            onClick={() => openTokenPicker()}
+            id={'tokenSelectorInput'}
+          >
             {token && (
               <TokenSymbol>
                 <img

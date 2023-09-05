@@ -204,6 +204,7 @@ const History = () => {
                     onClick={() => {
                       handleSwitchDropdowns()
                     }}
+                    id={'switchNetworkDirection'}
                   >
                     <SwitchIcon />
                   </SwitchChainIcon>

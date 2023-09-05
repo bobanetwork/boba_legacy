@@ -8,6 +8,7 @@ describe('Page', () => {
     page.addNetwork(Binance)
     page.addNetwork(Avalanche)
     page.visit()
+    page.waitForPageToLoad()
     page.changeMetamaskNetwork('ethereum')
     page.header.requestMetamaskConnect()
     page.connectMetamask()
@@ -15,7 +16,7 @@ describe('Page', () => {
   after(() => {
     page.header.disconnectWallet()
   })
-  describe.only('Page Header', () => {
+  describe('Page Header', () => {
     it('Navigation List', () => {
       page.checkNavigationListEthereum()
     })
@@ -31,7 +32,7 @@ describe('Page', () => {
       page.checkThemeSwitcher()
     })
   })
-  describe.only('Page Footer', () => {
+  describe('Page Footer', () => {
     it('Social Media Links', () => {
       page.checkSocialMediaLinks()
     })

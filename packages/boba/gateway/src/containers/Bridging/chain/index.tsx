@@ -81,7 +81,7 @@ const Chains = (props: Props) => {
           </ChainPickerIcon>
         </ChainPicker>
       </ChainPickerContainer>
-      <SwitchChainIcon onClick={() => switchChain()}>
+      <SwitchChainIcon onClick={() => switchChain()} id="switchBridgeDirection">
         <SwitchIcon />
       </SwitchChainIcon>
       <ChainPickerContainer>
