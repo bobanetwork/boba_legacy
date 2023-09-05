@@ -12,7 +12,6 @@ export const InputContainer = styled.div<{ error?: boolean }>`
   border: 1px solid
     ${({ theme, error }) =>
       error ? theme.colors.red[300] : theme.colors.box.border};
-  background: ${(props) => props.theme.colors.box.background};
 
   ${mobile(css`
     padding: 5px;

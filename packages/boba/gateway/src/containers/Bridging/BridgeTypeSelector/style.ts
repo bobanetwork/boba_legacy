@@ -28,9 +28,7 @@ export const BridgeTabItem = styled.div<{
   color: ${(props) =>
     props.theme.name === 'light' ? props.theme.colors.gray[600] : 'inherit'};
   box-shadow: ${({ theme: { name } }) =>
-    name === 'light'
-      ? '0px 2px 4px 0px rgba(0, 0, 0, 0.10)'
-      : '0px 4px 10px 0px rgba(186, 226, 26, 0.1)'};
+    name === 'light' ? '0px 2px 4px 0px rgba(0, 0, 0, 0.10)' : 'none'};
   ${(props) =>
     props.active &&
     css`
