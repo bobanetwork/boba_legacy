@@ -1277,7 +1277,7 @@ describe('teleportation', () => {
 
       // random address to ensure balance = 0 to be eligible for airdrop
       const randAddress = ethers.Wallet.createRandom().address
-      let lastEvent = events[events.length - 1]
+      const lastEvent = events[events.length - 1]
       const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
       const depositId = lastEvent.args.depositId
       const amount = lastEvent.args.amount
