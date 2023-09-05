@@ -120,7 +120,9 @@ const DelegateDaoModal = ({ open }) => {
                 <>
                   <DescriptionStyled>
                       My address: <br />
-                      {wAddress} <br />
+                    {wAddress}
+                    <br />
+                    <br />
                       Choose which BOBA to delegate BOBA voting power to
                   </DescriptionStyled>
                   <SelectToken />
@@ -151,7 +153,9 @@ const DelegateDaoModal = ({ open }) => {
                 <>
                   <DescriptionStyled>
                     My address: <br />
-                    {wAddress} <br />
+                    {wAddress}
+                    <br />
+                    <br />
                   Choose which BOBA to delegate BOBA voting power to
                   </DescriptionStyled>
                 <SelectToken />

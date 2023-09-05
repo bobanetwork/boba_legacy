@@ -27,7 +27,7 @@ export const Header = styled.div<{ error: boolean; isOpen: boolean }>`
   color: inherit;
   border-radius: 12px;
   min-width: 290px;
-  padding: 15px;
+  padding: 8px 15px;
   transition: 0.25s all;
   ${(props) =>
     props.theme.name === 'light' &&
@@ -143,6 +143,9 @@ export const DefaultIcon = styled.div`
 `
 export const Icon = styled(Svg)`
   margin-right: 8px;
+  div {
+    display: flex;
+  }
   svg {
     max-width: 32px;
     height: auto;
