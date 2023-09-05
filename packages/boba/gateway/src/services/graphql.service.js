@@ -118,6 +118,7 @@ class TeleportationGraphQLService extends GraphQLService {
   }
 
   async queryDisbursementSuccessEvent(walletAddress, sourceChainId, destChainId, token, amount, depositId) {
+    if (!token) return undefined;
     const query = gql(`query Teleportation($wallet: Bytes!, $sourceChainId: String!, $token: Bytes!, $amount: String!, $depositId: String!) {
   teleportationDisbursementSuccessEvents(
     where: { and: [{ to: $wallet }, { sourceChainId: $sourceChainId }, { token: $token }, { amount: $amount }, { depositId: $depositId }] }

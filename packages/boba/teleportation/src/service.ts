@@ -101,7 +101,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     this.state.supportedChains = []
     this.state.depositTeleportations = []
     const bobaTokenContractAddr = Object.keys(this.options.ownSupportedAssets).find(
-      (k) => this.options.ownSupportedAssets[k] === 'BOBA'
+      (k) => this.options.ownSupportedAssets[k?.toLowerCase()] === 'BOBA'
     )
 
     for (const chain of this.options.selectedBobaChains) {
@@ -404,7 +404,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       )
     }
 
-    const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr]
+    const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr?.toLowerCase()]
 
     const supportedAsset = Object.entries(this.options.ownSupportedAssets).find(
       ([address, tokenSymbol]) => {

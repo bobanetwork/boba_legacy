@@ -217,7 +217,7 @@ class TransactionService {
     }
 
     const _getTeleportationSupportedDestChainTokenAddrBySourceChainTokenAddr = (sourceChainTokenAddr, sourceChainId, destChainId) => {
-      const srcChainTokenSymbol = BobaChains[parseInt(sourceChainId)].supportedAssets[sourceChainTokenAddr]
+      const srcChainTokenSymbol = BobaChains[parseInt(sourceChainId)].supportedAssets[sourceChainTokenAddr?.toLowerCase()]
 
       const supportedAsset = Object.entries(BobaChains[parseInt(destChainId)].supportedAssets).find(
         ([address, tokenSymbol]) => {
@@ -225,9 +225,10 @@ class TransactionService {
         }
       )
       if (!supportedAsset) {
-        throw new Error(
+        console.error(
           `Asset ${srcChainTokenSymbol} on chain destinationChain not configured but possibly supported on-chain`
         )
+        return;
       }
       return supportedAsset[0] // return only address
     }
