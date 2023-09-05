@@ -12,7 +12,7 @@ const linesColor = (theme: string) => {
 
 const gradientColor = (theme: string) => {
   if (theme === 'light') {
-    return 'radial-gradient(45% 45% at 50% 50%, rgba(174, 219, 1, 0.4) 19.79%, rgba(174, 219, 1, 0.125) 50%, rgba(174, 219, 1, 0) 50%);'
+    return 'radial-gradient(60% 90% at 50% 50%,rgba(174,219,1,0.1) 19.79%,rgba(174,219,1,0.125) 50%,rgba(174,219,1,0) 50%);'
   } else {
     return 'radial-gradient(55.87% 55.87% at 50.00% 50.00%, rgba(174, 219, 1, 0.24) 19.79%, rgba(174, 219, 1, 0.08) 62.50%, rgba(174, 219, 1, 0.00) 91.67%);'
   }
