@@ -1,6 +1,4 @@
 import styled, { css } from 'styled-components'
-import { mobile, screen, sdesktop } from 'themes/screens'
-import { Svg, Typography } from 'components/global'
 
 export const HistoryContainer = styled.div`
   border-radius: 8px;
@@ -36,4 +34,41 @@ export const Content = styled.div`
   gap: 10px;
   margin-bottom: 10px;
   border-radius: 6px;
+`
+
+export const Disclaimer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  padding-top: 10%;
+  font-size: 16px;
+  gap: 10px;
+
+  ${(props) =>
+    props.theme.name === 'light' &&
+    css`
+      color: ${props.theme.colors.gray[700]};
+    `}
+  ${(props) =>
+    props.theme.name === 'dark' &&
+    css`
+      color: ${props.theme.colors.gray[100]};
+    `}
+
+    svg {
+    ${(props) =>
+      props.theme.name === 'light' &&
+      css`
+        fill: ${props.theme.colors.gray[700]};
+      `}
+    ${(props) =>
+      props.theme.name === 'dark' &&
+      css`
+        fill: ${props.theme.colors.gray[100]};
+      `}
+  }
 `

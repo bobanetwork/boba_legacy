@@ -249,17 +249,13 @@ const History = () => {
         </>
       )}
       {!transactionsFound && (
-        <NoHistory
-          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-        >
+        <NoHistory>
           <Svg src={noHistoryIcon} />
           <div>No Transactions Found.</div>
         </NoHistory>
       )}
       {!layer && (
-        <NoHistory
-          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-        >
+        <NoHistory>
           <Svg src={noHistoryIcon} />
           <div>No History.</div>
           <Button

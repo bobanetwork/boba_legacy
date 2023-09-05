@@ -288,9 +288,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   return (
     <>
       {transactions.length === 0 && (
-        <NoHistory
-          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-        >
+        <NoHistory>
           <Svg src={noHistoryIcon} />
           <div>Transactions Loading...</div>
         </NoHistory>
@@ -346,9 +344,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       {filteredProcessedTransactions.length === 0 &&
         transactions.length !== 0 &&
         !loading && (
-          <NoHistory
-            style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-          >
+          <NoHistory>
             <Svg src={noHistoryIcon} />
             <div>No Transactions Matching Filter.</div>
           </NoHistory>
