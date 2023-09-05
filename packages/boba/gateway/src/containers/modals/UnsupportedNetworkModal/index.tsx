@@ -28,7 +28,7 @@ const UnsupportedNetworkModal: FC<UnsupportedNetworkModalProps> = ({
       title="Switch Networks"
       transparent={false}
     >
-      <Typography variant="body2">
+      <Typography variant="body3">
         You are on an unsupported network. Switch networks to begin using this
         application.
       </Typography>
