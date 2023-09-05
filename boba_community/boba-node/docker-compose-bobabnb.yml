@@ -10,7 +10,7 @@ version: "3.9"
 services:
   dtl:
     container_name: dtl
-    image: bobanetwork/data-transport-layer:alt-l1-${RELEASE_VERSION}
+    image: bobanetwork/data-transport-layer:${RELEASE_VERSION}
     env_file:
       -  ../../ops/envs/dtl.env
     environment:
@@ -41,7 +41,7 @@ services:
     container_name: replica
     depends_on:
       - dtl
-    image: bobanetwork/l2geth:alt-l1-${RELEASE_VERSION}
+    image: bobanetwork/l2geth:${RELEASE_VERSION}
     deploy:
       replicas: 1
     entrypoint: sh ./geth.sh

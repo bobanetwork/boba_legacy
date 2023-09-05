@@ -50,7 +50,7 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
       if (layer === LAYER.L1) {
         return '13 ~ 14mins.'
       } else {
-        return '7 days'
+        return '1 ~ 5min.'
       }
     } else {
       if (layer === LAYER.L1) {
