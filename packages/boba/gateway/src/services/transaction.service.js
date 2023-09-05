@@ -225,7 +225,7 @@ class TransactionService {
         }
       )
       if (!supportedAsset) {
-        console.error(
+        throw new Error(
           `Asset ${srcChainTokenSymbol} on chain destinationChain not configured but possibly supported on-chain`
         )
       }
