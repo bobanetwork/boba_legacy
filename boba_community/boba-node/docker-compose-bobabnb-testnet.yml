@@ -10,12 +10,12 @@ version: "3.9"
 services:
   dtl:
     container_name: dtl
-    image: bobanetwork/data-transport-layer:alt-l1-${RELEASE_VERSION}
+    image: bobanetwork/data-transport-layer:${RELEASE_VERSION}
     env_file:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
-      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://replica.testnet.bnb.boba.network/'
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: 'https://testnet.bnb.boba.network'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 9728
@@ -27,7 +27,7 @@ services:
       DATA_TRANSPORT_LAYER__TURING_V1_HEIGHT: 0
     volumes:
 
-      - ./state-dumps/bobabnb:/opt/optimism/packages/data-transport-layer/state-dumps/
+      - ./state-dumps/bobabnbtestnet:/opt/optimism/packages/data-transport-layer/state-dumps/
     logging:
       driver: "json-file"
       options:
@@ -41,7 +41,7 @@ services:
     container_name: replica
     depends_on:
       - dtl
-    image: bobanetwork/l2geth:alt-l1-${RELEASE_VERSION}
+    image: bobanetwork/l2geth:${RELEASE_VERSION}
     deploy:
       replicas: 1
     entrypoint: sh ./geth.sh

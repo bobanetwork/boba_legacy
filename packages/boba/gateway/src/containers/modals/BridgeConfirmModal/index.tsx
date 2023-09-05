@@ -46,8 +46,13 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
   const { triggerSubmit } = useBridge()
 
   const estimateTime = () => {
+    console.log('layer', layer)
     if (bridgeType === BRIDGE_TYPE.CLASSIC) {
-      return '7 days'
+      if (layer === LAYER.L1) {
+        return '1 ~ 5min.'
+      } else {
+        return '7 days'
+      }
     } else if (bridgeType === BRIDGE_TYPE.FAST) {
       if (layer === LAYER.L1) {
         return '1 ~ 5min.'
