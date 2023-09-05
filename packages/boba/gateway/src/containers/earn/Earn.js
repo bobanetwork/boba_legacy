@@ -29,7 +29,8 @@ import {
   selectBaseEnabled,
   selectAccountEnabled,
   selectLayer,
-  selectActiveNetworkName
+  selectActiveNetworkName,
+  selectChainIdChanged
 } from 'selectors'
 
 import { getEarnInfo } from 'actions/earnAction'
@@ -68,6 +69,7 @@ const Earn = () => {
 
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const chainIdChanged = useSelector(selectChainIdChanged())
 
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
@@ -83,6 +85,7 @@ const Earn = () => {
   )
 
   useEffect(()=> {
+    setLpChoice(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
     setPoolTab(activeNetworkName[layer?.toLowerCase()])
   }, [layer, networkService])
 
@@ -93,6 +96,7 @@ const Earn = () => {
     }
 
     if (accountEnabled) {
+
       dispatch(fetchBalances())
     }
   }, [dispatch, baseEnabled, accountEnabled])
