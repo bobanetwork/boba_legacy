@@ -88,6 +88,19 @@ export const ModalHead = styled(Box)`
 export const IconButtonTag = styled.div`
   margin-left: auto;
   cursor: pointer;
+  > div > div {
+    display: flex;
+  }
+  :hover {
+    > div > div {
+      border-radius: 50%;
+      background: rgb(185 185 185 / 40%);
+      display: flex;
+      svg: {
+        fill: white;
+      }
+    }
+  }
 `
 
 export const Content = styled(Box)`
