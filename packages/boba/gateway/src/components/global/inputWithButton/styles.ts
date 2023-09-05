@@ -3,6 +3,7 @@ import { mobile } from 'themes/screens'
 
 export const InputContainer = styled.div<{ error?: boolean }>`
   width: 100%;
+  min-height: 56px;
   display: flex;
   padding: 5px 16px;
   justify-content: space-around;
