@@ -108,6 +108,7 @@ export const ActionLabel = styled.div<{ selected?: boolean }>`
   align-items: flex-start;
   gap: 10px;
   border-radius: 24px;
+  font-size: 14px;
   border: 2px solid
     ${({ theme: { colors, name } }) =>
       name === 'light' ? colors.gray[600] : colors.gray[200]};

@@ -50,6 +50,7 @@ export const BridgeAction = styled.div`
   display: flex;
   justify-content: around;
   align-items: center;
+  margin-top: 24px;
 `
 
 export const BridgeActionButton = styled(Button).attrs({
