@@ -3075,6 +3075,14 @@
     "@types/mersenne-twister" "^1.1.2"
     mersenne-twister "^1.1.0"
 
+"@chainlink/contracts-0.0.10@npm:@chainlink/contracts@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@chainlink/contracts/-/contracts-0.0.10.tgz#9eca8ff76e82e62b8ceeda9b2f69395cdb4dae56"
+  integrity sha512-ok+ucSQ+3mrR+zjbi6zIrdd5M9XymcqVcnXGVyqBVRYZp97jS2/rt/glP320JmHxmi4pacgDOg0Ux11xIr1S8Q==
+  optionalDependencies:
+    "@truffle/contract" "^4.2.6"
+    ethers "^4.0.45"
+
 "@chainlink/contracts@0.3.1":
   version "0.3.1"
   resolved "https://registry.npmjs.org/@chainlink/contracts/-/contracts-0.3.1.tgz"
@@ -18508,7 +18516,7 @@ ethereum-cryptography@^1.0.3:
     "@scure/bip32" "1.1.0"
     "@scure/bip39" "1.1.0"
 
-ethereum-cryptography@^2.0.0:
+ethereum-cryptography@^2.0.0, ethereum-cryptography@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ethereum-cryptography/-/ethereum-cryptography-2.1.2.tgz#18fa7108622e56481157a5cb7c01c0c6a672eb67"
   integrity sha512-Z5Ba0T0ImZ8fqXrJbpHcbpAvIswRte2wGNR/KePnu8GbbvgJ47lMxT/ZZPG6i9Jaht4azPDop4HaM00J0J59ug==

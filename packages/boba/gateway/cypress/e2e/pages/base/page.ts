@@ -37,11 +37,9 @@ export default class Page extends Base {
       .getNavigationLinks()
       .should('not.be.empty')
       .and(($p) => {
-        // should have found 5 elements for Ethereum
-        expect($p).to.have.length(5)
+        // should have found 6 elements for Ethereum
+        expect($p).to.have.length(6)
 
-        // make sure the first contains some text content
-        expect($p.first()).to.contain('Bridge')
         // // use jquery's map to grab all of their classes
         // // jquery's map returns a new jquery object
         const links = $p.map((i, el) => {
@@ -49,6 +47,7 @@ export default class Page extends Base {
         })
         // call classes.get() to make this a plain array
         expect(links.get()).to.deep.eq([
+          '/bridge',
           '/bridge',
           '/history',
           '/earn',
@@ -62,6 +61,7 @@ export default class Page extends Base {
         })
 
         expect(labels.get()).to.deep.eq([
+          '',
           'Bridge',
           'History',
           'Earn',
@@ -174,13 +174,39 @@ export default class Page extends Base {
         ])
       })
   }
+
   switchThroughMainnetNetworks() {
+    // switch to BNB
     this.header.switchNetwork('Binance', 'BNB', false)
     this.allowNetworkSwitch()
+    this.checkNetworkSwitchSuccessful('BNB')
+    cy.wait(2000)
+
+    // switch to AVAX
     this.header.switchNetwork('Avalanche Mainnet', 'AVAX', false)
     this.allowNetworkSwitch()
+    this.checkNetworkSwitchSuccessful('AVAX')
+    cy.wait(2000)
+    // switch to Ethereum
     this.header.switchNetwork('Ethereum', 'ETHEREUM', false)
     this.allowNetworkSwitch()
+    this.checkNetworkSwitchSuccessful('ETHEREUM')
+  }
+
+  checkNetworkSwitchSuccessful(networkAbbreviation: string) {
+    cy.window()
+      .its('store')
+      .invoke('getState')
+      .its('network')
+      .its('activeNetwork')
+      .should('equal', networkAbbreviation)
+
+    cy.window()
+      .its('store')
+      .invoke('getState')
+      .its('setup')
+      .its('baseEnabled')
+      .should('be.true')
   }
 
   waitForPageToLoad() {
