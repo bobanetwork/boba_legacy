@@ -10,11 +10,11 @@ describe('Page', () => {
     page.visit()
     page.waitForPageToLoad()
     page.changeMetamaskNetwork('ethereum')
-    page.header.requestMetamaskConnect()
+    page.requestMetamaskConnect()
     page.connectMetamask()
   })
   after(() => {
-    page.header.disconnectWallet()
+    page.disconnectWallet()
   })
   describe('Page Header', () => {
     it('Navigation List', () => {
