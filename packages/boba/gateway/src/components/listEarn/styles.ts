@@ -82,6 +82,7 @@ export const SvgContianer = styled.div`
     display: flex;
   }
   svg {
-    fill: #eeeeee;
+    fill: ${({ theme }) =>
+      theme.name === 'light' ? theme.colors.gray[700] : '#eeeeee'};
   }
 `

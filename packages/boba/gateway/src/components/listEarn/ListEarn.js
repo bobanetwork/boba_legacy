@@ -6,19 +6,11 @@ import { logAmount, powAmount, formatLargeNumber } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
 import { openAlert, openModal } from 'actions/uiAction';
-
 import { getEarnInfo, updateStakeToken, updateWithdrawToken } from 'actions/earnAction';
-
-
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import networkService from 'services/networkService'
-
 import { Box,Fade, CircularProgress } from '@mui/material';
 import * as S from "./styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
-
-import {AprLabel} from 'components/global/label'
 import {IconLabel} from 'components/global/IconLabel';
 import {TableContent} from 'components/global/table'
 
