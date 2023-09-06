@@ -7,7 +7,6 @@ import useBridgeSetup from 'hooks/useBridgeSetup'
 import { getCoinImage } from 'util/coinImage'
 
 import useAmountToReceive from 'hooks/useAmountToReceive'
-import useBridgeAlerts from 'hooks/useBridgeAlerts'
 import BridgeToAddress from './BridgeToAddress'
 import Fee from './Fee'
 import TokenInput from './TokenInput'
