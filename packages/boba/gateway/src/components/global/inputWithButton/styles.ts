@@ -23,7 +23,8 @@ export const Input = styled.input`
   flex: 1;
   padding: 10px;
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  color: ${(props) => props.theme.color};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : theme.color};
   font-size: 16px;
   font-style: normal;
   font-weight: 500;

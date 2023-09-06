@@ -133,5 +133,6 @@ export const ActionLabel = styled.div<{ selected?: boolean }>`
 `
 
 export const PlusIcon = styled(PlusIconOutline)`
-  color: ${({ theme: { colors } }) => colors.color};
+  color: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[700] : colors.color};
 `
