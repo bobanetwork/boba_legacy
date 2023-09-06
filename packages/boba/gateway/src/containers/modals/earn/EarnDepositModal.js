@@ -306,7 +306,7 @@ class EarnDepositModal extends React.Component {
         onClose={() => {
           this.handleClose()
         }}
-        title={`Stake ${stakeToken.symbol}`}
+        title={`Stake`}
       >
         <EarnInputContainer>
           <EarnContent>
@@ -358,11 +358,17 @@ class EarnDepositModal extends React.Component {
                 <Button
                   onClick={() => { this.handleApprove() }}
                   label="Approve amount"
+                style={{
+                  width: '100%'
+                }}
                   loading={loading}
                   disable={!stakeValueValid}
                 />
                 <Button
                   onClick={() => { this.handleClose() }}
+                style={{
+                  width: '100%'
+                }}
                   label="Cancel"
                   transparent
                 />
@@ -384,12 +390,18 @@ class EarnDepositModal extends React.Component {
               <WrapperActionsModal>
                 <Button
                   onClick={() => { this.handleConfirm() }}
+                style={{
+                  width: '100%'
+                }}
                   loading={loading}
                   disable={false}
                   label="Stake"
                 />
                 <Button
                   onClick={() => { this.handleClose() }}
+                style={{
+                  width: '100%'
+                }}
                   label="Cancel"
                   transparent
                 />

@@ -21,22 +21,16 @@ export const GridItemTag = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding-left: 8px;
-
 `
 
 export const GridItemTagR = styled.div`
-  display: 'flex',
-  flex-direction: column,
-  justify-content: space-between,
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: flex-start;
-  /*
-  [theme.breakpoints.down('md')]:{
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }
-  */
+  width: 100%;
+  margin: 8px;
+  padding-right: 8px;
 `
 
 export const DropdownWrapper = styled.div`
@@ -68,4 +62,5 @@ export const ItemHeaderContainer = styled.div`
   width: 100%;
   cursor: pointer;
   text-align: left;
+  padding-left: 8px;
 `

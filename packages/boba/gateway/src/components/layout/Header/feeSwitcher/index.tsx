@@ -30,7 +30,13 @@ import networkService from 'services/networkService.js'
 
 import useFeeSwitcher from 'hooks/useFeeSwitcher'
 import { getCoinImage } from 'util/coinImage'
-import { FeeSwitcherIcon, FeeSwitcherLabel, FeeSwitcherWrapper } from './styles'
+import {
+  FeeLabel,
+  FeeSwitcherIcon,
+  FeeSwitcherLabel,
+  FeeSwitcherLabelWrapper,
+  FeeSwitcherWrapper,
+} from './styles'
 
 import BobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
 
@@ -69,11 +75,14 @@ const FeeSwitcher: FC = () => {
 
   return (
     <FeeSwitcherWrapper>
-      <Tooltip
-        title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across ${networkName['l2']} according to your choice.`}
-      >
-        <FeeSwitcherIcon fontSize="small" />
-      </Tooltip>
+      <FeeSwitcherLabelWrapper>
+        <FeeLabel>Fee</FeeLabel>
+        <Tooltip
+          title={`BOBA or ${networkService.L1NativeTokenSymbol} will be used across ${networkName['l2']} according to your choice.`}
+        >
+          <FeeSwitcherIcon fontSize="small" />
+        </Tooltip>
+      </FeeSwitcherLabelWrapper>
       <Select
         isMulti={false}
         loading={false}

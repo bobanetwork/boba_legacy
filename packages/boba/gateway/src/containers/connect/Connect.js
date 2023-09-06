@@ -17,7 +17,7 @@ const Connect = ({
 
   if (!accountEnabled && !connectToBoba) {
     return (
-      <G.LayerAlert style={{ padding: '20px' }}>
+      <G.LayerAlert style={{ padding: '10px 20px' }}>
         <G.AlertInfo>
           <AlertIcon />
           <G.AlertText variant="body2" component="p">
@@ -33,7 +33,7 @@ const Connect = ({
     )
   } else if (layer !== 'L2' && connectToBoba) {
     return (
-      <G.LayerAlert style={{ padding: '20px' }}>
+      <G.LayerAlert style={{ padding: '10px 20px' }}>
         <G.AlertInfo>
           <AlertIcon />
           <G.AlertText variant="body2" component="p">

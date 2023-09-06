@@ -15,4 +15,6 @@ export const PlaceholderContainer = styled.div`
 export const Label = styled(Typography)`
   text-transform: capitalize;
   padding-bottom: 15px;
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : theme.colors.gray[100]};
 `

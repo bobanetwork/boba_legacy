@@ -258,7 +258,7 @@ const LayerSwitcher = ({ visisble = true, isButton = false }) => {
       <Button
         type="primary"
         variant="contained"
-        size="small"
+        size="md"
         newStyle
         onClick={() => (layer === 'L1') ?  dispatch(setConnectBOBA(true)) : dispatch(setConnectETH(true))}
         sx={{ fontWeight: '500;' }}

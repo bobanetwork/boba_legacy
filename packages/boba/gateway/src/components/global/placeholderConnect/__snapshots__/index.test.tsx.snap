@@ -6,7 +6,9 @@ exports[`PlaceholderConnect PlaceholderConnect is loading 1`] = `
     class="sc-fFGjHI eWYtNO"
   >
     loading
-    <div>
+    <div
+      class="sc-iVCKna dyLvdT"
+    >
       <div>
         <div
           data-src="no-data.svg"
@@ -15,7 +17,7 @@ exports[`PlaceholderConnect PlaceholderConnect is loading 1`] = `
       </div>
     </div>
     <p
-      class="sc-ewnqHT coSJgb sc-dicizt bnlGel"
+      class="sc-ewnqHT bIrpBD sc-dicizt jMoYNm"
     >
       No 
     </p>
@@ -35,7 +37,9 @@ exports[`PlaceholderConnect PlaceholderConnect is not loading 1`] = `
   <div
     class="sc-fFGjHI eWYtNO"
   >
-    <div>
+    <div
+      class="sc-iVCKna dyLvdT"
+    >
       <div>
         <div
           data-src="no-data.svg"
@@ -44,7 +48,7 @@ exports[`PlaceholderConnect PlaceholderConnect is not loading 1`] = `
       </div>
     </div>
     <p
-      class="sc-ewnqHT coSJgb sc-dicizt bnlGel"
+      class="sc-ewnqHT bIrpBD sc-dicizt jMoYNm"
     >
       No 
     </p>
