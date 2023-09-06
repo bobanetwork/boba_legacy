@@ -1,11 +1,6 @@
 import Base from './base'
 
 export default class PageHeader extends Base {
-  constructor() {
-    super()
-    this.id = 'header'
-  }
-
   getNavigationLinks() {
     return cy.get('#header').find('a')
   }
@@ -22,17 +17,6 @@ export default class PageHeader extends Base {
     return cy.get('div[title="dark-icon"]').should('exist')
   }
 
-  connectWallet() {
-    cy.get('#header')
-      .find('button[label|="Connect Wallet"]')
-      .should('exist')
-      .click()
-  }
-  requestMetamaskConnect() {
-    this.connectWallet()
-    cy.get('#connectMetaMask').should('exist').click()
-  }
-
   switchNetwork(
     networkName: string,
     networkAbbreviation: string,
@@ -40,7 +24,6 @@ export default class PageHeader extends Base {
   ) {
     this.getNetworkSwitcher().click()
     this.getNetworkSwitcher().contains(networkName).should('exist').click()
-    cy.wait(500)
     cy.get(
       `button[label="Switch to ${networkAbbreviation} ${
         isTestnet ? 'Testnet' : ''
@@ -48,7 +31,6 @@ export default class PageHeader extends Base {
     )
       .should('exist')
       .click()
-    cy.wait(500)
     cy.get(
       `button[label="Connect to the ${networkAbbreviation} ${
         isTestnet ? 'Testnet' : 'Mainnet'
@@ -56,8 +38,6 @@ export default class PageHeader extends Base {
     )
       .should('exist')
       .click()
-    cy.wait(500)
-    this.allowNetworkSwitch()
   }
   disconnectWallet() {
     cy.get('#header')

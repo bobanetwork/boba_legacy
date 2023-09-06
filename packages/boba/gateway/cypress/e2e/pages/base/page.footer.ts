@@ -1,10 +1,6 @@
 import Base from './base'
 
-export default class PageFooter extends Base {
-  constructor() {
-    super()
-    this.id = 'footer'
-  }
+export default class PageFooter {
   getSocialMediaLinks() {
     return cy.get('#socialLinks').find('a')
   }

@@ -101,7 +101,7 @@ export default class Bridge extends Page {
     cy.contains(`${amount} ETH`, { timeout: 60000 }).should('exist')
     cy.get('button').contains('Confirm').should('exist').click()
     if (destinationLayer === Layer.L1) {
-      cy.confirmMetamaskPermissionToSpend()
+      this.allowMetamaskToSpendToken()
     }
     this.confirmTransactionOnMetamask()
     if (destinationLayer === Layer.L2) {

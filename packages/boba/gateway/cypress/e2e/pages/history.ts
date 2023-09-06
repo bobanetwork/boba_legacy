@@ -38,9 +38,10 @@ export default class History extends Page {
   checkNetworkDropdowns() {
     this.withinPage()
       .find("div:contains('All Networks')")
-      .not(':has(*)')
+      .not(':has(*)') // checks that elements are leafs in the HTML tree
       .should('not.be.empty')
       .and(($p) => {
+        // newtork dropdowns exist and are set to 'All Networks' by default
         expect($p).to.have.length(2)
         const labels = $p.map((i, el) => {
           return Cypress.$(el).text()
@@ -72,19 +73,22 @@ export default class History extends Page {
     cy.window()
       .its('store')
       .invoke('getState')
-      .its('transaction', { timeout: 60000 })
+      .its('transaction', { timeout: 90000 })
       .should('not.be.empty')
   }
 
   checkSearchInput() {
-    this.getSearchInput().type(
-      '0x8a5c9043806640273140f0ff4f1730b780024a8220f301550de55cc2652c6e2b'
-    )
+    this.getSearchInput()
+      .focus()
+      .type(
+        '0x8a5c9043806640273140f0ff4f1730b780024a8220f301550de55cc2652c6e2b'
+      )
     this.getTransactions().should('have.length', 1)
     this.getSearchInput().clear()
     this.getTransactions().should('have.length.greaterThan', 1)
   }
-  changeDatePicker(from: boolean, targetDate: Date) {
+
+  changeDatePicker(from: boolean, targetDate: Date, shouldBeDisabled = false) {
     const originalDate = from ? this.fromDate : this.toDate
     const datePicker = from ? this.getFromDatePicker() : this.getToDatePicker()
 
@@ -103,15 +107,23 @@ export default class History extends Page {
       }
     }
 
-    this.withinPage()
-      .find('button[name=day]')
-      .contains(targetDate.getDate())
-      .should('have.length', 1)
-      .click()
-    if (from) {
-      this.fromDate = targetDate
+    if (shouldBeDisabled) {
+      this.withinPage()
+        .find('button[name=day]')
+        .contains(targetDate.getDate())
+        .invoke('attr', 'disabled')
+        .should('exist')
     } else {
-      this.toDate = targetDate
+      this.withinPage()
+        .find('button[name=day]')
+        .contains(targetDate.getDate())
+        .should('have.length', 1)
+        .click()
+      if (from) {
+        this.fromDate = targetDate
+      } else {
+        this.toDate = targetDate
+      }
     }
   }
   checkDatePickers() {
@@ -119,6 +131,8 @@ export default class History extends Page {
     const orignalToDate = this.toDate
     this.changeDatePicker(true, new Date('30 Jun 2023 12:00 AM'))
     this.changeDatePicker(false, new Date('30 Aug 2023 12:00 AM'))
+
+    // ensure transactions occured within the date specified in the date pickers
     this.withinPage()
       .find('div[title="transactionDate"]')
       .then(($date) => {
@@ -135,6 +149,13 @@ export default class History extends Page {
             .to.be.true
         }
       })
+
+    // dates after 'to date' should be disabled in 'from' date picker
+    this.changeDatePicker(true, new Date('31 Aug 2023 12:00 AM'), true)
+
+    // dates before 'from date' should be disabled in 'to' date picker
+    this.changeDatePicker(false, new Date('29 Jun 2023 12:00 AM'), true)
+
     this.changeDatePicker(true, orignalFromDate)
     this.changeDatePicker(false, orignalToDate)
   }

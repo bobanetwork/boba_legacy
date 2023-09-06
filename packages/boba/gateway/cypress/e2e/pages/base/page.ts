@@ -6,6 +6,7 @@ export default class Page extends Base {
   header: PageHeader
   footer: PageFooter
   walletConnectButtonText: string
+  id: string
   constructor() {
     super()
     this.header = new PageHeader()
@@ -175,10 +176,11 @@ export default class Page extends Base {
   }
   switchThroughMainnetNetworks() {
     this.header.switchNetwork('Binance', 'BNB', false)
-    cy.wait(500)
+    this.allowNetworkSwitch()
     this.header.switchNetwork('Avalanche Mainnet', 'AVAX', false)
-    cy.wait(500)
+    this.allowNetworkSwitch()
     this.header.switchNetwork('Ethereum', 'ETHEREUM', false)
+    this.allowNetworkSwitch()
   }
 
   waitForPageToLoad() {
@@ -188,5 +190,8 @@ export default class Page extends Base {
       .its('setup')
       .its('baseEnabled')
       .should('be.true')
+  }
+  disconnectWallet() {
+    this.header.disconnectWallet()
   }
 }

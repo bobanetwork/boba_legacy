@@ -1,10 +1,6 @@
 import { MetamaskNetwork } from '../../types'
 
 export default class Base {
-  id: string
-  constructor() {
-    this.id = ''
-  }
   connectMetamask() {
     cy.acceptMetamaskAccess()
   }
@@ -27,6 +23,9 @@ export default class Base {
   }
   allowNetworkToBeAddedAndSwitchedTo() {
     cy.allowMetamaskToAddAndSwitchNetwork()
+  }
+  allowMetamaskToSpendToken() {
+    cy.confirmMetamaskPermissionToSpend()
   }
 
   readLocalStorage() {
