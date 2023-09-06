@@ -39,24 +39,24 @@ Audits outstanding.
 ## Testnet deployments
 
 ### Goerli (L1)
-- Teleportation deployed to: `0x885bfeC3D89755d2bCc1e73b6EeEEae94D54eBE4`
-- Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
+- Teleportation deployed to: `0xB93d9748808A5cC7dC6b61b31F15b87F50BfcAd0`
+- Proxy__Teleportation deployed to: `0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13`
 
 ### BNB Testnet (L1)
-- Teleportation deployed to: `0xf07A686af44C6b53391Bc56024f148739D528D27`
-- Proxy__Teleportation deployed to: `0x1b633BdA998507795A4552809be25D1dCe1d881d`
+- Teleportation deployed to: `0xD151c8F0dc69618e6180a2dC74B05cCE3E08e0aC`
+- Proxy__Teleportation deployed to: `0x7f6a32bCaA70c65E08F2f221737612F6fC18347A`
 
 ### Boba Goerli
-- Teleportation deployed to: `0x28fd3770b42797890e07d53DDd1e10DcD55D966E`
-- Proxy__Teleportation deployed to: `0x64bD91c67af8cd17e04BeBDaac675f0EF6527edd`
+- Teleportation deployed to: `0x95ec63aE2573bD5e70C223E075D9483573968699`
+- Proxy__Teleportation deployed to: `0xB43EE846Aa266228FeABaD1191D6cB2eD9808894`
 
 ### Boba BNB Testnet
-- Teleportation deployed to: `0x885bfeC3D89755d2bCc1e73b6EeEEae94D54eBE4`
-- Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
+- Teleportation deployed to: `0x46FA6144C61d2bb9aCDc3Ca90C8673dd9B6caEB2`
+- Proxy__Teleportation deployed to: `0xf4d179d3a083Fa3Eede935FaF4C679D32d514186`
 
 
 ---
 
-## User flow / Dev flow: 
+## User flow / Dev flow:
 ![TeleportationFlow](https://github.com/bobanetwork/boba/assets/28724551/1c5fceb8-126d-42d1-92b4-59ec5ed9ad71)
 

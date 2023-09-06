@@ -2,6 +2,7 @@ import React, { ElementType, FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  INetwork,
   L1_ICONS,
   L2_ICONS,
   NetworkList as NetworkLists,
@@ -39,12 +40,13 @@ export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
 
   const networks = (NetworkLists as Record<string, any>)[networkType]
   const currentLayer = selectionLayer || (layer as string).toLowerCase()
-  const onChainChange = (chainDetail: any) => {
+  const onChainChange = (chainDetail: INetwork) => {
     dispatch(
       setNetwork({
         network: chainDetail.chain,
         name: chainDetail.name,
         networkIcon: chainDetail.icon,
+        chainIds: chainDetail.chainId,
         networkType,
       })
     )
@@ -53,11 +55,12 @@ export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
 
   return (
     <NetworkPickerList>
-      {networks.map((chainDetail: any) => {
-        const Icon =
+      {networks.map((chainDetail: INetwork) => {
+        const CurrentIcon =
           currentLayer === 'l1'
             ? l1Icon[chainDetail.icon]
             : l2Icon[chainDetail.icon]
+
         return (
           <NetworkItem
             selected={chainDetail.chain === activeNetwork}
@@ -65,7 +68,7 @@ export const NetworkList: FC<NetworkListProps> = ({ close = () => {} }) => {
             onClick={() => onChainChange(chainDetail)}
           >
             <NetworkIcon>
-              <Icon selected />
+              <CurrentIcon selected />
             </NetworkIcon>
             <NetworkLabel>{chainDetail.name[currentLayer]}</NetworkLabel>
           </NetworkItem>

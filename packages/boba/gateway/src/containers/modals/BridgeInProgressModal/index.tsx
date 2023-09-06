@@ -8,10 +8,11 @@ import { Heading } from 'components/global'
 import Modal from 'components/modal/Modal'
 import React, { FC } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectLayer } from 'selectors'
+import { selectBridgeType, selectLayer } from 'selectors'
 import { LAYER } from 'util/constant'
 import BlockConfirmation from './BlockConfirmation'
 import { InprogressContainer, MutedText, ProgressLoader } from './index.styles'
+import { BRIDGE_TYPE } from '../../Bridging/BridgeTypeSelector'
 
 interface Props {
   open: boolean
@@ -20,6 +21,7 @@ interface Props {
 const BridgeInProgressModal: FC<Props> = ({ open }) => {
   const dispatch = useDispatch<any>()
   const layer = useSelector(selectLayer())
+  const bridgeType = useSelector(selectBridgeType())
 
   const handleClose = () => {
     dispatch(closeModal('bridgeInProgress'))
@@ -40,7 +42,7 @@ const BridgeInProgressModal: FC<Props> = ({ open }) => {
       <InprogressContainer>
         <ProgressLoader />
         <Heading variant="h1">Bridging...</Heading>
-        {layer === LAYER.L1 ? (
+        {layer === LAYER.L1 && bridgeType !== BRIDGE_TYPE.TELEPORTATION ? (
           <BlockConfirmation onClose={handleClose} />
         ) : (
           <>

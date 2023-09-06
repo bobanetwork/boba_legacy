@@ -61,3 +61,8 @@ export function selectIsFetchTxBlockNumber() {
   }
 }
 
+export function selectIsTeleportationOfAssetSupported() {
+  return function (state) {
+    return state.bridge.isTeleportationOfAssetSupported
+  }
+}

@@ -15,7 +15,7 @@ limitations under the License. */
 
 import gasService from 'services/gas.service'
 import networkService from 'services/networkService'
-import transctionService from 'services/transaction.service'
+import transactionService from 'services/transaction.service'
 import { createAction } from './createAction'
 
 export function fetchBalances() {
@@ -32,19 +32,19 @@ export function addTokenList() {
 
 export function fetchTransactions() {
   return createAction('TRANSACTION/GETALL', () =>
-    transctionService.getTransactions()
+    transactionService.getTransactions()
   )
 }
 
 export function fetchSevens() {
   return createAction('SEVENS/GETALL', () =>
-    transctionService.getSevens()
+    transactionService.getSevens()
   )
 }
 
 export function fetchFastExits() {
   return createAction('FASTEXITS/GETALL', () =>
-    transctionService.getFastExits()
+    transactionService.getFastExits()
   )
 }
 
@@ -58,6 +58,18 @@ export function exitBOBA(token, value) {
 export function depositL1LP(currency, value, decimals) {
   return createAction('DEPOSIT/CREATE', () =>
     networkService.depositL1LP(currency, value, decimals)
+  )
+}
+
+export function isTeleportationOfAssetSupported(layer, asset, destChainId) {
+  return createAction('DEPOSIT/TELEPORTATION/TOKEN_SUPPORTED', () =>
+    networkService.isTeleportationOfAssetSupported(layer, asset, destChainId)
+  )
+}
+
+export function depositWithTeleporter(layer, currency, value, destChainId) {
+  return createAction('DEPOSIT/CREATE', () =>
+      networkService.depositWithTeleporter(layer, currency, value, destChainId)
   )
 }
 
