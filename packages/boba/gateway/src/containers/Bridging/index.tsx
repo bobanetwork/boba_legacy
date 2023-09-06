@@ -23,9 +23,11 @@ import {
   BridgeWrapper,
   BridginContainer,
 } from './styles'
+import useBridgeAlerts from 'hooks/useBridgeAlerts'
 
 const Bridging = () => {
   useBridgeCleanup()
+  useBridgeAlerts()
 
   const dispatch = useDispatch<any>()
   const accountEnabled = useSelector<any>(selectAccountEnabled())

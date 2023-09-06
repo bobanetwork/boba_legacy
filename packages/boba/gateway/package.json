@@ -14,7 +14,7 @@
     "pre-commit": "lint-staged --allow-empty",
     "prebuild": "./bin/release.sh",
     "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
-    "test": "react-scripts test --watchAll=false",
+    "test": "TZ=utc react-scripts test --watchAll=false",
     "test:coverage": "yarn test --coverage",
     "test:u": "yarn test -u",
     "test:w": "yarn test --watchAll=true",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
+    "@cfx-kit/wallet-avatar": "^0.0.5",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.6.0",
     "@eth-optimism/contracts": "0.5.11",

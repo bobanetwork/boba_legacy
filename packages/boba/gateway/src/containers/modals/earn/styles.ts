@@ -15,7 +15,7 @@ export const Flex = styled.div`
 export const EarnContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px 0px;
+  gap: 8px;
   width: 100%;
   > div {
     width: 100%;

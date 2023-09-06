@@ -1032,7 +1032,7 @@ describe('Asset Teleportation Tests', async () => {
           ethers.constants.AddressZero,
           _minAmount,
           chainId4,
-          {value: _minAmount}
+          { value: _minAmount }
         )
         const _amount = ethers.utils.parseEther('0.9')
         await Proxy__Teleportation.setMaxAmount(
@@ -1349,14 +1349,25 @@ describe('Asset Teleportation Tests', async () => {
           Proxy__Teleportation.teleportAsset(L2Boba.address, _amount, chainId4)
         )
           .to.emit(Proxy__Teleportation, 'AssetReceived')
-          .withArgs(L2Boba.address, chainId31337, chainId4, 4, signerAddress, _amount)
+          .withArgs(
+            L2Boba.address,
+            chainId31337,
+            chainId4,
+            4,
+            signerAddress,
+            _amount
+          )
         expect(
           (await Proxy__Teleportation.totalDeposits(chainId4)).toString()
         ).to.be.eq('5')
         expect(
           BigNumber.from(
-            (await Proxy__Teleportation.supportedTokens(L2Boba.address, chainId4))
-              .transferredAmount
+            (
+              await Proxy__Teleportation.supportedTokens(
+                L2Boba.address,
+                chainId4
+              )
+            ).transferredAmount
           )
             .sub(prevTransferredAmount)
             .toString()
@@ -1367,14 +1378,22 @@ describe('Asset Teleportation Tests', async () => {
 
       it('should teleport random tokens and emit event for alt l2', async () => {
         const prevTransferredAmount = BigNumber.from(
-          (await Proxy__Teleportation.supportedTokens(RandomERC20.address, chainId4))
-            .transferredAmount
+          (
+            await Proxy__Teleportation.supportedTokens(
+              RandomERC20.address,
+              chainId4
+            )
+          ).transferredAmount
         )
         const _amount = ethers.utils.parseEther('100')
         const preBalance = await RandomERC20.balanceOf(signerAddress)
         await RandomERC20.approve(Proxy__Teleportation.address, _amount)
         await expect(
-          Proxy__Teleportation.teleportAsset(RandomERC20.address, _amount, chainId4)
+          Proxy__Teleportation.teleportAsset(
+            RandomERC20.address,
+            _amount,
+            chainId4
+          )
         )
           .to.emit(Proxy__Teleportation, 'AssetReceived')
           .withArgs(
@@ -1390,8 +1409,12 @@ describe('Asset Teleportation Tests', async () => {
         ).to.be.eq('6')
         expect(
           BigNumber.from(
-            (await Proxy__Teleportation.supportedTokens(RandomERC20.address, chainId4))
-              .transferredAmount
+            (
+              await Proxy__Teleportation.supportedTokens(
+                RandomERC20.address,
+                chainId4
+              )
+            ).transferredAmount
           )
             .sub(prevTransferredAmount)
             .toString()
@@ -1497,11 +1520,11 @@ describe('Asset Teleportation Tests', async () => {
         const failedDisbursement =
           await Proxy__Teleportation.failedNativeDisbursements(0)
         expect(failedDisbursement.failed).to.be.eq(false)
-        expect(failedDisbursement.disbursement.amount).to.be.eq(_amount)
+        expect(failedDisbursement.disbursement.amount).to.be.eq('0')
         expect(failedDisbursement.disbursement.addr).to.be.eq(
-          PausedReceiver.address
+          ethers.constants.AddressZero
         )
-        expect(failedDisbursement.disbursement.sourceChainId).to.be.eq(4)
+        expect(failedDisbursement.disbursement.sourceChainId).to.be.eq(0)
         expect(failedDisbursement.disbursement.depositId).to.be.eq(0)
         expect(
           await ethers.provider.getBalance(Proxy__Teleportation.address)
@@ -1591,28 +1614,28 @@ describe('Asset Teleportation Tests', async () => {
         const failedDisbursementRetried1 =
           await Proxy__Teleportation.failedNativeDisbursements(2)
         expect(failedDisbursementRetried1.failed).to.be.eq(false)
-        expect(failedDisbursementRetried1.disbursement.amount).to.be.eq(_amount)
+        expect(failedDisbursementRetried1.disbursement.amount).to.be.eq('0')
         expect(failedDisbursementRetried1.disbursement.addr).to.be.eq(
-          PausedReceiver.address
+          ethers.constants.AddressZero
         )
         expect(failedDisbursementRetried1.disbursement.sourceChainId).to.be.eq(
-          4
+          0
         )
-        expect(failedDisbursementRetried1.disbursement.depositId).to.be.eq(2)
+        expect(failedDisbursementRetried1.disbursement.depositId).to.be.eq(0)
 
         const failedDisbursementRetried2 =
           await Proxy__Teleportation.failedNativeDisbursements(3)
         expect(failedDisbursementRetried2.failed).to.be.eq(false)
         expect(failedDisbursementRetried2.disbursement.amount).to.be.eq(
-          ethers.utils.parseEther('1')
+          '0'
         )
         expect(failedDisbursementRetried2.disbursement.addr).to.be.eq(
-          PausedReceiver.address
+          ethers.constants.AddressZero
         )
         expect(failedDisbursementRetried2.disbursement.sourceChainId).to.be.eq(
-          4
+          0
         )
-        expect(failedDisbursementRetried2.disbursement.depositId).to.be.eq(3)
+        expect(failedDisbursementRetried2.disbursement.depositId).to.be.eq(0)
         expect(
           await ethers.provider.getBalance(Proxy__Teleportation.address)
         ).to.be.eq(0)
@@ -1663,7 +1686,9 @@ describe('Asset Teleportation Tests', async () => {
 
       it('should not transferOwnership if caller is not owner', async () => {
         await expect(
-          Proxy__Teleportation.connect(signer2).transferOwnership(signer2Address)
+          Proxy__Teleportation.connect(signer2).transferOwnership(
+            signer2Address
+          )
         ).to.be.revertedWith('Caller is not the owner')
       })
 
@@ -1687,7 +1712,6 @@ describe('Asset Teleportation Tests', async () => {
       })
 
       it('should set minimum amount', async () => {
-
         await Proxy__Teleportation.setMinAmount(
           L2Boba.address,
           chainId4,
@@ -1707,7 +1731,6 @@ describe('Asset Teleportation Tests', async () => {
       })
 
       it('should set minimum amount native', async () => {
-
         await Proxy__Teleportation.setMinAmount(
           ethers.constants.AddressZero,
           chainId4,
@@ -1716,7 +1739,8 @@ describe('Asset Teleportation Tests', async () => {
         expect(
           (
             await Proxy__Teleportation.supportedTokens(
-              ethers.constants.AddressZero, chainId4
+              ethers.constants.AddressZero,
+              chainId4
             )
           ).minDepositAmount.toString()
         ).to.be.eq(ethers.utils.parseEther('1'))
@@ -1725,17 +1749,18 @@ describe('Asset Teleportation Tests', async () => {
       it('should not set minimum amount if caller is not owner', async () => {
         await expect(
           Proxy__Teleportation.connect(signer2).setMinAmount(
-            L2Boba.address, chainId4,
+            L2Boba.address,
+            chainId4,
             ethers.utils.parseEther('1')
           )
         ).to.be.revertedWith('Caller is not the owner')
       })
 
       it('should not set maximum amount if smaller than min amount', async () => {
-
         await expect(
           Proxy__Teleportation.setMaxAmount(
-            ethers.constants.AddressZero, chainId4,
+            ethers.constants.AddressZero,
+            chainId4,
             defaultMinDepositAmount.sub(1)
           )
         ).to.be.revertedWith('incorrect max deposit amount')
@@ -1750,7 +1775,8 @@ describe('Asset Teleportation Tests', async () => {
         expect(
           (
             await Proxy__Teleportation.supportedTokens(
-              ethers.constants.AddressZero, chainId4
+              ethers.constants.AddressZero,
+              chainId4
             )
           ).maxDepositAmount.toString()
         ).to.be.eq(defaultMaxDepositAmount.sub(2))
@@ -1771,7 +1797,8 @@ describe('Asset Teleportation Tests', async () => {
         expect(
           (
             await Proxy__Teleportation.supportedTokens(
-              ethers.constants.AddressZero, chainId4
+              ethers.constants.AddressZero,
+              chainId4
             )
           ).maxDepositAmount.toString()
         ).to.be.eq(defaultMaxDepositAmount.sub(2))

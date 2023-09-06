@@ -73,7 +73,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
     return txnAfterStartDate && txnBeforeEndDate
   }
 
-  // should filter out transctions that aren't cross domain
+  // should filter out transactions that aren't cross domain
   const crossDomainFilter = (transaction: ITransaction) => {
     return (
       transaction.crossDomainMessage &&
@@ -108,8 +108,9 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   }
   const getTransactionStatus = (transaction: ITransaction) => {
     if (
-      transaction.action &&
-      transaction.crossDomainMessage.crossDomainMessageSendTime
+      transaction.isTeleportation ||
+      (transaction.action &&
+        transaction.crossDomainMessage.crossDomainMessageSendTime)
     ) {
       switch (transaction.action.status) {
         case TRANSACTION_STATUS.Succeeded: {
@@ -162,31 +163,40 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
     // TODO: have a unknown token to use
     let token = {
-      name: 'Etheruem',
+      name: 'Ethereum',
       symbol: 'ETH',
       decimals: 18,
     }
     if (
       TokenInfo[transaction.originChainId.toString()][
-        transaction.action.token.toLowerCase()
+        transaction?.action?.token?.toLowerCase()
       ]
     ) {
       token =
         TokenInfo[transaction.originChainId.toString()][
-          transaction.action.token.toLowerCase()
+          transaction?.action?.token?.toLowerCase()
         ]
     }
 
     const symbol = token.symbol
 
     amountString = logAmount(transaction.action.amount, token.decimals, 4)
-    const fromHash = transaction.hash
-    let toHash = ''
-    if (chain === LAYER.L2 && transaction.crossDomainMessage.l1Hash) {
+    const fromHash = transaction.hash ?? transaction.crossDomainMessage.fromHash
+    let toHash = transaction.crossDomainMessage.toHash ?? ''
+    if (
+      !toHash &&
+      chain === LAYER.L2 &&
+      transaction.crossDomainMessage.l1Hash
+    ) {
       toHash = transaction.crossDomainMessage.l1Hash
-    } else if (chain === LAYER.L1 && transaction.crossDomainMessage.l2Hash) {
+    } else if (
+      !toHash &&
+      chain === LAYER.L1 &&
+      transaction.crossDomainMessage.l2Hash
+    ) {
       toHash = transaction.crossDomainMessage.l2Hash
     }
+
     const processedTransaction: IProcessedTransaction = {
       timeStamp: transaction.timeStamp,
       from: transaction.from,
@@ -278,9 +288,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   return (
     <>
       {transactions.length === 0 && (
-        <NoHistory
-          style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-        >
+        <NoHistory>
           <Svg src={noHistoryIcon} />
           <div>Transactions Loading...</div>
         </NoHistory>
@@ -336,9 +344,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
       {filteredProcessedTransactions.length === 0 &&
         transactions.length !== 0 &&
         !loading && (
-          <NoHistory
-            style={{ marginLeft: 'auto', marginRight: 'auto', padding: '20px' }}
-          >
+          <NoHistory>
             <Svg src={noHistoryIcon} />
             <div>No Transactions Matching Filter.</div>
           </NoHistory>

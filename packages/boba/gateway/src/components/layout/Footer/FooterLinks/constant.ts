@@ -29,7 +29,7 @@ export const FOOTERLINKS_RIGHT: Array<LinkProps> = [
     path: 'https://boba.network',
   },
   {
-    label: 'Terms of Service',
-    path: '',
+    label: 'Terms of Use',
+    path: 'https://boba.network/terms-of-use/',
   },
 ]

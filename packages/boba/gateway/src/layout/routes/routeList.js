@@ -17,7 +17,7 @@ import History from 'containers/history/History';
 export const COMMON_ROUTES = [
   {
     path: "*",
-    element: <Navigate to="/" />,
+    element: <Navigate to={ROUTES_PATH.BRIDGE} />,
     key: '',
   },
   {
