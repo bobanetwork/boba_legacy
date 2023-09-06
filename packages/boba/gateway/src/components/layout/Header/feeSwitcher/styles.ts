@@ -21,7 +21,8 @@ export const FeeSwitcherLabel = styled(Heading).attrs({
 `
 
 export const FeeSwitcherIcon = styled(HelpOutline)`
-  color: ${({ theme }) => theme.colors.gray[100]};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : theme.colors.gray[100]};
 `
 
 export const MenuItemStyle = styled(Typography).attrs({

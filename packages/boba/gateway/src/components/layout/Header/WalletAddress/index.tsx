@@ -1,14 +1,14 @@
-import React from 'react'
 import { generateAvatarURL } from '@cfx-kit/wallet-avatar'
+import React from 'react'
 
-import networkService from 'services/networkService'
-import { CircleIndicator, MenuItemStyle, ProfileIndicator } from './style'
-import truncate from 'truncate-middle'
 import { Heading } from 'components/global'
 import Menu from 'components/global/menu'
+import useDisconnect from 'hooks/useDisconnect'
+import networkService from 'services/networkService'
+import truncate from 'truncate-middle'
 import CopyIcon from './icons/copy'
 import DisconnectIcon from './icons/disconnect'
-import useDisconnect from 'hooks/useDisconnect'
+import { MenuItemStyle, ProfileIndicator } from './style'
 
 interface Props {}
 

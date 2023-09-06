@@ -6,17 +6,8 @@ export const StyleMenuButton = styled.div`
   align-items: center;
   padding: 8px 24px;
   border-radius: 33px;
-  gap: 10px;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[50]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[400]};
-    `}
-
   cursor: pointer;
+  gap: 10px;
+  background: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[50] : theme.colors.gray[400]};
 `
