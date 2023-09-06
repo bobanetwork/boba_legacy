@@ -11,6 +11,18 @@ import { PlaceholderContainer, Label } from './styles'
 import placehoderIcon from 'assets/images/icons/no-data.svg'
 import { LAYER } from 'util/constant'
 import { PlaceholderConnectInterface } from './types'
+import styled from 'styled-components'
+
+export const StyledSvg = styled(Svg)`
+  div {
+    display: flex;
+  }
+
+  svg {
+    fill: ${({ theme }) =>
+      theme.name === 'light' ? theme.colors.gray[600] : theme.colors.gray[100]};
+  }
+`
 
 export const PlaceholderConnect = ({
   isLoading = false,
@@ -29,7 +41,7 @@ export const PlaceholderConnect = ({
   const DefaultLabel = () => {
     return (
       <>
-        <Svg src={placehoderIcon} fill="" />
+        <StyledSvg src={placehoderIcon} />
         <Label variant="body2">No {location?.pathname?.substring(1)}</Label>
       </>
     )

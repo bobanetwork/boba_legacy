@@ -131,6 +131,9 @@ export const Icon = styled(Svg)`
   align-items: center;
   justify-content: center;
 
+  div {
+    display: flex;
+  }
   svg {
     max-width: 32px;
     min-width: 10px;

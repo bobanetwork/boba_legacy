@@ -82,8 +82,9 @@ function Select({
           sx: {
             '&& .Mui-selected': {
               backgroundColor: 'transparent !important',
-              color: theme.palette.secondary.main,
-            },}
+              color: styledTheme.name === 'light' ? styledTheme.colors.gray[ 600 ] : styledTheme.colors.gray[ 100 ]
+            },
+          }
         }}
       >
         {options.map((i, index) => (
@@ -135,18 +136,18 @@ function Select({
           menu: (base) => ({
             ...base,
             padding: '10px 5px',
-            background: styledTheme.colors.gray[ 400 ],
+            background: styledTheme.name === 'light' ? styledTheme.colors.gray[ 50 ] : styledTheme.colors.gray[ 400 ],
             borderRadius: '8px',
             zIndex: 100,
           }),
-          option: (base) => ({
+          option: (base, { isSelected }) => ({
             ...base,
-            background: styledTheme.colors.gray[ 400 ],
+            background: styledTheme.name === 'light' ? styledTheme.colors.gray[ 50 ] : styledTheme.colors.gray[ 400 ],
             cursor: 'pointer',
           }),
           control: (base) => ({
             ...base,
-            background: styledTheme.colors.gray[ 400 ],
+            background: styledTheme.name === 'light' ? styledTheme.colors.gray[ 50 ] : styledTheme.colors.gray[ 400 ],
             borderRadius: '33px',
             padding: '0 10px',
             width: '100%',
@@ -155,6 +156,12 @@ function Select({
           indicatorSeparator: (base) => ({
             ...base,
             display: 'none',
+          }),
+          indicatorsContainer: (base) => ({
+            ...base,
+            svg: {
+              fill: styledTheme.name === 'light' ? styledTheme.colors.gray[ 600 ] : styledTheme.colors.gray[ 100 ],
+            }
           }),
           singleValue: (base) => ({
             ...base,

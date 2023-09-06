@@ -36,6 +36,22 @@ import { ModalTypography } from 'components/global/modalTypography'
 import { Preloader } from 'components/dao/preloader'
 
 import { selectFixed, selectSetup, selectBalance, selectLayer } from 'selectors'
+import styled from 'styled-components'
+
+export const OutputLabel = styled(Typography).attrs({
+  variant: 'title',
+})`
+  margin-top: 8px;
+  color: #a8a8a8;
+`
+
+export const Description = styled(Typography).attrs({
+  variant: 'body2',
+})`
+  margin-top: 8px;
+  color: #a8a8a8;
+  line-height: 18px;
+`
 
 const Save = () => {
   const layer = useSelector(selectLayer())
@@ -139,26 +155,28 @@ const Save = () => {
             <S.Flex>
               <div>
                 <Typography variant="head">Staked</Typography>
-                <Typography variant="title">{totalBOBAstaked} BOBA</Typography>
+                <OutputLabel>
+                  {Number(totalBOBAstaked).toFixed(4)} BOBA
+                </OutputLabel>
               </div>
               <div>
                 <Typography variant="head">Boba Balance</Typography>
-                <Typography variant="title">
-                  {state.max_Float_String} BOBA
-                </Typography>
+                <OutputLabel>
+                  {Number(state.max_Float_String).toFixed(4)} BOBA
+                </OutputLabel>
               </div>
             </S.Flex>
             <div>
               <div>
                 <Typography variant="head">APY</Typography>
-                <Typography variant="title">5.22%</Typography>
+                <OutputLabel>5.0%</OutputLabel>
               </div>
             </div>
             {layer === 'L2' && (
               <div>
                 <Button
                   label="Stake"
-                  small
+                  style={{ width: '100%' }}
                   disable={!Boolean(state.max_Float_String !== '0.0')}
                   onClick={() => dispatch(openModal('StakeDepositModal'))}
                 />
@@ -170,53 +188,49 @@ const Save = () => {
           <S.BlockContainer>
             <div>
               <Typography variant="head">Staking Period</Typography>
-              <ModalTypography variant="body2">
+              <Description>
                 Each staking period lasts 2 weeks. If you do not unstake after a
                 <br />
                 staking period, your stake will be automatically renewed.
-              </ModalTypography>
+              </Description>
             </div>
             <div>
               <Typography variant="head">Unstaking Window</Typography>
-              <ModalTypography variant="body2">
+              <Description>
                 The first two days of every staking period, except for the first
                 <br />
                 staking period, are the unstaking window. You can only unstake
                 <br />
                 during the unstaking window.
-              </ModalTypography>
+              </Description>
             </div>
           </S.BlockContainer>
         </S.PaddingContainer>
       </S.GridContainer>
-      <div>
-        <div>
-          <S.PaddingContainer>
-            <S.TitleContainer>
-              <Typography variant="head">Staking History</Typography>
-            </S.TitleContainer>
-          </S.PaddingContainer>
-          <S.MobileTableContainer>
-            {(!stakeInfo && layer === 'L2') ||
-            (!Object.keys(stakeInfo).length && layer === 'L2') ? (
-              <Loader />
-            ) : (
-              <>
-                <S.StakeItemContainer>
-                  {Object.keys(stakeInfo).map((v, i) => {
-                    if (stakeInfo[i].isActive) {
-                      return (
-                        <TransactionList stakeInfo={stakeInfo[i]} key={i} />
-                      )
-                    }
-                    return null
-                  })}
-                </S.StakeItemContainer>
-              </>
-            )}
-          </S.MobileTableContainer>
-        </div>
-      </div>
+      <>
+        <S.PaddingContainer>
+          <S.TitleContainer>
+            <Typography variant="head">Staking History</Typography>
+          </S.TitleContainer>
+        </S.PaddingContainer>
+        <S.MobileTableContainer>
+          {(!stakeInfo && layer === 'L2') ||
+          (!Object.keys(stakeInfo).length && layer === 'L2') ? (
+            <Loader />
+          ) : (
+            <>
+              <S.StakeItemContainer>
+                {Object.keys(stakeInfo).map((v, i) => {
+                  if (stakeInfo[i].isActive) {
+                    return <TransactionList stakeInfo={stakeInfo[i]} key={i} />
+                  }
+                  return null
+                })}
+              </S.StakeItemContainer>
+            </>
+          )}
+        </S.MobileTableContainer>
+      </>
     </S.StakePageContainer>
   )
 }

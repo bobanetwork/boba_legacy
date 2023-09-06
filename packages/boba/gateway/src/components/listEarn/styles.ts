@@ -16,7 +16,7 @@ export const DropdownWrapper = styled.div`
   flex-direction: column;
   gap: 5px;
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   margin-top: 10px;
   border-radius: 10px;
   text-align: center;
@@ -57,7 +57,7 @@ export const DropdownWrapper = styled.div`
           color: ${colors.gray[100]};
           box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.15);
           button {
-            color: ${colors.gray[300]};
+            color: ${colors.gray[100]};
             &:hover {
               background: ${colors.gray[400]};
               color: ${colors.gray[100]};
@@ -78,4 +78,11 @@ export const SvgContianer = styled.div`
   align-items: center;
   justify-content: flex-start;
   width: 100%;
+  div {
+    display: flex;
+  }
+  svg {
+    fill: ${({ theme }) =>
+      theme.name === 'light' ? theme.colors.gray[700] : '#eeeeee'};
+  }
 `

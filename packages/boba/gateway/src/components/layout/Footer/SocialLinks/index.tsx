@@ -9,6 +9,7 @@ import DocsIcon from './icons/docs'
 import DiscordIcon from './icons/discord'
 import TwitterIcon from './icons/twitter'
 import TelegramIcon from './icons/telegram'
+import { WALLET_VERSION } from 'util/constant'
 
 interface Props {}
 
@@ -45,7 +46,7 @@ const SocialLinks = (props: Props) => {
           <TelegramIcon />
         </SocialLinkItem>
       </StyledSocialLinks>
-      <AppVersion>v0.7.2</AppVersion>
+      <AppVersion>v{WALLET_VERSION}</AppVersion>
     </SocialLinksContainer>
   )
 }

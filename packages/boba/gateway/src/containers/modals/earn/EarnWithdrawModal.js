@@ -212,7 +212,7 @@ class EarnWithdrawModal extends React.Component {
         open={open}
         onClose={()=>{this.handleClose()}}
         maxWidth="md"
-        title={`Withdraw ${withdrawToken.symbol}`}
+        title={`Unstake`}
 
       >
         <EarnInputContainer>
@@ -250,15 +250,20 @@ class EarnWithdrawModal extends React.Component {
             <WrapperActionsModal>
               <Button
                 onClick={()=>{this.handleConfirm()}}
-                label="Confirm"
+                label="Unstake"
                 loading={loading}
                 disable={!!disableSubmit}
-
+                style={{
+                  width: '100%'
+                }}
               />
               <Button
                 onClick={() => { this.handleClose() }}
                 label="Cancel"
                 transparent
+                style={{
+                  width: '100%'
+                }}
               />
 
             </WrapperActionsModal>

@@ -46,11 +46,13 @@ function networkReducer(state = initialState, action) {
         network,
         networkType,
         networkIcon,
+        chainIds,
         name
       } = action.payload;
       return {
         ...state,
         network,
+        chainIds,
         networkIcon,
         networkType,
         name

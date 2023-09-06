@@ -16,6 +16,14 @@ import { Wallets, Wallet, Icon, ArrowContainer, IconContainer } from './styles'
 
 import { useWalletConnect } from 'hooks/useWalletConnect'
 import { setConnect } from 'actions/setupAction'
+import styled from 'styled-components'
+
+const StyledSvg = styled(Svg)`
+  display: flex;
+  svg {
+    fill: ${({ theme }) => theme.name == 'light' ? theme.colors.gray[ 600 ] : theme.colors.gray[ 100 ]}
+  }
+`
 
 const WalletSelectorModal = ({ open }) => {
   const { triggerInit } = useWalletConnect()
@@ -90,7 +98,7 @@ const WalletSelectorModal = ({ open }) => {
             </IconContainer>
             <Typography variant="title">MetaMask</Typography>
             <ArrowContainer>
-              <Svg fill="#fff" src={ArrowIcon} />
+              <StyledSvg src={ArrowIcon} />
             </ArrowContainer>
           </Wallet>
           <Wallet
@@ -102,7 +110,7 @@ const WalletSelectorModal = ({ open }) => {
             </IconContainer>
             <Typography variant="title">WalletConnect</Typography>
             <ArrowContainer>
-              <Svg fill="#fff" src={ArrowIcon} />
+              <StyledSvg src={ArrowIcon} />
             </ArrowContainer>
           </Wallet>
         </Wallets>

@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
+    "@cfx-kit/wallet-avatar": "^0.0.5",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.6.0",
     "@eth-optimism/contracts": "0.5.11",
