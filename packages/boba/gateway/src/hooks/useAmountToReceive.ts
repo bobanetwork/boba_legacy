@@ -48,16 +48,22 @@ export const useAmountToReceive = () => {
     if (layer === LAYER.L1) {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         setAmountToReceive(formatedAmount())
-      } else {
+      } else if (bridgeType === BRIDGE_TYPE.FAST) {
         const value = Number(amount) * ((100 - Number(l2FeeRateN)) / 100)
         setAmountToReceive(value.toFixed(3))
+      } else {
+        // Teleportation, no fees as of now
+        setAmountToReceive(amount)
       }
     } else {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         setAmountToReceive(formatedAmount())
-      } else {
+      } else if (bridgeType === BRIDGE_TYPE.FAST) {
         const value = Number(amount) * ((100 - Number(l1FeeRateN)) / 100)
         setAmountToReceive(value.toFixed(3))
+      } else {
+        // Teleportation, no fees as of now
+        setAmountToReceive(amount)
       }
     }
   }, [dispatch, layer, token, amount, bridgeType, l2FeeRateN, l1FeeRateN])

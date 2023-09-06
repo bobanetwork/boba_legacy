@@ -22,7 +22,7 @@ import { useTheme } from 'styled-components'
 
 import { Button } from 'components/global'
 
-import transctionService from 'services/transaction.service'
+import transactionService from 'services/transaction.service'
 import { NETWORK_TYPE } from 'util/network/network.util'
 import {
   ALL_NETWORKS,
@@ -131,7 +131,7 @@ const History = () => {
   }
   const syncTransactions = async () => {
     if (accountEnabled) {
-      const newTransactions = await transctionService.getTransactions()
+      const newTransactions = await transactionService.getTransactions()
       if (newTransactions.length === 0) {
         setTransactionsFound(false)
       } else {

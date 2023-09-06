@@ -13,6 +13,7 @@ import {
   selectExitFee,
   selectFastDepositCost,
   selectFastExitCost,
+  selectIsTeleportationOfAssetSupported,
   selectL1FeeBalance,
   selectL1LPBalanceString,
   selectL1LPLiquidity,
@@ -29,6 +30,7 @@ import { logAmount } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
 import BN from 'bignumber.js'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
+import { BigNumberish, ethers } from 'ethers'
 
 enum ALERT_KEYS {
   OMG_INFO = 'OMG_INFO',
@@ -36,6 +38,17 @@ enum ALERT_KEYS {
   VALUE_TOO_LARGE = 'VALUE_TOO_LARGE',
   FAST_EXIT_ERROR = 'FAST_EXIT_ERROR',
   FAST_DEPOSIT_ERROR = 'FAST_DEPOSIT_ERROR',
+  TELEPORTATION_ASSET_NOT_SUPPORTED = 'TELEPORTER_ASSET_NOT_SUPPORTED',
+  TELEPORTATION_NO_UNCONVENTIONAL_WALLETS = 'TELEPORTATION_NO_UNCONVENTIONAL_WALLETS',
+}
+
+interface ITeleportationTokenSupport {
+  supported: boolean
+  minDepositAmount: BigNumberish
+  maxDepositAmount: BigNumberish
+  maxTransferAmountPerDay: BigNumberish
+  transferTimestampCheckPoint: BigNumberish
+  transferredAmount: BigNumberish
 }
 
 const useBridgeAlerts = () => {
@@ -44,6 +57,9 @@ const useBridgeAlerts = () => {
   const bridgeType = useSelector(selectBridgeType())
   const token = useSelector(selectTokenToBridge())
   const amountToBridge = useSelector(selectAmountToBridge())
+
+  const tokenForTeleportationSupported: ITeleportationTokenSupport =
+    useSelector(selectIsTeleportationOfAssetSupported())
 
   // fast input layer 1
   const L1LPBalance = useSelector(selectL2LPBalanceString)
@@ -62,6 +78,65 @@ const useBridgeAlerts = () => {
   const LPBalance = useSelector(selectL1LPBalanceString)
   const LPPending = useSelector(selectL1LPPendingString)
   const LPLiquidity = useSelector(selectL1LPLiquidity)
+
+  useEffect(() => {
+    if (bridgeType === BRIDGE_TYPE.TELEPORTATION) {
+      if (!tokenForTeleportationSupported.supported) {
+        dispatch(
+          clearBridgeAlert({
+            keys: [ALERT_KEYS.VALUE_TOO_LARGE, ALERT_KEYS.VALUE_TOO_SMALL],
+          })
+        )
+        dispatch(
+          setBridgeAlert({
+            meta: ALERT_KEYS.TELEPORTATION_ASSET_NOT_SUPPORTED,
+            type: 'error',
+            text: `Asset not supported, please choose different asset or one of our other bridge modes.`,
+          })
+        )
+      } else {
+        dispatch(
+          clearBridgeAlert({
+            keys: [ALERT_KEYS.TELEPORTATION_ASSET_NOT_SUPPORTED],
+          })
+        )
+        dispatch(
+          setBridgeAlert({
+            meta: ALERT_KEYS.TELEPORTATION_NO_UNCONVENTIONAL_WALLETS,
+            type: 'info',
+            text: `This bridge doesn't support smart-contract wallets that use a costly fallback method.`,
+          })
+        )
+
+        if (
+          amountToBridge &&
+          amountToBridge < tokenForTeleportationSupported.minDepositAmount
+        ) {
+          dispatch(
+            setBridgeAlert({
+              meta: ALERT_KEYS.VALUE_TOO_SMALL,
+              type: 'error',
+              text: `For this asset you need to bridge at least ${ethers.utils.formatEther(
+                tokenForTeleportationSupported.minDepositAmount
+              )}.`,
+            })
+          )
+        } else if (
+          amountToBridge > tokenForTeleportationSupported.maxDepositAmount
+        ) {
+          dispatch(
+            setBridgeAlert({
+              meta: ALERT_KEYS.VALUE_TOO_LARGE,
+              type: 'error',
+              text: `For this asset you are allowed to bridge at maximum ${ethers.utils.formatEther(
+                tokenForTeleportationSupported.maxDepositAmount
+              )} per transaction.`,
+            })
+          )
+        }
+      }
+    }
+  }, [tokenForTeleportationSupported, bridgeType])
 
   // show infor to user about to OMG token when
   // connected to layer 1 ETH as token is specific to ethereum only.
@@ -148,7 +223,7 @@ const useBridgeAlerts = () => {
         keys: [ALERT_KEYS.FAST_EXIT_ERROR],
       })
     )
-    if (layer === LAYER.L2) {
+    if (layer === LAYER.L2 && bridgeType !== BRIDGE_TYPE.TELEPORTATION) {
       // trigger only when withdrawing funds.
       let warning = ''
       const balance = Number(logAmount(token.balance, token.decimals))

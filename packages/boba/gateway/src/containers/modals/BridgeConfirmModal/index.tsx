@@ -53,12 +53,15 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
       } else {
         return '7 days'
       }
-    } else {
+    } else if (bridgeType === BRIDGE_TYPE.FAST) {
       if (layer === LAYER.L1) {
         return '1 ~ 5min.'
       } else {
         return '15min ~ 3hrs.'
       }
+    } else {
+      // Teleportation, instant
+      return '~1min.'
     }
   }
 

@@ -48,12 +48,15 @@ const Fee = (props: Props) => {
       } else {
         return '7 days'
       }
-    } else {
+    } else if (bridgeType === BRIDGE_TYPE.FAST) {
       if (layer === LAYER.L1) {
         return '1 ~ 5min.'
       } else {
         return '15min ~ 3hrs.'
       }
+    } else {
+      // Teleportation, instant
+      return '~1min.'
     }
   }
 
@@ -100,7 +103,7 @@ const Fee = (props: Props) => {
         <Label>Destination gas fee</Label>
         <Label>{gasFee}</Label>
       </InfoRow>
-      {layer === LAYER.L2 ? (
+      {layer === LAYER.L2 && bridgeType !== BRIDGE_TYPE.TELEPORTATION ? (
         <InfoRow>
           <Label>xChain Relay Fee</Label>
           <Label>{exitFee} BOBA</Label>
@@ -108,7 +111,12 @@ const Fee = (props: Props) => {
       ) : null}
       <InfoRow>
         <Label>Bridge Fee</Label>
-        <Label>{(layer === LAYER.L1 ? l2FeeRateN : l1FeeRateN) || 0}%</Label>
+        <Label>
+          {(layer === LAYER.L1 && bridgeType !== BRIDGE_TYPE.TELEPORTATION
+            ? l2FeeRateN
+            : l1FeeRateN) || 0}
+          %
+        </Label>
       </InfoRow>
       <InfoRow>
         <Label

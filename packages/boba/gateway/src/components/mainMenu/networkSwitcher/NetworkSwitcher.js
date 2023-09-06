@@ -9,11 +9,12 @@ import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher';
 import Tabs from 'components/tabs/Tabs';
 import NetworkListItem from './NetworkListItem'
 
-import {NetworkList, NETWORK_TYPE } from 'util/network/network.util';
+import {NetworkList, NETWORK_TYPE, INetwork} from 'util/network/network.util';
 
 import * as S from './NetworkSwitcher.styles'
 import { setNetwork } from 'actions/networkAction';
 import { selectNetwork, selectNetworkType } from 'selectors';
+import {AnyAction} from "redux";
 
 function NetworkSwitcher() {
   const dispatch = useDispatch();
@@ -34,9 +35,10 @@ function NetworkSwitcher() {
     setAnchorEl(null);
   };
 
-  const onChainChange = ({ icon, chain,name }) => {
+  const onChainChange = ({ icon, chain, name, chainId }) => {
     dispatch(setNetwork({
       network: chain,
+      chainIds: chainId,
       name: name,
       networkIcon: icon,
       networkType: activeTab,
