@@ -1,21 +1,4 @@
-export interface IBobaChains {
-  [chainId: number]: {
-    url: string
-    testnet: boolean
-    name: string
-    teleportationAddress: string
-    height: number
-    supportedAssets: {
-      [address: string]: string // symbol (MUST BE UNIQUE)
-    }
-  }
-}
-
-/**
- * @dev Chain configs
- * @property supportedAssets: BOBA as fee token only supported for EOAs, since Teleporter consists of a contract & the disburser wallet (assuming ETH fee) everything with 0x0 should be fine.
- **/
-export const BobaChains: IBobaChains = {
+export const BobaChains = {
   // TODO: Consider using AddressManager or AddressPackage instead
 
   //#region boba_networks
@@ -108,7 +91,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://api.zan.top/node/v1/bsc/testnet/public',
+    url: 'https://bsc.getblock.io/28c7f0fe-802f-4631-9f45-2df301789ecf/testnet/',
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',

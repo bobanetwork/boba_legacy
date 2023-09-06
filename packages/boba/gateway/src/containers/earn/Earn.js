@@ -131,6 +131,17 @@ const Earn = () => {
         accountEnabled={accountEnabled}
       />
 
+      <S.Help>
+        <Typography variant="body3">
+          Bridging fees are proportionally distributed to stakers. The bridges
+          are not farms. Your earnings only increase when someone uses the
+          bridge you have staked into.
+        </Typography>
+
+        <Tooltip title={<BridgeTooltip />}>
+          <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
+        </Tooltip>
+      </S.Help>
       {((layer === 'L2' && isLp1) || (layer === 'L1' && isLp2)) && (
         <S.LayerAlert>
           <S.AlertInfo>
@@ -172,19 +183,6 @@ const Earn = () => {
             />
           </S.EarnAction>
         </S.EarnActionContainer>
-
-        <S.Help>
-
-          <Typography variant="body3">
-            Bridging fees are proportionally distributed to stakers. The bridges
-            are not farms. Your earnings only increase when someone uses the
-            bridge you have staked into.
-          </Typography>
-
-          <Tooltip title={<BridgeTooltip />}>
-            <HelpOutline fontSize="small" sx={{ opacity: 0.65 }} />
-          </Tooltip>
-        </S.Help>
 
         <TableHeader options={tableHeaderOptions} />
 

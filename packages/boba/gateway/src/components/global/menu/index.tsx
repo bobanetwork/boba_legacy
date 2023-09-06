@@ -1,8 +1,9 @@
-import React, { FC, ReactNode, createElement } from 'react'
 import MUIMenu from '@mui/material/Menu'
 import MUIMenuItem from '@mui/material/MenuItem'
+import React, { FC } from 'react'
 import { StyleMenuButton } from './styles'
 import { MenuProps } from './types'
+import { useTheme } from 'styled-components'
 
 const Menu: FC<MenuProps> = ({ label, name, children, options }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -13,6 +14,8 @@ const Menu: FC<MenuProps> = ({ label, name, children, options }) => {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const theme: any = useTheme()
 
   return (
     <>

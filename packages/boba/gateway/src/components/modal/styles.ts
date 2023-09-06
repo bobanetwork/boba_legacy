@@ -57,7 +57,7 @@ export const Style = styled.div<StyleProps>`
     `}
 
   backdrop-filter: ${(props) => (props.transparent ? 'none' : 'blur(15px)')};
-  padding: 32px 24px;
+  padding: 24px;
   outline: 0;
   box-sizing: border-box;
   border-radius: 12px;
@@ -88,6 +88,19 @@ export const ModalHead = styled(Box)`
 export const IconButtonTag = styled.div`
   margin-left: auto;
   cursor: pointer;
+  > div > div {
+    display: flex;
+  }
+  :hover {
+    > div > div {
+      border-radius: 50%;
+      background: rgb(185 185 185 / 40%);
+      display: flex;
+      svg: {
+        fill: white;
+      }
+    }
+  }
 `
 
 export const Content = styled(Box)`

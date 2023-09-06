@@ -48,6 +48,7 @@ export PRIVATE_KEY='0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4
 export PRIVATE_KEY_2='0xc526ee95bf44d8fc405a158bb884d9d1238d99f0612e9f33d006bb0789009aaa'
 export PRIVATE_KEY_3='0x8166f546bab6da521a8369cab06c5d2b9e46670292d85c875ee9ec20e84ffb61'
 export BOBALINK_PRIVATE_KEY='0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e'
+export TELEPORTATION_POSTGRES_DB_HOST=localhost
 cd integration-tests
 npx hardhat test --network boba --no-compile --config ./hardhat.config.ts test/eth-l2/boba_aa_fee_boba.spec
 ```

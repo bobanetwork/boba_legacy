@@ -19,7 +19,7 @@ export const BridgeWrapper = styled.div`
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 8px;
   width: 100%;
   border-radius: 12px;
   border: 1px solid
@@ -50,6 +50,7 @@ export const BridgeAction = styled.div`
   display: flex;
   justify-content: around;
   align-items: center;
+  margin-top: 24px;
 `
 
 export const BridgeActionButton = styled(Button).attrs({

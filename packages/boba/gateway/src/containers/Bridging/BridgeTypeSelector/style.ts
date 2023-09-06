@@ -5,7 +5,7 @@ export const BridgeTabs = styled.div`
   justify-content: space-between;
   border: 1px solid
     ${({ theme: { name, colors } }) =>
-      name === 'light' ? colors.gray[400] : 'transperant'};
+      name === 'light' ? colors.gray[400] : 'transparent'};
   background: ${({ theme: { name, colors } }) =>
     name === 'light' ? colors.gray[100] : colors.gray[500]};
   border-radius: 8px;
@@ -27,10 +27,7 @@ export const BridgeTabItem = styled.div<{
   background: transparent;
   color: ${(props) =>
     props.theme.name === 'light' ? props.theme.colors.gray[600] : 'inherit'};
-  box-shadow: ${({ theme: { name } }) =>
-    name === 'light'
-      ? '0px 2px 4px 0px rgba(0, 0, 0, 0.10)'
-      : '0px 4px 10px 0px rgba(186, 226, 26, 0.1)'};
+  box-shadow: 'none';
   ${(props) =>
     props.active &&
     css`
@@ -40,10 +37,10 @@ export const BridgeTabItem = styled.div<{
       background: ${props.theme.colors.green[300]};
     `};
 
-  &:nth-child(odd) {
+  &:nth-child(1) {
     border-radius: 8px 0 0 8px;
   }
-  &:nth-child(even) {
+  &:nth-child(3) {
     border-radius: 0 8px 8px 0;
   }
 `

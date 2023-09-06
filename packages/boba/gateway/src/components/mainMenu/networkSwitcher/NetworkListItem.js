@@ -8,7 +8,7 @@ import * as S from './NetworkListItem.styles'
 
 function NetworkListItem({
   chain,
-  icon,
+  icon, chainId,
   label,
   name,
   onChainChange,
@@ -22,7 +22,7 @@ function NetworkListItem({
     divider
     key={chain}
     onClick={() => {
-      onChainChange({chain, icon, name})
+      onChainChange({chain, icon, name, chainId})
     }}>
     <Box display="flex" justifyContent="space-around" alignItems="center" gap={2}>
       <Box display="flex" justifyContent="space-around" alignItems="center" gap={1}>

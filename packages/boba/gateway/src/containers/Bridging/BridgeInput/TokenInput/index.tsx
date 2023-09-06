@@ -54,7 +54,7 @@ const TokenInput = (props: Props) => {
       setZeroBalanceError(false)
     }
 
-    if (layer === LAYER.L2) {
+    if (layer === LAYER.L2 && bridgeType !== BRIDGE_TYPE.TELEPORTATION) {
       let cost = classicExitCost || 0
       if (bridgeType === BRIDGE_TYPE.FAST) {
         cost = fastExitCost || 0

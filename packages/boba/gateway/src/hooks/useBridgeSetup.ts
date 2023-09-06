@@ -39,6 +39,11 @@ const useBridgeSetup = () => {
   const bridgeType = useSelector(selectBridgeType())
   const token = useSelector(selectTokenToBridge())
   useEffect(() => {
+    if (bridgeType === BRIDGE_TYPE.TELEPORTATION) {
+      // Teleportation
+      // TODO: Load required info
+    }
+
     if (layer === LAYER.L1) {
       if (token && bridgeType === BRIDGE_TYPE.FAST) {
         /**
@@ -73,7 +78,7 @@ const useBridgeSetup = () => {
       if (bridgeType === BRIDGE_TYPE.CLASSIC) {
         // fetching details for classic Exits
         dispatch(fetchClassicExitCost(token.address))
-      } else {
+      } else if (bridgeType === BRIDGE_TYPE.FAST) {
         dispatch(fetchL1LPBalance(token.addressL1))
         dispatch(fetchL1LPLiquidity(token.addressL1))
         dispatch(fetchL1LPPending(token.addressL2)) //lookup is, confusingly, via L2 token address
