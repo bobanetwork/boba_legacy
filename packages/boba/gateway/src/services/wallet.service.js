@@ -57,6 +57,9 @@ limitations under the License. */
 
   async listenMetaMask() {
     window.ethereum.on('accountsChanged', () => {
+      //reset connection
+      store.dispatch(setBaseState(false));
+      store.dispatch(setEnableAccount(false));
       window.location.reload()
     })
 
@@ -74,8 +77,7 @@ limitations under the License. */
         networkIcon,
         name
       })
-      store.dispatch(setBaseState(false));
-      store.dispatch(setEnableAccount(false));
+
 
       store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
       store.dispatch(

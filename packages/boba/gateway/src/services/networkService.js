@@ -683,6 +683,7 @@ class NetworkService {
 
   async switchChain(targetLayer) {
     // ignore request if we are already on the target layer
+
     if (!targetLayer) {
       return false
     }
@@ -771,7 +772,6 @@ class NetworkService {
 
 
   async getBalances() {
-
     try {
 
       let layer1Balances; 
@@ -844,7 +844,10 @@ class NetworkService {
       )
 
       const getERC20Balance = async (token, tokenAddress, layer, provider) => {
-        const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
+        const balance = await tokenC
+          .attach(tokenAddress)
+          .connect(provider)
+          .balanceOf(this.account)
         return {
           ...token,
           balance: new BN(balance.toString()),

@@ -47,7 +47,7 @@ const Home = () => {
   const accountEnabled = useSelector(selectAccountEnabled())
   useInterval(() => {
     if (accountEnabled /*== MetaMask is connected*/) {
-      console.log('trying here', accountEnabled, activeNetwork)
+      console.log('before MetaMask')
       dispatch(fetchBalances()) // account specific
       if (activeNetwork === NETWORK.ETHEREUM) {
         dispatch(getFS_Info())   // account specific
