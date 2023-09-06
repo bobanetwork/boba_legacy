@@ -35,7 +35,6 @@ const BridgeInput: FC<Props> = (props) => {
   const token = useSelector(selectTokenToBridge())
   const { amount: recievableAmount } = useAmountToReceive()
   useBridgeSetup()
-  useBridgeAlerts()
 
   const openTokenPicker = () => {
     dispatch(openModal('tokenPicker'))

@@ -6,6 +6,8 @@ import {
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  selectActiveNetwork,
+  selectActiveNetworkType,
   selectAmountToBridge,
   selectBobaFeeChoice,
   selectBobaPriceRatio,
@@ -29,6 +31,7 @@ import { logAmount } from 'util/amountConvert'
 import { LAYER } from 'util/constant'
 import BN from 'bignumber.js'
 import { BRIDGE_TYPE } from 'containers/Bridging/BridgeTypeSelector'
+import { NETWORK } from 'util/network/network.util'
 
 enum ALERT_KEYS {
   OMG_INFO = 'OMG_INFO',
@@ -36,6 +39,7 @@ enum ALERT_KEYS {
   VALUE_TOO_LARGE = 'VALUE_TOO_LARGE',
   FAST_EXIT_ERROR = 'FAST_EXIT_ERROR',
   FAST_DEPOSIT_ERROR = 'FAST_DEPOSIT_ERROR',
+  DEPRECATION_WARNING = 'DEPRECATION_WARNING',
 }
 
 const useBridgeAlerts = () => {
@@ -44,6 +48,9 @@ const useBridgeAlerts = () => {
   const bridgeType = useSelector(selectBridgeType())
   const token = useSelector(selectTokenToBridge())
   const amountToBridge = useSelector(selectAmountToBridge())
+
+  // network
+  const activeNetwork = useSelector(selectActiveNetwork())
 
   // fast input layer 1
   const L1LPBalance = useSelector(selectL2LPBalanceString)
@@ -366,6 +373,20 @@ const useBridgeAlerts = () => {
     L1feeBalance,
     fastDepositCost,
   ])
+
+  useEffect(() => {
+    if (activeNetwork === NETWORK.AVAX && layer === LAYER.L1) {
+      dispatch(
+        setBridgeAlert({
+          meta: ALERT_KEYS.DEPRECATION_WARNING,
+          text: `For users of BobaAvax (Fuji) or BobaAvax (Fuji) applications
+          you will need to transfer all your funds to Avalanche mainnet before October 31st
+          or risk permanently losing access to any assets on BobaAvax (Fuji)`,
+          type: 'warning',
+        })
+      )
+    }
+  }, [activeNetwork, layer])
 
   // on changing bridgeType only cleanup alerts
   useEffect(() => {

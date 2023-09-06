@@ -29,7 +29,7 @@ exports[`Testing history page Test History Page 1`] = `
         class="sc-dyTUbJ hUdBAf"
       >
         <p
-          class="sc-duSInm bFEZbS sc-ckPVkh bOmlMV"
+          class="sc-duSInm gaoAki sc-ckPVkh bOmlMV"
         >
           Date Range From
         </p>
@@ -43,7 +43,7 @@ exports[`Testing history page Test History Page 1`] = `
           </div>
         </div>
         <p
-          class="sc-duSInm bFEZbS sc-ckPVkh bOmlMV"
+          class="sc-duSInm gaoAki sc-ckPVkh bOmlMV"
         >
           To
         </p>
@@ -61,7 +61,7 @@ exports[`Testing history page Test History Page 1`] = `
         class="sc-kJpdyg gLZWIR"
       >
         <p
-          class="sc-duSInm bFEZbS sc-gAigJI lktCJV"
+          class="sc-duSInm gaoAki sc-gAigJI lktCJV"
         >
           Date Range
         </p>
@@ -90,7 +90,7 @@ exports[`Testing history page Test History Page 1`] = `
             class="sc-kJwmPe ctcryJ"
           >
             <p
-              class="sc-duSInm bFEZbS"
+              class="sc-duSInm gaoAki"
             >
               From
             </p>
@@ -118,7 +118,7 @@ exports[`Testing history page Test History Page 1`] = `
                     </div>
                   </div>
                   <p
-                    class="sc-duSInm bFEZbS"
+                    class="sc-duSInm gaoAki"
                   >
                     All Networks
                   </p>
@@ -150,7 +150,7 @@ exports[`Testing history page Test History Page 1`] = `
               </div>
             </div>
             <p
-              class="sc-duSInm bFEZbS"
+              class="sc-duSInm gaoAki"
             >
               To
             </p>
@@ -178,7 +178,7 @@ exports[`Testing history page Test History Page 1`] = `
                     </div>
                   </div>
                   <p
-                    class="sc-duSInm bFEZbS"
+                    class="sc-duSInm gaoAki"
                   >
                     All Networks
                   </p>
@@ -231,7 +231,7 @@ exports[`Testing history page Test History Page 1`] = `
             style="max-width: 168px;"
           >
             <p
-              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+              class="sc-duSInm gaoAki sc-jrrXlR iPvjOP"
             >
               Date
             </p>
@@ -241,7 +241,7 @@ exports[`Testing history page Test History Page 1`] = `
             style="max-width: 142px;"
           >
             <p
-              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+              class="sc-duSInm gaoAki sc-jrrXlR iPvjOP"
             >
               From
             </p>
@@ -251,7 +251,7 @@ exports[`Testing history page Test History Page 1`] = `
             style="max-width: 142px;"
           >
             <p
-              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+              class="sc-duSInm gaoAki sc-jrrXlR iPvjOP"
             >
               To
             </p>
@@ -261,7 +261,7 @@ exports[`Testing history page Test History Page 1`] = `
             style="max-width: 90px;"
           >
             <p
-              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+              class="sc-duSInm gaoAki sc-jrrXlR iPvjOP"
             >
               Token
             </p>
@@ -271,7 +271,7 @@ exports[`Testing history page Test History Page 1`] = `
             style="max-width: 80px;"
           >
             <p
-              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+              class="sc-duSInm gaoAki sc-jrrXlR iPvjOP"
             >
               Amount
             </p>
@@ -281,7 +281,7 @@ exports[`Testing history page Test History Page 1`] = `
             style="max-width: 88px;"
           >
             <p
-              class="sc-duSInm bFEZbS sc-jrrXlR iPvjOP"
+              class="sc-duSInm gaoAki sc-jrrXlR iPvjOP"
             >
               Status
             </p>
