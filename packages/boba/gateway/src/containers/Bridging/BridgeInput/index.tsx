@@ -33,7 +33,7 @@ const BridgeInput: FC<Props> = (props) => {
   const dispatch = useDispatch<any>()
   const isAccountEnabled = useSelector(selectAccountEnabled())
   const token = useSelector(selectTokenToBridge())
-  const { amount: recievableAmount } = useAmountToReceive()
+  const { amount: receivableAmount } = useAmountToReceive()
   useBridgeSetup()
   useBridgeAlerts()
 
@@ -76,7 +76,7 @@ const BridgeInput: FC<Props> = (props) => {
       {token && (
         <ReceiveContainer>
           <SectionLabel>Receive</SectionLabel>
-          <ReceiveAmount>{recievableAmount}</ReceiveAmount>
+          <ReceiveAmount>{receivableAmount}</ReceiveAmount>
         </ReceiveContainer>
       )}
       <BridgeToAddress />

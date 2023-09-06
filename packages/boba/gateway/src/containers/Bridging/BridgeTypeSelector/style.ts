@@ -5,7 +5,7 @@ export const BridgeTabs = styled.div`
   justify-content: space-between;
   border: 1px solid
     ${({ theme: { name, colors } }) =>
-      name === 'light' ? colors.gray[400] : 'transperant'};
+      name === 'light' ? colors.gray[400] : 'transparent'};
   background: ${({ theme: { name, colors } }) =>
     name === 'light' ? colors.gray[100] : colors.gray[500]};
   border-radius: 8px;
@@ -40,10 +40,10 @@ export const BridgeTabItem = styled.div<{
       background: ${props.theme.colors.green[300]};
     `};
 
-  &:nth-child(odd) {
+  &:nth-child(1) {
     border-radius: 8px 0 0 8px;
   }
-  &:nth-child(even) {
+  &:nth-child(3) {
     border-radius: 0 8px 8px 0;
   }
 `
