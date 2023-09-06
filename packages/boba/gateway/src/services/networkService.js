@@ -659,12 +659,7 @@ class NetworkService {
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
-<<<<<<< HEAD
-
-      if (!!NETWORK[ this.networkGateway ] && chainId === L2ChainId) {
-=======
       if (!!NETWORK[this.networkGateway] && chainId === L2ChainId) {
->>>>>>> d297404c0fb21432154fc0da103b91f2e4948026
         this.L1orL2 = 'L2';
       } else if (!!NETWORK[this.networkGateway] && chainId === L1ChainId) {
         this.L1orL2 = 'L1';
@@ -728,116 +723,6 @@ class NetworkService {
     await claim.wait()
   }
 
-<<<<<<< HEAD
-  async checkMonster() {
-
-    const NFTs = getNFTs()
-
-    let validMonsters = []
-
-    try {
-
-      if (!this.addresses.BobaMonsters) return Number('0');
-
-      const contract = new ethers.Contract(
-        this.addresses.BobaMonsters,
-        TuringMonsterJson.abi,
-        this.L2Provider
-      )
-
-      const monsterBalance = await contract.balanceOf(this.account)
-
-      let topMagic = 0
-      let topTop = 0
-
-      if(NFTs && Number(monsterBalance) > 0) {
-
-        for (const [ , value ] of Object.entries(NFTs)) {
-
-          if(value.name === 'TuringMonster') {
-            const owner = await contract.ownerOf(value.tokenID)
-
-            if(owner.toLowerCase() === this.account.toLowerCase()) {
-              const attributes = {
-                top:   value.meta.attributes[3].value,
-                magic: value.meta.attributes[4].value,
-              }
-              if(value.meta.attributes[3].value === 'crown') topTop = 1
-              if(value.meta.attributes[4].value === 'wizzard') topMagic = 1
-              validMonsters.push({tokenID: value.tokenID, attributes})
-            }
-          }
-        }
-
-        if(topMagic === 0 && topTop === 0) {
-          validMonsters.push({monsterType: 'basic'})
-        } else if (topMagic === 0 && topTop === 1) {
-          validMonsters.push({monsterType: 'crowned'})
-        } else if (topMagic === 1 && topTop === 0) {
-          validMonsters.push({monsterType: 'wizard'})
-        } else if (topMagic === 1 && topTop === 1) {
-          validMonsters.push({monsterType: 'crowned wizard'})
-        }
-
-        await addMonster( validMonsters )
-
-      }
-
-      return Number(monsterBalance.toString())
-
-    } catch (error) {
-      console.log("NS: checkMonster error:",error)
-      return error
-    }
-
-  }
-
-  /* This is for manually adding NFTs */
-  async addNFT( address, tokenID ) {
-
-
-    try {
-
-      const contract = new ethers.Contract(
-        address,
-        L2ERC721Json.abi,
-        this.L2Provider
-      )
-
-      const nftName = await contract.name()
-      const nftSymbol = await contract.symbol()
-      const nftMeta = await contract.tokenURI(tokenID)
-      console.log("nftMeta RAW:", nftMeta)
-      const UUID = address.substring(1, 6) + '_' + tokenID.toString() + '_' + this.account.substring(1, 6)
-
-      const { url , meta = [] } = await getNftImageUrl(nftMeta)
-
-      console.log("meta:", meta)
-
-      const NFT = {
-        UUID,
-        address,
-        name: nftName,
-        tokenID,
-        symbol: nftSymbol,
-        url,
-        meta,
-        account: this.account,
-        network: this.networkGateway,
-        layer: this.L1orL2
-      }
-
-      await addNFT( NFT )
-
-    } catch (error) {
-      console.log("NS: addNFT error:",error)
-      return error
-    }
-
-  }
-
-=======
->>>>>>> d297404c0fb21432154fc0da103b91f2e4948026
   async addTokenList() {
     // Add the token to our master list, if we do not have it yet
     // if the token is already in the list, then this function does nothing
@@ -3930,13 +3815,8 @@ class NetworkService {
   }
 
   async getFS_Info() {
-<<<<<<< HEAD
-    console.log(this.account)
-    if(this.account === null) {
-=======
 
     if (this.account === null) {
->>>>>>> d297404c0fb21432154fc0da103b91f2e4948026
       console.log('NS: getFS_Info() error - called but account === null')
       return
     }
