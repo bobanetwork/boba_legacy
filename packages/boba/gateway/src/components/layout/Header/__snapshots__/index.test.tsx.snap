@@ -3,11 +3,16 @@
 exports[`Layout => Header should match the snapshot 1`] = `
 <DocumentFragment>
   <div
-    class="sc-fABZjn hJKxpE"
+    class="sc-fABZjn fNXwka"
   >
-    <div
-      class="sc-gUMnWI ervjnC"
-    />
+    <a
+      class=""
+      href="/bridge"
+    >
+      <div
+        class="sc-gUMnWI dkUFbU"
+      />
+    </a>
     <div
       class="sc-hjLWnZ kFZkac"
     >

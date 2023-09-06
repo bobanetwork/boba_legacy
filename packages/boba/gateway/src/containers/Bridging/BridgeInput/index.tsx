@@ -7,7 +7,6 @@ import useBridgeSetup from 'hooks/useBridgeSetup'
 import { getCoinImage } from 'util/coinImage'
 
 import useAmountToReceive from 'hooks/useAmountToReceive'
-import useBridgeAlerts from 'hooks/useBridgeAlerts'
 import BridgeToAddress from './BridgeToAddress'
 import Fee from './Fee'
 import TokenInput from './TokenInput'
@@ -35,7 +34,6 @@ const BridgeInput: FC<Props> = (props) => {
   const token = useSelector(selectTokenToBridge())
   const { amount: receivableAmount } = useAmountToReceive()
   useBridgeSetup()
-  useBridgeAlerts()
 
   const openTokenPicker = () => {
     dispatch(openModal('tokenPicker'))
