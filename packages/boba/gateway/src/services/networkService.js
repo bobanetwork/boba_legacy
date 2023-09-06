@@ -670,6 +670,7 @@ class NetworkService {
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
+
       if (!!NETWORK[ this.networkGateway ] && chainId === L2ChainId) {
         this.L1orL2 = 'L2';
       } else if(!!NETWORK[ this.networkGateway ] && chainId === L1ChainId) {
@@ -700,7 +701,6 @@ class NetworkService {
       network: this.networkGateway,
       networkType: this.networkType
     })
-
     const targetIDHex = networkDetail[targetLayer].chainIdHex
     const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcUrl
     const chainParam = {
@@ -828,7 +828,6 @@ class NetworkService {
   /* This is for manually adding NFTs */
   async addNFT( address, tokenID ) {
 
-    console.log("address", address)
 
     try {
 
@@ -921,8 +920,8 @@ class NetworkService {
 
     try {
 
-      let layer1Balances, layer2Balances;
-
+      let layer1Balances; 
+      let layer2Balances;
       if (this.network === NETWORK.ETHEREUM) {
         layer1Balances = [
           {
@@ -946,7 +945,10 @@ class NetworkService {
             balance: new BN(0),
           },
         ]
+        console.log('is eth ', layer1Balances, layer2Balances)
+
       } else {
+
         layer1Balances = [
           {
             address: this.addresses.L1_ETH_Address,
@@ -969,7 +971,6 @@ class NetworkService {
             balance: new BN(0),
           },
         ]
-
       }
 
       // Always check ETH
@@ -1036,8 +1037,8 @@ class NetworkService {
         }
       })
 
-      const tokenBalances = await Promise.all(getBalancePromise)
-
+      const tokenBalances = await Promise.all(getBalancePromise) 
+      console.log('tokenBalances',tokenBalances)
       tokenBalances.forEach((token) => {
           if (token.layer === 'L1' &&
             token.symbol !== 'xBOBA' &&
@@ -1048,8 +1049,10 @@ class NetworkService {
             token.symbol !== 'WAGMIv3' &&
             token.symbol !== 'WAGMIv3-Oolong'
           ) {
+          console.log('token actual', token)
           layer1Balances.push(token)
         } else if (token.layer === 'L2') {
+          console.log('token layer', token)
           layer2Balances.push(token)
         }
       })
@@ -2245,9 +2248,9 @@ class NetworkService {
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(this.addresses.L1LPAddress)
         const tokenInfoFiltered = this.tokenInfo.L1[utils.getAddress(tokenAddress)]
         if (tokenInfo) {
-          tokenSymbol = tokenInfoFiltered.symbol
-          tokenName = tokenInfoFiltered.name
-          decimals = tokenInfoFiltered.decimals
+          tokenSymbol = tokenInfoFiltered?.symbol
+          tokenName = tokenInfoFiltered?.name
+          decimals = tokenInfoFiltered?.decimals
         } else {
           tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
           tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
@@ -3898,7 +3901,7 @@ class NetworkService {
   }
 
   async getFS_Info() {
-
+    console.log(this.account)
     if(this.account === null) {
       console.log('NS: getFS_Info() error - called but account === null')
       return

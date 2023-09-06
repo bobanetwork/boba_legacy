@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { openModal } from 'actions/uiAction'
-import { setConnect, setConnectBOBA, setConnectETH } from 'actions/setupAction'
+import {
+  setBaseState,
+  setEnableAccount,
+  setConnect,
+  setConnectBOBA,
+  setConnectETH,
+} from 'actions/setupAction'
+
+import { setActiveNetwork } from 'actions/networkAction'
+
 import {
   selectActiveNetwork,
   selectActiveNetworkType,
@@ -46,7 +55,7 @@ const useWalletSwitch = () => {
   useEffect(() => {
     if (accountEnabled) {
       if (activeNetwork !== network || activeNetworkType !== networkType) {
-        dispatch(openModal('switchNetworkModal'))
+        console.log('change network')
       }
     }
   }, [activeNetwork, activeNetworkType, network, networkType, dispatch])

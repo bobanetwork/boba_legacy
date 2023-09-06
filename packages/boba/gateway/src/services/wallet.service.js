@@ -16,10 +16,10 @@ limitations under the License. */
 
   import { providers, utils } from "ethers"
   import WalletConnectProvider from "@walletconnect/web3-provider"
-  import { rpcUrls } from 'util/network/network.util'
+  import { rpcUrls, CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
   import store from 'store'
-  import { CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
-import { setActiveNetwork, setNetwork } from 'actions/networkAction'
+  import { setActiveNetwork, setNetwork } from 'actions/networkAction'
+  import { setBaseState, setEnableAccount } from 'actions/setupAction';
 
   class WalletService {
     constructor() {
@@ -55,30 +55,40 @@ import { setActiveNetwork, setNetwork } from 'actions/networkAction'
       }
     }
 
-    async listenMetaMask() {
-      window.ethereum.on('accountsChanged', () => {
-        window.location.reload()
-      })
+  async listenMetaMask() {
+    window.ethereum.on('accountsChanged', () => {
+      window.location.reload()
+    })
 
-      window.ethereum.on('chainChanged', (chainId) => {
-        const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
-        const {
-          chain: network,
-          icon: networkIcon,
-          name
-        } = NetworkList[ networkType ].find(network => network.chain === chain);
-        store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
-        store.dispatch(
-          setNetwork({
-            networkType,
-            network,
-            networkIcon,
-            name
-          })
-        )
-        store.dispatch(setActiveNetwork())
+    window.ethereum.on('chainChanged', (chainId) => {
+
+      const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
+      const {
+        chain: network,
+        icon: networkIcon,
+        name
+      } = NetworkList[ networkType ].find(network => network.chain === chain);
+      console.log('chaging mask', {
+        networkType,
+        network,
+        networkIcon,
+        name
       })
-    }
+      store.dispatch(setBaseState(false));
+      store.dispatch(setEnableAccount(false));
+
+      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
+      store.dispatch(
+        setNetwork({
+          networkType,
+          network,
+          networkIcon,
+          name
+        })
+      )
+      store.dispatch(setActiveNetwork())
+    })
+  }
 
     async connectWalletConnect() {
       try {

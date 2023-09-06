@@ -65,6 +65,7 @@ const TokenPickerModal: FC<TokenPickerModalProps> = ({ open, tokenIndex }) => {
   }
 
   useEffect(() => {
+    console.log('here')
     dispatch(fetchBalances())
   }, [dispatch])
 

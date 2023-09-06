@@ -84,7 +84,7 @@ const Earn = () => {
 
   useEffect(()=> {
     setPoolTab(activeNetworkName[layer?.toLowerCase()])
-  }, [layer, networkService])
+  }, [layer, networkService, activeNetworkName])
 
 
   useEffect(() => {
@@ -96,6 +96,7 @@ const Earn = () => {
       dispatch(fetchBalances())
     }
   }, [dispatch, baseEnabled, accountEnabled])
+
 
 
   const getBalance = (address, chain) => {
@@ -111,6 +112,7 @@ const Earn = () => {
 
 
   const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP;
+
   const selectedNetworkConfig =
     lpChoice === 'L1LP'
       ? networkService?.networkConfig?.L1?.chainIdHex

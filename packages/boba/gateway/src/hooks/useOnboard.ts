@@ -17,7 +17,6 @@ export const useOnboard = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-
     const initBase = async () => {
       const initialized = await networkService.initializeBase({
         networkGateway: activeNetwork,

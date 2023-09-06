@@ -38,7 +38,6 @@ const useBridgeSetup = () => {
   const layer = useSelector(selectLayer())
   const bridgeType = useSelector(selectBridgeType())
   const token = useSelector(selectTokenToBridge())
-
   useEffect(() => {
     if (layer === LAYER.L1) {
       if (token && bridgeType === BRIDGE_TYPE.FAST) {
