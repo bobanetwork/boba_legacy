@@ -2429,7 +2429,7 @@ class NetworkService {
 
   getTeleportationContract(chainId) {
     const {teleportationAddr, networkConfig} = this.getTeleportationAddress(chainId)
-    if (!teleportationAddr) return;
+    if (!teleportationAddr || !this.Teleportation) return;
 
     const rpc = getRpcUrl({networkType: networkConfig.networkType, network: networkConfig.chain, layer: networkConfig.layer})
     const provider = new ethers.providers.StaticJsonRpcProvider(rpc)
@@ -4668,12 +4668,6 @@ class NetworkService {
     }
     return []
   }
-
-  async getCurrentChainId() {
-    const {chainId} = await this.provider?.getNetwork()
-    return chainId;
-  }
-
 }
 
 const networkService = new NetworkService()

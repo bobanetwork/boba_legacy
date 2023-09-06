@@ -13,7 +13,6 @@ export interface IKMSSignerConfig {
   awsKmsAccessKey: string
   awsKmsSecretKey: string
   awsKmsKeyId: string
-  /** @dev Should always be enabled, but can be helpful for debugging and unit tests, .. */
   disableDisburserCheck?: boolean
 }
 
@@ -149,14 +148,9 @@ export class KMSSigner {
     return this.getEthereumAddress(Buffer.from(pubKey.PublicKey))
   }
 
-  /** @dev Send transaction via AWS KMS
-   * @param providerUrl Network to send the transaction on
-   * @param toAddr Contract Address of Teleportation or toAddress if airdropping gas
-   * @param nativeValue Amount of native asset to send
-   * @param unsignedTx Data block */
   public sendTxViaKMS = async (
     providerUrl: string | providers.Provider,
-    toAddr: string,
+    contractAddr: string,
     nativeValue: BigNumber,
     unsignedTx: PopulatedTransaction
   ) => {
@@ -186,7 +180,7 @@ export class KMSSigner {
     let baseTxObj = {
       nonce: await provider.getTransactionCount(ethAddr),
       gasLimit: 10_000_000,
-      to: toAddr,
+      to: contractAddr,
       r: sig.r.toBuffer(),
       s: sig.s.toBuffer(),
       v: recoveredPubAddr.v,

@@ -116,53 +116,57 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     this.state.supportedChains = []
     this.state.depositTeleportations = []
     const bobaTokenContractAddr = Object.keys(this.options.ownSupportedAssets).find(
-      (k) => this.options.ownSupportedAssets[k] === Asset.BOBA
+      (k) => this.options.ownSupportedAssets[k?.toLowerCase()] === Asset.BOBA
     )
     if (!bobaTokenContractAddr) {
       this.logger.error(`Could not find BOBA contract address to check for support: ${JSON.stringify(this.options.ownSupportedAssets)}`)
     }
 
     for (const chain of this.options.selectedBobaChains) {
-      const chainId = chain.chainId
-      // assuming BOBA is enabled on supported networks to retain battle-tested logic
+      try {
+        const chainId = chain.chainId
+        // assuming BOBA is enabled on supported networks to retain battle-tested logic
 
-      this.logger.info('Check if Boba supported for chainId: ', {chainId, bobaTokenContractAddr})
-      const isSupported = await this.state.Teleportation.supportedTokens(
-        bobaTokenContractAddr,
-        chainId
-      )
-      this.logger.info('Boba supported: ', {isSupported})
+        this.logger.info('Check if Boba supported for chainId: ', {chainId, bobaTokenContractAddr})
+        const isSupported = await this.state.Teleportation.supportedTokens(
+          bobaTokenContractAddr,
+          chainId
+        )
+        this.logger.info('Boba supported: ', {isSupported})
 
-      if (!isSupported || !isSupported[0]) {
-        // do not fail, as secured on-chain anyway & run.ts just returns all testnets/mainnets - thus just ignore networks that don't support Boba
-        this.logger.error(
-          `Chain ${chainId} is not supported by the contract ${
-            this.state.Teleportation.address
-          } on chain ${
-            (await this.state.Teleportation.provider.getNetwork()).chainId
-          }`
-        )
-      } else {
-        this.state.supportedChains = [...this.state.supportedChains, chain]
-        const depositTeleportation = await getBobaContractAt(
-          'Teleportation',
-          chain.teleportationAddress,
-          chain.provider
-        )
-        const totalDisbursements =
-          await this.state.Teleportation.totalDisbursements(chainId)
-        const totalDeposits = await depositTeleportation.totalDeposits(
-          this.options.chainId
-        )
-        this.logger.info('Total disbursements for chain', {chainId, totalDisbursements})
+        if (!isSupported || !isSupported[0]) {
+          // do not fail, as secured on-chain anyway & run.ts just returns all testnets/mainnets - thus just ignore networks that don't support Boba
+          this.logger.error(
+            `Chain ${chainId} is not supported by the contract ${
+              this.state.Teleportation.address
+            } on chain ${
+              (await this.state.Teleportation.provider.getNetwork()).chainId
+            }`
+          )
+        } else {
+          this.state.supportedChains = [...this.state.supportedChains, chain]
+          const depositTeleportation = await getBobaContractAt(
+            'Teleportation',
+            chain.teleportationAddress,
+            chain.provider
+          )
+          const totalDisbursements =
+            await this.state.Teleportation.totalDisbursements(chainId)
+          const totalDeposits = await depositTeleportation.totalDeposits(
+            this.options.chainId
+          )
+          this.logger.info('Total disbursements for chain', {chainId, totalDisbursements})
 
-        this.state.depositTeleportations.push({
-          Teleportation: depositTeleportation,
-          chainId,
-          totalDisbursements,
-          totalDeposits,
-          height: chain.height,
-        })
+          this.state.depositTeleportations.push({
+            Teleportation: depositTeleportation,
+            chainId,
+            totalDisbursements,
+            totalDeposits,
+            height: chain.height,
+          })
+        }
+      } catch(err) {
+        this.logger.error(`Could not initialize network to disburse on: ${chain.chainId}, ${chain.url}, ${chain.name}`)
       }
     }
     this.logger.info('Teleportation service initialized successfully.')
@@ -184,7 +188,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
             events,
             latestBlock
           )
-          this.logger.info('Disbursed teleportations for network', {latestBlock})
+          this.logger.info('Disbursed teleportations for network', { latestBlock })
         } catch (err) {
           this.logger.error('Error while running teleportation', {
             err,
@@ -243,10 +247,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           const destChainId = event.args.toChainId
 
           if (destChainId.toString() !== this.options.chainId.toString()) {
-            this.logger.info('Ignoring event as different destination chainId: ', {
-              destChainId,
-              currChainId: this.options.chainId
-            })
+            this.logger.info('Ignoring event as different destination chainId: ', {destChainId, currChainId: this.options.chainId})
             continue;
           }
 
@@ -260,12 +261,12 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
 
             const [isTokenSupported, , , , ,] =
               await this.state.Teleportation.supportedTokens(
-                sourceChainTokenAddr,
+                destChainTokenAddr,
                 sourceChainId
               )
             if (!isTokenSupported) {
               throw new Error(
-                `Token '${sourceChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
+                `Token '${destChainTokenAddr}' not supported originating from chain '${sourceChainId}' with amount '${amount}'!`
               )
             } else {
               disbursement = [
@@ -523,7 +524,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       )
     }
 
-    const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr]
+    const srcChainTokenSymbol = srcChain.supportedAssets[sourceChainTokenAddr?.toLowerCase()]
 
     const supportedAsset = Object.entries(this.options.ownSupportedAssets).find(
       ([address, tokenSymbol]) => {

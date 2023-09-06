@@ -108,7 +108,10 @@ const useBridgeAlerts = () => {
           })
         )
 
-        if (amountToBridge < tokenForTeleportationSupported.minDepositAmount) {
+        if (
+          amountToBridge &&
+          amountToBridge < tokenForTeleportationSupported.minDepositAmount
+        ) {
           dispatch(
             setBridgeAlert({
               meta: ALERT_KEYS.VALUE_TOO_SMALL,
@@ -220,7 +223,7 @@ const useBridgeAlerts = () => {
         keys: [ALERT_KEYS.FAST_EXIT_ERROR],
       })
     )
-    if (layer === LAYER.L2) {
+    if (layer === LAYER.L2 && bridgeType !== BRIDGE_TYPE.TELEPORTATION) {
       // trigger only when withdrawing funds.
       let warning = ''
       const balance = Number(logAmount(token.balance, token.decimals))

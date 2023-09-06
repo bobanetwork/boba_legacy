@@ -3,8 +3,9 @@ import networkService from './networkService'
 import {AllNetworkConfigs, CHAIN_ID_LIST, getRpcUrlByChainId} from 'util/network/network.util'
 import {TRANSACTION_STATUS} from "../containers/history/types";
 import {teleportationGraphQLService} from "./graphql.service";
-import {ethers, providers} from "ethers";
+import {BigNumber, ethers, providers} from "ethers";
 import {isDevBuild} from "../util/constant";
+import {BobaChains} from "../util/chainConfig";
 
 class TransactionService {
   async getSevens(networkConfig = networkService.networkConfig) {
@@ -215,6 +216,23 @@ class TransactionService {
       };
     }
 
+    const _getTeleportationSupportedDestChainTokenAddrBySourceChainTokenAddr = (sourceChainTokenAddr, sourceChainId, destChainId) => {
+      const srcChainTokenSymbol = BobaChains[parseInt(sourceChainId)].supportedAssets[sourceChainTokenAddr?.toLowerCase()]
+
+      const supportedAsset = Object.entries(BobaChains[parseInt(destChainId)].supportedAssets).find(
+        ([address, tokenSymbol]) => {
+          return tokenSymbol === srcChainTokenSymbol
+        }
+      )
+      if (!supportedAsset) {
+        console.error(
+          `Asset ${srcChainTokenSymbol} on chain destinationChain not configured but possibly supported on-chain`
+        )
+        return;
+      }
+      return supportedAsset[0] // return only address
+    }
+
     const getEventsForTeleportation = async (contract, sourceChainId) => {
       if (contract) {
         let sentEvents = []
@@ -226,7 +244,7 @@ class TransactionService {
 
         if (!sentEvents || !sentEvents?.length) return []
         return await Promise.all(sentEvents.map(async sentEvent => {
-          let receiveEvent = await teleportationGraphQLService.queryDisbursementSuccessEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.token, sentEvent.amount, sentEvent.depositId)
+          let receiveEvent = await teleportationGraphQLService.queryDisbursementSuccessEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, _getTeleportationSupportedDestChainTokenAddrBySourceChainTokenAddr(sentEvent.token, sentEvent.sourceChainId, sentEvent.toChainId), sentEvent.amount, sentEvent.depositId)
           if (!receiveEvent && sentEvent.token === ethers.constants.AddressZero) {
             // Native assets can fail and retried
             receiveEvent = await teleportationGraphQLService.queryDisbursementFailedEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.amount, sentEvent.depositId)
@@ -234,7 +252,10 @@ class TransactionService {
               // check if successfully retried
               receiveEvent = await teleportationGraphQLService.queryDisbursementRetrySuccessEvent(networkService.account, sentEvent.sourceChainId, sentEvent.toChainId, sentEvent.amount, sentEvent.depositId)
             }
-            receiveEvent.token = ethers.constants.AddressZero
+            if (receiveEvent) {
+              // do in both cases, receiveEvent may still be undefined
+              receiveEvent.token = ethers.constants.AddressZero
+            }
           }
           return await mapEventToTransaction(sentEvent, receiveEvent, contract)
         }))

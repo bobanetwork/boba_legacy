@@ -135,8 +135,8 @@ describe('teleportation', () => {
         teleportationAddress: Teleportation.address,
         height: 0,
         supportedAssets: {
-          [L2BOBA.address]: Asset.BOBA,
-          [ethers.constants.AddressZero]: Asset.ETH,
+          [L2BOBA.address?.toLowerCase()]: Asset.BOBA,
+          [ethers.constants.AddressZero?.toLowerCase()]: Asset.ETH,
         },
       },
       // bnb will be added in routing tests to have cleaner before hooks
@@ -167,6 +167,7 @@ describe('teleportation', () => {
         awsKmsKeyId: process.env.TELEPORTATION_AWS_KMS_KEY_ID ?? '3',
         awsKmsEndpoint: process.env.TELEPORTATION_AWS_KMS_ENDPOINT ?? 'http://kms:8888/',
         awsKmsRegion: process.env.TELEPORTATION_AWS_KMS_REGION ?? 'us-east-1',
+        disableDisburserCheck: true,
       },
       airdropConfig: {
         ...airdropConfig, airdropEnabled,
@@ -660,8 +661,8 @@ describe('teleportation', () => {
           teleportationAddress: TeleportationBNB.address,
           height: 0,
           supportedAssets: {
-            [L2BNBOnBobaBnb.address]: Asset.BOBA,
-            [ethers.constants.AddressZero]: Asset.BNB, // simulate BNB for native to token teleport
+            [L2BNBOnBobaBnb.address?.toLowerCase()]: Asset.BOBA,
+            [ethers.constants.AddressZero?.toLowerCase()]: Asset.BNB, // simulate BNB for native to token teleport
           },
         },
       ]
@@ -675,9 +676,9 @@ describe('teleportation', () => {
           teleportationAddress: Teleportation.address,
           height: 0,
           supportedAssets: {
-            [L2BOBA.address]: Asset.BOBA,
-            [ethers.constants.AddressZero]: Asset.ETH,
-            [L2BNBOnBobaEth.address]: Asset.BNB,
+            [L2BOBA.address?.toLowerCase()]: Asset.BOBA,
+            [ethers.constants.AddressZero?.toLowerCase()]: Asset.ETH,
+            [L2BNBOnBobaEth.address?.toLowerCase()]: Asset.BNB,
           },
         },
       ]
@@ -725,8 +726,8 @@ describe('teleportation', () => {
             token,
             sourceChainId
           )
-        expect(receivingChainTokenAddr).to.be.eq(
-          L2BOBA.address,
+        expect(receivingChainTokenAddr.toLowerCase()).to.be.eq(
+          L2BOBA.address.toLowerCase(),
           'BOBA token address on BNB not correctly routed'
         )
 
@@ -805,8 +806,8 @@ describe('teleportation', () => {
             token,
             sourceChainId
           )
-        expect(receivingChainTokenAddr).to.be.eq(
-          L2BNBOnBobaEth.address,
+        expect(receivingChainTokenAddr.toLowerCase()).to.be.eq(
+          L2BNBOnBobaEth.address.toLowerCase(),
           'BNB token address on Boba ETH not correctly routed'
         )
 
@@ -1042,7 +1043,7 @@ describe('teleportation', () => {
           teleportationAddress: TeleportationBNB.address,
           height: 0,
           supportedAssets: {
-            [L2BNBOnBobaBnb.address]: Asset.BNB,
+            [L2BNBOnBobaBnb.address?.toLowerCase()]: Asset.BNB,
             [ethers.constants.AddressZero]: Asset.BOBA, // simulate BNB for native to token teleport
           },
         },
@@ -1057,9 +1058,9 @@ describe('teleportation', () => {
           teleportationAddress: Teleportation.address,
           height: 0,
           supportedAssets: {
-            [L2BOBA.address]: Asset.BOBA,
+            [L2BOBA.address?.toLowerCase()]: Asset.BOBA,
             [ethers.constants.AddressZero]: Asset.ETH,
-            [L2BNBOnBobaEth.address]: Asset.BNB,
+            [L2BNBOnBobaEth.address?.toLowerCase()]: Asset.BNB,
           },
         },
       ]
@@ -1110,7 +1111,7 @@ describe('teleportation', () => {
           sourceChainId
         )
       expect(receivingChainTokenAddr).to.be.eq(
-        L2BNBOnBobaEth.address,
+        L2BNBOnBobaEth.address?.toLowerCase(),
         'BNB token address on BNB not correctly routed'
       )
 
@@ -1202,7 +1203,7 @@ describe('teleportation', () => {
           sourceChainId
         )
       expect(receivingChainTokenAddr).to.be.eq(
-        L2BNBOnBobaEth.address,
+        L2BNBOnBobaEth.address?.toLowerCase(),
         'BNB token address on BNB not correctly routed'
       )
 
@@ -1290,7 +1291,7 @@ describe('teleportation', () => {
           sourceChainId
         )
       expect(receivingChainTokenAddr).to.be.eq(
-        L2BOBA.address,
+        L2BOBA.address?.toLowerCase(),
         'BOBA token address on BNB not correctly routed'
       )
 
@@ -1382,7 +1383,7 @@ describe('teleportation', () => {
           sourceChainId
         )
       expect(receivingChainTokenAddr).to.be.eq(
-        L2BNBOnBobaEth.address,
+        L2BNBOnBobaEth.address?.toLowerCase(),
         'BNB token address on BNB not correctly routed'
       )
 
@@ -1555,7 +1556,7 @@ describe('teleportation', () => {
           sourceChainId
         )
       expect(receivingChainTokenAddr).to.be.eq(
-        L2BNBOnBobaEth.address,
+        L2BNBOnBobaEth.address?.toLowerCase(),
         'BNB token address on BNB not correctly routed'
       )
 
