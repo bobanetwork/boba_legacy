@@ -1507,9 +1507,7 @@ describe('teleportation', () => {
 
       const gasDelta = ethers.utils.parseEther('0.003')
       expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo(amountToBridge, gasDelta)
-      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
-        amountToBridge, gasDelta
-      )
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.eq(amountToBridge)
     })
 
     it('should not airdrop within cooldown period', async () => {
@@ -1611,9 +1609,7 @@ describe('teleportation', () => {
       )
       const gasDelta = ethers.utils.parseEther('0.003')
       expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo(airdropConfig.airdropAmountWei, gasDelta)
-      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
-        airdropConfig.airdropAmountWei, gasDelta
-      )
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.eq(airdropConfig.airdropAmountWei)
     })
   })
 })

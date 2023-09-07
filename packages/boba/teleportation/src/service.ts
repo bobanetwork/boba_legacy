@@ -452,7 +452,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           let nativeAmount = this.options.airdropConfig?.airdropAmountWei
           if (!nativeAmount) {
             // default
-            nativeAmount = ethers.utils.parseEther('0.001')
+            nativeAmount = ethers.utils.parseEther('0.0005')
           }
 
           const airdropTx = await this.state.KMSSigner.sendTxViaKMS(
