@@ -159,7 +159,7 @@ const ListProposal = ({ proposal }) => {
         >
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Box display="flex" alignItems="center">
-              <Typography variant="body4" sx={{ opacity: 0.65 }}>
+              <Typography variant="body4" sx={{ opacity: 0.65, ml: '8px' }}>
                 {`${startTime} - ${endTime}`}
               </Typography >
             </Box>
@@ -168,16 +168,20 @@ const ListProposal = ({ proposal }) => {
             <S.GridItemTagR sx={{ width: '100%', padding: '15px 0px' }}>
               <Box
                 sx={{
+                  marginTop: '8px',
                   width: '100%',
                   display: 'flex',
                   justifyContent: 'space-between',
               }}>
-                <Typography variant="body4" style={{ opacity: 0.3 }}>
+                <Typography variant="body4">
                   Total: {proposal.totalVotes}
                 </Typography>
               </Box>
-              <Box sx={{ width: '100%', margin:'15px 0px' }}>
+              <Box sx={{ width: '100%', margin: '8px 0px' }}>
                 <LinearProgress
+                  style={{
+                    width: '100%'
+                  }}
                   A={proposal.forVotes}
                   B={proposal.againstVotes}
                   C={proposal.abstainVotes}
@@ -212,6 +216,7 @@ const ListProposal = ({ proposal }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href={getLink({ description: proposal.description })}
+                ml='8px'
               >
                 More details
               </Link>

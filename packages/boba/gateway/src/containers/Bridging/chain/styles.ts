@@ -7,8 +7,13 @@ import Switch from 'assets/images/icons/switchIcon.svg'
 export const ChainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 60px;
   width: 100%;
+  position: relative;
+
+  div: nth-of-type(3) {
+    margin-top: -25px;
+  }
 `
 
 export const ChainPickerContainer = styled.div`
@@ -76,10 +81,13 @@ export const SwitchChainIcon = styled.div`
   border-radius: 20px;
   border: 1px solid ${(props) => props.theme.colors.box.border};
   background: ${({ theme: { colors } }) => colors.box.background};
+  position: absolute;
+  top: 110px;
+  left: calc(50% - 20px);
 
   &:hover {
     border-color: ${({ theme: { colors, name } }) =>
-      name === 'light' ? colors.gray[600] : colors.gray[100]};
+      name === 'light' ? colors.gray[600] : colors.green[300]};
   }
 
   > div {

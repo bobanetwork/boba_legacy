@@ -48,9 +48,9 @@ const BridgeConfirmModal: FC<Props> = ({ open }) => {
   const estimateTime = () => {
     if (bridgeType === BRIDGE_TYPE.CLASSIC) {
       if (layer === LAYER.L1) {
-        return '1 ~ 5min.'
+        return '13 ~ 14mins.'
       } else {
-        return '7 days'
+        return '1 ~ 5min.'
       }
     } else if (bridgeType === BRIDGE_TYPE.FAST) {
       if (layer === LAYER.L1) {

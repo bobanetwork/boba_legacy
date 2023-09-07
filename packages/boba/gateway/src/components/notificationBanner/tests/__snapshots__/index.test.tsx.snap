@@ -3,20 +3,20 @@
 exports[`NotificationBanner  should match snapshot and check show banner when open set to true 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bgqQcB jRFBEO open "
+    class="sc-fABZjn eVnIba open "
   >
-    <div
-      class="sc-gTRrQi hipVoW"
+    <p
+      class="sc-duSInm gaoAki sc-gUMnWI iklkaY"
       data-testid="message"
     >
-      Alert message goes here
+      BobaAvax (Fuji) is being wound down & will no longer be available, starting October 31st
       <span
-        class="sc-ewnqHT lknSpb"
+        class="sc-hUOJWJ dFKYcc"
         role="readMore"
       >
         Read more
       </span>
-    </div>
+    </p>
   </div>
 </DocumentFragment>
 `;
@@ -24,20 +24,20 @@ exports[`NotificationBanner  should match snapshot and check show banner when op
 exports[`NotificationBanner  should match snapshot without message 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bgqQcB jRFBEO open "
+    class="sc-fABZjn eVnIba open "
   >
-    <div
-      class="sc-gTRrQi hipVoW"
+    <p
+      class="sc-duSInm gaoAki sc-gUMnWI iklkaY"
       data-testid="message"
     >
-      Alert message goes here
+      BobaAvax (Fuji) is being wound down & will no longer be available, starting October 31st
       <span
-        class="sc-ewnqHT lknSpb"
+        class="sc-hUOJWJ dFKYcc"
         role="readMore"
       >
         Read more
       </span>
-    </div>
+    </p>
   </div>
 </DocumentFragment>
 `;

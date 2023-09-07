@@ -3,6 +3,7 @@ import { mobile } from 'themes/screens'
 
 export const InputContainer = styled.div<{ error?: boolean }>`
   width: 100%;
+  min-height: 56px;
   display: flex;
   padding: 5px 16px;
   justify-content: space-around;
@@ -12,7 +13,6 @@ export const InputContainer = styled.div<{ error?: boolean }>`
   border: 1px solid
     ${({ theme, error }) =>
       error ? theme.colors.red[300] : theme.colors.box.border};
-  background: ${(props) => props.theme.colors.box.background};
 
   ${mobile(css`
     padding: 5px;
@@ -23,7 +23,8 @@ export const Input = styled.input`
   flex: 1;
   padding: 10px;
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  color: ${(props) => props.theme.color};
+  color: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[600] : theme.color};
   font-size: 16px;
   font-style: normal;
   font-weight: 500;

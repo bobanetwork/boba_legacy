@@ -66,7 +66,7 @@ export const Input = styled.input`
   ${(props) =>
     props.theme.name === 'dark' &&
     css`
-      color: ${props.theme.colors.gray[200]};
+      color: ${props.theme.colors.gray[100]};
     `}
   @media ${screen.mobile} {
     width: 120px;
