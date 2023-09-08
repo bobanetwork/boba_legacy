@@ -4,6 +4,7 @@ exports[`Testing history page Test History Page 1`] = `
 <DocumentFragment>
   <div
     class="sc-eWhHU dDMUmU"
+    id="history"
   >
     <div
       class="sc-brSOsn bhYExN"
@@ -88,6 +89,7 @@ exports[`Testing history page Test History Page 1`] = `
         >
           <div
             class="sc-kJwmPe ctcryJ"
+            id="networkDropdowns"
           >
             <p
               class="sc-duSInm gaoAki"
@@ -96,6 +98,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
             <div
               class="sc-fABZjn eemHrn dropdown sc-gCkVGe Mbgmo"
+              id="L1Networks"
             >
               <div
                 class="sc-gUMnWI kxveQW dropdown sc-gCkVGe Mbgmo"
@@ -137,6 +140,7 @@ exports[`Testing history page Test History Page 1`] = `
             </div>
             <div
               class="sc-pDgPE kbbFqH"
+              id="switchNetworkDirection"
             >
               <div
                 class="sc-hpGEOZ flecyt"
@@ -156,6 +160,7 @@ exports[`Testing history page Test History Page 1`] = `
             </p>
             <div
               class="sc-fABZjn eemHrn dropdown sc-gCkVGe Mbgmo"
+              id="L2Networks"
             >
               <div
                 class="sc-gUMnWI kxveQW dropdown sc-gCkVGe Mbgmo"
@@ -198,6 +203,7 @@ exports[`Testing history page Test History Page 1`] = `
           </div>
           <div
             class="sc-ehYhRg jxAxWZ dropdown undefined"
+            id="statusFilter"
           >
             <div
               class="sc-fia-DRh jfQAMp"
@@ -289,6 +295,7 @@ exports[`Testing history page Test History Page 1`] = `
         </div>
         <div
           class="sc-emqRaN cCQJsf"
+          id="transactionList"
         >
           <div
             class="sc-gTRrQi jcFGvU sc-dcrmVg dhrqJY sc-gACFrS ecmoih"
@@ -298,6 +305,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 11 Jul 2023 02:27 PM
@@ -308,6 +316,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -348,6 +357,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -419,6 +429,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -433,6 +444,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 11 Jul 2023 01:31 PM
@@ -443,6 +455,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -483,6 +496,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -559,6 +573,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -573,6 +588,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 10 Jul 2023 04:31 PM
@@ -583,6 +599,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -623,6 +640,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -694,6 +712,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -708,6 +727,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 10 Jul 2023 04:05 PM
@@ -718,6 +738,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -758,6 +779,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -829,6 +851,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -843,6 +866,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 07 Jul 2023 04:47 PM
@@ -853,6 +877,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -893,6 +918,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -964,6 +990,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -978,6 +1005,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 06 Jul 2023 10:25 PM
@@ -988,6 +1016,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1028,6 +1057,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1099,6 +1129,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -1113,6 +1144,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 06 Jul 2023 05:29 PM
@@ -1123,6 +1155,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1163,6 +1196,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1234,6 +1268,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -1248,6 +1283,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 05 Jul 2023 06:11 PM
@@ -1258,6 +1294,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1298,6 +1335,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1374,6 +1412,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -1388,6 +1427,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 05 Jul 2023 05:24 PM
@@ -1398,6 +1438,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1438,6 +1479,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1509,6 +1551,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -1523,6 +1566,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 168px;"
             >
               <div
+                aria-label="transactionDate"
                 class="sc-dSbvwS eKnfhr"
               >
                 04 Jul 2023 12:05 AM
@@ -1533,6 +1577,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionOriginDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1573,6 +1618,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 142px;"
             >
               <div
+                aria-label="transactionDestinationDetails"
                 class="sc-eSdRwT fKCtsY"
               >
                 <div
@@ -1649,6 +1695,7 @@ exports[`Testing history page Test History Page 1`] = `
               style="max-width: 88px;"
             >
               <div
+                aria-label="transactionStatus"
                 class="sc-OKtSx LsRGn"
               >
                 Completed
@@ -1666,6 +1713,7 @@ exports[`Testing history page Test transaction resolver 1`] = `
 <DocumentFragment>
   <div
     class="sc-emqRaN cCQJsf"
+    id="transactionList"
   />
   <div
     class="sc-IeChK iNxsQx"
