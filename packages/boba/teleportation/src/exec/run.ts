@@ -64,7 +64,7 @@ const main = async () => {
   )
   const TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI = config.str(
     'teleportation-airdrop-gas-amount-wei',
-    env.TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI || '1000000000000000' // 0.001 eth
+    env.TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI || '100000000000000' // 0.0001 eth
   )
   const TELEPORTATION_AIRDROP_MIN_USD_VALUE = config.str(
     'teleportation-airdrop-min-usd-value',

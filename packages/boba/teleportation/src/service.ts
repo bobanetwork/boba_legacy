@@ -388,7 +388,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   /** @dev Checks if major airdrop eligibility criteria has been met such as not bridging native, has no gas on destination network, bridges enough value, .. */
   async _fulfillsAirdropConditions(disbursement: Disbursement, assetUsdValues: ITokenUSDPrice|undefined) {
     const nativeBalance = await this.state.Teleportation.provider.getBalance(disbursement.addr)
-    if (nativeBalance.gt('0')) {
+    if (nativeBalance.gt(this.options.airdropConfig.airdropAmountWei)) {
       this.logger.info(`Not airdropping as wallet has native balance on destination network: ${nativeBalance}, wallet: ${disbursement.addr}`)
       return false;
     }
@@ -464,14 +464,15 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           await airdropTx.wait()
 
           // Save to db
+          const blockNumber = (await this.state.Teleportation.provider.getBlock('latest'))?.timestamp
           const newAirdrop = new LastAirdrop();
-          newAirdrop.blockTimestamp = latestBlock;
+          newAirdrop.blockTimestamp = blockNumber;
           newAirdrop.walletAddr = disbursement.addr;
           await lastAirdropRepository.save(newAirdrop)
 
           this.logger.info(`Successfully airdropped gas to ${disbursement.addr}, amount: ${nativeAmount}.`)
         } else {
-          this.logger.info(`Cool down, user already got an airdrop in the last 24h with this wallet: ${disbursement.addr}.`)
+          this.logger.info(`Cool down, user already got an airdrop within the cool down period with this wallet: ${disbursement.addr}.`)
         }
       } else {
         this.logger.info(`Not airdropping to ${disbursement.addr} as not eligible: ${JSON.stringify(disbursement)}`)

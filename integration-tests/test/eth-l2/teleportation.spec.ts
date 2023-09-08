@@ -28,7 +28,8 @@ import {
 import {OptimismEnv} from './shared/env'
 import {Asset} from "@boba/teleportation/src";
 
-describe('teleportation', () => {
+// TODO REMOVE
+describe.only('teleportation', () => {
   let env: OptimismEnv
   let signer: Signer
   let signerAddr: string
