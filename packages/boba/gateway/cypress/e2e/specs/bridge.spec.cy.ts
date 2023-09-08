@@ -1,6 +1,5 @@
 import Bridge from '../pages/bridge'
 import { Layer } from '../../../src/util/constant'
-
 const bridge = new Bridge()
 
 describe('Bridge', () => {
@@ -11,22 +10,28 @@ describe('Bridge', () => {
   })
   after(() => {
     bridge.header.disconnectWallet()
-    bridge.changeMetamaskNetwork('ethereum')
   })
 
   describe('Bridging', () => {
     before(() => {
-      bridge.switchToTestnet()
+      bridge.switchNetworkType('ETHEREUM', 'Testnet', false)
+    })
+    after(() => {
+      bridge.switchNetworkType('ETHEREUM', 'Mainnet', false)
     })
     it('should bridge ETH from L1 to L2', () => {
       bridge.bridgeToken('ETH', '0.001', Layer.L2)
     })
     it('should switch bridge direction', () => {
       // switch bridge direction from L2 to L1
-      bridge.switchBridgeDirection(Layer.L2)
+      bridge.switchBridgeDirection(Layer.L2, true)
     })
     it('should bridge ETH from L2 to L1', () => {
       bridge.bridgeToken('ETH', '0.001', Layer.L1)
+    })
+    it('should switch bridge direction', () => {
+      // switch bridge direction from L1 to L2
+      bridge.switchBridgeDirection(Layer.L1, false)
     })
   })
 })

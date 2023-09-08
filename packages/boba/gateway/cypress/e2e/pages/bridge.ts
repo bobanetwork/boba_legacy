@@ -8,21 +8,38 @@ export default class Bridge extends Page {
     this.id = 'bridge'
     this.walletConnectButtonText = 'Connect Wallet'
   }
-  switchToTestnet() {
+
+  switchNetworkType(network: string, networkType: string, newNetwork: boolean) {
     cy.get('#settings').should('exist').click()
     cy.get('label[title="testnetSwitch"]').click()
-    cy.get('button[label="Switch to ETHEREUM Testnet network"]').click()
-    cy.get('button[label="Connect to the ETHEREUM Testnet network"]').click()
-    this.allowNetworkSwitch()
+    cy.get(
+      `button[label="Switch to ${network} ${
+        networkType === 'Testnet' ? networkType : ''
+      } network"]`
+    ).click()
+    cy.get(
+      `button[label="Connect to the ${network} ${networkType} network"]`
+    ).click()
+
+    if (newNetwork) {
+      this.allowNetworkToBeAddedAndSwitchedTo()
+    } else {
+      this.allowNetworkSwitch()
+    }
+
     this.getReduxStore()
       .its('network')
       .its('activeNetworkType')
-      .should('equal', 'Testnet')
+      .should('equal', networkType)
   }
-  switchBridgeDirection(newOriginLayer: Layer) {
-    this.withinPage().find('#switchBridgeDirection').should('exist').click()
-    this.allowNetworkToBeAddedAndSwitchedTo()
 
+  switchBridgeDirection(newOriginLayer: Layer, newNetwork: boolean) {
+    this.withinPage().find('#switchBridgeDirection').should('exist').click()
+    if (newNetwork) {
+      this.allowNetworkToBeAddedAndSwitchedTo()
+    } else {
+      this.allowNetworkSwitch()
+    }
     this.getReduxStore()
       .its('setup')
       .its('netLayer')
@@ -81,7 +98,7 @@ export default class Bridge extends Page {
     cy.contains(`${amount} ETH`, { timeout: 60000 }).should('exist')
     cy.get('button').contains('Confirm').should('exist').click()
     if (destinationLayer === Layer.L1) {
-      this.allowMetamaskToSpendToken()
+      this.allowMetamaskToSpendToken('10')
     }
     this.confirmTransactionOnMetamask()
     if (destinationLayer === Layer.L2) {

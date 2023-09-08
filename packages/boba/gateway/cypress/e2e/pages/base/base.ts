@@ -24,8 +24,8 @@ export default class Base {
   allowNetworkToBeAddedAndSwitchedTo() {
     cy.allowMetamaskToAddAndSwitchNetwork()
   }
-  allowMetamaskToSpendToken() {
-    cy.confirmMetamaskPermissionToSpend()
+  allowMetamaskToSpendToken(amount?: string) {
+    cy.confirmMetamaskPermissionToSpend(amount)
   }
 
   readLocalStorage() {
