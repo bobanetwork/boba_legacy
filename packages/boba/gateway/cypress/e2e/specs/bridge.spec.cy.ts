@@ -6,8 +6,7 @@ const bridge = new Bridge()
 describe('Bridge', () => {
   before(() => {
     bridge.visit()
-    // waiting for baseEnabled to be set
-    bridge.waitForPageToLoad()
+    bridge.verifyReduxStoreSetup('baseEnabled', true)
     bridge.requestMetamaskConnect()
   })
   after(() => {

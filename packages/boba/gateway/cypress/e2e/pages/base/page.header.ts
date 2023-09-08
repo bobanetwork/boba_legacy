@@ -17,27 +17,9 @@ export default class PageHeader extends Base {
     return cy.get('div[title="dark-icon"]').should('exist')
   }
 
-  switchNetwork(
-    networkName: string,
-    networkAbbreviation: string,
-    isTestnet: boolean
-  ) {
+  switchNetwork(networkName: string) {
     this.getNetworkSwitcher().click()
     this.getNetworkSwitcher().contains(networkName).should('exist').click()
-    cy.get(
-      `button[label="Switch to ${networkAbbreviation} ${
-        isTestnet ? 'Testnet' : ''
-      } network"]`
-    )
-      .should('exist')
-      .click()
-    cy.get(
-      `button[label="Connect to the ${networkAbbreviation} ${
-        isTestnet ? 'Testnet' : 'Mainnet'
-      } network"]`
-    )
-      .should('exist')
-      .click()
   }
   disconnectWallet() {
     cy.get('#header')

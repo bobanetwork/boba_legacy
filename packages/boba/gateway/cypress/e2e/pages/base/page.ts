@@ -1,3 +1,4 @@
+/// <reference types="cypress"/>
 import Base from './base'
 import PageHeader from './page.header'
 import PageFooter from './page.footer'
@@ -20,6 +21,9 @@ export default class Page extends Base {
   }
   withinPage() {
     return cy.get(`#${this.id}`)
+  }
+  getReduxStore() {
+    return cy.window().its('store').invoke('getState')
   }
   connectWallet() {
     this.withinPage()
@@ -157,7 +161,7 @@ export default class Page extends Base {
           'https://etherscan.io/',
           'https://bobascan.com/',
           'https://boba.network',
-          '',
+          'https://boba.network/terms-of-use/',
         ])
         // get labels and verify
         const labels = $p.map((i, el) => {
@@ -170,53 +174,69 @@ export default class Page extends Base {
           'Blockexplorer',
           'Boba Blockexplorer',
           'Boba Network Website',
-          'Terms of Service',
+          'Terms of Use',
         ])
       })
   }
 
+  handleNetworkSwitchModals(networkAbbreviation: string, isTestnet: boolean) {
+    cy.get(
+      `button[label="Switch to ${networkAbbreviation} ${
+        isTestnet ? 'Testnet' : ''
+      } network"]`
+    )
+      .should('exist')
+      .click()
+
+    this.verifyReduxStoreSetup('accountEnabled', false)
+    this.verifyReduxStoreSetup('baseEnabled', false)
+
+    cy.get(
+      `button[label="Connect to the ${networkAbbreviation} ${
+        isTestnet ? 'Testnet' : 'Mainnet'
+      } network"]`
+    )
+      .should('exist')
+      .click()
+  }
+
   switchThroughMainnetNetworks() {
     // switch to BNB
-    this.header.switchNetwork('Binance', 'BNB', false)
+    this.header.switchNetwork('Binance')
+    this.handleNetworkSwitchModals('BNB', false)
     this.allowNetworkSwitch()
     this.checkNetworkSwitchSuccessful('BNB')
-    cy.wait(2000)
 
     // switch to AVAX
-    this.header.switchNetwork('Avalanche Mainnet', 'AVAX', false)
+    this.header.switchNetwork('Avalanche Mainnet')
+    this.handleNetworkSwitchModals('AVAX', false)
     this.allowNetworkSwitch()
     this.checkNetworkSwitchSuccessful('AVAX')
-    cy.wait(2000)
+
     // switch to Ethereum
-    this.header.switchNetwork('Ethereum', 'ETHEREUM', false)
+    this.header.switchNetwork('Ethereum')
+    this.handleNetworkSwitchModals('ETHEREUM', false)
     this.allowNetworkSwitch()
     this.checkNetworkSwitchSuccessful('ETHEREUM')
   }
 
   checkNetworkSwitchSuccessful(networkAbbreviation: string) {
-    cy.window()
-      .its('store')
-      .invoke('getState')
+    this.getReduxStore()
       .its('network')
       .its('activeNetwork')
       .should('equal', networkAbbreviation)
 
-    cy.window()
-      .its('store')
-      .invoke('getState')
-      .its('setup')
-      .its('baseEnabled')
-      .should('be.true')
+    this.verifyReduxStoreSetup('accountEnabled', true)
+    this.verifyReduxStoreSetup('baseEnabled', true)
   }
 
-  waitForPageToLoad() {
-    cy.window()
-      .its('store')
-      .invoke('getState')
+  verifyReduxStoreSetup(attribute: string, expectedValue: boolean | string) {
+    this.getReduxStore()
       .its('setup')
-      .its('baseEnabled')
-      .should('be.true')
+      .its(attribute)
+      .should(`equal`, expectedValue)
   }
+
   disconnectWallet() {
     this.header.disconnectWallet()
   }

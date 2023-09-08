@@ -14,9 +14,7 @@ export default class Bridge extends Page {
     cy.get('button[label="Switch to ETHEREUM Testnet network"]').click()
     cy.get('button[label="Connect to the ETHEREUM Testnet network"]').click()
     this.allowNetworkSwitch()
-    cy.window()
-      .its('store')
-      .invoke('getState')
+    this.getReduxStore()
       .its('network')
       .its('activeNetworkType')
       .should('equal', 'Testnet')
@@ -24,9 +22,8 @@ export default class Bridge extends Page {
   switchBridgeDirection(newOriginLayer: Layer) {
     this.withinPage().find('#switchBridgeDirection').should('exist').click()
     this.allowNetworkToBeAddedAndSwitchedTo()
-    cy.window()
-      .its('store')
-      .invoke('getState')
+
+    this.getReduxStore()
       .its('setup')
       .its('netLayer')
       .should('equal', newOriginLayer)
@@ -35,21 +32,13 @@ export default class Bridge extends Page {
   selectToken(tokenSymbol: string) {
     this.withinPage().contains('Select').should('exist').click()
 
-    // cy.get('svg[data-testid="AddCircleOutlineOutlinedIcon"]')
-    //   .should('exist')
-    //   .each(($p) => {
-    //     cy.wrap($p).click()
-    //     cy.confirmMetamaskAddToken()
-    //   })
     cy.get('div[title="tokenList"]')
       .contains(tokenSymbol)
       .should('exist')
       .click()
 
     // ensure store has correct values
-    cy.window()
-      .its('store')
-      .invoke('getState')
+    this.getReduxStore()
       .its('bridge')
       .its('tokens')
       .its(0)
@@ -70,19 +59,12 @@ export default class Bridge extends Page {
     const closeIconSrc = new RegExp('^.*close.*.svg$')
     this.selectToken(tokenSymbol)
     if (destinationLayer === Layer.L1) {
-      cy.window()
-        .its('store')
-        .invoke('getState')
+      this.getReduxStore()
         .its('setup')
         .its('bobaFeePriceRatio')
         .should('not.be.empty')
 
-      cy.window()
-        .its('store')
-        .invoke('getState')
-        .its('balance')
-        .its('exitFee')
-        .should('not.be.empty')
+      this.getReduxStore().its('balance').its('exitFee').should('not.be.empty')
     }
 
     cy.get(`input[placeholder="Amount to bridge to ${destinationLayer}"]`)
@@ -90,9 +72,7 @@ export default class Bridge extends Page {
       .focus()
       .type(`${amount}`)
 
-    cy.window()
-      .its('store')
-      .invoke('getState')
+    this.getReduxStore()
       .its('bridge')
       .its('amountToBridge')
       .should('equal', amount)

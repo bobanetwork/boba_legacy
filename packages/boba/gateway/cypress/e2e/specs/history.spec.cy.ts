@@ -5,21 +5,15 @@ const history = new History()
 describe('History', () => {
   before(() => {
     history.visit()
-    history.waitForPageToLoad()
+    history.verifyReduxStoreSetup('baseEnabled', true)
     history.requestMetamaskConnect()
-  })
-  describe('transactions', () => {
-    it('should load', () => {
-      history.waitForTransactionsToLoad()
-    })
+    history.waitForTransactionsToLoad()
   })
   describe('filters', () => {
     it('search bar', () => {
       history.checkSearchInput()
     })
     it('date pickers', () => {
-      history.getFromDatePicker()
-      history.getToDatePicker()
       history.checkDatePickers()
     })
 
@@ -28,7 +22,10 @@ describe('History', () => {
       history.getNetworksSwitchIcon()
     })
     it('status filter', () => {
-      history.getStatusFilter()
+      history.checkStatusFilter()
+    })
+    it('conjunction of filters', () => {
+      history.checkConjunctionOfFilters()
     })
   })
 })

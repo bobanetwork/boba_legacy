@@ -191,7 +191,7 @@ const History = () => {
                   width: '100%',
                 }}
               >
-                <NetworkDropdowns>
+                <NetworkDropdowns id="networkDropdowns">
                   <Typography variant="body2">From</Typography>
                   <DropdownNetwork
                     items={switched ? NETWORK_L2_OPTIONS : NETWORK_L1_OPTIONS}
@@ -199,12 +199,13 @@ const History = () => {
                     onItemSelected={(option) => setFromNetwork(option)}
                     error={false}
                     headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
+                    id={'L1Networks'}
                   />
                   <SwitchChainIcon
                     onClick={() => {
                       handleSwitchDropdowns()
                     }}
-                    id={'switchNetworkDirection'}
+                    id="switchNetworkDirection"
                   >
                     <SwitchIcon />
                   </SwitchChainIcon>
@@ -215,6 +216,7 @@ const History = () => {
                     onItemSelected={(option) => setToNetwork(option)}
                     error={false}
                     headers={[NETWORK_TYPE.MAINNET, NETWORK_TYPE.TESTNET]}
+                    id={'L2Networks'}
                   />
                 </NetworkDropdowns>
                 <FilterDropDown

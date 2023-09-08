@@ -8,7 +8,7 @@ describe('Page', () => {
     page.addNetwork(Binance)
     page.addNetwork(Avalanche)
     page.visit()
-    page.waitForPageToLoad()
+    page.verifyReduxStoreSetup('baseEnabled', true)
     page.changeMetamaskNetwork('ethereum')
     page.requestMetamaskConnect()
     page.connectMetamask()
@@ -20,10 +20,6 @@ describe('Page', () => {
     it('Navigation List', () => {
       page.checkNavigationListEthereum()
     })
-    it('Network Switcher exist', () => {
-      page.checkNetworkSwitcherMainnet()
-    })
-
     it('Network Switcher can switch networks', () => {
       page.switchThroughMainnetNetworks()
     })

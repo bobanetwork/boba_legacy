@@ -22,4 +22,7 @@ export default defineConfig({
       'cypress/e2e/**/history.spec.cy.ts',
     ],
   },
+  env: {
+    target_hash: process.env.CYPRESS_TEST_HASH,
+  },
 })

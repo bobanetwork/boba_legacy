@@ -39,6 +39,7 @@ export interface IDropdownProps {
   className?: string
   headers?: string[]
   style?: CSSProperties
+  id?: string
 }
 
 export const Dropdown: React.FC<IDropdownProps> = ({
@@ -49,6 +50,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
   className,
   headers = [],
   style,
+  id = '',
 }) => {
   if (headers) {
     let allItems: IDropdownItem[] = []
@@ -117,6 +119,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
       className={`dropdown ${className}`}
       ref={dropdownRef}
       style={style}
+      id={id}
     >
       <Header
         onClick={handleDropdown}

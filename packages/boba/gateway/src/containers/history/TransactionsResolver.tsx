@@ -244,14 +244,19 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
   const getTransactionChain = (
     chainID: string,
     hash: string,
-    status: string
+    status: string,
+    from: boolean
   ) => {
     const linkToHash = `${Chains[chainID].transactionUrlPrefix}${hash}`
     const networkName = Chains[chainID].name
     const imgSrc = Chains[chainID].imgSrc
 
     return (
-      <TransactionDetails>
+      <TransactionDetails
+        aria-label={
+          from ? 'transactionOriginDetails' : 'transactionDestinationDetails'
+        }
+      >
         <IconContainer>
           <Icon src={imgSrc} />
         </IconContainer>
@@ -276,7 +281,7 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
 
   const getTransactionDate = (timeStamp: number) => {
     return (
-      <TransactionDate title="transactionDate">
+      <TransactionDate aria-label="transactionDate">
         {formatDate(timeStamp, 'DD MMM YYYY hh:mm A')}
       </TransactionDate>
     )
@@ -313,7 +318,8 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                       content: getTransactionChain(
                         transaction.originChainId.toString(),
                         transaction.fromHash,
-                        transaction.status
+                        transaction.status,
+                        true
                       ),
                       width: 142,
                     },
@@ -321,7 +327,8 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                       content: getTransactionChain(
                         transaction.destinationChainId.toString(),
                         transaction.toHash,
-                        transaction.status
+                        transaction.status,
+                        false
                       ),
                       width: 142,
                     },
@@ -334,7 +341,11 @@ export const TransactionsResolver: React.FC<ITransactionsResolverProps> = ({
                       width: 80,
                     },
                     {
-                      content: <Status>{transaction.status}</Status>,
+                      content: (
+                        <Status aria-label="transactionStatus">
+                          {transaction.status}
+                        </Status>
+                      ),
                       width: 88,
                     },
                   ]}
