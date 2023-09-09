@@ -4,7 +4,7 @@ The [boba\_community/boba-node](./) repo runs a replica of the Boba L2geth, whic
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (15).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/basic considerations.png" alt=""><figcaption></figcaption></figure>
 
 1. Running a local Boba node (replica) does not allow you to mine ETH, OMG, or BOBA. There is no mining on L2.
 2. If you looking for best possible rpc read data (lowest possible latency) you are **strongly advised** not to run your own node, but to use **https://lightning-replica.boba.network**. This is an autoscaling rpc endpoint that speaks directly to the core Boba L2 geth.
@@ -14,13 +14,13 @@ The [boba\_community/boba-node](./) repo runs a replica of the Boba L2geth, whic
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/prerequisites.png" alt=""><figcaption></figcaption></figure>
 
 \- docker - docker-compose
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (2) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/start replica services.png" alt=""><figcaption></figcaption></figure>
 
 **Requirements**: you will need a command line and Docker. Before filing GitHub issues, please make sure Docker is installed and _running_.
 
@@ -80,7 +80,7 @@ replica    | DEBUG[04-22|20:38:45.941] Total fee                                
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (11) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/updating services.png" alt=""><figcaption></figcaption></figure>
 
 There will be occasional updates to both services. You can update them by updating `RELEASE_VERSION` in the `.env` file first, then running:
 

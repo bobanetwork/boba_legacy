@@ -12,13 +12,13 @@ There are 4 different mechanisms for following the status of a transaction. In a
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (17).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/using third party analytics.png" alt=""><figcaption></figcaption></figure>
 
 Some teams prefer to use providers such as [The Graph](https://thegraph.com/en/), which is available on Boba. Please see [The Graph on Boba](../../for-developers/features/subgraph.md) for more information.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/running a messenger.png" alt=""><figcaption></figcaption></figure>
 
 Internally in all the services and also in the `gateway`, the status of transactions is monitored through a `messenger`. Here is an example for how that is done.
 
@@ -64,7 +64,7 @@ Internally in all the services and also in the `gateway`, the status of transact
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 46.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/running the boba transaction API.png" alt=""><figcaption></figcaption></figure>
 
 The system is [documented here](../../ops\_boba/api/watcher-api/). For example, to get L2 transactions between two blocks, use `get.l2.transactions`:
 
