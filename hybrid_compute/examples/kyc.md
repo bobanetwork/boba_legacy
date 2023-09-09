@@ -57,7 +57,7 @@ contracts/
 
 
 
-<figure><img src="../../.gitbook/assets/basics.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/basics (1).png" alt=""><figcaption></figcaption></figure>
 
 Inside the folder, run `yarn install`.
 
