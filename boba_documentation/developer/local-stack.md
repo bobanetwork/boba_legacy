@@ -25,7 +25,7 @@ $ BUILD=1 DAEMON=0 ./up_local.sh
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (7).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/spinning up the stack.png" alt=""><figcaption></figcaption></figure>
 
 Stack spinup can take 15 minutes or more. There are many interdependent services to bring up with two waves of contract deployment and initialisation. Recommended settings - 10 CPUs, 30 to 40 GB of memory. You can either inspect the Docker `Dashboard>Containers/All>Ops` for the progress of the `ops_deployer` _or_ you can run this script to wait for the sequencer to be fully up:
 
@@ -43,7 +43,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/hepful commands.png" alt=""><figcaption></figcaption></figure>
 
 * _Running out of space on your Docker, or having other having hard to debug issues_? Try running `docker system prune -a --volumes` and then rebuild the images.
 * _To (re)build individual base services_: `docker-compose build -- l2geth`
@@ -51,7 +51,7 @@ When the command returns with `Pass: Found L2 Liquidity Pool contract address`, 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/running unit tests.png" alt=""><figcaption></figcaption></figure>
 
 To run unit tests for a specific package:
 
@@ -62,7 +62,7 @@ yarn test
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/running integration tests.png" alt=""><figcaption></figcaption></figure>
 
 Make sure you are in the `ops` folder and then run
 
