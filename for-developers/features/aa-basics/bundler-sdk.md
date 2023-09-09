@@ -234,7 +234,7 @@ Get the transaction that has this userOpHash mined, or null if not found.
 getUserOpReceipt (userOpHash: string, timeout = 30000, interval = 5000): Promise<string | null>
 ```
 
-
+***
 
 ### High-Level Provider API
 
