@@ -4,7 +4,7 @@ Boba Network shares the same [JSON-RPC API (opens new window)](https://eth.wiki/
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (2) (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/debug json rpc methods.png" alt=""><figcaption></figcaption></figure>
 
 You can use the lightning replica node to debug your transactions.
 
@@ -16,7 +16,7 @@ curl https://lightning-replica.boba.network/ -X POST --header 'Content-type: app
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/custom json rpc methods.png" alt=""><figcaption></figcaption></figure>
 
 **`eth_getBlockRange`**
 
@@ -265,7 +265,7 @@ curl -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","metho
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/unspported json rpc methods.png" alt=""><figcaption></figcaption></figure>
 
 **`eth_getAccounts`**
 
