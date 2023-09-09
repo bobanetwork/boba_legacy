@@ -4,7 +4,7 @@ description: Hybrid Compute Example - Minting NFTs with Random Attributes
 
 # Monster Minting
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (16).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/mint your monster.png" alt=""><figcaption></figcaption></figure>
 
 Clone the repository, open it, and install packages with `yarn`:
 
@@ -40,11 +40,11 @@ You can also do this via a hardware wallet, a mnemonic, via `hardhat.config.js`,
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (8).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/getting geth eth and geth boba.png" alt=""><figcaption></figcaption></figure>
 
 If you do not have testnet ETH, you can get some here [Faucets](https://docs.boba.network/for-developers/faucets).
 
-### Testing the Turing Monster NFT
+<figure><img src="../../.gitbook/assets/testing the turing monster nft.png" alt=""><figcaption></figcaption></figure>
 
 To run the tests you will also need some Goerli ETH on Goerli (L1) as the tests also test the NFT bridging functionality.
 
@@ -76,8 +76,6 @@ Ok, all done. Enjoy. The terminal will give you all the information you need to 
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (10) (1).png" alt=""><figcaption></figcaption></figure>
-
 To deploy run:
 
 ```bash
@@ -90,7 +88,7 @@ Add the ERC721 as permitted caller to the deployed TuringHelper. Call the method
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 5 (8).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/solidity code walkthrough.png" alt=""><figcaption></figcaption></figure>
 
 The ERC721 contract is largely standard, except for needing to provide the address of the `TuringHelper` contract. Nevertheless, the contract has been distributed into several smaller contracts to make them easily reusable for your own project.
 
