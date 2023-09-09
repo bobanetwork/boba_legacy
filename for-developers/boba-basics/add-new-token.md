@@ -4,7 +4,7 @@ description: Adding a new ERC20 token to Boba
 
 # Adding a new ERC20 to Boba
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (9) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/deploy L2 ERC20.png" alt=""><figcaption></figcaption></figure>
 
 ### Deploy [L2StandardERC20.sol](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/contracts/contracts/standards/L2StandardERC20.sol) via block explorer
 
@@ -51,7 +51,7 @@ const L2StandardERC20 = await Factory__L2StandardERC20.deploy(
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (5).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/Bridge the new token L2.png" alt=""><figcaption></figcaption></figure>
 
 ERC20 deposits into L2 can be triggered via the `depositERC20` and `depositERC20To` functions on the [`L1StandardBridge`](https://github.com/bobanetwork/boba/blob/release/v0.2.2/packages/contracts/contracts/L1/messaging/L1StandardBridge.sol). You **must** approve the Standard Token Bridge to use the amount of tokens that you want to deposit or the deposit will fail.
 
