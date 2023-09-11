@@ -35,8 +35,10 @@ export const Circle = styled.span`
 
 export const LabelContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   padding: 10px 0px;
   gap: 0px 25px;
+  width: 100%;
 `
 
 export const Label = styled.p`

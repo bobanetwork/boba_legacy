@@ -3,7 +3,8 @@ import styled from 'styled-components'
 export const TabHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  background: ${(props) => props.theme.colors.gray[400]};
+  background: ${({ theme }) =>
+    theme.name === 'light' ? theme.colors.gray[100] : theme.colors.gray[600]};
   border-radius: 8px;
   padding: 5px;
 `

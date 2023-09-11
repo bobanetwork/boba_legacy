@@ -17,3 +17,11 @@ export const MenuItemStyle = styled(Typography).attrs({
   align-items: center;
   justify-content: space-around;
 `
+
+export const ProfileIndicator = styled.img.attrs({
+  alt: 'profile image',
+})`
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+`

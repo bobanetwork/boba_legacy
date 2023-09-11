@@ -61,7 +61,7 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
       </div>
       <Flex>
         <div>
-          <ModalTypography variant="body2">Amount Staked </ModalTypography>
+          <ModalTypography variant="body2">Amount Staked</ModalTypography>
           <Typography variant="body2">
             {stakeInfo.depositAmount
               ? `${stakeInfo.depositAmount.toLocaleString(undefined, {

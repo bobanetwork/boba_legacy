@@ -93,6 +93,11 @@ export function resetBridgeAmount() {
   }
 }
 
+export function setTeleportationOfAssetSupported(payload) {
+  return function (dispatch) {
+    return dispatch({ type: 'BRIDGE/TELEPORTER/TOKEN_SUPPORTED', payload})
+  }
+}
 
 export function setFetchDepositTxBlock(payload) {
   store.dispatch({ type: 'BRIDGE/DEPOSIT_TX/BLOCK', payload})

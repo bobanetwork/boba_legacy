@@ -15,21 +15,24 @@ export const MaxButton = styled.button`
   padding: 4px 6px;
   border-radius: 6px;
   font-family: inherit;
-
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: ${props.theme.colors.gray[100]};
-      border: 1px solid ${props.theme.colors.gray[600]};
-      color: ${props.theme.colors.gray[600]};
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: ${props.theme.colors.gray[500]};
-      border: 1px solid ${props.theme.colors.gray[300]};
-      color: ${props.theme.colors.green[300]};
-    `}
+  ${({ theme: { colors, name } }) =>
+    name === 'light'
+      ? css`
+          color: ${colors.gray[600]};
+          border: 1px solid ${colors.gray[600]};
+          background: ${colors.gray[100]};
+          &:hover {
+            background: transparent;
+          }
+        `
+      : css`
+          color: ${colors.green[300]};
+          border: 1px solid ${colors.gray[400]};
+          background: transparent;
+          &:hover {
+            border: 1px solid ${colors.gray[100]};
+          }
+        `}
 `
 
 export const Input = styled.input`

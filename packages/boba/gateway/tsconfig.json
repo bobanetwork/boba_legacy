@@ -17,6 +17,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "noImplicitAny": false,
     "jsx": "react",
     "baseUrl": "src",
     "types": ["jest", "testing-library__jest-dom"],

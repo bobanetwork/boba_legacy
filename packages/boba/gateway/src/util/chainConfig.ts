@@ -1,26 +1,9 @@
-export interface IBobaChains {
-  [chainId: number]: {
-    url: string
-    testnet: boolean
-    name: string
-    teleportationAddress: string
-    height: number
-    supportedAssets: {
-      [address: string]: string // symbol (MUST BE UNIQUE)
-    }
-  }
-}
-
-/**
- * @dev Chain configs
- * @property supportedAssets: BOBA as fee token only supported for EOAs, since Teleporter consists of a contract & the disburser wallet (assuming ETH fee) everything with 0x0 should be fine.
- **/
-export const BobaChains: IBobaChains = {
+export const BobaChains = {
   // TODO: Consider using AddressManager or AddressPackage instead
 
   //#region boba_networks
   288: {
-    url: 'https://boba-ethereum.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    url: 'https://replica.boba.network',
     testnet: false,
     name: 'Boba Ethereum Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -33,7 +16,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   56288: {
-    url: 'https://boba-bnb.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    url: 'https://replica.bnb.boba.network',
     testnet: false,
     name: 'Boba BNB Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -55,7 +38,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   9728: {
-    url: 'https://boba-bnb-testnet.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    url: 'https://replica.testnet.bnb.boba.network',
     testnet: true,
     name: 'Boba BNB Testnet',
     teleportationAddress: '0xf4d179d3a083Fa3Eede935FaF4C679D32d514186',
@@ -69,7 +52,7 @@ export const BobaChains: IBobaChains = {
   //#endregion
   //#region l1
   1: {
-    url: 'https://mainnet.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    url: 'https://eth.llamarpc.com',
     testnet: false,
     name: 'Ethereum Mainnet',
     teleportationAddress: '0x0',
@@ -108,7 +91,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://api.zan.top/node/v1/bsc/testnet/public',
+    url: 'https://bsc.getblock.io/28c7f0fe-802f-4631-9f45-2df301789ecf/testnet/',
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',
