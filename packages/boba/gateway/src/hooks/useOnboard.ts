@@ -18,7 +18,6 @@ export const useOnboard = () => {
   useEffect(() => {
     window.scrollTo(0, 0)
     const initBase = async () => {
-      console.log('init from onBoard')
       const initialized = await networkService.initializeBase({
         networkGateway: activeNetwork,
         networkType: activeNetworkType,

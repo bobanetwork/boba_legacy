@@ -29,7 +29,8 @@ import {
   selectBaseEnabled,
   selectAccountEnabled,
   selectLayer,
-  selectActiveNetworkName
+  selectActiveNetworkName,
+  selectChainIdChanged
 } from 'selectors'
 
 import { getEarnInfo } from 'actions/earnAction'
@@ -68,6 +69,7 @@ const Earn = () => {
 
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const chainIdChanged = useSelector(selectChainIdChanged())
 
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
@@ -93,10 +95,10 @@ const Earn = () => {
     }
 
     if (accountEnabled) {
+
       dispatch(fetchBalances())
     }
-  }, [dispatch, baseEnabled, accountEnabled])
-
+  }, [dispatch, baseEnabled, accountEnabled, activeNetworkName])
 
 
   const getBalance = (address, chain) => {

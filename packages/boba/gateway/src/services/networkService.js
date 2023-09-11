@@ -894,7 +894,6 @@ class NetworkService {
       })
 
       const tokenBalances = await Promise.all(getBalancePromise) 
-      console.log('tokenBalances',tokenBalances)
       tokenBalances.forEach((token) => {
         if (token.layer === 'L1' &&
           token.symbol !== 'xBOBA' &&
@@ -907,7 +906,6 @@ class NetworkService {
         ) {
           layer1Balances.push(token)
         } else if (token.layer === 'L2') {
-          console.log('token layer', token)
           layer2Balances.push(token)
         }
       })
@@ -2419,7 +2417,7 @@ class NetworkService {
     }
     if (networkConfig.networkType !== NETWORK_TYPE.TESTNET) {
       if (isDevBuild()) {
-        console.log("DEV: Teleportation is only supported on testnet for now, chainId: ", chainId)
+       /*console.log("DEV: Teleportation is only supported on testnet for now, chainId: ", chainId)*/
       }
       return {teleportationAddr: undefined, networkConfig}
     }
