@@ -31,6 +31,18 @@ jobs:
         continue-on-error: true
       - name: Install dependencies
         run: yarn; yarn build
+      - name: Install linux deps
+        run: |
+          sudo apt-get install --no-install-recommends -y \
+          fluxbox \
+          xvfb
+
+      - name: Run xvfb and fluxbox
+        run: |
+          Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
+          fluxbox &
+        env:
+          DISPLAY: :0.0
       - name: Run end to end tests
         working-directory: ./packages/boba/gateway
         run: yarn test:integration
