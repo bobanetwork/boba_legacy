@@ -10,18 +10,19 @@ on:
   #     - 'boba/packages/boba/gateway/**/*'
 
 jobs:
-  cypress-run:
+  End-to-End-Test:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          build: npm run build
-          start: npm start
+      - name: Install dependencies
+        run: yarn; yarn build
+      - name: Run end to end tests
+        working-directory: ./boba/packages/boba/gateway
+        run: yarn test:integration
+
   # end-2-end-testing:
   #   runs-on: ubunto-latest
   #    steps:
