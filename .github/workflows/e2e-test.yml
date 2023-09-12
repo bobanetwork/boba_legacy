@@ -11,7 +11,7 @@ on:
 
 jobs:
   End-to-End-Test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.8.1
