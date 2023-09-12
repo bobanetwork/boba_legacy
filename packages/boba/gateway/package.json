@@ -18,10 +18,9 @@
     "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
     "test": "TZ=utc react-scripts test --watchAll=false",
     "test:coverage": "yarn test --coverage",
-    "test:integration": "start-server-and-test 'yarn start:server' http-get://localhost:3000 'yarn cypress:run'",
+    "test:integration": "start-server-and-test 'yarn start' http-get://localhost:3000 'yarn cypress:run'",
     "test:snapshots": "yarn test -u",
     "test:watch": "yarn test --watchAll=true",
-    "start:server": "serve ../../node_modules/@metamask/test-dapp/dist -p 3000",
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
