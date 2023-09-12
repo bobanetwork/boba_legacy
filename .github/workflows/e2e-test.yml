@@ -13,8 +13,10 @@ jobs:
   End-to-End-Test:
     runs-on: ubuntu-22.04
     steps:
-      - name: Use correct node version
-        run: nvm use
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: 16.16.0
       - name: Checkout
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
@@ -22,8 +24,22 @@ jobs:
       - name: Install dependencies
         run: yarn; yarn build
       - name: Run end to end tests
-        working-directory: ./boba/packages/boba/gateway
+        working-directory: ./packages/boba/gateway
         run: yarn test:integration
+        env:
+          REACT_APP_POLL_INTERVAL: 15000
+          SKIP_PREFLIGHT_CHECK: true
+          REACT_APP_WALLET_VERSION: 0.7.3
+          REACT_APP_ENV: dev
+          REACT_APP_STATUS: normal
+          REACT_APP_SPEED_CHECK: ${{ secrets.REACT_APP_SPEED_CHECK }}
+          REACT_APP_DISABLE_VE_DAO: 1
+          REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
+          PUBLIC_URL: https://gateway.boba.network/
+          CYPRESS_REMOTE_DEBUGGING_PORT: 9222
+          NETWORK_NAME: 'goerli'
+          SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
+          CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
 
   # end-2-end-testing:
   #   runs-on: ubunto-latest
@@ -36,17 +52,4 @@ jobs:
   #       working-directory: ./packages/boba/packages/gateway
   #       uses: cypress-io/github-action@v6
   #       run: yarn test-e2e
-  #       env:
-  #         REACT_APP_POLL_INTERVAL: 15000
-  #         SKIP_PREFLIGHT_CHECK: true
-  #         REACT_APP_WALLET_VERSION: 0.7.3
-  #         REACT_APP_ENV: dev
-  #         REACT_APP_STATUS: normal
-  #         REACT_APP_SPEED_CHECK: ${{ secrets.REACT_APP_SPEED_CHECK }}
-  #         REACT_APP_DISABLE_VE_DAO: 1
-  #         REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
-  #         PUBLIC_URL: https://gateway.boba.network/
-  #         CYPRESS_REMOTE_DEBUGGING_PORT: 9222
-  #         NETWORK_NAME: 'goerli'
-  #         SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
-  #         CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
+
