@@ -5,8 +5,6 @@ on:
     paths:
       - 'boba/packages/boba/gateway/**/*'
   pull_request:
-    paths:
-      - 'boba/packages/boba/gateway/**/*'
   workflow_dispatch:
 
 jobs:
