@@ -1,37 +1,48 @@
 name: End to end test for gateway
 
-on: push
-  # push:
-  #   paths:
-  #     - 'boba/packages/boba/gateway/**/*'
-  # pull_request:
-  #   paths:
-  #       - 'boba/packages/boba/gateway/**/*'
+on:
+  push:
+    paths:
+      - 'boba/packages/boba/gateway/**/*'
+  pull_request:
+    paths:
+      - 'boba/packages/boba/gateway/**/*'
 
 jobs:
-  end-2-end-testing:
-    runs-on: ubunto-latest
-     steps:
-      - name: install and build
-        run: yarn install; yarn build
+  cypress-run:
+    runs-on: ubuntu-22.04
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
       - name: Cypress run
-        working-directory: ./packages/boba/packages/gateway
         uses: cypress-io/github-action@v6
-        run: yarn test-e2e
-        browser: chrome
-        env:
-          REACT_APP_POLL_INTERVAL: 15000
-          SKIP_PREFLIGHT_CHECK: true
-          REACT_APP_WALLET_VERSION: 0.7.3
-          REACT_APP_ENV: dev
-          REACT_APP_STATUS: normal
-          REACT_APP_SPEED_CHECK: ${{ secrets.REACT_APP_SPEED_CHECK }}
-          REACT_APP_DISABLE_VE_DAO: 1
-          REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
-          PUBLIC_URL: https://gateway.boba.network/
-          CYPRESS_REMOTE_DEBUGGING_PORT: 9222
-          NETWORK_NAME: 'goerli'
-          SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
-          CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
+        with:
+          build: npm run build
+          start: npm start
+  # end-2-end-testing:
+  #   runs-on: ubunto-latest
+  #    steps:
+  #     - name: install and build
+  #       run: yarn install; yarn build
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Cypress run
+  #       working-directory: ./packages/boba/packages/gateway
+  #       uses: cypress-io/github-action@v6
+  #       run: yarn test-e2e
+  #       env:
+  #         REACT_APP_POLL_INTERVAL: 15000
+  #         SKIP_PREFLIGHT_CHECK: true
+  #         REACT_APP_WALLET_VERSION: 0.7.3
+  #         REACT_APP_ENV: dev
+  #         REACT_APP_STATUS: normal
+  #         REACT_APP_SPEED_CHECK: ${{ secrets.REACT_APP_SPEED_CHECK }}
+  #         REACT_APP_DISABLE_VE_DAO: 1
+  #         REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
+  #         PUBLIC_URL: https://gateway.boba.network/
+  #         CYPRESS_REMOTE_DEBUGGING_PORT: 9222
+  #         NETWORK_NAME: 'goerli'
+  #         SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
+  #         CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
