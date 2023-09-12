@@ -6,7 +6,7 @@
     "audit-check": "audit-ci --moderate",
     "build:storybook": "storybook build",
     "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-app-rewired build",
-    "cypress:run": "env-cmd cypress run --browser chrome --headed",
+    "cypress:run": "env-cmd --silent cypress run --browser chrome --headed",
     "format:check": "prettier --config .prettierrc.json --check \"./src/**/*.{ts,tsx}\"",
     "format:fix": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
