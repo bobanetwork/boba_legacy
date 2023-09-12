@@ -50,7 +50,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
   className,
   headers = [],
   style,
-  id = '',
+  id = 'dropdown',
 }) => {
   if (headers) {
     let allItems: IDropdownItem[] = []
