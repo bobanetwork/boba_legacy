@@ -3,13 +3,10 @@ name: End to end test for gateway
 on:
   push:
     paths:
-      - 'boba/packages/boba/gateway/**'
-    branches:
-      - 'master'
-      - 'develop'
+      - 'boba/packages/boba/gateway/**/*'
   pull_request:
     paths:
-      - 'boba/packages/boba/gateway/**'
+      - 'boba/packages/boba/gateway/**/*'
   workflow_dispatch:
 
 jobs:
