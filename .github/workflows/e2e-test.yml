@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: yarn; yarn build
       - name: Run end to end tests
-        working-directory: packages/boba/gateway
+        working-directory: ./packages/boba/gateway
         run: yarn test:integration
         env:
           REACT_APP_POLL_INTERVAL: 15000
