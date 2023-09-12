@@ -1,11 +1,12 @@
 name: End to end test for gateway
 
-on:
-  push:
-    paths:
-      - 'boba/packages/boba/gateway/**/*'
-  pull_request:
-  workflow_dispatch:
+on: push
+  # push:
+  #   paths:
+  #     - 'boba/packages/boba/gateway/**/*'
+  # pull_request:
+  #   paths:
+  #       - 'boba/packages/boba/gateway/**/*'
 
 jobs:
   end-2-end-testing:
