@@ -27,7 +27,7 @@ jobs:
           path: |
             node_modules
             /home/runner/.cache/Cypress
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('yarn.lock') }}
         continue-on-error: true
       - name: Install dependencies
         run: yarn; yarn build
