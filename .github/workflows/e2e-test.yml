@@ -13,6 +13,8 @@ jobs:
   End-to-End-Test:
     runs-on: ubuntu-22.04
     steps:
+      - name: Use correct node version
+        run: nvm use
       - name: Checkout
         uses: actions/checkout@v3
       # Install NPM dependencies, cache them correctly
