@@ -42,9 +42,11 @@ jobs:
           CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
       - name: Upload videos
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: Test footage
           path: ./packages/boba/gateway/cypress/videos/
+        continue-on-error: true
 
   # end-2-end-testing:
   #   runs-on: ubunto-latest
