@@ -35,11 +35,7 @@ Run the command below to get test coverage.
 ```sh
 yarn:coverage
 ```
-Run the command below to get test coverage.
 
-```sh
-yarn:coverage
-```
 Run the command below to update the test snapshots.
 
 ```sh
@@ -55,6 +51,7 @@ yarn:watch
 ## Integration testing on gateway.
 
 To run the integration test against the gateway execute the command below
+
 ```sh
 yarn test:integration
 ```
