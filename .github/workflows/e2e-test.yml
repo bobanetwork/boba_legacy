@@ -19,8 +19,6 @@ jobs:
           node-version: 16.16.0
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Use correct node version
-        run: nvm use
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Install dependencies
