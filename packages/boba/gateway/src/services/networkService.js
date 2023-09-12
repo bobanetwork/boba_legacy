@@ -892,7 +892,17 @@ class NetworkService {
       const tokenBalances = await Promise.allSettled(getBalancePromise).then(
         (results) =>
           results
-            .filter((result) => result.status === 'fulfilled')
+            .filter((result) => {
+              switch (result.status) {
+                case 'fulfilled': {
+                  return true
+                }
+                case 'rejected': {
+                  console.log("NS: getBalances:", result.reason)
+                  return false
+                }
+              }
+            })
             .map((result) => result.value)
       )
 

@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "audit-check": "audit-ci --moderate",
+    "build:storybook": "storybook build",
     "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-app-rewired build",
+    "cypress:run": "env-cmd cypress run --browser chrome --headed",
     "format:check": "prettier --config .prettierrc.json --check \"./src/**/*.{ts,tsx}\"",
     "format:fix": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
@@ -16,13 +18,11 @@
     "start": "GENERATE_SOURCEMAP=false react-app-rewired start",
     "test": "TZ=utc react-scripts test --watchAll=false",
     "test:coverage": "yarn test --coverage",
-    "test:u": "yarn test -u",
-    "test:w": "yarn test --watchAll=true",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "cypress:run": "env-cmd cypress run --browser chrome --headed",
+    "test:integration": "start-server-and-test 'yarn start:server' http-get://localhost:3000 'yarn cypress:run'",
+    "test:snapshots": "yarn test -u",
+    "test:watch": "yarn test --watchAll=true",
     "start:server": "serve ../../node_modules/@metamask/test-dapp/dist -p 3000",
-    "test-e2e": "start-server-and-test 'yarn start:server' http-get://localhost:3000 'yarn cypress:run'"
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",

@@ -22,11 +22,39 @@ gateway.boba.betwork.
 | NETWORK_NAME                  | Yes      | goerli        | Starting network for wallet                                    |
 | SECRET_WORDS                  | Yes      | N/A           | Secret phrase for wallet to be used by Cypress e2e test        |
 
-### Execute to update the version of package with latest tag from git.
+## Testing your gateway app.
 
-``
-yarn release
+Wooh!, To run unit testing on gateway code base, all we have to run the test command. Run:
 
+```sh
+yarn test
 ```
 
+Run the command below to get test coverage.
+
+```sh
+yarn:coverage
+```
+Run the command below to get test coverage.
+
+```sh
+yarn:coverage
+```
+Run the command below to update the test snapshots.
+
+```sh
+yarn:snapshots
+```
+
+Run the command below to watch the all tests while working.
+
+```sh
+yarn:watch
+```
+
+## Integration testing on gateway.
+
+To run the integration test against the gateway execute the command below
+```sh
+yarn test:integration
 ```

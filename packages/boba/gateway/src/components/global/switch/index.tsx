@@ -6,7 +6,7 @@ export const SwitchButton: React.FC<SwitchButtonTypes> = ({
   isDisable = false,
   isActive = false,
   onStateChange,
-  title,
+  title = 'switch-button',
 }) => {
   const [isChecked, setIsChecked] = useState(isActive)
 
