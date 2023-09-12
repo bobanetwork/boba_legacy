@@ -13,10 +13,14 @@ jobs:
   End-to-End-Test:
     runs-on: ubuntu-22.04
     steps:
-      - name: Use correct node version
-        run: nvm use
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: 16.16.0
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Use correct node version
+        run: nvm use
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Install dependencies
