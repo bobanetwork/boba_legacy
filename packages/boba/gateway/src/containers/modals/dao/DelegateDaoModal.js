@@ -32,6 +32,14 @@ import { Typography } from 'components/global/typography'
 import { getCoinImage } from 'util/coinImage'
 import { TabComponent } from 'components/global/tabs';
 import { ButtonContainer } from './styles';
+import styled from 'styled-components'
+
+const DescriptionStyled = styled(Typography).attrs({
+  variant: 'body2'
+})`
+  color: ${({ theme }) => theme.name === 'light' ? theme.colors.gray[ 700 ] : theme.colors.gray[ 100 ]};
+  line-height: 18px;
+`
 
 const DelegateDaoModal = ({ open }) => {
   const [recipient, setRecipient] = useState('')
@@ -50,7 +58,7 @@ const DelegateDaoModal = ({ open }) => {
   const submit = async () => {
     if (!selectedToken) {
       return null
-    }   
+    }
     const res = await dispatch(
       selectedToken === 'xboba'
         ? delegateVotesX({ recipient })
@@ -110,11 +118,13 @@ const DelegateDaoModal = ({ open }) => {
             content: (
               <>
                 <>
-                  <Typography variant="body2">
+                  <DescriptionStyled>
                       My address: <br />
-                      {wAddress} <br />
+                    {wAddress}
+                    <br />
+                    <br />
                       Choose which BOBA to delegate BOBA voting power to
-                  </Typography>
+                  </DescriptionStyled>
                   <SelectToken />
                 </>
                 <ButtonContainer>
@@ -141,11 +151,13 @@ const DelegateDaoModal = ({ open }) => {
             content: (
               <>
                 <>
-                <Typography variant="body2">
+                  <DescriptionStyled>
                     My address: <br />
-                    {wAddress} <br />
+                    {wAddress}
+                    <br />
+                    <br />
                   Choose which BOBA to delegate BOBA voting power to
-                </Typography>
+                  </DescriptionStyled>
                 <SelectToken />
                 </>
                 <>
@@ -164,7 +176,7 @@ const DelegateDaoModal = ({ open }) => {
                       /*tooltip={loading ? "Your delegation is still pending. Please wait for confirmation." : "Click here to delegate BOBA voting power from one L2 address to another L2 address"}*/
                       loading={loading}
                       disabled={disabled}
-                      label="Delegate to other"
+                    label="Delegate"
                       /*
                       triggerTime={new Date()}
                       fullWidth={true}
@@ -180,7 +192,7 @@ const DelegateDaoModal = ({ open }) => {
             ),
           }
         ]}
-      /> 
+      />
 
 
     </Modal>

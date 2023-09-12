@@ -13,25 +13,17 @@ export const HeaderContainer = styled.div`
   justify-content: flex-start;
   backdrop-filter: blur(7.5px);
   z-index: 9999;
-  ${(props) =>
-    props.theme.name === 'light' &&
-    css`
-      background: rgba(255, 255, 255, 0.5);
-    `}
-  ${(props) =>
-    props.theme.name === 'dark' &&
-    css`
-      background: rgba(0, 0, 0, 0.05);
-    `}
+  background: ${({ theme: { name, colors } }) =>
+    name === 'light' ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0, 0, 0, 0.05)'};
 
-    ${mobile(css`
+  ${mobile(css`
     padding: 0px 16px;
   `)}
 `
 
 export const BobaLogo = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 32px;
   margin-right: 32px;
   background: ${({ theme }) => `url(${BobaLogoImage}) no-repeat`};
   background-position: 100%;

@@ -22,6 +22,7 @@ import {
 } from './styles'
 
 import { ModalTypography } from 'components/global/modalTypography'
+import { Typography } from '../typography'
 export interface IDropdownItem {
   value?: string
   label: string | ReactNode
@@ -137,7 +138,7 @@ export const Dropdown: React.FC<IDropdownProps> = ({
               {selectedItem.imgSrc === 'default' && <DefaultIcon />}
             </IconContainer>
           )}
-          <div>{selectedItem.label}</div>
+          <Typography variant="body2">{selectedItem.label}</Typography>
 
           <Arrow src={ArrowDown} className={`dropdown ${className}`} />
         </Option>

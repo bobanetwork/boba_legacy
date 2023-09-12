@@ -9,14 +9,14 @@ import { BannerConfig } from '../bannerConfig'
 
 jest.mock('../bannerConfig', () => ({
   BannerConfig: {
-    ETHEREUM: {
-      message: `Alert message goes here`,
-      content: `Alert descriptive message goes here`,
+    AVAX: {
+      message: `BobaAvax (Fuji) is being wound down & will no longer be available, starting October 31st`,
+      content: `BobaAvax (Fuji) is being wound down & will no longer be available starting October 31st. For users of BobaAvax or BobaAvax applications you will need to transfer all your funds to Avalanche mainnet before October 31st or risk permanently losing access to any assets on BobaAvax.`,
     },
   },
 }))
 
-const data = BannerConfig[NETWORK.ETHEREUM]
+const data = BannerConfig[NETWORK.AVAX]
 
 const mockStore = configureStore()
 
@@ -28,7 +28,7 @@ const renderBanner = (props: any) => {
           theme: 'dark',
         },
         network: {
-          activeNetwork: NETWORK.ETHEREUM,
+          activeNetwork: NETWORK.AVAX,
           activeNetworkType: NETWORK_TYPE.MAINNET,
         },
       })}

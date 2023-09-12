@@ -70,6 +70,9 @@ export interface ICrossDomainMessage {
   l2BlockNumber?: number
   l2From?: string
   l2Hash?: string
+  // from/toHash will replace l2Hash/l1Hash once we remove the L1<>L2 coupling
+  fromHash?: string
+  toHash?: string
   l2To?: string
   l1BlockHash?: string
   l1BlockNumber?: number
@@ -95,6 +98,7 @@ export interface ITransaction {
   timeStamp: number
   to: string
   UserFacingStatus: TRANSACTION_FILTER_STATUS
+  isTeleportation?: boolean
 }
 
 export interface IProcessedTransaction {
