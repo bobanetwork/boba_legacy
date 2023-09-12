@@ -28,8 +28,6 @@ jobs:
             node_modules
             /home/runner/.cache/Cypress
           key: ${{ runner.os }}-yarn-v1-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-v1-
         continue-on-error: true
       - name: Install dependencies
         run: yarn; yarn build
