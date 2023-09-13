@@ -55,7 +55,9 @@ const useWalletSwitch = () => {
   useEffect(() => {
     if (accountEnabled) {
       if (activeNetwork !== network || activeNetworkType !== networkType) {
-        console.log('change network')
+        dispatch(setActiveNetwork())
+        dispatch(setBaseState(false))
+        dispatch(setEnableAccount(false))
       }
     }
   }, [activeNetwork, activeNetworkType, network, networkType, dispatch])

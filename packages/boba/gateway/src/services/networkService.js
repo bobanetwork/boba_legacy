@@ -903,7 +903,23 @@ class NetworkService {
         }
       })
 
-      const tokenBalances = await Promise.all(getBalancePromise)
+      const tokenBalances = await Promise.allSettled(getBalancePromise).then(
+        (results) =>
+          results
+            .filter((result) => {
+              switch (result.status) {
+                case 'fulfilled': {
+                  return true
+                }
+                case 'rejected': {
+                  console.log("NS: getBalances:", result.reason)
+                  return false
+                }
+              }
+            })
+            .map((result) => result.value)
+      )
+
       tokenBalances.forEach((token) => {
         if (token.layer === 'L1' &&
           token.symbol !== 'xBOBA' &&
