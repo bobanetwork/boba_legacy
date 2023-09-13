@@ -60,3 +60,20 @@ Audits outstanding.
 ## User flow / Dev flow:
 ![TeleportationFlow](https://github.com/bobanetwork/boba/assets/28724551/1c5fceb8-126d-42d1-92b4-59ec5ed9ad71)
 
+
+---
+
+## Contract params
+This section describes how whitelisted routes between networks can be configured. By default no asset can be bridged, not even the native asset - all need to be explicitly whitelisted.
+
+### Indicate support
+Support for an asset can be shut down and re-activated at any time (yes|no value).
+
+### Minimum Deposit Amount
+The minimum amount that needs to be deposited in order to be bridged. The value refers to the asset to be bridged (e.g. ETH or BOBA tokens) and will revert for transactions that do not exceed this threshold (>=).
+
+### Maximum Deposit Amount
+The maximum amount that can be deposited within one single bridge operation. The value refers to the asset that is being bridged and will revert for transactions that exceed this value.
+
+### Maximum Amount Per Day
+The maximum amount per day limits how many units of the asset to be bridged can be moved to the corresponding network per day.
