@@ -20,7 +20,8 @@ import { getFS_Saves, getFS_Info } from 'actions/fixedAction'
 
 import { fetchBalances } from 'actions/networkAction'
 
-import { selectAccountEnabled, selectActiveNetwork } from 'selectors'
+import { selectAccountEnabled, selectActiveNetwork, selectBaseEnabled,selectChainIdChanged
+} from 'selectors'
 
 /******** COMPONENTS ********/
 import { PageTitle } from 'components/layout/PageTitle'
@@ -45,16 +46,22 @@ const Home = () => {
   const dispatch = useDispatch()
   const activeNetwork = useSelector(selectActiveNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const baseEnabled = useSelector(selectBaseEnabled())
+
   useInterval(() => {
+    console.log('inside the interval on active network', activeNetwork)
     if (accountEnabled /*== MetaMask is connected*/) {
-      console.log('before MetaMask')
-      dispatch(fetchBalances()) // account specific
+      if(baseEnabled) {
+        dispatch(fetchBalances()) // account specific
+      }
       if (activeNetwork === NETWORK.ETHEREUM) {
         dispatch(getFS_Info())   // account specific
         dispatch(getFS_Saves()) // account specific
       }
     }
   }, POLL_INTERVAL)
+
+
 
   useGoogleAnalytics(); // Invoking GA analysis page view hooks
   useOnboard()

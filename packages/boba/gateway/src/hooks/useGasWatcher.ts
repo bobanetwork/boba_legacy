@@ -50,6 +50,7 @@ const useGasWatcher = () => {
       fetchGas()
 
       if (activeNetwork === NETWORK.ETHEREUM) {
+        console.log('im ethereum')
         dispatch(fetchVerifierStatus())
       }
     }

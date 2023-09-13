@@ -656,6 +656,10 @@ class NetworkService {
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
+      if (!this.networkGateway || typeof chainId === 'undefined' || typeof L1ChainId === 'undefined' || typeof L2ChainId === 'undefined') {
+          return;
+      }
+
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
@@ -666,6 +670,8 @@ class NetworkService {
       } else {
         return 'wrongnetwork'
       }
+
+
 
       // this should not do anything unless we changed chains
       if (this.L1orL2 === 'L2') {
@@ -774,7 +780,7 @@ class NetworkService {
   async getBalances() {
     try {
 
-      let layer1Balances; 
+      let layer1Balances;
       let layer2Balances;
       if (this.network === NETWORK.ETHEREUM) {
         layer1Balances = [
@@ -799,7 +805,8 @@ class NetworkService {
             balance: new BN(0),
           },
         ]
-        console.log('is eth ', layer1Balances, layer2Balances)
+
+        console.log('current network on getBalances', this.network)
 
       } else {
 
@@ -826,6 +833,9 @@ class NetworkService {
           },
         ]
       }
+
+      console.log('getting balances from', this.network)
+
 
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)
@@ -893,7 +903,7 @@ class NetworkService {
         }
       })
 
-      const tokenBalances = await Promise.all(getBalancePromise) 
+      const tokenBalances = await Promise.all(getBalancePromise)
       tokenBalances.forEach((token) => {
         if (token.layer === 'L1' &&
           token.symbol !== 'xBOBA' &&
@@ -3816,7 +3826,7 @@ class NetworkService {
   }
 
   async getFS_Info() {
-
+    console.log(this.account)
     if (this.account === null) {
       console.log('NS: getFS_Info() error - called but account === null')
       return
