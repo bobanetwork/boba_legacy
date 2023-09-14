@@ -41,7 +41,7 @@ module.exports = (config, env) => {
   );
   if (process.env.REACT_APP_ENV === 'dev') {
     config.plugins.push(new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
+      analyzerMode: 'disabled',
       generateStatsFile: true,
       statsOptions: {
         source: false
