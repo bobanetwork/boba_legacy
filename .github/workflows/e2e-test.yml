@@ -37,7 +37,7 @@ jobs:
           fluxbox \
           xvfb
       - name: give permissions to root
-        run: xhost local:root
+        run: sudo chown -R $USER /usr/share/X11
       - name: Run xvfb and fluxbox
         run: |
           Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
