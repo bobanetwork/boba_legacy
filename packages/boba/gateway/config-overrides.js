@@ -1,7 +1,6 @@
 // @ts-ignore
 const webpack = require('webpack');
-const { Buffer } = require('buffer');
-const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = (config, env) => {
   // Resto de tu configuración...
@@ -40,6 +39,15 @@ module.exports = (config, env) => {
       process: 'process',
     })
   );
+  if (process.env.REACT_APP_ENV === 'dev') {
+    config.plugins.push(new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      generateStatsFile: true,
+      statsOptions: {
+        source: false
+      }
+    }))
+  }
 
   return config;
 };

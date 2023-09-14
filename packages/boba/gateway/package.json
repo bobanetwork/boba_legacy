@@ -5,6 +5,7 @@
   "scripts": {
     "audit-check": "audit-ci --moderate",
     "build:prod": "GENERATE_SOURCEMAP=false REACT_APP_ENV=prod react-app-rewired build",
+    "build-storybook": "storybook build",
     "format:check": "prettier --config .prettierrc.json --check \"./src/**/*.{ts,tsx}\"",
     "format:fix": "prettier --config .prettierrc.json --write \"./src/**/*.{ts,tsx}\"",
     "get_artifacts": "./scripts/get_all_artifacts.sh",
@@ -18,8 +19,7 @@
     "test:coverage": "yarn test --coverage",
     "test:u": "yarn test -u",
     "test:w": "yarn test --watchAll=true",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -42,7 +42,6 @@
     "bootstrap-daterangepicker": "^3.1.0",
     "browserify-fs": "^1.0.0",
     "browserify-zlib": "^0.2.0",
-    "buffer": "^6.0.3",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.7",
     "dotenv": "^8.2.0",
@@ -87,7 +86,8 @@
     "truncate-middle": "^1.0.6",
     "ts-md5": "^1.2.11",
     "typescript": "^4.3.5",
-    "web3": "^1.8.2"
+    "web3": "^1.8.2",
+    "webpack-bundle-analyzer": "^4.9.1"
   },
   "browserslist": [
     ">0.2%",
