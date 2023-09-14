@@ -23,14 +23,14 @@ jobs:
 
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      # - name: Setup cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: node_modules
-      #     key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      #   continue-on-error: true
-      # - name: Install dependencies
-      #   run: yarn; yarn build
+      - name: Setup cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+        continue-on-error: true
+      - name: Install dependencies
+        run: yarn; yarn build
       - name: Install linux deps
         run: |
           sudo apt-get install -y \
@@ -61,6 +61,7 @@ jobs:
           NETWORK_NAME: 'goerli'
           SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
           CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
+          DISPLAY: :0.0
       - name: Upload videos
         uses: actions/upload-artifact@v3
         if: always()
