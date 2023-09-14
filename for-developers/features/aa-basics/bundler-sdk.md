@@ -4,11 +4,9 @@ description: Learn more about the Bundler SDK for Account Abstraction on Boba Ne
 
 # Bundler SDK
 
-## Bundler SDK
+This section documents the usage of the Bundler SDK, that is a major component of Account Abstraction.
 
-This section documents the usage of the Bundler SDK that is a major component of Account Abstraction.
-
-## Create and send UserOperation
+<figure><img src="../../../.gitbook/assets/create and send user operation.png" alt=""><figcaption></figcaption></figure>
 
 An UserOperation in simple terms is a pseudo-transaction object that expresses an user's intent.
 
@@ -19,7 +17,7 @@ This package provides 2 APIs for using UserOperations:
 
 Make sure you understand both of them, to use the one that is suited best for your use case.
 
-### LowLevel API
+<figure><img src="../../../.gitbook/assets/low level API.png" alt=""><figcaption></figcaption></figure>
 
 #### BaseAccountAPI
 
@@ -236,7 +234,7 @@ getUserOpReceipt (userOpHash: string, timeout = 30000, interval = 5000): Promise
 
 ***
 
-### High-Level Provider API
+<figure><img src="../../../.gitbook/assets/high level provider API.png" alt=""><figcaption></figcaption></figure>
 
 A simplified mode that doesn't require a different wallet extension. Instead, the current provider's account is used as wallet owner by calling its "Sign Message" operation.
 

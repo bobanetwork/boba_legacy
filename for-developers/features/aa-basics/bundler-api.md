@@ -1,39 +1,44 @@
 ---
 description: Learn more about the Bundler API for Account Abstraction on Boba Network
 ---
-# Bundler Endpoints
-
-|               |                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------ |
-| ChainID       | 9728                                                                                             |
-| AA bundler    | [https://bundler.testnet.bnb.boba.network](https://bundler.testnet.bnb.boba.network)             |
-| ChainID       | 2888                                                                                             |
-| AA bundler    | [https://bundler.goerli.boba.network](https://bundler.goerli.boba.network)                       |
 
 # Bundler API
+
+<figure><img src="../../../.gitbook/assets/bundler endpoints.png" alt=""><figcaption></figcaption></figure>
+
+|            |                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------ |
+| ChainID    | 9728                                                                                 |
+| AA bundler | [https://bundler.testnet.bnb.boba.network](https://bundler.testnet.bnb.boba.network) |
+| ChainID    | 2888                                                                                 |
+| AA bundler | [https://bundler.goerli.boba.network](https://bundler.goerli.boba.network)           |
+
+<figure><img src="../../../.gitbook/assets/bundler api.png" alt=""><figcaption></figcaption></figure>
+
 This section lists the Ethereum JSON-RPC API endpoints for a basic EIP-4337 "bundler".
 
+* `eth_sendUserOperation`
+* `eth_supportedEntryPoints`
+* `eth_chainId`
+* `eth_estimateUserOperationGas` (currently not supported)
 
-- `eth_sendUserOperation`
-- `eth_supportedEntryPoints`
-- `eth_chainId`
-- `eth_estimateUserOperationGas` (currently not supported)
+### eth\_sendUserOperation
 
-
-## eth_sendUserOperation
 Submit your userOperations to the bundler.
 
-### Parameters
+#### Parameters
+
 1. `UserOperation`, a full user operation struct.
 2. `EntryPoint`, address the request should be sent through.
 
-### Return value
+#### Return value
+
 Returns `userOpHash` if the UserOperation is valid.
 
 Otherwise it returns an error object with `code` and `message`. (and sometimes `data`)
 
 | **Code** | **Message**                                                                                                                         |
-|----------|-------------------------------------------------------------------------------------------------------------------------------------|
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | -32602   | Invalid UserOperation struct/fields                                                                                                 |
 | -32500   | Transaction rejected by entryPoint's simulateValidation, during wallet creation or validation                                       |
 | -32501   | Transaction rejected by paymaster's validatePaymasterUserOp                                                                         |
@@ -43,10 +48,10 @@ Otherwise it returns an error object with `code` and `message`. (and sometimes `
 | -32505   | Transaction rejected because paymaster (or signature aggregator) stake or unstake-delay is too low                                  |
 | -32506   | Transaction rejected because wallet specified unsupported signature aggregator                                                      |
 | -32507   | Transaction rejected because of wallet signature check failed (or paymaster siganture, if the paymaster uses its data as signature) |
-| -32508   | UserOperation not in valid time-range: either wallet or paymaster returned a time-range, and it is valid in the future  |
+| -32508   | UserOperation not in valid time-range: either wallet or paymaster returned a time-range, and it is valid in the future              |
 
+#### Usage
 
-### Usage
 Example request
 
 ```json
@@ -74,6 +79,7 @@ Example request
 ```
 
 Example response:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -83,6 +89,7 @@ Example response:
 ```
 
 Example failure response:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -99,10 +106,12 @@ Example failure response:
 }
 ```
 
-## eth_supportedEntryPoints
+### eth\_supportedEntryPoints
+
 Returns an array of the entryPoint addresses supported by the client.
 
 Request:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -113,6 +122,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -124,11 +134,12 @@ Response:
 }
 ```
 
+### eth\_chainId
 
-## eth_chainId
 Returns EIP-155 Chain ID.
 
 Request:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -139,6 +150,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -147,17 +159,19 @@ Response:
 }
 ```
 
-## eth_getUserOperationByHash
+### eth\_getUserOperationByHash
+
 Get a UserOperation based on a userOperation hash
 
-### Parameters
+#### Parameters
+
 1. `userOpHash`, a userOperation hash value
 
-### Return value
+#### Return value
+
 Returns a full UserOperation, with the addition of `entryPoint`, `blockNumber`, `blockHash` and `transactionHash` if the UserOperation is included in a block.
 
-Otherwise it returns `null` if the operation is yet to be included.
-For an invalid userOpHash returns an error object with `code`: -32601 and `message`: Missing/invalid userOpHash
+Otherwise it returns `null` if the operation is yet to be included. For an invalid userOpHash returns an error object with `code`: -32601 and `message`: Missing/invalid userOpHash
 
 Example request
 
@@ -173,6 +187,7 @@ Example request
 ```
 
 Example response:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -200,6 +215,7 @@ Example response:
 ```
 
 Example failure response:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -211,23 +227,19 @@ Example failure response:
 }
 ```
 
-## eth_getUserOperationReceipt
+### eth\_getUserOperationReceipt
+
 Get a UserOperation based on a userOperation hash
 
-### Parameters
+#### Parameters
+
 1. `userOpHash`, a userOperation hash value
 
-### Return value
+#### Return value
+
 Returns a receipt that includes
 
-`userOpHash`, the request hash
-`sender`
-`nonce`
-`actualGasCost`, actual amount paid (by account or paymaster) for this UserOperation
-`actualGasUsed`, total gas used by this UserOperation (including preVerification, creation, validation and execution)
-`success`, boolean - if this execution completed without revert
-`logs`, the logs generated by this UserOperation (not including logs of other UserOperations in the same bundle)
-`receipt`, the TransactionReceipt object.
+`userOpHash`, the request hash `sender` `nonce` `actualGasCost`, actual amount paid (by account or paymaster) for this UserOperation `actualGasUsed`, total gas used by this UserOperation (including preVerification, creation, validation and execution) `success`, boolean - if this execution completed without revert `logs`, the logs generated by this UserOperation (not including logs of other UserOperations in the same bundle) `receipt`, the TransactionReceipt object.
 
 Otherwise it returns `null` if the operation is yet to be included.
 
@@ -245,6 +257,7 @@ Example request
 ```
 
 Example response:
+
 ```json
 {
   "jsonrpc": "2.0",

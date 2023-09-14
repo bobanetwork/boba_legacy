@@ -1,17 +1,19 @@
-# Running the Bundler
+# Bundler Config
 
-## Bundler Configurations
+<figure><img src="../../../.gitbook/assets/bundler configurations.png" alt=""><figcaption></figcaption></figure>
 
 The Bundler can be run with custom configuration as per the networks requirement. The configuration is through options (or env vars) provided to the bundler while spining it up - and the ways to specify these are - either through a) (reccommended) the env variables when running the script , see [bundler.sh](https://github.com/bobanetwork/boba/blob/develop/packages/boba/bundler/bundler.sh) b) or through a file `workdir/bundler.config.json`
 
 The Bundler also has defaults set for certain parameters, the current defaults can be seen/set [here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/bundler/src/BundlerConfig.ts#L53)
 
 But, its important to rememeber the following order of precedence while specifying configurations:
+
 ```
 Shell vars > config file > defaults
 ```
 
 The complete list of configuration variables that can be customized
+
 ```
   beneficiary: ow.string, // account that will receive fees, if any
   entryPoint: ow.string, // entryPoint contract
@@ -37,11 +39,11 @@ The complete list of configuration variables that can be customized
   logsChunkSize: ow.optional.number, // the maximum permissble eth_getLogs range supported by the network, defaults to 5000
 ```
 
-Note- EntryPointWrapper is a requirement for the bundler when it is run against Boba Network - beacuse Boba Network does not support custom errors. 
+Note- EntryPointWrapper is a requirement for the bundler when it is run against Boba Network - beacuse Boba Network does not support custom errors.
 
 The EntryPointWrapper routes the following calls whcih the bundler needs in order to operate:
-- simulateValidation()
-- getSenderAddress()
-and includes the following helper methods-
-- getCodeHashes()
-- getUserOpHashes()
+
+* simulateValidation()
+* getSenderAddress() and includes the following helper methods-
+* getCodeHashes()
+* getUserOpHashes()
