@@ -1,14 +1,13 @@
-name: End to end test for gateway
+name: End to end test(Headful)
 permissions: read-all
 
 on:
-  push
-  # push:
-  #   paths:
-  #     - 'boba/packages/boba/gateway/**/*'
-  # pull_request:
-  #   paths:
-  #     - 'boba/packages/boba/gateway/**/*'
+  push:
+    paths:
+      - 'packages/boba/gateway/**/*'
+  pull_request:
+    paths:
+      - 'packages/boba/gateway/**/*'
 
 jobs:
   End-to-End-Test:
@@ -32,24 +31,12 @@ jobs:
           sudo apt-get install --no-install-recommends -y \
           fluxbox \
           xvfb
-      - name: Run xvfb and fluxbox
+      - name: Run end to end tests
+        working-directory: ./packages/boba/gateway
         run: |
           Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
-          fluxbox &
+          fluxbox & yarn test:integration
         env:
-          DISPLAY: :0.0
-      - name: Run end to end tests
-        uses: cypress-io/github-action@248bde77443c376edc45906ede03a1aba9da0462 # pin@v5.8.4
-        with:
-          working-directory: ./packages/boba/gateway
-          start: yarn start
-          command: yarn test:integration
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
-          browser: chrome
-          spec: tests/e2e/specs/*
-        env:
-          SKIP_METAMASK_SETUP: true
           REACT_APP_POLL_INTERVAL: 15000
           SKIP_PREFLIGHT_CHECK: true
           REACT_APP_WALLET_VERSION: 0.7.3
@@ -58,7 +45,6 @@ jobs:
           REACT_APP_SPEED_CHECK: ${{ secrets.REACT_APP_SPEED_CHECK }}
           REACT_APP_DISABLE_VE_DAO: 1
           REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
-          PUBLIC_URL: https://gateway.boba.network/
           CYPRESS_REMOTE_DEBUGGING_PORT: 9222
           NETWORK_NAME: 'goerli'
           SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
