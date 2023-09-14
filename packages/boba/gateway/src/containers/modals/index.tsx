@@ -33,11 +33,6 @@ import TransactionSuccessModal from './TransactionSuccessModal'
  */
 
 const ModalContainer = () => {
-  const depositModalState = useSelector(selectModalState('depositModal'))
-  const depositBatchModalState = useSelector(
-    selectModalState('depositBatchModal')
-  )
-
   const transferModalState = useSelector(selectModalState('transferModal'))
   const transferNFTModalState = useSelector(
     selectModalState('transferNFTModal')
@@ -110,12 +105,6 @@ const ModalContainer = () => {
 
   return (
     <>
-      {!!depositModalState && (
-        <DepositModal open={depositModalState} token={token} fast={fast} />
-      )}
-      {!!depositBatchModalState && (
-        <DepositBatchModal open={depositBatchModalState} />
-      )}
       {!!transferModalState && (
         <TransferModal open={transferModalState} token={token} />
       )}
