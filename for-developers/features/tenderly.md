@@ -2,37 +2,40 @@
 description: Debugging with Tenderly
 ---
 
-# What is Tenderly?
+# Debugging with Tenderly
+
 [Tenderly](https://tenderly.co/) is a great platform that supports your Web3 development efforts. It helps developers to build, test, monitor and operate their smart contracts.
 
-## What you can do
+<figure><img src="../../.gitbook/assets/what you can do.png" alt=""><figcaption></figcaption></figure>
+
 Tenderly development platform (Web3 Gateway just for Ethereum, for now) is enabled on all active Boba networks.
 
 Here are some core features you may want to have a look at:
-- [Monitoring](https://tenderly.co/monitoring)
-- [Alerting](https://tenderly.co/alerting)
-- [Web3 Gateway](https://tenderly.co/web3-gateway)
-- [Web3 Actions](https://tenderly.co/web3-actions)
-- [Simulator](https://tenderly.co/transaction-simulator)
-- [War Rooms](https://tenderly.co/war-room)
-- [Analytics](https://tenderly.co/analytics)
 
+* [Monitoring](https://tenderly.co/monitoring)
+* [Alerting](https://tenderly.co/alerting)
+* [Web3 Gateway](https://tenderly.co/web3-gateway)
+* [Web3 Actions](https://tenderly.co/web3-actions)
+* [Simulator](https://tenderly.co/transaction-simulator)
+* [War Rooms](https://tenderly.co/war-room)
+* [Analytics](https://tenderly.co/analytics)
 
-## Some examples
+<figure><img src="../../.gitbook/assets/some examples.png" alt=""><figcaption></figcaption></figure>
 
 ### Debug transactions
+
 Know why your transactions are failing and discover issues in no time:
 
-<img src="../../.gitbook/assets/Tenderly_Tx.png" alt="Tenderly Transaction" />
-
+![Tenderly Transaction](../../.gitbook/assets/Tenderly\_Tx.png)
 
 ### On-chain analytics
+
 Monitor your smart contracts and analyze user behavior.
 
-<img src="../../.gitbook/assets/Tenderly_Analytics.png" alt="On-chain analytics" />
-
+![On-chain analytics](../../.gitbook/assets/Tenderly\_Analytics.png)
 
 ### Web3 Actions
+
 Trigger server-side actions on new blocks, certain smart contract events, failed transactions and other configurable events.
 
-<img src="../../.gitbook/assets/Tenderly_Web3Actions.png" alt="Actions" />
+![Actions](../../.gitbook/assets/Tenderly\_Web3Actions.png)

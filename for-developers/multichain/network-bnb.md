@@ -4,22 +4,22 @@ description: A collection of links and addresses to get started on Boba-BNB
 
 # Contract Addresses Boba/BNB
 
-* [Boba BNB Testnet L2 (9728) for the BNB Testnet (97)]
+* \[Boba BNB Testnet L2 (9728) for the BNB Testnet (97)]
   * [Testnet Fountain for Developers on Boba BNB Testnet L2](network-bnb.md#testnet-fountain-for-developers-on-boba-bnb-testnet-l2)
   * [Bridging](network-bnb.md#bridging)
   * [Analytics and eth\_getLogs for Boba BNB Testnet](network-bnb.md#analytics-and-eth-getlogs-for-boba-bnb-testnet)
   * [Boba BNB Testnet Addresses](network-bnb.md#boba-bnb-testnet-addresses)
   * [Boba BNB Testnet Links and Endpoints](network-bnb.md#boba-bnb-testnet-links-and-endpoints)
-* [Boba BNB L2 (56288) for the BNB L1 (56)]
+* \[Boba BNB L2 (56288) for the BNB L1 (56)]
   * [Boba BNB Addresses](network-bnb.md#boba-bnb-addresses)
   * [Analytics and eth\_getLogs for Boba BNB](network-bnb.md#analytics-and-eth-getlogs-for-boba-bnb)
   * [Boba BNB Links and Endpoints](network-bnb.md#boba-bnb-links-and-endpoints)
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/boba bnb testnet.png" alt=""><figcaption></figcaption></figure>
 
 ### Testnet Fountain for Developers on BNB Testnet L2
 
-There is a Boba BNB testnet [fountain](https://gateway.boba.network/?network=Testnet&chain=BNB) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba BNB testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Boba BNB testnet [fountain](https://gateway.boba.network/?network=Testnet\&chain=BNB) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba BNB testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 
@@ -37,7 +37,7 @@ If you have unusual `getLogs` needs, especially calls from `0 to latest`, the ma
     RELEASE_VERSION=v0.X.X
     ```
 
-The docker-compose file is in [`boba-community/boba-node/docker-compose-bobabnb-testnet.yml`](https://github.com/bobanetwork/boba/tree/master/boba_community/boba-node).
+The docker-compose file is in [`boba-community/boba-node/docker-compose-bobabnb-testnet.yml`](https://github.com/bobanetwork/boba/tree/master/boba\_community/boba-node).
 
 ```bash
 $ docker compose -f docker-compose-bobabnb-testnet.yml pull
@@ -50,9 +50,9 @@ The DTL will first sync with the chain. During the sync, you will see the DTL an
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobabnbtestnet/README.md](https://github.com/bobanetwork/boba/tree/master/packages/contracts/deployments/bobabnbtestnet/)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB testnet address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressBobaBnbTestnet_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB testnet address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressBobaBnbTestnet\_0xAee1fb3f4353a9060aEC3943fE932b6Efe35CdAa.json).
 
-For **account abstraction** contract addresses, please refer the list [here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/account-abstraction/deployments/boba_bnb_testnet/addresses.json).
+For **account abstraction** contract addresses, please refer the list [here](https://github.com/bobanetwork/boba/blob/develop/packages/boba/account-abstraction/deployments/boba\_bnb\_testnet/addresses.json).
 
 ### Boba BNB Testnet Links and Endpoints
 
@@ -67,7 +67,7 @@ For **account abstraction** contract addresses, please refer the list [here](htt
 | AA bundler    | [https://bundler.testnet.bnb.boba.network](https://bundler.testnet.bnb.boba.network)             |
 | Gas Cap       | 50000000                                                                                         |
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (14) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/boba bnb l2.png" alt=""><figcaption></figcaption></figure>
 
 ### Analytics and eth\_getLogs for Bobabeam
 
@@ -92,16 +92,16 @@ $ docker compose -f docker-compose-bobabnb.yml up
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobabnb/README.md](https://github.com/bobanetwork/boba/tree/master/packages/contracts/deployments/bobabnb/)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressBobaBnb_0xeb989B25597259cfa51Bd396cE1d4B085EC4c753.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba BNB address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressBobaBnb\_0xeb989B25597259cfa51Bd396cE1d4B085EC4c753.json).
 
-### Boba BNB Links and Endpoints&#x20;
+### Boba BNB Links and Endpoints
 
-|               |                                                                                  |
-| ------------- | -------------------------------------------------------------------------------- |
-| ChainID       | 56288                                                                            |
-| RPC           | [https://bnb.boba.network](https://bnb.boba.network)
-<br/><br/>We have partnered with Tenderly (ip-based rate limiting, subscribe to Tenderly if you need more): <br/>[http://boba-bnb.gateway.tenderly.co](http://boba-bnb.gateway.tenderly.co)<br/>[http://gateway.tenderly.co/public/boba-bnb](http://gateway.tenderly.co/public/boba-bnb) |
-| Gateway            | [https://gateway.boba.network](https://gateway.boba.network)
-| Blockexplorer | [https://blockexplorer.bnb.boba.network](https://blockexplorer.bnb.boba.network) |
-| Websocket          | [wss://boba-bnb.gateway.tenderly.co](wss://boba-bnb.gateway.tenderly.co)<br/>[wss://gateway.tenderly.co/public/boba-bnb](wss://gateway.tenderly.co/public/boba-bnb)                                                                                         |
-| Gas Cap       | 50000000                                                                         |
+|                                                                                                                                                                                                                                                                                                                  |                                                                                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ChainID                                                                                                                                                                                                                                                                                                          | 56288                                                                                                                                                                                           |
+| RPC                                                                                                                                                                                                                                                                                                              | [https://bnb.boba.network](https://bnb.boba.network)                                                                                                                                            |
+| <p><br><br>We have partnered with Tenderly (ip-based rate limiting, subscribe to Tenderly if you need more):<br><a href="http://boba-bnb.gateway.tenderly.co">http://boba-bnb.gateway.tenderly.co</a><br><a href="http://gateway.tenderly.co/public/boba-bnb">http://gateway.tenderly.co/public/boba-bnb</a></p> |                                                                                                                                                                                                 |
+| Gateway                                                                                                                                                                                                                                                                                                          | [https://gateway.boba.network](https://gateway.boba.network)                                                                                                                                    |
+| Blockexplorer                                                                                                                                                                                                                                                                                                    | [https://blockexplorer.bnb.boba.network](https://blockexplorer.bnb.boba.network)                                                                                                                |
+| Websocket                                                                                                                                                                                                                                                                                                        | <p><a href="wss://boba-bnb.gateway.tenderly.co">wss://boba-bnb.gateway.tenderly.co</a><br><a href="wss://gateway.tenderly.co/public/boba-bnb">wss://gateway.tenderly.co/public/boba-bnb</a></p> |
+| Gas Cap                                                                                                                                                                                                                                                                                                          | 50000000                                                                                                                                                                                        |

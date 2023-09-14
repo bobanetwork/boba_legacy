@@ -2,7 +2,7 @@
 
 These custom paymasters, as per compatibiltiy with ERC4337 Account Abstraction design, will allow users to pay gas for txs using 'any' ERC20 token, and without needing any protocol level changes. The Sequencer however, would still only continue to accept the fee token it identifies as per the protocol, the Paymaster pays for the userOp execution, with their deposit on the Entrypoint in denominations of the native token and accepts the alt erc20 token as payment in return.
 
-## Paymasters
+<figure><img src="../../../.gitbook/assets/paymasters.png" alt=""><figcaption></figcaption></figure>
 
 **Boba Deposit Paymaster** - uses an oracle for price data and charges an user the appropriate amount of erc20 tokens in exchange for sponsoring their transactions (through their deposit on the entrypoint). Users need to deposit a stake amount on the paymaster in order to start using it. The stake ensures the paymaster can collect the erc20 tokens as payment in all conditions. Since this paymaster uses an oracle(an external contract) to fetch the price ratio, the bundler would fail simulating the userOp validation, in which case - the bundler should whitelist this paymaster if they trust it.
 
@@ -12,7 +12,7 @@ These custom paymasters, as per compatibiltiy with ERC4337 Account Abstraction d
 
 **GPODepositPaymaster** (alternate) - The GPO Deposit Paymaster is primarily suited for alt-L1 deployments of Boba, and it uses the gas price oracle to find out the price ratio between boba and the alt-l1 native token. The functionality is the same as that of the Boba Deposit Paymaster, and the paymaster also requires to be whitlisted at the bundler level.
 
-## Sequence Flows
+<figure><img src="../../../.gitbook/assets/sequence flows.png" alt=""><figcaption></figcaption></figure>
 
 ### Boba Deposit Paymaster
 

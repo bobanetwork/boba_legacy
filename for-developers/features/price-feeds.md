@@ -9,7 +9,7 @@ Price Feed oracles allow smart contracts to work with external data and open the
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 1 (1) (4).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/boba straw.png" alt=""><figcaption></figcaption></figure>
 
 Boba-Straw, Boba's self-operated price feed oracle is based on ChainLink's implementation and can handle price data aggregation from multiple trusted external entities (data oracles), on-chain. Currently, Boba-Straw is powered by Folkvang, our first data oracle. The price data is submitted based on the 0.25% price change threshold, but the maximal frequency is once every 10 minutes per market. To further increase reliability and precision, we are adding more data-sources. Data oracles accumulate BOBA for every submission to offset operational and gas costs. To be a data-provider oracle and earn BOBA refer to the section below.
 
@@ -123,7 +123,7 @@ To get the latest timestamp call **`latestTimestamp(base, quote)`**.
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 2 (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/witnet price feeds.png" alt=""><figcaption></figcaption></figure>
 
 The Witnet multichain decentralized oracle enables smart contracts to realize their true potential by giving them access to all sorts of valuable data sets, and by attesting and delivering that information securely thanks to its strong cryptoeconomic guarantees.
 
@@ -210,7 +210,7 @@ For more information about Witnet please refer to:
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 3 (13).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/bobalink.png" alt=""><figcaption></figcaption></figure>
 
 Bobalink uses Hybrid Compute to pull price feeds from Chainlink's smart contracts and push to price feed contracts [FluxAggregatorHC.sol](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/oracle/FluxAggregatorHC.sol) on L2. [FluxAggregatorHC.sol](https://github.com/bobanetwork/boba/blob/develop/packages/boba/contracts/contracts/oracle/FluxAggregatorHC.sol) is modified from the Chainlink's [FluxAggregator.sol](https://github.com/smartcontractkit/chainlink/blob/master/contracts/src/v0.6/FluxAggregator.sol) by removing the unnecessary components and adding Hybrid Compute and security checks for it.
 
@@ -388,7 +388,7 @@ Bobalink is available on Boba Mainnet L2, Boba Goerli L2, Bobabeam. It will be a
 
 
 
-<figure><img src="../../.gitbook/assets/Artboard 4 (11).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/hybridcompute.png" alt=""><figcaption></figcaption></figure>
 
 Hybrid Compute is Boba's off-chain compute system and among many other things you can fetch real-world market price data. Hybrid Compute gives you the flexibility to select and set up your own data source. Or even select and work with any other reliable service that can help provide such data. In the background, Hybrid Compute works with a modified L2Geth, by intercepting and injecting real world responses into the transaction. Learn more about Hybrid Compute [here](../../boba\_documentation/developer/hybrid\_compute.md).
 

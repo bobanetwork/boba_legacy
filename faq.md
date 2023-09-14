@@ -293,7 +293,7 @@ LP floating fee rate refers to the change in the fee logic on LPs. LP fee consis
 \
 
 
-<figure><img src=".gitbook/assets/hybridcompute.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/hybridcompute (1).png" alt=""><figcaption></figcaption></figure>
 
 ## What are the limits on Hybrid Compute Web2 calls?
 
