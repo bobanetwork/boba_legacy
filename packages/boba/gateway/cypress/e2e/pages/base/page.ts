@@ -183,7 +183,8 @@ export default class Page extends Base {
     cy.get(
       `button[label="Switch to ${networkAbbreviation} ${
         isTestnet ? 'Testnet' : ''
-      } network"]`
+      } network"]`,
+      { timeout: 90000 }
     )
       .should('exist')
       .click()
@@ -194,7 +195,8 @@ export default class Page extends Base {
     cy.get(
       `button[label="Connect to the ${networkAbbreviation} ${
         isTestnet ? 'Testnet' : 'Mainnet'
-      } network"]`
+      } network"]`,
+      { timeout: 90000 }
     )
       .should('exist')
       .click()

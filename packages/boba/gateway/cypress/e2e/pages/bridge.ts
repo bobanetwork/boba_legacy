@@ -88,7 +88,7 @@ export default class Bridge extends Page {
       .should('equal', amount)
 
     cy.get('button').contains('Bridge').should('exist').click()
-    cy.contains(`${amount} ETH`, { timeout: 60000 }).should('exist')
+    cy.contains(`${amount} ${tokenSymbol}`, { timeout: 60000 }).should('exist')
     cy.get('button').contains('Confirm').should('exist').click()
     if (destinationLayer === Layer.L1) {
       this.allowMetamaskToSpendToken('10')
