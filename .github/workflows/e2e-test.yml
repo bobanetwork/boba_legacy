@@ -13,21 +13,20 @@ jobs:
   End-to-End-Test:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3.8.1
-        with:
-          node-version: 16.16.0
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Setup cache
         uses: actions/cache@v3
         with:
-          path: |
-            node_modules
-            /home/runner/.cache/Cypress
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         continue-on-error: true
       - name: Install dependencies
         run: yarn; yarn build
@@ -67,16 +66,4 @@ jobs:
           name: Test footage
           path: ./packages/boba/gateway/cypress/videos/
         continue-on-error: true
-
-  # end-2-end-testing:
-  #   runs-on: ubunto-latest
-  #    steps:
-  #     - name: install and build
-  #       run: yarn install; yarn build
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Cypress run
-  #       working-directory: ./packages/boba/packages/gateway
-  #       uses: cypress-io/github-action@v6
-  #       run: yarn test-e2e
 
