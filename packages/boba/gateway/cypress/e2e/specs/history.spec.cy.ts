@@ -19,7 +19,6 @@ describe('History', () => {
 
     it('network dropdowns', () => {
       history.checkNetworkDropdowns()
-      history.getNetworksSwitchIcon()
     })
     it('status filter', () => {
       history.checkStatusFilter()

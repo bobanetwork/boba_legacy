@@ -221,10 +221,7 @@ export default class Page extends Base {
   }
 
   checkNetworkSwitchSuccessful(networkAbbreviation: string) {
-    this.getReduxStore()
-      .its('network')
-      .its('activeNetwork')
-      .should('equal', networkAbbreviation)
+    this.verifyReduxStoreNetwork('activeNetwork', networkAbbreviation)
 
     this.verifyReduxStoreSetup('accountEnabled', true)
     this.verifyReduxStoreSetup('baseEnabled', true)
@@ -235,6 +232,13 @@ export default class Page extends Base {
       .its('setup')
       .its(attribute)
       .should(`equal`, expectedValue)
+  }
+
+  verifyReduxStoreNetwork(attribute: string, expectedValue: boolean | string) {
+    this.getReduxStore()
+      .its('network')
+      .its(attribute)
+      .should('equal', expectedValue)
   }
 
   disconnectWallet() {

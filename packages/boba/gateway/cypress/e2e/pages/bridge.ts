@@ -13,6 +13,11 @@ export default class Bridge extends Page {
     this.withinPage().find('#settings').should('exist').click()
     cy.get('label[title="testnetSwitch"]').should('exist').click()
 
+    this.verifyReduxStoreNetwork(
+      'activeNetworkType',
+      isTestnet ? 'Testnet' : 'Mainnet'
+    )
+
     this.handleNetworkSwitchModals(network, isTestnet)
 
     if (newNetwork) {
@@ -31,10 +36,7 @@ export default class Bridge extends Page {
     } else {
       this.allowNetworkSwitch()
     }
-    this.getReduxStore()
-      .its('setup')
-      .its('netLayer')
-      .should('equal', newOriginLayer)
+    this.verifyReduxStoreSetup('netLayer', newOriginLayer)
   }
 
   selectToken(tokenSymbol: string) {
