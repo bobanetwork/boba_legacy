@@ -1,4 +1,4 @@
-name: End to end test for gateway
+name: End to end test(Headful)
 permissions: read-all
 
 on:
