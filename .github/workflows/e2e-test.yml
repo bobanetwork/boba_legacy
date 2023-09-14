@@ -23,20 +23,21 @@ jobs:
 
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      - name: Setup cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        continue-on-error: true
-      - name: Install dependencies
-        run: yarn; yarn build
+      # - name: Setup cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: node_modules
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      #   continue-on-error: true
+      # - name: Install dependencies
+      #   run: yarn; yarn build
       - name: Install linux deps
         run: |
           sudo apt-get install -y \
           fluxbox \
           xvfb
-
+      - name: give permissions to root
+        run: xhost local:root
       - name: Run xvfb and fluxbox
         run: |
           Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
