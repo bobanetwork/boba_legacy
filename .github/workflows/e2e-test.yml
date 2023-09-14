@@ -20,15 +20,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.16.0
+          cache: 'yarn'
 
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      - name: Setup cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-        continue-on-error: true
       - name: Install dependencies
         run: yarn; yarn build
       - name: Install linux deps
