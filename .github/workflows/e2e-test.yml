@@ -33,7 +33,7 @@ jobs:
         run: yarn; yarn build
       - name: Install linux deps
         run: |
-          sudo apt-get install --no-install-recommends -y \
+          sudo apt-get install -y \
           fluxbox \
           xvfb
 
