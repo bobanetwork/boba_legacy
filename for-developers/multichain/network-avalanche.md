@@ -4,24 +4,22 @@ description: A collection of links and addresses to get started on Boba-Avalanch
 
 # Contract Addresses Boba/Avalanche
 
-* [Boba Avalanche Testnet L2 (4328) for the Avalanche Testnet (43113)]
+* \[Boba Avalanche Testnet L2 (4328) for the Avalanche Testnet (43113)]
   * [Testnet Fountain for Developers on Boba Avalanche Testnet L2](network-avalanche.md#testnet-fountain-for-developers-on-boba-avalanche-testnet-l2)
   * [Bridging](network-avalanche.md#bridging)
   * [Analytics and eth\_getLogs for Boba Avalanche Testnet](network-avalanche.md#Analytics-and-eth-getlogs-for-boba-avalanche-testnet)
   * [Boba Avalanche Testnet L2 Addresses](network-avalanche.md#boba-avalanche-testnet-l2-addresses)
   * [Boba Avalanche Testnet L2 Links and Endpoints](network-avalanche.md#boba-avalanche-testnet-l2-links-and-endpoints)
-* [Boba Avalanche L2 (43288) for the Avalanche L1 (43114)]
+* \[Boba Avalanche L2 (43288) for the Avalanche L1 (43114)]
   * [Analytics and eth\_getLogs for Boba Avalanche Mainnet](network-avalanche.md#Analytics-and-eth-getlogs-for-boba-avalanche-mainnet)
   * [Boba Avalanche L2 Addresses](network-avalanche.md#boba-avalanche-l2-addresses)
   * [Boba Avalanche L2 Links and Endpoints](network-avalanche.md#boba-avalanche-l2-links-and-endpoints)
 
-
-
-<figure><img src="../../.gitbook/assets/Artboard 1 (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/BOBA AVALANCHE TESTNET.png" alt=""><figcaption></figcaption></figure>
 
 ### Testnet Fountain for Developers on Boba Avalanche Testnet L2
 
-There is a Boba Avalanche testnet [fountain](https://gateway.boba.network/?network=Testnet&chain=AVAX) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba Avalanche Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
+There is a Boba Avalanche testnet [fountain](https://gateway.boba.network/?network=Testnet\&chain=AVAX) for `BOBA`. Authentication is via Twitter - please go to the gateway and connect your MetaMask wallet to the Boba Avalanche Testnet L2. In **gateway > wallet**, you will see the `Developer Twitter/Turing test token fountain`. This system uses Turing hybrid compute to interact with Twitter.
 
 ### Bridging
 
@@ -52,23 +50,21 @@ The DTL will first sync with the chain. During the sync, you will see the DTL an
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobafuji/README.md](https://github.com/bobanetwork/boba/tree/master/packages/contracts/deployments/bobafuji/)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba Avalanche Testnet address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressesBobaOperaTestnet_0x12ad9f501149D3FDd703cC10c567F416B7F0af8b.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba Avalanche Testnet address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressesBobaOperaTestnet\_0x12ad9f501149D3FDd703cC10c567F416B7F0af8b.json).
 
 ### Boba Avalanche Testnet Links and Endpoints
 
-|               |                                                                                  |
-| ------------- | -------------------------------------------------------------------------------- |
-| ChainID       | 4328                                                                             |
-| RPC           | [https://testnet.avax.boba.network](https://testnet.avax.boba.network)           |
-| Replica RPC   | [https://replica.testnet.avax.boba.network](https://replica.testnet.avax.boba.network) |
-| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
+|               |                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| ChainID       | 4328                                                                                               |
+| RPC           | [https://testnet.avax.boba.network](https://testnet.avax.boba.network)                             |
+| Replica RPC   | [https://replica.testnet.avax.boba.network](https://replica.testnet.avax.boba.network)             |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)                                       |
 | Blockexplorer | [https://blockexplorer.testnet.avax.boba.network](https://blockexplorer.testnet.avax.boba.network) |
-| Websocket     | [wss://wss.testnet.avax.boba.network](wss://wss.testnet.avax.boba.network)       |
-| Gas Cap       | 50000000                                                                         |
+| Websocket     | [wss://wss.testnet.avax.boba.network](wss://wss.testnet.avax.boba.network)                         |
+| Gas Cap       | 50000000                                                                                           |
 
-
-
-<figure><img src="../../.gitbook/assets/Artboard 2 (12) (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/BOBA AVALANCHE L2.png" alt=""><figcaption></figcaption></figure>
 
 ### Analytics and eth\_getLogs for Boba Avalanche Mainnet
 
@@ -93,16 +89,16 @@ $ docker compose -f docker-compose-bobaavax.yml up
 
 For **primary contracts and addresses** see [packages/contracts/deployments/bobaavax/README.md](https://github.com/bobanetwork/boba/tree/master/packages/contracts/deployments/bobaavax/)
 
-For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba Avalanche address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressBobaAvax_0x00220f8ce1c4be8436574e575fE38558d85e2E6b.json).
+For **secondary addresses**, such as L2 Tokens and Messengers, please see the [Boba Avalanche address registration dump](https://github.com/bobanetwork/boba/tree/master/packages/boba/register/addresses/addressBobaAvax\_0x00220f8ce1c4be8436574e575fE38558d85e2E6b.json).
 
 ### Boba Avalanche Links and Endpoints
 
-|               |                                                                                  |
-| ------------- | -------------------------------------------------------------------------------- |
-| ChainID       | 43288                                                                            |
-| RPC Read      | [https://avax.boba.network](https://avax.boba.network)                           |
-| Write RPC     | [https://replica.avax.boba.network](https://replica.avax.boba.network)           |
-| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)             |
+|               |                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------- |
+| ChainID       | 43288                                                                              |
+| RPC Read      | [https://avax.boba.network](https://avax.boba.network)                             |
+| Write RPC     | [https://replica.avax.boba.network](https://replica.avax.boba.network)             |
+| Gateway       | [https://gateway.boba.network](https://gateway.boba.network)                       |
 | Blockexplorer | [https://blockexplorer.avax.boba.network](https://blockexplorer.avax.boba.network) |
-| Websocket     | [wss://wss.avax.boba.network](wss://wss.avax.boba.network)                       |
-| Gas Cap       | 50000000                                                                         |
+| Websocket     | [wss://wss.avax.boba.network](wss://wss.avax.boba.network)                         |
+| Gas Cap       | 50000000                                                                           |

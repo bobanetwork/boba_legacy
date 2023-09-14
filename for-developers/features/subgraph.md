@@ -11,7 +11,7 @@ yarn global add @graphprotocol/graph-cli
 yarn global add --dev @graphprotocol/graph-ts
 ```
 
-<figure><img src="../../.gitbook/assets/building and running.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/building and running (1).png" alt=""><figcaption></figcaption></figure>
 
 First, `cd` to either the **L1** or the **L2** folders, depending on where you will be deploying your subgraphs to. There are three subgraphs: Ethereum, Boba, and Goerli. A deploy key or access token is required to deploy subgraphs. Depending on which chain you are indexing, provide either `mainnet` or `goerli` as a setting to `yarn prepare:`.
 

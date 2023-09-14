@@ -10,13 +10,13 @@ This Price Feed Oracle is forked from the [Chainlink contracts](https://github.c
 
 
 
-<figure><img src="../../../../../.gitbook/assets/Artboard 1 (21).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../../.gitbook/assets/overview.png" alt=""><figcaption></figcaption></figure>
 
 The Price Feed Oracle works to provide the latest or past market price of specific tokens, aggregated from (>=1) trusted external entities (hereafter referred to as oracles). Token price aggregation happens in rounds, triggered by oracles. For a round of aggregation, multiple oracles submit their 'price' answers and the final determined answer is the median of all submissions. The 'price' answer for the round isn't finalized/accepted until the round has received a certain 'min no of answer submissions' from separate oracles. While the round moves between having min < submissions < max, the computed answer can vary depending on the data received up till that point. And after the 'max no of submissions on the round' the 'price' answer is finalized and fixed. If a round does not receive 'min no of answer submissions', the round can be superseded after a timeout period. The Terms used here and throughout - 'base' refers to the crypto asset/token and 'quote' refers to the asset (or fiat currency) to use as a reference for the price.
 
 
 
-<figure><img src="../../../../../.gitbook/assets/Artboard 2 (22).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../../.gitbook/assets/for price data recipients.png" alt=""><figcaption></figcaption></figure>
 
 Price is aggregated in individual FluxAggregator contracts, however the FeedRegistry contract stores the current Aggregator contract in use for a specific base/quote pair and allows to extract the feed data from a central point. On the FeedRegistry, use the following methods:
 
@@ -34,7 +34,7 @@ To extract other informational data please refer to the FeedRegistry contract.
 
 
 
-<figure><img src="../../../../../.gitbook/assets/Artboard 3 (16).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../../.gitbook/assets/for price data submitters.png" alt=""><figcaption></figcaption></figure>
 
 If you are an oracle (someone who is going to help by submitting price data), the main contracts to interact with are the respective FluxAggregators. Boba deploys and administers individual FluxAggregators for each asset feed. To be eligible to submit price data, the oracle (and the oracle admin) addresses needs to be added by the admin to respective FluxAggregators. Note - the _**`roundId`**_ here is the actual _**`roundId`**_ that the oracles use as a submission counter for the specific Aggregator, this is not equal to the _**`roundId`**_ obtained from the FeedRegistry, where phaseId combined with _**`roundId`**_ is returned.
 
@@ -57,7 +57,7 @@ A round started for reporting by an oracle, will have to meet the min number of 
 
 
 
-<figure><img src="../../../../../.gitbook/assets/Artboard 4 (15).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../../.gitbook/assets/supported token feeds.png" alt=""><figcaption></figcaption></figure>
 
 Note - It's highly recommended to obtain the feed addresses from the FeedRegsitry instead (call _**`getFeed(base, quote)`**_). The addresses listed here might be outdated! Prices returned are in decimals (8) of the underlying quote.
 
