@@ -41,7 +41,7 @@ import {
 } from 'selectors'
 
 import * as S from './OldDao.styles'
-import Connect from 'containers/connect/Connect'
+import Connect from 'containers/connect'
 import { TabHeader } from 'components/global/tabHeader'
 import useInterval from 'hooks/useInterval';
 import { NETWORK } from 'util/network/network.util';

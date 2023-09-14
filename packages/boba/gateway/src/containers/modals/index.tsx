@@ -8,7 +8,6 @@ import NewProposalModal from './dao/NewProposalModal'
 
 import EarnDepositModal from './earn/EarnDepositModal'
 import EarnWithdrawModal from './earn/EarnWithdrawModal'
-import ExitModal from './exit/ExitModal'
 import InstallMetaMaskModal from './noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import NoMetaMaskModal from './noMetaMask/NoMetaMaskModal'
 import SwitchNetworkModal from './switchNetwork/SwitchNetworkModal'
@@ -35,8 +34,6 @@ const ModalContainer = () => {
   const transferNFTModalState = useSelector(
     selectModalState('transferNFTModal')
   )
-
-  const exitModalState = useSelector(selectModalState('exitModal'))
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'))
   const transferPendingModalState = useSelector(
     selectModalState('transferPending')
@@ -107,9 +104,6 @@ const ModalContainer = () => {
       )}
       {!!transferNFTModalState && (
         <TransferNFTModal open={transferNFTModalState} token={token} />
-      )}
-      {!!exitModalState && (
-        <ExitModal open={exitModalState} token={token} fast={fast} />
       )}
       {!!EarnDepositModalState && (
         <EarnDepositModal open={EarnDepositModalState} />
