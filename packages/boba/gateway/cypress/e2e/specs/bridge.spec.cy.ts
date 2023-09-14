@@ -21,6 +21,7 @@ describe('Bridge', () => {
     })
     it('should bridge ETH and Boba from L1 to L2', () => {
       bridge.bridgeToken('ETH', '0.001', Layer.L2)
+      bridge.bridgeToken('BOBA', '10.00', Layer.L2)
     })
     it('should switch bridge direction', () => {
       // switch bridge direction from L2 to L1
