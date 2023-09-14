@@ -1,4 +1,5 @@
 name: End to end test for gateway
+permissions: read-all
 
 on:
   push
