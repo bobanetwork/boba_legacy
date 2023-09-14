@@ -13,7 +13,6 @@ import NoMetaMaskModal from './noMetaMask/NoMetaMaskModal'
 import SwitchNetworkModal from './switchNetwork/SwitchNetworkModal'
 import TokenPickerModal from './tokenPicker/TokenPickerModal'
 import TransferModal from './transfer/TransferModal'
-import TransferNFTModal from './transfer/TransferNFTModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
@@ -31,9 +30,6 @@ import TransactionSuccessModal from './TransactionSuccessModal'
 
 const ModalContainer = () => {
   const transferModalState = useSelector(selectModalState('transferModal'))
-  const transferNFTModalState = useSelector(
-    selectModalState('transferNFTModal')
-  )
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'))
   const transferPendingModalState = useSelector(
     selectModalState('transferPending')
@@ -101,9 +97,6 @@ const ModalContainer = () => {
     <>
       {!!transferModalState && (
         <TransferModal open={transferModalState} token={token} />
-      )}
-      {!!transferNFTModalState && (
-        <TransferNFTModal open={transferNFTModalState} token={token} />
       )}
       {!!EarnDepositModalState && (
         <EarnDepositModal open={EarnDepositModalState} />

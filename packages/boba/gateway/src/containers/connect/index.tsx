@@ -18,6 +18,7 @@ export const AlertContainer = styled.div`
   border-radius: 12px;
   background: ${({ theme }) => theme.bg.glassy};
   border: 1px solid ${({ theme }) => theme.bg.glassy};
+  margin-bottom: 12px;
 
   ${mobile(css`
     flex-direction: column;
