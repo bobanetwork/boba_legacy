@@ -24,9 +24,7 @@ jobs:
       - name: Setup cache
         uses: actions/cache@v3
         with:
-          path: |
-            node_modules
-            /home/runner/.cache/Cypress
+          path: node_modules
           key: ${{ runner.os }}-yarn-v1-${{ hashFiles('yarn.lock') }}
         continue-on-error: true
       - name: Install dependencies
@@ -79,4 +77,3 @@ jobs:
   #       working-directory: ./packages/boba/packages/gateway
   #       uses: cypress-io/github-action@v6
   #       run: yarn test-e2e
-
