@@ -20,7 +20,7 @@ import {CrossChainMessenger,} from '@eth-optimism/sdk'
 import {BigNumber, ethers, utils} from 'ethers'
 
 import store from 'store'
-import {groupBy, orderBy} from 'util/lodash';
+import { orderBy } from 'util/lodash';
 import BN from 'bn.js'
 
 import {logAmount} from 'util/amountConvert'
