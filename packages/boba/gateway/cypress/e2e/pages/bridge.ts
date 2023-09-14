@@ -9,17 +9,11 @@ export default class Bridge extends Page {
     this.walletConnectButtonText = 'Connect Wallet'
   }
 
-  switchNetworkType(network: string, networkType: string, newNetwork: boolean) {
-    cy.get('#settings').should('exist').click()
-    cy.get('label[title="testnetSwitch"]').click()
-    cy.get(
-      `button[label="Switch to ${network} ${
-        networkType === 'Testnet' ? networkType : ''
-      } network"]`
-    ).click()
-    cy.get(
-      `button[label="Connect to the ${network} ${networkType} network"]`
-    ).click()
+  switchNetworkType(network: string, isTestnet: boolean, newNetwork: boolean) {
+    this.withinPage().find('#settings').should('exist').click()
+    cy.get('label[title="testnetSwitch"]').should('exist').click()
+
+    this.handleNetworkSwitchModals(network, isTestnet)
 
     if (newNetwork) {
       this.allowNetworkToBeAddedAndSwitchedTo()
@@ -27,10 +21,7 @@ export default class Bridge extends Page {
       this.allowNetworkSwitch()
     }
 
-    this.getReduxStore()
-      .its('network')
-      .its('activeNetworkType')
-      .should('equal', networkType)
+    this.checkNetworkSwitchSuccessful(network)
   }
 
   switchBridgeDirection(newOriginLayer: Layer, newNetwork: boolean) {

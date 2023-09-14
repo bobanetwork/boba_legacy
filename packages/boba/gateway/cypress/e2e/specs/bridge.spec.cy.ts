@@ -14,12 +14,12 @@ describe('Bridge', () => {
 
   describe('Bridging', () => {
     before(() => {
-      bridge.switchNetworkType('ETHEREUM', 'Testnet', false)
+      bridge.switchNetworkType('ETHEREUM', true, false)
     })
     after(() => {
-      bridge.switchNetworkType('ETHEREUM', 'Mainnet', false)
+      bridge.switchNetworkType('ETHEREUM', false, false)
     })
-    it('should bridge ETH from L1 to L2', () => {
+    it('should bridge ETH and Boba from L1 to L2', () => {
       bridge.bridgeToken('ETH', '0.001', Layer.L2)
     })
     it('should switch bridge direction', () => {
