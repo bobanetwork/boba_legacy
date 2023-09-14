@@ -1,4 +1,5 @@
 name: End to end test for gateway
+permissions: read-all
 
 on:
   push
@@ -13,20 +14,17 @@ jobs:
   End-to-End-Test:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3.8.1
-        with:
-          node-version: 16.16.0
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+          cache: 'yarn'
+        continue-on-error: true
+
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
-      - name: Setup cache
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-yarn-v1-${{ hashFiles('yarn.lock') }}
-        continue-on-error: true
       - name: Install dependencies
         run: yarn; yarn build
       - name: Install linux deps
@@ -34,7 +32,6 @@ jobs:
           sudo apt-get install --no-install-recommends -y \
           fluxbox \
           xvfb
-
       - name: Run xvfb and fluxbox
         run: |
           Xvfb :0 -screen 0 1024x768x24 -listen tcp -ac &
@@ -42,9 +39,17 @@ jobs:
         env:
           DISPLAY: :0.0
       - name: Run end to end tests
-        working-directory: ./packages/boba/gateway
-        run: yarn test:integration
+        uses: cypress-io/github-action@248bde77443c376edc45906ede03a1aba9da0462 # pin@v5.8.4
+        with:
+          working-directory: ./packages/boba/gateway
+          start: yarn start
+          command: yarn test:integration
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+          browser: chrome
+          spec: tests/e2e/specs/*
         env:
+          SKIP_METAMASK_SETUP: true
           REACT_APP_POLL_INTERVAL: 15000
           SKIP_PREFLIGHT_CHECK: true
           REACT_APP_WALLET_VERSION: 0.7.3
@@ -58,22 +63,13 @@ jobs:
           NETWORK_NAME: 'goerli'
           SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
           CYPRESS_TEST_HASH: ${{secrets.E2E_TEST_SAMPLE_HASH }}
+          DISPLAY: :0.0
       - name: Upload videos
         uses: actions/upload-artifact@v3
         if: always()
         with:
           name: Test footage
-          path: ./packages/boba/gateway/cypress/videos/
+          path: |
+            ./packages/boba/gateway/cypress/videos/
+            ./packages/boba/gateway/cypress/screenshots/
         continue-on-error: true
-
-  # end-2-end-testing:
-  #   runs-on: ubunto-latest
-  #    steps:
-  #     - name: install and build
-  #       run: yarn install; yarn build
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Cypress run
-  #       working-directory: ./packages/boba/packages/gateway
-  #       uses: cypress-io/github-action@v6
-  #       run: yarn test-e2e
