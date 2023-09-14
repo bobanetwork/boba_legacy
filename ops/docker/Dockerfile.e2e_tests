@@ -1,0 +1,24 @@
+# Use an official Node.js runtime as the base image
+FROM ubuntu:latest
+FROM node:16.16.0
+FROM cypress/included
+
+# Set the working directory in the container
+WORKDIR /boba
+
+# Copy the Cypress test code into the container
+COPY . /boba
+
+RUN yarn clean; yarn; yarn build
+
+WORKDIR /boba/packages/boba/gateway/
+
+# Set environment variables if needed
+# ENV CYPRESS_ENVIRONMENT=production
+# need to pass environment variables to docker run in yaml file
+
+# Expose the port if your app runs on a specific port
+EXPOSE 3000
+
+# Start Cypress tests
+CMD ["yarn", "test:integration"]
