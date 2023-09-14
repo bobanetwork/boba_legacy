@@ -48,6 +48,7 @@ jobs:
         working-directory: ./packages/boba/gateway
         run: yarn test:integration
         env:
+          SKIP_METAMASK_SETUP: true
           REACT_APP_POLL_INTERVAL: 15000
           SKIP_PREFLIGHT_CHECK: true
           REACT_APP_WALLET_VERSION: 0.7.3
