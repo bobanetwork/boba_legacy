@@ -20,7 +20,6 @@ import { selectActiveNetwork, selectActiveNetworkType } from 'selectors'
 import { NetworkList } from 'util/network/network.util'
 
 const useNetwork = () => {
-  console.log('here')
   const dispatch = useDispatch<any>()
   const activeNetworkType = useSelector(selectActiveNetworkType())
   const activeNetwork = useSelector(selectActiveNetwork())
