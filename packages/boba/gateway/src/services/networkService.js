@@ -4009,8 +4009,10 @@ class NetworkService {
 
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
-
-      let descriptionList = await graphQLService.queryBridgeProposalCreated()
+      const L2ChainId = this.networkConfig.L2.chainId;
+      let descriptionList = await graphQLService.queryBridgeProposalCreated({
+        sourceChainId: L2ChainId
+      })
 
       for (let i = 0; i < totalProposals; i++) {
         const proposalRaw = descriptionList.data.governorProposalCreateds[i]

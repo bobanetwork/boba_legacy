@@ -31,6 +31,7 @@ import { selectTheme } from 'selectors'
 import Router from './routes'
 import CustomThemeProvider from 'themes'
 import { Background } from 'components/global/background'
+import FallbackLoader from './FallbackLoader'
 
 function App() {
   const dispatch = useDispatch()
@@ -420,7 +421,7 @@ function App() {
                 backgroundColor: `linear-gradient(180deg, #061122 0%, #08162C 100%)`,
               }}
             >
-              <Suspense fallback={<>Loading...</>}>
+              <Suspense fallback={<FallbackLoader />}>
                 <Router />
               </Suspense>
             </div>
