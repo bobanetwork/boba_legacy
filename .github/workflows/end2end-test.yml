@@ -17,7 +17,11 @@ jobs:
         with:
           node-version: 16.16.0
           cache: 'yarn'
-        continue-on-error: true
+      - uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
 
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests

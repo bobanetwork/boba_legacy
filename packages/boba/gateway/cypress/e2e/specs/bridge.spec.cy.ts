@@ -7,6 +7,12 @@ describe('Bridge', () => {
     bridge.visit()
     bridge.verifyReduxStoreSetup('baseEnabled', true)
     bridge.requestMetamaskConnect()
+    bridge.verifyReduxStoreSetup('accountEnabled', true)
+    bridge
+      .getReduxStore()
+      .its('setup')
+      .its('walletAddress')
+      .should('not.be.empty')
   })
   after(() => {
     bridge.header.disconnectWallet()
