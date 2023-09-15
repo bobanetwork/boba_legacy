@@ -60,7 +60,9 @@ class GraphQLService {
     })
   }
 
-  async queryBridgeProposalCreated() {
+  async queryBridgeProposalCreated({
+    sourceChainId
+  }) {
 
     const query = gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
 
@@ -84,7 +86,7 @@ class GraphQLService {
       }
     }
 
-    return await this.conductQuery(query)
+    return await this.conductQuery(query, null, sourceChainId)
   }
 
 }
