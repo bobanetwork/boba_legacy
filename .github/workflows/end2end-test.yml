@@ -1,11 +1,7 @@
 name: End to end test(Headful)
 permissions: read-all
 
-on:
-  push:
-  pull_request:
-    paths:
-      - 'packages/boba/gateway/**/*'
+on: push
 
 jobs:
   End-to-End-Test:
