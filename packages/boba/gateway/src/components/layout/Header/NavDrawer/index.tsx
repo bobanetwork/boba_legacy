@@ -1,5 +1,5 @@
 import { Drawer } from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import makeStyles from '@mui/styles/makeStyles'
 import SunIcon from 'assets/images/theme-sun.svg'
 import { Svg, SwitchButton } from 'components/global'
 import React, { FC, useState } from 'react'

@@ -1,7 +1,7 @@
 import React from 'react'
 import {  useSelector } from 'react-redux'
 
-import Connect from 'containers/connect/Connect'
+import Connect from 'containers/connect'
 
 import { selectLayer, selectAccountEnabled } from 'selectors'
 

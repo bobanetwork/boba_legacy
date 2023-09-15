@@ -16,18 +16,11 @@ limitations under the License. */
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { isEqual, orderBy } from 'util/lodash';
-
-
 import { useSelector } from 'react-redux'
 
-import "react-datepicker/dist/react-datepicker.css"
-
-import { setActiveDataTab } from 'actions/uiAction'
 import { fetchSevens, fetchFastExits } from 'actions/networkAction'
 
-import { selectBaseEnabled, selectActiveDataTab, selectSevens, selectFastExits } from 'selectors'
-
-import Tabs from 'components/tabs/Tabs'
+import { selectBaseEnabled, selectSevens, selectFastExits } from 'selectors'
 
 import Sevens from './Sevens'
 import FastExits from './FastExits'
@@ -45,7 +38,6 @@ function BobaScope() {
 
   const [ searchData, setSearchData ] = useState('')
 
-  const activeTab = useSelector(selectActiveDataTab, isEqual)
   const baseEnabled = useSelector(selectBaseEnabled())
 
   const unorderedSevens = useSelector(selectSevens, isEqual)

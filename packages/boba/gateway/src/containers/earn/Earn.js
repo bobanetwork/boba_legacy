@@ -34,12 +34,12 @@ import {
 
 import { getEarnInfo } from 'actions/earnAction'
 
-import Connect from 'containers/connect/Connect'
+import Connect from 'containers/connect'
 
 import ListEarn from 'components/listEarn/ListEarn'
 import AlertIcon from 'components/icons/AlertIcon'
 import Tooltip from 'components/tooltip/Tooltip';
-import LayerSwitcher from 'components/mainMenu/layerSwitcher/LayerSwitcher'
+import Button from 'components/button/Button'
 
 import networkService from 'services/networkService'
 
@@ -53,6 +53,7 @@ import { Typography } from 'components/global/typography'
 import { toLayer } from './types'
 
 import { BridgeTooltip } from './tooltips'
+import { setConnectBOBA, setConnectETH } from 'actions/setupAction';
 
 const Earn = () => {
   const dispatch = useDispatch();
@@ -68,6 +69,7 @@ const Earn = () => {
 
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const networkName = useSelector(selectActiveNetworkName())
 
   const [showMDO, setShowMDO] = useState(false)
   const [showMSO, setShowMSO] = useState(false)
@@ -148,7 +150,16 @@ const Earn = () => {
               You are on {layer}. To transact on {toLayer[layer]}, SWITCH LAYER to {toLayer[layer]}
             </S.AlertText>
           </S.AlertInfo>
-          <LayerSwitcher isButton={true} />
+          <Button
+            type="primary"
+            variant="contained"
+            size="md"
+            newStyle
+            onClick={() => (layer === 'L1') ? dispatch(setConnectBOBA(true)) : dispatch(setConnectETH(true))}
+            sx={{ fontWeight: '500;' }}
+          >
+            Connect to {networkName[ layer === 'L1' ? 'l2' : 'l1' ]}
+          </Button>
         </S.LayerAlert>
       )}
 
