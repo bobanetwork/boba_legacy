@@ -1,7 +1,15 @@
 name: End to end test(Headful)
 permissions: read-all
 
-on: push
+on:
+  push:
+    paths:
+      - 'packages/boba/gateway/**/*'
+      - '.github/workflows/end2end-test.yml'
+  pull_requests:
+    paths:
+      - 'packages/boba/gateway/**/*'
+      - '.github/workflows/end2end-test.yml'
 
 jobs:
   End-to-End-Test:
