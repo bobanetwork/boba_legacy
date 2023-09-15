@@ -23,7 +23,7 @@ import { openModal } from 'actions/uiAction'
 
 import * as S from './Save.styles'
 
-import Connect from 'containers/connect/Connect'
+import Connect from 'containers/connect'
 
 import { toWei_String } from 'util/amountConvert'
 import networkService from 'services/networkService'

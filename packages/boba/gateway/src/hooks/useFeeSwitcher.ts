@@ -1,7 +1,7 @@
 import { switchFee } from 'actions/setupAction'
 import { openAlert, openError } from 'actions/uiAction'
 import BN from 'bignumber.js'
-import { isEqual } from 'lodash'
+import { isEqual } from 'util/lodash'
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectBobaFeeChoice, selectlayer2Balance } from 'selectors'
