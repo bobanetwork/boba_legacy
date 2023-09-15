@@ -36,12 +36,26 @@ const Chains = (props: Props) => {
   const L1Icon = icons['L1']
   const L2Icon = icons['L2']
 
-  const openNetworkPicker = (inputLayer: string) => {
+  const openNetworkPicker = (
+    inputLayer: string,
+    destNetworkSelection: boolean
+  ) => {
     let sLayer = inputLayer
     if (layer && layer === LAYER.L2) {
       sLayer = inputLayer === 'l1' ? 'l2' : 'l1'
     }
-    dispatch(openModal('networkPicker', null, null, null, null, null, sLayer))
+    dispatch(
+      openModal(
+        'networkPicker',
+        null,
+        null,
+        null,
+        null,
+        null,
+        sLayer,
+        destNetworkSelection
+      )
+    )
   }
 
   const L1ChainInfo = () => {
@@ -74,7 +88,7 @@ const Chains = (props: Props) => {
     <ChainContainer>
       <ChainPickerContainer>
         <SectionLabel>From</SectionLabel>
-        <ChainPicker onClick={() => openNetworkPicker('l1')}>
+        <ChainPicker onClick={() => openNetworkPicker('l1', false)}>
           {!layer || layer === LAYER.L1 ? <L1ChainInfo /> : <L2ChainInfo />}
           <ChainPickerIcon>
             <DownArrow />
@@ -86,7 +100,7 @@ const Chains = (props: Props) => {
       </SwitchChainIcon>
       <ChainPickerContainer>
         <SectionLabel>To</SectionLabel>
-        <ChainPicker onClick={() => openNetworkPicker('l2')}>
+        <ChainPicker onClick={() => openNetworkPicker('l2', true)}>
           {!layer || layer === LAYER.L1 ? <L2ChainInfo /> : <L1ChainInfo />}
           <ChainPickerIcon>
             <DownArrow />

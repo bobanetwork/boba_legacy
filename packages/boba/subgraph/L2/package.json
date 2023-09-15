@@ -4,23 +4,26 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
+    "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml",
     "prepare:goerli": "mustache config/goerli.json subgraph.template.yaml > subgraph.yaml",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "create:subgraph:local": "graph create --node http://127.0.0.1:8020 boba/Bridges",
     "create:subgraph:goerli": "graph create --node https://graph.goerli.boba.network:8020 boba/Bridges",
+    "deploy:subgraph:local": "graph deploy boba/Bridges --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
     "deploy:subgraph:goerli": "graph deploy boba/Bridges --ipfs https://graph.goerli.boba.network:5001 --node https://graph.goerli.boba.network:8020",
     "deploy:subgraph:mainnet": "graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.29.0",
-    "@graphprotocol/graph-ts": "^0.26.0"
+    "@graphprotocol/graph-cli": "^0.55.0",
+    "@graphprotocol/graph-ts": "^0.31.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "3.4.1",
+    "@openzeppelin/contracts": "^4.9.3",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
     "mustache": "^4.2.0",
-    "truffle": "^5.0.4",
-    "truffle-contract": "^4.0.5",
-    "truffle-hdwallet-provider": "^1.0.4"
+    "truffle": "^5.11.2",
+    "truffle-contract": "^4.0.31",
+    "truffle-hdwallet-provider": "^1.0.17"
   }
 }

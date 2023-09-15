@@ -6,19 +6,11 @@ import { logAmount, powAmount, formatLargeNumber } from 'util/amountConvert';
 import { BigNumber } from 'ethers';
 
 import { openAlert, openModal } from 'actions/uiAction';
-
 import { getEarnInfo, updateStakeToken, updateWithdrawToken } from 'actions/earnAction';
-
-
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import networkService from 'services/networkService'
-
 import { Box,Fade, CircularProgress } from '@mui/material';
 import * as S from "./styles"
 import { getAllAddresses, getReward } from 'actions/networkAction';
-
-import {AprLabel} from 'components/global/label'
 import {IconLabel} from 'components/global/IconLabel';
 import {TableContent} from 'components/global/table'
 
@@ -194,7 +186,7 @@ class ListEarn extends React.Component {
       { content: <IconLabel token={{ name, symbol, address, chainId, decimals }} />, width:225 },
       { content: <Typography variant="body2"> {formatNumber(poolInfo.tokenBalance)}</Typography>,width:145 },
       { content: <Typography variant="body2"> {formatNumber(poolInfo.userDepositAmount)} </Typography>,width:115 },
-      { content: <AprLabel>{`${logAmount(poolInfo.APR, 0, 2)}`}</AprLabel>, width:85 },
+      { content: <Typography variant="body2">{`${logAmount(poolInfo.APR, 0, 2)}`}</Typography>, width: 85 },
       { content: <Typography variant="body2"> {userInfo.amount ? `${logAmount(userInfo.amount, decimals, 2)}` : `0`}</Typography>, width:90 },
       { content: <Typography variant="body2">{ userReward ? `${logAmount(userReward, decimals, 5)}` : `0`}</Typography>
          ,

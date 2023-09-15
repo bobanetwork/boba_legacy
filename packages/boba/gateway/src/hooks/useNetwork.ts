@@ -26,7 +26,7 @@ const useNetwork = () => {
   const activeNetwork = useSelector(selectActiveNetwork())
 
   useEffect(() => {
-    const { name, icon } = (NetworkList as any)[
+    const { name, icon, chainId } = (NetworkList as any)[
       activeNetworkType as any
     ].filter((n: any) => n.chain === activeNetwork)[0]
 
@@ -35,6 +35,7 @@ const useNetwork = () => {
         name,
         network: activeNetwork,
         networkIcon: icon,
+        chainIds: chainId,
       })
     )
   }, [dispatch, activeNetworkType, activeNetwork])

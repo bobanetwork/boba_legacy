@@ -31,6 +31,7 @@ export const TokenSelectorInput = styled.div`
   display: flex;
   flex: 1;
   width: 100%;
+  min-height: 56px;
   padding: 8px 16px;
   align-items: center;
   gap: 8px;
@@ -66,7 +67,10 @@ export const BridgeInfoContainer = styled.div`
     name === 'light' ? 'transparant' : 'rgba(238, 238, 238, 0.05)'};
 
   /* Green Hilight */
-  box-shadow: 0px 4px 10px 0px rgba(186, 226, 26, 0.1);
+  box-shadow: ${({ theme }) =>
+    theme.name === 'light'
+      ? 'none'
+      : '0px 4px 10px 0px rgba(186, 226, 26, 0.1);'};
 `
 
 export const InfoRow = styled.div`
@@ -82,7 +86,8 @@ export const TokenLabel = styled(Typography).attrs({
   variant: 'body1',
 })`
   flex: 1;
-  color: ${({ theme: { colors } }) => colors.color};
+  color: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[600] : colors.color};
 `
 
 export const TokenPickerIcon = styled.div`
@@ -90,13 +95,19 @@ export const TokenPickerIcon = styled.div`
 `
 export const DownArrow = styled(Svg).attrs(({ theme }) => ({
   src: ArrowDown,
-  fill: `${theme.name === 'light' ? '#000' : '#fff'}`,
-}))``
+  fill: `${
+    theme.name === 'light' ? theme.colors.gray[600] : theme.colors.gray[100]
+  }`,
+}))`
+  div {
+    display: flex;
+  }
+`
 
 export const ReceiveAmount = styled(Typography).attrs({
   variant: 'title',
 })`
-  padding: 12px 16px;
+  padding: 16px;
   border-radius: 12px;
   border: 1px solid
     ${({ theme }) =>

@@ -26,8 +26,8 @@ export const LayerAlert = styled.div`
   align-items: center;
   gap: 30px;
   border-radius: 8px;
-  margin: 20px 0px;
-  padding: 25px;
+  margin: 8px 0px;
+  padding: 10px;
   background: ${(props) => props.theme.colors.box.background};
 `
 
@@ -41,6 +41,11 @@ export const Help = styled.div`
   padding: 10px;
   border-radius: 8px;
   background: ${(props) => props.theme.colors.box.background};
+  ${({ theme: { name, colors } }) => css`
+    border: 1px solid ${name === 'light' ? colors.blue[200] : colors.blue[100]};
+    background: ${name === 'light' ? colors.blue[50] : colors.blue[500]};
+    color: ${name === 'light' ? colors.blue[500] : colors.blue[100]};
+  `}
 `
 
 export const AlertText = styled(Typography)`
@@ -83,6 +88,7 @@ export const EarnActionContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: 10px 0px;
 `
 
 export const EarnListContainer = styled.div`

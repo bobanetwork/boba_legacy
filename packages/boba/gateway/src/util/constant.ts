@@ -15,6 +15,7 @@ export const GAS_POLL_INTERVAL: EnvType =
 export const GA4_MEASUREMENT_ID: EnvType =
   process.env.REACT_APP_GA4_MEASUREMENT_ID || null
 export const APP_ENV: EnvType = process.env.REACT_APP_ENV || 'dev'
+export const isDevBuild = () => APP_ENV === 'dev'
 export const SENTRY_DSN: EnvType = process.env.REACT_APP_SENTRY_DSN || null
 export const INFURA_ID: EnvType = process.env.REACT_APP_INFURA_ID
 export const MAX_HEALTH_BLOCK_LAG: EnvType =
@@ -22,8 +23,6 @@ export const MAX_HEALTH_BLOCK_LAG: EnvType =
 export const WALLET_VERSION: EnvType = process.env.REACT_APP_WALLET_VERSION
 export const SPEED_CHECK: EnvType = process.env.REACT_APP_SPEED_CHECK
 export const TARGET_CHAIN_URL: EnvType = process.env.REACT_APP_TARGET_CHAIN_URL
-// VE DAO FLAG
-export const DISABLE_VE_DAO: EnvType = process.env.REACT_APP_DISABLE_VE_DAO
 // WalletConnect FLAG
 export const DISABLE_WALLETCONNECT: EnvType =
   process.env.REACT_APP_DISABLE_WALLETCONNECT
@@ -111,7 +110,7 @@ export const PAGES_BY_NETWORK: PagesByNetworkType = {
   avax: ['Bridge', 'Wallet', 'Earn', 'History'],
 }
 
-enum Layer {
+export enum Layer {
   L1 = 'L1',
   L2 = 'L2',
 }

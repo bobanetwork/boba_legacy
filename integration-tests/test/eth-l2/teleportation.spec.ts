@@ -127,8 +127,8 @@ describe('teleportation', () => {
         teleportationAddress: Teleportation.address,
         height: 0,
         supportedAssets: {
-          [L2BOBA.address]: 'BOBA',
-          [ethers.constants.AddressZero]: 'ETH',
+          [L2BOBA.address?.toLowerCase()]: 'BOBA',
+          [ethers.constants.AddressZero?.toLowerCase()]: 'ETH',
         },
       },
       // bnb will be added in routing tests to have cleaner before hooks
@@ -649,8 +649,8 @@ describe('teleportation', () => {
           teleportationAddress: TeleportationBNB.address,
           height: 0,
           supportedAssets: {
-            [L2BobaOnBobaBnb.address]: 'BOBA',
-            [ethers.constants.AddressZero]: 'BNB', // simulate BNB for native to token teleport
+            [L2BobaOnBobaBnb.address?.toLowerCase()]: 'BOBA',
+            [ethers.constants.AddressZero?.toLowerCase()]: 'BNB', // simulate BNB for native to token teleport
           },
         },
       ]
@@ -664,9 +664,9 @@ describe('teleportation', () => {
           teleportationAddress: Teleportation.address,
           height: 0,
           supportedAssets: {
-            [L2BOBA.address]: 'BOBA',
-            [ethers.constants.AddressZero]: 'ETH',
-            [L2BNBOnBobaEth.address]: 'BNB',
+            [L2BOBA.address?.toLowerCase()]: 'BOBA',
+            [ethers.constants.AddressZero?.toLowerCase()]: 'ETH',
+            [L2BNBOnBobaEth.address?.toLowerCase()]: 'BNB',
           },
         },
       ]
@@ -714,8 +714,8 @@ describe('teleportation', () => {
             token,
             sourceChainId
           )
-        expect(receivingChainTokenAddr).to.be.eq(
-          L2BOBA.address,
+        expect(receivingChainTokenAddr.toLowerCase()).to.be.eq(
+          L2BOBA.address.toLowerCase(),
           'BOBA token address on BNB not correctly routed'
         )
 
@@ -794,8 +794,8 @@ describe('teleportation', () => {
             token,
             sourceChainId
           )
-        expect(receivingChainTokenAddr).to.be.eq(
-          L2BNBOnBobaEth.address,
+        expect(receivingChainTokenAddr.toLowerCase()).to.be.eq(
+          L2BNBOnBobaEth.address.toLowerCase(),
           'BNB token address on Boba ETH not correctly routed'
         )
 

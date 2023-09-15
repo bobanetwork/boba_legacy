@@ -1,9 +1,8 @@
-import isEqual from 'lodash/isEqual'
-import intersection from 'lodash/intersection'
-import orderBy from 'lodash/orderBy'
-import groupBy from 'lodash/groupBy'
-import keyBy from 'lodash/keyBy'
-import flatten from 'lodash/flatten'
+import isEqual from 'lodash.isequal'
+import intersection from 'lodash.intersection'
+import orderBy from 'lodash.orderby'
+import keyBy from 'lodash.keyby'
+import flatten from 'lodash.flatten'
 
 
-export { isEqual, intersection, orderBy, groupBy, keyBy, flatten};
+export { isEqual, intersection, orderBy, keyBy, flatten };

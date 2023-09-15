@@ -5,18 +5,14 @@ import CDMCompletionModal from './CDMCompletion/CDMCompletionModal'
 import CastVoteModal from './dao/CastVoteModal'
 import DelegateDaoModal from './dao/DelegateDaoModal'
 import NewProposalModal from './dao/NewProposalModal'
-import DepositBatchModal from './deposit/DepositBatchModal'
-import DepositModal from './deposit/DepositModal'
+
 import EarnDepositModal from './earn/EarnDepositModal'
 import EarnWithdrawModal from './earn/EarnWithdrawModal'
-import ExitModal from './exit/ExitModal'
 import InstallMetaMaskModal from './noMetaMask/InstallMetaMaskModal/InstallMetaMaskModal'
 import NoMetaMaskModal from './noMetaMask/NoMetaMaskModal'
 import SwitchNetworkModal from './switchNetwork/SwitchNetworkModal'
 import TokenPickerModal from './tokenPicker/TokenPickerModal'
 import TransferModal from './transfer/TransferModal'
-import TransferNFTModal from './transfer/TransferNFTModal'
-import ManageLockModal from './veBoba/ManageLockModal'
 import WrongNetworkModal from './wrongNetwork/WrongNetworkModal'
 import TransferPendingModal from './transferPending/TransferPending'
 import WalletSelectorModal from './walletSelector/WalletSelectorModal'
@@ -37,17 +33,11 @@ const ModalContainer = () => {
     selectModalState('UnsupportedNetwork')
   )
 
-  const depositModalState = useSelector(selectModalState('depositModal'))
   const depositBatchModalState = useSelector(
     selectModalState('depositBatchModal')
   )
 
   const transferModalState = useSelector(selectModalState('transferModal'))
-  const transferNFTModalState = useSelector(
-    selectModalState('transferNFTModal')
-  )
-
-  const exitModalState = useSelector(selectModalState('exitModal'))
   const tokenPickerModalState = useSelector(selectModalState('tokenPicker'))
   const transferPendingModalState = useSelector(
     selectModalState('transferPending')
@@ -59,7 +49,6 @@ const ModalContainer = () => {
   const installMetaMaskModalState = useSelector(
     selectModalState('installMetaMaskModal')
   )
-  const manageLockModalState = useSelector(selectModalState('manageLock'))
   const walletSelectorModalState = useSelector(
     selectModalState('walletSelectorModal')
   )
@@ -118,20 +107,8 @@ const ModalContainer = () => {
         <UnsupportedNetworkModal open={UnsupportedNetworkModalState} />
       )}
 
-      {!!depositModalState && (
-        <DepositModal open={depositModalState} token={token} fast={fast} />
-      )}
-      {!!depositBatchModalState && (
-        <DepositBatchModal open={depositBatchModalState} />
-      )}
       {!!transferModalState && (
         <TransferModal open={transferModalState} token={token} />
-      )}
-      {!!transferNFTModalState && (
-        <TransferNFTModal open={transferNFTModalState} token={token} />
-      )}
-      {!!exitModalState && (
-        <ExitModal open={exitModalState} token={token} fast={fast} />
       )}
       {!!EarnDepositModalState && (
         <EarnDepositModal open={EarnDepositModalState} />
@@ -168,9 +145,6 @@ const ModalContainer = () => {
       )}
       {!!installMetaMaskModalState && (
         <InstallMetaMaskModal open={installMetaMaskModalState} />
-      )}
-      {!!manageLockModalState && (
-        <ManageLockModal open={manageLockModalState} lock={lock} />
       )}
       {!!walletSelectorModalState && (
         <WalletSelectorModal open={walletSelectorModalState} />

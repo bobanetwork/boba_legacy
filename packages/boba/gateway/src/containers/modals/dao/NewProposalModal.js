@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 import React, { useState, useEffect } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -24,13 +24,17 @@ import Modal from 'components/modal/Modal'
 import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
-import Select from 'components/select/Select'
-
 import { createDaoProposal } from 'actions/daoAction'
-import { selectProposalThreshold,selectLockRecords } from 'selectors'
-import BobaGlassIcon from 'components/icons/BobaGlassIcon'
-import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
+import { selectProposalThreshold } from 'selectors'
 import { Dropdown } from 'components/global/dropdown'
+import { Typography } from 'components/global'
+import styled from 'styled-components'
+
+const StyledDescription = styled(Typography).attrs({
+  variant: 'body2'
+})`
+color: ${({ theme, error }) => error ? theme.colors.red[ 200 ] : theme.name === 'light' ? theme.colors.gray[ 700 ] : theme.colors.gray[ 100 ]};
+`
 
 const NewProposalModal = ({ open }) => {
 
@@ -49,30 +53,11 @@ const NewProposalModal = ({ open }) => {
 
   const [ proposeText, setProposeText ] = useState('')
   const [ proposalUri, setProposalUri ] = useState('')
-  const [ nftOptions, setNftOptions ] = useState([]);
+
 
   const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
 
   const proposalThreshold = useSelector(selectProposalThreshold)
-  const records = useSelector(selectLockRecords);
-
-  useEffect(() => {
-    if (records && records.length > 0) {
-      const options = records.map((token) => ({
-        value: token.tokenId,
-        balance: token.balance,
-        label: `#${token.tokenId}`,
-        title: `VeBoba - ${token.balance}`,
-        subTitle: `Lock Amount - ${token.lockedAmount}`,
-        icon: BobaNFTGlass
-      }))
-      setNftOptions(options);
-    }
-
-    return () => {
-      setNftOptions([]);
-    };
-  }, [ records ]);
 
   useEffect(() => {
     let tokensSum = tokens.reduce((c, i) => c + Number(i.balance), 0);
@@ -81,7 +66,7 @@ const NewProposalModal = ({ open }) => {
     } else {
       setErrorText('')
     }
-  },[tokens, proposalThreshold])
+  }, [ tokens, proposalThreshold ])
 
 
   const onActionChange = (e) => {
@@ -192,49 +177,31 @@ const NewProposalModal = ({ open }) => {
       open={open}
       onClose={handleClose}
       maxWidth="sm"
-      title="New Proposal"
+      title="Create Proposal"
     >
       <Box>
-
-
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {action === '' &&
-            <Typography variant="body2" >
+            <StyledDescription>
               Currently, the DAO can change the voting threshold, propose free-form text proposals, and
               change to the bridge fee limits for the L1 and L2 bridge pools.
-            </Typography>
+            </StyledDescription>
           }
-
-          <Dropdown
-            style={{ zIndex: 3 }}
-            onItemSelected={(val)=> setTokens(val)}
-            defaultItem={{
-                value: null,
-                label: 'Select Nft type',
-            }}
-            items={nftOptions}
-          />
-
-
           <Dropdown
             style={{ zIndex: 1 }}
             onItemSelected={onActionChange}
             defaultItem={{
-                value: null,
-                label: 'Select Proposal type',
+              value: null,
+              label: 'Select Proposal type',
             }}
             items={options}
           />
 
-
-
           {action === 'change-threshold' &&
             <>
-              <Typography variant="body2"
-                style={{ lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5' }}
-              >
+            <StyledDescription>
                 The minimum number of votes required for an account to create a proposal. The current value is {proposalThreshold}.
-              </Typography>
+            </StyledDescription>
               <Input
                 label="DAO voting threshold"
                 placeholder='New voting threshold (e.g. 65000)'
@@ -248,12 +215,10 @@ const NewProposalModal = ({ open }) => {
           }
           {(action === 'change-lp1-fee' || action === 'change-lp2-fee') &&
             <>
-              <Typography variant="body2"
-                style={{ lineHeight: '1.1', fontSize: '0.9em', color: '#f8e5e5' }}
-              >
+            <StyledDescription>
                 Possible settings range from 0.0% to 5.0%.
                 All three values must be specified and the maximum fee must be larger than the minimum fee.
-              </Typography>
+            </StyledDescription>
               <Input
                 label="New LP minimium fee (%)"
                 placeholder="Minimium fee (e.g. 1.0)"
@@ -282,23 +247,18 @@ const NewProposalModal = ({ open }) => {
           }
           {action === 'text-proposal' &&
             <>
-              <Typography
-                variant="body2"
-                style={{ lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5' }}
-              >
+            <StyledDescription>
                 Your proposal title is limited to 100 characters. Use the link field below to provide more information.
-              </Typography>
+            </StyledDescription>
               <Input
                 placeholder="Title (<100 characters)"
                 value={proposeText}
                 onChange={(i) => setProposeText(i.target.value.slice(0, 100))}
               />
-              <Typography variant="body2"
-                style={{ lineHeight: '1', fontSize: '0.8em', color: '#f8e5e5' }}
-              >
+            <StyledDescription>
                 You should provide additional information (technical specifications, diagrams, forum threads, and other material) on a seperate
                 website. The link length is limited to 150 characters. You may need to use a link shortener.
-              </Typography>
+            </StyledDescription>
               <Input
                 placeholder="URI, https://..."
                 value={proposalUri}
@@ -306,7 +266,7 @@ const NewProposalModal = ({ open }) => {
               />
             </>
           }
-        {errorText ? <Typography variant="body2" color="danger" sx={{ mt: 1 }}>{errorText}</Typography> : null}
+          {errorText ? <StyledDescription error={true}>{errorText}</StyledDescription> : null}
         </Box>
       </Box>
       <Box sx={{ width: '100%', my: 2 }}>

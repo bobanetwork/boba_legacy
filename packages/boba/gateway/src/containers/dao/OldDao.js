@@ -41,7 +41,7 @@ import {
 } from 'selectors'
 
 import * as S from './OldDao.styles'
-import Connect from 'containers/connect/Connect'
+import Connect from 'containers/connect'
 import { TabHeader } from 'components/global/tabHeader'
 import useInterval from 'hooks/useInterval';
 import { NETWORK } from 'util/network/network.util';
@@ -151,7 +151,7 @@ const OldDao = () => {
                 </Typography>
                 <Typography
                   variant="head"
-                  style={{ color: 'rgba(144, 180, 6, 1)' }}
+                  style={{ marginTop: '8px', color: 'rgba(144, 180, 6, 1)' }}
                 >
                   {!!layer ? Math.round(Number(balance)) : '--'}
                 </Typography>
@@ -163,7 +163,7 @@ const OldDao = () => {
                 </Typography>
                 <Typography
                   variant="head"
-                  style={{ color: 'rgba(144, 180, 6, 1)' }}
+                  style={{ marginTop: '8px', color: 'rgba(144, 180, 6, 1)' }}
                 >
                   {!!layer ? Math.round(Number(balanceX)) : '--'}
                 </Typography>
@@ -185,7 +185,7 @@ const OldDao = () => {
                   dispatch(openModal('delegateDaoModal'))
                 }}
                 disable={!accountEnabled}
-                label="Stake BOBA"
+              label="Delegate Vote"
               />
             }
             {accountEnabled &&
