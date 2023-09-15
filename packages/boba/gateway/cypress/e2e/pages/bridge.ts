@@ -66,7 +66,6 @@ export default class Bridge extends Page {
   }
 
   bridgeToken(tokenSymbol: string, amount: string, destinationLayer: Layer) {
-    const closeIconSrc = new RegExp('^.*close.*.svg$')
     this.selectToken(tokenSymbol)
     if (destinationLayer === Layer.L1) {
       this.getReduxStore()
@@ -85,7 +84,8 @@ export default class Bridge extends Page {
     this.getReduxStore()
       .its('bridge')
       .its('amountToBridge')
-      .should('equal', amount)
+      .then(parseFloat)
+      .should('equal', parseFloat(amount))
 
     cy.get('button').contains('Bridge').should('exist').click()
     cy.contains(`${amount} ${tokenSymbol}`, { timeout: 60000 }).should('exist')
