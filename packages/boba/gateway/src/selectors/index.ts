@@ -12,7 +12,6 @@ export * from 'selectors/signatureSelector'
 export * from 'selectors/tokenSelector'
 export * from 'selectors/transactionSelector'
 export * from 'selectors/uiSelector'
-export * from 'selectors/veBobaSelector'
 export * from 'selectors/verifierSelector'
 export * from 'selectors/fixedSelector'
 

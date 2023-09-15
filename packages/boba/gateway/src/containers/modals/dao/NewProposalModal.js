@@ -25,8 +25,7 @@ import Button from 'components/button/Button'
 import Input from 'components/input/Input'
 
 import { createDaoProposal } from 'actions/daoAction'
-import { selectProposalThreshold, selectLockRecords } from 'selectors'
-import BobaNFTGlass from 'assets/images/boba2/BobaNFTGlass.svg'
+import { selectProposalThreshold } from 'selectors'
 import { Dropdown } from 'components/global/dropdown'
 import { Typography } from 'components/global'
 import styled from 'styled-components'
@@ -54,30 +53,11 @@ const NewProposalModal = ({ open }) => {
 
   const [ proposeText, setProposeText ] = useState('')
   const [ proposalUri, setProposalUri ] = useState('')
-  const [ nftOptions, setNftOptions ] = useState([]);
+
 
   const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
 
   const proposalThreshold = useSelector(selectProposalThreshold)
-  const records = useSelector(selectLockRecords);
-
-  useEffect(() => {
-    if (records && records.length > 0) {
-      const options = records.map((token) => ({
-        value: token.tokenId,
-        balance: token.balance,
-        label: `#${token.tokenId}`,
-        title: `VeBoba - ${token.balance}`,
-        subTitle: `Lock Amount - ${token.lockedAmount}`,
-        icon: BobaNFTGlass
-      }))
-      setNftOptions(options);
-    }
-
-    return () => {
-      setNftOptions([]);
-    };
-  }, [ records ]);
 
   useEffect(() => {
     let tokensSum = tokens.reduce((c, i) => c + Number(i.balance), 0);
@@ -207,18 +187,6 @@ const NewProposalModal = ({ open }) => {
               change to the bridge fee limits for the L1 and L2 bridge pools.
             </StyledDescription>
           }
-
-          {/*           <Dropdown
-            style={{ zIndex: 3 }}
-            onItemSelected={(val) => setTokens(val)}
-            defaultItem={{
-              value: null,
-              label: 'Select Nft type',
-            }}
-            items={nftOptions}
-          />
-
- */}
           <Dropdown
             style={{ zIndex: 1 }}
             onItemSelected={onActionChange}
