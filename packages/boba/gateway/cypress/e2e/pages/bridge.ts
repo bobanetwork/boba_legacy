@@ -73,7 +73,12 @@ export default class Bridge extends Page {
         .its('bobaFeePriceRatio')
         .should('not.be.empty')
 
+      this.verifyReduxStoreSetup('netLayer', Layer.L2)
       this.getReduxStore().its('balance').its('exitFee').should('not.be.empty')
+      this.getReduxStore()
+        .its('balance')
+        .its('classicExitCost')
+        .should('equal', 0)
     }
 
     cy.get(`input[placeholder="Amount to bridge to ${destinationLayer}"]`)
