@@ -50,7 +50,11 @@ const _Modal = ({
                 <S.TitleContainer>
                   <Heading variant="h2">{title}</Heading>
                   <S.IconButtonTag onClick={onClose}>
-                    <Svg src={CloseIcon} fill="#fff" />
+                    <Svg
+                      src={CloseIcon}
+                      fill="#fff"
+                      ariaLabel={'closeModalIcon'}
+                    />
                   </S.IconButtonTag>
                 </S.TitleContainer>
               </S.ModalHead>

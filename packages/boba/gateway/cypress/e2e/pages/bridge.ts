@@ -102,14 +102,7 @@ export default class Bridge extends Page {
         .should('exist')
     }
     this.getModal()
-      .find('svg')
-      .filter((i, element) => {
-        const svgDataSource = Cypress.$(element).attr('data-src')
-        if (svgDataSource && closeIconSrc.test(svgDataSource)) {
-          return true
-        }
-        return false
-      })
+      .find('div[aria-label=closeModalIcon]')
       .should('have.length', 1)
       .click()
   }

@@ -8,12 +8,14 @@ export const Svg: React.FC<SvgTypes> = ({
   stroke = 'current',
   onClick,
   className,
+  ariaLabel = 'svg',
 }) => (
   // @ts-ignore
   <ReactSVG
     src={src}
     onClick={onClick}
     className={className}
+    aria-label={ariaLabel}
     beforeInjection={(svg: SVGElement) => {
       svg.setAttribute('fill', fill)
       svg.setAttribute('stroke', stroke)
