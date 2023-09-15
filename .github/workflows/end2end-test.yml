@@ -52,7 +52,7 @@ jobs:
           REACT_APP_STATUS: normal
           REACT_APP_SPEED_CHECK: ${{ secrets.REACT_APP_SPEED_CHECK }}
           REACT_APP_DISABLE_VE_DAO: 1
-          REACT_APP_INFURA_ID: ${{ secrets.INFURA_ID }}
+          REACT_APP_INFURA_ID: ${{ secrets.E2E_TEST_INFURA_ID }}
           CYPRESS_REMOTE_DEBUGGING_PORT: 9222
           NETWORK_NAME: 'goerli'
           SECRET_WORDS: ${{secrets.E2E_TEST_WALLET_SECRET_WORDS}}
