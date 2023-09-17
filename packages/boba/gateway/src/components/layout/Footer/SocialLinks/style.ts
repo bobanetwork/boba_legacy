@@ -2,6 +2,12 @@ import { Typography } from '@mui/material'
 import styled, { css } from 'styled-components'
 import { mobile } from 'themes/screens'
 
+export const DisclaimerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 32px;
+`
+
 export const SocialLinksContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -16,8 +22,7 @@ export const StyledSocialLinks = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 30px;
-  flex: 1;
+  gap: 32px;
 `
 
 export const SocialLinkItem = styled.a`

@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   AppVersion,
+  DisclaimerContainer,
   SocialLinkItem,
   SocialLinksContainer,
   StyledSocialLinks,
@@ -16,6 +17,10 @@ interface Props {}
 const SocialLinks = (props: Props) => {
   return (
     <SocialLinksContainer>
+      <DisclaimerContainer>
+        <AppVersion>©2023 Enya Labs</AppVersion>
+        <AppVersion>v{WALLET_VERSION}</AppVersion>
+      </DisclaimerContainer>
       <StyledSocialLinks>
         <SocialLinkItem
           href="https://docs.boba.network"
@@ -46,7 +51,6 @@ const SocialLinks = (props: Props) => {
           <TelegramIcon />
         </SocialLinkItem>
       </StyledSocialLinks>
-      <AppVersion>v{WALLET_VERSION}</AppVersion>
     </SocialLinksContainer>
   )
 }

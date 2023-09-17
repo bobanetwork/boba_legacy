@@ -1,7 +1,14 @@
 import React, { useEffect } from 'react'
 import { FOOTERLINKS, FOOTERLINKS_RIGHT } from './constant'
 import { useSelector, useDispatch } from 'react-redux'
-import { LinkContainer, StyledLink, StyledNavLink } from './style'
+import {
+  ExplorereButton,
+  LinkContainer,
+  ScanContainer,
+  StyledLink,
+  StyledLinks,
+  StyledNavLink,
+} from './style'
 import { selectBlockExplorerLinks, selectBaseEnabled } from 'selectors'
 import { fetchBlockExplorerUrls } from 'actions/networkAction'
 
@@ -18,7 +25,7 @@ const FooterLinks = () => {
 
   return (
     <LinkContainer>
-      <div>
+      <StyledLinks>
         {FOOTERLINKS.map((link) => {
           if (link.isNav) {
             return (
@@ -33,28 +40,10 @@ const FooterLinks = () => {
             </StyledLink>
           )
         })}
-        {links && links.length > 0 ? (
-          <>
-            <StyledLink key={'Blockexplorer'} href={links[0]} target="_blank">
-              Blockexplorer
-            </StyledLink>
-            <StyledLink
-              key={'BobaBlockexplorer'}
-              href={links[1]}
-              target="_blank"
-            >
-              Boba Blockexplorer
-            </StyledLink>
-          </>
-        ) : null}
-      </div>
-      <div>
-        {FOOTERLINKS_RIGHT.map((link) => (
-          <StyledLink target="_blank" key={link.label} href={link.path}>
-            {link.label}
-          </StyledLink>
-        ))}
-      </div>
+      </StyledLinks>
+      <ScanContainer>
+        <ExplorereButton>Block Explorers</ExplorereButton>
+      </ScanContainer>
     </LinkContainer>
   )
 }
