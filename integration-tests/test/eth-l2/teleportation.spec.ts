@@ -76,7 +76,6 @@ describe('teleportation', () => {
   const airdropConfig = {
     airdropAmountWei: ethers.utils.parseEther('1'),
     airdropCooldownSeconds: 1000,
-    airdropMinUsdValue: '1',
   }
 
   before(async () => {
@@ -1245,97 +1244,6 @@ describe('teleportation', () => {
       )
       const gasDelta = ethers.utils.parseEther('0.003')
       expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo('0', gasDelta)
-      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
-        '0', gasDelta
-      )
-    })
-
-    it('do not receive gas on airdrop when usd value too low', async () => {
-      const teleportationServiceBnb = await startTeleportationService(true)
-      await teleportationServiceBnb.init()
-
-      // deposit token
-      const preBlockNumber = await ethers.provider.getBlockNumber()
-      await TeleportationBNB.connect(signer).teleportAsset(
-        ethers.constants.AddressZero,
-        defaultMinDepositAmount,
-        chainId, // toChainId
-        {value: defaultMinDepositAmount}
-      )
-
-      const blockNumber = await ethers.provider.getBlockNumber()
-      const events = await teleportationServiceBnb._getEvents(
-        TeleportationBNB,
-        TeleportationBNB.filters.AssetReceived(),
-        preBlockNumber,
-        blockNumber
-      )
-
-      expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
-
-      const teleportationServiceEth = await startTeleportationService(false, true)
-      await teleportationServiceEth.init()
-
-      // random address to ensure balance = 0 to be eligible for airdrop
-      const randAddress = ethers.Wallet.createRandom().address
-      const lastEvent = events[events.length - 1]
-      const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
-      const depositId = lastEvent.args.depositId
-      const amount = lastEvent.args.amount
-      const token = lastEvent.args.token
-      const emitter = lastEvent.args.emitter
-
-      const receivingChainTokenAddr =
-        teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
-          token,
-          sourceChainId
-        )
-      expect(receivingChainTokenAddr).to.be.eq(
-        L2BOBA.address?.toLowerCase(),
-        'BOBA token address on BNB not correctly routed'
-      )
-
-      let disbursement = [
-        {
-          token: receivingChainTokenAddr,
-          amount: amount.toString(),
-          addr: randAddress,
-          depositId: depositId.toNumber(),
-          sourceChainId: sourceChainId.toString(),
-        },
-      ]
-
-      console.log('Added disbursement: ', disbursement)
-
-      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
-
-      const preNativeBalance = await ethers.provider.getBalance(address1)
-      const preSignerNativeBalance = await ethers.provider.getBalance(randAddress)
-      const preBOBABalance = await L2BOBA.balanceOf(address1)
-      const preSignerBOBABalance = await L2BOBA.balanceOf(randAddress)
-
-      await teleportationServiceEth._disburseTx(
-        disbursement,
-        chainId,
-        blockNumber
-      )
-
-      const postNativeBalance = await ethers.provider.getBalance(address1)
-      const postSignerNativeBalance = await ethers.provider.getBalance(randAddress)
-      const postBOBABalance = await L2BOBA.balanceOf(address1)
-      const postSignerBOBABalance = await L2BOBA.balanceOf(randAddress)
-
-      expect(preBOBABalance.sub(postBOBABalance)).to.be.eq(
-        defaultMinDepositAmount
-      )
-      expect(postSignerBOBABalance.sub(preSignerBOBABalance)).to.be.eq(
-        defaultMinDepositAmount
-      )
-      // should not airdrop
-      const gasDelta = ethers.utils.parseEther('0.003')
-      expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo(
-        '0', gasDelta
-      )
       expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
         '0', gasDelta
       )

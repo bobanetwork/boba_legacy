@@ -29,7 +29,6 @@ import {historyDataRepository, lastAirdropRepository} from './data-source'
 import {IKMSSignerConfig, KMSSigner} from './utils/kms-signing'
 import {Asset, BobaChains} from "./utils/chains";
 import {LastAirdrop} from "./entities/LastAirdrop.entity";
-import {formatUnits} from "ethers/lib/utils";
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -54,8 +53,6 @@ interface TeleportationOptions {
   airdropConfig?: {
     /** Amount of native gas airdropped to user when conditions are met */
     airdropAmountWei?: BigNumberish,
-    /** Min USD value to be bridged to be eligible for an airdrop */
-    airdropMinUsdValue?: BigNumberish,
     /** Amount of seconds to wait after previous airdrop */
     airdropCooldownSeconds?: BigNumberish,
     /** Define if airdrop is enabled on this network */
