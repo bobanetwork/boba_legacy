@@ -142,7 +142,6 @@ const main = async () => {
     },
     airdropConfig: {
       airdropAmountWei: TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI,
-      airdropMinUsdValue: TELEPORTATION_AIRDROP_MIN_USD_VALUE,
       airdropCooldownSeconds: TELEPORTATION_AIRDROP_COOLDOWN_SECONDS,
       airdropEnabled: TELEPORTATION_AIRDROP_ENABLED,
     }
