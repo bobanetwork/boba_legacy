@@ -15,7 +15,7 @@ limitations under the License. */
 
 import React from 'react'
 
-import { Fade, Container, Box, useMediaQuery, useTheme } from '@mui/material'
+import { Fade, Container, Box } from '@mui/material'
 
 import { Heading } from 'components/global'
 import * as S from './styles'
@@ -34,9 +34,6 @@ const _Modal = ({
   isMobile = false,
   newStyle = false,
 }: ModalInterface) => {
-  const theme = useTheme()
-  const isMobileDevice = useMediaQuery(theme.breakpoints.down('md'))
-
   return (
     <S.StyledModal
       aria-labelledby="transition-modal-title"
