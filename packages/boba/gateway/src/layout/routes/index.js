@@ -6,7 +6,6 @@ import { selectActiveNetwork } from 'selectors';
 import { useRoutes } from 'react-router-dom';
 import { intersection } from 'util/lodash';
 
-
 export const Router = () => {
 
   const routeList = ROUTE_LIST;

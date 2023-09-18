@@ -31,7 +31,6 @@ import daoReducer from './daoReducer'
 import fixedReducer from './fixedReducer'
 import verifierReducer from './verifierReducer';
 import bridgeReducer from './bridgeReducer';
-import veBobaReducer from './veBobaReducer';
 import devToolsReducer from './devToolsReducer';
 import networkReducer from './networkReducer';
 
@@ -52,7 +51,6 @@ const rootReducer = combineReducers({
   fixed: fixedReducer,
   verifier: verifierReducer,
   bridge: bridgeReducer,
-  veboba: veBobaReducer,
   devTools: devToolsReducer,
   network: networkReducer
 })

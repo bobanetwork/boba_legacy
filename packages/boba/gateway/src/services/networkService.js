@@ -20,7 +20,7 @@ import {CrossChainMessenger,} from '@eth-optimism/sdk'
 import {BigNumber, ethers, utils} from 'ethers'
 
 import store from 'store'
-import {groupBy, orderBy} from 'util/lodash';
+import { orderBy } from 'util/lodash';
 import BN from 'bn.js'
 
 import {logAmount} from 'util/amountConvert'
@@ -65,12 +65,7 @@ import AuthenticatedFaucetJson from "../deployment/contracts/AuthenticatedFaucet
 import WAGMIv0Json from "../deployment/contracts/WAGMIv0.json"
 import WAGMIv1Json from "../deployment/contracts/WAGMIv1.json"
 
-//veBoba ABIs
-import veJson from "../deployment/contracts/ve.json"
-import voterJson from "../deployment/contracts/BaseV1Voter.json"
-
 // multi chain alt l1s ABI's
-// import AltL1BridgeJson from "../deployment/contracts/crosschain/AltL1Bridge.json"
 import ETHL1BridgeJson from "../deployment/contracts/crosschain/EthBridge.json"
 import L2StandardERC20Json from "../deployment/contracts/crosschain/L2StandardERC20.json"
 import LZEndpointMockJson from "../deployment/contracts/crosschain/LZEndpointMock.json"
@@ -84,8 +79,7 @@ import { graphQLService } from "./graphql.service"
 
 import tokenInfo from "@boba/register/addresses/tokenInfo"
 
-import {isDevBuild, Layer, MIN_NATIVE_L1_BALANCE} from 'util/constant'
-import {getPoolDetail} from 'util/poolDetails'
+import { isDevBuild, Layer, MIN_NATIVE_L1_BALANCE } from 'util/constant'
 import {CHAIN_ID_LIST, getNetworkDetail, getRpcUrl, NETWORK, NETWORK_TYPE, pingRpcUrl} from 'util/network/network.util'
 import appService from './app.service'
 import walletService from './wallet.service'
@@ -3420,152 +3414,6 @@ class NetworkService {
   }
 
   //Fetch DAO Proposals
-  /**
-   * Supporting the old (boba, xboba) and new proposals (govBoba / veNft) based.
-   * group created proposals by `to` and make use of respective contract to prepare the proposal data list.
-   *
-   */
-  // Use this proposal fetch for veDao.
-  async fetchProposalsVeDao() {
-
-    if (!this.delegateContract || this.networkGateway === 'goerli') return
-
-    const delegateCheckV1 = await this.delegateContract.attach(this.addresses.GovernorBravoDelegator)
-    const delegateCheckV2 = await this.delegateContract.attach(this.addresses.GovernorBravoDelegatorV2)
-
-    try {
-
-      let proposalList = []
-      /// @notice An event emitted when a new proposal is create
-      // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
-
-      const descriptionList = await graphQLService.queryBridgeProposalCreated()
-      const proposalGroup = groupBy(descriptionList.data.governorProposalCreateds, 'to');
-      const delegatorList = [this.addresses.GovernorBravoDelegator, this.addresses.GovernorBravoDelegatorV2];
-
-      for (let delegator of delegatorList) {
-        let delegateCheck;
-        if (delegator === this.addresses.GovernorBravoDelegator) {
-          delegateCheck = delegateCheckV1;
-        } else if (delegator === this.addresses.GovernorBravoDelegatorV2) {
-          delegateCheck = delegateCheckV2;
-        }
-        const proposals = proposalGroup[delegator.toLowerCase()]
-        const proposalCounts = await delegateCheck.proposalCount()
-        const totalProposals = await proposalCounts.toNumber()
-
-        for (let i = 0; i < totalProposals; i++) {
-          const proposalRaw = proposals[i]
-
-          if (typeof (proposalRaw) === 'undefined') continue
-
-          let proposalID = proposalRaw.proposalId
-
-          let proposalData = await delegateCheck.proposals(proposalID)
-
-          const proposalStates = [
-            'Pending',
-            'Active',
-            'Canceled',
-            'Defeated',
-            'Succeeded',
-            'Queued',
-            'Expired',
-            'Executed',
-          ]
-
-          let state = await delegateCheck.state(proposalID)
-
-          let againstVotes = parseInt(formatEther(proposalData.againstVotes))
-          let forVotes = parseInt(formatEther(proposalData.forVotes))
-          let abstainVotes = parseInt(formatEther(proposalData.abstainVotes))
-
-          let proposal = await delegateCheck.getActions(i + 2)
-
-          let description = proposalRaw.description.toString()
-
-          proposalList.push({
-            id: proposalID.toString(),
-            proposal,
-            description,
-            totalVotes: forVotes + againstVotes,
-            forVotes,
-            againstVotes,
-            abstainVotes,
-            state: proposalStates[state],
-            startTimestamp: proposalRaw.startTimestamp,
-            endTimestamp: proposalRaw.endTimestamp,
-          })
-        }
-      }
-
-      // hasLive proposal only checking for GovernorBravoDelegatorV2 contracts
-      let hasLiveProposal = false
-
-      if (this.account) {
-        const latestProposalIdRaw = await delegateCheckV2.latestProposalIds(this.account);
-        const latestProposalId = await latestProposalIdRaw.toNumber();
-        if (latestProposalId) { /// only if proposalId greater than 0
-          const latestProposalState = await delegateCheckV2.state(latestProposalId);
-          hasLiveProposal = [0, 1].includes(latestProposalState) /// pending & active proposal check.
-        }
-      }
-
-      return {
-        proposalList,
-        hasLiveProposal
-      }
-    } catch (error) {
-      console.log("NS: fetchProposalsVeDao error:", error)
-      return error
-    }
-  }
-
-  // to check wether the token has been already used for voting on proposal.
-  async checkProposalVote(proposalId, tokenId) {
-    if (!this.delegateContract) return
-
-    try {
-      const delegateCheck = await this.delegateContract.attach(this.addresses.GovernorBravoDelegatorV2)
-
-      if (this.account) {
-        const receipt = await delegateCheck.getReceipt(Number(proposalId), tokenId);
-        return receipt;
-      }
-
-    } catch (error) {
-      console.log('NS: checkProposalVote() error', error)
-      return error;
-    }
-  }
-
-
-  //Cast vote for proposal
-  // FIXME: keeping this to refer in next release will cleanup.
-  async castProposalVoteVeDao({id, userVote, tokenIds}) {
-
-    if (!this.delegateContract) return
-
-    if (!this.account) {
-      console.log('NS: castProposalVote() error - called but account === null')
-      return
-    }
-
-    try {
-      const delegateCheck = await this.delegateContract
-        .connect(this.provider.getSigner())
-        .attach(this.addresses.GovernorBravoDelegatorV2)
-
-      const res = await delegateCheck.castVote(id, userVote, tokenIds)
-
-      return res;
-
-    } catch (error) {
-      console.log("NS: castProposalVote error:", error)
-      return error
-    }
-  }
-
   async queueProposal(proposalID) {
 
     if (!this.delegateContract) return
@@ -3985,241 +3833,6 @@ class NetworkService {
     return ethers.utils.formatEther(await L2BillingContract.exitFee())
   }
 
-  /***********************************************/
-  /*****              VeBoba                 *****/
-
-  /***********************************************/
-
-
-  /**
-   * CreateLock
-   *  - to create veboba lock
-   */
-  async createLock({
-                     value_Wei_String,
-                     lock_duration
-                   }) {
-    if (!this.account) {
-      console.log('NS: createLock() error - called but account === null');
-      return
-    }
-
-    try {
-      const ve = new ethers.Contract(
-        this.addresses.Ve_BOBA,
-        veJson.abi,
-        this.provider.getSigner()
-      )
-
-      let allowance_BN = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .allowance(
-          this.account,
-          this.addresses.Ve_BOBA
-        )
-
-      let depositAmount_BN = BigNumber.from(value_Wei_String)
-
-      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
-
-      try {
-        if (approveAmount_BN.gt(allowance_BN)) {
-          const approveStatus = await this.BobaContract
-            .connect(this.provider.getSigner())
-            .approve(
-              this.addresses.Ve_BOBA,
-              approveAmount_BN
-            )
-          const TX = await approveStatus.wait()
-          console.log("approveStatus:", TX)
-        } else {
-          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
-        }
-      } catch (error) {
-        console.log("NS: ve:lock approve error:", error)
-        return error
-      }
-
-      const TX = await ve.create_lock(value_Wei_String, lock_duration)
-      await TX.wait()
-      return TX
-
-    } catch (error) {
-      console.log("NS: Ve: createLock error:", error)
-      return error;
-    }
-  }
-
-  /**
-   * withdrawLock
-   *  - To withdraw existing expired lock
-   */
-  async withdrawLock({tokenId}) {
-    if (!this.account) {
-      console.log('NS: withdrawLock() error - called but account === null')
-      return
-    }
-
-    try {
-      const ve = new ethers.Contract(
-        this.addresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider.getSigner()
-      )
-
-      const TX = await ve.withdraw(tokenId)
-      await TX.wait()
-      return TX
-    } catch (error) {
-      console.log("NS: Ve: withdrawLock error:", error)
-      return error;
-    }
-  }
-
-  /**
-   * increaseLockAmount
-   *  - To increse amount of existing lock
-   */
-  async increaseLockAmount({
-                             tokenId, value_Wei_String
-                           }) {
-    if (this.account === null) {
-      console.log('NS: increaseLockAmount() error - called but account === null')
-      return
-    }
-    try {
-      const ve = new ethers.Contract(
-        this.addresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider.getSigner()
-      )
-
-      let allowance_BN = await this.BobaContract
-        .connect(this.provider.getSigner())
-        .allowance(
-          this.account,
-          this.addresses.Ve_BOBA
-        )
-
-      let depositAmount_BN = BigNumber.from(value_Wei_String)
-
-      let approveAmount_BN = depositAmount_BN.add(BigNumber.from('1000000000000'))
-
-      try {
-        if (approveAmount_BN.gt(allowance_BN)) {
-          const approveStatus = await this.BobaContract
-            .connect(this.provider.getSigner())
-            .approve(
-              this.addresses.Ve_BOBA,
-              approveAmount_BN
-            )
-          await approveStatus.wait()
-        } else {
-          console.log("Allowance is sufficient:", allowance_BN.toString(), depositAmount_BN.toString())
-        }
-      } catch (error) {
-        console.log("NS: ve:increaseLockAmount approve error:", error)
-        return error
-      }
-
-      const TX = await ve.increase_amount(tokenId, value_Wei_String)
-      await TX.wait()
-      return TX
-    } catch (error) {
-      console.log("NS: Ve: increaseLockAmount error:", error)
-      return error;
-    }
-  }
-
-  /**
-   * extendLockTime
-   *  - To extend lock time of existing lock
-   */
-  async extendLockTime({
-                         tokenId, lock_duration
-                       }) {
-
-    if (this.account === null) {
-      console.log('NS: increaseUnlockTime() error - called but account === null')
-      return
-    }
-
-    try {
-      const ve = new ethers.Contract(
-        this.addresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider.getSigner()
-      )
-
-      const TX = await ve.increase_unlock_time(tokenId, lock_duration)
-      await TX.wait()
-      return TX
-
-    } catch (error) {
-      console.log("NS: Ve: extendLockTime error:", error)
-      return error;
-    }
-  }
-
-  /**
-   * fetchLockRecords
-   *  - To to fetch list of existing lock records.
-   */
-  async fetchLockRecords() {
-    if (this.account === null) {
-      console.log('NS: fetchLockRecords() error - called but account === null')
-      return
-    }
-
-    try {
-
-      const ve = new ethers.Contract(
-        this.addresses.Ve_BOBA, //check ve address is present
-        veJson.abi,
-        this.provider
-      )
-
-      const baseVoter = new ethers.Contract(
-        this.addresses.BASE_V1_VOTER,
-        voterJson.abi,
-        this.provider
-      )
-
-      let tokenIdList = [];
-      let balanceInfo = [];
-      let nftCount = await ve.balanceOf(this.account)
-
-      for (let index = 0; index < Number(nftCount); index++) {
-        const tokenId = await ve.tokenOfOwnerByIndex(this.account, index)
-        tokenIdList.push(Number(tokenId))
-      }
-
-      for (let tokenId of tokenIdList) {
-        const balance = await ve.balanceOfNFT(tokenId);
-        const locked = await ve.locked(tokenId);
-        const usedWeights = await baseVoter.usedWeights(tokenId);
-
-
-        balanceInfo.push({
-          tokenId,
-          balance: Number(utils.formatUnits(balance, 18)),
-          lockedAmount: Number(utils.formatUnits(locked.amount, 18)),
-          expiry: new Date(locked.end.toString() * 1000),
-          expirySeconds: locked.end.toString() * 1000,
-          usedWeights: Number(utils.formatUnits(usedWeights, 18))
-        })
-      }
-
-      return {
-        records: balanceInfo,
-      }
-    } catch (error) {
-      console.log("NS: Ve: fetchLockRecords error:", error)
-      return error;
-    }
-  }
-
-
   /*************************************************
    **************** Alt L1 Functions ***************
    *************************************************/
@@ -4393,141 +4006,9 @@ class NetworkService {
     }
   }
 
-  /************************************/
-  /********* Vote & Dao Pools *********/
-
-  /************************************/
-
-  async savePoolVote({
-                       tokenId,
-                       pools,
-                       weights
-                     }) {
-    if (this.account === null) {
-      console.log('NS: savePoolVote() error - called but account === null')
-      return
-    }
-
-    try {
-      const baseVoter = new ethers.Contract(
-        this.addresses.BASE_V1_VOTER,
-        voterJson.abi,
-        this.provider
-      )
-
-      await baseVoter
-        .connect(this.provider.getSigner())
-        .vote(
-          tokenId,
-          pools,
-          weights
-        )
-      return true;
-
-    } catch (error) {
-      console.log('NS: savePoolVote() error', error)
-      return error;
-    }
-  }
-
-  async distributePool({gaugeAddress}) {
-    if (this.account === null) {
-      console.log('NS: distributePool() error - called but account === null')
-      return
-    }
-
-    try {
-      const baseVoter = new ethers.Contract(
-        this.addresses.BASE_V1_VOTER,
-        voterJson.abi,
-        this.provider.getSigner()
-      )
-      console.log('gaugeAddress', gaugeAddress)
-      await baseVoter['distribute(address)'](gaugeAddress);
-
-      return true;
-    } catch (error) {
-      console.log('NS: distributePool() error', error)
-      return error;
-    }
-  }
-
-  async fetchPools() {
-    if (this.account === null) {
-      console.log('NS: fetchPools() error - called but account === null')
-      return
-    }
-
-    try {
-
-      const pools = []
-      const baseVoter = new ethers.Contract(
-        this.addresses.BASE_V1_VOTER,
-        voterJson.abi,
-        this.provider
-      )
-      // load and iterate over nft to find vote on pools.
-      let {records} = await this.fetchLockRecords();
-      // filter the ve nft records which has used.
-      records = records.filter((token) => token.usedWeights > 0)
-
-      const poolLen = await baseVoter.length();
-
-      for (let i = 0; i < Number(poolLen); i++) {
-        const poolId = await baseVoter.pools(i);
-        // pool votes
-        const rawVotes = await baseVoter.weights(poolId);
-        const votes = Number(utils.formatUnits(rawVotes, 18));
-        // total pools weights
-        const rawTotalWeights = await baseVoter.totalWeight();
-        const totalWeigths = Number(utils.formatUnits(rawTotalWeights, 18));
-
-        // vote percentage
-        const votePercentage = (votes / totalWeigths) * 100;
-        // guage address needed to distribute w.r.to pool.
-        const gaugeAddress = await baseVoter.gauges(poolId);
-
-        let usedTokens = [];
-        for (let j = 0; j < records.length; j++) {
-          const nft = records[j];
-          const rawTokenVote = await baseVoter.votes(nft.tokenId, poolId);
-          const tokenVote = Number(utils.formatUnits(rawTokenVote, 18));
-
-          if (tokenVote) {
-            usedTokens.push({
-              tokenId: nft.tokenId,
-              vote: tokenVote
-            })
-          }
-        }
-
-        pools.push({
-          ...getPoolDetail(poolId),
-          poolId,
-          totalVotes: votes.toFixed(2),
-          votePercentage,
-          gaugeAddress,
-          usedTokens
-        })
-      }
-
-      return {
-        pools
-      }
-
-    } catch (error) {
-      console.log("NS: Ve: fetchPools error:", error)
-      return error;
-    }
-  }
-
   /****************************************
-   ************* STARTS HERE **************
-   ***********OLD DAO REMOVE ME ***********
+   ************* DAO ***********
    *****************************************/
-
-  // FIXME: remove me once deprecated old dao.
-
   async fetchProposals() {
 
     if (!this.delegateContract) return
@@ -4542,8 +4023,10 @@ class NetworkService {
 
       /// @notice An event emitted when a new proposal is created
       // event ProposalCreated(uint id, address proposer, address[] targets, uint[] values, string[] signatures, bytes[] calldatas, uint startTimestamp, uint endTimestamp, string description);
-
-      let descriptionList = await graphQLService.queryBridgeProposalCreated()
+      const L2ChainId = this.networkConfig.L2.chainId;
+      let descriptionList = await graphQLService.queryBridgeProposalCreated({
+        sourceChainId: L2ChainId
+      })
 
       for (let i = 0; i < totalProposals; i++) {
         const proposalRaw = descriptionList.data.governorProposalCreateds[i]

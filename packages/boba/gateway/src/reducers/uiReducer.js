@@ -15,11 +15,7 @@ limitations under the License. */
 
 const initialState = {
   theme: 'dark',
-  depositModal: false,
-  depositBatchModal: false,
   transferModal: false,
-  transferNFTModal: false,
-  exitModal: false,
   bridgeTypeSwitch: false,
   tokenPicker: false,
   transferPending: false,
