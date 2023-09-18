@@ -34,10 +34,6 @@ export function selectProposals(state) {
     return state.dao.proposalList
 }
 
-export function selectLatestProposalState(state) {
-    return state.dao.hasLiveProposal
-}
-
 export function selectProposalThreshold(state) {
     return state.dao.proposalThreshold
 }

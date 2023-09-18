@@ -1,8 +1,7 @@
 import {ApolloClient, gql, HttpLink, InMemoryCache} from '@apollo/client';
 import fetch from 'cross-fetch';
-import {CHAIN_ID_LIST, NETWORK, NETWORK_TYPE} from 'util/network/network.util';
+import { NETWORK_TYPE } from 'util/network/network.util';
 import networkService from './networkService';
-import {Layer, LAYER} from "../util/constant";
 
 class GraphQLService {
 
@@ -61,7 +60,9 @@ class GraphQLService {
     })
   }
 
-  async queryBridgeProposalCreated() {
+  async queryBridgeProposalCreated({
+    sourceChainId
+  }) {
 
     const query = gql(`query { governorProposalCreateds { proposalId values description proposer } }`)
 
@@ -85,7 +86,7 @@ class GraphQLService {
       }
     }
 
-    return await this.conductQuery(query)
+    return await this.conductQuery(query, null, sourceChainId)
   }
 
 }
