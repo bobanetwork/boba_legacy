@@ -28,7 +28,6 @@ import {HistoryData} from './entities/HistoryData.entity'
 import {historyDataRepository, lastAirdropRepository} from './data-source'
 import {IKMSSignerConfig, KMSSigner} from './utils/kms-signing'
 import {Asset, BobaChains} from "./utils/chains";
-import {getUsdValueOfTokenViaDisbursements, getUsdValueOfTokenViaIDs, ITokenUSDPrice} from "./utils/coingecko";
 import {LastAirdrop} from "./entities/LastAirdrop.entity";
 import {formatUnits} from "ethers/lib/utils";
 
@@ -386,7 +385,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
   }
 
   /** @dev Checks if major airdrop eligibility criteria has been met such as not bridging native, has no gas on destination network, bridges enough value, .. */
-  async _fulfillsAirdropConditions(disbursement: Disbursement, assetUsdValues: ITokenUSDPrice|undefined) {
+  async _fulfillsAirdropConditions(disbursement: Disbursement) {
     const nativeBalance = await this.state.Teleportation.provider.getBalance(disbursement.addr)
     if (nativeBalance.gt(this.options.airdropConfig.airdropAmountWei)) {
       this.logger.info(`Not airdropping as wallet has native balance on destination network: ${nativeBalance}, wallet: ${disbursement.addr}`)
@@ -396,53 +395,16 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       this.logger.info(`Not airdropping as wallet is briding asset that is used to pay for gas on the destination network: ${disbursement.token}, wallet: ${disbursement.addr}`)
       return false;
     }
-
-    const erc20Contract = new Contract(disbursement.token, [{
-      "constant": true,
-      "inputs": [],
-      "name": "decimals",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint8"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    }], this.state.Teleportation.provider)
-    const decimals = disbursement.token === ethers.constants.AddressZero ? 18 : await erc20Contract.decimals()
-    const parsedAmount = parseFloat(formatUnits(disbursement.amount, decimals))
-
-    let bridgesEnoughInUSD: boolean
-    if (!assetUsdValues) {
-      this.logger.warn(`_fulfillsAirdropConditions: Couldn't check for usd values to enforce minimum usd value for disbursement:`, disbursement)
-      bridgesEnoughInUSD = true
-    } else {
-      const usdQuoteAsset = assetUsdValues[disbursement.token]?.usd
-      if (!usdQuoteAsset) {
-        this.logger.warn(`_fulfillsAirdropConditions: Couldn't find quote for asset ${disbursement.token}. Minimum usd check skipped.`, assetUsdValues)
-        bridgesEnoughInUSD = true
-      } else {
-        const usdValueToBridge = parsedAmount * usdQuoteAsset
-        bridgesEnoughInUSD = usdValueToBridge >= (this.options.airdropConfig?.airdropMinUsdValue ?? '15')
-        this.logger.info(`Wallet (${disbursement.addr}) tries to bridge asset ${disbursement.token} with $val of ${usdValueToBridge}`)
-      }
-    }
-
-    this.logger.info(`Airdrop check - bridgesEnough in USD (${bridgesEnoughInUSD})`)
-    return bridgesEnoughInUSD
+    this.logger.info(`Airdropping for: ${JSON.stringify(disbursement)}`)
+    return true;
   }
 
   async _airdropGas(disbursements: Disbursement[], latestBlock: number) {
     const provider = this.state.Teleportation.provider
-    // do outside loop to reduce API requests
-    const assetUsdValues: ITokenUSDPrice | undefined = await getUsdValueOfTokenViaDisbursements(this.options.ownSupportedAssets, disbursements)
-    this.logger.info(`Trying to airdrop gas with following usd quotes and for these assets: ${JSON.stringify(assetUsdValues)} / ${JSON.stringify(this.options.ownSupportedAssets)} / ${JSON.stringify(disbursements)}`)
 
     for (const disbursement of disbursements) {
 
-      if (await this._fulfillsAirdropConditions(disbursement, assetUsdValues)) {
+      if (await this._fulfillsAirdropConditions(disbursement)) {
         const lastAirdrop = await lastAirdropRepository.findOneBy({walletAddr: disbursement.addr})
         const unixTimestamp = Math.floor(Date.now() / 1000)
 
