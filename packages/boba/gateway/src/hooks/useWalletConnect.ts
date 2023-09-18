@@ -52,8 +52,6 @@ export const useWalletConnect = () => {
         dispatch(openModal('noMetaMaskModal'))
         return false
       } else if (initialized === 'wrongnetwork') {
-        console.log('wrong network account', networkService.account)
-        //dispatch(openModal('wrongNetworkModal'))
         return false
       } else if (initialized === false) {
         dispatch(setEnableAccount(false))
