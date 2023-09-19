@@ -19,6 +19,8 @@ limitations under the License. */
   import { rpcUrls } from 'util/network/network.util'
   import store from 'store'
   import { CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
+  import { openModal } from 'actions/uiAction';
+
 import { setActiveNetwork, setNetwork } from 'actions/networkAction'
 
   class WalletService {
@@ -55,19 +57,20 @@ import { setActiveNetwork, setNetwork } from 'actions/networkAction'
       }
     }
 
-    async listenMetaMask() {
-      window.ethereum.on('accountsChanged', () => {
-        window.location.reload()
-      })
+  async listenMetaMask() {
+    window.ethereum.on('accountsChanged', () => {
+      window.location.reload()
+    })
 
-      window.ethereum.on('chainChanged', (chainId) => {
+    window.ethereum.on('chainChanged', (chainId) => {
+      if (CHAIN_ID_LIST[Number(chainId)]) {
         const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
         const {
           chain: network,
           icon: networkIcon,
           name
-        } = NetworkList[ networkType ].find(network => network.chain === chain);
-        store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
+        } = NetworkList[networkType].find(network => network.chain === chain);
+        store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) });
         store.dispatch(
           setNetwork({
             networkType,
@@ -75,10 +78,13 @@ import { setActiveNetwork, setNetwork } from 'actions/networkAction'
             networkIcon,
             name
           })
-        )
-        store.dispatch(setActiveNetwork())
-      })
-    }
+        );
+        store.dispatch(setActiveNetwork());
+      } else {
+        store.dispatch(openModal('UnsupportedNetwork'))
+      }
+    })
+  }
 
     async connectWalletConnect() {
       try {
