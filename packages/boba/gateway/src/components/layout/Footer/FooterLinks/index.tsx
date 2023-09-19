@@ -11,6 +11,7 @@ import {
 } from './style'
 import { selectBlockExplorerLinks, selectBaseEnabled } from 'selectors'
 import { fetchBlockExplorerUrls } from 'actions/networkAction'
+import Select from 'components/global/select'
 
 const FooterLinks = () => {
   const dispatch = useDispatch<any>()
@@ -42,6 +43,7 @@ const FooterLinks = () => {
         })}
       </StyledLinks>
       <ScanContainer>
+        <Select label="Block Explorers" />
         <ExplorereButton>Block Explorers</ExplorereButton>
       </ScanContainer>
     </LinkContainer>

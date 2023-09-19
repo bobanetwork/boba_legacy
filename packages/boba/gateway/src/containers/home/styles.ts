@@ -8,5 +8,5 @@ export const HomeContainer = styled.div`
 `
 
 export const HomeContent = styled.div`
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - 73px);
 `

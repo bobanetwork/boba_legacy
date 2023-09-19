@@ -1,7 +1,7 @@
 import React from 'react'
 import {
-  AppVersion,
   DisclaimerContainer,
+  DisclaimerText,
   SocialLinkItem,
   SocialLinksContainer,
   StyledSocialLinks,
@@ -18,8 +18,8 @@ const SocialLinks = (props: Props) => {
   return (
     <SocialLinksContainer>
       <DisclaimerContainer>
-        <AppVersion>©2023 Enya Labs</AppVersion>
-        <AppVersion>v{WALLET_VERSION}</AppVersion>
+        <DisclaimerText>©2023 Enya Labs</DisclaimerText>
+        <DisclaimerText>v{WALLET_VERSION}</DisclaimerText>
       </DisclaimerContainer>
       <StyledSocialLinks>
         <SocialLinkItem
