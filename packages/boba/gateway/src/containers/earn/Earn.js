@@ -87,6 +87,7 @@ const Earn = () => {
   )
 
   useEffect(()=> {
+    setLpChoice(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
     setPoolTab(activeNetworkName[layer?.toLowerCase()])
   }, [layer, networkService, activeNetworkName])
 

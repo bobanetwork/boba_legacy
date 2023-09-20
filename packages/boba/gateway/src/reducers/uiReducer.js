@@ -34,6 +34,8 @@ const initialState = {
   walletSelectorModal: false,
   CDMCompletionModal: false,
   switchNetworkModal: false,
+  UnsupportedNetwork: false,
+
   ledger: false,
   alert: null,
   error: null,
