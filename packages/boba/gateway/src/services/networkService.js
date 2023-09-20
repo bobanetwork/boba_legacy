@@ -650,6 +650,10 @@ class NetworkService {
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
+      if (!this.networkGateway || typeof chainId === 'undefined' || typeof L1ChainId === 'undefined' || typeof L2ChainId === 'undefined') {
+          return;
+      }
+
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
 
@@ -660,6 +664,8 @@ class NetworkService {
       } else {
         return 'wrongnetwork'
       }
+
+
 
       // this should not do anything unless we changed chains
       if (this.L1orL2 === 'L2') {
@@ -677,6 +683,7 @@ class NetworkService {
 
   async switchChain(targetLayer) {
     // ignore request if we are already on the target layer
+
     if (!targetLayer) {
       return false
     }
@@ -685,7 +692,6 @@ class NetworkService {
       network: this.networkGateway,
       networkType: this.networkType
     })
-
     const targetIDHex = networkDetail[targetLayer].chainIdHex
     const rpcURL = targetLayer === 'L1' ? this.L1Provider.connection.url : networkDetail[targetLayer].rpcUrl
     const chainParam = {
@@ -766,11 +772,10 @@ class NetworkService {
 
 
   async getBalances() {
-
     try {
 
-      let layer1Balances, layer2Balances;
-
+      let layer1Balances;
+      let layer2Balances;
       if (this.network === NETWORK.ETHEREUM) {
         layer1Balances = [
           {
@@ -794,7 +799,10 @@ class NetworkService {
             balance: new BN(0),
           },
         ]
+
+
       } else {
+
         layer1Balances = [
           {
             address: this.addresses.L1_ETH_Address,
@@ -817,7 +825,6 @@ class NetworkService {
             balance: new BN(0),
           },
         ]
-
       }
 
       // Always check ETH
@@ -837,7 +844,10 @@ class NetworkService {
       )
 
       const getERC20Balance = async (token, tokenAddress, layer, provider) => {
-        const balance = await tokenC.attach(tokenAddress).connect(provider).balanceOf(this.account)
+        const balance = await tokenC
+          .attach(tokenAddress)
+          .connect(provider)
+          .balanceOf(this.account)
         return {
           ...token,
           balance: new BN(balance.toString()),
@@ -2067,9 +2077,9 @@ class NetworkService {
         tokenBalance = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).balanceOf(this.addresses.L1LPAddress)
         const tokenInfoFiltered = this.tokenInfo.L1[utils.getAddress(tokenAddress)]
         if (tokenInfo) {
-          tokenSymbol = tokenInfoFiltered.symbol
-          tokenName = tokenInfoFiltered.name
-          decimals = tokenInfoFiltered.decimals
+          tokenSymbol = tokenInfoFiltered?.symbol
+          tokenName = tokenInfoFiltered?.name
+          decimals = tokenInfoFiltered?.decimals
         } else {
           tokenSymbol = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).symbol()
           tokenName = await this.L1_TEST_Contract.attach(tokenAddress).connect(this.L1Provider).name()
@@ -2423,7 +2433,7 @@ class NetworkService {
     }
     if (networkConfig.networkType !== NETWORK_TYPE.TESTNET) {
       if (isDevBuild()) {
-        console.log("DEV: Teleportation is only supported on testnet for now, chainId: ", chainId)
+       /*console.log("DEV: Teleportation is only supported on testnet for now, chainId: ", chainId)*/
       }
       return {teleportationAddr: undefined, networkConfig}
     }
@@ -3661,7 +3671,6 @@ class NetworkService {
           this.account,
           this.addresses.L2LPAddress
         )
-      console.log("L2LP", allowance_BN.toString())
 
       approveStatus = await this.BobaContract
         .connect(this.provider.getSigner())
@@ -3670,13 +3679,11 @@ class NetworkService {
           approvalAmount
         )
       await approveStatus.wait()
-      console.log("L2LP", approveStatus)
     }
 
   }
 
   async getFS_Info() {
-
     if (this.account === null) {
       console.log('NS: getFS_Info() error - called but account === null')
       return

@@ -16,12 +16,11 @@ limitations under the License. */
 
   import { providers, utils } from "ethers"
   import WalletConnectProvider from "@walletconnect/web3-provider"
-  import { rpcUrls } from 'util/network/network.util'
+  import { rpcUrls, CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
   import store from 'store'
-  import { CHAIN_ID_LIST, NetworkList } from 'util/network/network.util'
+  import { setActiveNetwork, setNetwork } from 'actions/networkAction'
+  import { setBaseState, setEnableAccount } from 'actions/setupAction';
   import { openModal } from 'actions/uiAction';
-
-import { setActiveNetwork, setNetwork } from 'actions/networkAction'
 
   class WalletService {
     constructor() {
@@ -59,6 +58,9 @@ import { setActiveNetwork, setNetwork } from 'actions/networkAction'
 
   async listenMetaMask() {
     window.ethereum.on('accountsChanged', () => {
+      //reset connection
+      store.dispatch(setBaseState(false));
+      store.dispatch(setEnableAccount(false));
       window.location.reload()
     })
 
@@ -69,8 +71,8 @@ import { setActiveNetwork, setNetwork } from 'actions/networkAction'
           chain: network,
           icon: networkIcon,
           name
-        } = NetworkList[networkType].find(network => network.chain === chain);
-        store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) });
+        } = NetworkList[ networkType ].find(network => network.chain === chain);
+        store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
         store.dispatch(
           setNetwork({
             networkType,
@@ -78,8 +80,8 @@ import { setActiveNetwork, setNetwork } from 'actions/networkAction'
             networkIcon,
             name
           })
-        );
-        store.dispatch(setActiveNetwork());
+        )
+        store.dispatch(setActiveNetwork())
       } else {
         store.dispatch(openModal('UnsupportedNetwork'))
       }
