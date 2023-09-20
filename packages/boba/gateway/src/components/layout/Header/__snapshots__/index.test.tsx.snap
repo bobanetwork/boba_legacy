@@ -68,6 +68,7 @@ exports[`Layout => Header should match the snapshot 1`] = `
         class="sc-dPwPAC UluVn"
       >
         <div
+          aria-label="svg"
           class="sc-ePzlA-D hiWbI"
         >
           <div>
@@ -82,7 +83,9 @@ exports[`Layout => Header should match the snapshot 1`] = `
         class="sc-gjJAnY imSQnB"
         title="light-icon"
       >
-        <div>
+        <div
+          aria-label="svg"
+        >
           <div>
             <div
               data-src="theme-sun.svg"

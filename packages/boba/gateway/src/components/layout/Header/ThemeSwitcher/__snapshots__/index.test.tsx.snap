@@ -6,7 +6,9 @@ exports[`Layout => Header => ThemeSwitcher should match the snapshot 1`] = `
     class="sc-fABZjn jWXFnH"
     title="light-icon"
   >
-    <div>
+    <div
+      aria-label="svg"
+    >
       <div>
         <div
           data-src="theme-sun.svg"
