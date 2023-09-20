@@ -34,12 +34,15 @@ const TransactionList = ({ stakeInfo }: TransactionListInterface) => {
   const unlocktimeNextBegin = formatDate(timeZero_S + twoWeeks)
   const unlocktimeNextEnd = formatDate(timeZero_S + twoWeeks + twoDays)
 
+  const secondsInADay = 24 * 60 * 60
+  const duration_D = duration_S / secondsInADay
+
   let locked = true
   if (residual_S > twoWeeks) {
     locked = false
   }
 
-  const earned = stakeInfo.depositAmount * (0.05 / 365.0) * duration_S
+  const earned = stakeInfo.depositAmount * (0.05 / 365.0) * duration_D
 
   const handleUnstake = async () => {
     const withdrawTX = await dispatch(withdrawFS_Savings(stakeInfo.stakeId))
