@@ -3671,7 +3671,6 @@ class NetworkService {
           this.account,
           this.addresses.L2LPAddress
         )
-      console.log("L2LP", allowance_BN.toString())
 
       approveStatus = await this.BobaContract
         .connect(this.provider.getSigner())
@@ -3680,13 +3679,11 @@ class NetworkService {
           approvalAmount
         )
       await approveStatus.wait()
-      console.log("L2LP", approveStatus)
     }
 
   }
 
   async getFS_Info() {
-    console.log(this.account)
     if (this.account === null) {
       console.log('NS: getFS_Info() error - called but account === null')
       return
