@@ -20,6 +20,7 @@ limitations under the License. */
   import store from 'store'
   import { setActiveNetwork, setNetwork } from 'actions/networkAction'
   import { setBaseState, setEnableAccount } from 'actions/setupAction';
+  import { openModal } from 'actions/uiAction';
 
   class WalletService {
     constructor() {
@@ -64,31 +65,34 @@ limitations under the License. */
     })
 
     window.ethereum.on('chainChanged', (chainId) => {
-
-      const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
-      const {
-        chain: network,
-        icon: networkIcon,
-        name
-      } = NetworkList[ networkType ].find(network => network.chain === chain);
-      console.log('chaging mask', {
-        networkType,
-        network,
-        networkIcon,
-        name
-      })
-
-
-      store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
-      store.dispatch(
-        setNetwork({
+      if (CHAIN_ID_LIST[Number(chainId)]) {
+        const { networkType, chain } = CHAIN_ID_LIST[Number(chainId)]
+        const {
+          chain: network,
+          icon: networkIcon,
+          name
+        } = NetworkList[ networkType ].find(network => network.chain === chain);
+        console.log('chaging mask', {
           networkType,
           network,
           networkIcon,
           name
         })
-      )
-      store.dispatch(setActiveNetwork())
+
+
+        store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
+        store.dispatch(
+          setNetwork({
+            networkType,
+            network,
+            networkIcon,
+            name
+          })
+        )
+        store.dispatch(setActiveNetwork())
+      } else {
+        store.dispatch(openModal('UnsupportedNetwork'))
+      }
     })
   }
 
