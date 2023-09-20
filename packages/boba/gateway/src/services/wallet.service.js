@@ -72,14 +72,6 @@ limitations under the License. */
           icon: networkIcon,
           name
         } = NetworkList[ networkType ].find(network => network.chain === chain);
-        console.log('chaging mask', {
-          networkType,
-          network,
-          networkIcon,
-          name
-        })
-
-
         store.dispatch({ type: 'SETUP/CHAINIDCHANGED/SET', payload: Number(chainId) })
         store.dispatch(
           setNetwork({

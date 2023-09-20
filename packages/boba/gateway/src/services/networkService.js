@@ -800,7 +800,6 @@ class NetworkService {
           },
         ]
 
-        console.log('current network on getBalances', this.network)
 
       } else {
 
@@ -827,9 +826,6 @@ class NetworkService {
           },
         ]
       }
-
-      console.log('getting balances from', this.network)
-
 
       // Always check ETH
       const layer1Balance = await this.L1Provider.getBalance(this.account)

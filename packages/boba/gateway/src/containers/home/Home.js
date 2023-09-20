@@ -49,7 +49,6 @@ const Home = () => {
   const baseEnabled = useSelector(selectBaseEnabled())
 
   useInterval(() => {
-    console.log('inside the interval on active network', activeNetwork)
     if (accountEnabled /*== MetaMask is connected*/) {
       if(baseEnabled) {
         dispatch(fetchBalances()) // account specific
