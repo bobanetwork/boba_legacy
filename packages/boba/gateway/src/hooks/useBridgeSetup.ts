@@ -38,7 +38,6 @@ const useBridgeSetup = () => {
   const layer = useSelector(selectLayer())
   const bridgeType = useSelector(selectBridgeType())
   const token = useSelector(selectTokenToBridge())
-
   useEffect(() => {
     if (bridgeType === BRIDGE_TYPE.TELEPORTATION) {
       // Teleportation

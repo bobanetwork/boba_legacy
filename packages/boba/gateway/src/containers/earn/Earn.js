@@ -70,6 +70,7 @@ const Earn = () => {
 
   const baseEnabled = useSelector(selectBaseEnabled())
   const accountEnabled = useSelector(selectAccountEnabled())
+  const chainIdChanged = useSelector(selectChainIdChanged())
   const networkName = useSelector(selectActiveNetworkName())
 
   const [showMDO, setShowMDO] = useState(false)
@@ -88,7 +89,7 @@ const Earn = () => {
   useEffect(()=> {
     setLpChoice(networkService.L1orL2 === 'L1' ? 'L1LP' : 'L2LP')
     setPoolTab(activeNetworkName[layer?.toLowerCase()])
-  }, [layer, networkService])
+  }, [layer, networkService, activeNetworkName])
 
 
   useEffect(() => {
@@ -100,7 +101,7 @@ const Earn = () => {
 
       dispatch(fetchBalances())
     }
-  }, [dispatch, baseEnabled, accountEnabled])
+  }, [dispatch, baseEnabled, accountEnabled, activeNetworkName])
 
 
   const getBalance = (address, chain) => {
@@ -116,6 +117,7 @@ const Earn = () => {
 
 
   const selectedPoolInfo = lpChoice === 'L1LP' ? poolInfo.L1LP : poolInfo.L2LP;
+
   const selectedNetworkConfig =
     lpChoice === 'L1LP'
       ? networkService?.networkConfig?.L1?.chainIdHex

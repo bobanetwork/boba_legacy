@@ -10,154 +10,86 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import React, { useState } from 'react'
-import { Box } from '@mui/material'
-
-import { useDispatch, useSelector } from 'react-redux'
-import { closeModal, openAlert } from 'actions/uiAction'
-import Modal from 'components/modal/Modal'
-import Input from 'components/input/Input'
-
-import { createDaoProposal } from 'actions/daoAction'
-import { selectProposalThreshold } from 'selectors'
-import { Button } from 'components/global/button'
-import { ModalTypography } from 'components/global/modalTypography'
-import { Dropdown } from 'components/global/dropdown'
+import React, { useState } from 'react';
+import { Box, Button, Dropdown, Input, Modal, ModalTypography } from 'components/global';
+import { useDispatch, useSelector } from 'react-redux';
+import { closeModal, openAlert } from 'actions/uiAction';
+import { createDaoProposal } from 'actions/daoAction';
+import { selectProposalThreshold } from 'selectors';
 
 const NewProposalModal = ({ open }) => {
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+  const initialFormState = {
+    action: '',
+    votingThreshold: '',
+    LPfeeMin: '',
+    LPfeeMax: '',
+    LPfeeOwn: '',
+    proposeText: '',
+    proposalUri: ''
+  };
 
-  const [action, setAction] = useState('')
-  const [votingThreshold, setVotingThreshold] = useState('')
+  const [formState, setFormState] = useState(initialFormState);
 
-  const [LPfeeMin, setLPfeeMin] = useState('')
-  const [LPfeeMax, setLPfeeMax] = useState('')
-  const [LPfeeOwn, setLPfeeOwn] = useState('')
+  const {
+    action,
+    votingThreshold,
+    LPfeeMin,
+    LPfeeMax,
+    LPfeeOwn,
+    proposeText,
+    proposalUri,
+  } = formState
 
-  const [proposeText, setProposeText] = useState('')
-  const [proposalUri, setProposalUri] = useState('')
-
-  const loading = false //ToDo useSelector(selectLoading([ 'PROPOSAL_DAO/CREATE' ]))
-
-
-  const proposalThreshold = useSelector(selectProposalThreshold)
+  const resetState = () => setFormState(initialFormState);
 
   const onActionChange = (option) => {
-    setVotingThreshold('')
-    setLPfeeMin('')
-    setLPfeeMax('')
-    setLPfeeOwn('')
-    setProposeText('')
-    setProposalUri('')
-    setAction(option.value)
-  }
+    resetState();
+    setFormState(prevState => ({ ...prevState, action: option.value }));
+  };
 
   const handleClose = () => {
-    setVotingThreshold('')
-    setLPfeeMin('')
-    setLPfeeMax('')
-    setLPfeeOwn('')
-    setAction('')
-    setProposeText('')
-    setProposalUri('')
-    dispatch(closeModal('newProposalModal'))
-  }
+    resetState();
+    dispatch(closeModal('newProposalModal'));
+  };
 
-  const options = [
-    {
-      value: 'change-threshold',
-      label: 'Change Voting Threshold',
-      title: 'Change Voting Threshold',
-    },
-    {
-      value: 'text-proposal',
-      label: 'Freeform Text Proposal',
-      title: 'Freeform Text Proposal',
-    },
-    {
-      value: 'change-lp1-fee',
-      label: 'Change L1 LP fees',
-      title: 'Change L1 LP fees',
-    },
-    {
-      value: 'change-lp2-fee',
-      label: 'Change L2 LP fees',
-      title: 'Change L2 LP fees',
-    },
-  ]
-
-  const customStyles = {
-    option: (provided, state) => ({
-      ...provided,
-      color: state.isSelected ? '#282828' : '#909090',
-    }),
-  }
+  const handleCreateDaoProposal = async (action, value = [], text = '') => {
+    const result = await dispatch(createDaoProposal({ action, value, text }));
+    if (result) {
+      dispatch(openAlert('Proposal has been submitted. It will be listed soon'));
+      handleClose();
+    }
+  };
 
   const submit = async () => {
-
-    let res = null
-
-    if (action === 'change-threshold') {
-      res = await dispatch(
-        createDaoProposal({
-          action,
-          value: [votingThreshold],
-          text: '', //extra text if any
-      }))
-    } else if (action === 'text-proposal') {
-      res = await dispatch(createDaoProposal({
-        action,
-        text: `${proposeText}@@${proposalUri}`
-      }))
-    } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
-      res = await dispatch(createDaoProposal({
-        action,
-        value: [ Math.round(Number(LPfeeMin) * 10), Math.round(Number(LPfeeMax) * 10), Math.round(Number(LPfeeOwn) * 10) ],
-        text: ''  //extra text if any
-      }))
+    switch (action) {
+      case 'change-threshold':
+        handleCreateDaoProposal(action, [votingThreshold]);
+        break;
+      case 'text-proposal':
+        handleCreateDaoProposal(action, [], `${proposeText}@@${proposalUri}`);
+        break;
+      case 'change-lp1-fee':
+      case 'change-lp2-fee':
+        handleCreateDaoProposal(action, [
+          Math.round(Number(LPfeeMin) * 10),
+          Math.round(Number(LPfeeMax) * 10),
+          Math.round(Number(LPfeeOwn) * 10)
+        ]);
+        break;
+      default:
+        break;
     }
-
-    if (res) {
-      dispatch(openAlert(`Proposal has been submitted. It will be listed soon`))
-    }
-    handleClose()
-  }
-
-  const disabled = () => {
-    if (action === 'change-threshold') {
-      return !votingThreshold
-    } else if (action === 'text-proposal') {
-      return !proposeText
-    } else if (action === 'change-lp1-fee' || action === 'change-lp2-fee') {
-      if (Number(LPfeeMin) < 0.0 || Number(LPfeeMin) > 5.0) {
-        return true //aka disabled
-      }
-      if (Number(LPfeeMax) < 0.0 || Number(LPfeeMax) > 5.0) {
-        return true //aka disabled
-      }
-      if (Number(LPfeeMax) <= Number(LPfeeMin)) {
-        return true //aka disabled
-      }
-      if (Number(LPfeeOwn) < 0.0 || Number(LPfeeOwn) > 5.0) {
-        return true
-      }
-      if (LPfeeMin === '') {
-        return true
-      }
-      if (LPfeeMax === '') {
-        return true
-      }
-      if (LPfeeOwn === '') {
-        return true
-      }
-      return false
-    }
-  }
-
+  };
 
   return (
-    <Modal open={open} onClose={handleClose} maxWidth="sm" title="Create Proposal">
+    <Modal
+      open={open}
+      onClose={handleClose}
+      maxWidth="sm"
+      title="Create Proposal"
+    >
       <Box>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -169,8 +101,8 @@ const NewProposalModal = ({ open }) => {
             style={{ zIndex: 2 }}
             onItemSelected={(option)=> onActionChange(option)}
             defaultItem={{
-                value: null,
-                label: 'Choose type of proposal',
+              value: null,
+              label: 'Choose type of proposal',
             }}
             items={options}
           />
@@ -181,14 +113,14 @@ const NewProposalModal = ({ open }) => {
               </ModalTypography>
 
               <Input
-                  label="DAO voting threshold"
-                  placeholder='New voting threshold (e.g. 65000)'
-                  value={votingThreshold}
-                  type="number"
-                  onChange={(i) => setVotingThreshold(i.target.value)}
-                  fullWidth
-                  sx={{ marginBottom: '20px' }}
-            />
+                label="DAO voting threshold"
+                placeholder='New voting threshold (e.g. 65000)'
+                value={votingThreshold}
+                type="number"
+                onChange={(i) => setVotingThreshold(i.target.value)}
+                fullWidth
+                sx={{ marginBottom: '20px' }}
+              />
             </>
           }
           {(action === 'change-lp1-fee' || action === 'change-lp2-fee') &&
@@ -250,7 +182,9 @@ const NewProposalModal = ({ open }) => {
         </Box>
       </Box>
       <Button
-        onClick={() => { submit() }}
+        onClick={() => {
+          submit()
+        }}
         /*tooltip={loading ? "Your transaction is still pending. Please wait for confirmation." : "Click here to submit a new proposal"}*/
         loading={loading}
         disabled={disabled()}
