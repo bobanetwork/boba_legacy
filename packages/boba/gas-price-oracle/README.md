@@ -41,7 +41,7 @@ The L2 gas fee is
 gasFee = gasPrice * gasLimit
 ```
 
-**GAS PRICE** The gas price is fixed and is equal to **1 GWei**. Notably, the way fees are calculated on L2 differ from what you might be used to on L1, where the gas price can be adjusted e.g. to ensure faster mining. Since there is no mining on L2, the gas price is fixed.
+**GAS PRICE** The gas price is fixed and is equal to **0.1 GWei**. Notably, the way fees are calculated on L2 differ from what you might be used to on L1, where the gas price can be adjusted e.g. to ensure faster mining. Since there is no mining on L2, the gas price is fixed.
 
 **GAS LIMIT** On L2, we vary the gas limit to accommodate the ever-changing costs of running the L2. This can be confusing, since on L1, the gas limits are constants that depend only on the _type_ of transaction - e.g. on L1, a standard ETH transfer requires a gas limit of 21,000 units of gas.
 
