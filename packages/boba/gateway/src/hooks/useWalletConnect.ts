@@ -48,12 +48,10 @@ export const useWalletConnect = () => {
       const initialized = await networkService.initializeAccount({
         chainIdChanged,
       })
-
       if (initialized === 'nometamask') {
         dispatch(openModal('noMetaMaskModal'))
         return false
       } else if (initialized === 'wrongnetwork') {
-        dispatch(openModal('wrongNetworkModal'))
         return false
       } else if (initialized === false) {
         dispatch(setEnableAccount(false))
