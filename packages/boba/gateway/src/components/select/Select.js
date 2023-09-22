@@ -132,6 +132,7 @@ function Select({
         isMulti={isMulti}
         options={options}
         isLoading={isLoading}
+        isSearchable={false}
         styles={{
           menu: (base) => ({
             ...base,
@@ -144,6 +145,7 @@ function Select({
             ...base,
             background: styledTheme.name === 'light' ? styledTheme.colors.gray[ 50 ] : styledTheme.colors.gray[ 400 ],
             cursor: 'pointer',
+            color: styledTheme.colors.gray[ 800 ]
           }),
           control: (base) => ({
             ...base,

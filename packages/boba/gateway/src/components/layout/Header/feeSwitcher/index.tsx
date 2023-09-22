@@ -39,6 +39,7 @@ import {
 } from './styles'
 
 import BobaLogo from 'assets/images/Boba_Logo_White_Circle.png'
+import Menu from 'components/global/menu'
 
 const OptionBoba = () => ({
   value: 'BOBA',
