@@ -13,9 +13,17 @@ export const MenuItemStyle = styled(Typography).attrs({
 })`
   padding: 5px 10px;
   gap: 10px !important;
+  width: 100%;
   display: flex !important;
   align-items: center;
-  justify-content: space-around;
+  justify-content: flex-start;
+  color: ${({ theme: { colors, name } }) =>
+    name === 'light' ? colors.gray[800] : colors.gray[100]};
+
+  svg {
+    fill: ${({ theme: { colors, name } }) =>
+      name === 'light' ? colors.gray[800] : colors.gray[100]};
+  }
 `
 
 export const ProfileIndicator = styled.img.attrs({
