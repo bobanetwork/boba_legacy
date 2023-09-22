@@ -145,7 +145,7 @@ function Select({
             ...base,
             background: styledTheme.name === 'light' ? styledTheme.colors.gray[ 50 ] : styledTheme.colors.gray[ 400 ],
             cursor: 'pointer',
-            color: styledTheme.colors.gray[ 800 ]
+            color: styledTheme.name === 'light' ? styledTheme.colors.gray[ 800 ] : styledTheme.colors.gray[ 50 ],
           }),
           control: (base) => ({
             ...base,
