@@ -13,6 +13,8 @@ export interface IKMSSignerConfig {
   awsKmsAccessKey: string
   awsKmsSecretKey: string
   awsKmsKeyId: string
+  /** @dev Should always be enabled, but can be helpful for debugging and unit tests, .. */
+  disableDisburserCheck?: boolean
 }
 
 export class KMSSigner {
