@@ -5,7 +5,7 @@ export const StyledFooter = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin: 32px 32px 0px;
+  margin: 24px 32px;
 `
 
 export const DividerLine = styled.hr`
@@ -15,4 +15,10 @@ export const DividerLine = styled.hr`
   ${mobile(css`
     display: none;
   `)}
+`
+
+export const Row = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 `

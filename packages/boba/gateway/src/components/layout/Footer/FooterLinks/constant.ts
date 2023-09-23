@@ -21,9 +21,6 @@ export const FOOTERLINKS: Array<LinkProps> = [
     path: ROUTES_PATH.BOBASCOPE,
     isNav: true,
   },
-]
-
-export const FOOTERLINKS_RIGHT: Array<LinkProps> = [
   {
     label: 'Boba Network Website',
     path: 'https://boba.network',
@@ -33,3 +30,5 @@ export const FOOTERLINKS_RIGHT: Array<LinkProps> = [
     path: 'https://boba.network/terms-of-use/',
   },
 ]
+
+export const FOOTERLINKS_RIGHT: Array<LinkProps> = []
