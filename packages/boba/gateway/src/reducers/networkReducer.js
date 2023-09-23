@@ -35,8 +35,7 @@ const initialState = {
   activeNetworkIcon: 'ethereum',
   activeNetwork: NETWORK.ETHEREUM,
   activeNetworkType: NETWORK_TYPE.MAINNET,
-  activeNetworkName: {},
-  blockExplorerLinks:[]
+  activeNetworkName: {}
 }
 
 function networkReducer(state = initialState, action) {
@@ -79,12 +78,6 @@ function networkReducer(state = initialState, action) {
         // activeNetworkType,
         activeNetworkIcon,
         activeNetworkName
-      }
-    }
-    case 'NETWORK/SET/BLOCK_EXPLORER/SUCCESS': {
-      return {
-        ...state,
-        blockExplorerLinks: action.payload
       }
     }
     default:
