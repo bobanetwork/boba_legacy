@@ -12,9 +12,10 @@ export const Option = (props) => {
     label,
     subTitle
   } = props.data;
+
   return <>
     <components.Option {...props}>
-      <ValueContainer>
+      <ValueContainer active={props.isSelected}>
         {icon && <IconContainer>
           <img src={icon} alt={title} width="100%"/>
         </IconContainer>}

@@ -4,6 +4,7 @@ import { HistoryData } from './entities/HistoryData.entity'
 import * as postgres from 'pg' // keep depcheck (db driver)
 
 import dotenv from 'dotenv'
+import {LastAirdrop} from "./entities/LastAirdrop.entity";
 
 dotenv.config()
 
@@ -16,9 +17,10 @@ export const AppDataSource = new DataSource({
   database: process.env.TELEPORTATION_POSTGRES_DB ?? 'postgres',
   synchronize: false,
   logging: false,
-  entities: [HistoryData],
+  entities: [HistoryData, LastAirdrop],
   migrations: [],
   subscribers: [],
 })
 
 export const historyDataRepository = AppDataSource.getRepository(HistoryData)
+export const lastAirdropRepository = AppDataSource.getRepository(LastAirdrop)

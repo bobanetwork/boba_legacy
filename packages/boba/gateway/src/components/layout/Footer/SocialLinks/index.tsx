@@ -1,6 +1,7 @@
 import React from 'react'
 import {
-  AppVersion,
+  DisclaimerContainer,
+  DisclaimerText,
   SocialLinkItem,
   SocialLinksContainer,
   StyledSocialLinks,
@@ -15,7 +16,11 @@ interface Props {}
 
 const SocialLinks = (props: Props) => {
   return (
-    <SocialLinksContainer id="socialLinks">
+    <SocialLinksContainer>
+      <DisclaimerContainer>
+        <DisclaimerText>©2023 Enya Labs</DisclaimerText>
+        <DisclaimerText>v{WALLET_VERSION}</DisclaimerText>
+      </DisclaimerContainer>
       <StyledSocialLinks>
         <SocialLinkItem
           href="https://docs.boba.network"
@@ -46,7 +51,6 @@ const SocialLinks = (props: Props) => {
           <TelegramIcon />
         </SocialLinkItem>
       </StyledSocialLinks>
-      <AppVersion>v{WALLET_VERSION}</AppVersion>
     </SocialLinksContainer>
   )
 }

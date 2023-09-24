@@ -104,7 +104,7 @@ class NetworkService {
   constructor() {
 
     this.account = null    // the user's account
-    this.L1Provider = null // L1 Infura
+    this.L1Provider = null // L1
     this.L2Provider = null // L2 to Boba replica
     this.provider = null   // from MetaMask
     this.chainId = null // from Metamask
@@ -4163,15 +4163,6 @@ class NetworkService {
 
   async getBlockTime(blockNumber) {
     return (await this.provider.getBlock(blockNumber)).timestamp;
-  }
-
-  async getBlockExplorerLinks() {
-    if (this.networkConfig) {
-      const l1Explorer = this.networkConfig.L1.blockExplorerUrl
-      const l2Explorer = this.networkConfig.L2.blockExplorerUrl
-      return [l1Explorer, l2Explorer]
-    }
-    return []
   }
 }
 

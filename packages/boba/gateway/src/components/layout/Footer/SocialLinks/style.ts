@@ -1,6 +1,22 @@
-import { Typography } from '@mui/material'
+import { Typography } from 'components/global'
 import styled, { css } from 'styled-components'
 import { mobile } from 'themes/screens'
+
+export const DisclaimerContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 32px;
+`
+
+export const DisclaimerText = styled(Typography).attrs({
+  variant: 'body2',
+})`
+  color: ${({ theme }) =>
+    theme.name === 'light'
+      ? theme.colors['gray'][600]
+      : theme.colors['gray'][200]};
+  font-weight: 500;
+`
 
 export const SocialLinksContainer = styled.div`
   display: flex;
@@ -16,8 +32,7 @@ export const StyledSocialLinks = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 30px;
-  flex: 1;
+  gap: 32px;
 `
 
 export const SocialLinkItem = styled.a`
@@ -64,14 +79,4 @@ export const SocialLinkItem = styled.a`
       }
     }
   }
-`
-
-export const AppVersion = styled(Typography).attrs({
-  variant: 'body2',
-})`
-  justify-self: flex-end;
-  color: ${({ theme }) =>
-    theme.name === 'light'
-      ? theme.colors['gray'][600]
-      : theme.colors['gray'][200]};
 `

@@ -1,11 +1,27 @@
-import MUIMenu from '@mui/material/Menu'
-import MUIMenuItem from '@mui/material/MenuItem'
 import React, { FC } from 'react'
-import { StyleMenuButton } from './styles'
+import {
+  StyleMenuButton,
+  StyledLabel,
+  StyledMenu,
+  StyledMenuItem,
+} from './styles'
 import { MenuProps } from './types'
-import { useTheme } from 'styled-components'
 
-const Menu: FC<MenuProps> = ({ label, name, children, options }) => {
+const Menu: FC<MenuProps> = ({
+  label,
+  name,
+  children,
+  options,
+  variant,
+  anchorOrigin = {
+    vertical: 'bottom',
+    horizontal: 'center',
+  },
+  transformOrigin = {
+    vertical: 'top',
+    horizontal: 'center',
+  },
+}) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -15,37 +31,32 @@ const Menu: FC<MenuProps> = ({ label, name, children, options }) => {
     setAnchorEl(null)
   }
 
-  const theme: any = useTheme()
-
   return (
     <>
-      <StyleMenuButton onClick={handleClick}>
+      <StyleMenuButton variant={variant} active={open} onClick={handleClick}>
         {label || children}
       </StyleMenuButton>
-      <MUIMenu
+      <StyledMenu
         anchorEl={anchorEl}
         id={name}
         open={open}
         onClose={handleClose}
         onClick={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={anchorOrigin}
+        transformOrigin={transformOrigin}
       >
         {options.map((opt, index) => {
           return (
-            <MUIMenuItem
-              sx={{
-                margin: '5px',
-                borderRadius: '10px',
-              }}
-              key={index}
-              onClick={opt.onClick}
-            >
-              {opt.component}
-            </MUIMenuItem>
+            <StyledMenuItem key={index} onClick={opt.onClick}>
+              {opt.label ? (
+                <StyledLabel>{opt.label}</StyledLabel>
+              ) : (
+                opt.component
+              )}
+            </StyledMenuItem>
           )
         })}
-      </MUIMenu>
+      </StyledMenu>
     </>
   )
 }
