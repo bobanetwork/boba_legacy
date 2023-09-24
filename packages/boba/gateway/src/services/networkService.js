@@ -104,7 +104,7 @@ class NetworkService {
   constructor() {
 
     this.account = null    // the user's account
-    this.L1Provider = null // L1 Infura
+    this.L1Provider = null // L1
     this.L2Provider = null // L2 to Boba replica
     this.provider = null   // from MetaMask
     this.chainId = null // from Metamask

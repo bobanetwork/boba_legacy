@@ -23,10 +23,14 @@ export const bnbConfig = {
       name: "Boba BNB Testnet",
       chainId: 9728,
       chainIdHex: '0x2600',
-      rpcUrl: `https://testnet.bnb.boba.network`,
-      blockExplorer: `https://blockexplorer.testnet.bnb.boba.network/`,
-      transaction: `https://blockexplorer.testnet.bnb.boba.network/tx/`,
-      blockExplorerUrl: `https://blockexplorer.testnet.bnb.boba.network/`,
+      rpcUrl: [
+        `https://testnet.bnb.boba.network`,
+        `https://replica.testnet.bnb.boba.network`,
+        `https://boba-bnb-testnet.gateway.tenderly.co`
+      ],
+      blockExplorer: `https://testnet.bobascan.com/`,
+      transaction: `https://testnet.bobascan.com/tx/`,
+      blockExplorerUrl: `https://testnet.bobascan.com/`,
       symbol: "BOBA",
       tokenName: "Boba Token",
     },
@@ -45,7 +49,7 @@ export const bnbConfig = {
       rpcUrl: [
         `https://bsc-dataseed.binance.org`,
         `https://rpc.ankr.com/bsc`,
-        `https://1rpc.io/bnb`,
+        `https://1rpc.io/bnb`
       ],
       transaction: `https://bscscan.com/tx/`,
       blockExplorerUrl: `https://bscscan.com/`,
@@ -56,10 +60,13 @@ export const bnbConfig = {
       name: "Boba BNB Mainnet",
       chainId: 56288,
       chainIdHex: '0xDBE0',
-      rpcUrl: `https://bnb.boba.network`,
-      blockExplorer: `https://blockexplorer.bnb.boba.network/`,
-      transaction: `https://blockexplorer.bnb.boba.network/tx/`,
-      blockExplorerUrl: `https://blockexplorer.bnb.boba.network/`,
+      rpcUrl: [
+        `https://bnb.boba.network`,
+        `https://replica.bnb.boba.network`
+      ],
+      blockExplorer: `https://bobascan.com/`,
+      transaction: `https://bobascan.com/tx/`,
+      blockExplorerUrl: `https://bobascan.com/`,
       symbol: "BOBA",
       tokenName: "Boba Token",
     },
