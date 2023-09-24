@@ -5,7 +5,6 @@ gateway.boba.betwork.
 
 | Environment Vars             | Required | Default Valu | Description                                                     |
 | ---------------------------- | -------- | ------------ | --------------------------------------------------------------- |
-| REACT_APP_INFURA_ID          | Yes      | ''           | API key for infura account                                      |
 | REACT_APP_POLL_INTERVAL      | Yes      | 20000        | Interval to poll the fetch api about the records                |
 | SKIP_PREFLIGHT_CHECK         | N/A      | N/A          | N/A                                                             |
 | REACT_APP_WALLET_VERSION     | Yes      | N/A          | This will be useful while prepare the build.                    |
@@ -15,11 +14,4 @@ gateway.boba.betwork.
 | REACT_APP_GA4_MEASUREMENT_ID | Yes      | N/A          | Google analytics api key                                        |
 | REACT_APP_SENTRY_DSN         | Yes      | N/A          | Sentry DSN url to catch the error on frontend                   |
 | REACT_APP_ENABLE_LOCK_PAGE   | No       | N/A          | to enable the lock page on gateway menu                         |
-| REACT_APP_GAS_POLL_INTERVAL   | Yes       | 30000          | Poll interval to fetch the gas price and verifier status                         |
-
-
-### Execute to update the version of package with latest tag from git.
-
-``
-yarn release
-```
+| REACT_APP_GAS_POLL_INTERVAL  | Yes      | 30000        | Poll interval to fetch the gas price and verifier status        |

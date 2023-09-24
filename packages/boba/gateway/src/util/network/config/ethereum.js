@@ -1,5 +1,3 @@
-import {INFURA_ID } from "util/constant";
-
 export const ethereumConfig = {
   Testnet: {
     OMGX_WATCHER_URL: `https://api-watcher.goerli.boba.network/`,
@@ -12,7 +10,6 @@ export const ethereumConfig = {
       chainId: 5,
       chainIdHex: '0x5',
       rpcUrl: [
-        `https://goerli.infura.io/v3/${INFURA_ID}`,
         `https://goerli.gateway.tenderly.co`,
         `https://rpc.ankr.com/eth_goerli`,
       ],
@@ -60,7 +57,6 @@ export const ethereumConfig = {
       chainId: 1,
       chainIdHex: '0x1',
       rpcUrl: [
-        `https://mainnet.infura.io/v3/${INFURA_ID}`,
         `https://rpc.ankr.com/eth`,
         `http://gateway.tenderly.co/public/boba-ethereum`,
         `https://cloudflare-eth.com`,
