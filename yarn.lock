@@ -10122,10 +10122,10 @@
   resolved "https://registry.npmjs.org/@uniswap/lib/-/lib-4.0.1-alpha.tgz"
   integrity sha512-f6UIliwBbRsgVLxIaBANF6w09tYqc6Y/qXdsrbEmXHyFA7ILiKrIwRFXe1yOg8M3cksgVsO9N7yuL2DdCGQKBA==
 
-"@uniswap/sdk-core@^3.0.1":
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/@uniswap/sdk-core/-/sdk-core-3.1.0.tgz"
-  integrity sha512-YRrp6vYAbYmi3uDXQGkvj2eT8BMpNnUdCFb8GifDG0Ei+ohIpC4RNAB+5/ru3zR2Byhx8VahGrSKuvdd6BVMyA==
+"@uniswap/sdk-core@^4":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@uniswap/sdk-core/-/sdk-core-4.0.7.tgz#90dfd070d7e44494234618af398da158363ae827"
+  integrity sha512-jscx7KUIWzQatcL5PHY6xy0gEL9IGQcL5h/obxzX9foP2KoNk9cq66Ia8I2Kvpa7zBcPOeW1hU0hJNBq6CzcIQ==
   dependencies:
     "@ethersproject/address" "^5.0.2"
     big.js "^5.2.2"
@@ -10198,13 +10198,13 @@
     base64-sol "1.0.1"
 
 "@uniswap/v3-sdk@^3.6.2":
-  version "3.9.0"
-  resolved "https://registry.npmjs.org/@uniswap/v3-sdk/-/v3-sdk-3.9.0.tgz"
-  integrity sha512-LuoF3UcY1DxSAQKJ3E4/1Eq4HaNp+x+7q9mvbpiu+/PBj+O1DjLforAMrKxu+RsA0aarmZtz7yBnAPy+akgfgQ==
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/@uniswap/v3-sdk/-/v3-sdk-3.10.0.tgz#962c9e598250ced00702d944783c2d9ee3fa12f6"
+  integrity sha512-sbmSA1O+Ct960r66Ie/c1rOmVadpwRu8nQ79pGICv0pZJdnFIQ/SReG3F+iC2C2UNNjNP6aC2WDUggXrjyrgnA==
   dependencies:
     "@ethersproject/abi" "^5.0.12"
     "@ethersproject/solidity" "^5.0.9"
-    "@uniswap/sdk-core" "^3.0.1"
+    "@uniswap/sdk-core" "^4"
     "@uniswap/swap-router-contracts" "^1.2.1"
     "@uniswap/v3-periphery" "^1.1.1"
     "@uniswap/v3-staker" "1.0.0"
@@ -11699,15 +11699,6 @@ axios@^0.21.1:
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
     follow-redirects "^1.14.0"
-
-axios@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.5.0.tgz#f02e4af823e2e46a9768cfc74691fdd0517ea267"
-  integrity sha512-D4DdjDo5CY50Qms0qGQTTw6Q44jl7zRwY7bthds06pUGfChBCTcQs+N743eFWGEd6pRTMd6A+I87aWyFV5wiZQ==
-  dependencies:
-    follow-redirects "^1.15.0"
-    form-data "^4.0.0"
-    proxy-from-env "^1.1.0"
 
 axobject-query@^2.2.0:
   version "2.2.0"
@@ -18179,7 +18170,7 @@ fmix@^0.1.0:
   dependencies:
     imul "^1.0.0"
 
-follow-redirects@^1.0.0, follow-redirects@^1.12.1, follow-redirects@^1.14.0, follow-redirects@^1.15.0:
+follow-redirects@^1.0.0, follow-redirects@^1.12.1, follow-redirects@^1.14.0:
   version "1.15.2"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.2.tgz"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
@@ -26728,7 +26719,7 @@ proxy-addr@~2.0.7:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
 
-proxy-from-env@^1.0.0, proxy-from-env@^1.1.0:
+proxy-from-env@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
