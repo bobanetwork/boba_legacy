@@ -117,7 +117,7 @@ const NavDrawer: FC<Props> = ({ onClose, open }) => {
               <NavLinkItem
                 key={menu.label}
                 to={menu.path}
-                activeclassname="active"
+                className={({ isActive }) => (isActive ? 'active' : '')}
                 onClick={onClose}
               >
                 {menu.label}
