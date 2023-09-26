@@ -44,17 +44,17 @@ import OVM_GasPriceOracleJson
 
 // Boba contracts
 import DiscretionaryExitFeeJson
-  from '@boba/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
-import L1LPJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
-import L2LPJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
-import L2SaveJson from '@boba/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
-import Boba from "@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
+  from '@bobanetwork/contracts/artifacts/contracts/DiscretionaryExitFee.sol/DiscretionaryExitFee.json'
+import L1LPJson from '@bobanetwork/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import TeleportationJson from '@bobanetwork/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
+import L2LPJson from '@bobanetwork/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import L2SaveJson from '@bobanetwork/contracts/artifacts/contracts/BobaFixedSavings.sol/BobaFixedSavings.json'
+import Boba from "@bobanetwork/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json"
 import GovernorBravoDelegate
-  from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
+  from "@bobanetwork/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegate.sol/GovernorBravoDelegate.json"
 import GovernorBravoDelegator
-  from "@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
-import L2BillingContractJson from "@boba/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json"
+  from "@bobanetwork/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json"
+import L2BillingContractJson from "@bobanetwork/contracts/artifacts/contracts/L2BillingContract.sol/L2BillingContract.json"
 
 //special one-off locations
 import L1ERC20Json from '../deployment/contracts/L1ERC20.json'

@@ -1,5 +1,5 @@
 {
-  "name": "@boba/boba-fee",
+  "name": "@bobanetwork/boba-fee",
   "version": "1.0.0",
   "scripts": {
     "use:boba": "FEE_TOKEN=BOBA node ./src/index.js",

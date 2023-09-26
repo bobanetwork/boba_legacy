@@ -1,5 +1,5 @@
 {
-  "name": "@boba/gas-price-oracle",
+  "name": "@bobanetwork/gas-price-oracle",
   "version": "0.1.0",
   "private": true,
   "description": "Gas Price Oracle service",
@@ -26,7 +26,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@boba/contracts": "0.0.1",
+    "@bobanetwork/contracts": "0.0.2",
     "@eth-optimism/contracts": "0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "@nomiclabs/hardhat-ethers": "^2.0.2",

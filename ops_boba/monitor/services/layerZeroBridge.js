@@ -6,8 +6,8 @@ const GlobalEnv = require('./utils/globalEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
 
-const EthBridgeJson = require('@boba/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
-const AltL1Bridge = require('@boba/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
+const EthBridgeJson = require('@bobanetwork/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
+const AltL1Bridge = require('@bobanetwork/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
 
 const layerZeroMainnetAddresses = require('@boba/register/addresses/layerZeroMainnet.json')
 const layerZeroTestnetAddresses = require('@boba/register/addresses/layerZeroTestnet.json')

@@ -1,5 +1,5 @@
 {
-  "name": "@boba/turing-kyc",
+  "name": "@bobanetwork/turing-kyc",
   "version": "0.1.0",
   "description": "Turing KYC example",
   "main": "index.js",

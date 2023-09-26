@@ -4,7 +4,7 @@ import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { getContractFactory } from '@eth-optimism/contracts'
 import { registerBobaAddress } from '../src/hardhat-deploy-ethers'
 
-import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import TuringHelperJson from '@bobanetwork/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
 let L2Boba: Contract
 

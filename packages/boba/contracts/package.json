@@ -1,8 +1,8 @@
 {
-  "name": "@boba/contracts",
-  "version": "0.0.1",
+  "name": "@bobanetwork/contracts",
+  "version": "0.0.2",
   "description": "BOBA Smart Contracts",
-  "private": true,
+  "private": false,
   "author": "Enya.ai",
   "license": "MIT",
   "main": "dist/index",
@@ -24,7 +24,7 @@
     "test:slither": "slither ."
   },
   "dependencies": {
-    "@boba/turing-hybrid-compute": "0.2.0",
+    "@bobanetwork/turing-hybrid-compute": "0.2.0",
     "@chainlink/contracts": "0.3.1",
     "@eth-optimism/contracts": "0.5.11",
     "@eth-optimism/core-utils": "0.8.1",

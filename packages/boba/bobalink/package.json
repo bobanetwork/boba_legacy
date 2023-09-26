@@ -1,5 +1,5 @@
 {
-  "name": "@boba/bobalink",
+  "name": "@bobanetwork/bobalink",
   "version": "1.0.0",
   "description": "BOBA Link Service",
   "main": "dist/src/index",
@@ -19,7 +19,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@boba/contracts": "0.0.1",
+    "@bobanetwork/contracts": "0.0.2",
     "@eth-optimism/core-utils": "0.8.1",
     "@types/mocha": "^8.2.2",
     "@nomiclabs/hardhat-ethers": "^2.0.2",

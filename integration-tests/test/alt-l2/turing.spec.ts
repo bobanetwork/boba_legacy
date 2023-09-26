@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { Contract, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)

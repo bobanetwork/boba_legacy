@@ -13,8 +13,8 @@ import {
 import {orderBy} from 'lodash'
 
 /* Imports: Artifacts */
-import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import TeleportationJson from '@bobanetwork/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
+import L1ERC20Json from '@bobanetwork/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
 import {ChainInfo} from '@boba/teleportation/src/utils/types'

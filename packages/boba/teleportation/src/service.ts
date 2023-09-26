@@ -14,7 +14,7 @@ import 'reflect-metadata'
 import {sleep} from '@eth-optimism/core-utils'
 import {BaseService} from '@eth-optimism/common-ts'
 import {getContractFactory} from '@eth-optimism/contracts'
-import {getBobaContractAt} from '@boba/contracts'
+import {getBobaContractAt} from '@bobanetwork/contracts'
 
 /* Imports: Interface */
 import {

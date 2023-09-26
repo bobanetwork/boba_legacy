@@ -21,7 +21,7 @@ import BobaTuringCreditJson from "../../../packages/contracts/artifacts/contract
 import GasOracleJson from "../../../packages/contracts/artifacts/contracts/L2/predeploys/OVM_GasPriceOracle.sol/OVM_GasPriceOracle.json"
 import HelloTuringJson from "../artifacts/contracts/HelloTuring.sol/HelloTuring.json"
 import TuringHelper from "../artifacts/contracts/TuringHelper.sol/TuringHelper.json"
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import L2GovernanceERC20Json from '@bobanetwork/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 import { Server } from "http";
 
 let Factory__Hello: ContractFactory

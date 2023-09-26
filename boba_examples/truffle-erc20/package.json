@@ -1,5 +1,5 @@
 {
-  "name": "@boba/Truffle-ERC20-Example",
+  "name": "@bobanetwork/Truffle-ERC20-Example",
   "version": "1.0.0",
   "description": "Example of using Truffle to deploy an ERC20",
   "homepage": "https://github.com/bobanetwork/boba/develop/boba_examples/truffle-erc20#readme",

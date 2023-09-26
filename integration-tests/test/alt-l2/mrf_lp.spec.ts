@@ -8,7 +8,7 @@ import {
   deployBobaContractCore,
   getBobaContractABI,
   getBobaContractAt,
-} from '@boba/contracts'
+} from '@bobanetwork/contracts'
 
 import { expectLogs, getGasLimitOption } from './shared/utils'
 import { OptimismEnv } from './shared/env'

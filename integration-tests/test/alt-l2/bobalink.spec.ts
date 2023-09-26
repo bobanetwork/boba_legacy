@@ -4,7 +4,7 @@ chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 import { bobaLinkGetQuote } from '@boba/api'
 import util from 'util'
 

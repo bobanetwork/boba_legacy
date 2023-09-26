@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, utils, ethers } from 'ethers'
 import { getContractFactory } from '@eth-optimism/contracts'
-import { deployBobaContractCore, getBobaContractAt } from '@boba/contracts'
+import { deployBobaContractCore, getBobaContractAt } from '@bobanetwork/contracts'
 
 import { OptimismEnv } from './shared/env'
 

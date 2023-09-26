@@ -1,9 +1,9 @@
 {
-  "name": "@boba/register",
+  "name": "@bobanetwork/register",
   "version": "0.0.1",
   "description": "BOBA Smart Contracts Registration",
-  "private": true,
-  "author": "OMG",
+  "private": false,
+  "author": "Boba Network",
   "license": "MIT",
   "scripts": {
     "build": "yarn build:contracts",

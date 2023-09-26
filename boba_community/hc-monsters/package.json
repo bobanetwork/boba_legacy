@@ -1,5 +1,5 @@
 {
-  "name": "@boba/turing-monsters",
+  "name": "@bobanetwork/turing-monsters",
   "version": "0.1.0",
   "description": "Monster Maker",
   "main": "index.js",

@@ -1,5 +1,5 @@
 {
-  "name": "@boba/turing-twitter",
+  "name": "@bobanetwork/turing-twitter",
   "version": "0.1.0",
   "description": "Turing Twitter example",
   "main": "index.js",

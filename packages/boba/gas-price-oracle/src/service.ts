@@ -9,7 +9,7 @@ import fetch from 'node-fetch'
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
 import { loadContract, getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 
 interface GasPriceOracleOptions {
   // Providers for interacting with L1 and L2.

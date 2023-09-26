@@ -10,5 +10,5 @@ ignores: [
   "yargs",
   "@ethersproject/abi",
   "@ethersproject/providers",
-  "@boba/turing-hybrid-compute"
+  "@bobanetwork/turing-hybrid-compute"
 ]

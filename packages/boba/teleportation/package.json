@@ -1,5 +1,5 @@
 {
-   "name": "@boba/teleportation",
+   "name": "@bobanetwork/teleportation",
    "version": "1.0.0",
    "description": "The teleportation between L2s and L1s",
    "main": "dist/src/index",
@@ -20,7 +20,7 @@
    },
    "license": "MIT",
    "devDependencies": {
-      "@boba/contracts": "0.0.1",
+      "@bobanetwork/contracts": "0.0.2",
       "@eth-optimism/core-utils": "0.8.1",
       "@nomiclabs/hardhat-ethers": "^2.0.2",
       "@nomiclabs/hardhat-waffle": "^2.0.1",

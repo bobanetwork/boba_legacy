@@ -1,5 +1,5 @@
 {
-  "name": "@boba/monitor",
+  "name": "@bobanetwork/monitor",
   "version": "1.0.0",
   "description": "boba monitor",
   "main": "index.js",
@@ -10,8 +10,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@boba/contracts": "0.0.1",
-    "@boba/register": "0.0.1",
+    "@bobanetwork/contracts": "0.0.2",
+    "@bobanetwork/register": "0.0.1",
     "@eth-optimism/common-ts": "0.2.2",
     "@eth-optimism/contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
