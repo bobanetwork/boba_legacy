@@ -650,9 +650,9 @@ class NetworkService {
       const L1ChainId = networkDetail['L1']['chainId']
       const L2ChainId = networkDetail['L2']['chainId']
 
-      /* if (!this.networkGateway || typeof chainId === 'undefined' || typeof L1ChainId === 'undefined' || typeof L2ChainId === 'undefined') {
+      if (!this.networkGateway || typeof chainId === 'undefined' || typeof L1ChainId === 'undefined' || typeof L2ChainId === 'undefined') {
           return;
-      } */
+      }
 
       // there are numerous possible chains we could be on also, either L1 or L2
       // at this point, we only know whether we want to be on which network etc
