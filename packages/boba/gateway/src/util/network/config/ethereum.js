@@ -10,7 +10,7 @@ export const ethereumConfig = {
       chainId: 5,
       chainIdHex: '0x5',
       rpcUrl: [
-        `https://goerli.gateway.tenderly.co`,
+        // `https://goerli.gateway.tenderly.co`,
         `https://rpc.ankr.com/eth_goerli`,
       ],
       transaction: `https://goerli.etherscan.io/tx/`,

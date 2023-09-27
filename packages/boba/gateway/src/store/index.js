@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
-import { createStore , applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import RootReducer from 'reducers'
 import reduxThunk from 'redux-thunk'
 import persistReducer from 'redux-persist/lib/persistReducer'
@@ -30,10 +30,12 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, RootReducer)
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
 export const store = createStore(
   persistedReducer,
   initialState,
-  applyMiddleware(reduxThunk)
+  composeEnhancers(applyMiddleware(reduxThunk))
 )
 
 export default store;

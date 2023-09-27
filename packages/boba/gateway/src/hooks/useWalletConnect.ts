@@ -59,6 +59,7 @@ export const useWalletConnect = () => {
         return false
       } else if (initialized === LAYER.L1 || initialized === LAYER.L2) {
         dispatch(closeModal('wrongNetworkModal'))
+        dispatch(closeModal('walletSelectorModal'))
         dispatch(setLayer(initialized))
         dispatch(setEnableAccount(true))
         dispatch(setWalletAddress(networkService.account))
@@ -115,6 +116,7 @@ export const useWalletConnect = () => {
               }
             } else {
               resetConnectChain()
+              console.log(`open => walletSelectorModal doConnectLayer`)
               dispatch(openModal('walletSelectorModal'))
             }
           }
@@ -161,6 +163,7 @@ export const useWalletConnect = () => {
       if (DISABLE_WALLETCONNECT) {
         connectToNetwork()
       } else {
+        console.log(`open => walletSelectorModal connect to network`)
         dispatch(openModal('walletSelectorModal'))
       }
     }

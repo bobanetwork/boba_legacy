@@ -46,13 +46,11 @@ const Home = () => {
   const dispatch = useDispatch()
   const activeNetwork = useSelector(selectActiveNetwork())
   const accountEnabled = useSelector(selectAccountEnabled())
-  const baseEnabled = useSelector(selectBaseEnabled())
 
   useInterval(() => {
     if (accountEnabled /*== MetaMask is connected*/) {
-      if(baseEnabled) {
-        dispatch(fetchBalances()) // account specific
-      }
+      // dispatch(fetchBalances()) // account specific
+
       if (activeNetwork === NETWORK.ETHEREUM) {
         dispatch(getFS_Info())   // account specific
         dispatch(getFS_Saves()) // account specific

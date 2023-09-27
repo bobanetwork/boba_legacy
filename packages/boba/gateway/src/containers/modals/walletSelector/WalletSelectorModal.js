@@ -40,7 +40,6 @@ const WalletSelectorModal = ({ open }) => {
 
     try {
       if (await networkService.walletService.connectWallet(type)) {
-        dispatch(closeModal('walletSelectorModal'))
         triggerInit()
       } else {
         resetConnectChain()
