@@ -7,7 +7,7 @@ import FooterLinks from './FooterLinks'
 
 export const Footer: FC<FooterProps> = (props) => {
   return (
-    <StyledFooter>
+    <StyledFooter id="footer">
       <Row>
         <FooterLinks />
         <GasWatcher />

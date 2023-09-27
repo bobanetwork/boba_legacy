@@ -53,7 +53,7 @@ const FooterLinks = () => {
   }
 
   return (
-    <LinkContainer>
+    <LinkContainer id="footerLinks">
       <StyledLinks>
         {FOOTERLINKS.map((link) => {
           if (link.isNav) {
