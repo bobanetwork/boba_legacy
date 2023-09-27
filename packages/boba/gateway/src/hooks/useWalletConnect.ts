@@ -52,6 +52,7 @@ export const useWalletConnect = () => {
         dispatch(openModal('noMetaMaskModal'))
         return false
       } else if (initialized === 'wrongnetwork') {
+        dispatch(openModal('wrongNetworkModal'))
         return false
       } else if (initialized === false) {
         dispatch(setEnableAccount(false))
@@ -148,10 +149,17 @@ export const useWalletConnect = () => {
   }, [connectBOBARequest, doConnectToLayer])
 
   useEffect(() => {
-    if (connectRequest && !networkService.walletService.provider) {
+    const connectToNetwork = async () => {
+      if (await networkService.walletService.connectWallet('metamask')) {
+        triggerInit()
+      } else {
+        dispatch(setConnect(false))
+      }
+    }
+    if (connectRequest) {
       // bypass walletSelectorModal
       if (DISABLE_WALLETCONNECT) {
-        triggerInit()
+        connectToNetwork()
       } else {
         dispatch(openModal('walletSelectorModal'))
       }

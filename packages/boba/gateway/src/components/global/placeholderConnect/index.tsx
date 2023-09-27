@@ -34,7 +34,7 @@ export const PlaceholderConnect = ({
   const location = useLocation()
   const dispatch = useDispatch<any>()
 
-  const handdleConnect = () => {
+  const handleConnect = () => {
     dispatch(layer === LAYER.L2 ? setConnectBOBA(true) : setConnect(true))
   }
 
@@ -54,7 +54,7 @@ export const PlaceholderConnect = ({
       {!accountEnabled && (
         <>
           <DefaultLabel />
-          <Button small label="Connect Wallet" onClick={handdleConnect} />
+          <Button small label="Connect Wallet" onClick={handleConnect} />
         </>
       )}
     </PlaceholderContainer>

@@ -21,7 +21,7 @@ const SocialLinks = (props: Props) => {
         <DisclaimerText>©2023 Enya Labs</DisclaimerText>
         <DisclaimerText>v{WALLET_VERSION}</DisclaimerText>
       </DisclaimerContainer>
-      <StyledSocialLinks>
+      <StyledSocialLinks id="socialLinks">
         <SocialLinkItem
           href="https://docs.boba.network"
           target="_blank"

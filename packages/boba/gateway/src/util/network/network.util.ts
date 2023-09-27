@@ -140,7 +140,7 @@ export const NetworkList: { Mainnet: INetwork[]; Testnet: INetwork[] } = {
       label: 'BNB <> Boba',
       key: 'bnb',
       name: {
-        l1: 'Binance Smart Chain',
+        l1: 'BNB Smart Chain',
         l2: 'Boba BNB',
       },
       chainId: { [Layer.L1]: '56', [Layer.L2]: '56288' },
@@ -175,7 +175,7 @@ export const NetworkList: { Mainnet: INetwork[]; Testnet: INetwork[] } = {
       label: 'BNB (Testnet) <> Boba',
       key: 'bnb',
       name: {
-        l1: 'BNB Testnet',
+        l1: 'BNB Smart Chain Testnet',
         l2: 'Boba BNB Testnet',
       },
       chainId: { [Layer.L1]: '97', [Layer.L2]: '9728' },

@@ -158,8 +158,6 @@ export default class Page extends Base {
           'https://docs.boba.network/faq',
           '/devtools',
           '/bobascope',
-          'https://etherscan.io/',
-          'https://bobascan.com/',
           'https://boba.network',
           'https://boba.network/terms-of-use/',
         ])
@@ -171,8 +169,6 @@ export default class Page extends Base {
           'FAQs',
           'Dev Tools',
           'Bobascope',
-          'Blockexplorer',
-          'Boba Blockexplorer',
           'Boba Network Website',
           'Terms of Use',
         ])
@@ -194,7 +190,7 @@ export default class Page extends Base {
 
     cy.get(
       `button[label="Connect to the ${networkAbbreviation} ${
-        isTestnet ? 'Testnet' : 'Mainnet'
+        isTestnet ? 'Testnet' : ''
       } network"]`,
       { timeout: 90000 }
     )
@@ -204,7 +200,7 @@ export default class Page extends Base {
 
   switchThroughMainnetNetworks() {
     // switch to BNB
-    this.header.switchNetwork('Binance')
+    this.header.switchNetwork('BNB')
     this.handleNetworkSwitchModals('BNB', false)
     this.allowNetworkSwitch()
     this.checkNetworkSwitchSuccessful('BNB')

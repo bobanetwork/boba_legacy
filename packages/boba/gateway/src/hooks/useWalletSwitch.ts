@@ -58,6 +58,7 @@ const useWalletSwitch = () => {
         dispatch(setActiveNetwork())
         dispatch(setBaseState(false))
         dispatch(setEnableAccount(false))
+        dispatch(openModal('switchNetworkModal'))
       }
     }
   }, [activeNetwork, activeNetworkType, network, networkType, dispatch])

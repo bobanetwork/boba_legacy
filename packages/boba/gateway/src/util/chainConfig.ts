@@ -78,7 +78,7 @@ export const BobaChains = {
     },
   },
   5: {
-    url: 'https://goerli.gateway.tenderly.co',
+    url: 'https://rpc.ankr.com/eth_goerli', //'https://goerli.gateway.tenderly.co',
     testnet: true,
     name: 'Goerli Testnet',
     teleportationAddress: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13',
