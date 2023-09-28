@@ -170,7 +170,7 @@ Boba Network does have a testnet and it uses authentication through Twitter. Her
 
 First, download MetaMask on your browser as a plug-in and set up a MetaMask wallet (do not be surprised by the fox that will follow your cursor when you first launch the application. He’s friendly!)
 
-![Welcome to Metamask](.gitbook/assets/WELCOME-TO-METAMASK.png)
+<figure><img src=".gitbook/assets/wedfvbfdsdfvbfdsdfv (1).png" alt=""><figcaption></figcaption></figure>
 
 After you’ve set up your MetaMask account, you can [connect to the Goerli network Testnet](https://gateway.boba.network). After connecting, follow these steps:
 
@@ -181,7 +181,7 @@ After you’ve set up your MetaMask account, you can [connect to the Goerli netw
 * make sure that all of the network details such as the Network name, URL, and Chain ID have all been auto-filled.
 * Hit Approve.
 
-![Add to Network](.gitbook/assets/ALLOW-THIS-SITE-TO-ADD-NETWORK.png)
+<figure><img src=".gitbook/assets/wdfgfsdfgfdf.png" alt=""><figcaption></figcaption></figure>
 
 * now that you’re connected to the network, you can authenticate with Twitter:
 
@@ -263,12 +263,9 @@ You can also [look into using compilers and optimization options](https://docs.s
 
 There are multiple bridges available and are listed on our ecosystem page:
 
-![Boba Bridges](.gitbook/assets/BOBA-ECOSYSTEM-BRIDGES.png)
+<figure><img src=".gitbook/assets/wdfgbfsdfbfdfgn.png" alt=""><figcaption></figcaption></figure>
 
-\
-
-
-[On the Boba Network page](https://gateway.boba.network/), click the Ecosystem link in the top menu to navigate to the list of available bridges.
+Find all bridges [here](https://boba.network/dapps/?filter=true\&project\_category=bridge)
 
 ## On Optimism it is possible to skip the sequencer entirely and submit transactions directly to the CanonicalTransactionChain via an Ethereum transaction. Can you do this with Boba too?
 
