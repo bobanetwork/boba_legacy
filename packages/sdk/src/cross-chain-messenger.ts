@@ -9,7 +9,7 @@ import {
 import { Signer } from '@ethersproject/abstract-signer'
 import { ethers, BigNumber, Overrides } from 'ethers'
 import { sleep, remove0x } from '@eth-optimism/core-utils'
-import { predeploys } from '@eth-optimism/contracts'
+import { predeploys } from '@bobanetwork/contracts'
 
 import {
   ICrossChainMessenger,
