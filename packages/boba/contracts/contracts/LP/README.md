@@ -1,6 +1,6 @@
 # Liquidity Pools
 
-<figure><img src="../../../../../.gitbook/assets/liquidity-pool-graph.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../../.gitbook/assets/wergrewedfgfdwedfg.png" alt=""><figcaption></figcaption></figure>
 
 
 
