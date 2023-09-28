@@ -106,7 +106,7 @@ On the contract level, we decode the result from the Turing request and release 
 
 #### 5. User obtains the funds if the answer is correct or sees an error message
 
-<figure><img src="../../.gitbook/assets/client-geth-aws.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/werfgfwedfgb.png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="../../.gitbook/assets/implementation.png" alt=""><figcaption></figcaption></figure>
 
