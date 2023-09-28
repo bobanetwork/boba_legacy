@@ -118,8 +118,8 @@ npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS "Constructor argu
 
 On contract creation, you will receive an address to check a pending transaction. If it does not redirect you to block explorer, verify you are on the chain where the contract was deployed, and type the contract's address into the search bar. Your contract details should come up.
 
-<figure><img src="../../.gitbook/assets/Artboard 46 (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/sdfgbnsdfghndf.png" alt=""><figcaption></figcaption></figure>
 
 Once you have provided all the necessary information, hit 'Verify & Publish'
 
-<figure><img src="../../.gitbook/assets/Artboard 46_1.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/wefgwefgerfg.png" alt=""><figcaption></figcaption></figure>
