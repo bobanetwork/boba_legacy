@@ -66,6 +66,9 @@ Audits outstanding.
 ## Contract params
 This section describes how whitelisted routes between networks can be configured. By default no asset can be bridged, not even the native asset - all need to be explicitly whitelisted.
 
+Asset support is configured on-chain on the Teleportation contract via 
+`function addSupportedToken(address _token, uint32 _toChainId, uint256 _minDepositAmount, uint256 _maxDepositAmount, uint256 _maxTransferAmountPerDay)`.
+
 ### Indicate support
 Support for an asset can be shut down and re-activated at any time (yes|no value).
 
