@@ -2530,7 +2530,7 @@
     bigint-crypto-utils "^3.0.23"
     ethereum-cryptography "0.1.3"
 
-"@nomicfoundation/ethereumjs-evm@1.0.0", "@nomicfoundation/ethereumjs-evm@^1.0.0", "@nomicfoundation/ethereumjs-evm@^1.0.0-rc.3":
+"@nomicfoundation/ethereumjs-evm@^1.0.0", "@nomicfoundation/ethereumjs-evm@^1.0.0-rc.3":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@nomicfoundation/ethereumjs-evm/-/ethereumjs-evm-1.0.0.tgz"
   integrity sha512-hVS6qRo3V1PLKCO210UfcEQHvlG7GqR8iFzp0yyjTg2TmJQizcChKgWo8KFsdMw6AyoLgLhHGHw4HdlP8a4i+Q==

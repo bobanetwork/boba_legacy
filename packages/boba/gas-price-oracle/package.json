@@ -26,7 +26,6 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@nomicfoundation/ethereumjs-evm": "1.0.0",
     "@bobanetwork/contracts": "0.0.2",
     "@bobanetwork/core_contracts": "0.5.12",
     "@eth-optimism/core-utils": "0.8.1",
