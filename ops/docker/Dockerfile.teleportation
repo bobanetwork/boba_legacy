@@ -12,7 +12,7 @@ COPY --from=builder /optimism/yarn.lock .
 COPY --from=builder /optimism/node_modules ./node_modules
 
 # copy @boba package
-COPY --from=builder /optimism/packages/boba/contracts ./node_modules/@boba/contracts
+COPY --from=builder /optimism/packages/boba/contracts ./node_modules/@bobanetwork/contracts
 
 # copy deps (would have been nice if docker followed the symlinks required)
 COPY --from=builder /optimism/packages/core-utils/package.json ./packages/core-utils/package.json

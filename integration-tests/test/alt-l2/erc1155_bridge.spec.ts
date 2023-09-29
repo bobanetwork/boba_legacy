@@ -7,7 +7,7 @@ import {
   getBobaContractAt,
   getBobaContractABI,
   deployBobaContractCore,
-} from '@boba/contracts'
+} from '@bobanetwork/contracts'
 
 import { getFilteredLogIndex } from './shared/utils'
 import { OptimismEnv } from './shared/env'

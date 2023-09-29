@@ -2,20 +2,20 @@
 pragma solidity >0.8.8;
 
 /* Library Imports */
-import { AddressAliasHelper } from "@eth-optimism/contracts/contracts/standards/AddressAliasHelper.sol";
-import { Lib_AddressResolver } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
-import { Lib_OVMCodec } from "@eth-optimism/contracts/contracts/libraries/codec/Lib_OVMCodec.sol";
-import { Lib_AddressManager } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressManager.sol";
-import { Lib_SecureMerkleTrie } from "@eth-optimism/contracts/contracts/libraries/trie/Lib_SecureMerkleTrie.sol";
-import { Lib_DefaultValues } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_DefaultValues.sol";
-import { Lib_PredeployAddresses } from "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
-import { Lib_CrossDomainUtils } from "@eth-optimism/contracts/contracts/libraries/bridge/Lib_CrossDomainUtils.sol";
+import { AddressAliasHelper } from "@bobanetwork/core_contracts/contracts/standards/AddressAliasHelper.sol";
+import { Lib_AddressResolver } from "@bobanetwork/core_contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
+import { Lib_OVMCodec } from "@bobanetwork/core_contracts/contracts/libraries/codec/Lib_OVMCodec.sol";
+import { Lib_AddressManager } from "@bobanetwork/core_contracts/contracts/libraries/resolver/Lib_AddressManager.sol";
+import { Lib_SecureMerkleTrie } from "@bobanetwork/core_contracts/contracts/libraries/trie/Lib_SecureMerkleTrie.sol";
+import { Lib_DefaultValues } from "@bobanetwork/core_contracts/contracts/libraries/constants/Lib_DefaultValues.sol";
+import { Lib_PredeployAddresses } from "@bobanetwork/core_contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
+import { Lib_CrossDomainUtils } from "@bobanetwork/core_contracts/contracts/libraries/bridge/Lib_CrossDomainUtils.sol";
 
 /* Interface Imports */
-import { IL1CrossDomainMessenger } from "@eth-optimism/contracts/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
+import { IL1CrossDomainMessenger } from "@bobanetwork/core_contracts/contracts/L1/messaging/IL1CrossDomainMessenger.sol";
 import { IL1DepositHash } from "./IL1DepositHash.sol";
-import { ICanonicalTransactionChain } from "@eth-optimism/contracts/contracts/L1/rollup/ICanonicalTransactionChain.sol";
-import { IStateCommitmentChain } from "@eth-optimism/contracts/contracts/L1/rollup/IStateCommitmentChain.sol";
+import { ICanonicalTransactionChain } from "@bobanetwork/core_contracts/contracts/L1/rollup/ICanonicalTransactionChain.sol";
+import { IStateCommitmentChain } from "@bobanetwork/core_contracts/contracts/L1/rollup/IStateCommitmentChain.sol";
 
 /* External Imports */
 import { OwnableUpgradeable } from

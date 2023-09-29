@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import "@boba/contracts/contracts/standards/L1StandardERC721.sol";
+import "@bobanetwork/contracts/contracts/standards/L1StandardERC721.sol";
 
 /**
 * Sample L1 representation of TestExtraDataERC721

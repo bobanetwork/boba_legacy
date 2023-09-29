@@ -1,6 +1,6 @@
 import { BigNumber, Contract, ContractFactory, utils, Wallet } from 'ethers'
 import { ethers } from 'hardhat'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { MessageStatus } from '@eth-optimism/sdk'
 
 import { expect } from './shared/setup'

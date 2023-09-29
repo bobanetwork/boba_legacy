@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import dotenv from 'dotenv'
 import * as fs from 'fs'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import chalk from 'chalk'
 
 // load token details

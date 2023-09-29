@@ -6,7 +6,7 @@ import {
   Wallet,
   utils,
 } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)

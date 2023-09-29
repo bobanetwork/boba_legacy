@@ -2,7 +2,7 @@
 pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
-import "@boba/contracts/contracts/DAO/governance/GovernorBravoDelegate.sol";
+import "@bobanetwork/contracts/contracts/DAO/governance/GovernorBravoDelegate.sol";
 
 interface IMockGovernorBravoDelegate {
 

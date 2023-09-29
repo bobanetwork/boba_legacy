@@ -1,5 +1,5 @@
 {
-  "name": "@boba/hcb-dapp-contracts",
+  "name": "@bobanetwork/hcb-dapp-contracts",
   "version": "0.1.0",
   "description": "Contracts for HybridCompute UX DApp",
   "main": "index.js",
