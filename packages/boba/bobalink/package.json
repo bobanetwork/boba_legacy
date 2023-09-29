@@ -19,7 +19,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@ethersproject/rlp": "5.7.0",
     "@bobanetwork/contracts": "0.0.2",
     "@eth-optimism/core-utils": "0.8.1",
     "@types/mocha": "^8.2.2",
