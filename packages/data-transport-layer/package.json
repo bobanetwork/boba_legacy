@@ -39,7 +39,7 @@
     "@eth-optimism/common-ts": "0.2.2",
     "@bobanetwork/core_contracts": "0.5.12",
     "@eth-optimism/core-utils": "0.8.1",
-    "@bobanetwork/sdk": "1.0.6",
+    "@bobanetwork/sdk": "1.0.7",
     "@ethersproject/providers": "^5.5.0",
     "@ethersproject/transactions": "^5.5.0",
     "@sentry/node": "^7.30.0",

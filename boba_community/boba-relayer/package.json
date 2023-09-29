@@ -7,7 +7,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@bobanetwork/sdk": "1.0.6",
+    "@bobanetwork/sdk": "1.0.7",
     "dotenv": "^16.0.0",
     "ethers": "^5.5.4",
     "node-fetch": "2.6.0",

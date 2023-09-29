@@ -15,7 +15,7 @@
     "@eth-optimism/common-ts": "0.2.2",
     "@bobanetwork/core_contracts": "^0.5.13",
     "@eth-optimism/core-utils": "0.8.1",
-    "@bobanetwork/sdk": "1.0.6",
+    "@bobanetwork/sdk": "1.0.7",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.4",

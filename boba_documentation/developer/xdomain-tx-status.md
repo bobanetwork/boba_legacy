@@ -24,7 +24,7 @@ Internally in all the services and also in the `gateway`, the status of transact
     CrossChainMessenger,
     MessageStatus,
     MessageDirection,
-  } from '@eth-optimism/sdk'
+  } from '@bobanetwork/sdk'
 
   const messenger = new CrossChainMessenger({
     l1SignerOrProvider: l1Wallet,
@@ -62,7 +62,7 @@ Internally in all the services and also in the `gateway`, the status of transact
 
 ## Using the Boba Transaction API
 
-The system is [documented here](../../ops_boba/api/watcher-api/README.md). For example, to get L2 transactions between two blocks, use `get.l2.transactions`: 
+The system is [documented here](../../ops_boba/api/watcher-api/README.md). For example, to get L2 transactions between two blocks, use `get.l2.transactions`:
 
 ### get.l2.transactions
 

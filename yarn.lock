@@ -637,16 +637,6 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@bobanetwork/core_contracts@0.5.11":
-  version "0.5.11"
-  resolved "https://registry.yarnpkg.com/@bobanetwork/core_contracts/-/core_contracts-0.5.11.tgz#4c219d8d43294aa91976825ed3da06dc983c727d"
-  integrity sha512-9JK67iVNgrlr6B3xxiUzYm22/q5cG9VrrrOC4Bzu3HeNroFLoDjVAHf669kUx9Wf9lsSz2NFAifPsOCIcMGbgQ==
-  dependencies:
-    "@eth-optimism/core-utils" "0.8.1"
-    "@ethersproject/abstract-provider" "^5.5.0"
-    "@ethersproject/abstract-signer" "^5.5.0"
-    "@ethersproject/hardware-wallets" "^5.5.0"
-
 "@bobanetwork/core_contracts@0.5.12":
   version "0.5.12"
   resolved "https://registry.yarnpkg.com/@bobanetwork/core_contracts/-/core_contracts-0.5.12.tgz#e77fd7701451ae245aa78971d11312e5bfbb04d0"
@@ -656,18 +646,6 @@
     "@ethersproject/abstract-provider" "^5.5.0"
     "@ethersproject/abstract-signer" "^5.5.0"
     "@ethersproject/hardware-wallets" "^5.5.0"
-
-"@bobanetwork/sdk@1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@bobanetwork/sdk/-/sdk-1.0.6.tgz#c95a78fa0a000d60abc695450435c8f5965eca34"
-  integrity sha512-J9rX87Byut5C3Lfa2hSx9O2afdb6PYTcCZi2Mb9Fb7c71/Wz9GnegUZPI4AmQLbo8IqXuzF/MEUsFRbchFq3JA==
-  dependencies:
-    "@bobanetwork/core_contracts" "0.5.11"
-    "@eth-optimism/core-utils" "0.8.1"
-    lodash "^4.17.21"
-    merkletreejs "^0.2.27"
-    node-fetch "^2.6.7"
-    rlp "^2.2.7"
 
 "@chainlink/contracts@0.3.1":
   version "0.3.1"

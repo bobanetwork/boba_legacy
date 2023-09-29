@@ -13,7 +13,7 @@ const {
   CrossChainMessenger,
   MessageStatus,
   CONTRACT_ADDRESSES,
-} = require('@eth-optimism/sdk')
+} = require('@bobanetwork/sdk')
 
 const main = async () => {
   const env = process.env

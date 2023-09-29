@@ -14,7 +14,7 @@ import {
   CrossChainMessenger,
   NumberLike,
   asL2Provider,
-} from '@eth-optimism/sdk'
+} from '@bobanetwork/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'

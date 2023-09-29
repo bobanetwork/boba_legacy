@@ -10,7 +10,7 @@ import {
 } from 'ethers'
 import { getContractInterface, predeploys } from '@bobanetwork/core_contracts'
 import { remove0x, sleep } from '@eth-optimism/core-utils'
-import { asL2Provider } from '@eth-optimism/sdk'
+import { asL2Provider } from '@bobanetwork/sdk'
 import { cleanEnv, str, num, bool, makeValidator } from 'envalid'
 import dotenv from 'dotenv'
 import { expectEvent } from '@openzeppelin/test-helpers'
