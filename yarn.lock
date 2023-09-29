@@ -3062,32 +3062,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bobanetwork/contracts@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@bobanetwork/contracts/-/contracts-0.0.2.tgz#0b2044671ca391bf661fc31ff761af397130724d"
-  integrity sha512-+0bd2JSzqjxnoAKNOcjzpAQb6jzdVJkqjVQ4UKTUBzRyqVUIMFn+njJ7+OtVpH8DQ6RunNdpS5J0Koq/ObZCTQ==
+"@bobanetwork/core_contracts@^0.5.11":
+  version "0.5.11"
+  resolved "https://registry.yarnpkg.com/@bobanetwork/core_contracts/-/core_contracts-0.5.11.tgz#4c219d8d43294aa91976825ed3da06dc983c727d"
+  integrity sha512-9JK67iVNgrlr6B3xxiUzYm22/q5cG9VrrrOC4Bzu3HeNroFLoDjVAHf669kUx9Wf9lsSz2NFAifPsOCIcMGbgQ==
   dependencies:
-    "@bobanetwork/turing-hybrid-compute" "0.2.0"
-    "@chainlink/contracts" "0.3.1"
-    "@eth-optimism/contracts" "0.5.11"
     "@eth-optimism/core-utils" "0.8.1"
-    "@ethersproject/abstract-provider" "^5.5.1"
-    "@nomiclabs/hardhat-etherscan" "^3.1.0"
-    "@nomiclabs/hardhat-waffle" "^2.0.1"
-    "@openzeppelin/contracts" "4.3.2"
-    "@openzeppelin/contracts-upgradeable" "4.3.2"
-    dotenv "^8.2.0"
-    glob "^7.1.6"
-
-"@bobanetwork/turing-hybrid-compute@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@bobanetwork/turing-hybrid-compute/-/turing-hybrid-compute-0.2.0.tgz#b84600a2faa13e9dbcfca50178f1a834893bbb3d"
-  integrity sha512-KQ4RnCfgqqF+cF4E207VulJNH+GqlRgv+0qxLda8jOcOlCSbikY7t5I1iasG7s8eOeDvElShizC25gScBng3Sw==
-  dependencies:
-    "@uniswap/sdk" "^3.0.3"
-    ip "^1.1.5"
-    web3 "^1.6.1"
-    web3-eth-abi "^1.6.1"
+    "@ethersproject/abstract-provider" "^5.5.0"
+    "@ethersproject/abstract-signer" "^5.5.0"
+    "@ethersproject/hardware-wallets" "^5.5.0"
 
 "@cfx-kit/wallet-avatar@^0.0.5":
   version "0.0.5"

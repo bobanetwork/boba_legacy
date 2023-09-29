@@ -1,4 +1,4 @@
-import { getContractInterface } from '@bobanetwork/contracts'
+import { getContractInterface } from '@bobanetwork/core_contracts'
 import { ethers } from 'ethers'
 
 import { CoreCrossChainMessage } from '../interfaces'

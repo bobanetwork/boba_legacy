@@ -1,4 +1,4 @@
-import { getContractInterface, predeploys } from '@bobanetwork/contracts'
+import { getContractInterface, predeploys } from '@bobanetwork/core_contracts'
 import { ethers, Contract } from 'ethers'
 
 import { toAddress } from './coercion'

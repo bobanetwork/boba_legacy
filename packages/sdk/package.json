@@ -57,7 +57,7 @@
     "typedoc": "^0.24.7"
   },
   "dependencies": {
-    "@bobanetwork/contracts": "^0.0.2",
+    "@bobanetwork/core_contracts": "^0.5.11",
     "@eth-optimism/core-utils": "0.8.1",
     "lodash": "^4.17.21",
     "merkletreejs": "^0.2.27",
