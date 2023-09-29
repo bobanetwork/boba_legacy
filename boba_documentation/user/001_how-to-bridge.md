@@ -6,9 +6,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 [https://gateway.boba.network/](https://gateway.boba.network)
 
-{% embed url="https://youtu.be/kXrGlwSOckI" %}
-
-{% embed url="https://youtu.be/s7up9FPpxPs" %}
+{% embed url="https://youtu.be/Y2bps8CkHSg" %}
 
 {% embed url="https://youtu.be/LgmmNqIMU_s" %}
 
