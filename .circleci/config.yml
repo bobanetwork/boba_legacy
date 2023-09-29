@@ -4,7 +4,7 @@ executors:
   intergration-tests-executor:
     resource_class: xlarge
     machine:
-      image: ubuntu-2204:2022.10.1
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
