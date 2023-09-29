@@ -5,7 +5,7 @@ chai.use(chaiAsPromised)
 /* Imports: External */
 import { ethers, BigNumber, Contract, Wallet } from 'ethers'
 import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
-import { mainnetSwapNativeTokenForBOBA } from '@boba/api'
+import { mainnetSwapNativeTokenForBOBA } from '@bobanetwork/api'
 import ethSigUtil from 'eth-sig-util'
 import util from 'util'
 

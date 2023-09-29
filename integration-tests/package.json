@@ -20,6 +20,8 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.2",
     "@bobanetwork/accountabstraction": "*",
+    "@bobanetwork/api": "0.0.1",
+    "@bobanetwork/teleportation": "1.0.0",
     "@bobanetwork/contracts": "0.0.2",
     "@bobanetwork/bundler_sdk": "*",
     "@bobanetwork/core_contracts": "^0.5.13",

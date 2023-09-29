@@ -9,8 +9,8 @@ const { sleep } = require('@eth-optimism/core-utils')
 const EthBridgeJson = require('@bobanetwork/contracts/artifacts/contracts/lzTokenBridge/EthBridge.sol/EthBridge.json')
 const AltL1Bridge = require('@bobanetwork/contracts/artifacts/contracts/lzTokenBridge/AltL1Bridge.sol/AltL1Bridge.json')
 
-const layerZeroMainnetAddresses = require('@boba/register/addresses/layerZeroMainnet.json')
-const layerZeroTestnetAddresses = require('@boba/register/addresses/layerZeroTestnet.json')
+const layerZeroMainnetAddresses = require('@bobanetwork/register/addresses/layerZeroMainnet.json')
+const layerZeroTestnetAddresses = require('@bobanetwork/register/addresses/layerZeroTestnet.json')
 
 class LayerZeroBridgeMonitor extends GlobalEnv {
   constructor() {

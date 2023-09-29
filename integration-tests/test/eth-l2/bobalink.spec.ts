@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers'
 import { getContractFactory } from '@bobanetwork/core_contracts'
 import { getBobaContractAt } from '@bobanetwork/contracts'
-import { bobaLinkGetQuote } from '@boba/api'
+import { bobaLinkGetQuote } from '@bobanetwork/api'
 import util from 'util'
 
 /* eslint-disable */
