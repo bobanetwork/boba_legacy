@@ -76,7 +76,7 @@ commands:
 
       - run:
           name: Build the core services
-          command: docker-compose build
+          command: docker-compose build --progress plain
           working_directory: ops
 
       - run:
