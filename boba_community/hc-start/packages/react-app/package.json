@@ -34,7 +34,7 @@
     "@uiw/react-textarea-code-editor": "^2.0.1",
     "@usedapp/core": "^0.12.9",
     "babel-plugin-macros": "^3.1.0",
-    "graphql": "^16.3.0",
+    "graphql": "^16.8.1",
     "ipfs-deploy": "^11.2.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
