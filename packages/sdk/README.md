@@ -1,11 +1,11 @@
-# @eth-optimism/sdk
+# @bobanetwork/sdk
 
-The `@eth-optimism/sdk` package provides a set of tools for interacting with Optimism.
+The `@bobanetwork/sdk` package provides a set of tools for interacting with Optimism.
 
 ## Installation
 
 ```
-npm install @eth-optimism/sdk
+npm install @bobanetwork/sdk
 ```
 
 ## Docs
