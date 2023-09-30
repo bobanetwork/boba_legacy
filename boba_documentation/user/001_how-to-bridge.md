@@ -8,7 +8,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 {% embed url="https://youtu.be/Y2bps8CkHSg" %}
 
-{% embed url="https://youtu.be/LgmmNqIMU_s" %}
+{% embed url="https://youtu.be/vGOGiEO2Dn4" %}
 
 {% embed url="https://youtu.be/Yxbkw_pKAYw" %}
 
