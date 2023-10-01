@@ -26,6 +26,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@ethersproject/providers": "^5.5.0",
     "@nomicfoundation/ethereumjs-evm": "1.0.0",
     "@bobanetwork/contracts": "0.0.2",
     "@bobanetwork/core_contracts": "0.5.12",
@@ -46,6 +47,8 @@
     "node-fetch": "^2.6.1"
   },
   "dependencies": {
+    "@ethersproject/providers": "^5.5.0",
+    "@nomicfoundation/ethereumjs-evm": "1.0.0",
     "@eth-optimism/common-ts": "0.2.2",
     "bcfg": "^0.2.1",
     "dotenv": "^8.2.0",

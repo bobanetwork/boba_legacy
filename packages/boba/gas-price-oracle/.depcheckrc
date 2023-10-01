@@ -1,3 +1,4 @@
 ignores: [
-  "@nomicfoundation/ethereumjs-evm"
+  "@nomicfoundation/ethereumjs-evm",
+  "@ethersproject/providers"
 ]

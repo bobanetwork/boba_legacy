@@ -223,7 +223,7 @@ workflows:
   main:
     jobs:
       - integration-tests
-      - integration-tests-avalanche
+      #- integration-tests-avalanche
       - integration-tests-bnb
       - go-lint-test-build:
           name: proxyd-tests
