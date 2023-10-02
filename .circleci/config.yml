@@ -79,9 +79,10 @@ commands:
       - run:
           name: Build the core services
           command: |
-            docker context create buildx-build
-            docker buildx create --use buildx-build
-            docker buildx bake -f docker-compose.yml --load
+            # docker context create buildx-build
+            # docker buildx create --use buildx-build
+            # docker buildx bake -f docker-compose.yml --load
+            docker-compose build
           working_directory: ops
 
       - run:
