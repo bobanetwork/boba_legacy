@@ -50,6 +50,7 @@
     * [Price Oracles](for-developers/features/price-feeds.md)
     * [Custom Relayer](for-developers/features/relay-message.md)
     * [Dual fee system](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/boba-fee/README.md)
+    * [Transaction Builder](for-developers/features/transaction-builder.md)
   * [Multichain](for-developers/multichain/README.md)
     * [Contract Addresses Boba/Ethereum](for-developers/multichain/network-parameters.md)
     * [Contract Addresses Boba/BNB](for-developers/multichain/network-bnb.md)
