@@ -3,7 +3,7 @@ import {Contract, ContractFactory, providers, utils, Wallet} from "ethers";
 import TuringHelperJson from "../artifacts/contracts/TuringHelper.sol/HybridComputeHelper.json";
 import {getContractFactory} from "@eth-optimism/contracts";
 const cfg = hre.network.config
-import L2GovernanceERC20Json from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import L2GovernanceERC20Json from '@bobanetwork/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
 
 async function main() {
   const local_provider = new providers.JsonRpcProvider(cfg['url'])

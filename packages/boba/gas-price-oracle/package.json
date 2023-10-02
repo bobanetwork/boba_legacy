@@ -1,5 +1,5 @@
 {
-  "name": "@boba/gas-price-oracle",
+  "name": "@bobanetwork/gas-price-oracle",
   "version": "0.1.0",
   "private": true,
   "description": "Gas Price Oracle service",
@@ -26,8 +26,10 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@boba/contracts": "0.0.1",
-    "@eth-optimism/contracts": "0.5.11",
+    "@ethersproject/providers": "^5.5.0",
+    "@nomicfoundation/ethereumjs-evm": "1.0.0",
+    "@bobanetwork/contracts": "0.0.2",
+    "@bobanetwork/core_contracts": "0.5.12",
     "@eth-optimism/core-utils": "0.8.1",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
@@ -45,6 +47,8 @@
     "node-fetch": "^2.6.1"
   },
   "dependencies": {
+    "@ethersproject/providers": "^5.5.0",
+    "@nomicfoundation/ethereumjs-evm": "1.0.0",
     "@eth-optimism/common-ts": "0.2.2",
     "bcfg": "^0.2.1",
     "dotenv": "^8.2.0",

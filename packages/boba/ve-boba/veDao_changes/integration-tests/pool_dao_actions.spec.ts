@@ -3,22 +3,22 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract, ContractFactory, BigNumber, utils, ethers } from 'ethers'
 
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 
-import L1BobaJson from '@boba/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
-import L2BobaJson from '@boba/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
-import xBobaJson from '@boba/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
+import L1BobaJson from '@bobanetwork/contracts/artifacts/contracts/DAO/governance-token/BOBA.sol/BOBA.json'
+import L2BobaJson from '@bobanetwork/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json'
+import xBobaJson from '@bobanetwork/contracts/artifacts/contracts/standards/xL2GovernanceERC20.sol/xL2GovernanceERC20.json'
 
-import L1LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
-import L2LiquidityPoolJson from '@boba/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
+import L1LiquidityPoolJson from '@bobanetwork/contracts/artifacts/contracts/LP/L1LiquidityPool.sol/L1LiquidityPool.json'
+import L2LiquidityPoolJson from '@bobanetwork/contracts/artifacts/contracts/LP/L2LiquidityPool.sol/L2LiquidityPool.json'
 
 // use a mock contract only to adjust time params freely
 import GovernorBravoDelegateJson from '../../artifacts/contracts/MockGovernorBravoDelegate.sol/MockGovernorBravoDelegate.json'
 import TimelockJson from '../../artifacts/contracts/MockTimelock.sol/MockTimelock.json'
 
-import GovernorBravoDelegatorJson from '@boba/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
+import GovernorBravoDelegatorJson from '@bobanetwork/contracts/artifacts/contracts/DAO/governance/GovernorBravoDelegator.sol/GovernorBravoDelegator.json'
 
-import VeJson from '@boba/ve-boba/artifacts/contracts/ve.sol/ve.json'
+import VeJson from '@bobanetwork/ve-boba/artifacts/contracts/ve.sol/ve.json'
 
 import { OptimismEnv } from './shared/env'
 

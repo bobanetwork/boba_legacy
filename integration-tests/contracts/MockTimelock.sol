@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.16;
 
-import "@boba/contracts/contracts/DAO/governance/Timelock.sol";
+import "@bobanetwork/contracts/contracts/DAO/governance/Timelock.sol";
 import { IMockGovernorBravoDelegate } from "./MockGovernorBravoDelegate.sol";
 
 contract MockTimelock is Timelock {

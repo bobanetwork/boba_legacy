@@ -1,5 +1,5 @@
 import { Wallet, providers } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 
 /* eslint-disable */
 require('dotenv').config()

@@ -4,7 +4,7 @@ import * as path from 'path'
 import * as mkdirp from 'mkdirp'
 import { utils, Wallet, providers } from 'ethers'
 
-import TuringHelperJson from '@boba/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
+import TuringHelperJson from '@bobanetwork/turing-hybrid-compute/artifacts/contracts/TuringHelper.sol/TuringHelper.json'
 
 const ensure = (value, key) => {
   if (typeof value === 'undefined' || value === null || Number.isNaN(value)) {

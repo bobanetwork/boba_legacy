@@ -5,7 +5,7 @@ const DatabaseService = require('./database.service')
 const GlobalEnv = require('./utils/globalEnv')
 const fetch = require('node-fetch')
 const { sleep } = require('@eth-optimism/core-utils')
-const { getRelayedMessageEventsFromGraph } = require('@eth-optimism/sdk')
+const { getRelayedMessageEventsFromGraph } = require('@bobanetwork/sdk')
 const { orderBy } = require('lodash')
 
 class BlockMonitorService extends GlobalEnv {

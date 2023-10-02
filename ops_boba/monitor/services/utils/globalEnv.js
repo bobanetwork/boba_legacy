@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 const ethers = require('ethers')
-const { getContractFactory } = require('@eth-optimism/contracts')
-const { getBobaContractAt, getBobaContractABI } = require('@boba/contracts')
-const { CrossChainMessenger, isChainIDForGraph } = require('@eth-optimism/sdk')
+const { getContractFactory } = require('@bobanetwork/core_contracts')
+const { getBobaContractAt, getBobaContractABI } = require('@bobanetwork/contracts')
+const { CrossChainMessenger, isChainIDForGraph } = require('@bobanetwork/sdk')
 const { Logger } = require('@eth-optimism/common-ts')
 const fetch = require('node-fetch')
 

@@ -1,5 +1,5 @@
 import { Wallet, providers } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory } from 'ethers'
 import { Provider } from '@ethersproject/abstract-provider'

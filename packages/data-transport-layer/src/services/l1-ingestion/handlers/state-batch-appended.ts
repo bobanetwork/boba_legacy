@@ -1,6 +1,6 @@
 /* Imports: External */
-import { StateBatchAppendedEvent } from '@eth-optimism/contracts/dist/types/contracts/L1/rollup/StateCommitmentChain'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { StateBatchAppendedEvent } from '@bobanetwork/core_contracts/dist/types/contracts/L1/rollup/StateCommitmentChain'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { BigNumber } from 'ethers'
 
 /* Imports: Internal */

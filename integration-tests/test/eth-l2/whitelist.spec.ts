@@ -3,7 +3,7 @@ import { ContractFactory } from 'ethers'
 import { ethers } from 'hardhat'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
-import { predeploys } from '@eth-optimism/contracts'
+import { predeploys } from '@bobanetwork/core_contracts'
 
 /* Imports: Internal */
 import { OptimismEnv } from './shared/env'

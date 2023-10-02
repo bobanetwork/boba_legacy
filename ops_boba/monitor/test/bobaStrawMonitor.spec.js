@@ -3,8 +3,8 @@ const { expect } = require('./setup')
 const bobaStrawMonitorService = require('../services/bobaStrawMonitor')
 const { formatBigNumberToEther } = require('../services/utils/utils')
 
-const FluxAggregatorJson = require('@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json')
-const L1ERC20Json = require('@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json')
+const FluxAggregatorJson = require('@bobanetwork/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json')
+const L1ERC20Json = require('@bobanetwork/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json')
 
 let service
 let FluxAggregator

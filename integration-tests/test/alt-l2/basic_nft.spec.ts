@@ -5,7 +5,7 @@ const expect = chai.expect
 
 import { Contract, BigNumber } from 'ethers'
 
-import { getBobaContractAt, deployBobaContractCore } from '@boba/contracts'
+import { getBobaContractAt, deployBobaContractCore } from '@bobanetwork/contracts'
 
 import { OptimismEnv } from './shared/env'
 

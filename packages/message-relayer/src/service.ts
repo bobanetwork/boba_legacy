@@ -8,7 +8,7 @@ import {
   CrossChainMessenger,
   MessageStatus,
   ProviderLike,
-} from '@eth-optimism/sdk'
+} from '@bobanetwork/sdk'
 
 interface MessageRelayerOptions {
   /**

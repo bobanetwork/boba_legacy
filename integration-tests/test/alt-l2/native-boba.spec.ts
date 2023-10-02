@@ -1,6 +1,6 @@
 /* Imports: External */
 import { Wallet, utils, BigNumber, Contract } from 'ethers'
-import { predeploys, getContractFactory } from '@eth-optimism/contracts'
+import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
 import { expectApprox } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */

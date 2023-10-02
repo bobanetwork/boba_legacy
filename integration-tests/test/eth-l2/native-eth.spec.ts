@@ -1,6 +1,6 @@
 /* Imports: External */
 import { Wallet, utils, BigNumber } from 'ethers'
-import { predeploys } from '@eth-optimism/contracts'
+import { predeploys } from '@bobanetwork/core_contracts'
 import { expectApprox } from '@eth-optimism/core-utils'
 
 /* Imports: Internal */

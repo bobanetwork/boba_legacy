@@ -3,12 +3,12 @@ import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, BigNumber, utils } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import {
   deployBobaContractCore,
   getBobaContractABI,
   getBobaContractAt,
-} from '@boba/contracts'
+} from '@bobanetwork/contracts'
 
 import { expectLogs } from './shared/utils'
 import { OptimismEnv } from './shared/env'
