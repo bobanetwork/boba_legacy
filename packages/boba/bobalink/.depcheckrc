@@ -1,3 +1,5 @@
 ignores: [
-  "@ethersproject/rlp"
+  "@ethersproject/rlp",
+  "@ethersproject/contracts",
+  "@sentry/node"
 ]

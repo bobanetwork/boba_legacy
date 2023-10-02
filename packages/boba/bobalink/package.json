@@ -19,7 +19,9 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@sentry/node": "^7.30.0",
     "@ethersproject/rlp": "5.7.0",
+    "@ethersproject/contracts": "^5.0.11",
     "@bobanetwork/contracts": "0.0.2",
     "@eth-optimism/core-utils": "0.8.1",
     "@types/mocha": "^8.2.2",
@@ -33,6 +35,8 @@
     "chai": "^4.3.4"
   },
   "dependencies": {
+    "@ethersproject/contracts": "^5.0.11",
+    "@sentry/node": "^7.30.0",
     "@eth-optimism/common-ts": "0.2.2",
     "bcfg": "^0.2.1",
     "dotenv": "^8.2.0",
