@@ -2,3 +2,6 @@
 	path = l2geth/tests/testdata
 	url = https://github.com/ethereum/tests
 
+[submodule "boba_community/hc-captcha-mainnetfaucet-2023/lib/forge-std"]
+	path = boba_community/hc-captcha-mainnetfaucet-2023/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

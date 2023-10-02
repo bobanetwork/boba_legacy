@@ -1,0 +1,51 @@
+{
+  "name": "@boba/mainnetfaucet",
+  "version": "0.1.0",
+  "description": "Boba Mainnet faucet",
+  "main": "index.js",
+  "repository": "git@github.com:bobanetwork/boba/packages/boba/boba_community/hc-captcha-mainnetfaucet-2023",
+  "license": "Internal use only",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf ./artifacts ./cache",
+    "start:lambda": "python-lambda-local -f lambda_handler aws/twitter.py aws/event.json",
+    "start:lambda-sam": "cd aws && sam build && sam local invoke -e event.json && cd ..",
+    "build": "yarn build:contracts",
+    "build:contracts": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "redis:start": "docker run -p 6379:6379 -d redis",
+    "test:unit": "forge test -vvv --watch",
+    "test:local": "hardhat --network boba_local test",
+    "test:goerli": "hardhat --network boba_goerli test",
+    "test:mainnet": "hardhat --network boba_mainnet test"
+  },
+  "devDependencies": {
+    "@eth-optimism/contracts": "^0.5.11",
+    "@ethersproject/address": "^5.6.0",
+    "@ethersproject/contracts": "^5.6.0",
+    "@ethersproject/networks": "^5.6.2",
+    "@ethersproject/providers": "^5.6.5",
+    "@ethersproject/solidity": "^5.6.0",
+    "@nomicfoundation/hardhat-foundry": "^1.1.1",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/contracts": "^4.5.0",
+    "@openzeppelin/contracts-upgradeable": "4.3.2",
+    "@types/mocha": "^8.2.2",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.5.4",
+    "hardhat": "^2.8.4",
+    "mocha": "^8.3.1",
+    "ts-node": "10.8.1",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
+    "base64-sol": "^1.1.0",
+    "dotenv": "^16.0.0",
+    "ip": "^1.1.5",
+    "request-promise-native": "^1.0.9",
+    "web3": "^1.6.1",
+    "web3-eth-abi": "^1.6.1"
+  }
+}
