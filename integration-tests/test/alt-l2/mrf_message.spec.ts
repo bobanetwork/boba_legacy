@@ -2,7 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 chai.use(chaiAsPromised)
 import { Contract } from 'ethers'
-import { getBobaContractAt } from '@boba/contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 
 import { OptimismEnv } from './shared/env'
 

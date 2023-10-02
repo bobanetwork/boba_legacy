@@ -4,7 +4,7 @@ chai.use(chaiAsPromised)
 import { ethers } from 'hardhat'
 import { BigNumber, Contract, utils, ContractFactory } from 'ethers'
 import ethSigUtil from 'eth-sig-util'
-import { predeploys, getContractFactory } from '@eth-optimism/contracts'
+import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
 
 /* Imports: Internal */
 import { OptimismEnv } from './shared/env'

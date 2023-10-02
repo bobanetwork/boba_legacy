@@ -1,6 +1,6 @@
 import { Wallet, providers } from 'ethers'
 import { Bcfg } from '@eth-optimism/core-utils'
-import { predeploys } from '@eth-optimism/contracts'
+import { predeploys } from '@bobanetwork/core_contracts'
 import * as dotenv from 'dotenv'
 import Config from 'bcfg'
 

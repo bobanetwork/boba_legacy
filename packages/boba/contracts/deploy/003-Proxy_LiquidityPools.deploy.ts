@@ -1,7 +1,7 @@
 /* Imports: External */
 import { Contract } from 'ethers'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
+import { getContractFactory, predeploys } from '@bobanetwork/core_contracts'
 import {
   deployBobaContract,
   getDeploymentSubmission,

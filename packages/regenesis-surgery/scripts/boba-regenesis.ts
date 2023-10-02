@@ -6,13 +6,13 @@ import chalk from 'chalk'
 // Load state dump from `geth dump` - format should be [{},{},{}]
 import rawStateDump from '../deployment/state-dump.raw.json'
 // State dump from /packages/contracts
-import coreStateDump from '@eth-optimism/contracts/dist/dumps/state-dump.latest.json'
+import coreStateDump from '@bobanetwork/core_contracts/dist/dumps/state-dump.latest.json'
 
 // Load the bytecodes of Boba and xBoba token with the correct OFFSET value
 import BobaAndXBobaContract from '../BobaAndXBobaContract.json'
 
 // Get contract list
-import deployedContractList from '@boba/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json'
+import deployedContractList from '@bobanetwork/register/addresses/addressesRinkeby_0x93A96D6A5beb1F661cf052722A1424CDDA3e9418.json'
 
 dotenv.config()
 

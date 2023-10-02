@@ -1,7 +1,7 @@
 /* External Imports */
 import { ethers } from 'hardhat'
 import { Signer, Contract } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { expect } from '../../setup'
 
 let L1NFTBridge: Contract

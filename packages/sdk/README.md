@@ -1,11 +1,11 @@
-# @eth-optimism/sdk
+# @bobanetwork/sdk
 
-The `@eth-optimism/sdk` package provides a set of tools for interacting with Optimism.
+The `@bobanetwork/sdk` package provides a set of tools for interacting with Optimism.
 
 ## Installation
 
 ```
-npm install @eth-optimism/sdk
+npm install @bobanetwork/sdk
 ```
 
 ## Docs
@@ -16,7 +16,7 @@ You can find auto-generated API documentation over at [sdk.optimism.io](https://
 
 ### CrossChainMessenger
 
-The [`CrossChainMessenger`](https://github.com/ethereum-optimism/optimism/blob/develop/packages/sdk/src/cross-chain-messenger.ts) class simplifies the process of moving assets and data between Ethereum and Optimism.
+The [`CrossChainMessenger`](https://github.com/bobanetwork/boba/blob/develop/packages/sdk/src/cross-chain-messenger.ts) class simplifies the process of moving assets and data between Ethereum and Optimism.
 You can use this class to, for example, initiate a withdrawal of ERC20 tokens from Optimism back to Ethereum, accurately track when the withdrawal is ready to be finalized on Ethereum, and execute the finalization transaction after the challenge period has elapsed.
 The `CrossChainMessenger` can handle deposits and withdrawals of ETH and any ERC20-compatible token.
 Detailed API descriptions can be found at [sdk.optimism.io](https://sdk.optimism.io/classes/crosschainmessenger).

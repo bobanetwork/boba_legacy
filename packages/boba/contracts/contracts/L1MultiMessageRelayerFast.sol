@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
 import { IL1CrossDomainMessengerFast } from "./IL1CrossDomainMessengerFast.sol";
 
 /* Library Imports */
-import { Lib_AddressResolver } from "@eth-optimism/contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
+import { Lib_AddressResolver } from "@bobanetwork/core_contracts/contracts/libraries/resolver/Lib_AddressResolver.sol";
 
 /**
  * @title L1MultiMessageRelayerFast

@@ -1,7 +1,7 @@
 /* Imports: Internal */
 import { providers } from 'ethers'
 import { applyL1ToL2Alias } from '@eth-optimism/core-utils'
-import { asL2Provider } from '@eth-optimism/sdk'
+import { asL2Provider } from '@bobanetwork/sdk'
 
 /* Imports: External */
 import { expect } from './shared/setup'

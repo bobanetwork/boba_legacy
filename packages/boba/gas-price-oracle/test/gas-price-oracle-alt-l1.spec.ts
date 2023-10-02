@@ -3,7 +3,7 @@ import { expect } from './setup'
 /* External Imports */
 import { ethers } from 'hardhat'
 import { ContractFactory, Contract, Signer, BigNumber, Wallet } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { GasPriceOracleAltL1Service } from '../'
 import fs, { promises as fsPromise } from 'fs'
 import path from 'path'

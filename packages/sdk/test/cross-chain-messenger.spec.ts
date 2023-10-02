@@ -1,6 +1,6 @@
 import { Provider } from '@ethersproject/abstract-provider'
 import { expectApprox } from '@eth-optimism/core-utils'
-import { predeploys } from '@eth-optimism/contracts'
+import { predeploys } from '@bobanetwork/core_contracts'
 import { Contract } from 'ethers'
 import { ethers } from 'hardhat'
 

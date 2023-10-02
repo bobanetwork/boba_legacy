@@ -107,6 +107,7 @@ services:
       - l1_chain
       - dtl
     image: bobanetwork/deployer:latest
+    restart: on-failure
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.packages
@@ -147,6 +148,7 @@ services:
       - dtl
       - l2geth
     image: bobanetwork/boba_deployer:latest
+    restart: on-failure
     build:
       context: ..
       dockerfile: ./ops/docker/Dockerfile.packages
