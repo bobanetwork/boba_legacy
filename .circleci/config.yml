@@ -81,7 +81,7 @@ commands:
           command: |
             docker context create buildx-build
             docker buildx create --use buildx-build
-            docker buildx bake -f docker-compose.yml
+            docker buildx bake -f docker-compose.yml --load
           working_directory: ops
 
       - run:
