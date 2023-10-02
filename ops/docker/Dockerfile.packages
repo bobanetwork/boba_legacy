@@ -104,6 +104,8 @@ COPY --from=builder /opt/optimism/packages/boba/bundler_sdk ./packages/boba/bund
 COPY --from=builder /opt/optimism/packages/contracts ./packages/contracts
 COPY --from=builder /opt/optimism/packages/boba/contracts ./packages/boba/contracts
 COPY --from=builder /opt/optimism/packages/boba/turing ./packages/boba/turing
+COPY --from=builder /opt/optimism/packages/boba/bobalink ./packages/boba/bobalink
+COPY --from=builder /opt/optimism/packages/boba/gas-price-oracle ./packages/boba/gas-price-oracle
 
 FROM packages as deployer
 WORKDIR /opt/optimism/packages/contracts
@@ -111,6 +113,8 @@ COPY ./ops/scripts/deployer.sh .
 CMD ["yarn", "run", "deploy"]
 
 FROM packages as boba_deployer
+COPY --from=builder /opt/optimism/packages/boba/gas-price-oracle ./gas-price-oracle
+COPY --from=builder /opt/optimism/packages/boba/bobalink ./bobalink
 WORKDIR /opt/optimism/packages/boba/contracts
 ENTRYPOINT ["./scripts/wait-for-l1-and-l2.sh", "./scripts/deployer.sh"]
 
