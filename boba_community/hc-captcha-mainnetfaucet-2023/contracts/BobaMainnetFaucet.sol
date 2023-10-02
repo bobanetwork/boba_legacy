@@ -9,8 +9,6 @@ contract BobaMainnetFaucet is Ownable {
     uint256 public nativeFaucetAmount;
     uint256 public waitingPeriod;
 
-    // Turing
-    address public hcHelperAddress;
     string public hcBackendUrl;
     TuringHelper public hcHelper;
 
@@ -46,14 +44,13 @@ contract BobaMainnetFaucet is Ownable {
     );
 
     constructor(
-        address _turingHelperAddress,
-        string memory _turingUrl,
+        address _hcHelperAddress,
+        string memory _hcUrl,
         uint256 _waitingPeriod,
         uint256 _nativeFaucetAmount
     ) {
-        hcHelperAddress = _turingHelperAddress;
-        hcHelper = TuringHelper(_turingHelperAddress);
-        hcBackendUrl = _turingUrl;
+        hcHelper = TuringHelper(_hcHelperAddress);
+        hcBackendUrl = _hcUrl;
         waitingPeriod = _waitingPeriod;
         nativeFaucetAmount = _nativeFaucetAmount;
     }
@@ -70,7 +67,6 @@ contract BobaMainnetFaucet is Ownable {
         require(_turingHelperAddress != address(0), "HCHelper cannot be ZeroAddr");
         require(_nativeFaucetAmount > 0, "Native amount too small");
 
-        hcHelperAddress = _turingHelperAddress;
         hcHelper = TuringHelper(_turingHelperAddress);
         hcBackendUrl = _turingUrl;
         waitingPeriod = _waitingPeriod;
@@ -95,25 +91,26 @@ contract BobaMainnetFaucet is Ownable {
 
     function getNativeFaucet(
         bytes32 _uuid,
-        string memory _key
+        string memory _key,
+        address _to
     ) external {
-        require(nativeClaimRecords[msg.sender] + waitingPeriod < block.timestamp, 'Invalid request');
+        require(nativeClaimRecords[_to] + waitingPeriod <= block.timestamp, 'Invalid request');
 
         bytes32 hashedKey = keccak256(abi.encodePacked(_key));
-        uint256 result = _verifyKey(_uuid, hashedKey);
+        uint256 result = _verifyKey(_uuid, hashedKey, _to);
 
         require(result == 1, 'Captcha wrong');
 
-        nativeClaimRecords[msg.sender] = block.timestamp;
+        nativeClaimRecords[_to] = block.timestamp;
 
-        (bool sent,) = (msg.sender).call{gas: SAFE_GAS_STIPEND, value: nativeFaucetAmount}("");
+        (bool sent,) = (_to).call{gas: SAFE_GAS_STIPEND, value: nativeFaucetAmount}("");
         require(sent, "Failed to send native");
 
-        emit IssuedNative(_uuid, hashedKey, msg.sender, nativeFaucetAmount, block.timestamp);
+        emit IssuedNative(_uuid, hashedKey, _to, nativeFaucetAmount, block.timestamp);
     }
 
-    function _verifyKey(bytes32 _uuid, bytes32 _key) private returns (uint256) {
-        bytes memory encRequest = abi.encodePacked(_uuid, _key);
+    function _verifyKey(bytes32 _uuid, bytes32 _key, address _to) private returns (uint256) {
+        bytes memory encRequest = abi.encode(_uuid, _key, _to);
         bytes memory encResponse = hcHelper.TuringTxV2(hcBackendUrl, encRequest);
 
         uint256 result = abi.decode(encResponse,(uint256));

@@ -29,6 +29,9 @@ const local_provider = new providers.JsonRpcProvider(cfg["url"]);
 
 const deployerPK = hre.network.config.accounts[0];
 const deployerWallet = new Wallet(deployerPK, local_provider);
+const otherWallet_1 = new Wallet(hre.network.config.accounts[1], local_provider);
+const otherWallet_2 = new Wallet(hre.network.config.accounts[2], local_provider);
+const otherWallet_3 = new Wallet(hre.network.config.accounts[3], local_provider);
 
 let BOBAL2Address;
 let BobaHcCreditAddress;
@@ -44,10 +47,12 @@ let addressesBOBA;
 const ethClaimAmount = ethers.utils.parseEther("0.0001")
 const depositAmount = utils.parseEther("1"); // for HCCredit
 
+const DEFAULT_WAITING_PERIOD = 43200 // 12h
 const USE_LOCAL_BACKEND = true
 let localTuringUrl: string;
 let getCaptchaUrl: string;
 const publicTuringUrl = 'https://zci1n9pde8.execute-api.us-east-1.amazonaws.com/Prod/' // TODO
+let turingUrlUsed: string
 
 enum LocalEndpoint {
   getCaptcha = "getCAPTCHA",
@@ -174,14 +179,14 @@ describe("Get gas from mainnet faucet", function () {
       deployerWallet
     );
 
-    const turingUrl = USE_LOCAL_BACKEND
+    turingUrlUsed = USE_LOCAL_BACKEND
       ? localTuringUrl
       : publicTuringUrl
 
     mainnetFaucet = await Factory__MainnetFaucet.deploy(
       hcHelper.address,
-      turingUrl,
-      43200, // 12h
+      turingUrlUsed,
+      DEFAULT_WAITING_PERIOD, // 12h
       ethClaimAmount,
       gasOverride
     );
@@ -198,7 +203,7 @@ describe("Get gas from mainnet faucet", function () {
     const fTx = await deployerWallet.sendTransaction({
       ...gasOverride,
       to: mainnetFaucet.address,
-      value: ethClaimAmount
+      value: ethClaimAmount.mul(5)
     });
     await fTx.wait();
     console.log("Funded faucet with ETH..");
@@ -256,9 +261,29 @@ describe("Get gas from mainnet faucet", function () {
     expect(helperAddress).to.equal(hcHelper.address);
   });
 
-  it("should get native faucet", async () => {
+  it("should fail to get captcha if no data provided", async () => {
     const captcha = await (await fetch(getCaptchaUrl, {
       body: JSON.stringify({}), method: 'POST', headers: {
+        "content-type": "application/json"
+      }
+    })).json()
+
+    expect(captcha?.result?.error).to.be.eq("No address provided.")
+  });
+
+  it("should fail to get captcha if no address provided", async () => {
+    const captcha = await (await fetch(getCaptchaUrl, {
+      body: JSON.stringify({"other_key": "abc"}), method: 'POST', headers: {
+        "content-type": "application/json"
+      }
+    })).json()
+
+    expect(captcha?.result?.error).to.be.eq("No address provided.")
+  });
+
+  it("should get native faucet", async () => {
+    const captcha = await (await fetch(getCaptchaUrl, {
+      body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
     })).json()
@@ -267,8 +292,10 @@ describe("Get gas from mainnet faucet", function () {
     const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
     // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
-    await mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr)
-    const res = await mainnetFaucet.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr);
+    console.log("Using wallet: ", deployerWallet.address)
+    console.log("Current key: ", captcha.result.imageStr)
+    await mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr, deployerWallet.address)
+    const res = await mainnetFaucet.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr, deployerWallet.address);
     await res.wait();
 
     const postUserBalance = await deployerWallet.getBalance()
@@ -278,9 +305,9 @@ describe("Get gas from mainnet faucet", function () {
     expect(preContractBalance).to.be.gt(postContractBalance, "Faucet should have issued funds")
   });
 
-  it("native faucet should fail when image string is invalid", async () => {
+  it("native faucet should fail when user already claimed within waiting period", async () => {
     const captcha = await (await fetch(getCaptchaUrl, {
-      body: JSON.stringify({}), method: 'POST', headers: {
+      body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
     })).json()
@@ -289,13 +316,93 @@ describe("Get gas from mainnet faucet", function () {
     const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
     // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
-    try {
-      await mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr + "2")
-      const res = await mainnetFaucet.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr + "2");
-      await res.wait();
-    } catch {}
+    await expect(mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr, deployerWallet.address)).to.be.revertedWith("Invalid request")
 
     const postUserBalance = await deployerWallet.getBalance()
+    const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    expect(preUserBalance).to.be.eq(postUserBalance, "User should have not received testnet funds")
+    expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
+  });
+
+  it('should not be able to change hcHelper to zero address', async () => {
+    await expect(mainnetFaucet.configure(ethers.constants.AddressZero, "abc", 123, 976)).to.be.revertedWith("HCHelper cannot be ZeroAddr")
+  })
+
+  it('should not be able to change nativeAmount to 0', async () => {
+    await expect(mainnetFaucet.configure(otherWallet_1.address, "abc", 123, 0)).to.be.revertedWith("Native amount too small")
+  })
+
+  it('should be able to change settings as owner', async () => {
+    let tx = await mainnetFaucet.configure(otherWallet_1.address, "abc", 123, 976)
+    await tx.wait()
+    expect(await mainnetFaucet.hcHelper()).to.be.eq(otherWallet_1.address)
+    expect(await mainnetFaucet.hcBackendUrl()).to.be.eq("abc")
+    expect(await mainnetFaucet.waitingPeriod()).to.be.eq(123)
+    expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(976)
+
+    // back to defaults
+    tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, DEFAULT_WAITING_PERIOD, ethClaimAmount)
+    await tx.wait()
+    expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
+    expect(await mainnetFaucet.hcBackendUrl()).to.be.eq(turingUrlUsed)
+    expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD)
+    expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
+  })
+
+  it('should be able to change settings as owner', async () => {
+    await expect(mainnetFaucet.connect(otherWallet_1).configure(otherWallet_1.address, "abc", 123, 976)).to.be.revertedWith("Ownable: caller is not the owner")
+
+    expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
+    expect(await mainnetFaucet.hcBackendUrl()).to.be.eq(turingUrlUsed)
+    expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD)
+    expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
+  })
+
+  it("native faucet should succeed after user who previously claimed waited long enough (waiting period)", async () => {
+    // remove waiting period
+    let tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, 0, ethClaimAmount)
+    await tx.wait()
+
+    const captcha = await (await fetch(getCaptchaUrl, {
+      body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+        "content-type": "application/json"
+      }
+    })).json()
+
+    const preUserBalance = await deployerWallet.getBalance()
+    const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
+    await mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr, deployerWallet.address)
+    tx = await mainnetFaucet.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr, deployerWallet.address)
+    await tx.wait()
+
+    const postUserBalance = await deployerWallet.getBalance()
+    const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    expect(preUserBalance).to.be.lt(postUserBalance, "User should have received testnet funds")
+    expect(preContractBalance).to.be.gt(postContractBalance, "Faucet should not have all original funds")
+
+    // remove waiting period
+    tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, DEFAULT_WAITING_PERIOD, ethClaimAmount)
+    await tx.wait()
+  });
+
+  it("native faucet should fail when image string is invalid", async () => {
+    const captcha = await (await fetch(getCaptchaUrl, {
+      body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+        "content-type": "application/json"
+      }
+    })).json()
+
+    const preUserBalance = await otherWallet_1.getBalance()
+    const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
+    await expect(mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr + "2", otherWallet_1.address)).to.be.revertedWith("Captcha wrong")
+
+    const postUserBalance = await otherWallet_1.getBalance()
     const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
     expect(preUserBalance).to.be.eq(postUserBalance, "User should have not received testnet funds")
@@ -305,25 +412,64 @@ describe("Get gas from mainnet faucet", function () {
 
   it("native faucet should fail when uuid has not been issued", async () => {
     const captcha = await (await fetch(getCaptchaUrl, {
-      body: JSON.stringify({}), method: 'POST', headers: {
+      body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
     })).json()
 
-    const preUserBalance = await deployerWallet.getBalance()
+    const preUserBalance = await otherWallet_1.getBalance()
     const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
     // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
-    try {
-      await mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid+"2", captcha.result.imageStr)
-      const res = await mainnetFaucet.getNativeFaucet(captcha.result.uuid+"2", captcha.result.imageStr);
-      await res.wait();
-    } catch {}
+    const modifiedUuid = captcha.result.uuid.substring(0, captcha.result.uuid.length-2) + Math.floor(Math.random() * (99 - 10 + 1) + 10).toString()
+    await expect(mainnetFaucet.estimateGas.getNativeFaucet(modifiedUuid, captcha.result.imageStr, otherWallet_1.address)).to.be.revertedWith("Captcha wrong")
 
-    const postUserBalance = await deployerWallet.getBalance()
+    const postUserBalance = await otherWallet_1.getBalance()
     const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
     expect(preUserBalance).to.be.eq(postUserBalance, "User should have not received testnet funds")
     expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
+  });
+
+  it("native faucet should fail when address does not match uuid", async () => {
+    const captcha = await (await fetch(getCaptchaUrl, {
+      body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+        "content-type": "application/json"
+      }
+    })).json()
+
+    const preUserBalance = await otherWallet_1.getBalance()
+    const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
+    await expect(mainnetFaucet.estimateGas.getNativeFaucet(captcha.result.uuid, captcha.result.imageStr, otherWallet_2.address)).to.be.revertedWith("Captcha wrong")
+
+    const postUserBalance = await otherWallet_1.getBalance()
+    const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    expect(preUserBalance).to.be.eq(postUserBalance, "User should have not received testnet funds")
+    expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
+  });
+
+  it("should fail to withdraw funds as non-owner", async () => {
+    await expect(mainnetFaucet.connect(otherWallet_1).withdrawNative(1)).to.be.revertedWith("Ownable: caller is not the owner")
+  });
+
+  it("should fail to withdraw funds if not available", async () => {
+    await expect(mainnetFaucet.withdrawNative(ethers.constants.MaxUint256)).to.be.revertedWith("Failed to send native")
+  });
+
+  it("should withdraw funds as owner", async () => {
+    const preUserBalance = await deployerWallet.getBalance()
+    const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    const tx = await mainnetFaucet.withdrawNative(preContractBalance)
+    await tx.wait()
+
+    const postUserBalance = await deployerWallet.getBalance()
+    const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+    expect(postContractBalance).to.be.eq(0, "Faucet should have no original funds")
+    expect(postUserBalance).to.be.gt(preUserBalance, "User should have received all testnet funds")
   });
 });

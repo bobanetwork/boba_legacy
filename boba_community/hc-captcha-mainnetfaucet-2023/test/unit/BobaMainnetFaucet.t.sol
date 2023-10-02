@@ -11,7 +11,6 @@ contract CounterTest is Test {
 
     BobaMainnetFaucet private faucet;
     TuringHelperMock private turingHelper;
-    // TODO: Replace with local host
     string constant private backendUrl = "http://localhost:8080/turing";
     uint256 constant private waitingPeriod = 1 days;
     uint256 constant private nativeAmount = 0.001 ether;
@@ -58,7 +57,7 @@ contract CounterTest is Test {
         uint256 _amount = 1 ether;
 
         vm.startPrank(OWNER);
-        assertEq(faucet.hcHelperAddress(), address(turingHelper), "Turing helper address wrong precondition");
+        assertEq(address(faucet.hcHelper()), address(turingHelper), "Turing helper address wrong precondition");
         assertEq(faucet.hcBackendUrl(), backendUrl, "Turing backend url invalid");
         assertEq(faucet.waitingPeriod(), waitingPeriod, "Waiting period invalid");
         assertEq(faucet.nativeFaucetAmount(), nativeAmount, "Native amount invalid");
@@ -73,7 +72,7 @@ contract CounterTest is Test {
         uint256 _amount = 0;
 
         vm.startPrank(OWNER);
-        assertEq(faucet.hcHelperAddress(), address(turingHelper), "Turing helper address wrong precondition");
+        assertEq(address(faucet.hcHelper()), address(turingHelper), "Turing helper address wrong precondition");
         assertEq(faucet.hcBackendUrl(), backendUrl, "Turing backend url invalid");
         assertEq(faucet.waitingPeriod(), waitingPeriod, "Waiting period invalid");
         assertEq(faucet.nativeFaucetAmount(), nativeAmount, "Native amount invalid");
@@ -88,7 +87,7 @@ contract CounterTest is Test {
         uint256 _amount = 1 ether;
 
         vm.startPrank(OWNER);
-        assertEq(faucet.hcHelperAddress(), address(turingHelper), "Turing helper address wrong precondition");
+        assertEq(address(faucet.hcHelper()), address(turingHelper), "Turing helper address wrong precondition");
         assertEq(faucet.hcBackendUrl(), backendUrl, "Turing backend url invalid");
         assertEq(faucet.waitingPeriod(), waitingPeriod, "Waiting period invalid");
         assertEq(faucet.nativeFaucetAmount(), nativeAmount, "Native amount invalid");
@@ -98,7 +97,7 @@ contract CounterTest is Test {
             _waitingPeriod,
             _amount);
         faucet.configure(_turingAddr, _beUrl, _waitingPeriod, _amount);
-        assertEq(faucet.hcHelperAddress(), _turingAddr, "Turing helper address invalid");
+        assertEq(address(faucet.hcHelper()), _turingAddr, "Turing helper address invalid");
         assertEq(faucet.hcBackendUrl(), _beUrl, "Turing backend url invalid");
         assertEq(faucet.waitingPeriod(), _waitingPeriod, "Waiting period invalid");
         assertEq(faucet.nativeFaucetAmount(), _amount, "Native amount invalid");
@@ -139,7 +138,7 @@ contract CounterTest is Test {
         assertEq(USER_1.balance, 0, "User should not have balance");
         vm.expectEmit(address(faucet));
         emit IssuedNative("11", keccak256(abi.encodePacked("22")), USER_1, nativeAmount, block.timestamp);
-        faucet.getNativeFaucet("11", "22");
+        faucet.getNativeFaucet("11", "22", USER_1);
         assertEq(USER_1.balance, nativeAmount, "User should have received funds");
         vm.stopPrank();
     }
@@ -151,7 +150,7 @@ contract CounterTest is Test {
         vm.deal(address(faucet), nativeAmount);
         assertEq(USER_1.balance, nativeAmount, "User should only have balance from first claim");
         vm.expectRevert("Invalid request");
-        faucet.getNativeFaucet("11", "22");
+        faucet.getNativeFaucet("11", "22", USER_1);
         vm.stopPrank();
     }
 
@@ -161,7 +160,7 @@ contract CounterTest is Test {
         turingHelper.mockResponse(abi.encode(1));
         assertEq(USER_1.balance, 0, "User should not have balance");
         vm.expectRevert("Failed to send native");
-        faucet.getNativeFaucet("11", "22");
+        faucet.getNativeFaucet("11", "22", USER_1);
         vm.stopPrank();
     }
 
@@ -172,7 +171,7 @@ contract CounterTest is Test {
         vm.deal(address(faucet), nativeAmount);
         assertEq(USER_1.balance, 0, "User should not have balance");
         vm.expectRevert("Captcha wrong");
-        faucet.getNativeFaucet("11", "22");
+        faucet.getNativeFaucet("11", "22", USER_1);
         vm.stopPrank();
     }
 

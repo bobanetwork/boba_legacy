@@ -1,5 +1,5 @@
 {
-  "name": "@boba/mainnetfaucet",
+  "name": "@bobanetwork/mainnetfaucet",
   "version": "0.1.0",
   "description": "Boba Mainnet faucet",
   "main": "index.js",
