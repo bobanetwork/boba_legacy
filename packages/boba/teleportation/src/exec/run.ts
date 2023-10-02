@@ -14,6 +14,8 @@ import { ChainInfo, SupportedAssets } from '../utils/types'
 import { AppDataSource } from '../data-source'
 import { HistoryData } from '../entities/HistoryData.entity'
 import { Init1687802800701 } from '../migrations/1687802800701-00_Init'
+import {LastAirdrop} from "../entities/LastAirdrop.entity";
+import {LastAirdrop1687802800701} from "../migrations/1687802800701-01_LastAirdrop";
 
 dotenv.config()
 
@@ -23,8 +25,8 @@ const main = async () => {
       migrationsRun: true,
       logging: false,
       synchronize: false,
-      entities: [HistoryData],
-      migrations: [Init1687802800701],
+      entities: [HistoryData, LastAirdrop],
+      migrations: [Init1687802800701, LastAirdrop1687802800701],
     })
     await AppDataSource.initialize() // initialize DB connection
   }
@@ -59,6 +61,22 @@ const main = async () => {
   const TELEPORTATION_AWS_KMS_ENDPOINT = config.str(
     'teleportation-aws-kms-endpoint',
     env.TELEPORTATION_AWS_KMS_ENDPOINT
+  )
+  const TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI = config.str(
+    'teleportation-airdrop-gas-amount-wei',
+    env.TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI || '100000000000000' // 0.0001 eth
+  )
+  const TELEPORTATION_AIRDROP_MIN_USD_VALUE = config.str(
+    'teleportation-airdrop-min-usd-value',
+    env.TELEPORTATION_AIRDROP_MIN_USD_VALUE || '15'
+  )
+  const TELEPORTATION_AIRDROP_COOLDOWN_SECONDS = config.str(
+    'teleportation-airdrop-cooldown-seconds',
+    env.TELEPORTATION_AIRDROP_COOLDOWN_SECONDS || '86400'
+  )
+  const TELEPORTATION_AIRDROP_ENABLED = config.bool(
+    'teleportation-airdrop-enabled',
+    env.TELEPORTATION_AIRDROP_ENABLED.toLowerCase() === "true" || false
   )
 
   // Optional
@@ -122,6 +140,11 @@ const main = async () => {
       awsKmsRegion: TELEPORTATION_AWS_KMS_REGION,
       awsKmsEndpoint: TELEPORTATION_AWS_KMS_ENDPOINT
     },
+    airdropConfig: {
+      airdropAmountWei: TELEPORTATION_AIRDROP_GAS_AMOUNT_WEI,
+      airdropCooldownSeconds: TELEPORTATION_AIRDROP_COOLDOWN_SECONDS,
+      airdropEnabled: TELEPORTATION_AIRDROP_ENABLED,
+    }
   })
 
   await service.start()
