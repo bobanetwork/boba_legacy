@@ -89,7 +89,7 @@ WORKDIR /opt/optimism
 # needs to happen before `yarn` otherwise patch-packages does not apply the patches
 COPY ./patches ./patches
 
-RUN yarn install --frozen-lockfile && yarn cache clean
+RUN yarn install
 
 COPY ./packages ./packages
 COPY ./ops_boba ./ops_boba
