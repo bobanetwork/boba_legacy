@@ -5,7 +5,7 @@ import fs from 'fs'
 import { Command } from 'commander'
 import { erc4337RuntimeVersion } from '@bobanetwork/bundler_utils'
 import { ethers, Wallet } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { BundlerServer } from './BundlerServer'
 import { UserOpMethodHandler } from './UserOpMethodHandler'
 import {

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@boba/bundler",
+  "name": "@bobanetwork/bundler",
   "version": "0.2.0",
   "author": "Dror Tirosh",
   "license": "MIT",

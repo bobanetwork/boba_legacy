@@ -4,7 +4,7 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 import { Contract, utils, Wallet } from 'ethers'
-import { getBobaContractAt } from '@boba/contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 
 import { OptimismEnv } from './shared/env'
 

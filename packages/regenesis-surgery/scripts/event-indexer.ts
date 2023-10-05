@@ -3,7 +3,7 @@ import { createWriteStream } from 'fs'
 import dotenv from 'dotenv'
 import { stringifyStream } from '@discoveryjs/json-ext'
 
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { abi as FACTORY_ABI } from '@uniswap/v3-core-optimism/artifacts-ovm/contracts/UniswapV3Factory.sol/UniswapV3Factory.json'
 
 dotenv.config()

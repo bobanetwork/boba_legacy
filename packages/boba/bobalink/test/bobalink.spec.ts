@@ -5,9 +5,9 @@ import { ethers } from 'hardhat'
 import { ContractFactory, Contract, Signer, Wallet, utils } from 'ethers'
 
 /* Imports: Artifacts */
-import FluxAggregatorJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
-import FluxAggregatorHCJson from '@boba/contracts/artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import FluxAggregatorJson from '@bobanetwork/contracts/artifacts/contracts/oracle/FluxAggregator.sol/FluxAggregator.json'
+import FluxAggregatorHCJson from '@bobanetwork/contracts/artifacts/contracts/oracle/FluxAggregatorHC.sol/FluxAggregatorHC.json'
+import L1ERC20Json from '@bobanetwork/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
 import { BobaLinkPairs } from '../src/utils/types'

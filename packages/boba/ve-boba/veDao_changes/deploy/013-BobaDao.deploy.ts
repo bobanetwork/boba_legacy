@@ -1,5 +1,5 @@
 /* Imports: External */
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { DeployFunction, DeploymentSubmission } from 'hardhat-deploy/dist/types'
 import { Contract, ContractFactory, utils, BigNumber } from 'ethers'
 import { registerBobaAddress } from './000-Messenger.deploy'

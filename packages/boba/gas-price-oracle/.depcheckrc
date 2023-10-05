@@ -1,0 +1,4 @@
+ignores: [
+  "@nomicfoundation/ethereumjs-evm",
+  "@ethersproject/providers"
+]

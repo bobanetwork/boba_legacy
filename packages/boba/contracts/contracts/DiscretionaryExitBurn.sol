@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
+import "@bobanetwork/core_contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 
-import "@eth-optimism/contracts/contracts/L2/messaging/IL2ERC20Bridge.sol";
-import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
+import "@bobanetwork/core_contracts/contracts/L2/messaging/IL2ERC20Bridge.sol";
+import "@bobanetwork/core_contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 

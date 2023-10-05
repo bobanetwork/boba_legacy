@@ -4,10 +4,10 @@ chai.use(chaiAsPromised)
 
 /* Imports: External */
 import { ethers, BigNumber, Contract, Wallet } from 'ethers'
-import { predeploys, getContractFactory } from '@eth-optimism/contracts'
+import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
 import ethSigUtil from 'eth-sig-util'
 import util from 'util'
-import { mainnetSwapBOBAForETH } from '@boba/api'
+import { mainnetSwapBOBAForETH } from '@bobanetwork/api'
 
 /* Imports: Internal */
 

@@ -11,9 +11,9 @@ import { IERC721Metadata } from "@openzeppelin/contracts/token/ERC721/extensions
 
 /* Library Imports */
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import { CrossDomainEnabled } from "@eth-optimism/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
+import { CrossDomainEnabled } from "@bobanetwork/core_contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@eth-optimism/contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
+import "@bobanetwork/core_contracts/contracts/libraries/constants/Lib_PredeployAddresses.sol";
 
 /* Contract Imports */
 import { IL2StandardERC721 } from "../standards/IL2StandardERC721.sol";
@@ -22,7 +22,7 @@ import { iSupportBridgeExtraData } from "./interfaces/iSupportBridgeExtraData.so
 /* External Imports */
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
-import "@eth-optimism/contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
+import "@bobanetwork/core_contracts/contracts/L2/predeploys/OVM_GasPriceOracle.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
