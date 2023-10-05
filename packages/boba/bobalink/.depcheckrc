@@ -1,0 +1,5 @@
+ignores: [
+  "@ethersproject/rlp",
+  "@ethersproject/contracts",
+  "@sentry/node"
+]

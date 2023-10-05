@@ -1,6 +1,6 @@
 /* Imports: External */
 import { expectApprox, sleep } from '@eth-optimism/core-utils'
-import { predeploys, getContractFactory } from '@eth-optimism/contracts'
+import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
 import { Wallet, BigNumber, Contract, ContractFactory, constants } from 'ethers'
 import { serialize } from '@ethersproject/transactions'
 import { ethers } from 'hardhat'

@@ -325,40 +325,6 @@ describe("Get gas from mainnet faucet", function () {
     expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
   });
 
-  it('should not be able to change hcHelper to zero address', async () => {
-    await expect(mainnetFaucet.configure(ethers.constants.AddressZero, "abc", 123, 976)).to.be.revertedWith("HCHelper cannot be ZeroAddr")
-  })
-
-  it('should not be able to change nativeAmount to 0', async () => {
-    await expect(mainnetFaucet.configure(otherWallet_1.address, "abc", 123, 0)).to.be.revertedWith("Native amount too small")
-  })
-
-  it('should be able to change settings as owner', async () => {
-    let tx = await mainnetFaucet.configure(otherWallet_1.address, "abc", 123, 976)
-    await tx.wait()
-    expect(await mainnetFaucet.hcHelper()).to.be.eq(otherWallet_1.address)
-    expect(await mainnetFaucet.hcBackendUrl()).to.be.eq("abc")
-    expect(await mainnetFaucet.waitingPeriod()).to.be.eq(123)
-    expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(976)
-
-    // back to defaults
-    tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, DEFAULT_WAITING_PERIOD, ethClaimAmount)
-    await tx.wait()
-    expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
-    expect(await mainnetFaucet.hcBackendUrl()).to.be.eq(turingUrlUsed)
-    expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD)
-    expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
-  })
-
-  it('should be able to change settings as owner', async () => {
-    await expect(mainnetFaucet.connect(otherWallet_1).configure(otherWallet_1.address, "abc", 123, 976)).to.be.revertedWith("Ownable: caller is not the owner")
-
-    expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
-    expect(await mainnetFaucet.hcBackendUrl()).to.be.eq(turingUrlUsed)
-    expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD)
-    expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
-  })
-
   it("native faucet should succeed after user who previously claimed waited long enough (waiting period)", async () => {
     // remove waiting period
     let tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, 0, ethClaimAmount)
@@ -409,7 +375,6 @@ describe("Get gas from mainnet faucet", function () {
     expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
   });
 
-
   it("native faucet should fail when uuid has not been issued", async () => {
     const captcha = await (await fetch(getCaptchaUrl, {
       body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
@@ -451,25 +416,63 @@ describe("Get gas from mainnet faucet", function () {
     expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
   });
 
-  it("should fail to withdraw funds as non-owner", async () => {
-    await expect(mainnetFaucet.connect(otherWallet_1).withdrawNative(1)).to.be.revertedWith("Ownable: caller is not the owner")
-  });
+  describe('configure', () => {
+    it('should not be able to change hcHelper to zero address', async () => {
+      await expect(mainnetFaucet.configure(ethers.constants.AddressZero, "abc", 123, 976)).to.be.revertedWith("HCHelper cannot be ZeroAddr")
+    })
 
-  it("should fail to withdraw funds if not available", async () => {
-    await expect(mainnetFaucet.withdrawNative(ethers.constants.MaxUint256)).to.be.revertedWith("Failed to send native")
-  });
+    it('should not be able to change nativeAmount to 0', async () => {
+      await expect(mainnetFaucet.configure(otherWallet_1.address, "abc", 123, 0)).to.be.revertedWith("Native amount too small")
+    })
 
-  it("should withdraw funds as owner", async () => {
-    const preUserBalance = await deployerWallet.getBalance()
-    const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+    it('should be able to change settings as owner', async () => {
+      let tx = await mainnetFaucet.configure(otherWallet_1.address, "abc", 123, 976)
+      await tx.wait()
+      expect(await mainnetFaucet.hcHelper()).to.be.eq(otherWallet_1.address)
+      expect(await mainnetFaucet.hcBackendUrl()).to.be.eq("abc")
+      expect(await mainnetFaucet.waitingPeriod()).to.be.eq(123)
+      expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(976)
 
-    const tx = await mainnetFaucet.withdrawNative(preContractBalance)
-    await tx.wait()
+      // back to defaults
+      tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, DEFAULT_WAITING_PERIOD, ethClaimAmount)
+      await tx.wait()
+      expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
+      expect(await mainnetFaucet.hcBackendUrl()).to.be.eq(turingUrlUsed)
+      expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD)
+      expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
+    })
 
-    const postUserBalance = await deployerWallet.getBalance()
-    const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+    it('should be able to change settings as owner', async () => {
+      await expect(mainnetFaucet.connect(otherWallet_1).configure(otherWallet_1.address, "abc", 123, 976)).to.be.revertedWith("Ownable: caller is not the owner")
 
-    expect(postContractBalance).to.be.eq(0, "Faucet should have no original funds")
-    expect(postUserBalance).to.be.gt(preUserBalance, "User should have received all testnet funds")
-  });
+      expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
+      expect(await mainnetFaucet.hcBackendUrl()).to.be.eq(turingUrlUsed)
+      expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD)
+      expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
+    })
+  })
+
+  describe('withdraw', () => {
+    it("should fail to withdraw funds as non-owner", async () => {
+      await expect(mainnetFaucet.connect(otherWallet_1).withdrawNative(1)).to.be.revertedWith("Ownable: caller is not the owner")
+    });
+
+    it("should fail to withdraw funds if not available", async () => {
+      await expect(mainnetFaucet.withdrawNative(ethers.constants.MaxUint256)).to.be.revertedWith("Failed to send native")
+    });
+
+    it("should withdraw funds as owner", async () => {
+      const preUserBalance = await deployerWallet.getBalance()
+      const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+      const tx = await mainnetFaucet.withdrawNative(preContractBalance)
+      await tx.wait()
+
+      const postUserBalance = await deployerWallet.getBalance()
+      const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+      expect(postContractBalance).to.be.eq(0, "Faucet should have no original funds")
+      expect(postUserBalance).to.be.gt(preUserBalance, "User should have received all testnet funds")
+    });
+  })
 });

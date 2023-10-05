@@ -1,4 +1,4 @@
-import {expect} from '@boba/teleportation/test/setup'
+import {expect} from '@bobanetwork/teleportation/test/setup'
 
 /* External Imports */
 import {ethers} from 'hardhat'
@@ -13,20 +13,20 @@ import {
 import {orderBy} from 'lodash'
 
 /* Imports: Artifacts */
-import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import TeleportationJson from '@bobanetwork/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
+import L1ERC20Json from '@bobanetwork/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
-import {ChainInfo} from '@boba/teleportation/src/utils/types'
+import {ChainInfo} from '@bobanetwork/teleportation/src/utils/types'
 
 /* Imports: Core */
-import {TeleportationService} from '@boba/teleportation/src/service'
+import {TeleportationService} from '@bobanetwork/teleportation/src/service'
 import {
   AppDataSource,
   historyDataRepository,
-} from '@boba/teleportation/src/data-source'
+} from '@bobanetwork/teleportation/src/data-source'
 import {OptimismEnv} from './shared/env'
-import {Asset} from "@boba/teleportation/src";
+import {Asset} from "@bobanetwork/teleportation/src";
 
 describe('teleportation', () => {
   let env: OptimismEnv

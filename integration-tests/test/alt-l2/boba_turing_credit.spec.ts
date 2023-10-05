@@ -4,8 +4,8 @@ chai.use(chaiAsPromised)
 import { Contract, BigNumber, utils, ContractFactory } from 'ethers'
 import { ethers } from 'hardhat'
 
-import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 
 import { OptimismEnv } from './shared/env'
 import { verifyStateRoots } from './shared/state-root-verification'

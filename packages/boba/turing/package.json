@@ -1,5 +1,5 @@
 {
-  "name": "@boba/turing-hybrid-compute",
+  "name": "@bobanetwork/turing-hybrid-compute",
   "version": "0.2.0",
   "description": "Hybrid Compute for Ethereum prototype",
   "main": "index.js",

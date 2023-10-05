@@ -1,6 +1,6 @@
 import { Contract, Signer } from 'ethers'
 import { ethers } from 'hardhat'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 
 import { expect } from '../setup'
 import {

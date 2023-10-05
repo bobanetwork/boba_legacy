@@ -87,7 +87,7 @@ A quick note on fees and subscription: Currently the feed is free to use for the
 To get the latest price data call method **`latestRoundData(base, quote)`**. To get the price data from a certain past round (historical price) call method **`getRoundData(base, quote, roundId)`**. The `roundId` supplied here is phaseId plus aggregator roundId, for reference query the latest `roundId`. The answer returned will be of the form of decimals specified on the contract call method **`decimals(base, quote)`**. For example,
 
 ```javascript
-import "@boba/contracts/oracle/FeedRegistry.sol"
+import "@bobanetwork/contracts/oracle/FeedRegistry.sol"
 
 contract MyContract {
 
@@ -138,7 +138,7 @@ A complete list of publicly available Witnet data feeds on Boba can be found in 
 Witnet price feeds can be integrated into your own Boba Mainnet contracts in two different ways:
 
 1. [Integrate through proxy](https://docs.witnet.io/smart-contracts/witnet-data-feeds/using-witnet-data-feeds#reading-multiple-currency-pairs-from-the-router) Recommended for testing and upgradability.
-   This is the preferred way to consume the Witnet-powered price feeds. Through using the ***Price Feeds Router***.  
+   This is the preferred way to consume the Witnet-powered price feeds. Through using the ***Price Feeds Router***.
 
 2. [Integrate directly](https://docs.witnet.io/smart-contracts/witnet-data-feeds/using-witnet-data-feeds#reading-last-price-and-timestamp-from-a-price-feed-contract-serving-a-specific-pair) Optimized for gas cost and decentralization
 
@@ -168,7 +168,7 @@ contract MyContract {
     IWitnetPriceRouter immutable public router;
 
     /**
-     * IMPORTANT: pass the WitnetPriceRouter address depending on 
+     * IMPORTANT: pass the WitnetPriceRouter address depending on
      * the network you are using! Please find available addresses here:
      * https://docs.witnet.io/smart-contracts/price-feeds/contract-addresses
      */
@@ -186,7 +186,7 @@ contract MyContract {
         (_price,,) = router.valueFor(bytes4(0x3d15f701));
     }
 
-    /// Returns the BTC / ETH price (6 decimals), derived from the ETH/USD and 
+    /// Returns the BTC / ETH price (6 decimals), derived from the ETH/USD and
     /// the BTC/USD pairs that were ultimately provided by the Witnet oracle.
     function getBtcEthPrice() public view returns (int256 _price) {
         return (1000000 * getBtcUsdPrice()) / getEthUsdPrice();
@@ -210,9 +210,9 @@ print("> lastTimestamp:", valueFor[1])
 print("> latestUpdateStatus:", valueFor[2])
 ```
 
-For more information about Witnet please refer to: 
+For more information about Witnet please refer to:
 
-[website](https://witnet.io/) | [docs](https://docs.witnet.io/) | [github](https://github.com/witnet) | [twitter](https://twitter.com/witnet_io) | [telegram](https://t.me/witnetio) | [discord](https://discord.gg/witnet) 
+[website](https://witnet.io/) | [docs](https://docs.witnet.io/) | [github](https://github.com/witnet) | [twitter](https://twitter.com/witnet_io) | [telegram](https://t.me/witnetio) | [discord](https://discord.gg/witnet)
 
 ## 3. Turing
 

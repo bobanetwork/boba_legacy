@@ -4,7 +4,7 @@ import chai, { expect } from 'chai'
 import { encodeSolidityRevertMessage, approveERC20 } from './shared/utils'
 import { OptimismEnv } from './shared/env'
 import { solidity } from 'ethereum-waffle'
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
+import { getContractFactory, predeploys } from '@bobanetwork/core_contracts'
 
 chai.use(solidity)
 

@@ -12,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /* External Imports */
-import "@eth-optimism/contracts/contracts/L1/messaging/L1StandardBridgeAltL1.sol";
+import "@bobanetwork/core_contracts/contracts/L1/messaging/L1StandardBridgeAltL1.sol";
 
 /**
  * @dev An L1 LiquidityPool implementation
