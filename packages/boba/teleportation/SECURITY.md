@@ -7,8 +7,13 @@ Currently, the funds are distributed on the destination network when the backend
 With the multi-sig approach Ocean suggested, we would need to rewrite the already audited Teleportation contract as well as the backend service.
 
 **Why did we choose AWS KMS over other approaches?**  
-We already had a version of Teleportation before that was using a regular EOA for distribution. Early on, it was decided to move this key into AWS KMS to sign transactions.**What are the options?**  
+We already had a version of Teleportation before that was using a regular EOA for distribution. Early on, it was decided to move this key into AWS KMS to sign transactions.
+
+**What are the options?**  
 An acceptable option could be to use the multi-sigs to manage the allocated bridge funds as extra layer of security. Depending on the use of the Light bridge we will transfer some lower amount to that AWS KMS secured EOAccount.Feedback welcome!
+
+**Disburser Wallet vs. Owner wallet**
+Ensure Disburser wallet and Owner wallet are not the same accounts. The disburser wallet is responsible for distributing funds, the owner wallet for withdrawing user funds.
 
 ## FAQ
 - An important factor is the ability to quickly pull funds if any issues come up. Also, if it’s pulled, where will it be sent to?
