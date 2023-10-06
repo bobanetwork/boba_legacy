@@ -56,9 +56,7 @@ def hc_getCAPTCHA(event, context):
     toAddr = Web3.to_checksum_address(body['to'])
 
     uuidBytes = Web3.solidity_keccak(['string'], [str(uuid2)]).hex()
-
-    # TODO: Add address again once working
-    keyBytes = Web3.solidity_keccak(['string'], [str(uuid2)]).hex() + toAddr
+    keyBytes = uuidBytes + toAddr
 
     # Use the first random string
     imageData = image.generate(imageStr)

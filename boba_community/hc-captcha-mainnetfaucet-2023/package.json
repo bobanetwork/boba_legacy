@@ -44,6 +44,7 @@
     "base64-sol": "^1.1.0",
     "dotenv": "^16.0.0",
     "ip": "^1.1.5",
+    "redis": "^4.6.10",
     "request-promise-native": "^1.0.9",
     "web3": "^1.6.1",
     "web3-eth-abi": "^1.6.1"

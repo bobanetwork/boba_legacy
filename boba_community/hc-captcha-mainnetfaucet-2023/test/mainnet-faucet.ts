@@ -11,17 +11,15 @@ import L2GovernanceERC20Json
   from "../../../packages/contracts/artifacts/contracts/standards/L2GovernanceERC20.sol/L2GovernanceERC20.json";
 import BobaTuringCreditJson
   from "../../../packages/contracts/artifacts/contracts/L2/predeploys/BobaTuringCredit.sol/BobaTuringCredit.json";
-import http from "http";
 import {spawn} from "child_process";
 
 chai.use(solidity);
 const abiDecoder = require("web3-eth-abi");
 
 const fetch = require("node-fetch");
+const sendMetaTx = require("../api/hc_sendMetaTx.js").handler
 
 const cfg = hre.network.config;
-const hPortGet = 1235; // Port for local HTTP server
-const hPortVerify = 1236; // Port for local HTTP server
 let urlStr;
 
 const gasOverride = {gasLimit: 8_000_000};
@@ -45,21 +43,37 @@ let hcCredit: Contract;
 let L2BOBAToken: Contract;
 let addressesBOBA;
 const ethClaimAmount = ethers.utils.parseEther("0.0001")
-const depositAmount = utils.parseEther("1"); // for HCCredit
+const depositAmount = utils.parseEther("2"); // for HCCredit
 
 const DEFAULT_WAITING_PERIOD = 43200 // 12h
 const USE_LOCAL_BACKEND = true
-let localTuringUrl: string;
-let getCaptchaUrl: string;
 const publicTuringUrl = 'https://zci1n9pde8.execute-api.us-east-1.amazonaws.com/Prod/' // TODO
 let turingUrlUsed: string
 
 enum LocalEndpoint {
   getCaptcha = "getCAPTCHA",
   verifyCaptcha = "verifyCAPTCHA",
+  sendMetaTx = "sendMetaTx"
 }
 
-const loadPythonResult = (params, endpoint: LocalEndpoint) => {
+const EndpointConfig = {
+  // Urls to be set by createServer
+  [LocalEndpoint.getCaptcha]: {
+    port: 1235,
+    url: '',
+  },
+  [LocalEndpoint.verifyCaptcha]: {
+    port: 1236,
+    url: '',
+  },
+  [LocalEndpoint.sendMetaTx]: {
+    port: 1237,
+    url: '',
+  },
+}
+
+const loadPythonResult = async (params, endpoint: LocalEndpoint) => {
+
   return new Promise((resolve, reject) => {
     const childPython = spawn('python3', [`./api/run-local-server-${endpoint}.py`, params])
     let result = ''
@@ -85,11 +99,11 @@ const loadPythonResult = (params, endpoint: LocalEndpoint) => {
 const createServer = (endpoint: LocalEndpoint) => {
   const http = require('http')
   const ip = require('ip')
-  const port = endpoint === LocalEndpoint.getCaptcha ? hPortGet : hPortVerify
+  const port = EndpointConfig[endpoint].port
 
   const server = (module.exports = http
     .createServer(async function (req, res) {
-      if (endpoint === LocalEndpoint.getCaptcha || (endpoint === LocalEndpoint.verifyCaptcha && req.headers['content-type'] === 'application/json')) {
+      if (endpoint === LocalEndpoint.getCaptcha || LocalEndpoint.sendMetaTx || (endpoint === LocalEndpoint.verifyCaptcha && req.headers['content-type'] === 'application/json')) {
         let bodyStr = ''
 
         req.on('data', (chunk) => {
@@ -98,13 +112,16 @@ const createServer = (endpoint: LocalEndpoint) => {
 
         req.on('end', async () => {
 
-          const jBody = JSON.stringify({body: bodyStr, logs: false})
-          let result
+          const jBody = {body: bodyStr, logs: false}
 
-          result = ((await loadPythonResult(jBody, endpoint)) as string).replace(
-            '\r\n',
-            ''
-          ) // load Python directly, since examples are currently in Python & to have common test-base
+          let result
+          if (endpoint === LocalEndpoint.sendMetaTx) {
+            const metatxres = await sendMetaTx(jBody, {})
+            result = JSON.stringify(metatxres)
+          } else {
+            result = ((await loadPythonResult(JSON.stringify(jBody), endpoint)) as string) // load Python directly, since examples are currently in Python & to have common test-base
+          }
+          result = result?.replace('\r\n', '')
 
           if (!result) {
             throw new Error('No server response..')
@@ -131,14 +148,9 @@ const createServer = (endpoint: LocalEndpoint) => {
   const urlBase = 'http://' + ip.address() + ':' + port
   const endpointUrl = urlBase + '/' + endpoint
 
-  if (endpoint === LocalEndpoint.getCaptcha) {
-    getCaptchaUrl = endpointUrl
-  } else {
-    localTuringUrl = endpointUrl
-    console.log("Set local turing url: ", localTuringUrl)
-  }
+  EndpointConfig[endpoint].url = endpointUrl
 
-  console.log('Created local HTTP server at', localTuringUrl)
+  console.log('Created local HTTP server at', endpointUrl)
 }
 
 describe("Get gas from mainnet faucet", function () {
@@ -147,6 +159,7 @@ describe("Get gas from mainnet faucet", function () {
     if (USE_LOCAL_BACKEND) {
       createServer(LocalEndpoint.getCaptcha)
       createServer(LocalEndpoint.verifyCaptcha)
+      createServer(LocalEndpoint.sendMetaTx)
     }
 
     if (hre.network.name === "boba_goerli") {
@@ -180,7 +193,7 @@ describe("Get gas from mainnet faucet", function () {
     );
 
     turingUrlUsed = USE_LOCAL_BACKEND
-      ? localTuringUrl
+      ? EndpointConfig[LocalEndpoint.verifyCaptcha].url
       : publicTuringUrl
 
     mainnetFaucet = await Factory__MainnetFaucet.deploy(
@@ -262,7 +275,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("should fail to get captcha if no data provided", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -272,7 +285,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("should fail to get captcha if no address provided", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({"other_key": "abc"}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -282,7 +295,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("should get native faucet", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -306,7 +319,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("native faucet should fail when user already claimed within waiting period", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -330,7 +343,7 @@ describe("Get gas from mainnet faucet", function () {
     let tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, 0, ethClaimAmount)
     await tx.wait()
 
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -356,7 +369,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("native faucet should fail when image string is invalid", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -376,7 +389,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("native faucet should fail when uuid has not been issued", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -386,7 +399,7 @@ describe("Get gas from mainnet faucet", function () {
     const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
     // NOTE: imageStr is string inputted by end user based on captcha (base64 image)
-    const modifiedUuid = captcha.result.uuid.substring(0, captcha.result.uuid.length-2) + Math.floor(Math.random() * (99 - 10 + 1) + 10).toString()
+    const modifiedUuid = captcha.result.uuid.substring(0, captcha.result.uuid.length - 2) + Math.floor(Math.random() * (99 - 10 + 1) + 10).toString()
     await expect(mainnetFaucet.estimateGas.getNativeFaucet(modifiedUuid, captcha.result.imageStr, otherWallet_1.address)).to.be.revertedWith("Captcha wrong")
 
     const postUserBalance = await otherWallet_1.getBalance()
@@ -397,7 +410,7 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   it("native faucet should fail when address does not match uuid", async () => {
-    const captcha = await (await fetch(getCaptchaUrl, {
+    const captcha = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
       body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
         "content-type": "application/json"
       }
@@ -415,6 +428,256 @@ describe("Get gas from mainnet faucet", function () {
     expect(preUserBalance).to.be.eq(postUserBalance, "User should have not received testnet funds")
     expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
   });
+
+  describe('meta tx', () => {
+    // TODO: - test claim multiple times for meta tx (to different wallets), but only for valid captcha and with valid signature
+    it('should not get nonce if no address provided', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Address not defined')
+    })
+
+    it('should not get nonce if address provided is invalid for 1st request', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: "0x0"}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Address invalid')
+    })
+
+    it('should not send meta tx if no address provided for 2nd request', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({sig: "0x0"}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Address not defined')
+    })
+
+    it('should not send meta tx if address provided is invalid for 2nd request', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({sig: "0x0", to: "0x0"}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Address invalid')
+    })
+
+    /** @dev For test environments we may not want to set a faucet contract address in the .env file, so that we can set it dynamically from the tests. */
+    it('should not send meta tx if no contract faucet address provided', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({sig: "0x0", to: otherWallet_1.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('No mainnet faucet address provided')
+    })
+
+    it('should get nonce to sign', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      console.log("Received nonce: ", metaRequest?.result?.nonce)
+      expect(metaRequest?.result?.nonce?.length).to.be.eq(22)
+    })
+
+    it('should get different nonce to sign on every call', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest2 = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.nonce?.length).to.be.eq(22)
+      expect(metaRequest2?.result?.nonce?.length).to.be.eq(22)
+      expect(metaRequest?.result?.nonce).to.not.be.eq(metaRequest2?.result?.nonce)
+    })
+
+    it('should fail if get nonce not called before', async () => {
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({
+          to: otherWallet_3.address,
+          sig: "0x0",
+          faucetAddr: mainnetFaucet.address,
+          uuid: "123",
+          key: "987"
+        }), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Invalid signature')
+    })
+
+    it('should fail when uuid and imageKey not provided', async () => {
+      await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({to: deployerWallet.address, sig: "0x0", faucetAddr: mainnetFaucet.address}),
+        method: 'POST',
+        headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Captcha results not provided')
+    })
+
+    it('should fail when uuid not provided', async () => {
+      await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({to: deployerWallet.address, sig: "0x0", faucetAddr: mainnetFaucet.address, key: "123"}),
+        method: 'POST',
+        headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Captcha results not provided')
+    })
+
+    it('should fail when imageKey not provided', async () => {
+      await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({to: deployerWallet.address, sig: "0x0", faucetAddr: mainnetFaucet.address, uuid: "123"}),
+        method: 'POST',
+        headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Captcha results not provided')
+    })
+
+    it('should fail for signature with invalid length', async () => {
+      await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({
+          to: deployerWallet.address,
+          sig: "0x0",
+          faucetAddr: mainnetFaucet.address,
+          uuid: "123",
+          key: "987"
+        }), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Invalid signature')
+    })
+
+    it('should fail for invalid signature', async () => {
+      await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({
+          to: deployerWallet.address,
+          uuid: "123",
+          key: "987",
+          sig: "0x0293cc0d4eb416ca95349b7e63dc9d1c9a7aab4865b5cd6d6f2c36fb1dce12d34a05039aedf0bc64931a439def451bcf313abbcc72e9172f7fd51ecca30b41dd1b",
+          faucetAddr: mainnetFaucet.address
+        }), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Invalid signature')
+    })
+
+    it('should issue funds for valid signature', async () => {
+      let metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
+        body: JSON.stringify({to: otherWallet_2.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      // ImageStr only in local environment defined (already solved captcha)
+      const {uuid, imageBase64, imageStr} = metaRequest?.result
+      expect(uuid?.length).to.be.gt(0, "UUID not defined")
+      expect(imageBase64?.length).to.be.gt(0, "ImageBase64 not defined")
+
+      metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: otherWallet_2.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const nonce = metaRequest?.result?.nonce
+      expect(metaRequest?.result?.nonce?.length).to.be.eq(22, "Nonce has invalid length")
+
+      const sig = await otherWallet_2.signMessage(nonce)
+      expect(sig?.length).to.be.eq(132, "Signature has invalid length")
+
+      const preUserBalance = await otherWallet_2.getBalance()
+      const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+      metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({to: otherWallet_2.address, sig, uuid, key: imageStr, faucetAddr: mainnetFaucet.address}),
+        method: 'POST',
+        headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const postUserBalance = await otherWallet_2.getBalance()
+      const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+      console.log("Meta transaction API response: ", metaRequest)
+      expect(metaRequest?.result?.error).to.be.undefined
+      expect(metaRequest?.result?.message).to.be.eq('Funds issued')
+      expect(postUserBalance).to.be.gt(preUserBalance, "Did not receive user funds");
+      expect(postContractBalance).to.be.lt(preContractBalance, "Faucet did not issue funds")
+    })
+
+  })
 
   describe('configure', () => {
     it('should not be able to change hcHelper to zero address', async () => {
