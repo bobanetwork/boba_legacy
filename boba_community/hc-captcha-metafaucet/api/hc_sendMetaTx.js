@@ -22,7 +22,7 @@ const FAUCET_ABI = [{
     { internalType: 'string', name: '_key', type: 'string' },
     { internalType: 'address', name: '_to', type: 'address' }
   ],
-  name: 'getNativeFaucet',
+  name: 'getFaucet',
   outputs: [],
   stateMutability: 'nonpayable',
   type: 'function'
@@ -74,8 +74,8 @@ exports.handler = async function hc_sendMetaTx(event, context) {
   const faucetContract = new ethers.Contract(faucetAddr, FAUCET_ABI, wallet);
 
   try {
-    await faucetContract.estimateGas.getNativeFaucet(body.uuid, body.key, body.to);
-    const tx = await faucetContract.getNativeFaucet(body.uuid, body.key, body.to);
+    await faucetContract.estimateGas.getFaucet(body.uuid, body.key, body.to);
+    const tx = await faucetContract.getFaucet(body.uuid, body.key, body.to);
     const receipt = await tx.wait()
 
     return await return_payload(redisClient, {
