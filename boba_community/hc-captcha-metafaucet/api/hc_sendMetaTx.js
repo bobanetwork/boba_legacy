@@ -9,6 +9,7 @@ if (IS_LOCAL) {
   dotenv.config({path: './api/.env'})
 }
 
+// Local private key (public anyway)
 const PK_KEY = IS_LOCAL ? '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' : process.env.PK_KEY;
 const RPC_URL = IS_LOCAL ? 'http://localhost:8545' : process.env.RPC_URL;
 
@@ -72,17 +73,21 @@ exports.handler = async function hc_sendMetaTx(event, context) {
   const faucetAddr = CONTRACT_FAUCET_ADDR || body.faucetAddr;
   const faucetContract = new ethers.Contract(faucetAddr, FAUCET_ABI, wallet);
 
-  await faucetContract.estimateGas.getNativeFaucet(body.uuid, body.key, body.to);
-  const tx = await faucetContract.getNativeFaucet(body.uuid, body.key, body.to);
-  const receipt = await tx.wait()
+  try {
+    await faucetContract.estimateGas.getNativeFaucet(body.uuid, body.key, body.to);
+    const tx = await faucetContract.getNativeFaucet(body.uuid, body.key, body.to);
+    const receipt = await tx.wait()
 
-  //const txHash = await w3.sendTransaction(tx);
-  // const receipt = await w3.waitForTransaction(tx.hash);
-
-  return await return_payload(redisClient, {
-    txHash: receipt.transactionHash,
-    message: receipt.status === 0 ? 'Transaction has failed' : 'Funds issued'
-  });
+    return await return_payload(redisClient, {
+      txHash: receipt.transactionHash,
+      message: receipt.status === 0 ? 'Transaction has failed' : 'Funds issued'
+    });
+  } catch (err) {
+    const errorMsg = err?.reason ?? err
+    return await return_payload(redisClient, {
+      error: errorMsg
+    })
+  }
 }
 
 async function return_payload(redisClient, payload) {
@@ -108,6 +113,7 @@ async function return_payload(redisClient, payload) {
 
 async function verify_sig(redisClient, w3, address, sig) {
   const nonce = await redisClient.get(address);
+  await redisClient.del(address) // remove nonce from db, instant expiration
   if (!nonce || sig.length !== 132) {
     return false;
   }
@@ -116,7 +122,10 @@ async function verify_sig(redisClient, w3, address, sig) {
 }
 
 async function issue_nonce(redisClient, address) {
-  const nonceToSign = ethers.utils.base58.encode(ethers.utils.randomBytes(16));
+  let nonceToSign = ethers.utils.base58.encode(ethers.utils.randomBytes(16));
+  if (nonceToSign.length !== 22) {
+    nonceToSign = ethers.utils.base58.encode(ethers.utils.randomBytes(20)).substring(0, 22)
+  }
   await redisClient.set(address, nonceToSign, 'EX', 600);
   return nonceToSign;
 }

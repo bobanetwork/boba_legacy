@@ -30,6 +30,7 @@ const deployerWallet = new Wallet(deployerPK, local_provider);
 const otherWallet_1 = new Wallet(hre.network.config.accounts[1], local_provider);
 const otherWallet_2 = new Wallet(hre.network.config.accounts[2], local_provider);
 const otherWallet_3 = new Wallet(hre.network.config.accounts[3], local_provider);
+const otherWallet_4 = new Wallet(hre.network.config.accounts[4], local_provider);
 
 let BOBAL2Address;
 let BobaHcCreditAddress;
@@ -216,7 +217,7 @@ describe("Get gas from mainnet faucet", function () {
     const fTx = await deployerWallet.sendTransaction({
       ...gasOverride,
       to: mainnetFaucet.address,
-      value: ethClaimAmount.mul(5)
+      value: ethClaimAmount.mul(10)
     });
     await fTx.wait();
     console.log("Funded faucet with ETH..");
@@ -430,7 +431,6 @@ describe("Get gas from mainnet faucet", function () {
   });
 
   describe('meta tx', () => {
-    // TODO: - test claim multiple times for meta tx (to different wallets), but only for valid captcha and with valid signature
     it('should not get nonce if no address provided', async () => {
       const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
         body: JSON.stringify({}), method: 'POST', headers: {
@@ -631,9 +631,9 @@ describe("Get gas from mainnet faucet", function () {
       expect(metaRequest?.result?.error).to.be.eq('Invalid signature')
     })
 
-    it('should issue funds for valid signature', async () => {
+    const claimFundsViaMetaTx = async (wallet: Wallet) => {
       let metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
-        body: JSON.stringify({to: otherWallet_2.address}), method: 'POST', headers: {
+        body: JSON.stringify({to: wallet.address}), method: 'POST', headers: {
           "content-type": "application/json"
         }
       })).json()
@@ -644,7 +644,7 @@ describe("Get gas from mainnet faucet", function () {
       expect(imageBase64?.length).to.be.gt(0, "ImageBase64 not defined")
 
       metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
-        body: JSON.stringify({to: otherWallet_2.address}), method: 'POST', headers: {
+        body: JSON.stringify({to: wallet.address}), method: 'POST', headers: {
           "content-type": "application/json"
         }
       })).json()
@@ -652,22 +652,22 @@ describe("Get gas from mainnet faucet", function () {
       const nonce = metaRequest?.result?.nonce
       expect(metaRequest?.result?.nonce?.length).to.be.eq(22, "Nonce has invalid length")
 
-      const sig = await otherWallet_2.signMessage(nonce)
+      const sig = await wallet.signMessage(nonce)
       expect(sig?.length).to.be.eq(132, "Signature has invalid length")
 
-      const preUserBalance = await otherWallet_2.getBalance()
+      const preUserBalance = await wallet.getBalance()
       const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
       metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
         // faucetAddr only needs to be defined in tests
-        body: JSON.stringify({to: otherWallet_2.address, sig, uuid, key: imageStr, faucetAddr: mainnetFaucet.address}),
+        body: JSON.stringify({to: wallet.address, sig, uuid, key: imageStr, faucetAddr: mainnetFaucet.address}),
         method: 'POST',
         headers: {
           "content-type": "application/json"
         }
       })).json()
 
-      const postUserBalance = await otherWallet_2.getBalance()
+      const postUserBalance = await wallet.getBalance()
       const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
 
       console.log("Meta transaction API response: ", metaRequest)
@@ -675,8 +675,82 @@ describe("Get gas from mainnet faucet", function () {
       expect(metaRequest?.result?.message).to.be.eq('Funds issued')
       expect(postUserBalance).to.be.gt(preUserBalance, "Did not receive user funds");
       expect(postContractBalance).to.be.lt(preContractBalance, "Faucet did not issue funds")
+    }
+
+    it('should issue funds for valid signature', async () => {
+      await claimFundsViaMetaTx(otherWallet_2)
     })
 
+    it('should issue funds for valid signature for different wallets within waiting period but reject for same wallet or same nonce', async () => {
+      expect(await mainnetFaucet.waitingPeriod()).to.be.gt(0)
+
+      await claimFundsViaMetaTx(otherWallet_1)
+      await claimFundsViaMetaTx(otherWallet_4)
+
+      // should reject 2nd time request
+      let metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.getCaptcha].url, {
+        body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      // ImageStr only in local environment defined (already solved captcha)
+      const {uuid, imageBase64, imageStr} = metaRequest?.result
+      expect(uuid?.length).to.be.gt(0, "UUID not defined")
+      expect(imageBase64?.length).to.be.gt(0, "ImageBase64 not defined")
+
+      metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: otherWallet_1.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const nonce = metaRequest?.result?.nonce
+      expect(metaRequest?.result?.nonce?.length).to.be.eq(22, "Nonce has invalid length")
+
+      const sig = await otherWallet_1.signMessage(nonce)
+      expect(sig?.length).to.be.eq(132, "Signature has invalid length")
+
+      const preUserBalance = await otherWallet_1.getBalance()
+      const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+      metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({to: otherWallet_1.address, sig, uuid, key: imageStr, faucetAddr: mainnetFaucet.address}),
+        method: 'POST',
+        headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const postUserBalance = await otherWallet_1.getBalance()
+      const postContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+
+      console.log("Meta transaction API response: ", metaRequest)
+      expect(metaRequest?.result?.error).to.contain('Invalid request')
+      expect(postUserBalance).to.be.eq(preUserBalance, "Should not receive user funds");
+      expect(postContractBalance).to.be.eq(preContractBalance, "Faucet did issue funds")
+
+      let tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, 0, ethClaimAmount)
+      await tx.wait()
+      expect(await mainnetFaucet.waitingPeriod()).to.be.eq(0, "Waiting period not changed (1)")
+
+      // try again with same nonce/signature and fail as nonce invalidated
+      metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({to: otherWallet_1.address, sig, uuid, key: imageStr, faucetAddr: mainnetFaucet.address}),
+        method: 'POST',
+        headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('Invalid signature')
+
+      tx = await mainnetFaucet.configure(hcHelper.address, turingUrlUsed, DEFAULT_WAITING_PERIOD, ethClaimAmount)
+      await tx.wait()
+      expect(await mainnetFaucet.waitingPeriod()).to.be.eq(DEFAULT_WAITING_PERIOD, "Waiting period not changed (2)")
+    })
   })
 
   describe('configure', () => {
@@ -705,7 +779,7 @@ describe("Get gas from mainnet faucet", function () {
       expect(await mainnetFaucet.nativeFaucetAmount()).to.be.eq(ethClaimAmount)
     })
 
-    it('should be able to change settings as owner', async () => {
+    it('should not be able to change settings as non-owner', async () => {
       await expect(mainnetFaucet.connect(otherWallet_1).configure(otherWallet_1.address, "abc", 123, 976)).to.be.revertedWith("Ownable: caller is not the owner")
 
       expect(await mainnetFaucet.hcHelper()).to.be.eq(hcHelper.address)
@@ -727,6 +801,7 @@ describe("Get gas from mainnet faucet", function () {
     it("should withdraw funds as owner", async () => {
       const preUserBalance = await deployerWallet.getBalance()
       const preContractBalance = await ethers.provider.getBalance(mainnetFaucet.address)
+      expect(preContractBalance).to.be.gt(0, "Contract balance already 0")
 
       const tx = await mainnetFaucet.withdrawNative(preContractBalance)
       await tx.wait()
