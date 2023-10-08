@@ -441,6 +441,32 @@ describe("Get gas from mainnet faucet", function () {
     expect(preContractBalance).to.be.eq(postContractBalance, "Faucet should have all original funds")
   });
 
+  describe('local environment tests', () => {
+    // these tests are only applicable to local/test environments
+
+    it('should fail when faucet address not provided at all', async () => {
+      await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        body: JSON.stringify({to: deployerWallet.address}), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
+        // faucetAddr only needs to be defined in tests
+        body: JSON.stringify({
+          to: deployerWallet.address,
+          uuid: "123",
+          key: "987",
+          sig: "0x0293cc0d4eb416ca95349b7e63dc9d1c9a7aab4865b5cd6d6f2c36fb1dce12d34a05039aedf0bc64931a439def451bcf313abbcc72e9172f7fd51ecca30b41dd1b",
+        }), method: 'POST', headers: {
+          "content-type": "application/json"
+        }
+      })).json()
+
+      expect(metaRequest?.result?.error).to.be.eq('No faucet address provided')
+    })
+  })
+
   describe('meta tx', () => {
     it('should not get nonce if no address provided', async () => {
       const metaRequest = await (await fetch(EndpointConfig[LocalEndpoint.sendMetaTx].url, {
@@ -490,7 +516,7 @@ describe("Get gas from mainnet faucet", function () {
         }
       })).json()
 
-      expect(metaRequest?.result?.error).to.be.eq('No mainnet faucet address provided')
+      expect(metaRequest?.result?.error).to.be.eq('No faucet address provided')
     })
 
     it('should get nonce to sign', async () => {

@@ -51,7 +51,7 @@ exports.handler = async function hc_sendMetaTx(event, context) {
   }
 
   if (!CONTRACT_FAUCET_ADDR && !body.faucetAddr) {
-    return await return_payload(redisClient, { error: 'No mainnet faucet address provided' });
+    return await return_payload(redisClient, { error: 'No faucet address provided' });
   } else if (CONTRACT_FAUCET_ADDR && body.faucetAddr) {
     return await return_payload(redisClient, { error: 'Faucet address already configured' });
   }
@@ -70,7 +70,7 @@ exports.handler = async function hc_sendMetaTx(event, context) {
     return await return_payload(redisClient, {error: 'Please contact support (1)'})
   }
   const wallet = new ethers.Wallet(PK_KEY, w3);
-  const faucetAddr = CONTRACT_FAUCET_ADDR || body.faucetAddr;
+  const faucetAddr = CONTRACT_FAUCET_ADDR ?? body.faucetAddr;
   const faucetContract = new ethers.Contract(faucetAddr, FAUCET_ABI, wallet);
 
   try {
