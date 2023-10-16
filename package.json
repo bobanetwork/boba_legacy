@@ -69,7 +69,7 @@
     "lerna": "^4.0.0",
     "lint-staged": "11.0.0",
     "markdownlint": "^0.29.0",
-    "markdownlint-cli2": "0.4.0",
+    "markdownlint-cli2": "0.10.0",
     "mkdirp": "^3.0.1",
     "mocha": "^8.4.0",
     "nyc": "^15.1.0",
