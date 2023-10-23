@@ -58,7 +58,7 @@
     "level": "^6.0.1",
     "levelup": "^5.1.1",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@ethersproject/abstract-provider": "^5.5.0",
