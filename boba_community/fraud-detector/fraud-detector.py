@@ -154,7 +154,7 @@ def doEvent(event, force_L2):
     l2SR = None
     now = time.time()
     if (force_L2 and sr == ib['_batch'][-1]) or (now > last_l2check + l2_check_interval):
-      l2SR = rpc[2].eth.getBlock(rCount)['stateRoot']
+      l2SR = rpc[2].eth.get_block(rCount)['stateRoot']
       last_l2check = now
 
     # Handle a possible lag in keeping the verifier up to date.
@@ -169,7 +169,7 @@ def doEvent(event, force_L2):
       if waitCount % 40 == 0:
         logger.warning("Still waiting for verifier to catch up after {} attempts".format(waitCount))
 
-    vfb = rpc[3].eth.getBlock(rCount)
+    vfb = rpc[3].eth.get_block(rCount)
     vfSR = vfb['stateRoot']
 
     match = ""
@@ -181,17 +181,17 @@ def doEvent(event, force_L2):
       match = "**** SCC/VERIFIER MISMATCH ****"
 
     if l2SR:
-      l2SR_str = Web3.utils.toHex(l2SR)
+      l2SR_str = Web3.to_hex(l2SR)
     else:
       l2SR_str = "                                --                                "
-    log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.utils.toHex(sr), l2SR_str, Web3.utils.toHex(vfSR), match)
+    log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.to_hex(sr), l2SR_str, Web3.to_hex(vfSR), match)
     matchedLock.acquire()
     if match != "":
       Matched['is_ok'] = False
       logger.warning(log_str)
     else:
       Matched['Block'] = rCount
-      Matched['Root'] = Web3.utils.toHex(sr)
+      Matched['Root'] = Web3.to_hex(sr)
       Matched['Time'] = time.time()
       logger.info(log_str)
     matchedLock.release()
@@ -238,13 +238,13 @@ def fpLoop():
 
   logger.info("#SCC-IDX L1-Block SCC-STATEROOT L2-STATEROOT VERIFIER-STATEROOT MISMATCH")
 
-  topic_sig = Web3.utils.toHex(Web3.keccak(text="StateBatchAppended(uint256,bytes32,uint256,uint256,bytes)"))
+  topic_sig = Web3.to_hex(Web3.keccak(text="StateBatchAppended(uint256,bytes32,uint256,uint256,bytes)"))
 
   while startBlock < l1_tip:
     toBlock = min(startBlock+batch_size, l1_tip) - 1
     #print("Scanning from",startBlock,"to",toBlock)
 
-    batch = rpc[1].eth.getLogs({
+    batch = rpc[1].eth.get_logs({
       "fromBlock":startBlock,
       "toBlock":toBlock,
       "address":scc_addr,
@@ -265,7 +265,7 @@ def fpLoop():
       time.sleep(30)
       continue
 
-    batch = rpc[1].eth.getLogs({
+    batch = rpc[1].eth.get_logs({
       "fromBlock":startBlock,
       "toBlock":toBlock,
       "address":scc_addr,
