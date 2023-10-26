@@ -82,7 +82,7 @@ services:
     environment:
       <<: *l1_node_web3_url
       L1_CONFIRMATIONS: 8
-      L2_NODE_WEB3_URL: https://replica.goerli.boba.network
+      L2_NODE_WEB3_URL: https://boba-goerli.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI
       L2_CHECK_INTERVAL: 10
       VERIFIER_WEB3_URL: http://verifier_l2geth:8545
       ADDRESS_MANAGER_ADDRESS: '0x6FF9c8FF8F0B6a0763a3030540c21aFC721A9148'

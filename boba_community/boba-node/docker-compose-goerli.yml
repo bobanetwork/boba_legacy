@@ -15,7 +15,7 @@ services:
       -  ../../ops/envs/dtl.env
     environment:
       << : *l1_rpc_dtl
-      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://replica.goerli.boba.network
+      DATA_TRANSPORT_LAYER__L2_RPC_ENDPOINT: https://boba-goerli.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI
       DATA_TRANSPORT_LAYER__SYNC_FROM_L1: 'false'
       DATA_TRANSPORT_LAYER__SYNC_FROM_L2: 'true'
       DATA_TRANSPORT_LAYER__L2_CHAIN_ID: 2888

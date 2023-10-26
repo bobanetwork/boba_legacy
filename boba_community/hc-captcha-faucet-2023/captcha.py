@@ -115,7 +115,7 @@ ERC20_CONTRACT_ADDR = "0x4200000000000000000000000000000000000023"  # token (BOB
 
 SUPPORTED_NETWORKS = {
   "BOBA_BNB_TESTNET": "https://replica.testnet.bnb.boba.network",
-  "BOBA_GOERLI_TESTNET": "https://replica.goerli.boba.network",
+  "BOBA_GOERLI_TESTNET": "https://boba-goerli.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI",
   "BOBA_AVAX_TESTNET": "https://replica.testnet.avax.boba.network",
 }
 

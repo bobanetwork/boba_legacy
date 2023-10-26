@@ -91,7 +91,7 @@ Here is some example queries to get you started:
 
 ## Local setup
 
-1. Run local hardhat node and fork network: `npx hardhat node --fork https://replica.goerli.boba.network --hostname 0.0.0.0`
+1. Run local hardhat node and fork network: `npx hardhat node --fork https://boba-goerli.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI --hostname 0.0.0.0`
 2. Clone [graph-node](https://github.com/graphprotocol/graph-node)
 3. Replace `mainnet:` with `boba:` in the `ethereum:` property.
 4. Run `docker-compose up` in the `./docker` directory of the repo.

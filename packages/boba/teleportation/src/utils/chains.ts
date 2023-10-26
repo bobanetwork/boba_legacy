@@ -51,7 +51,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   2888: {
-    url: 'https://replica.goerli.boba.network',
+    url: 'https://boba-goerli.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
     testnet: true,
     name: 'Boba Ethereum Goerli',
     teleportationAddress: '0xB43EE846Aa266228FeABaD1191D6cB2eD9808894',
