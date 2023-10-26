@@ -7,11 +7,12 @@
 # stress_tester.py and contains a lot of irrelevant cruft to be cleaned up
 # later.
 
-import os,sys
+import os
 from web3 import Web3
-import signal
+import inspect
 import time
-import requests,json
+import json
+from ratelimiter import RateLimiter
 import logging
 from web3.middleware import geth_poa_middleware
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
@@ -32,6 +33,13 @@ logger.debug (os.environ['ADDRESS_MANAGER_ADDRESS'])
 logger.debug (os.environ['L1_DEPLOYMENT_BLOCK'])
 logger.debug (os.environ['L2_START_BLOCK'])
 logger.debug (os.environ['L2_CHECK_INTERVAL'])
+logger.debug (os.environ['RATE_LIMITER_MAX_CALLS'])
+logger.debug (os.environ['RATE_LIMITER_PERIOD'])
+
+MAX_CALLS = int(os.environ['RATE_LIMITER_MAX_CALLS'])
+PERIOD = int(os.environ['RATE_LIMITER_PERIOD'])
+MAX_ATTEMPTS = 3
+
 if 'SCC_NAME' in os.environ:
   logger.debug (os.environ['SCC_NAME'])
 
@@ -58,6 +66,25 @@ Matched = {
 }
 matchedLock = Lock()
 
+
+def getRPCRateLimiter():
+  @RateLimiter(max_calls=MAX_CALLS, period=PERIOD)
+  def rateLimiter(method, *args, **kwargs):
+      attempts = 0
+      while True:
+        try:
+          return method(*args, **kwargs)
+        except Exception as e:
+          if attempts >= 3:
+            logger.error("An error occured in fraud-detector: %s", str(e))
+            return str(e)
+          else:
+            logger.error("An error occured in fraud-detector: %s \n %s", str(inspect.getouterframes(inspect.currentframe())[-2].frame), str(e))
+            logger.info("Will try again...")
+            attempts += 1
+            time.sleep(3)
+  return rateLimiter
+
 def status(*args):
   global Matched
   matchedLock.acquire()
@@ -82,57 +109,59 @@ except:
 batch_size =1000
 
 rpc = [None]*4
+rpcRateLimters = [getRPCRateLimiter() if i > 0 else None for i in range(4)]
+
 
 
 while True:
   try:
     rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
-    assert (rpc[1].is_connected())
+    assert (rpcRateLimters[1](rpc[1].is_connected))
     break
   except:
     logger.info ("Waiting for L1...")
     time.sleep(10)
 
-rpc[1].middleware_onion.inject(geth_poa_middleware, layer=0)
+rpcRateLimters[1](rpc[1].middleware_onion.inject, geth_poa_middleware, layer=0)
 logger.debug("Connected to L1_NODE_WEB3_URL")
 
 while True:
   try:
     rpc[2] = Web3(Web3.HTTPProvider(os.environ['L2_NODE_WEB3_URL']))
-    assert (rpc[2].is_connected())
+    assert (rpcRateLimters[2](rpc[2].is_connected))
     break
   except:
     logger.info ("Waiting for L2...")
     time.sleep(10)
 
-rpc[2].middleware_onion.inject(geth_poa_middleware, layer=0)
+rpcRateLimters[2](rpc[2].middleware_onion.inject, geth_poa_middleware, layer=0)
 logger.debug("Connected to L2_NODE_WEB3_URL")
 
 while True:
   try:
     rpc[3] = Web3(Web3.HTTPProvider(os.environ['VERIFIER_WEB3_URL']))
-    assert (rpc[3].is_connected())
+    assert (rpcRateLimters[3](rpc[3].is_connected))
     break
   except:
     logger.info ("Waiting for verifier...")
     time.sleep(10)
 
-rpc[3].middleware_onion.inject(geth_poa_middleware, layer=0)
+rpcRateLimters[3](rpc[3].middleware_onion.inject, geth_poa_middleware, layer=0)
 logger.debug("Connected to VERIFIER_WEB3_URL")
 
-def loadContract(rpc, addr, abiPath):
+def loadContract(rateLimiter, rpc, addr, abiPath):
   with open(abiPath) as f:
     abi = json.loads(f.read())['abi']
-  c = rpc.eth.contract(address=addr, abi=abi)
+  c = rateLimiter(rpc.eth.contract, address=addr, abi=abi)
   return c
 
-address_manager = loadContract(rpc[1],os.environ['ADDRESS_MANAGER_ADDRESS'],'./contracts/Lib_AddressManager.json')
+address_manager = loadContract(rpcRateLimters[1], rpc[1],os.environ['ADDRESS_MANAGER_ADDRESS'],'./contracts/Lib_AddressManager.json')
 if 'SCC_NAME' in os.environ:
   # V1 overrides this to "OVM_StateCommitmentChain"
   scc_addr = address_manager.functions.getAddress(os.environ['SCC_NAME']).call()
 else:
   scc_addr = address_manager.functions.getAddress("StateCommitmentChain").call()
-scc_contract = loadContract(rpc[1],scc_addr,'./contracts/StateCommitmentChain.json')
+scc_contract = loadContract(rpcRateLimters[1], rpc[1],scc_addr,'./contracts/StateCommitmentChain.json')
 
 rCount = element_start - 1
 checkpoint = [ element_start, l1_base ]
@@ -145,7 +174,7 @@ def doEvent(event, force_L2):
   global l3_block
   global l2_check_interval,last_l2check
 
-  t = rpc[1].eth.get_transaction(event.transactionHash)
+  t = rpcRateLimters[1](rpc[1].eth.get_transaction, event.transactionHash)
 
   (junk, ib) = scc_contract.decode_function_input(t.input)
   for sr in ib['_batch']:
@@ -154,13 +183,13 @@ def doEvent(event, force_L2):
     l2SR = None
     now = time.time()
     if (force_L2 and sr == ib['_batch'][-1]) or (now > last_l2check + l2_check_interval):
-      l2SR = rpc[2].eth.get_block(rCount)['stateRoot']
+      l2SR = rpcRateLimters[2](rpc[2].eth.get_block, rCount)['stateRoot']
       last_l2check = now
 
     # Handle a possible lag in keeping the verifier up to date.
     waitCount = 0
     while rCount > l3_block:
-      l3_block = rpc[3].eth.block_number
+      l3_block = rpcRateLimters[3](rpc[3].eth.get_block_number)
       if rCount <= l3_block:
         break
       logger.debug("Waiting for verifier to catch up, currently at block {}/{}".format(rpc[3].eth.block_number, rCount))
@@ -169,7 +198,7 @@ def doEvent(event, force_L2):
       if waitCount % 40 == 0:
         logger.warning("Still waiting for verifier to catch up after {} attempts".format(waitCount))
 
-    vfb = rpc[3].eth.get_block(rCount)
+    vfb = rpcRateLimters[3](rpc[3].eth.get_block,rCount)
     vfSR = vfb['stateRoot']
 
     match = ""
@@ -230,7 +259,8 @@ def server_loop():
     ws.set_notification_pool(None)
 
 def fpLoop():
-  l1_tip = rpc[1].eth.block_number - l1_confirmations
+  # alias for get block number
+  l1_tip = rpcRateLimters[1](rpc[1].eth.get_block_number) - l1_confirmations
 
   assert(l1_tip > l1_base)
   startBlock = l1_base
@@ -244,7 +274,7 @@ def fpLoop():
     toBlock = min(startBlock+batch_size, l1_tip) - 1
     #print("Scanning from",startBlock,"to",toBlock)
 
-    batch = rpc[1].eth.get_logs({
+    batch = rpcRateLimters[1](rpc[1].eth.get_logs, {
       "fromBlock":startBlock,
       "toBlock":toBlock,
       "address":scc_addr,
@@ -260,12 +290,12 @@ def fpLoop():
   logger.debug("Caught up to L1 tip. Waiting for new events from startBlock " + str(startBlock))
 
   while True:
-    toBlock = rpc[1].eth.block_number - l1_confirmations
+    toBlock = rpcRateLimters[1](rpc[1].eth.get_block_number) - l1_confirmations
     if startBlock > toBlock:
       time.sleep(30)
       continue
 
-    batch = rpc[1].eth.get_logs({
+    batch = rpcRateLimters[1](rpc[1].eth.get_logs,{
       "fromBlock":startBlock,
       "toBlock":toBlock,
       "address":scc_addr,
