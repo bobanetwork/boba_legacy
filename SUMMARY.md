@@ -57,6 +57,10 @@
     * [Contract Addresses Boba/Avalanche](for-developers/multichain/network-avalanche.md)
 * [Other](other/README.md)
   * [Liquidity Pools](packages/boba/contracts/contracts/LP/README.md)
-  * [Boba Straw Price Feed Oracle](packages/boba/contracts/contracts/oracle/README.md)
-  * [Gas Price Oracle](packages/boba/gas-price-oracle/README.md)
   * [Contracts Registration](packages/boba/register/README.md)
+
+## Oracles
+
+* [Introduction to DIA Oracles](oracles/introduction-to-dia-oracles.md)
+* [Boba Straw Price Feed Oracle](oracles/oracle.md)
+* [Gas Price Oracle](oracles/gas-price-oracle.md)
