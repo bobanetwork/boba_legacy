@@ -20,7 +20,7 @@
     "chalk": "^5.3.0",
     "dotenv": "^8.2.0",
     "glob": "^7.1.6",
-    "patch-package": "^6.4.7"
+    "patch-package": "^8.0.0"
   },
   "devDependencies": {
     "@ethersproject/providers": "^5.5.0",

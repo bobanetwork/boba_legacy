@@ -74,7 +74,7 @@
     "mocha": "^8.4.0",
     "nyc": "^15.1.0",
     "node-gyp": "^9.0.0",
-    "patch-package": "^6.4.7",
+    "patch-package": "^8.0.0",
     "prettier": "^2.8.0",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "ts-mocha": "^10.0.0",
