@@ -2,11 +2,14 @@ package proxyd
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"math"
+	"math/big"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -15,31 +18,38 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/txpool"
 	"github.com/ethereum/go-ethereum/core/types"
-
 	"github.com/ethereum/go-ethereum/log"
-	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/cors"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 )
 
 const (
-	ContextKeyAuth              = "authorization"
-	ContextKeyReqID             = "req_id"
-	ContextKeyXForwardedFor     = "x_forwarded_for"
-	MaxBatchRPCCallsHardLimit   = 100
-	cacheStatusHdr              = "X-Proxyd-Cache-Status"
-	defaultServerTimeout        = time.Second * 10
-	maxRequestBodyLogLen        = 2000
-	defaultMaxUpstreamBatchSize = 10
+	ContextKeyAuth               = "authorization"
+	ContextKeyReqID              = "req_id"
+	ContextKeyXForwardedFor      = "x_forwarded_for"
+	DefaultMaxBatchRPCCallsLimit = 100
+	MaxBatchRPCCallsHardLimit    = 1000
+	cacheStatusHdr               = "X-Proxyd-Cache-Status"
+	defaultRPCTimeout            = 10 * time.Second
+	defaultBodySizeLimit         = 256 * opt.KiB
+	defaultWSHandshakeTimeout    = 10 * time.Second
+	defaultWSReadTimeout         = 2 * time.Minute
+	defaultWSWriteTimeout        = 10 * time.Second
+	maxRequestBodyLogLen         = 2000
+	defaultMaxUpstreamBatchSize  = 10
 )
 
 var emptyArrayResponse = json.RawMessage("[]")
 
 type Server struct {
-	backendGroups          map[string]*BackendGroup
+	BackendGroups          map[string]*BackendGroup
 	wsBackendGroup         *BackendGroup
 	wsMethodWhitelist      *StringSet
 	rpcMethodMappings      map[string]string
@@ -50,10 +60,12 @@ type Server struct {
 	timeout                time.Duration
 	maxUpstreamBatchSize   int
 	maxBatchSize           int
+	enableServedByHeader   bool
 	upgrader               *websocket.Upgrader
 	mainLim                FrontendRateLimiter
 	overrideLims           map[string]FrontendRateLimiter
 	senderLim              FrontendRateLimiter
+	allowedChainIds        []*big.Int
 	limExemptOrigins       []*regexp.Regexp
 	limExemptUserAgents    []*regexp.Regexp
 	globallyLimitedMethods map[string]bool
@@ -65,12 +77,6 @@ type Server struct {
 
 type limiterFunc func(method string) bool
 
-type WSServerLimiter struct {
-	isLimited         limiterFunc
-	isRateLimitSender func(ctx context.Context, req *RPCReq) error
-	maxBodySize       int64
-}
-
 func NewServer(
 	backendGroups map[string]*BackendGroup,
 	wsBackendGroup *BackendGroup,
@@ -80,6 +86,7 @@ func NewServer(
 	authenticatedPaths map[string]string,
 	timeout time.Duration,
 	maxUpstreamBatchSize int,
+	enableServedByHeader bool,
 	cache RPCCache,
 	rateLimitConfig RateLimitConfig,
 	senderRateLimitConfig SenderRateLimitConfig,
@@ -93,18 +100,22 @@ func NewServer(
 	}
 
 	if maxBodySize == 0 {
-		maxBodySize = math.MaxInt64
+		maxBodySize = defaultBodySizeLimit
 	}
 
 	if timeout == 0 {
-		timeout = defaultServerTimeout
+		timeout = defaultRPCTimeout
 	}
 
 	if maxUpstreamBatchSize == 0 {
 		maxUpstreamBatchSize = defaultMaxUpstreamBatchSize
 	}
 
-	if maxBatchSize == 0 || maxBatchSize > MaxBatchRPCCallsHardLimit {
+	if maxBatchSize == 0 {
+		maxBatchSize = DefaultMaxBatchRPCCallsLimit
+	}
+
+	if maxBatchSize > MaxBatchRPCCallsHardLimit {
 		maxBatchSize = MaxBatchRPCCallsHardLimit
 	}
 
@@ -158,7 +169,7 @@ func NewServer(
 	}
 
 	return &Server{
-		backendGroups:        backendGroups,
+		BackendGroups:        backendGroups,
 		wsBackendGroup:       wsBackendGroup,
 		wsMethodWhitelist:    wsMethodWhitelist,
 		rpcMethodMappings:    rpcMethodMappings,
@@ -166,17 +177,19 @@ func NewServer(
 		authenticatedPaths:   authenticatedPaths,
 		timeout:              timeout,
 		maxUpstreamBatchSize: maxUpstreamBatchSize,
+		enableServedByHeader: enableServedByHeader,
 		cache:                cache,
 		enableRequestLog:     enableRequestLog,
 		maxRequestBodyLogLen: maxRequestBodyLogLen,
 		maxBatchSize:         maxBatchSize,
 		upgrader: &websocket.Upgrader{
-			HandshakeTimeout: 5 * time.Second,
+			HandshakeTimeout: defaultWSHandshakeTimeout,
 		},
 		mainLim:                mainLim,
 		overrideLims:           overrideLims,
 		globallyLimitedMethods: globalMethodLims,
 		senderLim:              senderLim,
+		allowedChainIds:        senderRateLimitConfig.AllowedChainIds,
 		limExemptOrigins:       limExemptOrigins,
 		limExemptUserAgents:    limExemptUserAgents,
 	}, nil
@@ -227,6 +240,9 @@ func (s *Server) Shutdown() {
 	}
 	if s.wsServer != nil {
 		_ = s.wsServer.Shutdown(context.Background())
+	}
+	for _, bg := range s.BackendGroups {
+		bg.Shutdown()
 	}
 }
 
@@ -303,7 +319,13 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 		"remote_ip", xff,
 	)
 
-	body, err := io.ReadAll(io.LimitReader(r.Body, s.maxBodySize))
+	body, err := io.ReadAll(LimitReader(r.Body, s.maxBodySize))
+	if errors.Is(err, ErrLimitReaderOverLimit) {
+		log.Error("request body too large", "req_id", GetReqID(ctx))
+		RecordRPCError(ctx, BackendProxyd, MethodUnknown, ErrRequestBodyTooLarge)
+		writeRPCError(ctx, w, nil, ErrRequestBodyTooLarge)
+		return
+	}
 	if err != nil {
 		log.Error("error reading request body", "err", err)
 		writeRPCError(ctx, w, nil, ErrInternal)
@@ -341,32 +363,47 @@ func (s *Server) HandleRPC(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		batchRes, batchContainsCached, err := s.handleBatchRPC(ctx, reqs, isLimited, true)
+		batchRes, batchContainsCached, servedBy, err := s.handleBatchRPC(ctx, reqs, isLimited, true)
 		if err == context.DeadlineExceeded {
 			writeRPCError(ctx, w, nil, ErrGatewayTimeout)
+			return
+		}
+		if errors.Is(err, ErrConsensusGetReceiptsCantBeBatched) ||
+			errors.Is(err, ErrConsensusGetReceiptsInvalidTarget) {
+			writeRPCError(ctx, w, nil, ErrInvalidRequest(err.Error()))
 			return
 		}
 		if err != nil {
 			writeRPCError(ctx, w, nil, ErrInternal)
 			return
 		}
-
+		if s.enableServedByHeader {
+			w.Header().Set("x-served-by", servedBy)
+		}
 		setCacheHeader(w, batchContainsCached)
 		writeBatchRPCRes(ctx, w, batchRes)
 		return
 	}
 
 	rawBody := json.RawMessage(body)
-	backendRes, cached, err := s.handleBatchRPC(ctx, []json.RawMessage{rawBody}, isLimited, false)
+	backendRes, cached, servedBy, err := s.handleBatchRPC(ctx, []json.RawMessage{rawBody}, isLimited, false)
 	if err != nil {
+		if errors.Is(err, ErrConsensusGetReceiptsCantBeBatched) ||
+			errors.Is(err, ErrConsensusGetReceiptsInvalidTarget) {
+			writeRPCError(ctx, w, nil, ErrInvalidRequest(err.Error()))
+			return
+		}
 		writeRPCError(ctx, w, nil, ErrInternal)
 		return
+	}
+	if s.enableServedByHeader {
+		w.Header().Set("x-served-by", servedBy)
 	}
 	setCacheHeader(w, cached)
 	writeRPCRes(ctx, w, backendRes[0])
 }
 
-func (s *Server) handleBatchRPC(ctx context.Context, reqs []json.RawMessage, isLimited limiterFunc, isBatch bool) ([]*RPCRes, bool, error) {
+func (s *Server) handleBatchRPC(ctx context.Context, reqs []json.RawMessage, isLimited limiterFunc, isBatch bool) ([]*RPCRes, bool, string, error) {
 	// A request set is transformed into groups of batches.
 	// Each batch group maps to a forwarded JSON-RPC batch request (subject to maxUpstreamBatchSize constraints)
 	// A groupID is used to decouple Requests that have duplicate ID so they're not part of the same batch that's
@@ -452,6 +489,7 @@ func (s *Server) handleBatchRPC(ctx context.Context, reqs []json.RawMessage, isL
 		batches[batchGroup] = append(batches[batchGroup], batchElem{parsedReq, i})
 	}
 
+	servedBy := make(map[string]bool, 0)
 	var cached bool
 	for group, batch := range batches {
 		var cacheMisses []batchElem
@@ -476,14 +514,19 @@ func (s *Server) handleBatchRPC(ctx context.Context, reqs []json.RawMessage, isL
 					"batch_index", i,
 				)
 				batchRPCShortCircuitsTotal.Inc()
-				return nil, false, context.DeadlineExceeded
+				return nil, false, "", context.DeadlineExceeded
 			}
 
 			start := i * s.maxUpstreamBatchSize
 			end := int(math.Min(float64(start+s.maxUpstreamBatchSize), float64(len(cacheMisses))))
 			elems := cacheMisses[start:end]
-			res, err := s.backendGroups[group.backendGroup].Forward(ctx, createBatchRequest(elems), isBatch)
+			res, sb, err := s.BackendGroups[group.backendGroup].Forward(ctx, createBatchRequest(elems), isBatch)
+			servedBy[sb] = true
 			if err != nil {
+				if errors.Is(err, ErrConsensusGetReceiptsCantBeBatched) ||
+					errors.Is(err, ErrConsensusGetReceiptsInvalidTarget) {
+					return nil, false, "", err
+				}
 				log.Error(
 					"error forwarding RPC batch",
 					"batch_size", len(elems),
@@ -514,7 +557,15 @@ func (s *Server) handleBatchRPC(ctx context.Context, reqs []json.RawMessage, isL
 		}
 	}
 
-	return responses, cached, nil
+	servedByString := ""
+	for sb, _ := range servedBy {
+		if servedByString != "" {
+			servedByString += ", "
+		}
+		servedByString += sb
+	}
+
+	return responses, cached, servedByString, nil
 }
 
 func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
@@ -530,51 +581,7 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 		log.Error("error upgrading client conn", "auth", GetAuthCtx(ctx), "req_id", GetReqID(ctx), "err", err)
 		return
 	}
-
-	origin := r.Header.Get("Origin")
-	userAgent := r.Header.Get("User-Agent")
-	// Use XFF in context since it will automatically be replaced by the remote IP
-	xff := stripXFF(GetXForwardedFor(ctx))
-	isUnlimitedOrigin := s.isUnlimitedOrigin(origin)
-	isUnlimitedUserAgent := s.isUnlimitedUserAgent(userAgent)
-
-	if xff == "" {
-		writeRPCError(ctx, w, nil, ErrInvalidRequest("request does not include a remote IP"))
-		return
-	}
-
-	isLimited := func(method string) bool {
-		isGloballyLimitedMethod := s.isGlobalLimit(method)
-		if !isGloballyLimitedMethod && (isUnlimitedOrigin || isUnlimitedUserAgent) {
-			return false
-		}
-
-		var lim FrontendRateLimiter
-		if method == "" {
-			lim = s.mainLim
-		} else {
-			lim = s.overrideLims[method]
-		}
-
-		if lim == nil {
-			return false
-		}
-
-		ok, err := lim.Take(context.Background(), xff)
-		if err != nil {
-			log.Warn("error taking rate limit", "err", err)
-			return true
-		}
-		return !ok
-	}
-
-	isRateLimitSender := func(ctx context.Context, req *RPCReq) error {
-		if s.senderLim != nil {
-			return s.rateLimitSender(ctx, req)
-		} else {
-			return nil
-		}
-	}
+	clientConn.SetReadLimit(s.maxBodySize)
 
 	proxier, err := s.wsBackendGroup.ProxyWS(ctx, clientConn, s.wsMethodWhitelist)
 	if err != nil {
@@ -588,9 +595,8 @@ func (s *Server) HandleWS(w http.ResponseWriter, r *http.Request) {
 
 	activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Inc()
 	go func() {
-		proxyWSServerLimiter := WSServerLimiter{isLimited: isLimited, isRateLimitSender: isRateLimitSender, maxBodySize: s.maxBodySize}
 		// Below call blocks so run it in a goroutine.
-		if err := proxier.Proxy(ctx, &proxyWSServerLimiter); err != nil {
+		if err := proxier.Proxy(ctx); err != nil {
 			log.Error("error proxying websocket", "auth", GetAuthCtx(ctx), "req_id", GetReqID(ctx), "err", err)
 		}
 		activeClientWsConnsGauge.WithLabelValues(GetAuthCtx(ctx)).Dec()
@@ -611,16 +617,7 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 	}
 	ctx := context.WithValue(r.Context(), ContextKeyXForwardedFor, xff) // nolint:staticcheck
 
-	if s.authenticatedPaths == nil {
-		// handle the edge case where auth is disabled
-		// but someone sends in an auth key anyway
-		if authorization != "" {
-			log.Info("blocked authenticated request against unauthenticated proxy")
-			httpResponseCodesTotal.WithLabelValues("404").Inc()
-			w.WriteHeader(404)
-			return nil
-		}
-	} else {
+	if len(s.authenticatedPaths) > 0 {
 		if authorization == "" || s.authenticatedPaths[authorization] == "" {
 			log.Info("blocked unauthorized request", "authorization", authorization)
 			httpResponseCodesTotal.WithLabelValues("401").Inc()
@@ -628,7 +625,7 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 			return nil
 		}
 
-		ctx = context.WithValue(r.Context(), ContextKeyAuth, s.authenticatedPaths[authorization]) // nolint:staticcheck
+		ctx = context.WithValue(ctx, ContextKeyAuth, s.authenticatedPaths[authorization]) // nolint:staticcheck
 	}
 
 	return context.WithValue(
@@ -636,6 +633,14 @@ func (s *Server) populateContext(w http.ResponseWriter, r *http.Request) context
 		ContextKeyReqID, // nolint:staticcheck
 		randStr(10),
 	)
+}
+
+func randStr(l int) string {
+	b := make([]byte, l)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(b)
 }
 
 func (s *Server) isUnlimitedOrigin(origin string) bool {
@@ -688,25 +693,43 @@ func (s *Server) rateLimitSender(ctx context.Context, req *RPCReq) error {
 		return ErrInvalidParams(err.Error())
 	}
 
+	// Check if the transaction is for the expected chain,
+	// otherwise reject before rate limiting to avoid replay attacks.
+	if !s.isAllowedChainId(tx.ChainId()) {
+		log.Debug("chain id is not allowed", "req_id", GetReqID(ctx))
+		return txpool.ErrInvalidSender
+	}
+
 	// Convert the transaction into a Message object so that we can get the
 	// sender. This method performs an ecrecover, which can be expensive.
-	msg, err := tx.AsMessage(types.LatestSignerForChainID(tx.ChainId()), nil)
+	msg, err := core.TransactionToMessage(tx, types.LatestSignerForChainID(tx.ChainId()), nil)
 	if err != nil {
 		log.Debug("could not get message from transaction", "err", err, "req_id", GetReqID(ctx))
 		return ErrInvalidParams(err.Error())
 	}
-
-	ok, err := s.senderLim.Take(ctx, fmt.Sprintf("%s:%d", msg.From().Hex(), tx.Nonce()))
+	ok, err := s.senderLim.Take(ctx, fmt.Sprintf("%s:%d", msg.From.Hex(), tx.Nonce()))
 	if err != nil {
 		log.Error("error taking from sender limiter", "err", err, "req_id", GetReqID(ctx))
 		return ErrInternal
 	}
 	if !ok {
-		log.Debug("sender rate limit exceeded", "sender", msg.From(), "req_id", GetReqID(ctx))
+		log.Debug("sender rate limit exceeded", "sender", msg.From.Hex(), "req_id", GetReqID(ctx))
 		return ErrOverSenderRateLimit
 	}
 
 	return nil
+}
+
+func (s *Server) isAllowedChainId(chainId *big.Int) bool {
+	if s.allowedChainIds == nil || len(s.allowedChainIds) == 0 {
+		return true
+	}
+	for _, id := range s.allowedChainIds {
+		if chainId.Cmp(id) == 0 {
+			return true
+		}
+	}
+	return false
 }
 
 func setCacheHeader(w http.ResponseWriter, cached bool) {

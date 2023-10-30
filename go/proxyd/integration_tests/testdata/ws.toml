@@ -4,18 +4,15 @@ ws_backend_group = "main"
 
 ws_method_whitelist = [
   "eth_subscribe",
-  "eth_accounts",
-  "eth_sendRawTransaction"
+  "eth_accounts"
 ]
 
 [server]
 rpc_port = 8545
 ws_port = 8546
-max_body_size_bytes = 10000
 
 [backend]
 response_timeout_seconds = 1
-max_response_size_bytes = 10000
 
 [backends]
 [backends.good]
@@ -29,11 +26,3 @@ backends = ["good"]
 
 [rpc_method_mappings]
 eth_chainId = "main"
-
-[rate_limit]
-enable_backend_rate_limiter = true
-
-[sender_rate_limit]
-enabled = true
-limit = 10000
-interval = "1s"
