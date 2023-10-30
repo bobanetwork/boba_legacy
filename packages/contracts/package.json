@@ -109,7 +109,7 @@
     "hardhat-gas-reporter": "^1.0.4",
     "hardhat-output-validator": "^0.1.18",
     "istanbul": "^0.4.5",
-    "lint-staged": "11.0.0",
+    "lint-staged": "15.0.2",
     "lodash": "^4.17.21",
     "merkle-patricia-tree": "^4.0.0",
     "merkletreejs": "^0.2.18",

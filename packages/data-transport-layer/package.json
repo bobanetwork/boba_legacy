@@ -84,7 +84,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-unicorn": "^32.0.1",
     "hardhat": "^2.12.5",
-    "lint-staged": "11.0.0",
+    "lint-staged": "15.0.2",
     "mocha": "^8.4.0",
     "pino-pretty": "^10.0.1",
     "prettier": "^2.3.1",

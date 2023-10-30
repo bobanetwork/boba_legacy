@@ -6,7 +6,7 @@
   "devDependencies": {
     "@types/prettier": "2.7.2",
     "prettier": "^2.2.1",
-    "lint-staged": "11.0.0"
+    "lint-staged": "15.0.2"
   },
   "scripts": {
     "lint": "yarn lint:fix && yarn lint:check",
