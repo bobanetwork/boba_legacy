@@ -418,7 +418,7 @@ services:
     environment:
       L1_NODE_WEB3_URL: http://l1_chain:8545
       L1_CONFIRMATIONS: 8
-      L2_NODE_WEB3_URL: http://l2geth:8545
+      L2_NODE_WEB3_URL: http://replica:8545
       L2_CHECK_INTERVAL: 10
       VERIFIER_WEB3_URL: http://verifier:8545
       ADDRESS_MANAGER_ADDRESS: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
