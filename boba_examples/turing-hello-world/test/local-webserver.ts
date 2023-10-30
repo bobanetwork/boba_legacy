@@ -204,7 +204,7 @@ if (hre.network.name === "boba_local") {
 
     it('Should fund your Turing helper contract in turingCredit', async () => {
 
-      const depositAmount = utils.parseEther('0.5')
+      const depositAmount = utils.parseEther('1.5')
       const preBalance = await turingCredit.prepaidBalance(helper.address)
 
       const bobaBalance = await L2BOBAToken.balanceOf(deployerWallet.address)
@@ -283,7 +283,6 @@ if (hre.network.name === "boba_local") {
     it("should charge extra gas for L1 calldata storage", async() => {
       const g1 = (await hello.estimateGas.multArray(urlStr2, 1, 10, gasOverride)).toNumber()
       const g2 = (await hello.estimateGas.multArray(urlStr2, 101, 10, gasOverride)).toNumber()
-
       // Larger calldata costs more gas inside the contract itself. We need to test for
       // additional usage on top of this from the L1 calldata calculation. The exact value
       // depends on the L1 gas price so this test doesn't look for a specific number
@@ -304,11 +303,57 @@ if (hre.network.name === "boba_local") {
       expect(result).to.equal(nElem * 55)
     })
 
+    it("should allow repeated calls (legacy support)", async () => {
+      await hello.estimateGas.callTwice(urlStr, '6', '6', 1, gasOverride)
+      let tr = await hello.callTwice(urlStr, '6', '6', 1, gasOverride)
+      const res = await tr.wait()
+      expect(res).to.be.ok
+
+      const ev = res.events.find(e => e.event === "MultFloatNumbers")
+      const result = parseInt(ev.data.slice(-64), 16) / 100
+      expect(result.toFixed(5)).to.equal('904.78000')
+    })
+
+    it("should disallow repeated calls with different input", async () => {
+      try {
+        await hello.estimateGas.callTwice(urlStr, '6', '7', 1, gasOverride)
+        expect(1).to.equal(0)
+      } catch (e) {
+        // generic error code indicating that a tx reverted
+        expect(e.error.toString()).to.contain("gas required exceeds allowance")
+      }
+
+      try {
+        let tr = await hello.callTwice(urlStr, '6', '7', 1, gasOverride)
+        const res = await tr.wait()
+        expect(1).to.equal(0)
+      } catch (e) {
+        expect(e.toString()).to.contain("transaction failed")
+      }
+    })
+
+   it("should disallow repeated calls at different depth", async () => {
+      try {
+        await hello.estimateGas.callTwice(urlStr, '8', '8', 2, gasOverride)
+        expect(1).to.equal(0)
+      } catch (e) {
+        expect(e.error.toString()).to.contain("gas required exceeds allowance")
+      }
+       try {
+        let tr = await hello.callTwice(urlStr, '8', '8', 2, gasOverride)
+	const res = await tr.wait()
+        expect(1).to.equal(0)
+      } catch (e) {
+        expect(e.toString()).to.contain("transaction failed")
+      }
+   })
+
     it("final balance", async () => {
       const postBalance = await turingCredit.prepaidBalance(
         helper.address
       )
-      //expect(postBalance).to.equal( utils.parseEther('0.5'))
+      // Change expected value if tests are added or skipped above
+      expect(postBalance).to.equal( utils.parseEther('0.9'))
     })
   })
 } else {

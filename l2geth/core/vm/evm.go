@@ -749,6 +749,14 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 			// We are in Verifier/Replica mode
 			// Turing for this Transaction has already been run elsewhere - replay using
 			// information from the EVM context
+			if evm.Context.TuringInput == nil {
+				evm.Context.TuringInput = make([]byte, len(input))
+				copy(evm.Context.TuringInput, input)
+				evm.Context.TuringVMDepth = evm.depth
+			} else if !bytes.Equal(input, evm.Context.TuringInput) || evm.depth != evm.Context.TuringVMDepth {
+				log.Debug("TURING ERROR: evm.Context.Turing already set")
+				return nil, gas, ErrTuringDepth
+			}
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Trace("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
 		}
