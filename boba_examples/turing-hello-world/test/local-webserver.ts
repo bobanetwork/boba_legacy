@@ -1,5 +1,4 @@
-import { BigNumber, Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
-import { ethers } from 'hardhat'
+import { Contract, ContractFactory, providers, Wallet, utils } from 'ethers'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
@@ -280,14 +279,26 @@ if (hre.network.name === "boba_local") {
       }
     })
 
-    it("should charge extra gas for L1 calldata storage", async() => {
-      const g1 = (await hello.estimateGas.multArray(urlStr2, 1, 10, gasOverride)).toNumber()
-      const g2 = (await hello.estimateGas.multArray(urlStr2, 101, 10, gasOverride)).toNumber()
+     it("should charge extra gas for L1 calldata storage", async() => {
+      const eg1 = (await hello.estimateGas.multArray(urlStr2, 1, 10, gasOverride)).toNumber()
+      let tx1 = await hello.multArray(urlStr2, 1, 10, gasOverride)
+      const res1 = await tx1.wait()
+      expect(res1).to.be.ok
+      const ag1 = res1.gasUsed.toNumber()
+
+      const eg2 = (await hello.estimateGas.multArray(urlStr2, 101, 10, gasOverride)).toNumber()
+      let tx2 = await hello.multArray(urlStr2, 101, 10, gasOverride)
+      const res2 = await tx2.wait()
+      expect(res2).to.be.ok
+      const ag2 = res2.gasUsed.toNumber()
+
       // Larger calldata costs more gas inside the contract itself. We need to test for
       // additional usage on top of this from the L1 calldata calculation. The exact value
-      // depends on the L1 gas price so this test doesn't look for a specific number
-      expect (g2 - g1).to.be.above(110000)
-    })
+      // depends on the L1 gas price so this test doesn't look for a specific number.
+      // Actual tx is a different code path than estimateGas so both are checked.
+      expect (eg2 - eg1).to.be.above(110000)
+      expect (ag2 - ag1).to.be.above(110000)
+   })
 
     it("should support a large response", async() => {
       const nElem = 2038
@@ -353,7 +364,7 @@ if (hre.network.name === "boba_local") {
         helper.address
       )
       // Change expected value if tests are added or skipped above
-      expect(postBalance).to.equal( utils.parseEther('0.9'))
+      expect(postBalance).to.equal(utils.parseEther('0.7'))
     })
   })
 } else {

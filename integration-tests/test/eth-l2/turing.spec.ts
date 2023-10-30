@@ -73,7 +73,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
     ).attach(L1StandardBridgeAddress)
     /* eslint-disable */
     const http = require('http')
-      const ip = require('ip')
+    const ip = require('ip')
     // start local server
     const server = (module.exports = http
       .createServer(async function (req, res) {
@@ -114,7 +114,7 @@ describe('Turing 256 Bit Random Number Test', async () => {
           res.end('Expected content-type: application/json')
         }
       })
-    .listen(apiPort))
+      .listen(apiPort))
     URL = `http://${ip.address()}:${apiPort}/echo`
     /* eslint-enable */
   })
@@ -267,13 +267,23 @@ describe('Turing 256 Bit Random Number Test', async () => {
     } catch (e) {
       expect(e.error.toString()).to.contain('SERVER_ERROR')
     }
+    try {
+      await random.MixedInput(URL, 123, 999, { gasLimit: 11_000_000 })
+    } catch (e) {
+      expect(e.error.toString()).to.contain('SERVER_ERROR')
+    }
   })
 
   // Should reject a 2nd call from a different EVM depth.
   it('should disallow nested Turing calls', async () => {
     try {
-      const tr = await random.NestedRandom(1)
+      await random.estimateGas.NestedRandom(1)
       expect(1).to.equal(0)
+    } catch (e) {
+      expect(e.error.toString()).to.contain('SERVER_ERROR')
+    }
+    try {
+      const tr = await random.NestedRandom(1, { gasLimit: 11_000_000 })
     } catch (e) {
       expect(e.error.toString()).to.contain('SERVER_ERROR')
     }

@@ -757,6 +757,23 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 				log.Debug("TURING ERROR: evm.Context.Turing already set")
 				return nil, gas, ErrTuringDepth
 			}
+
+			// For compatibility, only apply a charge beyond the legacy size limit
+			if isTuring2 {
+				if len(evm.Context.Turing) > 160 {
+					feePerByte := evm.Context.TuringGasMul * 500.0 / 32.0
+					turingGas = uint64(float64(len(evm.Context.Turing)) * feePerByte)
+				}
+
+				if contract.Gas <= turingGas {
+					log.Debug("TURING ERROR: Insufficient gas for calldata", "have", contract.Gas, "need", turingGas)
+					return nil, 0, ErrTuringTooLong
+				} else {
+					log.Debug("TURING Deducting calldata gas", "had", contract.Gas, "len", len(evm.Context.Turing), "Mul", evm.Context.TuringGasMul, "deducting", turingGas)
+					contract.UseGas(turingGas)
+				}
+			}
+
 			ret, err = run(evm, contract, evm.Context.Turing, false)
 			log.Trace("TURING REPLAY", "evm.Context.Turing", evm.Context.Turing)
 		}
