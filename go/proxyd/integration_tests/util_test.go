@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -123,7 +122,6 @@ type ProxydWSClient struct {
 	conn    *websocket.Conn
 	msgCB   ProxydWSClientOnMessage
 	closeCB ProxydWSClientOnClose
-	mu      sync.Mutex
 }
 
 type WSMessage struct {
@@ -136,11 +134,10 @@ type ProxydWSClientOnClose func(err error)
 
 func NewProxydWSClient(
 	url string,
-	header http.Header,
 	msgCB ProxydWSClientOnMessage,
 	closeCB ProxydWSClientOnClose,
 ) (*ProxydWSClient, error) {
-	conn, _, err := websocket.DefaultDialer.Dial(url, header) // nolint:bodyclose
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil) // nolint:bodyclose
 	if err != nil {
 		return nil, err
 	}
@@ -178,8 +175,6 @@ func (h *ProxydWSClient) SoftClose() error {
 }
 
 func (h *ProxydWSClient) WriteMessage(msgType int, msg []byte) error {
-	h.mu.Lock()
-	defer h.mu.Unlock()
 	return h.conn.WriteMessage(msgType, msg)
 }
 
