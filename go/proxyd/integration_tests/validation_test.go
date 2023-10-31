@@ -1,6 +1,7 @@
 package integration_tests
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -10,14 +11,12 @@ import (
 )
 
 const (
-	notWhitelistedResponse         = `{"jsonrpc":"2.0","error":{"code":-32001,"message":"rpc method is not whitelisted custom message"},"id":999}`
-	parseErrResponse               = `{"jsonrpc":"2.0","error":{"code":-32700,"message":"parse error"},"id":null}`
-	invalidJSONRPCVersionResponse  = `{"error":{"code":-32600,"message":"invalid JSON-RPC version"},"id":null,"jsonrpc":"2.0"}`
-	invalidIDResponse              = `{"error":{"code":-32600,"message":"invalid ID"},"id":null,"jsonrpc":"2.0"}`
-	invalidMethodResponse          = `{"error":{"code":-32600,"message":"no method specified"},"id":null,"jsonrpc":"2.0"}`
-	invalidBatchLenResponse        = `{"error":{"code":-32600,"message":"must specify at least one batch call"},"id":null,"jsonrpc":"2.0"}`
-	invalidRateLimitResponse       = `{"jsonrpc":"2.0","error":{"code":-32000,"message":"over rate limit with special message"},"id":1}`
-	invalidSenderRateLimitResponse = `{"jsonrpc":"2.0","error":{"code":-32017,"message":"sender is over rate limit"},"id":1}`
+	notWhitelistedResponse        = `{"jsonrpc":"2.0","error":{"code":-32001,"message":"rpc method is not whitelisted custom message"},"id":999}`
+	parseErrResponse              = `{"jsonrpc":"2.0","error":{"code":-32700,"message":"parse error"},"id":null}`
+	invalidJSONRPCVersionResponse = `{"error":{"code":-32600,"message":"invalid JSON-RPC version"},"id":null,"jsonrpc":"2.0"}`
+	invalidIDResponse             = `{"error":{"code":-32600,"message":"invalid ID"},"id":null,"jsonrpc":"2.0"}`
+	invalidMethodResponse         = `{"error":{"code":-32600,"message":"no method specified"},"id":null,"jsonrpc":"2.0"}`
+	invalidBatchLenResponse       = `{"error":{"code":-32600,"message":"must specify at least one batch call"},"id":null,"jsonrpc":"2.0"}`
 )
 
 func TestSingleRPCValidation(t *testing.T) {
@@ -28,7 +27,7 @@ func TestSingleRPCValidation(t *testing.T) {
 
 	config := ReadConfig("whitelist")
 	client := NewProxydClient("http://127.0.0.1:8545")
-	shutdown, err := proxyd.Start(config)
+	_, shutdown, err := proxyd.Start(config)
 	require.NoError(t, err)
 	defer shutdown()
 
@@ -112,7 +111,7 @@ func TestBatchRPCValidation(t *testing.T) {
 
 	config := ReadConfig("whitelist")
 	client := NewProxydClient("http://127.0.0.1:8545")
-	shutdown, err := proxyd.Start(config)
+	_, shutdown, err := proxyd.Start(config)
 	require.NoError(t, err)
 	defer shutdown()
 
@@ -227,6 +226,31 @@ func TestBatchRPCValidation(t *testing.T) {
 			require.Equal(t, tt.reqCount, len(goodBackend.Requests()))
 		})
 	}
+}
+
+func TestSizeLimits(t *testing.T) {
+	goodBackend := NewMockBackend(BatchedResponseHandler(200, goodResponse))
+	defer goodBackend.Close()
+
+	require.NoError(t, os.Setenv("GOOD_BACKEND_RPC_URL", goodBackend.URL()))
+
+	config := ReadConfig("size_limits")
+	client := NewProxydClient("http://127.0.0.1:8545")
+	_, shutdown, err := proxyd.Start(config)
+	require.NoError(t, err)
+	defer shutdown()
+
+	payload := strings.Repeat("barf", 1024*1024)
+	out, code, err := client.SendRequest([]byte(fmt.Sprintf(`{"jsonrpc": "2.0", "method": "eth_chainId", "params": [%s], "id": 1}`, payload)))
+	require.NoError(t, err)
+	require.Equal(t, `{"jsonrpc":"2.0","error":{"code":-32021,"message":"request body too large"},"id":null}`, strings.TrimSpace(string(out)))
+	require.Equal(t, 413, code)
+
+	// The default response is already over the size limit in size_limits.toml.
+	out, code, err = client.SendRequest([]byte(`{"jsonrpc": "2.0", "method": "eth_chainId", "params": [], "id": 1}`))
+	require.NoError(t, err)
+	require.Equal(t, `{"jsonrpc":"2.0","error":{"code":-32020,"message":"backend response too large"},"id":1}`, strings.TrimSpace(string(out)))
+	require.Equal(t, 500, code)
 }
 
 func asArray(in ...string) string {
