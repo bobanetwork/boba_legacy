@@ -16,6 +16,10 @@ let DiscretionaryExitFee: Contract
 let L2NFTBridgeContract: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  if ((hre as any).deployConfig.isLightMode) {
+    console.log('Skipping deployment function as in light mode..')
+    return;
+  }
   const isLocalAltL1 = (hre as any).deployConfig.isLocalAltL1
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)

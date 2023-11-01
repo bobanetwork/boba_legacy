@@ -6,9 +6,9 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: L2LiquidityPool
-    network: boba
+    network: goerli
     source:
-      address: '0x8d3866a79aA780BA3DC1a300a1567635F3754a0e'
+      address: '0x0000000000000000000000000000000000000000'
       abi: L2LiquidityPool
     mapping:
       kind: ethereum/events
@@ -36,9 +36,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: OVM_L2StandardBridge
-    network: boba
+    network: goerli
     source:
-      address: '0x4200000000000000000000000000000000000010'
+      address: '0x0000000000000000000000000000000000000000'
       abi: OVM_L2StandardBridge
     mapping:
       kind: ethereum/events
@@ -60,9 +60,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: GovernorBravoDelegate
-    network: boba
+    network: goerli
     source:
-      address: '0x472e5C097C790c6a44366a89a987Ec996A4d83e0'
+      address: '0x0000000000000000000000000000000000000000'
       abi: GovernorBravoDelegate
     mapping:
       kind: ethereum/events
@@ -100,9 +100,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: Boba_GasPriceOracle
-    network: boba
+    network: goerli
     source:
-      address: '0x7F974A09a251dEA6b75af3e0A0e29D1133DaCf4b'
+      address: '0x0000000000000000000000000000000000000000'
       abi: Boba_GasPriceOracle
     mapping:
       kind: ethereum/events
@@ -124,9 +124,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: TuringMonsters
-    network: boba
+    network: goerli
     source:
-      address: '0x757b8E819d91659844E44F2141402831B60Fa4EE'
+      address: '0x0000000000000000000000000000000000000000'
       abi: TuringMonsters
     mapping:
       kind: ethereum/events
@@ -145,9 +145,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: TuringHelperFactory
-    network: boba
+    network: goerli
     source:
-      address: '0x58dDFB37998584991d8b75F87baf0A3428dD095e'
+      address: '0x0000000000000000000000000000000000000000'
       abi: TuringHelperFactory
     mapping:
       kind: ethereum/events
@@ -165,9 +165,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: Teleportation
-    network: boba
+    network: goerli
     source:
-      address: '0xf4d179d3a083Fa3Eede935FaF4C679D32d514186'
+      address: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13'
       abi: Teleportation
     mapping:
       kind: ethereum/events

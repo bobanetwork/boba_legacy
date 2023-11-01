@@ -54,6 +54,14 @@ Audits outstanding.
 - Teleportation deployed to: `0x46FA6144C61d2bb9aCDc3Ca90C8673dd9B6caEB2`
 - Proxy__Teleportation deployed to: `0xf4d179d3a083Fa3Eede935FaF4C679D32d514186`
 
+### Arbitrum Goerli
+- Teleportation deployed to: `0x81F27a114A25ac1c6186fC36888B1b120a46a650`
+- Proxy__Teleportation deployed to: `0x7063f59e1Db3e505D844d11A71C78F92D39E5963`
+
+### Optimism Goerli
+- Teleportation deployed to: `0x885bfeC3D89755d2bCc1e73b6EeEEae94D54eBE4`
+- Proxy__Teleportation deployed to: `0xC226F132A686A08018431C913d87693396246024`
+
 
 ---
 
@@ -66,7 +74,7 @@ Audits outstanding.
 ## Contract params
 This section describes how whitelisted routes between networks can be configured. By default no asset can be bridged, not even the native asset - all need to be explicitly whitelisted.
 
-Asset support is configured on-chain on the Teleportation contract via 
+Asset support is configured on-chain on the Teleportation contract via
 `function addSupportedToken(address _token, uint32 _toChainId, uint256 _minDepositAmount, uint256 _maxDepositAmount, uint256 _maxTransferAmountPerDay)`.
 
 ### Indicate support

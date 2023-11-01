@@ -24,6 +24,10 @@ const getTimestamp = async (hre) => {
 }
 
 const deployFn: DeployFunction = async (hre) => {
+  if ((hre as any).deployConfig.isLightMode) {
+    console.log('Skipping deployment function as in light mode..')
+    return;
+  }
   if ((hre as any).deployConfig.isLocalAltL1) {
     return
   }
