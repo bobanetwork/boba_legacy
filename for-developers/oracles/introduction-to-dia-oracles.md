@@ -1,5 +1,5 @@
 ---
-description: Ecosystem Price Oracles
+description: A comprehensive guide to use DIA
 ---
 
 # Introduction to DIA Oracles
@@ -8,9 +8,9 @@ description: Ecosystem Price Oracles
 
 [DIA](https://diadata.org/) is a cross-chain oracle provider that sources granular market data from diverse exchanges, including CEXs, DEXs, and NFT marketplaces. Its data sourcing is thorough, enabling unparalleled transparency and customizability for resilient price feeds for 20,000+ assets. Its versatile data processing and delivery ensures adaptability and reliability for any decentralized application.
 
-#### [Oracle configuration settings](#user-content-fn-1)[^1]
+#### Oracle configuration settings
 
-**Oracle specifications:**
+Oracle specifications:
 
 **Methodology: VWAPIR**
 
@@ -56,6 +56,7 @@ Here is an example of how to access a price value on DIA oracles:
 1. Access your custom oracle smart contract on Boba.
 2. Call getValue(pair\_name) with pair\_name being the full pair name such as BTC/USD. You can use the "Read" section on the explorer to execute this call.
 3. The response of the call contains two values:
+4.
    1. The current asset price in USD with a fix-comma notation of 8 decimals.
    2. The UNIX timestamp of the last oracle update.
 
@@ -66,5 +67,3 @@ You can find DIA's oracle integration samples in Solidity and Vyper languages by
 ### Support
 
 For assistance, connect with the DIA team directly on[ ](https://chat.openai.com/c/d2ca764b-00d6-4de7-8555-0cc30ac416b1)[Discord](https://discord.gg/dia-dao) or [Telegram](https://t.me/diadata\_org). Developers seeking other specialized, production-grade oracle with tailored price feeds and configurations can initiate the request here: [Request a Custom Oracle | DIA Documentation](https://docs.diadata.org/introduction/intro-to-dia-oracles/request-an-oracle)
-
-[^1]: 
