@@ -65,7 +65,7 @@ Here, `value` is the price to submit, note: in decimals as returned by the contr
 
 For more info please refer to:
 
-[\[contracts\]](../oracles/oracle.md)
+[\[contracts\]](../../oracles/oracle.md)
 
 [\[examples\]](../../boba\_examples/boba-straw/)
 
