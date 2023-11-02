@@ -1,7 +1,7 @@
 ---
 description: >-
   A collection of links and addresses to get started on Boba-Avalanche. Notice:
-  Boba Avalanche has been shutdown on 31. October 2023.
+  Boba Avalanche has been shutdown on October 31, 2023.
 ---
 
 # Contract Addresses Boba/Avalanche
