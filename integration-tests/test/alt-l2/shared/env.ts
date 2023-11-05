@@ -9,7 +9,7 @@ import {
   CrossChainMessenger,
   MessageStatus,
   MessageDirection,
-} from '@eth-optimism/sdk'
+} from '@bobanetwork/sdk'
 
 /* Imports: Internal */
 import {

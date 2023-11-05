@@ -1,7 +1,7 @@
-import { expect } from '@boba/teleportation/test/setup'
+import {expect} from '@bobanetwork/teleportation/test/setup'
 
 /* External Imports */
-import { ethers } from 'hardhat'
+import {ethers} from 'hardhat'
 import {
   BigNumber,
   Contract,
@@ -10,22 +10,23 @@ import {
   utils,
   Wallet,
 } from 'ethers'
-import { orderBy } from 'lodash'
+import {orderBy} from 'lodash'
 
 /* Imports: Artifacts */
-import TeleportationJson from '@boba/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
-import L1ERC20Json from '@boba/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
+import TeleportationJson from '@bobanetwork/contracts/artifacts/contracts/Teleportation.sol/Teleportation.json'
+import L1ERC20Json from '@bobanetwork/contracts/artifacts/contracts/test-helpers/L1ERC20.sol/L1ERC20.json'
 
 /* Imports: Interface */
-import { ChainInfo } from '@boba/teleportation/src/utils/types'
+import {ChainInfo} from '@bobanetwork/teleportation/src/utils/types'
 
 /* Imports: Core */
-import { TeleportationService } from '@boba/teleportation/src/service'
+import {TeleportationService} from '@bobanetwork/teleportation/src/service'
 import {
   AppDataSource,
   historyDataRepository,
-} from '@boba/teleportation/src/data-source'
-import { OptimismEnv } from './shared/env'
+} from '@bobanetwork/teleportation/src/data-source'
+import {OptimismEnv} from './shared/env'
+import {Asset} from "@bobanetwork/teleportation/src";
 
 describe('teleportation', () => {
   let env: OptimismEnv
@@ -61,19 +62,25 @@ describe('teleportation', () => {
   })
 
   let chainId: number
-  let chainIdBnb: number
+  let chainIdBobaBnb: number
   let Factory__Teleportation: ContractFactory
   let Teleportation: Contract
   let TeleportationBNB: Contract
 
   let Factory__L2BOBA: ContractFactory
   let L2BOBA: Contract
-  let L2BobaOnBobaBnb: Contract
+  let L2BNBOnBobaBnb: Contract
   let L2BNBOnBobaEth: Contract
+
+  // Here to have an easy way to modify globally
+  const airdropConfig = {
+    airdropAmountWei: ethers.utils.parseEther('1'),
+    airdropCooldownSeconds: 1000,
+  }
 
   before(async () => {
     chainId = (await ethers.provider.getNetwork()).chainId
-    chainIdBnb = chainId + 1
+    chainIdBobaBnb = chainId + 1
 
     Factory__Teleportation = new ethers.ContractFactory(
       TeleportationJson.abi,
@@ -127,8 +134,8 @@ describe('teleportation', () => {
         teleportationAddress: Teleportation.address,
         height: 0,
         supportedAssets: {
-          [L2BOBA.address?.toLowerCase()]: 'BOBA',
-          [ethers.constants.AddressZero?.toLowerCase()]: 'ETH',
+          [L2BOBA.address?.toLowerCase()]: Asset.BOBA,
+          [ethers.constants.AddressZero?.toLowerCase()]: Asset.ETH,
         },
       },
       // bnb will be added in routing tests to have cleaner before hooks
@@ -136,8 +143,8 @@ describe('teleportation', () => {
     selectedBobaChainsBnb = selectedBobaChains
   })
 
-  const startTeleportationService = async (useBnb?: boolean) => {
-    const chainIdToUse = useBnb ? chainIdBnb : chainId
+  const startTeleportationService = async (useBnb?: boolean, airdropEnabled?: boolean) => {
+    const chainIdToUse = useBnb ? chainIdBobaBnb : chainId
 
     return new TeleportationService({
       l2RpcProvider: ethers.provider,
@@ -159,6 +166,10 @@ describe('teleportation', () => {
         awsKmsKeyId: process.env.TELEPORTATION_AWS_KMS_KEY_ID ?? '3',
         awsKmsEndpoint: process.env.TELEPORTATION_AWS_KMS_ENDPOINT ?? 'http://kms:8888/',
         awsKmsRegion: process.env.TELEPORTATION_AWS_KMS_REGION ?? 'us-east-1',
+        disableDisburserCheck: true,
+      },
+      airdropConfig: {
+        ...airdropConfig, airdropEnabled,
       },
     })
   }
@@ -548,7 +559,7 @@ describe('teleportation', () => {
       const teleportationService = await startTeleportationService()
       await teleportationService.init()
 
-      await historyDataRepository.delete({ chainId })
+      await historyDataRepository.delete({chainId})
 
       const latestBlock = await ethers.provider.getBlockNumber()
       const depositTeleportations = {
@@ -580,14 +591,14 @@ describe('teleportation', () => {
       await Teleportation.deployTransaction.wait()
 
       // deploy other token for routing tests
-      L2BobaOnBobaBnb = await Factory__L2BOBA.deploy(
+      L2BNBOnBobaBnb = await Factory__L2BOBA.deploy(
         utils.parseEther('100000000000'),
         'BOBA',
         'BOBA',
         18
       )
-      await L2BobaOnBobaBnb.deployTransaction.wait()
-      await L2BobaOnBobaBnb.transfer(address1, utils.parseEther('100000000'))
+      await L2BNBOnBobaBnb.deployTransaction.wait()
+      await L2BNBOnBobaBnb.transfer(address1, utils.parseEther('100000000'))
 
       // deploy other token for routing tests
       L2BNBOnBobaEth = await Factory__L2BOBA.deploy(
@@ -604,7 +615,7 @@ describe('teleportation', () => {
 
       // add the supported chain & token
       await TeleportationBNB.addSupportedToken(
-        L2BobaOnBobaBnb.address,
+        L2BNBOnBobaBnb.address,
         chainId,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,
@@ -621,14 +632,14 @@ describe('teleportation', () => {
       // add support on previous network
       await Teleportation.addSupportedToken(
         L2BNBOnBobaEth.address,
-        chainIdBnb,
+        chainIdBobaBnb,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,
         defaultMaxTransferPerDay
       )
       await Teleportation.addSupportedToken(
         L2BOBA.address,
-        chainIdBnb,
+        chainIdBobaBnb,
         defaultMinDepositAmount,
         defaultMaxDepositAmount,
         defaultMaxTransferPerDay
@@ -641,7 +652,7 @@ describe('teleportation', () => {
       // mock BNB network & overwrite prev network
       selectedBobaChains = [
         {
-          chainId: chainIdBnb,
+          chainId: chainIdBobaBnb,
           url: 'http://localhost:8545',
           provider: ethers.provider,
           testnet: true,
@@ -649,8 +660,8 @@ describe('teleportation', () => {
           teleportationAddress: TeleportationBNB.address,
           height: 0,
           supportedAssets: {
-            [L2BobaOnBobaBnb.address?.toLowerCase()]: 'BOBA',
-            [ethers.constants.AddressZero?.toLowerCase()]: 'BNB', // simulate BNB for native to token teleport
+            [L2BNBOnBobaBnb.address?.toLowerCase()]: Asset.BOBA,
+            [ethers.constants.AddressZero?.toLowerCase()]: Asset.BNB, // simulate BNB for native to token teleport
           },
         },
       ]
@@ -664,9 +675,9 @@ describe('teleportation', () => {
           teleportationAddress: Teleportation.address,
           height: 0,
           supportedAssets: {
-            [L2BOBA.address?.toLowerCase()]: 'BOBA',
-            [ethers.constants.AddressZero?.toLowerCase()]: 'ETH',
-            [L2BNBOnBobaEth.address?.toLowerCase()]: 'BNB',
+            [L2BOBA.address?.toLowerCase()]: Asset.BOBA,
+            [ethers.constants.AddressZero?.toLowerCase()]: Asset.ETH,
+            [L2BNBOnBobaEth.address?.toLowerCase()]: Asset.BNB,
           },
         },
       ]
@@ -678,12 +689,12 @@ describe('teleportation', () => {
 
       // deposit token
       const preBlockNumber = await ethers.provider.getBlockNumber()
-      await L2BobaOnBobaBnb.connect(signer).approve(
+      await L2BNBOnBobaBnb.connect(signer).approve(
         TeleportationBNB.address,
         utils.parseEther('10')
       )
       await TeleportationBNB.connect(signer).teleportAsset(
-        L2BobaOnBobaBnb.address,
+        L2BNBOnBobaBnb.address,
         utils.parseEther('10'),
         chainId // toChainId
       )
@@ -703,7 +714,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        const sourceChainId = chainIdBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
+        const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
         const depositId = event.args.depositId
         const amount = event.args.amount
         const token = event.args.token
@@ -765,7 +776,7 @@ describe('teleportation', () => {
         ethers.constants.AddressZero, // send native BNB
         utils.parseEther('10'),
         chainId, // toChainId
-        { value: utils.parseEther('10') }
+        {value: utils.parseEther('10')}
       )
 
       const blockNumber = await ethers.provider.getBlockNumber()
@@ -783,7 +794,7 @@ describe('teleportation', () => {
 
       let disbursement = []
       for (const event of events) {
-        const sourceChainId = chainIdBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
+        const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
         const depositId = event.args.depositId
         const amount = event.args.amount
         const token = event.args.token
@@ -847,7 +858,7 @@ describe('teleportation', () => {
       await Teleportation.connect(signer).teleportAsset(
         L2BNBOnBobaEth.address, // send BNB as token
         utils.parseEther('10'),
-        chainIdBnb // toChainId
+        chainIdBobaBnb // toChainId
       )
 
       const blockNumber = await ethers.provider.getBlockNumber()
@@ -896,7 +907,7 @@ describe('teleportation', () => {
       disbursement = orderBy(disbursement, ['depositId'], ['asc'])
 
       const bnbChainInfo = selectedBobaChains.find(
-        (c) => c.chainId === chainIdBnb
+        (c) => c.chainId === chainIdBobaBnb
       )
       if (!bnbChainInfo) {
         throw new Error('BNB provider not configured!')
@@ -909,7 +920,7 @@ describe('teleportation', () => {
 
       await teleportationServiceBnb._disburseTx(
         disbursement,
-        chainIdBnb,
+        chainIdBobaBnb,
         blockNumber
       )
 
@@ -926,6 +937,587 @@ describe('teleportation', () => {
         utils.parseEther('9.08'),
         utils.parseEther('10.02')
       )
+    })
+  })
+
+  describe('airdrop', () => {
+    before(async () => {
+      Factory__Teleportation = new ethers.ContractFactory(
+        TeleportationJson.abi,
+        TeleportationJson.bytecode,
+        wallet1
+      )
+
+      Teleportation = await Factory__Teleportation.deploy()
+      await Teleportation.deployTransaction.wait()
+
+      Factory__L2BOBA = new ethers.ContractFactory(
+        L1ERC20Json.abi,
+        L1ERC20Json.bytecode,
+        signer
+      )
+      L2BOBA = await Factory__L2BOBA.deploy(
+        utils.parseEther('100000000000'),
+        'BOBA',
+        'BOBA',
+        18
+      )
+      await L2BOBA.deployTransaction.wait()
+      await L2BOBA.transfer(address1, utils.parseEther('100000000'))
+
+      // intialize the teleportation contract
+      await Teleportation.initialize()
+
+
+      TeleportationBNB = await Factory__Teleportation.deploy()
+      await Teleportation.deployTransaction.wait()
+
+      // deploy other token for routing tests
+      L2BNBOnBobaBnb = await Factory__L2BOBA.deploy(
+        utils.parseEther('100000000000'),
+        'BOBA',
+        'BOBA',
+        18
+      )
+      await L2BNBOnBobaBnb.deployTransaction.wait()
+      await L2BNBOnBobaBnb.transfer(address1, utils.parseEther('100000000'))
+
+      // deploy other token for routing tests
+      L2BNBOnBobaEth = await Factory__L2BOBA.deploy(
+        utils.parseEther('100000000000'),
+        'BNB',
+        'BNB',
+        18
+      )
+      await L2BNBOnBobaEth.deployTransaction.wait()
+      await L2BNBOnBobaEth.transfer(address1, utils.parseEther('100000000'))
+
+      // intialize the teleportation contract
+      await TeleportationBNB.initialize()
+
+      // add the supported chain & token
+      await TeleportationBNB.addSupportedToken(
+        L2BNBOnBobaBnb.address,
+        chainId,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
+      await TeleportationBNB.addSupportedToken(
+        ethers.constants.AddressZero,
+        chainId,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
+
+      // add support on previous network
+      await Teleportation.addSupportedToken(
+        L2BNBOnBobaEth.address,
+        chainIdBobaBnb,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
+      await Teleportation.addSupportedToken(
+        L2BOBA.address,
+        chainIdBobaBnb,
+        defaultMinDepositAmount,
+        defaultMaxDepositAmount,
+        defaultMaxTransferPerDay
+      )
+
+      console.log(
+        `Teleportation on ETH: ${Teleportation.address} / on BNB: ${TeleportationBNB.address}`
+      )
+
+      // mock BNB network & overwrite prev network
+      selectedBobaChains = [
+        {
+          chainId: chainIdBobaBnb,
+          url: 'http://localhost:8545',
+          provider: ethers.provider,
+          testnet: true,
+          name: 'localhost:bnb',
+          teleportationAddress: TeleportationBNB.address,
+          height: 0,
+          supportedAssets: {
+            [L2BNBOnBobaBnb.address?.toLowerCase()]: Asset.BNB,
+            [ethers.constants.AddressZero]: Asset.BOBA, // simulate BNB for native to token teleport
+          },
+        },
+      ]
+      selectedBobaChainsBnb = [
+        {
+          chainId,
+          url: 'http://localhost:8545',
+          provider: ethers.provider,
+          testnet: true,
+          name: 'localhost',
+          teleportationAddress: Teleportation.address,
+          height: 0,
+          supportedAssets: {
+            [L2BOBA.address?.toLowerCase()]: Asset.BOBA,
+            [ethers.constants.AddressZero]: Asset.ETH,
+            [L2BNBOnBobaEth.address?.toLowerCase()]: Asset.BNB,
+          },
+        },
+      ]
+    })
+
+    it('receive gas on airdrop', async () => {
+      const teleportationServiceBnb = await startTeleportationService(true)
+      await teleportationServiceBnb.init()
+
+      // deposit token
+      const preBlockNumber = await ethers.provider.getBlockNumber()
+      await L2BNBOnBobaBnb.connect(signer).approve(
+        TeleportationBNB.address,
+        utils.parseEther('10')
+      )
+      await TeleportationBNB.connect(signer).teleportAsset(
+        L2BNBOnBobaBnb.address,
+        utils.parseEther('10'),
+        chainId // toChainId
+      )
+
+      const blockNumber = await ethers.provider.getBlockNumber()
+      const events = await teleportationServiceBnb._getEvents(
+        TeleportationBNB,
+        TeleportationBNB.filters.AssetReceived(),
+        preBlockNumber,
+        blockNumber
+      )
+
+      expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
+
+      const teleportationServiceEth = await startTeleportationService(false, true)
+      await teleportationServiceEth.init()
+
+      // random address to ensure balance = 0 to be eligible for airdrop
+      const randAddress = ethers.Wallet.createRandom().address
+
+      const lastEvent = events[events.length - 1]
+      const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
+      const depositId = lastEvent.args.depositId
+      const amount = lastEvent.args.amount
+      const token = lastEvent.args.token
+      const emitter = lastEvent.args.emitter
+
+      const receivingChainTokenAddr =
+        teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          token,
+          sourceChainId
+        )
+      expect(receivingChainTokenAddr).to.be.eq(
+        L2BNBOnBobaEth.address?.toLowerCase(),
+        'BNB token address on BNB not correctly routed'
+      )
+
+      let disbursement = [
+        {
+          token: receivingChainTokenAddr,
+          amount: amount.toString(),
+          addr: randAddress,
+          depositId: depositId.toNumber(),
+          sourceChainId: sourceChainId.toString(),
+        },
+      ]
+
+      console.log('Added disbursement: ', disbursement)
+
+      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+
+      const preNativeBalance = await ethers.provider.getBalance(address1)
+      const preSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+      const preTokenBalance = await L2BNBOnBobaBnb.balanceOf(address1)
+      const preSignerTokenBalance = await L2BNBOnBobaBnb.balanceOf(randAddress)
+
+      await teleportationServiceEth._disburseTx(
+        disbursement,
+        chainId,
+        blockNumber
+      )
+
+      const postNativeBalance = await ethers.provider.getBalance(address1)
+      const postSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+      const postTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const postSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(randAddress)
+
+      expect(preTokenBalance.sub(postTokenBalance)).to.be.eq(
+        utils.parseEther('10')
+      )
+      expect(postSignerTokenBalance.sub(preSignerTokenBalance)).to.be.eq(
+        utils.parseEther('10')
+      )
+      const gasDelta = ethers.utils.parseEther('0.003')
+      expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo(airdropConfig.airdropAmountWei, gasDelta)
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
+        airdropConfig.airdropAmountWei, gasDelta
+      )
+    })
+
+    it('should not receive gas on airdrop when airdrop disabled (e.g. for L1)', async () => {
+      const teleportationServiceBnb = await startTeleportationService(true)
+      await teleportationServiceBnb.init()
+
+      // deposit token
+      const preBlockNumber = await ethers.provider.getBlockNumber()
+      await L2BNBOnBobaBnb.connect(signer).approve(
+        TeleportationBNB.address,
+        utils.parseEther('10')
+      )
+      await TeleportationBNB.connect(signer).teleportAsset(
+        L2BNBOnBobaBnb.address,
+        utils.parseEther('10'),
+        chainId // toChainId
+      )
+
+      const blockNumber = await ethers.provider.getBlockNumber()
+      const events = await teleportationServiceBnb._getEvents(
+        TeleportationBNB,
+        TeleportationBNB.filters.AssetReceived(),
+        preBlockNumber,
+        blockNumber
+      )
+
+      expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
+
+      const teleportationServiceEth = await startTeleportationService(false, false)
+      await teleportationServiceEth.init()
+
+      // random address to ensure balance = 0 to be eligible for airdrop
+      const randAddress = ethers.Wallet.createRandom().address
+
+      const lastEvent = events[events.length - 1]
+      const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
+      const depositId = lastEvent.args.depositId
+      const amount = lastEvent.args.amount
+      const token = lastEvent.args.token
+      const emitter = lastEvent.args.emitter
+
+      const receivingChainTokenAddr =
+        teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          token,
+          sourceChainId
+        )
+      expect(receivingChainTokenAddr).to.be.eq(
+        L2BNBOnBobaEth.address?.toLowerCase(),
+        'BNB token address on BNB not correctly routed'
+      )
+
+      let disbursement = [
+        {
+          token: receivingChainTokenAddr,
+          amount: amount.toString(),
+          addr: randAddress,
+          depositId: depositId.toNumber(),
+          sourceChainId: sourceChainId.toString(),
+        },
+      ]
+
+      console.log('Added disbursement: ', disbursement)
+
+      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+
+      const preNativeBalance = await ethers.provider.getBalance(address1)
+      const preSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+      const preTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const preSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(randAddress)
+
+      await teleportationServiceEth._disburseTx(
+        disbursement,
+        chainId,
+        blockNumber
+      )
+
+      const postNativeBalance = await ethers.provider.getBalance(address1)
+      const postSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+      const postTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const postSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(randAddress)
+
+      expect(preTokenBalance.sub(postTokenBalance)).to.be.eq(
+        utils.parseEther('10')
+      )
+      expect(postSignerTokenBalance.sub(preSignerTokenBalance)).to.be.eq(
+        utils.parseEther('10')
+      )
+      const gasDelta = ethers.utils.parseEther('0.003')
+      expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo('0', gasDelta)
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
+        '0', gasDelta
+      )
+    })
+
+    it('should not airdrop if user has gas on destination network', async () => {
+      const teleportationServiceBnb = await startTeleportationService(true)
+      await teleportationServiceBnb.init()
+
+      // deposit token
+      const preBlockNumber = await ethers.provider.getBlockNumber()
+      await L2BNBOnBobaBnb.connect(signer).approve(
+        TeleportationBNB.address,
+        utils.parseEther('10')
+      )
+      await TeleportationBNB.connect(signer).teleportAsset(
+        L2BNBOnBobaBnb.address,
+        utils.parseEther('10'),
+        chainId // toChainId
+      )
+
+      const blockNumber = await ethers.provider.getBlockNumber()
+      const events = await teleportationServiceBnb._getEvents(
+        TeleportationBNB,
+        TeleportationBNB.filters.AssetReceived(),
+        preBlockNumber,
+        blockNumber
+      )
+
+      expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
+
+      const teleportationServiceEth = await startTeleportationService(false, true)
+      await teleportationServiceEth.init()
+
+      const lastEvent = events[events.length - 1]
+      const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
+      const depositId = lastEvent.args.depositId
+      const amount = lastEvent.args.amount
+      const token = lastEvent.args.token
+      const emitter = lastEvent.args.emitter
+
+      const receivingChainTokenAddr =
+        teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          token,
+          sourceChainId
+        )
+      expect(receivingChainTokenAddr).to.be.eq(
+        L2BNBOnBobaEth.address?.toLowerCase(),
+        'BNB token address on BNB not correctly routed'
+      )
+
+      let disbursement = [
+        {
+          token: receivingChainTokenAddr,
+          amount: amount.toString(),
+          addr: emitter,
+          depositId: depositId.toNumber(),
+          sourceChainId: sourceChainId.toString(),
+        },
+      ]
+
+      console.log('Added disbursement: ', disbursement)
+
+      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+
+      const preNativeBalance = await ethers.provider.getBalance(address1)
+      const preSignerNativeBalance = await ethers.provider.getBalance(signerAddr)
+      const preTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const preSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(signerAddr)
+
+      await teleportationServiceEth._disburseTx(
+        disbursement,
+        chainId,
+        blockNumber
+      )
+
+      const postNativeBalance = await ethers.provider.getBalance(address1)
+      const postSignerNativeBalance = await ethers.provider.getBalance(signerAddr)
+      const postTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const postSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(signerAddr)
+
+      expect(preTokenBalance.sub(postTokenBalance)).to.be.eq(
+        utils.parseEther('10')
+      )
+      expect(postSignerTokenBalance.sub(preSignerTokenBalance)).to.be.eq(
+        utils.parseEther('10')
+      )
+      const gasDelta = ethers.utils.parseEther('0.003')
+      expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo('0', gasDelta)
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.closeTo(
+        '0', gasDelta
+      )
+    })
+
+    it('should not airdrop if user bridges asset that is native on destination network', async () => {
+      const teleportationServiceETH = await startTeleportationService(false)
+      await teleportationServiceETH.init()
+
+      // deposit token
+      const amountToBridge = utils.parseEther('10')
+      const preBlockNumber = await ethers.provider.getBlockNumber()
+      await L2BOBA.connect(signer).approve(
+        Teleportation.address,
+        amountToBridge
+      )
+      await Teleportation.connect(signer).teleportAsset(
+        L2BOBA.address,
+        amountToBridge,
+        chainIdBobaBnb // toChainId
+      )
+
+      const blockNumber = await ethers.provider.getBlockNumber()
+      const events = await teleportationServiceETH._getEvents(
+        Teleportation,
+        Teleportation.filters.AssetReceived(),
+        preBlockNumber,
+        blockNumber
+      )
+
+      expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
+
+      const teleportationServiceBnb = await startTeleportationService(true, true)
+      await teleportationServiceBnb.init()
+
+      // random address to ensure balance = 0 to be eligible for airdrop
+      const randAddress = ethers.Wallet.createRandom().address
+      const lastEvent = events[events.length - 1]
+      const sourceChainId = lastEvent.args.sourceChainId
+      const depositId = lastEvent.args.depositId
+      const amount = lastEvent.args.amount
+      const token = lastEvent.args.token
+      const emitter = lastEvent.args.emitter
+
+      const receivingChainTokenAddr =
+        teleportationServiceBnb._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          token,
+          sourceChainId
+        )
+      expect(receivingChainTokenAddr).to.be.eq(
+        ethers.constants.AddressZero,
+        'BOBA token address on ETH not correctly routed'
+      )
+
+      let disbursement = [
+        {
+          token: receivingChainTokenAddr,
+          amount: amount.toString(),
+          addr: randAddress,
+          depositId: depositId.toNumber(),
+          sourceChainId: sourceChainId.toString(),
+        },
+      ]
+
+      console.log('Added disbursement: ', disbursement)
+
+      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+
+      const preNativeBalance = await ethers.provider.getBalance(address1)
+      const preSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+
+      await teleportationServiceBnb._disburseTx(
+        disbursement,
+        chainId,
+        blockNumber
+      )
+
+      const postNativeBalance = await ethers.provider.getBalance(address1)
+      const postSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+
+      const gasDelta = ethers.utils.parseEther('0.003')
+      expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo(amountToBridge, gasDelta)
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.eq(amountToBridge)
+    })
+
+    it('should not airdrop within cooldown period', async () => {
+      const teleportationServiceBnb = await startTeleportationService(true)
+      await teleportationServiceBnb.init()
+
+      // deposit token
+      const preBlockNumber = await ethers.provider.getBlockNumber()
+      await L2BNBOnBobaBnb.connect(signer).approve(
+        TeleportationBNB.address,
+        utils.parseEther('20')
+      )
+      await TeleportationBNB.connect(signer).teleportAsset(
+        L2BNBOnBobaBnb.address,
+        utils.parseEther('10'),
+        chainId // toChainId
+      )
+
+      const blockNumber = await ethers.provider.getBlockNumber()
+      const events = await teleportationServiceBnb._getEvents(
+        TeleportationBNB,
+        TeleportationBNB.filters.AssetReceived(),
+        preBlockNumber,
+        blockNumber
+      )
+
+      expect(events.length).to.be.gt(0, 'Event length must be greater than 0')
+
+      const teleportationServiceEth = await startTeleportationService(false, true)
+      await teleportationServiceEth.init()
+
+      const lastEvent = events[events.length - 1]
+      const randWallet = ethers.Wallet.createRandom().connect(Teleportation.provider)
+      const randAddress = randWallet.address
+      const sourceChainId = chainIdBobaBnb // event.args.sourceChainId -> (is correct, but we were mocking a fake chainId for testing)
+      const depositId = lastEvent.args.depositId
+      const amount = lastEvent.args.amount
+      const token = lastEvent.args.token
+      const emitter = lastEvent.args.emitter
+
+      const receivingChainTokenAddr =
+        teleportationServiceEth._getSupportedDestChainTokenAddrBySourceChainTokenAddr(
+          token,
+          sourceChainId
+        )
+      expect(receivingChainTokenAddr).to.be.eq(
+        L2BNBOnBobaEth.address?.toLowerCase(),
+        'BNB token address on BNB not correctly routed'
+      )
+
+      let disbursement = [
+        {
+          token: receivingChainTokenAddr,
+          amount: amount.toString(),
+          addr: randAddress,
+          depositId: depositId.toNumber(),
+          sourceChainId: sourceChainId.toString(),
+        },
+      ]
+
+      console.log('Added disbursements: ', disbursement)
+
+      disbursement = orderBy(disbursement, ['depositId'], ['asc'])
+
+      const preNativeBalance = await ethers.provider.getBalance(address1)
+      const preSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+      const preTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const preSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(randAddress)
+
+      await teleportationServiceEth._disburseTx(
+        disbursement,
+        chainId,
+        blockNumber
+      )
+
+      // disburse again to trigger cooldown period
+      await TeleportationBNB.connect(signer).teleportAsset(
+        L2BNBOnBobaBnb.address,
+        utils.parseEther('10'),
+        chainId // toChainId
+      )
+      disbursement[0].depositId += 1;
+      await teleportationServiceEth._disburseTx(
+        disbursement,
+        chainId,
+        blockNumber
+      )
+
+      const postNativeBalance = await ethers.provider.getBalance(address1)
+      const postSignerNativeBalance = await ethers.provider.getBalance(randAddress)
+      const postTokenBalance = await L2BNBOnBobaEth.balanceOf(address1)
+      const postSignerTokenBalance = await L2BNBOnBobaEth.balanceOf(randAddress)
+
+      expect(preTokenBalance.sub(postTokenBalance)).to.be.eq(
+        utils.parseEther('20')
+      )
+      expect(postSignerTokenBalance.sub(preSignerTokenBalance)).to.be.eq(
+        utils.parseEther('20')
+      )
+      const gasDelta = ethers.utils.parseEther('0.003')
+      expect(preNativeBalance.sub(postNativeBalance)).to.be.closeTo(airdropConfig.airdropAmountWei, gasDelta)
+      expect(postSignerNativeBalance.sub(preSignerNativeBalance)).to.be.eq(airdropConfig.airdropAmountWei)
     })
   })
 })

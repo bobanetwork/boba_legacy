@@ -4,7 +4,7 @@ import { Contract, Wallet, BigNumber, providers } from 'ethers'
 /* Imports: Internal */
 import { sleep } from '@eth-optimism/core-utils'
 import { BaseService } from '@eth-optimism/common-ts'
-import { getBobaContractABI } from '@boba/contracts'
+import { getBobaContractABI } from '@bobanetwork/contracts'
 
 /* Imports: Inteface */
 import {

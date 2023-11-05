@@ -4,7 +4,7 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 import { ethers } from 'hardhat'
 import { BigNumber, Contract, utils } from 'ethers'
-import { predeploys, getContractFactory } from '@eth-optimism/contracts'
+import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
 
 import { OptimismEnv } from './shared/env'
 

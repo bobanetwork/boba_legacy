@@ -1,7 +1,7 @@
 /* Imports: External */
 import { fromHexString, FallbackProvider } from '@eth-optimism/core-utils'
 import { BaseService, LegacyMetrics } from '@eth-optimism/common-ts'
-import { TypedEvent } from '@eth-optimism/contracts/dist/types/common'
+import { TypedEvent } from '@bobanetwork/core_contracts/dist/types/common'
 import { BaseProvider } from '@ethersproject/providers'
 import { LevelUp } from 'levelup'
 import { constants, Event } from 'ethers'
@@ -11,7 +11,7 @@ import {
   isChainIDForGraph,
   getLatestConfirmedBlock,
   isMoonbeamL1,
-} from '@eth-optimism/sdk'
+} from '@bobanetwork/sdk'
 import { orderBy } from 'lodash'
 
 /* Imports: Internal */

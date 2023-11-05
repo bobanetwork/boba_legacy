@@ -87,7 +87,7 @@ rpc = [None]*4
 while True:
   try:
     rpc[1] = Web3(Web3.HTTPProvider(os.environ['L1_NODE_WEB3_URL']))
-    assert (rpc[1].isConnected())
+    assert (rpc[1].is_connected())
     break
   except:
     logger.info ("Waiting for L1...")
@@ -99,7 +99,7 @@ logger.debug("Connected to L1_NODE_WEB3_URL")
 while True:
   try:
     rpc[2] = Web3(Web3.HTTPProvider(os.environ['L2_NODE_WEB3_URL']))
-    assert (rpc[2].isConnected())
+    assert (rpc[2].is_connected())
     break
   except:
     logger.info ("Waiting for L2...")
@@ -111,7 +111,7 @@ logger.debug("Connected to L2_NODE_WEB3_URL")
 while True:
   try:
     rpc[3] = Web3(Web3.HTTPProvider(os.environ['VERIFIER_WEB3_URL']))
-    assert (rpc[3].isConnected())
+    assert (rpc[3].is_connected())
     break
   except:
     logger.info ("Waiting for verifier...")
@@ -181,17 +181,17 @@ def doEvent(event, force_L2):
       match = "**** SCC/VERIFIER MISMATCH ****"
 
     if l2SR:
-      l2SR_str = Web3.toHex(l2SR)
+      l2SR_str = Web3.utils.toHex(l2SR)
     else:
       l2SR_str = "                                --                                "
-    log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.toHex(sr), l2SR_str, Web3.toHex(vfSR), match)
+    log_str = "{} {} {} {} {} {}".format(rCount, event.blockNumber, Web3.utils.toHex(sr), l2SR_str, Web3.utils.toHex(vfSR), match)
     matchedLock.acquire()
     if match != "":
       Matched['is_ok'] = False
       logger.warning(log_str)
     else:
       Matched['Block'] = rCount
-      Matched['Root'] = Web3.toHex(sr)
+      Matched['Root'] = Web3.utils.toHex(sr)
       Matched['Time'] = time.time()
       logger.info(log_str)
     matchedLock.release()
@@ -238,7 +238,7 @@ def fpLoop():
 
   logger.info("#SCC-IDX L1-Block SCC-STATEROOT L2-STATEROOT VERIFIER-STATEROOT MISMATCH")
 
-  topic_sig = Web3.toHex(Web3.keccak(text="StateBatchAppended(uint256,bytes32,uint256,uint256,bytes)"))
+  topic_sig = Web3.utils.toHex(Web3.keccak(text="StateBatchAppended(uint256,bytes32,uint256,uint256,bytes)"))
 
   while startBlock < l1_tip:
     toBlock = min(startBlock+batch_size, l1_tip) - 1

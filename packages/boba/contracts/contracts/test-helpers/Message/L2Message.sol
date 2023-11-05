@@ -2,7 +2,7 @@
 pragma solidity >0.7.5;
 
 /* Library Imports */
-import { CrossDomainEnabled } from "@eth-optimism/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
+import { CrossDomainEnabled } from "@bobanetwork/core_contracts/contracts/libraries/bridge/CrossDomainEnabled.sol";
 import { L1Message } from "./L1Message.sol";
 
 contract L2Message is CrossDomainEnabled {

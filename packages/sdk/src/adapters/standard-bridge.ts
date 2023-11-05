@@ -5,7 +5,7 @@ import {
   TransactionResponse,
   BlockTag,
 } from '@ethersproject/abstract-provider'
-import { getContractInterface, predeploys } from '@eth-optimism/contracts'
+import { getContractInterface, predeploys } from '@bobanetwork/core_contracts'
 import { hexStringEquals } from '@eth-optimism/core-utils'
 
 import {

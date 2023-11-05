@@ -9,12 +9,12 @@ import { getFilteredLogIndex } from './shared/utils'
 
 import { OptimismEnv } from './shared/env'
 import { hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
-import { predeploys } from '@eth-optimism/contracts'
+import { predeploys } from '@bobanetwork/core_contracts'
 // use local sdk
 import { PaymasterAPI, SimpleAccountAPI } from "@bobanetwork/bundler_sdk";
 import SimpleAccountJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/SimpleAccount.sol/SimpleAccount.json'
 import SimpleAccountFactoryJson from '@bobanetwork/accountabstraction/artifacts/contracts/samples/SimpleAccountFactory.sol/SimpleAccountFactory.json'
-import L2StandardERC20Json from '@eth-optimism/contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
+import L2StandardERC20Json from '@bobanetwork/core_contracts/artifacts/contracts/standards/L2StandardERC20.sol/L2StandardERC20.json'
 import EntryPointJson from '@bobanetwork/accountabstraction/artifacts/contracts/core/EntryPoint.sol/EntryPoint.json'
 import SampleRecipientJson from '../../artifacts/contracts/SampleRecipient.sol/SampleRecipient.json'
 import { HttpRpcClient } from '@bobanetwork/bundler_sdk/dist/HttpRpcClient'

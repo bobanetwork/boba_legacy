@@ -1,7 +1,7 @@
 /* Imports: External */
 import { Contract, Wallet, utils } from 'ethers'
 import { ethers } from 'hardhat'
-import { getContractFactory, predeploys } from '@eth-optimism/contracts'
+import { getContractFactory, predeploys } from '@bobanetwork/core_contracts'
 
 /* Imports: Internal */
 import { expect } from './shared/setup'

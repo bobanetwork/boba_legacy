@@ -124,6 +124,11 @@ func ApplyTransaction(config *params.ChainConfig, bc ChainContext, author *commo
 		}
 	}
 
+	p2 := msg.GasPrice()
+	if vmenv.ChainConfig().IsTuringCharge2Fork(vmenv.BlockNumber) && p2.BitLen() > 0 {
+		vmenv.Context.TuringGasMul = float64(l1GasPrice.Uint64()) / float64(p2.Uint64())
+	}
+
 	// Determine the L2 Boba fee if users chose BOBA as the fee token
 	feeTokenSelection := statedb.GetFeeTokenSelection(msg.From())
 

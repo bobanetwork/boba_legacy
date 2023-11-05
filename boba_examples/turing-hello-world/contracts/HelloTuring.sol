@@ -37,9 +37,36 @@ contract HelloTuring {
         return product;
     }
 
+    // Tests error handling when a contract tries to make more than one call
+    // per Tx, using the "multFloatNumbers" offchain handler.
+    // Multiple calls from the same stack depth are permitted for legacy reasons
+    // but should not be used in new code.
+    function callTwice(string memory _url, string memory a, string memory b, uint32 mode)
+    public returns (uint256) {
+
+      bytes memory encRequest;
+      bytes memory encResponse;
+
+      if (mode == 2) {
+         // Call from a different stack depth
+	 HelloTuring(address(this)).callTwice(_url, a, b, 0);
+      } else if (mode == 1) {
+        // Call from same stack depth
+        encRequest = abi.encode(b);
+        encResponse = myHelper.TuringTxV2(_url, encRequest);
+      }
+
+      encRequest = abi.encode(a);
+      encResponse = myHelper.TuringTxV2(_url, encRequest);
+
+      uint256 product = abi.decode(encResponse, (uint256));
+      emit MultFloatNumbers(product);
+      return product;
+    }
+
     // Tests a Turing method which returns a variable-length array.
     // The parameters 'a' and 'b' are passed in the request, returing
-    // an array of 'b' elements each with value 'a'. This function
+    // an array of 'a' elements each with value 'b'. This function
     // adds all of the returned values and returns a total of (a*b)
     function multArray(string memory _url, uint256 a, uint256 b)
       public {

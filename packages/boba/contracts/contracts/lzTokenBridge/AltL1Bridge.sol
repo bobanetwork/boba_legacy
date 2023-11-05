@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 /* Library Imports */
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
-import { IL2StandardERC20 } from "@eth-optimism/contracts/contracts/standards/IL2StandardERC20.sol";
+import { IL2StandardERC20 } from "@bobanetwork/core_contracts/contracts/standards/IL2StandardERC20.sol";
 
 import { IAltL1Bridge } from "./interfaces/IAltL1Bridge.sol";
 import "./lzApp/NonblockingLzApp.sol";

@@ -1,7 +1,7 @@
 /* Imports: External */
 import { ethers, BigNumber, Contract, utils } from 'ethers'
-import { predeploys, getContractFactory } from '@eth-optimism/contracts'
-import { deployBobaContractCore } from '@boba/contracts'
+import { predeploys, getContractFactory } from '@bobanetwork/core_contracts'
+import { deployBobaContractCore } from '@bobanetwork/contracts'
 
 /* Imports: Internal */
 import { expect } from './shared/setup'

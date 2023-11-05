@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { Contract, ContractFactory, utils } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
+import { getBobaContractAt } from '@bobanetwork/contracts'
 import chai, { expect } from 'chai'
 import { solidity } from 'ethereum-waffle'
 chai.use(solidity)
@@ -73,45 +73,48 @@ describe('Turing 256 Bit Random Number Test', async () => {
     ).attach(L1StandardBridgeAddress)
     /* eslint-disable */
     const http = require('http')
-    const ip = require("ip")
+    const ip = require('ip')
     // start local server
-    const server = module.exports = http.createServer(async function (req, res) {
+    const server = (module.exports = http
+      .createServer(async function (req, res) {
+        if (req.headers['content-type'] === 'application/json') {
+          let body = ''
 
-      if (req.headers['content-type'] === 'application/json') {
+          req.on('data', function (chunk) {
+            body += chunk.toString()
+          })
 
-        let body = '';
+          req.on('end', async function () {
+            const jsonBody = JSON.parse(body)
+            const input = JSON.parse(body).params[0]
+            let result
 
-        req.on('data', function (chunk) {
-          body += chunk.toString()
-        })
-
-        req.on('end', async function () {
-          const jsonBody = JSON.parse(body)
-          const input = JSON.parse(body).params[0]
-          let result
-
-          const args = utils.defaultAbiCoder.decode(['uint256','uint256'], input)
-          if (req.url === "/echo") {
-            const randomPrice = Math.floor(Math.random() * 1000)
-            result = input
-            let response = {
-              "jsonrpc": "2.0",
-              "id": jsonBody.id,
-              "result": result
+            const args = utils.defaultAbiCoder.decode(
+              ['uint256', 'uint256'],
+              input
+            )
+            if (req.url === '/echo') {
+              const randomPrice = Math.floor(Math.random() * 1000)
+              result = input
+              let response = {
+                jsonrpc: '2.0',
+                id: jsonBody.id,
+                result: result,
+              }
+              res.end(JSON.stringify(response))
+              server.emit('success', body)
+            } else {
+              res.writeHead(400, { 'Content-Type': 'text/plain' })
+              res.end('Bad request')
             }
-            res.end(JSON.stringify(response))
-            server.emit('success', body)
-          } else {
-            res.writeHead(400, { 'Content-Type': 'text/plain' })
-            res.end('Bad request')
-          }
-        });
-      } else {
-        console.log("Other request:", req)
-        res.writeHead(400, { 'Content-Type': 'text/plain' })
-        res.end('Expected content-type: application/json')
-      }
-    }).listen(apiPort)
+          })
+        } else {
+          console.log('Other request:', req)
+          res.writeHead(400, { 'Content-Type': 'text/plain' })
+          res.end('Expected content-type: application/json')
+        }
+      })
+      .listen(apiPort))
     URL = `http://${ip.address()}:${apiPort}/echo`
     /* eslint-enable */
   })
@@ -264,13 +267,23 @@ describe('Turing 256 Bit Random Number Test', async () => {
     } catch (e) {
       expect(e.error.toString()).to.contain('SERVER_ERROR')
     }
+    try {
+      await random.MixedInput(URL, 123, 999, { gasLimit: 11_000_000 })
+    } catch (e) {
+      expect(e.error.toString()).to.contain('SERVER_ERROR')
+    }
   })
 
   // Should reject a 2nd call from a different EVM depth.
   it('should disallow nested Turing calls', async () => {
     try {
-      const tr = await random.NestedRandom(1)
+      await random.estimateGas.NestedRandom(1)
       expect(1).to.equal(0)
+    } catch (e) {
+      expect(e.error.toString()).to.contain('SERVER_ERROR')
+    }
+    try {
+      const tr = await random.NestedRandom(1, { gasLimit: 11_000_000 })
     } catch (e) {
       expect(e.error.toString()).to.contain('SERVER_ERROR')
     }

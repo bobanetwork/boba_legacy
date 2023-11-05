@@ -1,20 +1,20 @@
 /* Imports: External */
 import {
-  BigNumber,
+  BigNumber, BigNumberish,
   constants as ethersConstants,
-  Contract,
-  EventFilter,
+  Contract, ethers,
+  EventFilter, PopulatedTransaction,
   providers,
   Wallet,
 } from 'ethers'
-import { orderBy } from 'lodash'
+import {orderBy} from 'lodash'
 import 'reflect-metadata'
 
 /* Imports: Internal */
-import { sleep } from '@eth-optimism/core-utils'
-import { BaseService } from '@eth-optimism/common-ts'
-import { getContractFactory } from '@eth-optimism/contracts'
-import { getBobaContractAt } from '@boba/contracts'
+import {sleep} from '@eth-optimism/core-utils'
+import {BaseService} from '@eth-optimism/common-ts'
+import {getContractFactory} from '@bobanetwork/core_contracts'
+import {getBobaContractAt} from '@bobanetwork/contracts'
 
 /* Imports: Interface */
 import {
@@ -24,9 +24,11 @@ import {
   Disbursement,
   SupportedAssets,
 } from './utils/types'
-import { HistoryData } from './entities/HistoryData.entity'
-import { historyDataRepository } from './data-source'
-import { IKMSSignerConfig, KMSSigner } from './utils/kms-signing'
+import {HistoryData} from './entities/HistoryData.entity'
+import {historyDataRepository, lastAirdropRepository} from './data-source'
+import {IKMSSignerConfig, KMSSigner} from './utils/kms-signing'
+import {Asset, BobaChains} from "./utils/chains";
+import {LastAirdrop} from "./entities/LastAirdrop.entity";
 
 interface TeleportationOptions {
   l2RpcProvider: providers.StaticJsonRpcProvider
@@ -47,6 +49,15 @@ interface TeleportationOptions {
   blockRangePerPolling: number
 
   awsConfig: IKMSSignerConfig
+
+  airdropConfig?: {
+    /** Amount of native gas airdropped to user when conditions are met */
+    airdropAmountWei?: BigNumberish,
+    /** Amount of seconds to wait after previous airdrop */
+    airdropCooldownSeconds?: BigNumberish,
+    /** Define if airdrop is enabled on this network */
+    airdropEnabled: boolean
+  }
 }
 
 const optionSettings = {}
@@ -88,7 +99,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     // check the disburser wallet is the disburser of the contract
     const disburserAddress = await this.state.Teleportation.disburser()
     const kmsSignerAddress = await this.state.KMSSigner.getSignerAddr()
-    if (disburserAddress.toLowerCase() !== kmsSignerAddress.toLowerCase()) {
+    if (!this.options.awsConfig.disableDisburserCheck && disburserAddress.toLowerCase() !== kmsSignerAddress.toLowerCase()) {
       throw new Error(
         `Disburser wallet ${kmsSignerAddress} is not the disburser of the contract ${disburserAddress}`
       )
@@ -101,8 +112,11 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
     this.state.supportedChains = []
     this.state.depositTeleportations = []
     const bobaTokenContractAddr = Object.keys(this.options.ownSupportedAssets).find(
-      (k) => this.options.ownSupportedAssets[k?.toLowerCase()] === 'BOBA'
+      (k) => this.options.ownSupportedAssets[k?.toLowerCase()] === Asset.BOBA
     )
+    if (!bobaTokenContractAddr) {
+      this.logger.error(`Could not find BOBA contract address to check for support: ${JSON.stringify(this.options.ownSupportedAssets)}`)
+    }
 
     for (const chain of this.options.selectedBobaChains) {
       try {
@@ -335,7 +349,7 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
         const disburseTxUnsigned =
           await this.state.Teleportation.populateTransaction.disburseAsset(
             slicedDisbursement,
-            { value: nativeValue }
+            {value: nativeValue}
           )
         const disburseTx = await this.state.KMSSigner.sendTxViaKMS(
           this.state.Teleportation.provider,
@@ -353,9 +367,75 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
           disbursement
         )} - latestBlock: ${latestBlock}`
       )
+
       await this._putDepositInfo(chainId, latestBlock)
+
+      // Only do on boba l2
+      if (this.options.airdropConfig?.airdropEnabled) {
+        await this._airdropGas(disbursement, latestBlock)
+      } else {
+        this.logger.info(`Gas airdrop is disabled on chainId: ${chainId}.`)
+      }
     } catch (e) {
       this.logger.error(e)
+    }
+  }
+
+  /** @dev Checks if major airdrop eligibility criteria has been met such as not bridging native, has no gas on destination network, bridges enough value, .. */
+  async _fulfillsAirdropConditions(disbursement: Disbursement) {
+    const nativeBalance = await this.state.Teleportation.provider.getBalance(disbursement.addr)
+    if (nativeBalance.gt(this.options.airdropConfig.airdropAmountWei)) {
+      this.logger.info(`Not airdropping as wallet has native balance on destination network: ${nativeBalance}, wallet: ${disbursement.addr}`)
+      return false;
+    }
+    if (disbursement.token === ethers.constants.AddressZero) {
+      this.logger.info(`Not airdropping as wallet is briding asset that is used to pay for gas on the destination network: ${disbursement.token}, wallet: ${disbursement.addr}`)
+      return false;
+    }
+    this.logger.info(`Airdropping for: ${JSON.stringify(disbursement)}`)
+    return true;
+  }
+
+  async _airdropGas(disbursements: Disbursement[], latestBlock: number) {
+    const provider = this.state.Teleportation.provider
+
+    for (const disbursement of disbursements) {
+
+      if (await this._fulfillsAirdropConditions(disbursement)) {
+        const lastAirdrop = await lastAirdropRepository.findOneBy({walletAddr: disbursement.addr})
+        const unixTimestamp = Math.floor(Date.now() / 1000)
+
+        const airdropCooldownSeconds = this.options.airdropConfig?.airdropCooldownSeconds ?? '86400'
+        if (!lastAirdrop || BigNumber.from(airdropCooldownSeconds).lt(unixTimestamp - lastAirdrop.blockTimestamp)) {
+
+          let nativeAmount = this.options.airdropConfig?.airdropAmountWei
+          if (!nativeAmount) {
+            // default
+            nativeAmount = ethers.utils.parseEther('0.0005')
+          }
+
+          const airdropTx = await this.state.KMSSigner.sendTxViaKMS(
+            provider,
+            disbursement.addr,
+            BigNumber.from(nativeAmount.toString()), // native amount, converge types
+            {data: '0x'} as PopulatedTransaction // native transfer
+          )
+          await airdropTx.wait()
+
+          // Save to db
+          const blockNumber = (await this.state.Teleportation.provider.getBlock('latest'))?.timestamp
+          const newAirdrop = new LastAirdrop();
+          newAirdrop.blockTimestamp = blockNumber;
+          newAirdrop.walletAddr = disbursement.addr;
+          await lastAirdropRepository.save(newAirdrop)
+
+          this.logger.info(`Successfully airdropped gas to ${disbursement.addr}, amount: ${nativeAmount}.`)
+        } else {
+          this.logger.info(`Cool down, user already got an airdrop within the cool down period with this wallet: ${disbursement.addr}.`)
+        }
+      } else {
+        this.logger.info(`Not airdropping to ${disbursement.addr} as not eligible: ${JSON.stringify(disbursement)}`)
+      }
     }
   }
 
@@ -428,10 +508,10 @@ export class TeleportationService extends BaseService<TeleportationOptions> {
       historyData.chainId = chainId
       historyData.blockNo = latestBlock
       if (
-        await historyDataRepository.findOneBy({ chainId: historyData.chainId })
+        await historyDataRepository.findOneBy({chainId: historyData.chainId})
       ) {
         await historyDataRepository.update(
-          { chainId: historyData.chainId },
+          {chainId: historyData.chainId},
           historyData
         )
       } else {

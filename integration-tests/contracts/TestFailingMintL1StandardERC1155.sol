@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >0.7.5;
 
-import "@boba/contracts/contracts/standards/L1StandardERC1155.sol";
+import "@bobanetwork/contracts/contracts/standards/L1StandardERC1155.sol";
 
 /**
 * A Failing mint L1ERC1155 contract

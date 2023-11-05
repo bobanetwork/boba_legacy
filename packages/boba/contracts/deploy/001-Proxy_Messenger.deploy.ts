@@ -1,5 +1,5 @@
 import { Contract, ContractFactory } from 'ethers'
-import { getContractFactory } from '@eth-optimism/contracts'
+import { getContractFactory } from '@bobanetwork/core_contracts'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import {
   getDeploymentSubmission,

@@ -1,5 +1,10 @@
 version: 2.1
 
+parameters:
+  ci_builder_image:
+    type: string
+    default: us-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_ARTIFACT_REPOSITORY}/images/ci-builder:latest
+
 executors:
   intergration-tests-executor:
     resource_class: xlarge
@@ -8,6 +13,7 @@ executors:
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
 
 commands:
   check-changed:
@@ -71,12 +77,16 @@ commands:
           patterns: common-ts,contracts,core-utils,data-transport-layer,message-relayer,regenesis-surgery,sdk,integration-tests,l2geth,packages/boba/account-abstraction,packages/boba/bobalink,packages/boba/bundler,packages/boba/bundler_sdk,packages/boba/bundler_utils,packages/boba/contracts,packages/boba/gas-price-oracle,packages/boba/register,packages/boba/teleportation,ops,ops_boba
       - run:
           name: Build the project
-          command: yarn && yarn build
+          command: yarn && yarn install && yarn build
           working_directory: ./
 
       - run:
           name: Build the core services
-          command: docker-compose build
+          command: |
+            # docker context create buildx-build
+            # docker buildx create --use buildx-build
+            # docker buildx bake -f docker-compose.yml --load
+            docker-compose build
           working_directory: ops
 
       - run:
@@ -110,7 +120,7 @@ commands:
           name: Start background logging
           working_directory: ops
           background: true
-          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> logs --follow
+          command: docker-compose -f <<parameters.docker_compose_file>> -f <<parameters.docker_compose_side_file>> logs --follow || true
       - run:
           name: Wait for sequencer
           command: bash scripts/wait-for-sequencer.sh
@@ -159,15 +169,14 @@ jobs:
         type: string
         default: this-package-does-not-exist
     docker:
-      - image: ethereumoptimism/ci-builder:latest
-      - image: cimg/postgres:14.1
+      - image: <<pipeline.parameters.ci_builder_image>>
     steps:
       - checkout
       - check-changed:
           patterns: go/proxyd
       - run:
           name: Lint
-          command: golangci-lint run -E goimports,sqlclosecheck,bodyclose,asciicheck,misspell,errorlint -e "errors.As" -e "errors.Is" ./...
+          command: make lint
           working_directory: <<parameters.working_directory>>
       - store_test_results:
           path: /test-results
@@ -223,7 +232,7 @@ workflows:
   main:
     jobs:
       - integration-tests
-      - integration-tests-avalanche
+      #- integration-tests-avalanche
       - integration-tests-bnb
       - go-lint-test-build:
           name: proxyd-tests

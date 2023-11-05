@@ -1,6 +1,6 @@
 {
-  "name": "@boba/contracts",
-  "version": "0.0.1",
+  "name": "@bobanetwork/contracts",
+  "version": "0.0.2",
   "description": "BOBA Smart Contracts",
   "private": true,
   "author": "Enya.ai",
@@ -24,9 +24,9 @@
     "test:slither": "slither ."
   },
   "dependencies": {
-    "@boba/turing-hybrid-compute": "0.2.0",
+    "@bobanetwork/turing-hybrid-compute": "0.2.0",
     "@chainlink/contracts": "0.3.1",
-    "@eth-optimism/contracts": "0.5.11",
+    "@bobanetwork/core_contracts": "0.5.13",
     "@eth-optimism/core-utils": "0.8.1",
     "@ethersproject/abstract-provider": "^5.5.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",

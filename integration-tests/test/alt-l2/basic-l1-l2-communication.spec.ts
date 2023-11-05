@@ -1,7 +1,7 @@
 /* Imports: External */
 import { Contract, ContractFactory } from 'ethers'
 import { ethers } from 'hardhat'
-import { MessageDirection, MessageStatus } from '@eth-optimism/sdk'
+import { MessageDirection, MessageStatus } from '@bobanetwork/sdk'
 import {
   applyL1ToL2Alias,
   awaitCondition,
