@@ -10,23 +10,7 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 {% embed url="https://youtu.be/vGOGiEO2Dn4" %}
 
-{% embed url="https://youtu.be/Yxbkw_pKAYw" %}
-
-{% embed url="https://youtu.be/2Ahz81ogekw" %}
-
-{% embed url="https://youtu.be/YPlvYScr8Fo" %}
-
-{% embed url="https://youtu.be/y0xTsU4zLA8" %}
-
-{% embed url="https://youtu.be/EQ9bYJlhJaQ" %}
-
-{% embed url="https://youtu.be/QUXpbeA-BgY" %}
-
-{% embed url="https://youtu.be/HQ48yXAOJds" %}
-
-{% embed url="https://youtu.be/PP4DJCT0WsE" %}
-
-{% embed url="https://youtu.be/N1f6h9rnCAs" %}
+{% embed url="https://youtu.be/ZIcJMpjvFOI" %}
 
 **Before getting started, make sure you have enough ETH in your Metamask wallet to approve and send transactions (we recommend 0.05 ETH).**
 
