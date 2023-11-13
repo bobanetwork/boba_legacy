@@ -39,13 +39,13 @@ jobs:
 
       - if: steps.changes.outputs.src == 'true'
         name: Build version specific docker image
-        run: docker build . --file Dockerfile --tag bobanetwork/lightbridge:v${{ steps.version.outputs.version }}
+        run: docker build . --file ./ops/docker/Dockerfile.teleportation --tag bobanetwork/lightbridge:v${{ steps.version.outputs.version }}
       - if: steps.changes.outputs.src == 'true'
         name: Push version specific docker image
         run: docker push bobanetwork/lightbridge:v${{ steps.version.outputs.version }}
       - if: steps.changes.outputs.src == 'true'
         name: Build stable docker image
-        run: docker build . --file Dockerfile --tag bobanetwork/lightbridge:stable
+        run: docker build . --file ./ops/docker/Dockerfile.teleportation --tag bobanetwork/lightbridge:stable
       - if: steps.changes.outputs.src == 'true'
         name: Push stable docker image
         run: docker push bobanetwork/lightbridge:stable
