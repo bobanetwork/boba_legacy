@@ -1,0 +1,38 @@
+name: Build & Release Light Bridge
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        # run only if some file in 'src' folder was changed
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_ACCESS_TOKEN_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN_SECRET }}
+      - name: Get project versions
+        run: |
+          echo "version=$(cat ./packages/boba/teleportation/package.json | jq ".version" | tr -d '"\r\n')" >> $GITHUB_OUTPUT
+        id: version
+
+      - id: deploy
+        name: Deploy
+        uses: bitovi/github-actions-deploy-docker-to-ec2@v0.5.8
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_default_region: ${{ secrets.AWS_REGION }}
+          dot_env: ${{ secrets.LIGHTBRIDGE_ENV_BOBAETH_TESTNET }} # todo allow selection
+          # ghv_env: ${{ vars.VARS }}

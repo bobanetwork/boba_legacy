@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  lightbridge_db:
+    image: postgres
+    deploy:
+      replicas: 1
+    environment:
+      POSTGRES_PASSWORD: ${TELEPORTATION_POSTGRES_PWD:-abcdef}
+      POSTGRES_DB: postgres
+    volumes:
+      - lightbridge_db_data:/var/lib/postgresql/data
+
+  lightbridge:
+    image: bobanetwork/lightbridge:${IMAGE_VERSION:-stable}
+    depends_on:
+      - lightbridge_db
+    environment:
+      L2_NODE_WEB3_URL: "${L2_NODE_WEB3_URL}"
+      TELEPORTATION_AWS_KMS_ACCESS_KEY: "${TELEPORTATION_AWS_KMS_ACCESS_KEY}"
+      TELEPORTATION_AWS_KMS_SECRET_KEY: "${TELEPORTATION_AWS_KMS_SECRET_KEY}"
+      TELEPORTATION_AWS_KMS_KEY_ID: "${TELEPORTATION_AWS_KMS_KEY_ID}"
+      TELEPORTATION_AWS_KMS_REGION: "${TELEPORTATION_AWS_KMS_REGION:-us-east-2}"
+      TELEPORTATION_AWS_KMS_ENDPOINT: "${TELEPORTATION_AWS_KMS_ENDPOINT}"
+    command: ["yarn", "start"]
+    restart: always
+    mem_limit: 750m
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  lightbridge_db_data:

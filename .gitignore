@@ -36,6 +36,7 @@ packages/boba/gas-price-oracle/data
 *.swp
 
 .env
+.env-*
 *.log
 
 # boba_community
