@@ -7,7 +7,7 @@ on:
         type: string
         default: bobanetwork
         required: false
-        description: Used for testing
+        description: Docker Repo to use. Useful for testing
       force:
         type: boolean
         default: false
