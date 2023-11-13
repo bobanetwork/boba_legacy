@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build_docker:
-    name: Build Docker Image
+    name: Deploy to AWS
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
