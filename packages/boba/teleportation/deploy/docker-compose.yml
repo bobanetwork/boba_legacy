@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  lightbridge_db:
+  teleportation_db:
     image: postgres
     deploy:
       replicas: 1

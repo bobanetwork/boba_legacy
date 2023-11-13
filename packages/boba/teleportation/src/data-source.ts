@@ -10,7 +10,7 @@ dotenv.config()
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.TELEPORTATION_POSTGRES_DB_HOST ?? 'lightbridge_db',
+  host: process.env.TELEPORTATION_POSTGRES_DB_HOST ?? 'teleportation_db',
   port: parseInt(process.env.TELEPORTATION_POSTGRES_PORT ?? '5432', 10),
   username: process.env.TELEPORTATION_POSTGRES_USER ?? 'postgres',
   password: process.env.TELEPORTATION_POSTGRES_PASSWORD ?? 'abcdef',
