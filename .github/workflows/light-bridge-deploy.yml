@@ -1,4 +1,4 @@
-name: Build & Release Light Bridge
+name: Deploy Light Bridge
 
 on:
   workflow_dispatch:
