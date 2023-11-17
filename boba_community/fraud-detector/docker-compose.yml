@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 x-l1_rpc_dtl: &l1_rpc_dtl
   DATA_TRANSPORT_LAYER__L1_RPC_ENDPOINT: 'https://mainnet.gateway.tenderly.co'
@@ -10,7 +10,7 @@ services:
   verifier_dtl:
     image: bobanetwork/data-transport-layer:${RELEASE_VERSION}
     env_file:
-      -  ../../ops/envs/dtl.env
+      - ../../ops/envs/dtl.env
     environment:
       <<: *l1_rpc_dtl
       DATA_TRANSPORT_LAYER__CONFIRMATIONS: 8
@@ -27,10 +27,10 @@ services:
       - ./state-dumps/mainnet/:/opt/optimism/packages/data-transport-layer/state-dumps/
     #  - ./<YOUR PERSISTED STORAGE>:/db/
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-file: "5"
-        max-size: "10m"
+        max-file: '5'
+        max-size: '10m'
     ports:
       - ${DTL_PORT:-7878}:7878
       - ${REGISTRY_PORT:-8080}:8081
@@ -54,28 +54,28 @@ services:
       ROLLUP_VERIFIER_ENABLE: 'true'
       RETRIES: 60
       # no need to keep this secret, only used internally to sign blocks
-      BLOCK_SIGNER_KEY: "6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27"
-      BLOCK_SIGNER_ADDRESS: "0x00000398232E2064F896018496b4b44b3D62751F"
-      ROLLUP_POLL_INTERVAL_FLAG: "10s"
+      BLOCK_SIGNER_KEY: '6587ae678cf4fc9a33000cdbf9f35226b71dcc6a4684a31203241f9bcfd55d27'
+      BLOCK_SIGNER_ADDRESS: '0x00000398232E2064F896018496b4b44b3D62751F'
+      ROLLUP_POLL_INTERVAL_FLAG: '10s'
       ROLLUP_ENFORCE_FEES: 'true'
       # turing
-      TURING_CREDIT_ADDRESS: "0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf"
+      TURING_CREDIT_ADDRESS: '0xF8D2f1b0292C0Eeef80D8F47661A9DaCDB4b23bf'
       # fee token
-      L2_BOBA_TOKEN_ADDRESS: "0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7"
-      BOBA_GAS_PRICE_ORACLE_ADDRESS: "0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51"
+      L2_BOBA_TOKEN_ADDRESS: '0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7'
+      BOBA_GAS_PRICE_ORACLE_ADDRESS: '0xeE06ee2F239d2ab11792D77f3C347d919ddA0d51'
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-file: "5"
-        max-size: "10m"
+        max-file: '5'
+        max-size: '10m'
     ports:
       - ${VERIFIER_HTTP_PORT:-8547}:8545
       - ${VERIFIER_WS_PORT:-8548}:8546
 
   fraud-detector:
     depends_on:
-     - verifier_dtl
-     - verifier_l2geth
+      - verifier_dtl
+      - verifier_l2geth
     image: bobanetwork/fraud-detector:${RELEASE_VERSION}
     deploy:
       replicas: 1
@@ -88,12 +88,14 @@ services:
       ADDRESS_MANAGER_ADDRESS: '0x8376ac6C3f73a25Dd994E0b0669ca7ee0C02F089'
       L1_DEPLOYMENT_BLOCK: 13502893
       L2_START_BLOCK: 1
+      RATE_LIMITER_MAX_CALLS: 5
+      RATE_LIMITER_PERIOD: 1
     #volumes:
     #  - ./<YOUR PERSISTED STORAGE>:/db/
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-file: "5"
-        max-size: "10m"
+        max-file: '5'
+        max-size: '10m'
     ports:
       - ${FRAUD_CHECKER_HTTP_PORT:-8555}:8555
