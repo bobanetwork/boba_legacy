@@ -1,0 +1,4 @@
+python-dotenv
+redis
+web3>=5.29.2
+captcha
