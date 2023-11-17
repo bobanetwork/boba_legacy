@@ -1,5 +1,10 @@
 version: 2.1
 
+parameters:
+  ci_builder_image:
+    type: string
+    default: us-docker.pkg.dev/${GCP_PROJECT_ID}/${GCP_ARTIFACT_REPOSITORY}/images/ci-builder:latest
+
 executors:
   intergration-tests-executor:
     resource_class: xlarge
@@ -164,15 +169,14 @@ jobs:
         type: string
         default: this-package-does-not-exist
     docker:
-      - image: ethereumoptimism/ci-builder:latest
-      - image: cimg/postgres:14.1
+      - image: <<pipeline.parameters.ci_builder_image>>
     steps:
       - checkout
       - check-changed:
           patterns: go/proxyd
       - run:
           name: Lint
-          command: golangci-lint run -E goimports,sqlclosecheck,bodyclose,asciicheck,misspell,errorlint -e "errors.As" -e "errors.Is" ./...
+          command: make lint
           working_directory: <<parameters.working_directory>>
       - store_test_results:
           path: /test-results

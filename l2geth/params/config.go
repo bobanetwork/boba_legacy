@@ -305,6 +305,36 @@ var (
 
 	// Enable the conditional logic to prevent Turing balances from reaching zero
 	BobaOperaTestnetTuringChargeForkNum = big.NewInt(3000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaMainnetTuringCharge2ForkNum = big.NewInt(1064000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaGoerliTuringCharge2ForkNum = big.NewInt(114000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaMoonbeamTuringCharge2ForkNum = big.NewInt(1580000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaMoonbaseTuringCharge2ForkNum = big.NewInt(350000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaAvaxTuringCharge2ForkNum = big.NewInt(101200)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaFujiTuringCharge2ForkNum = big.NewInt(4000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaBnbTuringCharge2ForkNum = big.NewInt(25740000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaBnbTestnetTuringCharge2ForkNum = big.NewInt(428000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaOperaTuringCharge2ForkNum = big.NewInt(80000)
+
+	// Enable the conditional logic to fix bug in charging for L1 Turing calldata
+	BobaOperaTestnetTuringCharge2ForkNum = big.NewInt(3000)
 )
 
 // TrustedCheckpoint represents a set of post-processed trie roots (CHT and
@@ -563,6 +593,43 @@ func (c *ChainConfig) IsTuringChargeFork(num *big.Int) bool {
 	}
 	if c.ChainID.Cmp(OpOperaTestnetChainID) == 0 {
 		return isForked(BobaOperaTestnetTuringChargeForkNum, num)
+	}
+	return true
+}
+
+func (c *ChainConfig) IsTuringCharge2Fork(num *big.Int) bool {
+	if c.ChainID == nil {
+		return true
+	}
+	if c.ChainID.Cmp(OpMainnetChainID) == 0 {
+		return isForked(BobaMainnetTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpGoerliChainID) == 0 {
+		return isForked(BobaGoerliTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpMoonbeamChainID) == 0 {
+		return isForked(BobaMoonbeamTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpMoonbaseChainID) == 0 {
+		return isForked(BobaMoonbaseTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpBnbChainID) == 0 {
+		return isForked(BobaBnbTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpBnbTestnetChainID) == 0 {
+		return isForked(BobaBnbTestnetTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpAvaxChainID) == 0 {
+		return isForked(BobaAvaxTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpFujiChainID) == 0 {
+		return isForked(BobaFujiTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpOperaChainID) == 0 {
+		return isForked(BobaOperaTuringCharge2ForkNum, num)
+	}
+	if c.ChainID.Cmp(OpOperaTestnetChainID) == 0 {
+		return isForked(BobaOperaTestnetTuringCharge2ForkNum, num)
 	}
 	return true
 }
