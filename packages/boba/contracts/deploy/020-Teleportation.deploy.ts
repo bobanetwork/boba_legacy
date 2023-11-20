@@ -136,6 +136,18 @@ const deployFn: DeployFunction = async (hre) => {
       res = await Teleportation.initialize()
       file.log(fileName, `Teleportation initialized: ${await res.wait()}`)
     } else {
+      try {
+        const disburser = await Teleportation.disburser()
+        if (!disburser || disburser === ethers.constants.AddressZero) {
+          // not initialized
+          let res = await Proxy__Teleportation.initialize()
+          file.log(fileName, `Initialized proxy: ${await res.wait()}`)
+          res = await Teleportation.initialize()
+          file.log(fileName, `Teleportation initialized: ${await res.wait()}`)
+        }
+      } catch(err) {
+        file.log(fileName, `Could not initialized not initialized contracts for already deployed contracts: ${JSON.stringify(err)}`)
+      }
       file.log(fileName, `Not initializing contract again as already done.`)
     }
 
