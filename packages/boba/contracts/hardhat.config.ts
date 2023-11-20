@@ -104,7 +104,7 @@ const config: HardhatUserConfig = {
       url: 'https://optimism.llamarpc.com',
     },
     arbitrumMainnet: {
-      url: 'https://endpoints.omniatech.io/v1/arbitrum/goerli/public',
+      url: 'https://arbitrum.llamarpc.com',
     },
   },
   solidity: {
