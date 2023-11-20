@@ -114,10 +114,14 @@ export const getBobaContractAt = async (
   address: string,
   signer?: any
 ) => {
-  if (!signer) {
-    return new Contract(address, getContractArtifact(name).abi)
+  const artifact = getContractArtifact(name)
+  if (!artifact) {
+    throw new Error(`Contract artifact ${name} not found..`)
   }
-  return new Contract(address, getContractArtifact(name).abi, signer)
+  if (!signer) {
+    return new Contract(address, artifact.abi)
+  }
+  return new Contract(address, artifact.abi, signer)
 }
 
 export const getBobaContractABI = (name: string) => {

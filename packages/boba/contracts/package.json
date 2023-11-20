@@ -13,6 +13,7 @@
     "build:typescript": "tsc -p ./tsconfig.json",
     "autogen:artifacts": "ts-node src/generate-artifacts.ts",
     "deploy": "ts-node \"./bin/deploy.ts\"",
+    "deploy:light": "ts-node \"./bin/deploy.lb.ts\"",
     "clean": "rm -rf ./artifacts ./cache",
     "lint": "yarn lint:check",
     "lint:check": "eslint . --ext js,jsx,ts,tsx",

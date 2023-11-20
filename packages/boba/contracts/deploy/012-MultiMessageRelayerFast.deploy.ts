@@ -13,6 +13,11 @@ require('dotenv').config()
 let L1_MultiMessageRelayerFast: Contract
 
 const deployFn: DeployFunction = async (hre) => {
+  if ((hre as any).deployConfig.isLightMode) {
+    console.log('Skipping deployment function as in light mode..')
+    return;
+  }
+
 
   const addressManager = getContractFactory('Lib_AddressManager')
     .connect((hre as any).deployConfig.deployer_l1)

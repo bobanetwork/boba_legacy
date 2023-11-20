@@ -1,0 +1,26 @@
+{
+  "network": "goerli",
+  "contracts": {
+    "L2LiquidityPool": {
+      "address": "0x0000000000000000000000000000000000000000"
+    },
+    "OVM_L2StandardBridge": {
+      "address": "0x0000000000000000000000000000000000000000"
+    },
+    "GovernorBravoDelegate": {
+      "address": "0x0000000000000000000000000000000000000000"
+    },
+    "Boba_GasPriceOracle": {
+      "address": "0x0000000000000000000000000000000000000000"
+    },
+    "TuringHelperFactory": {
+      "address": "0x0000000000000000000000000000000000000000"
+  },
+    "TuringMonsters": {
+      "address": "0x0000000000000000000000000000000000000000"
+    },
+    "Teleportation": {
+      "address": "0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13"
+    }
+  }
+}

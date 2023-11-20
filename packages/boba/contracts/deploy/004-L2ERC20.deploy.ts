@@ -23,6 +23,11 @@ const initialSupply_8 = utils.parseUnits('10000', 8)
 const initialSupply_18 = utils.parseEther('10000000000')
 
 const deployFn: DeployFunction = async (hre) => {
+  if ((hre as any).deployConfig.isLightMode) {
+    console.log('Skipping deployment function as in light mode..')
+    return;
+  }
+
   const registerLPToken = async (L1TokenAddress, L2TokenAddress) => {
     const registerL1LP = await Proxy__L1LiquidityPool.registerPool(
       L1TokenAddress,

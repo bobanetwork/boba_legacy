@@ -27,7 +27,8 @@ export const BobaChains: IBobaChains = {
 
   //#region boba_networks
   288: {
-    url: 'https://boba-ethereum.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves) --> boba listed though, but requires a hosted service
+    url: process.env.TELEPORTATION_RPC_BOBAETHMAINNET ?? 'https://boba-ethereum.gateway.tenderly.co',
     testnet: false,
     name: 'Boba Ethereum Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -40,7 +41,8 @@ export const BobaChains: IBobaChains = {
     },
   },
   56288: {
-    url: 'https://boba-bnb.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    url: process.env.TELEPORTATION_RPC_BOBABNBMAINNET ?? 'https://replica.bnb.boba.network',
     testnet: false,
     name: 'Boba BNB Mainnet',
     teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
@@ -51,7 +53,8 @@ export const BobaChains: IBobaChains = {
     },
   },
   2888: {
-    url: 'https://replica.goerli.boba.network',
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    url: process.env.TELEPORTATION_RPC_BOBAETHGOERLI ?? 'https://replica.goerli.boba.network',
     testnet: true,
     name: 'Boba Ethereum Goerli',
     teleportationAddress: '0xB43EE846Aa266228FeABaD1191D6cB2eD9808894',
@@ -62,7 +65,8 @@ export const BobaChains: IBobaChains = {
     },
   },
   9728: {
-    url: 'https://boba-bnb-testnet.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    url: process.env.TELEPORTATION_RPC_BOBABNBTESTNET ?? 'https://boba-bnb-testnet.gateway.tenderly.co',
     testnet: true,
     name: 'Boba BNB Testnet',
     teleportationAddress: '0xf4d179d3a083Fa3Eede935FaF4C679D32d514186',
@@ -73,10 +77,53 @@ export const BobaChains: IBobaChains = {
       ['0xc614A66f82e71758Fa7735C91dAD1088c8362f15'.toLowerCase()]: Asset.ETH,
     },
   },
+  421613: {
+    url: process.env.TELEPORTATION_RPC_ARBITRUMGOERLI ?? 'https://arbitrum-goerli.public.blastapi.io',
+    testnet: true,
+    name: 'Arbitrum Goerli',
+    teleportationAddress: '0x7063f59e1Db3e505D844d11A71C78F92D39E5963',
+    height: 53880808,
+    supportedAssets: {
+      ['0x0000000000000000000000000000000000000000'.toLowerCase()]: Asset.ETH,
+    },
+  },
+  420: {
+    url: process.env.TELEPORTATION_RPC_OPTIMISMGOERLI ?? 'https://optimism-goerli.publicnode.com',
+    testnet: true,
+    name: 'Optimism Goerli',
+    teleportationAddress: '0xC226F132A686A08018431C913d87693396246024',
+    height: 17010097,
+    supportedAssets: {
+      ['0x0000000000000000000000000000000000000000'.toLowerCase()]: Asset.ETH,
+    },
+  },
+  42161: {
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    url: process.env.TELEPORTATION_RPC_ARBITRUMMAINNET ?? 'https://arbitrum.llamarpc.com',
+    testnet: false,
+    name: 'Arbitrum Mainnet',
+    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    height: 3393,
+    supportedAssets: {
+      ['0x0000000000000000000000000000000000000000'.toLowerCase()]: Asset.ETH,
+    },
+  },
+  10: {
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    url: process.env.TELEPORTATION_RPC_OPTIMISMMAINNET ?? 'https://optimism.llamarpc.com',
+    testnet: false,
+    name: 'Optimism Mainnet',
+    teleportationAddress: '0xd68809330075C792C171C450B983F4D18128e9BF',
+    height: 3393,
+    supportedAssets: {
+      ['0x0000000000000000000000000000000000000000'.toLowerCase()]: Asset.ETH,
+    },
+  },
   //#endregion
   //#region l1
   1: {
-    url: 'https://mainnet.gateway.tenderly.co/1clfZoq7qEGyF4SQvF8gvI',
+    // TODO: Public nodes available, deploy once contract is live
+    url: process.env.TELEPORTATION_RPC_ETHMAINNET ?? 'https://eth.llamarpc.com',
     testnet: false,
     name: 'Ethereum Mainnet',
     teleportationAddress: '0x0',
@@ -89,7 +136,8 @@ export const BobaChains: IBobaChains = {
     },
   },
   56: {
-    url: 'https://rpc.ankr.com/bsc',
+    // TODO: Public nodes available, deploy once contract is live
+    url: process.env.TELEPORTATION_RPC_BNBMAINNET ?? 'https://rpc.ankr.com/bsc',
     testnet: false,
     name: 'BNB Mainnet',
     teleportationAddress: '0x0',
@@ -102,7 +150,8 @@ export const BobaChains: IBobaChains = {
     },
   },
   5: {
-    url: 'https://goerli.gateway.tenderly.co',
+    // TODO: DEV VERSION (GRT tokens needed): subgraph deployed: https://api.studio.thegraph.com/query/57436/boba_bridges/version/latest
+    url: process.env.TELEPORTATION_RPC_GOERLITESTNET ?? 'https://rpc.ankr.com/eth_goerli',
     testnet: true,
     name: 'Goerli Testnet',
     teleportationAddress: '0x84b22166366a6f7E0cD0c3ce9998f2913Bf17A13',
@@ -115,7 +164,8 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    url: 'https://api.zan.top/node/v1/bsc/testnet/public',
+    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    url: process.env.TELEPORTATION_RPC_BNBTESTNET ?? 'https://api.zan.top/node/v1/bsc/testnet/public',
     testnet: true,
     name: 'BNB Testnet',
     teleportationAddress: '0x7f6a32bCaA70c65E08F2f221737612F6fC18347A',
