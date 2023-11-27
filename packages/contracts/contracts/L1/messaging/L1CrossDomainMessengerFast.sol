@@ -223,7 +223,7 @@ contract L1CrossDomainMessengerFast is
             successfulMessages[xDomainCalldataHash] = true;
             emit RelayedMessage(xDomainCalldataHash);
         } else {
-            failedMessages[xDomainCalldataHash] == true;
+            failedMessages[xDomainCalldataHash] = true;
             emit FailedRelayedMessage(xDomainCalldataHash);
         }
 
