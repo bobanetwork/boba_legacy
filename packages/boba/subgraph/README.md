@@ -1,3 +1,13 @@
+# Goldsky migration
+Light bridge has been migrated to Goldsky, more contracts may follow (we may need to evaluate which subgraphs are still needed).
+
+You need only one config file: `subgraph.json`
+This one has to be adapted manually, but the rest is automized.
+
+Just execute `goldsky subgraph deploy light-bridge/v{VERSION} --from-abi ./subgraph.json` to deploy the subgraphs on all supported networks.
+
+---
+
 # Boba Network Subgraphs
 
 These subgraphs index the **StandardBridge**, the **LiquidityPool**, the **Boba DAO**, and the **TuringMonster** contracts.
