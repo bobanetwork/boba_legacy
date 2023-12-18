@@ -86,7 +86,7 @@ jobs:
       - run: yarn compile
 
       - run: FORCE_COLOR=1 yarn coverage
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: solidity-coverage
           path: |
