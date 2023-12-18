@@ -54,7 +54,7 @@
     "hardhat": "^2.12.5",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",
-    "typedoc": "^0.24.7"
+    "typedoc": "^0.25.4"
   },
   "dependencies": {
     "@bobanetwork/core_contracts": "0.5.13",
