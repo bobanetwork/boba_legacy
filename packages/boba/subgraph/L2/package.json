@@ -11,7 +11,8 @@
     "create:subgraph:goerli": "graph create --node https://graph.goerli.boba.network:8020 boba/Bridges",
     "deploy:subgraph:local": "graph deploy boba/Bridges --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
     "deploy:subgraph:goerli": "graph deploy boba/Bridges --ipfs https://graph.goerli.boba.network:5001 --node https://graph.goerli.boba.network:8020",
-    "deploy:subgraph:mainnet": "graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph"
+    "deploy:subgraph:mainnet": "graph deploy --product hosted-service BOBANETWORK/boba-l2-subgraph",
+    "deploy:goldsky": "goldsky subgraph deploy light-bridge/v1 --from-abi ./subgraph.json"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.55.0",

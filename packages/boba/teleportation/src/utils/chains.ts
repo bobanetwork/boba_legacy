@@ -27,7 +27,6 @@ export const BobaChains: IBobaChains = {
 
   //#region boba_networks
   288: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves) --> boba listed though, but requires a hosted service
     url: process.env.TELEPORTATION_RPC_BOBAETHMAINNET ?? 'https://boba-ethereum.gateway.tenderly.co',
     testnet: false,
     name: 'Boba Ethereum Mainnet',
@@ -41,7 +40,6 @@ export const BobaChains: IBobaChains = {
     },
   },
   56288: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
     url: process.env.TELEPORTATION_RPC_BOBABNBMAINNET ?? 'https://replica.bnb.boba.network',
     testnet: false,
     name: 'Boba BNB Mainnet',
@@ -53,7 +51,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   2888: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    // GoldSky GraphQL endpoint:  https://api.goldsky.com/api/public/project_clq6jph4q9t2p01uja7p1f0c3/subgraphs/light-bridge-boba-goerli/v1/gn
     url: process.env.TELEPORTATION_RPC_BOBAETHGOERLI ?? 'https://replica.goerli.boba.network',
     testnet: true,
     name: 'Boba Ethereum Goerli',
@@ -65,7 +63,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   9728: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    // GoldSky GraphQL endpoint:  https://api.goldsky.com/api/public/project_clq6jph4q9t2p01uja7p1f0c3/subgraphs/light-bridge-boba-bnb-testnet/v1/gn
     url: process.env.TELEPORTATION_RPC_BOBABNBTESTNET ?? 'https://boba-bnb-testnet.gateway.tenderly.co',
     testnet: true,
     name: 'Boba BNB Testnet',
@@ -78,6 +76,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   421613: {
+    // GoldSky GraphQL endpoint: https://api.goldsky.com/api/public/project_clq6jph4q9t2p01uja7p1f0c3/subgraphs/light-bridge-arbitrum-goerli/v1/gn
     url: process.env.TELEPORTATION_RPC_ARBITRUMGOERLI ?? 'https://arbitrum-goerli.public.blastapi.io',
     testnet: true,
     name: 'Arbitrum Goerli',
@@ -88,6 +87,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   420: {
+    // GoldSky GraphQL endpoint: https://api.goldsky.com/api/public/project_clq6jph4q9t2p01uja7p1f0c3/subgraphs/light-bridge-optimism-goerli/v1/gn
     url: process.env.TELEPORTATION_RPC_OPTIMISMGOERLI ?? 'https://optimism-goerli.publicnode.com',
     testnet: true,
     name: 'Optimism Goerli',
@@ -98,7 +98,6 @@ export const BobaChains: IBobaChains = {
     },
   },
   42161: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
     url: process.env.TELEPORTATION_RPC_ARBITRUMMAINNET ?? 'https://arbitrum.llamarpc.com',
     testnet: false,
     name: 'Arbitrum Mainnet',
@@ -109,7 +108,6 @@ export const BobaChains: IBobaChains = {
     },
   },
   10: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
     url: process.env.TELEPORTATION_RPC_OPTIMISMMAINNET ?? 'https://optimism.llamarpc.com',
     testnet: false,
     name: 'Optimism Mainnet',
@@ -122,7 +120,6 @@ export const BobaChains: IBobaChains = {
   //#endregion
   //#region l1
   1: {
-    // TODO: Public nodes available, deploy once contract is live
     url: process.env.TELEPORTATION_RPC_ETHMAINNET ?? 'https://eth.llamarpc.com',
     testnet: false,
     name: 'Ethereum Mainnet',
@@ -136,7 +133,6 @@ export const BobaChains: IBobaChains = {
     },
   },
   56: {
-    // TODO: Public nodes available, deploy once contract is live
     url: process.env.TELEPORTATION_RPC_BNBMAINNET ?? 'https://rpc.ankr.com/bsc',
     testnet: false,
     name: 'BNB Mainnet',
@@ -150,7 +146,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   5: {
-    // TODO: DEV VERSION (GRT tokens needed): subgraph deployed: https://api.studio.thegraph.com/query/57436/boba_bridges/version/latest
+    // GoldSky GraphQL endpoint: https://api.goldsky.com/api/public/project_clq6jph4q9t2p01uja7p1f0c3/subgraphs/light-bridge-goerli/v1/gn
     url: process.env.TELEPORTATION_RPC_GOERLITESTNET ?? 'https://rpc.ankr.com/eth_goerli',
     testnet: true,
     name: 'Goerli Testnet',
@@ -164,7 +160,7 @@ export const BobaChains: IBobaChains = {
     },
   },
   97: {
-    // TODO: seemingly no public graph node available (would require hosted_service or deploying it ourselves)
+    // GoldSky GraphQL endpoint:  https://api.goldsky.com/api/public/project_clq6jph4q9t2p01uja7p1f0c3/subgraphs/light-bridge-chapel/v1/gn
     url: process.env.TELEPORTATION_RPC_BNBTESTNET ?? 'https://api.zan.top/node/v1/bsc/testnet/public',
     testnet: true,
     name: 'BNB Testnet',
