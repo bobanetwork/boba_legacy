@@ -29,6 +29,8 @@
     * [Boba Straw Price Feed Oracle](oracles/oracle.md)
     * [Gas Price Oracle](oracles/gas-price-oracle.md)
     * [Introduction to DIA Oracles](for-developers/oracles/introduction-to-dia-oracles.md)
+  * [Indexer](for-developers/indexer/README.md)
+    * [Subquery Indexer](for-developers/indexer/subquery-indexer.md)
   * [Boba Basics](for-developers/boba-basics/README.md)
     * [Testnet faucets for developers](for-developers/boba-basics/faucets.md)
     * [Sending ETH to L2](https://github.com/bobanetwork/boba/blob/develop/boba\_examples/init-fund-l2/README.md)
