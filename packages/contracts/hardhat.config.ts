@@ -104,6 +104,9 @@ const config: HardhatUserConfig = {
     bobaoperaTestnet: {
       url: 'https://testnet.bobaopera.boba.network',
     },
+    sepolia: {
+      url: 'https://sepolia.gateway.tenderly.co',
+    },
   },
   mocha: {
     timeout: 50000,
@@ -162,6 +165,7 @@ const config: HardhatUserConfig = {
       'boba-mainnet': process.env.BOBA_MAINNET_KEY,
       goerli: process.env.ETHERSCAN_GOERLI_KEY,
       'boba-goerli': process.env.BOBA_MAINNET_KEY,
+      sepolia: process.env.ETHERSCAN_KEY,
       moonbeam: process.env.MOONBEAM_KEY,
       bobabeam: 'DEFAULT_KEY',
       bobabase: 'DEFAULT_KEY',
@@ -286,6 +290,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://blockexplorer.testnet.bobaopera.boba.network/api',
           browserURL: 'https://blockexplorer.testnet.bobaopera.boba.network/',
+        },
+      },
+      {
+        network: 'sepolia',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api-sepolia.etherscan.io/api',
+          browserURL: 'https://sepolia.etherscan.io',
         },
       },
     ],
