@@ -29,6 +29,7 @@
     * [Boba Straw Price Feed Oracle](oracles/oracle.md)
     * [Gas Price Oracle](oracles/gas-price-oracle.md)
     * [Introduction to DIA Oracles](for-developers/oracles/introduction-to-dia-oracles.md)
+    * [Introduction to SupraOracles](for-developers/oracles/introduction-to-supraoracles.md)
   * [Indexer](for-developers/indexer/README.md)
     * [Subquery Indexer](for-developers/indexer/subquery-indexer.md)
   * [Boba Basics](for-developers/boba-basics/README.md)
