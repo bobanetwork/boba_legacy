@@ -1,6 +1,4 @@
-import {
-  defaultHardhatNetworkHdAccountsConfigParams
-} from 'hardhat/internal/core/config/default-config'
+import { defaultHardhatNetworkHdAccountsConfigParams } from 'hardhat/internal/core/config/default-config'
 import { normalizeHardhatNetworkAccountsConfig } from 'hardhat/internal/core/providers/util'
 
 export const hardHatLocalTestnet = {
@@ -187,4 +185,5 @@ export const supportedLocalTestnet = {
   4003: FantomLocalTestnet,
   43112: AvalancheLocalTestnet,
   99: BnbLocalTestnet,
+  11155111: hardHatLocalTestnet,
 }
