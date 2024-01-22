@@ -86,7 +86,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -95,13 +95,13 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Cache yarn modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Cache compilers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-compilers
         with:
           path: |
