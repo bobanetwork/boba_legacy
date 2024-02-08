@@ -4,7 +4,7 @@ The anchorage is activated on Sepolia Testnet. For other networks, please refer 
 
 ## Overview
 
-The repliace node section is a collection of guides and tutorials help you run your own BOBA node. 
+The repliace node section is a collection of guides and tutorials help you run your own BOBA node.
 
 ## Node Architecture
 
@@ -20,7 +20,7 @@ The Execution Client takes care of running the block information it gets from th
 
 ### Legacy Geth
 
-Boba switched its database from **Geth** to **Erigon** during a big update called the [Anchorage Upgrade](https://github.com/bobanetwork/v3-anchorage/blob/develop/boba-chain-ops/README.md#migration). The old data from Geth, before this upgrade, can still be accessed with the new system but needs a special part called Legacy Geth to work properly. This means if you need to use certain commands, like `eth_call`, on the old data, you'll have to use Legacy Geth.
+Boba switched its database from **Geth** to **Erigon** during a significant update called the [Anchorage Upgrade](https://github.com/bobanetwork/v3-anchorage/blob/develop/boba-chain-ops/README.md#migration). The old data from Geth, before this upgrade, can still be accessed with the new system but needs a special part called Legacy Geth to work properly. This means if you need to use certain commands, like `eth_call`, on the old data, you'll have to use Legacy Geth.
 
 You don't always need Legacy Geth, though. It's mainly for those who want to keep a full historical record of Boba nodes.
 
