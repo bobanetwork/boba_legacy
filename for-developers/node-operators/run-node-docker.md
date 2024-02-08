@@ -1,6 +1,6 @@
 # Running a Node with Docker
 
-This tutorial will walk you through the process of using Docker to run an BOBA Sepolia node, OP Mainnet node and OP Sepolia node.
+This tutorial will walk you through the process of using Docker to run an BOBA Sepolia node, OP Mainnet node and OP Sepolia node. You can find all Docker Compose files [here](https://github.com/bobanetwork/v3-anchorage/tree/develop/boba-community).
 
 ## Prerequisites
 
@@ -110,6 +110,14 @@ Once you've configured your `.env` file, you can run the node using Docker Compo
 
 ```bash
 docker-compose -f [docker-compose-file] up -d
+```
+
+## Optional: Run the Node with Geth
+
+We support both geth and erigon as the execution engines for Boba Sepolia node. You can start the node with geth using the following command:
+
+```bash
+docker-compose -f docker-compose-sepolia-geth.yml up -d
 ```
 
 ## Operating the Node
