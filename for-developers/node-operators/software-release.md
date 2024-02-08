@@ -2,6 +2,8 @@
 
 This page provides a list of the necessary versions of node software and instructions on how to keep them updated.
 
+Our latest releases, notes and changelogs can be found on Github. `op-node` releases can be found [here](https://github.com/bobanetwork/v3-anchorage/tags) and `op-erigon` release can be found [here](https://github.com/bobanetwork/v3-erigon/releases).
+
 ## Required Version by Network
 
 These are the minimal required versions for the `op-node`, `op-erigon` and `op-geth` by network.

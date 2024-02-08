@@ -4,7 +4,7 @@ description: A collection of links and addresses to get started on Boba-Ethereum
 
 # Contract Addresses Boba/Ethereum
 
-## Sepolia (28882)
+<figure><img src="../../.gitbook/assets/sepolia 28882.png" alt=""><figcaption></figcaption></figure>
 
 For **primary network contracts and addresses** see [packages/contracts-bedrock/deployments/boba-sepolia](https://github.com/bobanetwork/v3-anchorage/tree/develop/packages/contracts-bedrock/deployments/boba-sepolia)
 
@@ -15,7 +15,7 @@ For **primary network contracts and addresses** see [packages/contracts-bedrock/
 | Sepolia ChainID | 28882                                                        |
 | Sepolia RPC     | <p><a href="https://sepolia.boba.network">https://sepolia.boba.network</a><br><br><em><strong>This  endpoint is not for production systems and is rate limited.</strong></em></p><p></a></p> |
 | Gateway        | [https://gateway.boba.network](https://gateway.boba.network) |
-| Blockexplorer  | **TODO** |
+| Blockexplorer  | **TDB** |
 | Websocket      | [wss://wss.sepolia.boba.network](wss://wss.sepolia.boba.network) |
 | Gas Cap        | 50000000                                                     |
 
