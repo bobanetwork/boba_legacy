@@ -4,13 +4,23 @@ description: Setup a wallet, buy & transfer cryptocurrencies, use the different 
 
 # How To use Boba's services
 
+
+
 YouTube[https://gateway.boba.network/](https://gateway.boba.network)
 
 {% embed url="https://youtu.be/Y2bps8CkHSg" %}
 
 {% embed url="https://youtu.be/vGOGiEO2Dn4" %}
 
-{% embed url="https://youtu.be/rbuvlPHUe4I" %}
+{% embed url="https://www.youtube.com/watch?v=ScqYkLSH2nY" %}
+
+{% embed url="https://www.youtube.com/watch?v=bJa944PWxUg" %}
+
+{% embed url="https://www.youtube.com/watch?v=INg_63IxhOY" %}
+
+{% embed url="https://www.youtube.com/watch?v=_G9tw7FR6b4" %}
+
+{% embed url="https://www.youtube.com/watch?v=UC5mAV-3nbs" %}
 
 **Before getting started, make sure you have enough ETH in your Metamask wallet to approve and send transactions (we recommend 0.05 ETH).**
 
