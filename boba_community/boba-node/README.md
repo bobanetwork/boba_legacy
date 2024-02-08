@@ -1,4 +1,4 @@
-# Replica node
+# Replica node (Legacy)
 
 The [boba\_community/boba-node](./) repo runs a replica of the Boba L2geth, which is useful for generating analytics for blockexplorers and other specialized use cases.
 
