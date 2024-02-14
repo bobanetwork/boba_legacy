@@ -19,9 +19,9 @@ Always verify snapshots by comparing the sha256sum of the downloaded file to the
 | ------ | ------------- | ----- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Geth   | 2024-01-18    | 1.5MB | [Link](https://boba-db.s3.us-east-2.amazonaws.com/sepolia/boba-sepolia-geth-db-legacy.tgz) | `e8aa790f15e46bdd63cc6532c4b1df77d78cda83fcd6e55568317d23eeabc4c3` |
 
+### Optimism Sepolia Testnet (Archive Node)
 
-
-
-
-
+| Client | Snapshot Date | Size  | Download Link                                                | sha256sum                                                    |
+| ------ | ------------- | ----- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Erigon | 2023-08-11    | 912KB | [Link](https://boba-db.s3.us-east-2.amazonaws.com/sepolia/optimism-sepolia-erigon-db.tgz) | `10a5dd5cf58932df2bd90ef6844f2029b42c8a7fb2655ab2d558125db8db9c21` |
 
