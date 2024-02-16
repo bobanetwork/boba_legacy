@@ -11,6 +11,42 @@ These are the minimal required versions for the `op-node`, `op-erigon` and `op-g
 | Network      | op-node                                                      | op-erigon                                                    | op-geth                                                      |
 | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Boba Sepolia | [v1.5.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/op-node%2Fv1.5.0) | [v0.2.2](https://github.com/bobanetwork/v3-erigon/releases/tag/v0.2.2) | [v1.101305.3](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101305.3) |
+| Op Sepolia   | [v1.6.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/v1.6.0) | [v1.0.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.0.0) | [v1.101308.1](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.1) |
+| Op Mainnet   | [v1.6.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/v1.6.0) | [v1.0.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.0.0) | [v1.101308.1](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.1) |
+
+## [op-node v1.6.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/v1.6.0)
+
+**Description**
+
+This is a mandatory release for node operators on Op networks. It supports the Ecotone hardfork.
+
+**Required Action**
+
+Upgrade your `op-node` software.
+
+**Suggested action**
+
+Explicitly specify the Beacon endpoint: `--l1.beacon` and `$OP_NODE_L1_BEACON`
+
+## [op-erigon v1.0.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.0.0)
+
+**Description**
+
+This is a mandatory release for node operators on Op networks. It supports the Ecotone hardfork.
+
+**Required Action**
+
+Upgrade your `op-erigon` software.
+
+## [op-geth v1.101308.1](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.1)
+
+**Description**
+
+This is a mandatory release for node operators on Op networks.
+
+**Required Action**
+
+* Upgrade your `op-geth` software.
 
 ## [op-node v1.5.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/op-node%2Fv1.5.0)
 
