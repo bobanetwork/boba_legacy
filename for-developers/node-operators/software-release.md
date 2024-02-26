@@ -10,7 +10,7 @@ These are the minimal required versions for the `op-node`, `op-erigon` and `op-g
 
 | Network      | op-node                                                      | op-erigon                                                    | op-geth                                                      |
 | ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Boba Sepolia | [v1.6.1](https://github.com/bobanetwork/v3-anchorage/releases/tag/op-node%2Fv1.6.1) | [v1.1.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.1.0) | TBD                                                          |
+| Boba Sepolia | [v1.6.1](https://github.com/bobanetwork/v3-anchorage/releases/tag/op-node%2Fv1.6.1) | [v1.1.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.1.0) | [v1.101308.1](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.1) |
 | Op Sepolia   | [v1.6.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/v1.6.0) | [v1.0.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.0.0) | [v1.101308.1](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.1) |
 | Op Mainnet   | [v1.6.0](https://github.com/bobanetwork/v3-anchorage/releases/tag/v1.6.0) | [v1.0.0](https://github.com/bobanetwork/v3-erigon/releases/tag/v1.0.0) | [v1.101308.1](https://github.com/ethereum-optimism/op-geth/releases/tag/v1.101308.1) |
 

@@ -11,7 +11,7 @@ Always verify snapshots by comparing the sha256sum of the downloaded file to the
 | Client | Snapshot Date | Size  | Download Link                                                | sha256sum                                                    |
 | ------ | ------------- | ----- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Erigon | 2024-01-18    | 912KB | [Link](https://boba-db.s3.us-east-2.amazonaws.com/sepolia/boba-sepolia-erigon-db.tgz) | `b887d2e0318e9299e844da7d39ca32040e3d0fb6a9d7abe2dd2f8624eca1cade` |
-| Geth   | 2024-01-18    | 2MB   | [Link](https://boba-db.s3.us-east-2.amazonaws.com/sepolia/boba-sepolia-geth-db.tgz) | `713c10e3232fad373ab77b751c2c17fb4d73540b3496d298507dfd3f823d6a5f` |
+| Geth   | 2024-01-18    | 2MB   | [Link](https://boba-db.s3.us-east-2.amazonaws.com/sepolia/boba-sepolia-geth-db.tgz) | `b229c8e51e41a26bb21a84b329d3134ae5cc6541b04eb160aebd573f0e6b94ae` |
 
 ### BOBA Sepolia Testnet (Legacy)
 
