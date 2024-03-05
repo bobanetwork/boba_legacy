@@ -1,6 +1,13 @@
 ---
 2-reviewers:
-  - any: ['.github/**/*', 'l2geth/**/*', 'ops/**/*', 'packages/batch-submitter/**/*', 'packages/contracts/**/*', 'packages/data-transport-layer/**/*', 'packages/message-relayer/**/*', 'patches/**/*']
+  - '.github/**/*'
+  - 'l2geth/**/*'
+  - 'ops/**/*'
+  - 'packages/batch-submitter/**/*'
+  - 'packages/contracts/**/*'
+  - 'packages/data-transport-layer/**/*'
+  - 'packages/message-relayer/**/*'
+  - 'patches/**/*'
 
 M-ci:
   - any: ['.github/**/*']
