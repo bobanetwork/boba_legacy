@@ -45,6 +45,7 @@ type SyncService struct {
 	ctx                            context.Context
 	cancel                         context.CancelFunc
 	verifier                       bool
+	readOnly                       bool
 	db                             ethdb.Database
 	scope                          event.SubscriptionScope
 	txFeed                         event.Feed
@@ -127,6 +128,7 @@ func NewSyncService(ctx context.Context, cfg Config, txpool *core.TxPool, bc *co
 		ctx:                            ctx,
 		cancel:                         cancel,
 		verifier:                       cfg.IsVerifier,
+		readOnly:                       cfg.IsReadOnly,
 		enable:                         cfg.Eth1SyncServiceEnable,
 		syncing:                        atomic.Value{},
 		bc:                             bc,
@@ -157,7 +159,7 @@ func NewSyncService(ctx context.Context, cfg Config, txpool *core.TxPool, bc *co
 	// a remote server that indexes the layer one contracts. Place this
 	// code behind this if statement so that this can run without the
 	// requirement of the remote server being up.
-	if service.enable {
+	if service.enable && !cfg.IsReadOnly {
 		// Ensure that the rollup client can connect to a remote server
 		// before starting. Retry until it can connect.
 		tEnsure := time.NewTicker(10 * time.Second)
@@ -238,6 +240,12 @@ func (s *SyncService) Start() error {
 		log.Info("Running without syncing enabled")
 		return nil
 	}
+
+	if s.readOnly {
+		log.Info("Running in read only mode")
+		return nil
+	}
+
 	log.Info("Initializing Sync Service")
 	if err := s.updateGasPriceOracleCache(nil); err != nil {
 		return err
@@ -598,8 +606,8 @@ func (s *SyncService) GasPriceOracleOwnerAddress() *common.Address {
 	return &s.gasPriceOracleOwnerAddress
 }
 
-/// Update the execution context's timestamp and blocknumber
-/// over time. This is only necessary for the sequencer.
+// / Update the execution context's timestamp and blocknumber
+// / over time. This is only necessary for the sequencer.
 func (s *SyncService) updateL1BlockNumber() error {
 	context, err := s.client.GetLatestEthContext()
 	if err != nil {

@@ -87,6 +87,7 @@ type Backend interface {
 
 	// Optimism-specific API
 	IsVerifier() bool
+	IsReadOnly() bool
 	IsSyncing() bool
 	GetEthContext() (uint64, uint64)
 	GetRollupContext() (uint64, uint64, uint64)

@@ -162,6 +162,7 @@ var (
 		utils.RollupMaxCalldataSizeFlag,
 		utils.RollupBackendFlag,
 		utils.RollupEnforceFeesFlag,
+		utils.RollupReadOnlyFlag,
 		utils.RollupFeeThresholdDownFlag,
 		utils.RollupFeeThresholdUpFlag,
 		utils.SequencerClientHttpFlag,
