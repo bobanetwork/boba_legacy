@@ -49,6 +49,10 @@ func (b *LesApiBackend) IsVerifier() bool {
 	return false
 }
 
+func (b *LesApiBackend) IsReadOnly() bool {
+	return false
+}
+
 func (b *LesApiBackend) GasLimit() uint64 {
 	panic("not implemented")
 }

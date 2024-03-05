@@ -48,6 +48,7 @@ type EthAPIBackend struct {
 	gpo             *gasprice.Oracle
 	rollupGpo       *gasprice.RollupOracle
 	verifier        bool
+	readOnly        bool
 	gasLimit        uint64
 	UsingOVM        bool
 	MaxCallDataSize int
@@ -55,6 +56,10 @@ type EthAPIBackend struct {
 
 func (b *EthAPIBackend) IsVerifier() bool {
 	return b.verifier
+}
+
+func (b *EthAPIBackend) IsReadOnly() bool {
+	return b.readOnly
 }
 
 func (b *EthAPIBackend) IsSyncing() bool {
