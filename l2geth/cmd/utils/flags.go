@@ -870,6 +870,11 @@ var (
 		Usage:  "HTTP endpoint for the sequencer client",
 		EnvVar: "SEQUENCER_CLIENT_HTTP",
 	}
+	RollupReadOnlyFlag = cli.BoolFlag{
+		Name:   "rollup.readonly",
+		Usage:  "Enable read only mode",
+		EnvVar: "ROLLUP_READONLY",
+	}
 )
 
 // MakeDataDir retrieves the currently requested data directory, terminating
@@ -1111,6 +1116,8 @@ func setEth1(ctx *cli.Context, cfg *rollup.Config) {
 // UsingOVM
 // setRollup configures the rollup
 func setRollup(ctx *cli.Context, cfg *rollup.Config) {
+	fmt.Println("RollupEnableVerifierFlag.Name", RollupEnableVerifierFlag.Name)
+	fmt.Println("RollupReadOnlyFlag.Name", RollupReadOnlyFlag.Name)
 	if ctx.GlobalIsSet(RollupEnableVerifierFlag.Name) {
 		cfg.IsVerifier = ctx.GlobalBool(RollupEnableVerifierFlag.Name)
 	}
@@ -1148,6 +1155,10 @@ func setRollup(ctx *cli.Context, cfg *rollup.Config) {
 	}
 	if ctx.GlobalIsSet(SequencerClientHttpFlag.Name) {
 		cfg.SequencerClientHttp = ctx.GlobalString(SequencerClientHttpFlag.Name)
+	}
+	if ctx.GlobalIsSet(RollupReadOnlyFlag.Name) {
+		fmt.Println(RollupReadOnlyFlag.Name)
+		cfg.IsReadOnly = ctx.GlobalBool(RollupReadOnlyFlag.Name)
 	}
 }
 
