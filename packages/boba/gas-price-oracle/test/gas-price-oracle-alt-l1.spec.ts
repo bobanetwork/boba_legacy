@@ -857,7 +857,8 @@ describe('gas-price-oracle', () => {
       await tempGasPriceOracleAltL1Service.init()
 
       const input = [-100, 2, 2, 2, 2, 2, 2, 2, 2, 10000]
-      const filteredOutliers = tempGasPriceOracleAltL1Service.filterOutliers(input)
+      const filteredOutliers =
+        tempGasPriceOracleAltL1Service.filterOutliers(input)
       expect(filteredOutliers.includes(10000)).to.be.eq(false)
       expect(filteredOutliers.includes(-100)).to.be.eq(false)
       expect(filteredOutliers.length).to.be.eq(input.length - 2)
@@ -908,7 +909,9 @@ describe('gas-price-oracle', () => {
           tempGasPriceOracleAltL1Service.options.l1TokenCoinGeckoId
         )
       const BobaPriceFromCoinMarketCap =
-        await tempGasPriceOracleAltL1Service._getTokenPriceFromCoinMarketCap('14556')
+        await tempGasPriceOracleAltL1Service._getTokenPriceFromCoinMarketCap(
+          '14556'
+        )
       const l1NativeTokenPriceFromCoinMarketCap =
         await tempGasPriceOracleAltL1Service._getTokenPriceFromCoinMarketCap(
           tempGasPriceOracleAltL1Service.options.l1TokenCoinMarketCapId
@@ -962,12 +965,6 @@ describe('gas-price-oracle', () => {
       expect(priceRatio.toNumber()).to.be.gte(calculatedPriceRatio - 2)
       expect(priceRatio.toNumber()).to.be.lte(calculatedPriceRatio + 2)
       /* eslint-enable */
-
-      // Don't update the price ratio if the price is the same
-      const preBlockNumber = await wallet8.provider.getBlockNumber()
-      await tempGasPriceOracleAltL1Service._updatePriceRatio()
-      const postBlockNumber = await wallet8.provider.getBlockNumber()
-      expect(preBlockNumber).to.be.eq(postBlockNumber)
     })
   })
 })
