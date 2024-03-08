@@ -47,7 +47,7 @@ BOBA can bridged between the following networks. For your convenience, we've add
 #### Limits for bridging BOBA
 - Minimum Amount to be bridged: **20 BOBA**
 - Maximum Amount to be bridged: **20 000 BOBA**
-- Maximum Amount to be bridged per day (for all users combined): **40 000 BOBA**
+- Maximum Amount to be bridged per day & per route (for all users combined): **40 000 BOBA**
 
 ### BNB
 These are the supported routes for BNB.
@@ -57,7 +57,7 @@ These are the supported routes for BNB.
 #### Limits for bridging BNB
 - Minimum Amount to be bridged: **0.01 BNB**
 - Maximum Amount to be bridged: **2 BNB**
-- Maximum Amount to be bridged per day (for all users combined): **6 BNB**
+- Maximum Amount to be bridged per day & per route (for all users combined): **6 BNB**
 
 ### ETH
 ETH can be bridged from and to these networks.
@@ -69,7 +69,7 @@ ETH can be bridged from and to these networks.
 #### Limits for bridging ETH
 - Minimum Amount to be bridged: **0.01 ETH**
 - Maximum Amount to be bridged: **2 ETH**
-- Maximum Amount to be bridged per day (for all users combined): **6 ETH**
+- Maximum Amount to be bridged per day & per route (for all users combined): **6 ETH**
 
 ## Gas Airdrop
 If you bridge from **ETH Mainnet** to either **BOBA ETH** or **BOBA BNB Mainnet** you might receive some gas if you match certain conditions.
