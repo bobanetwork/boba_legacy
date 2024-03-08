@@ -45,6 +45,7 @@
     * [JSON-RPC API](for-developers/boba-basics/json-rpc-api.md)
     * [Token Bridging](for-developers/boba-basics/bridge-basics/README.md)
       * [Using the Standard Token Bridge](for-developers/boba-basics/bridge-basics/standard-bridge.md)
+      * [Using the LightBridge](for-developers/boba-basics/bridge-basics/light-bridge.md)
       * [Using the Fast Token Bridge](for-developers/boba-basics/bridge-basics/fast-bridge.md)
       * [Using the BOBA Token Bridge Between L1s](for-developers/boba-basics/bridge-basics/boba-token-bridge.md)
     * [Verifying Contracts](for-developers/boba-basics/verify-smart-contracts.md)
