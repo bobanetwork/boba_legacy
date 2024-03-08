@@ -5,6 +5,14 @@ description: Learn more about the Light Bridge
 # Using the Light Bridge
 The light bridge allows you to bridge particular assets into any direction that has been whitelisted. At the day of writing it is the fastest and most convenient way to bridge assets on Boba.
 
+## How to use LightBridge?
+1. Head over to the [Gateway](https://gateway.boba.network)
+2. Connect your wallet
+3. Select "Light Bridge" in the tabs
+4. Happy bridging!
+
+![LightBridge-TabsGateway.png](../../../.gitbook/assets/LightBridge-TabsGateway.png)
+
 ## How does it work?
 From a birds-eye perspective we do have 3 components:
 1. The User interacting with the user-interface such as the [Gateway DApp](https://gateway.boba.network/),
