@@ -671,14 +671,20 @@ export class GasPriceOracleService extends BaseService<GasPriceOracleOptions> {
 
   private async _queryTokenPrice(tokenPair: string): Promise<void> {
     if (tokenPair === 'ETH/USD') {
-      this.state.ETHUSDPrice = Number(
+      const ETHUSDPrice = Number(
         await this._getTokenPriceFromCoinGecko('ethereum')
       )
+      if (ETHUSDPrice > 0) {
+        this.state.ETHUSDPrice = ETHUSDPrice
+      }
     }
     if (tokenPair === 'BOBA/USD') {
-      this.state.BOBAUSDPrice = Number(
+      const BOBAUSDPrice = Number(
         await this._getTokenPriceFromCoinGecko('boba-network')
       )
+      if (BOBAUSDPrice > 0) {
+        this.state.BOBAUSDPrice = BOBAUSDPrice
+      }
     }
   }
 
