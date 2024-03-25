@@ -2961,17 +2961,7 @@
   resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.3.2.tgz"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@openzeppelin/contracts@^4.4.0":
-  version "4.8.0"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.8.0.tgz"
-  integrity sha512-AGuwhRRL+NaKx73WKRNzeCxOCOCxpaqF+kp8TJ89QzAipSwZy/NoflkWaL9bywXFRhIzXt8j38sfF7KBKCPWLw==
-
-"@openzeppelin/contracts@^4.7.3":
-  version "4.8.1"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-4.8.1.tgz"
-  integrity sha512-xQ6eUZl+RDyb/FiZe1h+U7qr/f4p/SrTSQcTPH2bjur3C5DbuW/zFgCU/b1P/xcIaEqJep+9ju4xDRi3rmChdQ==
-
-"@openzeppelin/contracts@^4.8.0", "@openzeppelin/contracts@^4.9.2":
+"@openzeppelin/contracts@^4.4.0", "@openzeppelin/contracts@^4.7.3", "@openzeppelin/contracts@^4.8.0", "@openzeppelin/contracts@^4.9.2":
   version "4.9.2"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.2.tgz#1cb2d5e4d3360141a17dbc45094a8cad6aac16c1"
   integrity sha512-mO+y6JaqXjWeMh9glYVzVu8HYPGknAAnWyxTRhGeckOruyXQMNnlcW6w/Dx9ftLeIQk6N+ZJFuVmTwF7lEIFrg==
@@ -4453,7 +4443,7 @@
     dotenv "^14.2.0"
     hardhat-watcher "^2.1.1"
 
-"@uniswap/v2-core@1.0.1", "@uniswap/v2-core@^1.0.0":
+"@uniswap/v2-core@1.0.1", "@uniswap/v2-core@^1.0.0", "@uniswap/v2-core@^1.0.1":
   version "1.0.1"
   resolved "https://registry.npmjs.org/@uniswap/v2-core/-/v2-core-1.0.1.tgz"
   integrity sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==
@@ -4468,6 +4458,11 @@
   resolved "https://registry.npmjs.org/@uniswap/v3-core/-/v3-core-1.0.0.tgz"
   integrity sha512-kSC4djMGKMHj7sLMYVnn61k9nu+lHjMIxgg9CDQT+s2QYLoA56GbSK9Oxr+qJXzzygbkrmuY6cwgP6cW2JXPFA==
 
+"@uniswap/v3-core@^1.0.0":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@uniswap/v3-core/-/v3-core-1.0.1.tgz#b6d2bdc6ba3c3fbd610bdc502395d86cd35264a0"
+  integrity sha512-7pVk4hEm00j9tc71Y9+ssYpO6ytkeI0y7WE9P6UcmNzhxPePwyAxImuhVsTqWK9YFvzgtvzJHi64pBl4jUzKMQ==
+
 "@uniswap/v3-periphery@1.4.1":
   version "1.4.1"
   resolved "https://registry.npmjs.org/@uniswap/v3-periphery/-/v3-periphery-1.4.1.tgz"
@@ -4481,14 +4476,14 @@
     hardhat-watcher "^2.1.1"
 
 "@uniswap/v3-periphery@^1.0.1", "@uniswap/v3-periphery@^1.1.1":
-  version "1.4.3"
-  resolved "https://registry.npmjs.org/@uniswap/v3-periphery/-/v3-periphery-1.4.3.tgz"
-  integrity sha512-80c+wtVzl5JJT8UQskxVYYG3oZb4pkhY0zDe0ab/RX4+8f9+W5d8wI4BT0wLB0wFQTSnbW+QdBSpkHA/vRyGBA==
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@uniswap/v3-periphery/-/v3-periphery-1.4.4.tgz#d2756c23b69718173c5874f37fd4ad57d2f021b7"
+  integrity sha512-S4+m+wh8HbWSO3DKk4LwUCPZJTpCugIsHrWR86m/OrUyvSqGDTXKFfc2sMuGXCZrD1ZqO3rhQsKgdWg3Hbb2Kw==
   dependencies:
     "@openzeppelin/contracts" "3.4.2-solc-0.7"
     "@uniswap/lib" "^4.0.1-alpha"
-    "@uniswap/v2-core" "1.0.1"
-    "@uniswap/v3-core" "1.0.0"
+    "@uniswap/v2-core" "^1.0.1"
+    "@uniswap/v3-core" "^1.0.0"
     base64-sol "1.0.1"
 
 "@uniswap/v3-sdk@^3.6.2":
