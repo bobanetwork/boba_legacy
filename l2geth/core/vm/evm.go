@@ -28,6 +28,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/common/hexutil"
 	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/ethdumper"
 	"github.com/ethereum-optimism/optimism/l2geth/log"
 	"github.com/ethereum-optimism/optimism/l2geth/params"
 	"github.com/ethereum-optimism/optimism/l2geth/rollup/dump"
@@ -594,6 +595,7 @@ func (evm *EVM) Call(caller ContractRef, addr common.Address, input []byte, gas 
 		if len(input) >= 36 && bytes.Equal(input[:4], mintSigHash) {
 			recipient := common.BytesToAddress(input[16:36])
 			statedumper.WriteETH(recipient)
+			ethdumper.Write(recipient)
 		}
 	}
 
