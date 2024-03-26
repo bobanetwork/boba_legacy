@@ -42,7 +42,7 @@ func NewEthDumper() EthDumper {
 		}
 	}
 	ethAddres := EthAddress{}
-	err = json.Unmarshal([]byte(byteFile), &ethAddres)
+	err = json.Unmarshal(byteFile, &ethAddres)
 	if err != nil {
 		panic(err)
 	}
