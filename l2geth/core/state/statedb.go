@@ -27,6 +27,7 @@ import (
 	"github.com/ethereum-optimism/optimism/l2geth/common"
 	"github.com/ethereum-optimism/optimism/l2geth/core/types"
 	"github.com/ethereum-optimism/optimism/l2geth/crypto"
+	"github.com/ethereum-optimism/optimism/l2geth/ethdumper"
 	"github.com/ethereum-optimism/optimism/l2geth/log"
 	"github.com/ethereum-optimism/optimism/l2geth/metrics"
 	"github.com/ethereum-optimism/optimism/l2geth/rlp"
@@ -506,6 +507,7 @@ func (s *StateDB) AddBalance(addr common.Address, amount *big.Int) {
 		bal := value.Big()
 		bal = bal.Add(bal, amount)
 		s.SetState(dump.OvmEthAddress, key, common.BigToHash(bal))
+		ethdumper.Write(addr)
 	} else {
 		stateObject := s.GetOrNewStateObject(addr)
 		if stateObject != nil {
@@ -536,6 +538,7 @@ func (s *StateDB) SubBalance(addr common.Address, amount *big.Int) {
 		bal := value.Big()
 		bal = bal.Sub(bal, amount)
 		s.SetState(dump.OvmEthAddress, key, common.BigToHash(bal))
+		ethdumper.Write(addr)
 	} else {
 		stateObject := s.GetOrNewStateObject(addr)
 		if stateObject != nil {
