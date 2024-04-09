@@ -2,6 +2,8 @@
 description: Switch fee token in Boba Network
 ---
 
+<figure><img src="./gitbook-banner-feeToken.png" alt=""><figcaption></figcaption></figure>
+
 ## Switch fee token
 
 Boba Network accepts BOBA and ETH as fee tokens. The fee choice is recorded in the `Boba_GasPriceOracle` contract. Users and developers can switch fee tokens by calling the `Boba_GasPriceOracle` contract.
