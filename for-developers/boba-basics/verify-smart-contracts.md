@@ -35,73 +35,60 @@ You need to add the following Etherscan config to your `hardhat.config.js` file:
 ```js
 module.exports = {
   networks: {
-    'boba-mainnet': {
-      url: 'https://mainnet.boba.network',
+    boba_eth_mainnet: {
+      url: process.env.LIGHTBRIDGE_RPC_BOBAETHMAINNET ?? 'https://mainnet.boba.network',
     },
-    bobabeam: {
-      url: 'https://bobabeam.boba.network',
+    boba_bnb_mainnet: {
+      url: 'https://boba-bnb.gateway.tenderly.co',
     },
-    bobaavax: {
-      url: 'https://avax.boba.network',
+    boba_sepolia: {
+      url: 'https://sepolia.boba.network',
     },
-    bobabnb: {
-      url: 'https://bnb.boba.network',
-    },
-    bobaopera: {
-      url: 'https://bobaopera.boba.network',
+    boba_bnb_testnet: {
+      url: 'https://boba-bnb-testnet.gateway.tenderly.co',
     },
   },
   etherscan: {
     apiKey: {
-      'boba-mainnet': process.env.BOBA_MAINNET_KEY,
-      bobabeam: 'NO_KEY_REQUIRED',
-      bobaavax: 'NO_KEY_REQUIRED',
-      bobabnb: 'NO_KEY_REQUIRED',
-      bobaopera: 'NO_KEY_REQUIRED',
+      boba_eth_mainnet: "boba", // not required, set placeholder
+      boba_bnb_mainnet: "boba", // not required, set placeholder
+      boba_bnb_testnet: "boba", // not required, set placeholder
+      boba_sepolia: "boba", // not required, set placeholder
     },
      customChains: [
-      {
-        network: 'boba-mainnet',
-        chainId: 288,
-        urls: {
-          apiURL: 'https://api.bobascan.com/api',
-          browserURL: 'https://bobascan.com',
-        },
-      },
-      {
-        network: 'bobabeam',
-        chainId: 1294,
-        urls: {
-          apiURL: 'https://blockexplorer.bobabeam.boba.network/api',
-          browserURL: 'https://blockexplorer.bobabeam.boba.network/',
-        },
-      },
-      {
-        network: 'bobaavax',
-        chainId: 43288,
-        urls: {
-          apiURL: 'https://blockexplorer.avax.boba.network/api',
-          browserURL: 'https://blockexplorer.avax.boba.network/',
-        },
-      },
-      {
-        network: 'bobabnb',
-        chainId: 56288,
-        urls: {
-          apiURL: 'https://blockexplorer.bnb.boba.network/api',
-          browserURL: 'https://blockexplorer.bnb.boba.network/',
-        },
-      },
-      {
-        network: 'bobaopera',
-        chainId: 301,
-        urls: {
-          apiURL: 'https://blockexplorer.bobaopera.boba.network/api',
-          browserURL: 'https://blockexplorer.bobaopera.boba.network/',
-        },
-      },
+       {
+         network: "boba_eth_mainnet",
+         chainId: 288,
+         urls: {
+           apiURL: "https://api.routescan.io/v2/network/mainnet/evm/288/etherscan",
+           browserURL: "https://bobascan.com"
+         },
+       },
+       {
+         network: "boba_bnb_mainnet",
+         chainId: 56288,
+         urls: {
+           apiURL: "https://api.routescan.io/v2/network/mainnet/evm/56288/etherscan",
+           browserURL: "https://bobascan.com"
+         },
+       },
+       {
+         network: "boba_sepolia",
+         chainId: 28882,
+         urls: {
+           apiURL: "https://api.routescan.io/v2/network/testnet/evm/28882/etherscan",
+           browserURL: "https://testnet.bobascan.com"
+         },
+       },
+       {
+         network: "boba_bnb_testnet",
+         chainId: 9728,
+         urls: {
+           apiURL: "https://api.routescan.io/v2/network/testnet/evm/9728/etherscan",
+           browserURL: "https://testnet.bobascan.com"
+         },
+       }
     ],
-  },
   }
 };
 ```
@@ -112,14 +99,7 @@ Lastly, run the `verify` task, passing the address of the contract, the network 
 npx hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
 ```
 
+---
 
+Alternatively you may want to use [Sourcify](https://sourcify.dev/) to verify your contracts.
 
-<figure><img src="../../.gitbook/assets/verifying contracts with blockscout.png" alt=""><figcaption></figcaption></figure>
-
-On contract creation, you will receive an address to check a pending transaction. If it does not redirect you to block explorer, verify you are on the chain where the contract was deployed, and type the contract's address into the search bar. Your contract details should come up.
-
-<figure><img src="../../.gitbook/assets/sdfgbnsdfghndf.png" alt=""><figcaption></figcaption></figure>
-
-Once you have provided all the necessary information, hit 'Verify & Publish'
-
-<figure><img src="../../.gitbook/assets/wefgwefgerfg.png" alt=""><figcaption></figcaption></figure>
