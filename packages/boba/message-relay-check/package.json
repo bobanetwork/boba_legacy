@@ -1,0 +1,13 @@
+{
+  "name": "message-relay-check",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@bobanetwork/sdk": "^1.0.7",
+    "dotenv": "16.0.3",
+    "ethers": "5.7.2"
+  }
+}
