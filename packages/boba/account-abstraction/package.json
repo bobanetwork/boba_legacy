@@ -48,7 +48,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@typechain/ethers-v5": "^10.1.0",
     "@types/chai": "^4.2.21",
-    "@types/node": "^16.4.12",
+    "@types/node": "^20.12.8",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
     "chai": "^4.3.4",
