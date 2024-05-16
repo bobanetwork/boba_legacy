@@ -1,74 +1,29 @@
 import { ethers } from 'ethers'
 import fetch from 'node-fetch'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config()
+
 export const WHITELIST_CHAIN_ID: Array<number> = [
   1287, 1284, 4002, 250, 43113, 43114, 97, 56,
 ]
 
+const THE_GRAPH_API_KEY = process.env.THE_GRAPH_API_KEY
+
 export const GRAPH_API_URL: any = {
-  // Bobabase
-  1287: {
-    rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabase-address-manager',
-  },
-  // Bobabeam
-  1284: {
-    rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabeam-address-manager',
-  },
-  // Bobaopera testnet
-  4002: {
-    rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-tn-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-tn-address-manager',
-  },
-  // Bobaopera
-  250: {
-    rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaopera-address-manager',
-  },
-  // Avalanche Testnet (fuji)
-  43113: {
-    rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobafuji-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobafuji-address-manager',
-  },
-  // Avalanche Mainnet
-  43114: {
-    rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaavax-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobaavax-address-manager',
-  },
   // BNB Testnet
   97: {
     rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-tn-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-tn-address-manager',
+      typeof THE_GRAPH_API_KEY !== 'undefined'
+        ? `https://gateway-arbitrum.network.thegraph.com/api/${THE_GRAPH_API_KEY}/subgraphs/id/DzAc9upeBtED6hAKBCkEUYmVTc5kSd2Cfg3Bw63fd8B4`
+        : 'https://api.studio.thegraph.com/query/35866/boba-bnb-testnet-rollup/version/latest',
   },
   // BNB Mainnet
   56: {
     rollup:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-rollup',
-    // The process of syncing Lib_addressManager is super slow
-    addressManager:
-      'https://api.thegraph.com/subgraphs/name/bobanetwork/bobabnb-address-manager',
+      typeof THE_GRAPH_API_KEY !== 'undefined'
+        ? `https://gateway-arbitrum.network.thegraph.com/api/${THE_GRAPH_API_KEY}/deployments/id/QmWfzcJBxFaEJ2c5n6ZxjERhmwNpkncrZQnzEyGiKiSFpF`
+        : `https://api.studio.thegraph.com/query/35866/boba-bnb-rollup/version/latest`,
   },
 }
 
@@ -280,7 +235,7 @@ export const getAddressSetEventsFromGraph = async (
   if (!GRAPH_API_URL[chainID]) {
     return []
   }
-  const response = await fetch(GRAPH_API_URL[chainID].addressManager, {
+  const response = await fetch(GRAPH_API_URL[chainID].rollup, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

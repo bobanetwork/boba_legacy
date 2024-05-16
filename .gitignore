@@ -69,6 +69,9 @@ packages/boba/gateway/public/env.js
 /packages/boba/subgraph/L2/build
 /packages/boba/subgraph/L1/generated
 /packages/boba/subgraph/L2/generated
+/packages/boba/subgraph/L1/rollup/generated
+/packages/boba/subgraph/L1/rollup/subgraph.yaml
+/packages/boba/subgraph/L1/rollup/yarn.lock
 
 # api
 env-mainnet.yml
@@ -81,3 +84,4 @@ packages/boba/contracts/coverage/
 
 packages/boba/account-abstraction/deployments/hardhat/
 packages/boba/bundler_sdk/coverage/
+
