@@ -52,38 +52,51 @@ x-integration_4_pk: &integration_4_pk
 version: "3"
 
 services:
-  l1_chain:
-    image: bobanetwork/bnb:bootstrap
-    restart: always
-    command: ash /scripts/bsc-rpc.sh
-    environment:
-      NODE_ID: "l1_chain"
-      BSC_CHAIN_ID: "99"
-      CLUSTER_CIDR: "192.168.0.0/24"
-      NETSTATS_URL: "bscpwd@netstats:3000"
-      BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
-      BOOTSTRAP_TCP_PORT: 30311
-      VERBOSE: 3
-    ports:
-      - '9545:8545'
-    networks:
-      - bnb-network
+  # local bnb somehow doesn't work with circle ci
+  # l1_chain:
+  #   image: bobanetwork/bnb:bootstrap
+  #   restart: always
+  #   command: ash /scripts/bsc-rpc.sh
+  #   environment:
+  #     NODE_ID: "l1_chain"
+  #     BSC_CHAIN_ID: "99"
+  #     CLUSTER_CIDR: "192.168.0.0/24"
+  #     NETSTATS_URL: "bscpwd@netstats:3000"
+  #     BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
+  #     BOOTSTRAP_TCP_PORT: 30311
+  #     VERBOSE: 3
+  #   ports:
+  #     - '9545:8545'
+  #   networks:
+  #     - bnb-network
 
-  l1_chain_validator:
-    image: bobanetwork/bnb:validator
-    restart: always
-    command: ash /scripts/bsc-validator.sh
+  # l1_chain_validator:
+  #   image: bobanetwork/bnb:validator
+  #   restart: always
+  #   command: ash /scripts/bsc-validator.sh
+  #   environment:
+  #     NODE_ID: "l1_chain_validator"
+  #     BOOTSTRAP_HOST: "l1_chain"
+  #     BSC_CHAIN_ID: "99"
+  #     CLUSTER_CIDR: "192.168.0.0/24"
+  #     NETSTATS_URL: "bscpwd@netstats:3000"
+  #     BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
+  #     BOOTSTRAP_TCP_PORT: 30311
+  #     VERBOSE: 3
+  #   networks:
+  #     - bnb-network
+
+  # this is a helper service used because there's no official hardhat image
+  l1_chain:
+    image: bobanetwork/hardhat:latest
+    build:
+      context: ./docker/hardhat
+      dockerfile: Dockerfile
     environment:
-      NODE_ID: "l1_chain_validator"
-      BOOTSTRAP_HOST: "l1_chain"
-      BSC_CHAIN_ID: "99"
-      CLUSTER_CIDR: "192.168.0.0/24"
-      NETSTATS_URL: "bscpwd@netstats:3000"
-      BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
-      BOOTSTRAP_TCP_PORT: 30311
-      VERBOSE: 3
-    networks:
-      - bnb-network
+      GAS_PRICE: 54321012345
+    ports:
+      # expose the service to the host for integration testing
+      - ${L1CHAIN_HTTP_PORT:-9545}:8545
 
   deployer:
     depends_on:
