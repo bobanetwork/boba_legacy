@@ -9,7 +9,7 @@ executors:
   intergration-tests-executor:
     resource_class: xlarge
     machine:
-      image: ubuntu-2204:2022.10.1
+      image: ubuntu-2204:edge
       docker_layer_caching: true
     environment:
       DOCKER_BUILDKIT: 1
@@ -206,17 +206,6 @@ jobs:
           test_folder: "eth-l2"
       - report-integration-tests
 
-  integration-tests-avalanche:
-    executor: intergration-tests-executor
-    parallelism: 4
-    steps:
-      - download-solidity-compilers
-      - run-integration-tests:
-          docker_compose_file: "docker-compose-avalanche.yml"
-          docker_compose_side_file: "docker-compose-avalanche-side.yml"
-          test_folder: "alt-l2"
-      - report-integration-tests
-
   integration-tests-bnb:
     executor: intergration-tests-executor
     parallelism: 4
@@ -232,7 +221,6 @@ workflows:
   main:
     jobs:
       - integration-tests
-      #- integration-tests-avalanche
       - integration-tests-bnb
       - go-lint-test-build:
           name: proxyd-tests
