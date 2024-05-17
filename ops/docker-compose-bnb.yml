@@ -59,7 +59,7 @@ services:
     environment:
       NODE_ID: "l1_chain"
       BSC_CHAIN_ID: "99"
-      CLUSTER_CIDR: "2001:db8:abc1::/64"
+      CLUSTER_CIDR: "192.168.0.0/24"
       NETSTATS_URL: "bscpwd@netstats:3000"
       BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
       BOOTSTRAP_TCP_PORT: 30311
@@ -77,7 +77,7 @@ services:
       NODE_ID: "l1_chain_validator"
       BOOTSTRAP_HOST: "l1_chain"
       BSC_CHAIN_ID: "99"
-      CLUSTER_CIDR: "2001:db8:abc1::/64"
+      CLUSTER_CIDR: "192.168.0.0/24"
       NETSTATS_URL: "bscpwd@netstats:3000"
       BOOTSTRAP_PUB_KEY: "177ae5db445a2f70db781b019aedd928f5b1528a7a43448840b022408f9a21509adcce0b37c87d59da68d47a16879cc1e95a62bbac9723f7b22f4365b2afabbe"
       BOOTSTRAP_TCP_PORT: 30311
@@ -460,7 +460,6 @@ services:
 networks:
   bnb-network:
     name: local-network
-    enable_ipv6: true
     ipam:
       config:
-        - subnet: "2001:db8:abc1::/64"
+        - subnet: "192.168.0.0/24"
