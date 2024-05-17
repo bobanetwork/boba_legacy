@@ -19,11 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # - name: golangci-lint gas-oracle
-      #   uses: golangci/golangci-lint-action@v3
-      #   with:
-      #     version: v1.51.0
-      #     working-directory: go/gas-oracle
+      - name: golangci-lint gas-oracle
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.56.1
+          working-directory: go/gas-oracle
       - name: golangci-lint batch-submitter
         uses: golangci/golangci-lint-action@v3
         with:

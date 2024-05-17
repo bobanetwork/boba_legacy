@@ -1,0 +1,34 @@
+---
+2-reviewers:
+  - '.github/**/*'
+  - 'l2geth/**/*'
+  - 'ops/**/*'
+  - 'packages/batch-submitter/**/*'
+  - 'packages/contracts/**/*'
+  - 'packages/data-transport-layer/**/*'
+  - 'packages/message-relayer/**/*'
+  - 'patches/**/*'
+
+M-ci:
+  - any: ['.github/**/*']
+
+M-l2geth:
+  - any: ['l2geth/**/*']
+
+M-integration:
+  - any: ['integration-tests/**/*']
+
+M-batch-submitter:
+  - any: ['packages/batch-submitter/**/*']
+
+M-contracts:
+  - any: ['packages/contracts/**/*']
+
+M-core-utils:
+  - any: ['packages/core-utils/**/*']
+
+M-dtl:
+  - any: ['packages/data-transport-layer/**/*']
+
+M-ops:
+  - any: ['ops/**/*']
