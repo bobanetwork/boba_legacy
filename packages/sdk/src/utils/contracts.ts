@@ -505,12 +505,12 @@ export const BRIDGE_ADAPTER_DATA: {
   99: {
     Standard: {
       Adapter: StandardBridgeAdapter,
-      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l1Bridge: '0x09635F643e140090A9A8Dcd712eD6285858ceBef',
       l2Bridge: predeploys.L2StandardBridge,
     },
     ETH: {
       Adapter: ETHBridgeAdapter,
-      l1Bridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      l1Bridge: '0x09635F643e140090A9A8Dcd712eD6285858ceBef',
       l2Bridge: predeploys.L2StandardBridge,
     },
   },
