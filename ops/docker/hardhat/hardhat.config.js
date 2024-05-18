@@ -2,10 +2,12 @@ const isForkModeEnabled = !!process.env.FORK_URL
 const forkUrl = process.env.FORK_URL
 const forkStartingBlock = parseInt(process.env.FORK_STARTING_BLOCK) || undefined
 const gasPrice = parseInt(process.env.GAS_PRICE) || 0
+const chainId = parseInt(process.env.CHAIN_ID) || 31337
 
 const config = {
   networks: {
     hardhat: {
+      chainId,
       gasPrice,
       initialBaseFeePerGas: 0
     },
