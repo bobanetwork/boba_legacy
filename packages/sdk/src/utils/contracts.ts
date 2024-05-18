@@ -266,15 +266,15 @@ export const CONTRACT_ADDRESSES: {
   // BNB local
   99: {
     l1: {
-      AddressManager: '0xC194E4CFa59D2DfC520217dA22E23DF8D4658a37',
-      L1CrossDomainMessenger: '0x8b8656D5d37C3DC620B80817972E0d9a5267761b',
-      L1CrossDomainMessengerFast: '0x07B43F437c3A13eeb17EF2beBea046e61502151f',
+      AddressManager: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+      L1CrossDomainMessenger: '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f',
+      L1CrossDomainMessengerFast: '4EE6eCAD1c2Dae9f525404De8555724e3c35d07B',
       L1StandardBridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
-      StateCommitmentChain: '0x57a243B34F9232515Fa9FD8D4c2daFd611cF1BCA',
-      CanonicalTransactionChain: '0x3717E342Bc746c01244fb40e47521945091238ce',
-      BondManager: '0xcF8dDe2accE564024B4b92ef7db81B0e6698F07f',
-      L1MultiMessageRelayer: '0x90f502229E1fAa70cCf900B2D14595a5C55B3bE8',
-      L1MultiMessageRelayerFast: '0x64160054BdD6e53915C221cBBfAAbaf1f80c7f20',
+      StateCommitmentChain: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
+      CanonicalTransactionChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
+      BondManager: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
+      L1MultiMessageRelayer: '0x9E545E3C0baAB3E08CdfD552C960A1050f373042',
+      L1MultiMessageRelayerFast: '0x22753E4264FDDc6181dc7cce468904A80a363E44',
     },
     l2: DEFAULT_L2_CONTRACT_ADDRESSES,
   },
