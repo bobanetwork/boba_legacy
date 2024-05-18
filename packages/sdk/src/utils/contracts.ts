@@ -268,8 +268,8 @@ export const CONTRACT_ADDRESSES: {
     l1: {
       AddressManager: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
       L1CrossDomainMessenger: '0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f',
-      L1CrossDomainMessengerFast: '4EE6eCAD1c2Dae9f525404De8555724e3c35d07B',
-      L1StandardBridge: '0x285766B642eAA86b8052817c827E4472cDb3dd18',
+      L1CrossDomainMessengerFast: '0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B',
+      L1StandardBridge: '0x09635F643e140090A9A8Dcd712eD6285858ceBef',
       StateCommitmentChain: '0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE',
       CanonicalTransactionChain: '0x0B306BF915C4d645ff596e518fAf3F9669b97016',
       BondManager: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
