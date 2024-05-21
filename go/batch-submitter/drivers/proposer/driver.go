@@ -220,7 +220,7 @@ func (d *Driver) CraftBatchTx(
 	// so in the event their API is unreachable we can fallback to a degraded
 	// mode of operation. This also applies to our test environments, as hardhat
 	// doesn't support the query either.
-	case drivers.IsMaxPriorityFeePerGasNotFoundError(err):
+	case drivers.IsMaxPriorityFeePerGasNotFoundError(err) || drivers.IsMaxPriorityFeePerGasNotSupportedError(err):
 		log.Warn(d.cfg.Name + " eth_maxPriorityFeePerGas is unsupported " +
 			"by current backend, using fallback gasTipCap")
 		opts.GasTipCap = drivers.FallbackGasTipCap
@@ -265,7 +265,7 @@ func (d *Driver) SubmitBatchTx(
 	// so in the event their API is unreachable we can fallback to a degraded
 	// mode of operation. This also applies to our test environments, as hardhat
 	// doesn't support the query either.
-	case drivers.IsMaxPriorityFeePerGasNotFoundError(err):
+	case drivers.IsMaxPriorityFeePerGasNotFoundError(err) || drivers.IsMaxPriorityFeePerGasNotSupportedError(err):
 		log.Warn(d.cfg.Name + " eth_maxPriorityFeePerGas is unsupported " +
 			"by current backend, using fallback gasTipCap")
 		opts.GasTipCap = drivers.FallbackGasTipCap

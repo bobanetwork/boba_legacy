@@ -59,6 +59,7 @@
   "dependencies": {
     "@bobanetwork/core_contracts": "0.5.13",
     "@eth-optimism/core-utils": "0.8.1",
+    "dotenv": "8.6.0",
     "lodash": "^4.17.21",
     "merkletreejs": "^0.2.27",
     "node-fetch": "^2.6.7",

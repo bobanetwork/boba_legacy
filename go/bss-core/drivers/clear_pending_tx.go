@@ -138,7 +138,7 @@ func SignClearingTx(
 
 	gasTipCap, err := l1Client.SuggestGasTipCap(ctx)
 	if err != nil {
-		if !IsMaxPriorityFeePerGasNotFoundError(err) {
+		if !IsMaxPriorityFeePerGasNotFoundError(err) && !IsMaxPriorityFeePerGasNotSupportedError(err) {
 			return nil, err
 		}
 

@@ -10,7 +10,7 @@ describe('subgraph tests', () => {
   let provider: ethers.providers.Provider
   beforeEach(async () => {
     provider = new ethers.providers.JsonRpcProvider(
-      'https://rpc.ankr.com/fantom_testnet'
+      'https://data-seed-prebsc-2-s2.bnbchain.org:8545'
     )
   })
 
@@ -18,14 +18,14 @@ describe('subgraph tests', () => {
     // These two events are from the same block
     const event_1 = await getRelayedMessageEventsFromGraph(
       provider,
-      '0x1ab4456687fc99dbaf42fd88da031754fe13167fbca1922db2989e89151058e7',
+      '0xeb2f76016d0029df16a0ebc7abba5c4afe2b424b0c0ea3cb1bf5ead5f92bf2d0',
       false
     )
     expect(event_1).to.have.lengthOf(1)
 
     const event_2 = await getRelayedMessageEventsFromGraph(
       provider,
-      '0x75cdbb1106a93a5fefb47234c253da860f0114ed64a15f629c6fabb45170b222',
+      '0x2d2ce68e715e0dae0fef636d67383cdbb976a1624db62ebc2ee0d892228f30f4',
       false
     )
     expect(event_1).to.have.lengthOf(1)
@@ -36,7 +36,7 @@ describe('subgraph tests', () => {
   it('should get transaction and transaction receipt from event', async () => {
     const event = await getRelayedMessageEventsFromGraph(
       provider,
-      '0x1ab4456687fc99dbaf42fd88da031754fe13167fbca1922db2989e89151058e7',
+      '0xeb2f76016d0029df16a0ebc7abba5c4afe2b424b0c0ea3cb1bf5ead5f92bf2d0',
       false
     )
     const transactionReceipt = await event[0].getTransactionReceipt()
@@ -48,13 +48,13 @@ describe('subgraph tests', () => {
 
   it('should get AddressSet events', async () => {
     provider = new ethers.providers.JsonRpcProvider(
-      'https://api.avax-test.network/ext/bc/C/rpc'
+      'https://data-seed-prebsc-2-s2.bnbchain.org:8545'
     )
     const event = await getAddressSetEventsFromGraph(
       provider,
-      'L2CrossDomainMessenger',
-      11967648,
-      11967648
+      'L2ERC1155Bridge',
+      30863106,
+      30863106
     )
     expect(event).to.have.lengthOf(1)
 

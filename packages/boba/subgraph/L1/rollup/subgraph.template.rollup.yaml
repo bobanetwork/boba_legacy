@@ -3,6 +3,26 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
+    name: Lib_AddressManager
+    network: {{network}}
+    source:
+      address: '{{contracts.Lib_AddressManager.address}}'
+      abi: Lib_AddressManager
+      startBlock: {{ contracts.Lib_AddressManager.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Lib_AddressManager
+      abis:
+        - name: Lib_AddressManager
+          file: ./abis/Lib_AddressManager.json
+      eventHandlers:
+        - event: AddressSet(indexed string,address,address)
+          handler: handleAddressSet
+      file: ./src/Lib_AddressManagermapping.ts
+  - kind: ethereum
     name: L1CrossDomainMessenger
     network: {{network}}
     source:
