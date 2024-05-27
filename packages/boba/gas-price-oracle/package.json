@@ -39,7 +39,7 @@
     "ethers": "^5.5.4",
     "hardhat": "^2.12.5",
     "mocha": "^8.3.1",
-    "prettier": "^2.2.1",
+    "prettier": "^3.2.5",
     "rimraf": "^3.0.2",
     "ts-node": "10.9.1",
     "tslint": "^6.1.3",
