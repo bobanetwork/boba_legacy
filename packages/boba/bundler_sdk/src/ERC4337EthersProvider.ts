@@ -128,7 +128,7 @@ export class ERC4337EthersProvider extends BaseProvider {
       this.config.entryPointAddress,
       this.chainId
     )
-    const waitPromise = new Promise<TransactionReceipt>((resolve, reject) => {
+    const waitForUserOp = async (): Promise<TransactionReceipt> => await new Promise((resolve, reject) => {
       new UserOperationEventListener(
         resolve,
         reject,
@@ -148,7 +148,7 @@ export class ERC4337EthersProvider extends BaseProvider {
       data: hexValue(userOp.callData), // should extract the actual called method from this "execFromEntryPoint()" call
       chainId: this.chainId,
       wait: async (confirmations?: number): Promise<TransactionReceipt> => {
-        const transactionReceipt = await waitPromise
+        const transactionReceipt = await waitForUserOp()
         if (userOp.initCode.length !== 0) {
           // checking if the wallet has been deployed by the transaction; it must be if we are here
           await this.smartAccountAPI.checkAccountPhantom()

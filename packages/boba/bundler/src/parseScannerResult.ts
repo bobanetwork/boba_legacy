@@ -213,6 +213,8 @@ export function parseScannerResult(
     'CREATE',
     'COINBASE',
     'SELFDESTRUCT',
+    'RANDOM',
+    'PREVRANDAO',
   ])
 
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
