@@ -839,7 +839,8 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
                 L1LiquidityPoolAddress,
                 _amount,
                 DEFAULT_FINALIZE_WITHDRAWAL_L1_GAS,
-                ""
+                "",
+                { value: _amount }
             );
         } else {
             require(_amount <= IERC20(_tokenAddress).balanceOf(address(this)), "Requested ERC20 exceeds pool balance");
