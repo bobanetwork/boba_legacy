@@ -834,7 +834,7 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
 
         if (_tokenAddress == Lib_PredeployAddresses.OVM_ETH) {
             require(_amount <= address(this).balance, "Requested ETH exceeds pool balance");
-            L2StandardBridge(Lib_PredeployAddresses.L2_STANDARD_BRIDGE).withdrawTo{ value: _amount }(
+            L2LiquidityPoolHelper(payable(Lib_PredeployAddresses.L2_STANDARD_BRIDGE)).withdrawTo{ value: _amount }(
                 _tokenAddress,
                 L1LiquidityPoolAddress,
                 _amount,
@@ -1031,4 +1031,16 @@ contract L2LiquidityPool is CrossDomainEnabled, ReentrancyGuardUpgradeable, Paus
         }
     }
 
+}
+
+interface L2LiquidityPoolHelper {
+    function withdrawTo(
+        address _l2Token,
+        address _to,
+        uint256 _amount,
+        uint32 _l1Gas,
+        bytes calldata _data
+    )
+        external
+        payable;
 }
