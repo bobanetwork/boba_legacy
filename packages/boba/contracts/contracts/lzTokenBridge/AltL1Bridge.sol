@@ -34,6 +34,9 @@ import "./lzApp/NonblockingLzApp.sol";
     uint256 public transferredAmount;
     uint256 public transferTimestampCheckPoint;
 
+    // Map the L2 token to the L1 token to limit token pairs.
+    mapping(address => address) public tokenPairs;
+
     // Note: Specify the _lzEndpoint on this layer, _dstChainId is not the actual evm chainIds, but the layerZero
     // proprietary ones, pass the chainId of the destination for _dstChainId
     function initialize(address _lzEndpoint, uint16 _dstChainId, address _ethBridgeAddress) public initializer {
@@ -85,6 +88,8 @@ import "./lzApp/NonblockingLzApp.sol";
         bytes calldata _data
     ) internal {
         require(_to != address(0), "_to cannot be zero address");
+        require(tokenPairs[_l2Token] != address(0), "token pair not registered");
+        require(_data.length < 100, "data too long");
 
         // check if the total amount transferred is smaller than the maximum amount of tokens can be transferred in 24 hours
         // if it's out of 24 hours, reset the transferred amount to 0 and set the transferTimestampCheckPoint to the current time
@@ -184,6 +189,14 @@ import "./lzApp/NonblockingLzApp.sol";
     /**************
      *    Admin    *
      **************/
+
+    function registerTokenPair(address _l1Token, address _l2Token) external onlyOwner {
+        require(_l1Token != address(0) && _l2Token != address(0), "token addresses cannot be zero address");
+        require(tokenPairs[_l2Token] == address(0), "token pair already registered");
+        tokenPairs[_l2Token] = _l1Token;
+
+        emit TokenPairRegistered(_l1Token, _l2Token);
+    }
 
     function setDstChainId(uint16 _dstChainId) external onlyOwner {
         dstChainId = _dstChainId;
