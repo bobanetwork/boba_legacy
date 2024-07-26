@@ -20,6 +20,11 @@ interface IEthBridge {
         bytes _data
     );
 
+    event TokenPairRegistered(
+        address indexed _l1Token,
+        address indexed _l2Token
+    );
+
     function depositERC20(
         address _l1Token,
         address _l2Token,

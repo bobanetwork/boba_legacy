@@ -20,6 +20,11 @@ interface IAltL1Bridge {
         bytes _data
     );
 
+    event TokenPairRegistered(
+        address indexed _l1Token,
+        address indexed _l2Token
+    );
+
     function withdraw(
         address _l2Token,
         uint256 _amount,
