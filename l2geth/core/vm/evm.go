@@ -471,6 +471,12 @@ func (evm *EVM) bobaTuringCall(input []byte, caller common.Address, mayBlock boo
 
 	// The URL we are going to query
 	endIDX := startIDXurl + lengthURL
+        if endIDX > len(rest) {
+		log.Debug("TURING malformed bobaTuringCall:URL")
+		retError[35] = 12 // re-use this error code
+		return retError, 12
+        }
+
 	url := string(rest[startIDXurl:endIDX])
 	// we use a specific end value (startIDXurl+lengthURL) since the URL is right-packed with zeros
 
