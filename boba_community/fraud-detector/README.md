@@ -2,7 +2,9 @@
 description: Learn how to help detect operator fraud
 ---
 
-# Checking Boba Mainnet for Fraud
+# Checking Boba Mainnet for Fraud (pre-Anchorage)
+
+This page applies to the Boba network prior to the Anchorage update in April 2024. The block derivation process in the new system provides stronger inherent guarantees of cross-chain consistency, as described at https://specs.optimism.io/protocol/derivation.html in the Optimism Bedrock documentation. The following information is preserved as a historical reference.
 
 ## Basics
 
@@ -16,7 +18,7 @@ The central idea is that if two (or more) geths injects the same transactions, t
 
 ## What do when you discover a state root mismatch
 
-Congratulations! The security of the L2 depends on community monitoring of the operator's actions. If you have discovered a state root mismatch, please file a GitHub issue (https://github.com/bobanetwork/boba/issues). We should have a good response/clarification for you quickly. In the future, with the Boba governance token, additional mechanisms will be released to incentivize and reward community monitoring of Boba.
+(section removed; not applicable to Anchorage)
 
 ## Running the Fraud Detector, the Verifier, and the Data Transport Layer (DTL) from local images
 
@@ -25,8 +27,8 @@ Congratulations! The security of the L2 depends on community monitoring of the o
 **Open a terminal window**. First, clone the project and install needed dependencies:
 
 ```bash
-$ git clone git@github.com:bobanetwork/boba.git
-$ cd boba
+$ git clone git@github.com:bobanetwork/boba_legacy.git
+$ cd boba_legacy
 $ yarn install
 $ yarn build
 $ cd ops
@@ -63,7 +65,7 @@ $ docker compose up
 Finally, **Open another terminal window** and upload the `addresses.json` to the `data transport layer` service.
 
 ```bash
-$ cd boba/boba_community/fraud-detector
+$ cd boba_legacy/boba_community/fraud-detector
 $ curl -H "Content-Type: application/json" -T state-dumps/mainnet/addresses.json http://localhost:8080/addresses.json
 ```
 
