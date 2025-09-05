@@ -133,33 +133,36 @@ sequenceDiagram
 
 ## Component Responsibilities
 
-| Component | Primary Responsibility | Failure Impact |
-|-----------|----------------------|----------------|
-| **L2StandardBridge** | Initiate withdrawals, burn tokens | Users can't start withdrawals |
-| **L2CrossDomainMessenger** | Encode cross-domain messages | Message format errors |
-| **L2ToL1MessagePasser** | Store message hashes | Withdrawal proofs fail |
-| **Sequencer** | Submit state batches to L1 | No withdrawals can progress |
-| **StateCommitmentChain** | Store L2 state, enforce fraud window | Withdrawals can't be proven |
-| **Data Transport Layer** | Sync L1/L2 events | Services lose visibility |
-| **Message Relayer** | Process withdrawals after window | Withdrawals stuck at ready state |
-| **L1CrossDomainMessenger** | Verify and execute withdrawals | Final step fails |
-| **L1StandardBridge** | Release tokens to users | Users don't receive funds |
+| Component                  | Primary Responsibility               | Failure Impact                   |
+| -------------------------- | ------------------------------------ | -------------------------------- |
+| **L2StandardBridge**       | Initiate withdrawals, burn tokens    | Users can't start withdrawals    |
+| **L2CrossDomainMessenger** | Encode cross-domain messages         | Message format errors            |
+| **L2ToL1MessagePasser**    | Store message hashes                 | Withdrawal proofs fail           |
+| **Sequencer**              | Submit state batches to L1           | No withdrawals can progress      |
+| **StateCommitmentChain**   | Store L2 state, enforce fraud window | Withdrawals can't be proven      |
+| **Data Transport Layer**   | Sync L1/L2 events                    | Services lose visibility         |
+| **Message Relayer**        | Process withdrawals after window     | Withdrawals stuck at ready state |
+| **L1CrossDomainMessenger** | Verify and execute withdrawals       | Final step fails                 |
+| **L1StandardBridge**       | Release tokens to users              | Users don't receive funds        |
 
 ## Monitoring Points
 
 ### Critical Health Checks
 
 1. **State Batch Frequency**
+   
    - Monitor: `StateBatchAppended` events on StateCommitmentChain
    - Alert: No batches for > 1 hour
    - Contract: `0xeF85fA550e6EC5486121313C895EDe1005e2397f`
 
 2. **Message Relayer Activity**
+   
    - Monitor: `RelayedMessage` events on L1CrossDomainMessenger
    - Alert: No relays for ready messages
    - Contract: `0x31338a7D5d123E18a9a71447136B54B6D28241ae`
 
 3. **Service Uptime**
+   
    - Monitor: DTL L1/L2 ingestion services
    - Monitor: Message relayer service
    - Alert: Process not running

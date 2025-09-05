@@ -1,6 +1,7 @@
 # Boba Network Withdrawal Flow - Complete Learning Guide
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [System Components](#system-components)
 3. [Complete Withdrawal Flow](#complete-withdrawal-flow)
@@ -15,6 +16,7 @@
 Boba Network uses an optimistic rollup design where withdrawals from L2 to L1 require a **7-day challenge period** for security. This document explains the complete flow from when a user initiates a withdrawal until they receive their tokens on L1.
 
 ### Key Concepts
+
 - **Optimistic Rollup**: Assumes transactions are valid unless challenged
 - **Fraud Proof Window**: 7-day period where transactions can be challenged
 - **State Commitment**: L2 state is periodically committed to L1
@@ -25,6 +27,7 @@ Boba Network uses an optimistic rollup design where withdrawals from L2 to L1 re
 ### Smart Contracts
 
 #### L2 Contracts
+
 ```
 L2StandardBridge (0x4200000000000000000000000000000000000010)
 ├── Handles withdrawal initiation
@@ -40,6 +43,7 @@ OVM_L2ToL1MessagePasser (0x4200000000000000000000000000000000000000)
 ```
 
 #### L1 Contracts (BSC for Boba BNB)
+
 ```
 StateCommitmentChain (0xeF85fA550e6EC5486121313C895EDe1005e2397f)
 ├── Stores L2 state commitments
@@ -61,6 +65,7 @@ L1MultiMessageRelayerFast (0x???)
 ### Off-Chain Services
 
 #### Data Transport Layer (DTL)
+
 ```
 L2IngestionService
 ├── Monitors L2 blocks and transactions
@@ -74,6 +79,7 @@ L1IngestionService
 ```
 
 #### Message Relayer Service
+
 ```
 MessageRelayerService
 ├── Processes pending withdrawals
@@ -83,6 +89,7 @@ MessageRelayerService
 ```
 
 #### Subgraph Indexers
+
 ```
 L2 Subgraph
 ├── Indexes WithdrawalInitiated events
@@ -117,6 +124,7 @@ sequenceDiagram
 ```
 
 **What happens:**
+
 1. User calls `withdraw()` on L2StandardBridge
 2. Bridge burns user's L2 tokens (prevents double-spending)
 3. Bridge constructs withdrawal message for L1
@@ -146,6 +154,7 @@ sequenceDiagram
 ```
 
 **What happens:**
+
 1. DTL monitors and indexes withdrawal events
 2. Sequencer periodically submits L2 state batches to L1
 3. StateCommitmentChain stores state commitments with timestamps
@@ -174,6 +183,7 @@ gantt
 ```
 
 **What happens:**
+
 1. System waits for fraud proof window to expire
 2. Message relayer continuously checks withdrawal status
 3. No action can be taken until 7 days pass
@@ -201,6 +211,7 @@ sequenceDiagram
 ```
 
 **What happens:**
+
 1. Message relayer calls `relayMessage()` with inclusion proof
 2. L1CrossDomainMessenger verifies the message:
    - Checks fraud proof window has expired
@@ -321,13 +332,13 @@ SEQUENCER_PUBLISH_WINDOW = 1800 // 30 minutes
 
 ### Timeline Breakdown
 
-| Phase | Duration | Description |
-|-------|----------|-------------|
-| L2 Withdrawal | Instant | User transaction on L2 |
-| State Batch Wait | 0-30 min | Wait for next sequencer batch |
-| Fraud Proof Window | **7 days** | Challenge period |
-| Relay Processing | 1-5 min | Message relayer execution |
-| **Total Time** | **~7 days** | Normal completion time |
+| Phase              | Duration    | Description                   |
+| ------------------ | ----------- | ----------------------------- |
+| L2 Withdrawal      | Instant     | User transaction on L2        |
+| State Batch Wait   | 0-30 min    | Wait for next sequencer batch |
+| Fraud Proof Window | **7 days**  | Challenge period              |
+| Relay Processing   | 1-5 min     | Message relayer execution     |
+| **Total Time**     | **~7 days** | Normal completion time        |
 
 ### Why 17 Days Indicates Problems
 
@@ -343,6 +354,7 @@ If withdrawals are taking 17 days instead of 7, it suggests:
 ### Diagnostic Steps
 
 #### 1. Check State Batch Submissions
+
 ```bash
 # Query recent StateBatchAppended events on BSC
 # Contract: 0xeF85fA550e6EC5486121313C895EDe1005e2397f
@@ -350,6 +362,7 @@ If withdrawals are taking 17 days instead of 7, it suggests:
 ```
 
 #### 2. Verify Message Relayer Status
+
 ```bash
 # Check if message relayer service is running
 # Look for recent RelayedMessage events
@@ -357,6 +370,7 @@ If withdrawals are taking 17 days instead of 7, it suggests:
 ```
 
 #### 3. Monitor Withdrawal Status
+
 ```typescript
 // Using Boba SDK
 const messenger = new CrossChainMessenger({...});
@@ -366,13 +380,13 @@ const status = await messenger.getMessageStatus(withdrawalTx);
 
 ### Common Issues and Solutions
 
-| Issue | Symptoms | Solution |
-|-------|----------|----------|
-| Sequencer Down | No state batches for hours | Restart sequencer service |
-| Relayer Down | Messages stuck at READY_FOR_RELAY | Restart message relayer |
-| DTL Issues | Events not indexed | Restart DTL services |
-| Gas Issues | Relayer transactions failing | Fund relayer wallet |
-| RPC Issues | Service connection errors | Check RPC endpoints |
+| Issue          | Symptoms                          | Solution                  |
+| -------------- | --------------------------------- | ------------------------- |
+| Sequencer Down | No state batches for hours        | Restart sequencer service |
+| Relayer Down   | Messages stuck at READY_FOR_RELAY | Restart message relayer   |
+| DTL Issues     | Events not indexed                | Restart DTL services      |
+| Gas Issues     | Relayer transactions failing      | Fund relayer wallet       |
+| RPC Issues     | Service connection errors         | Check RPC endpoints       |
 
 ### Emergency Procedures
 
@@ -383,6 +397,7 @@ const status = await messenger.getMessageStatus(withdrawalTx);
 ## Code References
 
 ### Key Files
+
 - `packages/contracts/contracts/L2/messaging/L2StandardBridge.sol` - L2 withdrawal logic
 - `packages/contracts/contracts/L1/messaging/L1CrossDomainMessenger.sol` - L1 verification
 - `packages/contracts/contracts/L1/rollup/StateCommitmentChain.sol` - Fraud proof window
@@ -391,6 +406,7 @@ const status = await messenger.getMessageStatus(withdrawalTx);
 - `packages/boba/contracts/contracts/L1MultiMessageRelayerFast.sol` - Batch processing
 
 ### Configuration Files
+
 - `packages/contracts/deployments/bobabnb/` - Contract addresses and configs
 - `packages/boba/subgraph/L1/rollup/config/bobabnb.json` - Subgraph configuration
 

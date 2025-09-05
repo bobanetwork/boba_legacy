@@ -39,6 +39,8 @@ const main = async () => {
   const l2TxReceipt = await l2Provider.getTransactionReceipt(
     L2_TRANSACTION_HASH
   )
+  console.log(`🔔`.repeat(20))
+  console.log(`l2 receipt from => ${l2TxReceipt.from} with txHash`, l2TxReceipt);
   if (l2TxReceipt === null) {
     console.error(
       `!! invalid L2_TRANSACTION_HASH: ${L2_TRANSACTION_HASH}. The transaction is not found.`
@@ -51,6 +53,9 @@ const main = async () => {
       i.address === contractAddress.l2.L2CrossDomainMessenger &&
       i.topics[0] === L2_CROSS_DOMAIN_MESSENGER_TOPIC
   )
+
+  console.log(`logData`,logData);
+
   if (logData.length === 0) {
     console.error(
       `!! invalid L2_TRANSACTION_HASH: ${L2_TRANSACTION_HASH}. The transaction is not a cross chain message.`
@@ -81,10 +86,21 @@ const main = async () => {
   const fromBlock = Math.max(0, l1BlockNumber - 10000000)
   const messages = await messenger.getMessagesByTransaction(L2_TRANSACTION_HASH)
 
+  console.log(`l1BlockNumber`, l1BlockNumber, l1BlockNumber.toString())
+  console.log(`messages`, messages)
+
+
   for (const message of messages) {
+    const resolved = await messenger.toCrossChainMessage(message);
+    console.log(`resolved from messenger`, resolved);
     const messageStatus = await messenger.getMessageStatus(message, {
       fromBlock,
     })
+
+    const stateRoot = await messenger.getStateRootBatchByTransactionIndex(l2TxReceipt.blockNumber - 1);
+    console.log(`state root`, stateRoot);
+
+    console.log(`messageStatus`, message, messageStatus, fromBlock)
     if (messageStatus === MessageStatus.RELAYED) {
       console.log(
         `Your message is relayed on L1 sucessfully! L1 transaction hash: ${message.transactionHash}.`

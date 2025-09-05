@@ -5,7 +5,9 @@ This directory contains comprehensive documentation for understanding and troubl
 ## 📚 Documentation Overview
 
 ### [Boba Withdrawal Flow Guide](./boba-withdrawal-flow-guide.md)
+
 **The main learning document** - Complete technical guide covering:
+
 - System architecture and components
 - Step-by-step withdrawal flow
 - Smart contract interactions
@@ -13,21 +15,27 @@ This directory contains comprehensive documentation for understanding and troubl
 - Code references and configuration
 
 ### [System Architecture](./boba-system-architecture.md)
+
 **Visual system overview** - Diagrams and architecture documentation:
+
 - Component relationship diagrams
 - Service dependency maps
 - Data flow sequences
 - Monitoring points and health checks
 
 ### [Troubleshooting Guide](./withdrawal-troubleshooting-guide.md)
+
 **Operational troubleshooting** - Practical diagnostic procedures:
+
 - Quick diagnosis checklist
 - Common issues and solutions
 - Emergency procedures
 - Monitoring setup recommendations
 
 ### [L2 Exit Mechanisms](./l2Exits/)
+
 **Alternative withdrawal methods** - Fee-based exit systems:
+
 - Discretionary exit fees and billing systems
 - Gas burning mechanisms for spam prevention
 - Complete flow analysis for all exit types
@@ -36,11 +44,13 @@ This directory contains comprehensive documentation for understanding and troubl
 ## 🎯 Quick Start
 
 ### For Developers
+
 1. Read the [Withdrawal Flow Guide](./boba-withdrawal-flow-guide.md) to understand the complete system
 2. Review the [System Architecture](./boba-system-architecture.md) for component relationships
 3. Study the code references in `packages/contracts/` and `packages/message-relayer/`
 
 ### For Operators
+
 1. Use the [Troubleshooting Guide](./withdrawal-troubleshooting-guide.md) for immediate issues
 2. Set up monitoring based on the [System Architecture](./boba-system-architecture.md) metrics
 3. Keep the [Quick Reference Commands](./withdrawal-troubleshooting-guide.md#quick-reference-commands) handy
@@ -56,18 +66,21 @@ If you're here because of the withdrawal delay issue, start with:
 ## 📋 Key Information Summary
 
 ### Normal Operation
+
 - **Expected withdrawal time**: ~7 days
 - **Fraud proof window**: 604,800 seconds (exactly 7 days)
 - **State batch frequency**: Every ~30 minutes
 - **Message processing**: <1 hour after fraud window expires
 
 ### Critical Services (Boba BNB)
+
 - **StateCommitmentChain**: `0xeF85fA550e6EC5486121313C895EDe1005e2397f`
 - **L1CrossDomainMessenger**: `0x31338a7D5d123E18a9a71447136B54B6D28241ae`
 - **L1StandardBridge**: `0x1E0f7f4b2656b14C161f1caDF3076C02908F9ACC`
 - **L2StandardBridge**: `0x4200000000000000000000000000000000000010`
 
 ### Service Stack
+
 ```
 User Withdrawal (L2)
     ↓
@@ -90,17 +103,19 @@ User Receives Tokens (L1)
 - Multiple withdrawals stuck at `READY_FOR_RELAY` status
 - Message relayer service not running
 - Relayer wallet balance <0.1 BNB
-- >5% transaction failure rate
+- > 5% transaction failure rate
 
 ## 🛠️ Common Fixes
 
 ### Sequencer Issues
+
 ```bash
 systemctl restart boba-sequencer
 tail -f /var/log/boba-sequencer.log
 ```
 
 ### Message Relayer Issues
+
 ```bash
 systemctl restart message-relayer
 # Check relayer wallet balance
@@ -108,6 +123,7 @@ systemctl restart message-relayer
 ```
 
 ### Data Transport Layer Issues
+
 ```bash
 systemctl restart data-transport-layer-l1
 systemctl restart data-transport-layer-l2
@@ -122,17 +138,20 @@ systemctl restart data-transport-layer-l2
 ## 🔗 Related Resources
 
 ### Code Repositories
+
 - `packages/contracts/` - Smart contract implementations
 - `packages/message-relayer/` - Message relayer service
 - `packages/data-transport-layer/` - Event monitoring and sync
 - `packages/sdk/` - TypeScript SDK for interacting with the system
 
 ### External Resources
+
 - [Boba Network Documentation](https://docs.boba.network)
 - [BSCScan](https://bscscan.com) - For L1 transaction monitoring
 - [Boba BNB Explorer](https://blockexplorer.bnb.boba.network) - For L2 transaction monitoring
 
 ### Monitoring Dashboards
+
 - State Commitment Monitor: Track `StateBatchAppended` events
 - Message Relay Monitor: Track `RelayedMessage` events
 - Service Health Dashboard: Monitor all critical services

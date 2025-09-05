@@ -24,6 +24,7 @@ When withdrawals are taking longer than 7 days, follow this systematic approach:
 **Objective**: Verify the sequencer is submitting L2 state to BSC
 
 **Steps**:
+
 ```bash
 # Query StateCommitmentChain for recent StateBatchAppended events
 # Contract: 0xeF85fA550e6EC5486121313C895EDe1005e2397f on BSC
@@ -34,6 +35,7 @@ When withdrawals are taking longer than 7 days, follow this systematic approach:
 ```
 
 **Using Web3 CLI**:
+
 ```javascript
 const stateCommitmentChain = "0xeF85fA550e6EC5486121313C895EDe1005e2397f";
 const currentBlock = await provider.getBlockNumber();
@@ -50,6 +52,7 @@ console.log(`Found ${events.length} state batches in last 24 hours`);
 ```
 
 **Interpretation**:
+
 - ✅ **Normal**: 40-50 events per day (every ~30 minutes)
 - ⚠️ **Warning**: <20 events per day (gaps > 1 hour)
 - 🔴 **Critical**: <5 events per day or no events >4 hours
@@ -59,6 +62,7 @@ console.log(`Found ${events.length} state batches in last 24 hours`);
 **Objective**: Confirm the message relayer is actively processing withdrawals
 
 **Steps**:
+
 ```bash
 # Check L1CrossDomainMessenger for RelayedMessage events
 # Contract: 0x31338a7D5d123E18a9a71447136B54B6D28241ae on BSC
@@ -67,6 +71,7 @@ console.log(`Found ${events.length} state batches in last 24 hours`);
 ```
 
 **Using Boba SDK**:
+
 ```typescript
 import { CrossChainMessenger } from '@bobanetwork/sdk';
 
@@ -87,6 +92,7 @@ console.log('Withdrawal status:', status);
 ```
 
 **Interpretation**:
+
 - ✅ **Normal**: Status progresses from UNCONFIRMED → READY_FOR_RELAY → RELAYED
 - ⚠️ **Warning**: Stuck at READY_FOR_RELAY for >1 hour
 - 🔴 **Critical**: Multiple messages stuck at READY_FOR_RELAY
@@ -96,6 +102,7 @@ console.log('Withdrawal status:', status);
 **Objective**: Ensure the 7-day waiting period has actually expired
 
 **Steps**:
+
 ```javascript
 // For a specific withdrawal, check if fraud proof window has expired
 const stateCommitmentChain = new ethers.Contract(
@@ -115,6 +122,7 @@ if (isInsideWindow) {
 ```
 
 **Timeline Calculation**:
+
 ```javascript
 const FRAUD_PROOF_WINDOW = 604800; // 7 days in seconds
 const batchTimestamp = batchHeader.extraData; // Decode to get timestamp
@@ -132,6 +140,7 @@ if (timeRemaining > 0) {
 **Objective**: Verify all critical services can communicate with blockchains
 
 **RPC Health Checks**:
+
 ```bash
 # Test L2 RPC (Boba BNB)
 curl -X POST https://bnb.boba.network \
@@ -145,6 +154,7 @@ curl -X POST https://bsc-dataseed.binance.org \
 ```
 
 **Service Status Checks**:
+
 ```bash
 # Check if message relayer process is running
 ps aux | grep message-relayer
@@ -162,6 +172,7 @@ tail -f /var/log/data-transport-layer.log
 **Objective**: Ensure the relayer has funds and transactions aren't failing
 
 **Gas Balance Check**:
+
 ```javascript
 const relayerAddress = "0x..."; // Message relayer wallet address
 const balance = await provider.getBalance(relayerAddress);
@@ -176,6 +187,7 @@ if (parseFloat(balanceInBNB) < 0.1) {
 ```
 
 **Recent Transaction Check**:
+
 ```javascript
 // Check recent transactions from relayer
 const recentTxs = await provider.getHistory(relayerAddress, -10); // Last 10 transactions
@@ -194,17 +206,20 @@ for (const tx of recentTxs) {
 ### Issue 1: Sequencer Not Submitting State Batches
 
 **Symptoms**:
+
 - No `StateBatchAppended` events for >2 hours
 - Withdrawals stuck indefinitely
 - L2 appears to be working normally
 
 **Root Causes**:
+
 - Sequencer service crashed or stopped
 - BSC RPC connectivity issues
 - Insufficient gas funds for sequencer
 - BSC network congestion
 
 **Solutions**:
+
 ```bash
 # 1. Restart sequencer service
 systemctl restart boba-sequencer
@@ -222,17 +237,20 @@ curl -X POST https://bsc-dataseed.binance.org -H "Content-Type: application/json
 ### Issue 2: Message Relayer Not Processing
 
 **Symptoms**:
+
 - Withdrawals stuck at `READY_FOR_RELAY` status
 - No `RelayedMessage` events from L1CrossDomainMessenger
 - Fraud proof window has expired
 
 **Root Causes**:
+
 - Message relayer service down
 - Relayer wallet out of gas
 - L1 RPC connection issues
 - Incorrect relayer configuration
 
 **Solutions**:
+
 ```bash
 # 1. Restart message relayer
 systemctl restart message-relayer
@@ -250,17 +268,20 @@ cat /etc/message-relayer/config.json
 ### Issue 3: Data Transport Layer Sync Issues
 
 **Symptoms**:
+
 - Events not being indexed
 - Services can't find withdrawal data
 - Inconsistent status reporting
 
 **Root Causes**:
+
 - DTL services crashed
 - Database corruption
 - RPC rate limiting
 - Block reorganizations
 
 **Solutions**:
+
 ```bash
 # 1. Restart DTL services
 systemctl restart data-transport-layer-l1
@@ -277,16 +298,19 @@ rm -rf /var/lib/dtl/database
 ### Issue 4: Gas Price Spikes
 
 **Symptoms**:
+
 - Relayer transactions failing with "out of gas"
 - Successful transactions but very slow confirmation
 - High transaction costs
 
 **Root Causes**:
+
 - BSC network congestion
 - Gas price estimation issues
 - Fixed gas limits too low
 
 **Solutions**:
+
 ```bash
 # 1. Update gas configuration
 # Increase gas limit and gas price multiplier in relayer config
